@@ -156,12 +156,6 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
     }
 
 
-    override fun onDestroy() {
-        super.onDestroy()
-        EventBus.getDefault().unregister(this)
-    }
-
-
     override fun onBleStateChange(curModel: Int, state: Int) {
         //如果是多设备界面应该先判断curModel
         scanViewModel._state.value = state
