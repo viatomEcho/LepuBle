@@ -11,7 +11,7 @@
         android:name=".MyApplication"
         android:theme="@style/Theme.LepuBle">
         <activity
-            android:name=".ScanActivity"
+            android:name=".ui.scan.ScanActivity"
             android:label="@string/title_activity_scan"
             android:theme="@style/Theme.LepuBle.NoActionBar" />
         <activity

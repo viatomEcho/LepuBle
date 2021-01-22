@@ -1,4 +1,4 @@
-package com.lepu.blepro.utils
+package com.lepu.demo.ble
 
 import android.bluetooth.le.ScanRecord
 import java.util.*

@@ -2,10 +2,26 @@ package com.lepu.blepro.event
 
 object EventMsgConst {
 
+
     /**
      * ble discovery
      */
-    const val EventDeviceFound = "com.lepu.ble.device.found"
+    interface Discovery{
+        companion object{
+            const val EventDeviceFound = "com.lepu.ble.device.found"
+            const val EventDeviceFound_Device = "com.lepu.ble.device.found.device"
+            const val EventDeviceFound_ScanResult = "com.lepu.ble.device.found.scanResult"
+        }
+
+    }
+    interface RealTime{
+        companion object{
+            const val EventRealTimeStop = "com.lepu.ble.realtime.stop"
+
+        }
+    }
+
+
     const val EventDeviceDisconnect = "com.lepu.ble.device.disconnect"
 
 

@@ -1,42 +1,35 @@
-package com.lepu.demo
+package com.lepu.demo.ui.scan
 
 import android.app.ProgressDialog
-import android.bluetooth.BluetoothAdapter
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.View
-import android.widget.FrameLayout
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import com.lepu.blepro.ble.BleServiceHelper.Companion.BleServiceHelper
+import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.objs.Bluetooth
-import com.lepu.blepro.utils.LogUtils
+import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.demo.EventUI
+import com.lepu.demo.R
 import com.lepu.demo.ble.DeviceHelper
 import com.lepu.demo.ui.o2.ConnectO2Fragment
-import com.lepu.demo.ui.o2.ConnectO2ViewModel
 import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 
 
 class ScanActivity : AppCompatActivity() {
 
+    private val scanViewModel: ScanViewModel by viewModels()
+
     private lateinit var fragment: Fragment
     private var dialog: ProgressDialog? = null
-    var currentModel: Int = Bluetooth.MODEL_O2RING
+    var curType: Int = 0 // 设备type 不同于model
 
-    var currentBleDevice: Bluetooth? = null
 
 
     private val handler = Handler(Looper.getMainLooper())
@@ -44,13 +37,7 @@ class ScanActivity : AppCompatActivity() {
 
         dialog?.dismiss()
         Toast.makeText(this, "连接超时", Toast.LENGTH_SHORT).show()
-        when (currentModel) {
-            Bluetooth.MODEL_O2RING -> {
-                currentBleDevice?.let {
-                    DeviceHelper.connectO2(this, currentBleDevice!!)
-                }
-            }
-        }
+        DeviceHelper.connect(this, scanViewModel.device.value as Bluetooth )
 
     }
 
@@ -61,53 +48,63 @@ class ScanActivity : AppCompatActivity() {
         setContentView(R.layout.activity_scan)
         setSupportActionBar(findViewById(R.id.toolbar))
 
+        curType = intent.getIntExtra("curModel", Bluetooth.MODEL_O2RING)
+
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
-        initUI()
-        EventBus.getDefault().register(this)
-        if (savedInstanceState == null) {
-            addO2Fragment()
-        }
 
-        BleServiceHelper.startDiscover()
+
+
+
+        initUI()
+        LiveEventBus.get(EventUI.ConnectingLoading)
+                .observe(this, Observer {
+                    if (it as Boolean) processBindDevice()
+                })
+        LiveEventBus.get(EventUI.BindFinish)
+                .observe(this, Observer {
+                    if (it as Boolean) finishBind()
+                })
+
+
     }
 
 
 
 
     private fun initUI() {
-        when (currentModel) {
+        when (curType) {
             Bluetooth.MODEL_O2RING -> {
                 title = "O2Ring"
-                addO2Fragment()
+                addO2Fragment(Bluetooth.MODEL_O2RING)
             }
         }
 
     }
 
-    private fun addO2Fragment() {
-        fragment = ConnectO2Fragment.newInstance(currentModel)
+    private fun addO2Fragment(model: Int) {
+        fragment = ConnectO2Fragment.newInstance(model)
         supportFragmentManager.beginTransaction()
             .replace(R.id.connent_scan, fragment)
             .commitNow()
+
 
     }
 
 
     private fun finishBind() {
-        LogUtils.d("finish bind")
+        LepuBleLog.d("finish bind")
 
         dialog?.dismiss()
         handler.removeCallbacks(runnable)
-        finish()
     }
 
 
     private fun processBindDevice() {
         dialog = ProgressDialog(this)
-        dialog?.setMessage("正在连接...")
+        dialog?.setMessage("正在绑定...")
         dialog?.setCancelable(false)
         dialog?.show()
 
@@ -115,28 +112,12 @@ class ScanActivity : AppCompatActivity() {
         handler.postDelayed(runnable, 20000)
     }
 
-    @Subscribe(threadMode = ThreadMode .MAIN)
-    fun onBleProUIEvent(event: O2RingEvent) {
-        LogUtils.d(event.action)
-        when (event.action) {
-            O2RingEvent.O2UIConnectingLoading -> { // 开始连接
-                currentBleDevice = event.data as Bluetooth
-                processBindDevice()
-
-            }
-            O2RingEvent.O2UIBindFinish -> { // 执行绑定完成
-                finishBind()
-            }
-
-        }
-    }
 
 
     override fun onDestroy() {
         super.onDestroy()
-        EventBus.getDefault().unregister(this)
         handler.removeCallbacksAndMessages(null)
-        BleServiceHelper.stopDiscover()
+        BleServiceHelper.stopScan()
     }
 
 

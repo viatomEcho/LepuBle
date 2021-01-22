@@ -1,6 +1,6 @@
 package com.lepu.blepro.ble.cmd;
 
-public class Er1BleCRC {
+public class BleCRC {
     /**
      * CRC8 code table
      */

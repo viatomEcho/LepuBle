@@ -10,9 +10,8 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.lepu.blepro.ble.BleService
 import com.lepu.demo.R
-import com.lepu.demo.ScanActivity
+import com.lepu.demo.ui.scan.ScanActivity
 
 class HomeFragment : Fragment() {
 

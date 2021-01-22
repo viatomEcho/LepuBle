@@ -16,7 +16,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <application>
         <service
-            android:name="com.lepu.blepro.ble.BleService"
+            android:name="com.lepu.blepro.ble.service.BleService"
             android:enabled="true"
             android:exported="true" />
     </application>

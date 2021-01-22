@@ -7,9 +7,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.lepu.blepro.ble.BleServiceHelper.Companion.BleServiceHelper
-import com.lepu.blepro.utils.LogUtils
-import com.lepu.demo.ble.BleServiceObserverImpl
 
 class MainActivity : AppCompatActivity() {
 

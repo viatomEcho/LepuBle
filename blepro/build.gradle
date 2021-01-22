@@ -36,9 +36,7 @@ android {
         jvmTarget = '1.8'
     }
 
-    lintOptions {
-        abortOnError false
-    }
+
 }
 
 dependencies {
@@ -61,8 +59,8 @@ dependencies {
 
     //lifceycle
     implementation "androidx.lifecycle:lifecycle-service:$lifecycle_version"
-    //eventbus
-    implementation 'org.greenrobot:eventbus:3.1.1'
+
+    implementation 'com.jeremyliao:live-event-bus-x:1.7.3'
 }
 
 
@@ -71,7 +69,7 @@ publish {
     userOrg = 'WuJuan' //注册时候的用户名
     groupId = 'com.lepu.blepro' //compile引用时的第1部分
     artifactId = 'lepu-ble' //发布到JCenter上的项目名字，compile引用时的第2部分项目名
-    publishVersion = '1.0.0'//版本号 ，compile引用时的最后部分，下次更新是只需要更改版本号即可
+    publishVersion = '0.0.1'//版本号 ，compile引用时的最后部分，下次更新是只需要更改版本号即可
     desc = 'LepuBle'//描述，不重要
     website = 'https://github.com/viatom-develop/trunk_lecarefit.git' //项目的GitHub网站
 }

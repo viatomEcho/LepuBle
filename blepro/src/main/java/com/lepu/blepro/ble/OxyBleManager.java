@@ -1,6 +1,5 @@
 package com.lepu.blepro.ble;
 
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
@@ -12,10 +11,9 @@ import java.util.UUID;
 import androidx.annotation.NonNull;
 
 import com.lepu.blepro.utils.ByteArrayKt;
-import com.lepu.blepro.utils.LogUtils;
+import com.lepu.blepro.utils.LepuBleLog;
 
 import no.nordicsemi.android.ble.BleManager;
-import no.nordicsemi.android.ble.data.Data;
 
 public class OxyBleManager extends BleManager {
 
@@ -28,9 +26,9 @@ public class OxyBleManager extends BleManager {
 
     private BluetoothGattCharacteristic write_char, notify_char;
 
-    private onNotifyListener listener;
+    private NotifyListener listener;
 
-    public void setNotifyListener(onNotifyListener listener) {
+    public void setNotifyListener(NotifyListener listener) {
         this.listener = listener;
     }
 
@@ -140,7 +138,7 @@ public class OxyBleManager extends BleManager {
 
     public void sendCmd(byte[] bytes) {
 
-        LogUtils.d("send: " + ByteArrayKt.bytesToHex(bytes));
+        LepuBleLog.d("send: " + ByteArrayKt.bytesToHex(bytes));
 
         writeCharacteristic(write_char, bytes)
                 .split()
@@ -150,9 +148,6 @@ public class OxyBleManager extends BleManager {
                 .enqueue();
     }
 
-    public interface onNotifyListener {
-        void onNotify(BluetoothDevice device, Data data);
-    }
 
     @Override
     public void log(final int priority, @NonNull final String message) {

@@ -1,6 +1,6 @@
 package com.lepu.blepro.objs;
 
-import com.lepu.blepro.utils.LogUtils;
+import com.lepu.blepro.utils.LepuBleLog;
 
 import java.util.ArrayList;
 
@@ -26,7 +26,7 @@ public class BluetoothController {
 
     synchronized public static boolean addDevice(Bluetooth b) {
         boolean needNotify = false;
-        LogUtils.d("addDevice => " + b.getName() + "macAddr:" + b.getMacAddr());
+        LepuBleLog.d("addDevice => " + b.getName() + "macAddr:" + b.getMacAddr());
 
         if (!bleDevices.contains(b)) {
             bleDevices.add(b);
@@ -69,7 +69,7 @@ public class BluetoothController {
                 list.add(b);
             }
         }
-        LogUtils.d("get device: " + model + " -> " + list.size());
+        LepuBleLog.d("get device: " + model + " -> " + list.size());
         return list;
     }
 

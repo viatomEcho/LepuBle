@@ -1,8 +1,8 @@
 package com.lepu.demo
 
 import android.app.Application
-import com.lepu.blepro.ble.BleServiceHelper
-import com.lepu.blepro.utils.LogUtils
+import com.lepu.blepro.BleServiceHelper
+import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.ble.BleServiceObserverImpl
 
 /**
@@ -13,9 +13,9 @@ import com.lepu.demo.ble.BleServiceObserverImpl
 class MyApplication: Application(){
     override fun onCreate() {
         super.onCreate()
-        LogUtils.setDebug(true)
+        LepuBleLog.setDebug(true)
 
-        BleServiceHelper.BleServiceHelper.initRunVal("")
+//        BleServiceHelper.BleServiceHelper.initRunVal("")
 
         BleServiceHelper.BleServiceHelper.initService(this, BleServiceObserverImpl())
 

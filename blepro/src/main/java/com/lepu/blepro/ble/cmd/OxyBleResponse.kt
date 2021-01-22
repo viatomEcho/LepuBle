@@ -1,7 +1,7 @@
 package com.lepu.blepro.ble.cmd
 import android.os.Parcelable
 import com.lepu.blepro.utils.ByteUtils
-import com.lepu.blepro.utils.LogUtils
+import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
 import kotlinx.android.parcel.Parcelize
 import org.json.JSONObject
@@ -146,7 +146,7 @@ class OxyBleResponse{
 
         fun addContent(bytes: ByteArray) {
             if (index >= fileSize) {
-                LogUtils.d("index > fileSize. 文件下载完成")
+                LepuBleLog.d("index > fileSize. 文件下载完成")
                 return
             } else {
 
