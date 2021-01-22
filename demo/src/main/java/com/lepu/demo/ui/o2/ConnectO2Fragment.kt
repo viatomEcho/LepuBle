@@ -127,7 +127,7 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
         scanViewModel.state.observe(viewLifecycleOwner, Observer {
             val b = scanViewModel.device.value
             textView.text = "${DeviceHelper.convertState(it)} => ${b?.name}"
-            switch.isChecked = it == State.CONNECTED
+            if (it != State.CONNECTING) switch.isChecked = it == State.CONNECTED
             switch.text = DeviceHelper.convertState(it)
         })
 
