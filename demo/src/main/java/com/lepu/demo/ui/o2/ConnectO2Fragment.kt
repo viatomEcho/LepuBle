@@ -120,8 +120,13 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
             if (isChecked && scanViewModel.state.value == State.DISCONNECTED)
                 DeviceHelper.reconnect(currentModel)
 
-            if (!isChecked && scanViewModel.state.value == State.CONNECTED)
-                DeviceHelper.disconnect(currentModel, false)
+            if (!isChecked && scanViewModel.state.value == State.CONNECTED) {
+//                DeviceHelper.disconnect(currentModel, false)
+                DeviceHelper.disconnect(false) // 可使用于多设备时候全部断开
+
+            }
+
+
         }
 
         scanViewModel.state.observe(viewLifecycleOwner, Observer {
