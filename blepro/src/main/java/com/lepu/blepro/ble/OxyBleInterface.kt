@@ -16,7 +16,7 @@ import kotlin.concurrent.schedule
 import kotlin.experimental.inv
 
 
-class OxyBleInterface(model: Int) : BleInterface(model) {
+class OxyBleInterface(model: Int): BleInterface(model) {
 
 
     private var curCmd: Int = 0
@@ -131,7 +131,7 @@ class OxyBleInterface(model: Int) : BleInterface(model) {
                 LiveEventBus.get(EventMsgConst.Oxy.EventOxyInfo).post(info)
                 LepuBleLog.d("发送 info")
                 // 即可开启实时任务
-                runRtTask()
+                runOxyRt()
 
             }
 
@@ -223,9 +223,14 @@ class OxyBleInterface(model: Int) : BleInterface(model) {
         }
     }
 
+    fun runOxyRt(){
+        super.runRtTask(1000)
+        LiveEventBus.get(EventMsgConst.RealTime.EventRealTimeStop).post(false)
+    }
 
-
-
-
+    fun oxyStopRT(){
+        super.stopRtTask()
+        LiveEventBus.get(EventMsgConst.RealTime.EventRealTimeStop).post(true)
+    }
 
 }

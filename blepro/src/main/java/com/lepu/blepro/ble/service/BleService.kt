@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.le.*
 import android.content.Context
 import android.content.Intent
-import android.nfc.Tag
 import android.os.Binder
 import android.os.IBinder
 import android.text.TextUtils
@@ -13,6 +12,7 @@ import android.util.SparseArray
 import androidx.core.util.isEmpty
 import androidx.lifecycle.LifecycleService
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.OxyBleInterface
 import com.lepu.blepro.event.EventMsgConst
@@ -20,15 +20,33 @@ import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.lepuble.ble.Er1BleInterface
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.HashMap
 
+/**
+ * 一个为蓝牙通讯的服务的Service, {@link BleServiceHelper}是它的帮助类
+ *
+ * 1.单列，在Application onCreate中初始化
+ *
+ * 2.继承LifecycleService使生命周期可被观察, 通过实现{@link BleServiceObserver}可自定义订阅者，订阅者通过观察此服务的生命周期变化，在不同阶段进行相应的工作
+ *    如： 在Service OnCreate/ onDestroy时进行 数据库初始化/关闭
+ *
+ * 3.vailFace是保存BleInterface的SparseArray集合, 以设备的Model值为key, 所以，不知支持不同类型（Model）设备同时使用，不支持同类型不同主机的情况
+ *
+ * 4. 扫描
+ *      单设备模式： 正常扫描，过滤出扫描结果中的当前model的设备，如果配对成功通过LiveEventBus发送通知，
+ *
+ *
+ *
+ *
+ *
+ *
+ */
 
 class BleService: LifecycleService() {
-
-
 
     /**
      * 保存可用的BleInterface集合
@@ -36,18 +54,25 @@ class BleService: LifecycleService() {
     var vailFace: SparseArray<BleInterface> = SparseArray()
 
 
+
     /**
-     * 套装组合时是否只扫描当前设备
-     * 结束扫描恢复默认值
+     * 是否只过滤出targetModel设备
+     * 结束扫描恢复默认值:true
+     *
      */
     var singleScanMode: Boolean = true
 
 
     /**
-     *  套装组合时指定扫描的目标设备
-     *  结束扫描恢复默认值
+     *  指定扫描的目标设备
+     *  结束扫描恢复默认值 0
+     *  初始化：详见initInterfaces()
+     *  单一设备模式 = 当前model
+     *  组合套装模式 = 最后被添加的model
+     *
      */
     var targetModel: Int = 0
+
 
 
 
@@ -63,17 +88,8 @@ class BleService: LifecycleService() {
     }
 
 
-
     /**
-     * ble interfaces
-     * manage all ble client
-     */
-//    lateinit var oxyInterface: OxyBleInterface
-
-
-
-    /**
-     * 未当前Service添加生命周期监听
+     * 为当前Service添加生命周期监听
      *
      */
     private fun addObserver(){
@@ -94,21 +110,29 @@ class BleService: LifecycleService() {
 
     /**
      * 根据model 配置interface
+     * @param isClear 只有组合时，先后一一初始化interface才应该false
      */
-    fun initInterfaces(models: IntArray) {
-        LepuBleLog.d("initInterfaces start...${models.size}")
-        vailFace.clear()
-        for (m in models){
-            LepuBleLog.d("initInterfaces model= > m")
-            when(m) {
-                Bluetooth.MODEL_O2RING -> {
-                    vailFace.put(m, OxyBleInterface(m))
-                    LepuBleLog.d("initInterfaces ${vailFace.size()}")
-                }
+    fun initInterfaces(m: Int, isClear: Boolean) {
+        LepuBleLog.d("initInterfaces start...$m, $isClear")
+        if (vailFace.get(m) != null) return
+
+        if (isClear) vailFace.clear()
+
+        when(m) {
+            Bluetooth.MODEL_O2RING -> {
+                vailFace.put(m, OxyBleInterface(m))
+            }
+            Bluetooth.MODEL_ER1 -> {
+                vailFace.put(m, Er1BleInterface(m))
+
             }
         }
+        targetModel = m
+
+        LepuBleLog.d("initInterfaces ${vailFace.size()}")
 
     }
+
 
 
     private val binder = BleBinder()
@@ -123,10 +147,17 @@ class BleService: LifecycleService() {
         scanDevice(true)
     }
 
-
+    /**
+     * 连接前都应调用此方法，会重置扫描条件为默认值
+     * 组合套装 将targetModel重置为默认最后添加的设备model
+     *
+     *
+     */
     fun stopDiscover() {
-        targetModel = 0
+        //重置
+        targetModel = vailFace.keyAt(vailFace.size() -1)
         singleScanMode = true
+
         isDiscovery = false
         scanDevice(false)
     }
@@ -134,11 +165,9 @@ class BleService: LifecycleService() {
 
 
     /**
-     * check auto scan
-     * 有未连接的绑定设备则继续搜索
+     * 重新连接开启扫描
      */
     fun reconnect(m: Int) {
-
 
         if (vailFace.isEmpty())return
 
@@ -149,12 +178,26 @@ class BleService: LifecycleService() {
             reScan = true
         }
         if (reScan) {
-
+            targetModel = m
             startDiscover()
         }
 
         LepuBleLog.d("${vailFace.get(m)::class.simpleName} => ${vailFace.get(m).state} => ReScan: $reScan")
     }
+
+    fun reconnect() {
+        if (vailFace.isEmpty())return
+
+        var reScan = false
+
+        if (BleServiceHelper.BleServiceHelper.hasUnConnected()) {
+            reScan = true
+        }
+        if (reScan) {
+            startDiscover()
+        }
+    }
+
 
     private var isDiscovery : Boolean = false
     private var bluetoothAdapter : BluetoothAdapter? = null
@@ -223,18 +266,20 @@ class BleService: LifecycleService() {
             result.scanRecord?.let {
                 HashMap<String, Any>().apply {
                     this[EventMsgConst.Discovery.EventDeviceFound_Device] = b
-                    this[EventMsgConst.Discovery.EventDeviceFound_ScanResult] = it
-                    LiveEventBus.get(EventMsgConst.Discovery.EventDeviceFound_ScanResult).post(this)
+                    this[EventMsgConst.Discovery.EventDeviceFound_ScanRecord] = it
+
                     LepuBleLog.d("post paring...${b.name}")
+                    LiveEventBus.get(EventMsgConst.Discovery.EventDeviceFound_ScanRecord).post(this)
+
                 }
 
             }
 
             if (BluetoothController.addDevice(b)) {
-                LiveEventBus.get(EventMsgConst.Discovery.EventDeviceFound).post(b)
                 LepuBleLog.d("post found...${b.name}")
-                // 如果已绑定 则重连
+                LiveEventBus.get(EventMsgConst.Discovery.EventDeviceFound).post(b)
             }
+
 
         }
 
@@ -255,18 +300,22 @@ class BleService: LifecycleService() {
         }
     }
 
+    /**
+     * 过滤出当前类型设备
+     * 组合套装时:
+     * （singleScanMode = true）  model = targetModel的设备被过滤出
+     * （singleScanMode = false） model 属于套装的设备被过滤出
+     */
     private fun filterResult(b: Bluetooth): Boolean{
-        if(vailFace.size() == 1){
-            if (b.model == vailFace.keyAt(0))return true
-        }else {
+        if(vailFace.size() == 1 && b.model == targetModel){
+           return true
+        }else if (vailFace.size() > 1){
             //组合
             var fix = false
             for (i in 0 until vailFace.size()) {
                 val key: Int = vailFace.keyAt(i)
 
-                LepuBleLog.d("${b.model} => $key")
-
-                var f = if (singleScanMode && targetModel != 0) targetModel else key  // 如果组合套装设置但设备扫描模式
+                var f = if (singleScanMode) targetModel else key  // 如果组合套装设置但设备扫描模式
                 if (b.model == f) {
                     fix = true
                     break

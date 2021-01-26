@@ -26,7 +26,6 @@ public class BluetoothController {
 
     synchronized public static boolean addDevice(Bluetooth b) {
         boolean needNotify = false;
-        LepuBleLog.d("addDevice => " + b.getName() + "macAddr:" + b.getMacAddr());
 
         if (!bleDevices.contains(b)) {
             bleDevices.add(b);
@@ -36,6 +35,8 @@ public class BluetoothController {
             modelList.add(b.getModel());
             needNotify = true;
         }
+        LepuBleLog.d("addDevice => " + b.getName() + "macAddr:" + b.getMacAddr() + " needNotify:" + needNotify);
+
 
         return needNotify;
     }

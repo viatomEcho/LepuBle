@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.lepu.blepro.objs.Bluetooth
 import com.lepu.demo.R
 import com.lepu.demo.ui.scan.ScanActivity
 
@@ -28,6 +29,8 @@ class HomeFragment : Fragment() {
 
         val textView: TextView = root.findViewById(R.id.text_home)
         val button: Button = root.findViewById(R.id.o2ring)
+        val er1: Button = root.findViewById(R.id.er1)
+        val multiply: Button = root.findViewById(R.id.multiply)
         homeViewModel.text.observe(viewLifecycleOwner, Observer {
             textView.text = it
         })
@@ -36,7 +39,21 @@ class HomeFragment : Fragment() {
         })
 
         button.setOnClickListener( View.OnClickListener {
-            Intent(context, ScanActivity::class.java).also { intent -> context?.startActivity(intent) }
+            Intent(context, ScanActivity::class.java).apply {
+                this.putExtra("curType", Bluetooth.MODEL_O2RING)
+            }.also { intent -> context?.startActivity(intent) }
+        })
+
+        er1.setOnClickListener( View.OnClickListener {
+            Intent(context, ScanActivity::class.java).apply {
+                this.putExtra("curType", Bluetooth.MODEL_ER1)
+            }.also { intent -> context?.startActivity(intent) }
+        })
+
+        multiply.setOnClickListener( View.OnClickListener {
+            Intent(context, ScanActivity::class.java).apply {
+                this.putExtra("curType", 33)
+            }.also { intent -> context?.startActivity(intent) }
         })
 
         return root

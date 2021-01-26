@@ -10,7 +10,7 @@ object EventMsgConst {
         companion object{
             const val EventDeviceFound = "com.lepu.ble.device.found"
             const val EventDeviceFound_Device = "com.lepu.ble.device.found.device"
-            const val EventDeviceFound_ScanResult = "com.lepu.ble.device.found.scanResult"
+            const val EventDeviceFound_ScanRecord = "com.lepu.ble.device.found.scanResult"
         }
 
     }
@@ -28,16 +28,21 @@ object EventMsgConst {
     /**
      * ER1 LiveDataBus Event
      */
-    const val EventEr1Info = "com.lepu.ble.er1.info"
-    const val EventEr1RtData = "com.lepu.ble.er1.rtData"
-    const val EventEr1InvalidRtData = "com.lepu.ble.er1.invalid.rtData"
-    const val EventEr1Unbind = "com.lepu.ble.er1.unbind"
+    interface ER1{
+        companion object{
+            const val EventEr1Info = "com.lepu.ble.er1.info"
+            const val EventEr1RtData = "com.lepu.ble.er1.rtData"
+            const val EventEr1InvalidRtData = "com.lepu.ble.er1.invalid.rtData"
+            const val EventEr1Unbind = "com.lepu.ble.er1.unbind"
+        }
+    }
+
+
+
 
     /**
      * Oxy LiveDataBus Event
      */
-
-
     interface Oxy{
         companion object{
             /**

@@ -1,0 +1,41 @@
+apply plugin: 'com.novoda.bintray-release'
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+    tasks.withType(Javadoc) {
+        options{
+            encoding "UTF-8"
+            charSet 'UTF-8'
+            links "http://docs.oracle.com/javase/7/docs/api"
+        }
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+}
+
+
+def siteUrl = 'https://github.com/viatomEcho/LepuBle'   // 项目的主页
+
+//publish {
+//    userOrg = 'jessyancoding'      //bintray注册的用户名
+//    groupId = 'me.jessyan'         //compile引用时的第1部分groupId
+//    artifactId = 'autosize'     //compile引用时的第2部分项目名
+//    publishVersion = rootProject.versionName    //compile引用时的第3部分版本号
+//    desc = '一个极低成本的 Android 屏幕适配方案'
+//    website = siteUrl
+//}
+publish {
+    userOrg = 'echowujuan' //注册时候的用户名
+    groupId = 'com.lepu.blepro' //compile引用时的第1部分
+    artifactId = 'lepu-ble' //发布到JCenter上的项目名字，compile引用时的第2部分项目名
+    publishVersion = rootProject.versionName//版本号 ，compile引用时的最后部分，下次更新是只需要更改版本号即可
+    desc = 'LepuBle'//描述，不重要
+    website = siteUrl //项目的GitHub网站
+}
+
+
+
+
+
+

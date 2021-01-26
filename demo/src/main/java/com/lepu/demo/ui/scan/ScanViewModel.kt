@@ -12,12 +12,17 @@ import com.lepu.demo.ble.DeviceHelper
  * description:
  */
 class ScanViewModel: ViewModel() {
-    val _state = MutableLiveData<Int>().apply {
-        value = DeviceHelper.State.UNBOUND
+    val _state = MutableLiveData<IntArray>().apply {
+        value = intArrayOf(DeviceHelper.State.UNBOUND, DeviceHelper.State.UNBOUND)
     }
 
-    val _device = MutableLiveData<Bluetooth>()
+    val _device = MutableLiveData<Array<Bluetooth?>>().apply {
+        value = arrayOfNulls(2)
+    }
 
-    var state: LiveData<Int> = _state
-    var device : LiveData<Bluetooth> = _device
+    var state: LiveData<IntArray> = _state
+    var device : LiveData<Array<Bluetooth?>> = _device
+
+
+
 }

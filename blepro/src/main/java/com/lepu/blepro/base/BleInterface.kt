@@ -3,8 +3,10 @@ package com.lepu.blepro.base
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.os.Handler
+import android.os.Looper
 import androidx.annotation.NonNull
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.ble.NotifyListener
 import com.lepu.blepro.ble.OxyBleManager
 import com.lepu.blepro.constants.Ble
@@ -61,13 +63,17 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      * 获取实时波形
      */
     private var count: Int = 0
-    private val rtHandler = Handler()
+    private val rtHandler = Handler(Looper.getMainLooper())
     private  var rTask: RtTask = RtTask()
+
+    private var  delayMillis: Long = 1000
+
+
     inner class RtTask : Runnable {
         override fun run() {
             count++
             if (state) {
-                rtHandler.postDelayed(rTask, 1000)
+                rtHandler.postDelayed(rTask, delayMillis)
                 getRtData()
             }
         }
@@ -154,6 +160,12 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         state = true
         connecting = false
         publish()
+
+        //如果是组合套装 全部重连中
+        if(BleServiceHelper.isReconnecting) {
+            if (BleServiceHelper.hasUnConnected()) BleServiceHelper.reconnect() else BleServiceHelper.isReconnecting = false
+        }
+
     }
 
     override fun onDeviceConnecting(device: BluetoothDevice) {
@@ -173,6 +185,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         if (isAutoReconnect){
             //todo
         }
+
 
     }
 
@@ -231,9 +244,10 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         return if (state) Ble.State.CONNECTED else if (connecting) Ble.State.CONNECTING else Ble.State.DISCONNECTED
     }
 
-    fun runRtTask() {
+    fun runRtTask(delayMillis: Long) {
         LepuBleLog.d(TAG, "runRtTask start..." )
         stopRtTask()
+        this.delayMillis = delayMillis
         rtHandler.postDelayed(rTask, 200)
         LiveEventBus.get(EventMsgConst.RealTime.EventRealTimeStop).post(false)
 

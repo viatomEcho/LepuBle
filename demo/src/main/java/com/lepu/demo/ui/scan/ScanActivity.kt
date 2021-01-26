@@ -18,6 +18,7 @@ import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.EventUI
 import com.lepu.demo.R
 import com.lepu.demo.ble.DeviceHelper
+import com.lepu.demo.ui.bind.ConnectEr1Fragment
 import com.lepu.demo.ui.o2.ConnectO2Fragment
 import org.greenrobot.eventbus.EventBus
 
@@ -25,6 +26,7 @@ import org.greenrobot.eventbus.EventBus
 class ScanActivity : AppCompatActivity() {
 
     private val scanViewModel: ScanViewModel by viewModels()
+
 
     private lateinit var fragment: Fragment
     private var dialog: ProgressDialog? = null
@@ -37,8 +39,8 @@ class ScanActivity : AppCompatActivity() {
 
         dialog?.dismiss()
         Toast.makeText(this, "连接超时", Toast.LENGTH_SHORT).show()
-        DeviceHelper.connect(this, scanViewModel.device.value as Bluetooth )
 
+//            DeviceHelper.connect(this,  scanViewModel.device.value!![0] as Bluetooth)
     }
 
 
@@ -48,14 +50,7 @@ class ScanActivity : AppCompatActivity() {
         setContentView(R.layout.activity_scan)
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        curType = intent.getIntExtra("curModel", Bluetooth.MODEL_O2RING)
-
-        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
-
-
+        curType = intent.getIntExtra("curType", 0)
 
 
         initUI()
@@ -78,16 +73,34 @@ class ScanActivity : AppCompatActivity() {
         when (curType) {
             Bluetooth.MODEL_O2RING -> {
                 title = "O2Ring"
-                addO2Fragment(Bluetooth.MODEL_O2RING)
+                addO2Fragment(Bluetooth.MODEL_O2RING,0, false, R.id.fragment1, true)
+            }
+            Bluetooth.MODEL_ER1 ->{
+                title = "ER1"
+                addEr1Fragment(Bluetooth.MODEL_ER1, 0, false, R.id.fragment1, true)
+            }
+            33 -> {
+                title = "ER1 + O2Ring"
+                addO2Fragment(Bluetooth.MODEL_O2RING, 0, true, R.id.fragment1, true )
+                addEr1Fragment(Bluetooth.MODEL_ER1, 1, true, R.id.fragment2, false)
+
             }
         }
 
     }
 
-    private fun addO2Fragment(model: Int) {
-        fragment = ConnectO2Fragment.newInstance(model)
+    private fun addO2Fragment(model: Int, modelIndex: Int,multiply: Boolean, layoutId: Int, isClear: Boolean) {
+        fragment = ConnectO2Fragment.newInstance(model, modelIndex, multiply, isClear)
         supportFragmentManager.beginTransaction()
-            .replace(R.id.connent_scan, fragment)
+            .replace(layoutId, fragment)
+            .commitNow()
+
+    }
+
+    private fun addEr1Fragment(model: Int,  modelIndex: Int, multiply: Boolean, layoutId: Int, isClear: Boolean) {
+        fragment = ConnectEr1Fragment.newInstance(model, modelIndex,multiply, isClear)
+        supportFragmentManager.beginTransaction()
+            .replace(layoutId, fragment)
             .commitNow()
 
 
@@ -103,6 +116,7 @@ class ScanActivity : AppCompatActivity() {
 
 
     private fun processBindDevice() {
+        LepuBleLog.d("processBindDevice")
         dialog = ProgressDialog(this)
         dialog?.setMessage("正在绑定...")
         dialog?.setCancelable(false)
@@ -117,7 +131,11 @@ class ScanActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacksAndMessages(null)
-        BleServiceHelper.stopScan()
+        dialog?.dismiss()
+        DeviceHelper.stopScan()
+        DeviceHelper.disconnect(false)
+        DeviceHelper.clearVailFace()
+
     }
 
 

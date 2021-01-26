@@ -2,18 +2,18 @@
 buildscript {
     ext.kotlin_version = "1.4.20"
     repositories {
-        google()
+        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
         jcenter()
-        mavenCentral()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.1'
+        classpath 'com.android.tools.build:gradle:3.5.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
         //
-        classpath 'com.novoda:bintray-release:0.9'
+        classpath 'com.novoda:bintray-release:0.9.2'
 
 
     }
@@ -21,15 +21,31 @@ buildscript {
 
 allprojects {
     repositories {
-        maven { url "https://www.jitpack.io" }
-        google()
+        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
         jcenter()
+        google()
 
-        mavenCentral()
+    }
 
+    // bintray 上传如果注释中有中文，可能会出现：编码GBK的不可映射字符
+    tasks.withType(Javadoc) {
+        options {
+            encoding "UTF-8"
+            charSet 'UTF-8'
+            links "http://docs.oracle.com/javase/7/docs/api"
+        }
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+ext {
+    minSdkVersion = 23
+    targetSdkVersion = 29
+    compileSdkVersion = 29
+    buildToolsVersion = "29.0.2"
+    versionCode = 1
+    versionName = "0.0.1"
 }

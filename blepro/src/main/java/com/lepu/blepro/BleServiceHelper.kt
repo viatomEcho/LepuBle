@@ -7,12 +7,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
+import android.util.SparseArray
 import androidx.core.util.isEmpty
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.service.BleService
-import com.lepu.blepro.ble.OxyBleInterface
 import com.lepu.blepro.constants.Ble
-import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
@@ -23,12 +22,18 @@ import com.lepu.blepro.utils.LepuBleLog
 class BleServiceHelper private constructor() {
     private val TAG = "BleServiceHelper"
 
+
+    /**
+     * 组合套装手动重连中
+     */
+    var isReconnecting: Boolean = false
+
     companion object {
         val BleServiceHelper: BleServiceHelper by lazy {
             BleServiceHelper()
         }
-    }
 
+    }
 
     lateinit var bleService: BleService
     private val bleConn = object : ServiceConnection {
@@ -69,29 +74,19 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * 当前要设置的设备Model, 必须在
-     * @see initService 之后调用
+     * 当前要设置的设备Model, 必须在initService 之后调用
+     * vailFace.get(model) == null 考虑两种情况
+     * 1. 单设备模式下，应该初始化缺没有初始化,这种情况正常使用BleService initInterface（先清空vailFace）
+     * 2. 组合套装下：
+     *  后一设备注册时找不到设备对应的interface，
+     *  此时 BleService initInterface()不应该清空vailFace
      * o2ring、er1
-     *
      */
-    fun setInterfaces(model: IntArray): BleServiceHelper {
-        if (!this::bleService.isInitialized) return this else bleService.initInterfaces(model)
+    fun setInterfaces(model: Int, isClear: Boolean): BleServiceHelper {
+        if (!this::bleService.isInitialized) return this
+        if (getInterface(model) == null) bleService.initInterfaces(model, isClear)
         return this
     }
-
-
-    /**
-     *
-     * 扫描模式：只有在组合套装时候有效
-     * 默认true，即为设备扫描模式
-     * false时，会发送组合套装设备的所有扫描结果
-     */
-    fun singleScanMode(s: Boolean): BleServiceHelper {
-        if (!check()) return this else bleService.singleScanMode = s
-        return this
-    }
-
-
 
 
 
@@ -115,11 +110,7 @@ class BleServiceHelper private constructor() {
             LepuBleLog.d("bleService.isInitialized  = false")
             return
         }
-
-        getInterface(model)?.onSubscribe(observer) ?: run {
-            setInterfaces(intArrayOf(model))
-            getInterface(model)?.onSubscribe(observer)
-        }
+        getInterface(model)?.onSubscribe(observer)
     }
 
 
@@ -132,60 +123,84 @@ class BleServiceHelper private constructor() {
         if (check()) getInterface(model)?.detach(observer)
     }
 
+//    /**
+//     *
+//     */
+//    fun targetModel(model: Int){
+//        if (!check())return
+//        bleService.targetModel = model
+//    }
 
     /**
      * 开始扫描
+     * 注意：当前的扫描参数
      */
     fun startScan() {
-        LepuBleLog.d("startScan....")
-        if (check()) bleService.startDiscover()
+
+        if (check()) {
+            LepuBleLog.d("startScan....singleScanModel:${bleService.singleScanMode}, targetModel:${bleService.targetModel}")
+            bleService.startDiscover()
+        }
     }
 
     /**
-     * 指定目标设备，开始扫描
+     * 开始扫描,组合套装可用此方法来设置扫描条件
+     * @param singleScanMode 是否只过滤出targetModel设备 , false时targetModel无效
+     * @param targetModel 过滤的设备Model
+     *
      */
-    fun startScan(m: Int) {
+    fun startScan(singleScanMode: Boolean, targetModel: Int) {
         if (!check()) return
-        bleService.singleScanMode = true
-        bleService.targetModel = m
+        bleService.singleScanMode = singleScanMode
+        bleService.targetModel = targetModel
         startScan()
     }
 
 
+
     /**
      * 停止扫描
+     * 连接之前调用该方法，并会重置扫描条件为默认值
+     * 组合套装时,targetModel 会被重置为末尾添加的model
+     *
      */
     fun stopScan() {
         if (check()) bleService.stopDiscover()
     }
 
-
-    private fun getInterface(model: Int): BleInterface? {
+    /**
+     * vailFace.get(model) == null 考虑两种情况
+     * 1. 单设备模式下，应该初始化缺没有初始化,这种情况正常使用BleService initInterface（先清空vailFace）
+     * 2. 组合套装下：
+     *  后一设备注册时找不到设备对应的interface，
+     *  此时 BleService initInterface()不应该清空vailFace
+     */
+    fun getInterface(model: Int): BleInterface? {
         if (!check()) return null
 
         val vailFace = bleService.vailFace
-        LepuBleLog.d(TAG, "getInterface => $model, ${vailFace.size()}, isNUll = ${vailFace.get(model) == null}")
+        LepuBleLog.d(TAG, "Warning: getInterface => $model, ${vailFace.size()}, isNUll = ${vailFace.get(model) == null}")
         return vailFace.get(model)
     }
-
+    fun getInterfaces(): SparseArray<BleInterface>? {
+        if (!check()) return null
+        return bleService.vailFace
+    }
     /**
-     * 连接
+     * 连接之前停止扫描
+     * 组合套装： 如果还有设备要连接将重启扫描
+     *
      */
     fun connect(context: Context,model: Int, b: BluetoothDevice) {
         if (!check()) return
-        val vailFace = bleService.vailFace
-        when (model) {
-            Bluetooth.MODEL_O2RING -> {
-                if (vailFace.get(Bluetooth.MODEL_O2RING) != null) {
-                    val oxyBleInterface = vailFace.get(Bluetooth.MODEL_O2RING) as OxyBleInterface
-                    stopScan()
-                    oxyBleInterface.connect(context, b)
-                }
-            }
-            // todo
+        getInterface(model)?.let {
+            stopScan()
+            it.connect(context, b)
         }
-
     }
+
+
+
 
     /**
      *  主动发起重连, 只能单设备扫描
@@ -194,10 +209,15 @@ class BleServiceHelper private constructor() {
     fun reconnect(model: Int) {
         LepuBleLog.d(TAG, "into reconnect " )
         if (!check()) return
-        bleService.targetModel = 0
-        bleService.singleScanMode = true
         bleService.reconnect(model)
 
+    }
+    fun reconnect() {
+        if (!check()) return
+        bleService.singleScanMode = false
+        bleService.reconnect()
+
+        isReconnecting = true
     }
 
 
@@ -210,11 +230,11 @@ class BleServiceHelper private constructor() {
         LepuBleLog.d(TAG, "into disconnect" )
 
         if (!check()) return
-        stopScan()
         val vailFace = bleService.vailFace
         for (i in 0 until vailFace.size()) {
             getInterface(vailFace.keyAt(i))?.let { it ->
-                    it.disconnect(autoReconnect)
+                stopScan()
+                it.disconnect(autoReconnect)
             }
         }
     }
@@ -225,11 +245,8 @@ class BleServiceHelper private constructor() {
     fun disconnect(model: Int, autoReconnect: Boolean) {
         LepuBleLog.d(TAG, "into disconnect" )
         if (!check()) return
-        val i =
-        stopScan()
-
         getInterface(model)?.let {
-            LepuBleLog.d(TAG, "$i")
+            stopScan()
             it.disconnect(autoReconnect)
         }
 
@@ -240,6 +257,20 @@ class BleServiceHelper private constructor() {
      * 主动获取当前蓝牙连接状态
      */
     fun getConnectState(model: Int): Int = if (check()) getInterface(model)?.calBleState()!! else Ble.State.UNKNOWN
+
+
+
+    fun hasUnConnected(): Boolean{
+        if (!check()) return false
+        bleService.vailFace.let {
+            for (i in 0 until it.size()) {
+                val ble = getInterface(it.keyAt(i)) as BleInterface
+                if (!ble.state) return true
+            }
+        }
+        LepuBleLog.d(TAG, "没有未连接设备")
+        return false
+    }
 
 
     /**
@@ -287,6 +318,11 @@ class BleServiceHelper private constructor() {
         getInterface(model)?.stopRtTask()
     }
 
+    fun clearVailFace(){
+        if (!check()) return
+        bleService.vailFace.clear()
+    }
+
     private fun check(): Boolean{
         if (!this::bleService.isInitialized){
             LepuBleLog.d("Warning: bleService.isInitialized = false!!")
@@ -298,6 +334,8 @@ class BleServiceHelper private constructor() {
         }
         return true
     }
+
+
 
 
 
