@@ -2,8 +2,6 @@ package com.lepu.lepuble.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
-import android.os.Handler
-import androidx.annotation.NonNull
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.Er1BleManager
@@ -16,16 +14,17 @@ import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
-import no.nordicsemi.android.ble.data.Data
-import no.nordicsemi.android.ble.observer.ConnectionObserver
 import kotlin.experimental.inv
 
+/**
+ * 蓝牙操作
+ */
 class Er1BleInterface(model: Int): BleInterface(model) {
-    private val TAG: String = "Er1BleInterface"
+    private val tag: String = "Er1BleInterface"
 
 
     override fun initManager(context: Context, device: BluetoothDevice) {
-        manager = OxyBleManager(context)
+        manager = Er1BleManager(context)
         manager.setConnectionObserver(this)
         manager.setNotifyListener(this)
         manager.connect(device)
@@ -33,7 +32,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
             .timeout(10000)
             .retry(3, 100)
             .done {
-                LepuBleLog.d(TAG, "Device Init")
+                LepuBleLog.d(tag, "Device Init")
             }
             .enqueue()
     }
@@ -59,7 +58,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
             UniversalBleCmd.GET_INFO -> {
                 val erInfo = LepuDevice(response.content)
 
-                LepuBleLog.d(TAG, "get info success")
+                LepuBleLog.d(tag, "get info success")
                 LiveEventBus.get(EventMsgConst.ER1.EventEr1Info).post(erInfo)
 
             }
@@ -79,7 +78,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
             UniversalBleCmd.READ_FILE_LIST -> {
                 fileList = Er1BleResponse.Er1FileList(response.content)
-                LepuBleLog.d(TAG, fileList.toString())
+                LepuBleLog.d(tag, fileList.toString())
             }
 
             UniversalBleCmd.READ_FILE_START -> {
@@ -87,14 +86,14 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                     curFile = Er1BleResponse.Er1File(curFileName!!, toUInt(response.content))
                     sendCmd(UniversalBleCmd.readFileData(0))
                 } else {
-                    LepuBleLog.d(TAG, "read file failed：${response.pkgType}")
+                    LepuBleLog.d(tag, "read file failed：${response.pkgType}")
                 }
             }
 
             UniversalBleCmd.READ_FILE_DATA -> {
                 curFile?.apply {
                     this.addContent(response.content)
-                    LepuBleLog.d(TAG, "read file：${curFile?.fileName}   => ${curFile?.index} / ${curFile?.fileSize}")
+                    LepuBleLog.d(tag, "read file：${curFile?.fileName}   => ${curFile?.index} / ${curFile?.fileSize}")
 
                     if (this.index < this.fileSize) {
                         sendCmd(UniversalBleCmd.readFileData(this.index))
@@ -105,7 +104,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
             }
 
             UniversalBleCmd.READ_FILE_END -> {
-                LepuBleLog.d(TAG, "read file finished: ${curFile?.fileName} ==> ${curFile?.fileSize}")
+                LepuBleLog.d(tag, "read file finished: ${curFile?.fileName} ==> ${curFile?.fileSize}")
                 curFileName = null
                 curFile = null
             }

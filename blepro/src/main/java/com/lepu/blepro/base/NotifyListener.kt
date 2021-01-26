@@ -1,4 +1,4 @@
-package com.lepu.blepro.ble
+package com.lepu.blepro.base
 
 import android.bluetooth.BluetoothDevice
 import no.nordicsemi.android.ble.data.Data

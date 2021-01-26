@@ -7,8 +7,6 @@ import android.os.Looper
 import androidx.annotation.NonNull
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
-import com.lepu.blepro.ble.NotifyListener
-import com.lepu.blepro.ble.OxyBleManager
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.observer.BleChangeObserver
@@ -21,16 +19,12 @@ import kotlin.collections.ArrayList
 /**
  * author: wujuan
  * created on: 2021/1/20 17:41
- * description:
+ * description: 蓝牙指令、操作基类
+ *
  */
 abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener {
 
-    private val TAG = "BleInterface"
-
-//    /**
-//     * 设备Model
-//     */
-//    var model: Int = 0
+    private val tag = "BleInterface"
 
     /**
      * 蓝牙连接状态
@@ -47,13 +41,11 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     /**
      *  断开连接后是否开启扫描重连
      *  默认false
+     *
      */
     private var isAutoReconnect: Boolean = false
 
-
-
-
-    lateinit var manager: OxyBleManager
+    lateinit var manager: BaseBleManager
     lateinit var device: BluetoothDevice
 
     private var pool: ByteArray? = null
@@ -93,7 +85,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      */
     internal fun onSubscribe(observer: BleChangeObserver) {
         stateSubscriber.add(observer)
-        LepuBleLog.d(TAG, "model=>${model}, 总数${stateSubscriber.size}成功添加了一个订阅者")
+        LepuBleLog.d(tag, "model=>${model}, 总数${stateSubscriber.size}成功添加了一个订阅者")
 
     }
 
@@ -103,7 +95,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      */
     internal fun detach(observer: BleChangeObserver) {
         if (stateSubscriber.isNotEmpty()) stateSubscriber.remove(observer)
-        LepuBleLog.d(TAG, "model=>${model}, 总数${stateSubscriber.size}成功将要移除一个订阅者")
+        LepuBleLog.d(tag, "model=>${model}, 总数${stateSubscriber.size}成功将要移除一个订阅者")
     }
 
     override fun onNotify(device: BluetoothDevice?, data: Data?) {
@@ -120,7 +112,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         if (connecting || state) {
             return
         }
-        LepuBleLog.d(TAG, "try connect: ${device.name}")
+        LepuBleLog.d(tag, "try connect: ${device.name}")
         this.device = device
         initManager(context, device)
 
@@ -132,19 +124,19 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
 
 
     fun disconnect(isAutoConnect: Boolean) {
-        LepuBleLog.d(TAG, "into disconnect ")
+        LepuBleLog.d(tag, "into disconnect ")
 
         if (!this::manager.isInitialized) {
-            LepuBleLog.d(TAG, "manager unInitialized")
+            LepuBleLog.d(tag, "manager unInitialized")
             return
         }
         manager.disconnect()
         manager.close()
         if (!this::device.isInitialized){
-            LepuBleLog.d(TAG, "device unInitialized")
+            LepuBleLog.d(tag, "device unInitialized")
             return
         }
-        LepuBleLog.d(TAG,"tay disconnect..." )
+        LepuBleLog.d(tag,"tay disconnect..." )
         this.onDeviceDisconnected(device, ConnectionObserver.REASON_SUCCESS)
         this.isAutoReconnect = isAutoReconnect
 
@@ -156,7 +148,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     abstract fun hasResponse(bytes: ByteArray?): ByteArray?
 
     override fun onDeviceConnected(device: BluetoothDevice) {
-        LepuBleLog.d(TAG, "${device.name} connected")
+        LepuBleLog.d(tag, "${device.name} connected")
         state = true
         connecting = false
         publish()
@@ -169,7 +161,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     }
 
     override fun onDeviceConnecting(device: BluetoothDevice) {
-        LepuBleLog.d(TAG, "${device.name} Connecting")
+        LepuBleLog.d(tag, "${device.name} Connecting")
         state = false
         connecting = true
         publish()
@@ -177,7 +169,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
-        LepuBleLog.d(TAG, "${device.name} Disconnected")
+        LepuBleLog.d(tag, "${device.name} Disconnected")
         state = false
         connecting = false
         stopRtTask()
@@ -190,7 +182,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {
-        LepuBleLog.d(TAG, "${device.name} Disconnecting")
+        LepuBleLog.d(tag, "${device.name} Disconnecting")
         state = false
         connecting = false
 
@@ -199,7 +191,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     }
 
     override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
-        LepuBleLog.d(TAG, "${device.name} FailedToConnect")
+        LepuBleLog.d(tag, "${device.name} FailedToConnect")
         state = false
 
         connecting = false
@@ -208,7 +200,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
 
 
     override fun onDeviceReady(device: BluetoothDevice) {
-        LepuBleLog.d(TAG, "${device.name} isReady")
+        LepuBleLog.d(tag, "${device.name} isReady")
         connecting = false
     }
 
@@ -229,7 +221,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      * 2.实现 @see O2BleObserver
      */
     private fun publish() {
-        LepuBleLog.d(TAG, "publish=>${stateSubscriber.size}")
+        LepuBleLog.d(tag, "publish=>${stateSubscriber.size}")
         for (i in stateSubscriber) {
             i.onBleStateChange(model, calBleState())
         }
@@ -240,12 +232,12 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      * {@link BleConst}
      */
     internal fun calBleState(): Int {
-        LepuBleLog.d(TAG, "ble state::::$state  connecting::::$connecting")
+        LepuBleLog.d(tag, "ble state::::$state  connecting::::$connecting")
         return if (state) Ble.State.CONNECTED else if (connecting) Ble.State.CONNECTING else Ble.State.DISCONNECTED
     }
 
     fun runRtTask(delayMillis: Long) {
-        LepuBleLog.d(TAG, "runRtTask start..." )
+        LepuBleLog.d(tag, "runRtTask start..." )
         stopRtTask()
         this.delayMillis = delayMillis
         rtHandler.postDelayed(rTask, 200)
@@ -255,7 +247,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     }
 
     fun stopRtTask(){
-        LepuBleLog.d(TAG, "stopRtTask start..." )
+        LepuBleLog.d(tag, "stopRtTask start..." )
         rtHandler.removeCallbacks(rTask)
         LiveEventBus.get(EventMsgConst.RealTime.EventRealTimeStop).post(true)
 

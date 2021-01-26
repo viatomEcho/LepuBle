@@ -14,6 +14,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.BleServiceHelper
+import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
@@ -82,6 +83,16 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
                 adapter.deviceList = BluetoothController.getDevices(currentModel)
                 adapter.notifyDataSetChanged()
 
+            })
+        // 设备信息通知
+        LiveEventBus.get(EventMsgConst.ER1.EventEr1Info)
+            .observe(this, {
+                it?.let {
+                    //去绑定
+                    if (DeviceHelper.bind(it, scanViewModel.device.value!![modelIndex] as Bluetooth)) {
+                        LiveEventBus.get(EventUI.BindFinish).post(true)
+                    }
+                }
             })
 
 
@@ -182,18 +193,11 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
         val bluetooth = scanViewModel.device.value!![modelIndex] as Bluetooth
         if ( bluetooth.model != curModel) return
 
-        if (state == DeviceHelper.State.CONNECTED){
-            (scanViewModel.state.value!![modelIndex] == DeviceHelper.State.UNBOUND).also {
-                //去绑定
-                if (DeviceHelper.bind(scanViewModel.device.value!![modelIndex] as Bluetooth)) {
-                    LiveEventBus.get(EventUI.BindFinish).post(true)
-                }
-            }
-            if (!isMultiply)return
-            val any = scanViewModel.state.value?.toList()?.any { it == DeviceHelper.State.UNBOUND }
-            if (any == true )
-                DeviceHelper.startScan(false, 0)
-        }
+        if (!isMultiply || state !=  DeviceHelper.State.CONNECTED)return
+        val any = scanViewModel.state.value?.toList()?.any { it == DeviceHelper.State.UNBOUND }
+        if (any == true )
+            DeviceHelper.startScan(false, 0)
+
 
     }
 }

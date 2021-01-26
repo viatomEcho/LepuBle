@@ -141,26 +141,19 @@ object DeviceHelper {
         when (b.model) {
             Bluetooth.MODEL_O2RING -> {
                 //真正绑定执行
-                val oxyInfo = info as OxyInfo
-                bindO2Ring(b, oxyInfo)
+                bindO2Ring(b, info as OxyInfo)
                 return true
             }
-
-        }
-        LepuBleLog.d("绑定失败！！！")
-        return false
-    }
-
-    fun bind(b: Bluetooth): Boolean{
-        when(b.model){
             Bluetooth.MODEL_ER1 -> {
-                bindEr1(b)
+                bindEr1(b, info as LepuDevice)
                 return true
             }
             else ->{
-                LepuBleLog.d("Warning: 没有此model！！！！")
+                LepuBleLog.d("Warning: 没有此model!!")
             }
+
         }
+        LepuBleLog.d("绑定失败!!")
         return false
     }
 
@@ -170,9 +163,9 @@ object DeviceHelper {
         hasOxy = true
     }
 
-    private fun bindEr1(b: Bluetooth) {
+    private fun bindEr1(b: Bluetooth, info: LepuDevice) {
         er1Name = b.name
-        er1Sn = b.name
+        er1Sn = info.sn
         hasEr1 = true
     }
 
