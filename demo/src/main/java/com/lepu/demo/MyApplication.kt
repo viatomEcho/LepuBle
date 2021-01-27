@@ -15,9 +15,8 @@ class MyApplication: Application(){
         super.onCreate()
         LepuBleLog.setDebug(true)
 
-//        BleServiceHelper.BleServiceHelper.initRunVal("")
-
         BleServiceHelper.BleServiceHelper.initService(this, BleServiceObserverImpl())
+//                .setRawFolder()
 
     }
 

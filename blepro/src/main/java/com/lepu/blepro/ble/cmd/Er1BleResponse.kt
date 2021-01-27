@@ -2,6 +2,7 @@ package com.lepu.blepro.ble.cmd
 
 import android.os.Parcelable
 import com.lepu.blepro.ble.data.Er1DataController
+import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.utils.toUInt
 import kotlinx.android.parcel.Parcelize
 
@@ -129,7 +130,7 @@ object Er1BleResponse {
     }
 
 
-    class Er1File(val name:String, val size: Int) {
+    class Er1File(val model: Int,  val name:String, val size: Int, private val userId: String) {
         var fileName: String
         var fileSize: Int
         var content: ByteArray
@@ -147,6 +148,8 @@ object Er1BleResponse {
                 return // 已下载完成
             } else {
                 System.arraycopy(bytes, 0, content, index, bytes.size)
+                DownloadHelper.writeFile(model, userId, fileName, bytes )
+
                 index += bytes.size
             }
         }

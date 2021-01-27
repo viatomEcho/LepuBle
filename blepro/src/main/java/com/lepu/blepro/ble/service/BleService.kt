@@ -20,7 +20,7 @@ import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
-import com.lepu.lepuble.ble.Er1BleInterface
+import com.lepu.blepro.ble.Er1BleInterface
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
@@ -76,6 +76,9 @@ class BleService: LifecycleService() {
      * 结束本次扫描时恢复默认值
      */
     var needPair: Boolean = false
+
+
+
 
 
 

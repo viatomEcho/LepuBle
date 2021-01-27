@@ -69,6 +69,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      */
      var  delayMillis: Long = 1000
 
+//    lateinit var folder: String
+
 
 
 

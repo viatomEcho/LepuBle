@@ -1,4 +1,4 @@
-package com.lepu.lepuble.ble
+package com.lepu.blepro.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
@@ -9,7 +9,6 @@ import com.lepu.blepro.ble.cmd.Er1BleResponse
 import com.lepu.blepro.ble.cmd.UniversalBleCmd
 import com.lepu.blepro.ble.data.Er1DataController
 import com.lepu.blepro.ble.data.LepuDevice
-import com.lepu.blepro.ble.Er1BleManager
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
@@ -43,9 +42,11 @@ class Er1BleInterface(model: Int): BleInterface(model) {
     var curFileName: String? = null
     var curFile: Er1BleResponse.Er1File? = null
     var fileList: Er1BleResponse.Er1FileList? = null
+    private var userId: String? = null
 
     override fun readFile(userId: String, fileName: String) {
-        curFileName =fileName
+        this.userId = userId
+        this.curFileName =fileName
         sendCmd(UniversalBleCmd.readFileStart(fileName.toByteArray(), 0))
     }
 
@@ -79,7 +80,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
             UniversalBleCmd.READ_FILE_START -> {
                 if (response.pkgType == 0x01.toByte()) {
-                    curFile = Er1BleResponse.Er1File(curFileName!!, toUInt(response.content))
+                    curFile = userId?.let { Er1BleResponse.Er1File(model, curFileName!!, toUInt(response.content), it) }
                     sendCmd(UniversalBleCmd.readFileData(0))
                 } else {
                     LepuBleLog.d(tag, "read file failed：${response.pkgType}")

@@ -1,5 +1,6 @@
 package com.lepu.blepro.ble.cmd
 import android.os.Parcelable
+import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
@@ -12,7 +13,7 @@ class OxyBleResponse{
     class OxyResponse(bytes: ByteArray) {
         var no:Int
         var len: Int
-        var state: Boolean
+        var  state: Boolean
         var content: ByteArray
 
         init {
@@ -126,21 +127,17 @@ class OxyBleResponse{
     }
 
     @Parcelize
-    class OxyFile(val name: String, val size: Int, val user: String) : Parcelable  {
+    class OxyFile(val model: Int, val name: String, val size: Int, private val userId: String) : Parcelable  {
         var fileName: String
         var fileSize: Int
         var fileContent: ByteArray
         var index: Int  // 标识当前下载index
-        var userId: String
 
         init {
             fileName = name
             fileSize = size
             fileContent = ByteArray(size)
             index = 0
-            userId = user
-
-
         }
 
 
@@ -149,9 +146,8 @@ class OxyBleResponse{
                 LepuBleLog.d("index > fileSize. 文件下载完成")
                 return
             } else {
-
                 System.arraycopy(bytes, 0, fileContent, index, bytes.size)
-                //TODO 保存到文件
+                DownloadHelper.writeFile(model, userId, fileName, bytes )
 
                 index += bytes.size
 

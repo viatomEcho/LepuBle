@@ -22,6 +22,13 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "OxyBleInterface"
 
 
+
+    var curFileName: String? = null
+    var curFile: OxyBleResponse.OxyFile? = null
+
+    private var userId: String? = null
+
+
     private var curCmd: Int = 0
     /**
      * 是否需要发送实时指令，不会停止实时任务
@@ -50,11 +57,6 @@ class OxyBleInterface(model: Int): BleInterface(model) {
         }
     }
 
-
-    var curFileName: String? = null
-    var curFile: OxyBleResponse.OxyFile? = null
-
-    lateinit var userId: String
 
     override fun readFile(userId: String, fileName: String) {
         this.curFileName = fileName
@@ -158,7 +160,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "文件大小：${fileSize}  文件名：$curFileName")
                     curFileName?.let {
 
-                        curFile = OxyBleResponse.OxyFile(curFileName!!, fileSize, userId)
+                        curFile = userId?.let { it1 -> OxyBleResponse.OxyFile(model, curFileName!!, fileSize, it1) }
                         sendOxyCmd(OxyBleCmd.OXY_CMD_READ_CONTENT, OxyBleCmd.readFileContent())
                     }
 

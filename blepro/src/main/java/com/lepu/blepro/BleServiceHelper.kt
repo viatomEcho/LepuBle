@@ -20,8 +20,8 @@ import com.lepu.blepro.utils.LepuBleLog
  * 蓝牙服务
  */
 class BleServiceHelper private constructor() {
-    private val TAG = "BleServiceHelper"
 
+    var rawFolder: SparseArray<String>? = null
 
     /**
      * 组合套装手动重连中
@@ -29,6 +29,10 @@ class BleServiceHelper private constructor() {
     var isReconnecting: Boolean = false
 
     companion object {
+        const val tag: String = "BleServiceHelper"
+
+
+
         val BleServiceHelper: BleServiceHelper by lazy {
             BleServiceHelper()
         }
@@ -73,6 +77,12 @@ class BleServiceHelper private constructor() {
         return this
     }
 
+    fun setRawFolder(folders: SparseArray<String>): BleServiceHelper{
+        rawFolder = folders
+        return this
+    }
+
+
     /**
      * 当前要设置的设备Model, 必须在initService 之后调用
      * vailFace.get(model) == null 考虑两种情况
@@ -82,7 +92,7 @@ class BleServiceHelper private constructor() {
      *  此时 BleService initInterface()不应该清空vailFace
      * o2ring、er1
      */
-    fun setInterfaces(model: Int, isClear: Boolean, runRtImmediately: Boolean = false ): BleServiceHelper {
+    fun setInterfaces(model: Int, isClear: Boolean = false, runRtImmediately: Boolean = false): BleServiceHelper {
         if (!this::bleService.isInitialized) return this
         if (getInterface(model) == null) bleService.initInterfaces(model, isClear ,runRtImmediately)
         return this
@@ -131,10 +141,10 @@ class BleServiceHelper private constructor() {
 //        bleService.targetModel = model
 //    }
 
-    fun setNeedPair(p: Boolean){
-        if (!check()) return
-        bleService.needPair = p
-    }
+//    fun setNeedPair(p: Boolean){
+//        if (!check()) return
+//        bleService.needPair = p
+//    }
 
     /**
      * 开始扫描
@@ -189,7 +199,7 @@ class BleServiceHelper private constructor() {
         if (!check()) return null
 
         val vailFace = bleService.vailFace
-        LepuBleLog.d(TAG, "Warning: getInterface => $model, ${vailFace.size()}, isNUll = ${vailFace.get(model) == null}")
+        LepuBleLog.d(tag, "Warning: getInterface => $model, ${vailFace.size()}, isNUll = ${vailFace.get(model) == null}")
         return vailFace.get(model)
     }
     fun getInterfaces(): SparseArray<BleInterface>? {
@@ -217,7 +227,7 @@ class BleServiceHelper private constructor() {
      *  场景：绑定成功后，从其他设备切换回来
      */
     fun reconnect(model: Int) {
-        LepuBleLog.d(TAG, "into reconnect " )
+        LepuBleLog.d(tag, "into reconnect " )
         if (!check()) return
         bleService.reconnect(model)
 
@@ -237,7 +247,7 @@ class BleServiceHelper private constructor() {
      * 场景：切换到其他设备
      */
     fun disconnect(autoReconnect: Boolean) {
-        LepuBleLog.d(TAG, "into disconnect" )
+        LepuBleLog.d(tag, "into disconnect" )
 
         if (!check()) return
         val vailFace = bleService.vailFace
@@ -253,7 +263,7 @@ class BleServiceHelper private constructor() {
      * 断开指定设备
      */
     fun disconnect(model: Int, autoReconnect: Boolean) {
-        LepuBleLog.d(TAG, "into disconnect" )
+        LepuBleLog.d(tag, "into disconnect" )
         if (!check()) return
         getInterface(model)?.let {
             stopScan()
@@ -278,7 +288,7 @@ class BleServiceHelper private constructor() {
                 if (!ble.state) return true
             }
         }
-        LepuBleLog.d(TAG, "没有未连接设备")
+        LepuBleLog.d(tag, "没有未连接设备")
         return false
     }
 

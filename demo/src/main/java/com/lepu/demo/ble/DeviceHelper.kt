@@ -113,7 +113,7 @@ object DeviceHelper {
         BleServiceHelper.clearVailFace()
     }
 
-    fun setInterface(model: Int, isClear: Boolean, runRtImmediately: Boolean = false){
+    fun setInterface(model: Int, isClear: Boolean = false, runRtImmediately: Boolean = false){
         BleServiceHelper.setInterfaces(model, isClear, runRtImmediately )
     }
 
