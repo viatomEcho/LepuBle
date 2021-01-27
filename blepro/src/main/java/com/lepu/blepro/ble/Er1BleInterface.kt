@@ -4,13 +4,12 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.Er1BleManager
-import com.lepu.blepro.ble.OxyBleManager
 import com.lepu.blepro.ble.cmd.BleCRC
 import com.lepu.blepro.ble.cmd.Er1BleResponse
 import com.lepu.blepro.ble.cmd.UniversalBleCmd
 import com.lepu.blepro.ble.data.Er1DataController
 import com.lepu.blepro.ble.data.LepuDevice
+import com.lepu.blepro.ble.Er1BleManager
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
@@ -21,7 +20,6 @@ import kotlin.experimental.inv
  */
 class Er1BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Er1BleInterface"
-
 
     override fun initManager(context: Context, device: BluetoothDevice) {
         manager = Er1BleManager(context)
@@ -58,17 +56,15 @@ class Er1BleInterface(model: Int): BleInterface(model) {
             UniversalBleCmd.GET_INFO -> {
                 val erInfo = LepuDevice(response.content)
 
-                LepuBleLog.d(tag, "get info success")
+                LepuBleLog.d(tag, "GET_INFO => success")
                 LiveEventBus.get(EventMsgConst.ER1.EventEr1Info).post(erInfo)
+
+                if (runRtImmediately) runRtTask()
 
             }
 
             UniversalBleCmd.RT_DATA -> {
                 val rtData = Er1BleResponse.RtData(response.content)
-//                model.hr.value = rtData.param.hr
-//                model.duration.value = rtData.param.recordTime
-//                model.lead.value = rtData.param.leadOn
-//                model.battery.value = rtData.param.battery
 
                 Er1DataController.receive(rtData.wave.wFs)
 //                LepuBleLog.d(TAG, "ER1 Controller: ${Er1DataController.dataRec.size}")
@@ -154,13 +150,11 @@ class Er1BleInterface(model: Int): BleInterface(model) {
     }
 
     override fun syncData(type: String, value: Int) {
-        TODO("Not yet implemented")
     }
 
 
 
     override fun resetDeviceInfo() {
-        TODO("Not yet implemented")
     }
 
     /**
@@ -174,7 +168,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
     /**
      * get file list
      */
-    public fun getFileList() {
+    override fun getFileList() {
         sendCmd(UniversalBleCmd.getFileList())
     }
 

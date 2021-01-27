@@ -64,7 +64,7 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
 
 
         if ( !isMultiply) DeviceHelper.startScan()
-        else if (isMultiply && modelIndex == scanViewModel.state.value!!.size -1)DeviceHelper.startScan(false, currentModel)
+        else if (isMultiply && modelIndex == scanViewModel.state.value!!.size -1)DeviceHelper.startScan(false, currentModel, true)
 
 
 
@@ -194,9 +194,10 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
         if ( bluetooth.model != curModel) return
 
         if (!isMultiply || state !=  DeviceHelper.State.CONNECTED)return
+
         val any = scanViewModel.state.value?.toList()?.any { it == DeviceHelper.State.UNBOUND }
         if (any == true )
-            DeviceHelper.startScan(false, 0)
+            DeviceHelper.startScan(false, 0, true)
 
 
     }

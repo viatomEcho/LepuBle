@@ -65,13 +65,17 @@ class BleService: LifecycleService() {
 
     /**
      *  指定扫描的目标设备
-     *  结束扫描恢复默认值 0
-     *  初始化：详见initInterfaces()
-     *  单一设备模式 = 当前model
-     *  组合套装模式 = 最后被添加的model
+     *  结束扫描恢复默认值： 最后添加到vailFace的model {@link BleService #initInterfaces()}
      *
      */
     var targetModel: Int = 0
+
+    /**
+     * 本次扫描是否需要发送配对信息
+     * 默认： false
+     * 结束本次扫描时恢复默认值
+     */
+    var needPair: Boolean = false
 
 
 
@@ -112,24 +116,36 @@ class BleService: LifecycleService() {
      * 根据model 配置interface
      * @param isClear 只有组合时，先后一一初始化interface才应该false
      */
-    fun initInterfaces(m: Int, isClear: Boolean) {
-        LepuBleLog.d("initInterfaces start...$m, $isClear")
-        if (vailFace.get(m) != null) return
+    fun initInterfaces(m: Int, isClear: Boolean, runRtImmediately: Boolean): BleInterface? {
+        LepuBleLog.d("initInterfaces start...$m, $isClear, $runRtImmediately")
+        vailFace.get(m)?.let { return it }
 
         if (isClear) vailFace.clear()
 
         when(m) {
             Bluetooth.MODEL_O2RING -> {
-                vailFace.put(m, OxyBleInterface(m))
+                OxyBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+                    vailFace.put(m, this)
+                    targetModel = m
+
+                    return this
+                }
             }
             Bluetooth.MODEL_ER1 -> {
-                vailFace.put(m, Er1BleInterface(m))
+                Er1BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+                    vailFace.put(m, this)
+                    targetModel = m
+                    return this
+                }
 
             }
+            else -> {
+                return throw Exception("查完此model")
+            }
         }
-        targetModel = m
 
-        LepuBleLog.d("initInterfaces ${vailFace.size()}")
 
     }
 
@@ -143,6 +159,8 @@ class BleService: LifecycleService() {
     fun startDiscover() {
         BluetoothController.clear()
         LepuBleLog.d("start discover")
+        LepuBleLog.d("startScan....singleScanModel:$singleScanMode, targetModel:$targetModel, needPair$needPair")
+
         isDiscovery = true
         scanDevice(true)
     }
@@ -157,6 +175,7 @@ class BleService: LifecycleService() {
         //重置
         targetModel = vailFace.keyAt(vailFace.size() -1)
         singleScanMode = true
+        needPair = false
 
         isDiscovery = false
         scanDevice(false)
@@ -263,7 +282,7 @@ class BleService: LifecycleService() {
 
             if (!filterResult(b)) return
 
-            if (BluetoothController.checkO2Device(b.model))
+            if (needPair)
             result.scanRecord?.let {
                 HashMap<String, Any>().apply {
                     this[EventMsgConst.Discovery.EventDeviceFound_Device] = b

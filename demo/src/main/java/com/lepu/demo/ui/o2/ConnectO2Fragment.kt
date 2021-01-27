@@ -71,15 +71,15 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
         }
 
         //必须在订阅之前
-        DeviceHelper.setInterface(currentModel, isClear)
+        DeviceHelper.setInterface(currentModel, isClear, true)
         // 订阅蓝牙状态（实现 BleChangeObserver）
         // 如果不订阅，则必须调用setInterface()初始化
         lifecycle.addObserver(BIOL(this, currentModel))
 
         //订阅之后扫描
         // 组合套装 只有最后添加的fragment 开启扫描, 并且使用多设备过滤模式
-        if ( !isMultiply ) DeviceHelper.startScan()
-        else if (isMultiply && modelIndex == scanViewModel.state.value!!.size -1)DeviceHelper.startScan(false, currentModel)
+        if ( !isMultiply ) DeviceHelper.startScan(true)
+        else if (isMultiply && modelIndex == scanViewModel.state.value!!.size -1)DeviceHelper.startScan(false, currentModel, true)
 
 
 
@@ -204,6 +204,7 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
 
 
 
+
         return root
     }
 
@@ -245,7 +246,7 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
         if (!isMultiply)return
         val any = scanViewModel.state.value?.toList()?.any { it == State.UNBOUND }
         if (any == true && state == State.CONNECTED )
-            DeviceHelper.startScan(false, 0)
+            DeviceHelper.startScan(false, 0, false)
 
 
     }

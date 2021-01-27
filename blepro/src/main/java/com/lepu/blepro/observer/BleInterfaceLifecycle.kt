@@ -17,6 +17,4 @@ internal interface BleInterfaceLifecycle: LifecycleObserver{
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun detachBI()
-
-
 }

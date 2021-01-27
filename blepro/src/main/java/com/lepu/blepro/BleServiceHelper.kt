@@ -82,9 +82,9 @@ class BleServiceHelper private constructor() {
      *  此时 BleService initInterface()不应该清空vailFace
      * o2ring、er1
      */
-    fun setInterfaces(model: Int, isClear: Boolean): BleServiceHelper {
+    fun setInterfaces(model: Int, isClear: Boolean, runRtImmediately: Boolean = false ): BleServiceHelper {
         if (!this::bleService.isInitialized) return this
-        if (getInterface(model) == null) bleService.initInterfaces(model, isClear)
+        if (getInterface(model) == null) bleService.initInterfaces(model, isClear ,runRtImmediately)
         return this
     }
 
@@ -131,17 +131,26 @@ class BleServiceHelper private constructor() {
 //        bleService.targetModel = model
 //    }
 
+    fun setNeedPair(p: Boolean){
+        if (!check()) return
+        bleService.needPair = p
+    }
+
     /**
      * 开始扫描
-     * 注意：当前的扫描参数
+     * 注意：当前的扫描参数, 如果前一次扫描正常结束， 此次扫描相关属性将为默认值
      */
     fun startScan() {
-
-        if (check()) {
-            LepuBleLog.d("startScan....singleScanModel:${bleService.singleScanMode}, targetModel:${bleService.targetModel}")
-            bleService.startDiscover()
-        }
+        if (check()) bleService.startDiscover()
     }
+
+    fun startScan(needPair: Boolean) {
+        if (!check()) return
+        bleService.needPair = needPair
+        bleService.startDiscover()
+    }
+
+
 
     /**
      * 开始扫描,组合套装可用此方法来设置扫描条件
@@ -149,11 +158,12 @@ class BleServiceHelper private constructor() {
      * @param targetModel 过滤的设备Model
      *
      */
-    fun startScan(singleScanMode: Boolean, targetModel: Int) {
+    fun startScan(singleScanMode: Boolean, targetModel: Int, needPair: Boolean) {
         if (!check()) return
         bleService.singleScanMode = singleScanMode
         bleService.targetModel = targetModel
-        startScan()
+        bleService.needPair = needPair
+        bleService.startDiscover()
     }
 
 
@@ -307,6 +317,31 @@ class BleServiceHelper private constructor() {
     fun syncData(model: Int, type: String, value: Int) {
         if (!check()) return
         getInterface(model)?.syncData(type, value)
+    }
+
+    /**
+     * 设置实时认为间隔时间
+     */
+    fun setRTDelayTime(model: Int, delayMillis: Long){
+        if (!check()) return
+        getInterface(model)?.delayMillis = delayMillis
+    }
+
+    /**
+     * 设置是否立即开启实时任务
+     */
+    fun setRunRtImmediately(model: Int, i: Boolean){
+        if (!check()) return
+        getInterface(model)?.runRtImmediately = i
+    }
+
+
+    /**
+     * 开启实时任务
+     */
+    fun startRtTask(model: Int){
+        if (!check()) return
+        getInterface(model)?.runRtTask()
     }
 
 

@@ -1,6 +1,6 @@
 package com.lepu.blepro.ble.data;
 
-public class OxyDataController {
+public final class OxyDataController {
 
     public static int index = 0;
 

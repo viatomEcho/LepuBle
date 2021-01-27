@@ -50,6 +50,11 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
 
     private var pool: ByteArray? = null
 
+    /**
+     * 是否在获取设备信息后立即执行实时任务
+     * 默认：false
+     */
+    var runRtImmediately: Boolean = false
 
     /**
      * 获取实时波形
@@ -58,7 +63,13 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     private val rtHandler = Handler(Looper.getMainLooper())
     private  var rTask: RtTask = RtTask()
 
-    private var  delayMillis: Long = 1000
+    /**
+     * 获取实时的间隔
+     * 默认： 1000 ms
+     */
+     var  delayMillis: Long = 1000
+
+
 
 
     inner class RtTask : Runnable {
@@ -236,14 +247,11 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         return if (state) Ble.State.CONNECTED else if (connecting) Ble.State.CONNECTING else Ble.State.DISCONNECTED
     }
 
-    fun runRtTask(delayMillis: Long) {
+    fun runRtTask() {
         LepuBleLog.d(tag, "runRtTask start..." )
         stopRtTask()
-        this.delayMillis = delayMillis
-        rtHandler.postDelayed(rTask, 200)
+        rtHandler.postDelayed(rTask, 500)
         LiveEventBus.get(EventMsgConst.RealTime.EventRealTimeStop).post(false)
-
-
     }
 
     fun stopRtTask(){
@@ -265,6 +273,11 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     abstract fun syncData(type: String, value: Int)
 
     /**
+     * 获取文件列表
+     */
+    abstract fun getFileList()
+
+    /**
      * 读文件
      */
     abstract fun readFile(userId: String, fileName: String)
@@ -273,5 +286,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      * 重置设备
      */
     abstract fun resetDeviceInfo()
+
+
 
 }
