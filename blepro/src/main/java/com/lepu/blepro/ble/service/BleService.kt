@@ -263,6 +263,7 @@ class BleService: LifecycleService() {
 
             if (!filterResult(b)) return
 
+            if (BluetoothController.checkO2Device(b.model))
             result.scanRecord?.let {
                 HashMap<String, Any>().apply {
                     this[EventMsgConst.Discovery.EventDeviceFound_Device] = b
