@@ -213,8 +213,8 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     }
 
 
-    override fun syncData(type: String, value: Int) {
-        sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.syncData(type, value))
+    override fun syncData(type: String, value: Any) {
+        sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.syncData(type, value as Int))
     }
 
     override fun getFileList() {

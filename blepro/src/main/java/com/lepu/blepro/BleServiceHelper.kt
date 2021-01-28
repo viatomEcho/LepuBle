@@ -26,7 +26,7 @@ class BleServiceHelper private constructor() {
     /**
      * 组合套装手动重连中
      */
-    var isReconnecting: Boolean = false
+    var reconnectingMulti: Boolean = false
 
     companion object {
         const val tag: String = "BleServiceHelper"
@@ -55,13 +55,6 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * 是否打印log
-     */
-    fun setLog(log: Boolean): BleServiceHelper {
-        LepuBleLog.setDebug(log)
-        return this
-    }
-    /**
      * 在Application onCreate中初始化本单列,
      *
      */
@@ -74,6 +67,15 @@ class BleServiceHelper private constructor() {
         Intent(application, BleService::class.java).also { intent ->
             application.bindService(intent, bleConn, Context.BIND_AUTO_CREATE)
         }
+        return this
+    }
+
+
+    /**
+     * 是否打印log
+     */
+    fun setLog(log: Boolean): BleServiceHelper {
+        LepuBleLog.setDebug(log)
         return this
     }
 
@@ -92,7 +94,7 @@ class BleServiceHelper private constructor() {
      *  此时 BleService initInterface()不应该清空vailFace
      * o2ring、er1
      */
-    fun setInterfaces(model: Int, isClear: Boolean = false, runRtImmediately: Boolean = false): BleServiceHelper {
+    fun setInterfaces(model: Int, isClear: Boolean = true, runRtImmediately: Boolean = false): BleServiceHelper {
         if (!this::bleService.isInitialized) return this
         if (getInterface(model) == null) bleService.initInterfaces(model, isClear ,runRtImmediately)
         return this
@@ -237,7 +239,7 @@ class BleServiceHelper private constructor() {
         bleService.singleScanMode = false
         bleService.reconnect()
 
-        isReconnecting = true
+        reconnectingMulti = true
     }
 
 
@@ -324,7 +326,7 @@ class BleServiceHelper private constructor() {
     /**
      * 同步信息
      */
-    fun syncData(model: Int, type: String, value: Int) {
+    fun syncData(model: Int, type: String, value: Any) {
         if (!check()) return
         getInterface(model)?.syncData(type, value)
     }

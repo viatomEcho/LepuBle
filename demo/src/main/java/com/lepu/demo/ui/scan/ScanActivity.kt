@@ -9,18 +9,14 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
+import com.lepu.blepro.BleUtilService
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.EventUI
 import com.lepu.demo.R
-import com.lepu.demo.ble.DeviceHelper
 import com.lepu.demo.ui.bind.ConnectEr1Fragment
 import com.lepu.demo.ui.o2.ConnectO2Fragment
-import org.greenrobot.eventbus.EventBus
 
 
 class ScanActivity : AppCompatActivity() {
@@ -132,9 +128,8 @@ class ScanActivity : AppCompatActivity() {
         super.onDestroy()
         handler.removeCallbacksAndMessages(null)
         dialog?.dismiss()
-        DeviceHelper.stopScan()
-        DeviceHelper.disconnect(false)
-        DeviceHelper.clearVailFace()
+        BleUtilService.stopScan()
+        BleUtilService.disconnect(false)
 
     }
 

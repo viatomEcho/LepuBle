@@ -3,8 +3,8 @@ package com.lepu.demo.ui.scan
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.lepu.blepro.BleUtilService
 import com.lepu.blepro.objs.Bluetooth
-import com.lepu.demo.ble.DeviceHelper
 
 /**
  * author: wujuan
@@ -13,7 +13,7 @@ import com.lepu.demo.ble.DeviceHelper
  */
 class ScanViewModel: ViewModel() {
     val _state = MutableLiveData<IntArray>().apply {
-        value = intArrayOf(DeviceHelper.State.UNBOUND, DeviceHelper.State.UNBOUND)
+        value = intArrayOf(BleUtilService.State.UNBOUND, BleUtilService.State.UNBOUND)
     }
 
     val _device = MutableLiveData<Array<Bluetooth?>>().apply {

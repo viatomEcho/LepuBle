@@ -150,7 +150,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
         sendCmd(UniversalBleCmd.getInfo())
     }
 
-    override fun syncData(type: String, value: Int) {
+    override fun syncData(type: String, value: Any) {
     }
 
 

@@ -120,11 +120,10 @@ class BleService: LifecycleService() {
      * @param isClear 只有组合时，先后一一初始化interface才应该false
      */
     fun initInterfaces(m: Int, isClear: Boolean, runRtImmediately: Boolean): BleInterface? {
-        LepuBleLog.d("initInterfaces start...$m, $isClear, $runRtImmediately")
-        vailFace.get(m)?.let { return it }
-
+        LepuBleLog.d("initInterfaces start...$m,  $runRtImmediately")
         if (isClear) vailFace.clear()
 
+        vailFace.get(m)?.let { return it }
         when(m) {
             Bluetooth.MODEL_O2RING -> {
                 OxyBleInterface(m).apply {

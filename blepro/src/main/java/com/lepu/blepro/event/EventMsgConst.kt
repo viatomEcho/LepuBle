@@ -16,8 +16,8 @@ object EventMsgConst {
     }
     interface RealTime{
         companion object{
+            const val EventRealTimeStart = "com.lepu.ble.realtime.start"
             const val EventRealTimeStop = "com.lepu.ble.realtime.stop"
-
         }
     }
 

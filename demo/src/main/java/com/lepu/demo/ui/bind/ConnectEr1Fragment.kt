@@ -1,7 +1,6 @@
 package com.lepu.demo.ui.bind
 
 import android.os.Bundle
-import android.text.BoringLayout
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,20 +12,16 @@ import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.BleServiceHelper
-import com.lepu.blepro.ble.data.LepuDevice
+import com.lepu.blepro.BleUtilService
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BIOL
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.LepuBleLog
-import com.lepu.blepro.vals.er1Name
-import com.lepu.blepro.vals.hasEr1
 import com.lepu.demo.EventUI
 import com.lepu.demo.R
 import com.lepu.demo.ble.BleAdapter
-import com.lepu.demo.ble.DeviceHelper
 import com.lepu.demo.ui.scan.ScanViewModel
 
 /**
@@ -58,13 +53,13 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
             isMultiply = it.getBoolean(ARG_IS_MULTIPLY)
         }
         //必须在订阅之前
-        DeviceHelper.setInterface(currentModel, isClear)
+        BleUtilService.setInterface(currentModel, isClear)
 
         lifecycle.addObserver(BIOL(this, currentModel))
 
 
-        if ( !isMultiply) DeviceHelper.startScan()
-        else if (isMultiply && modelIndex == scanViewModel.state.value!!.size -1)DeviceHelper.startScan(false, currentModel, true)
+        if ( !isMultiply) BleUtilService.startScan()
+        else if (isMultiply && modelIndex == scanViewModel.state.value!!.size -1)BleUtilService.startScan(false, currentModel, true)
 
 
 
@@ -75,10 +70,10 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
                 val b =  it as Bluetooth
                 val bluetooth = scanViewModel.device.value!![modelIndex]
 
-                if (scanViewModel.state.value!![modelIndex]  > DeviceHelper.State.UNBOUND
+                if (scanViewModel.state.value!![modelIndex]  > BleUtilService.State.UNBOUND
                     && bluetooth != null
                     && b.name == bluetooth.name) {//已绑定
-                    DeviceHelper.connect(requireContext(), b)
+                    BleUtilService.connect(requireContext(), b)
                 }
                 adapter.deviceList = BluetoothController.getDevices(currentModel)
                 adapter.notifyDataSetChanged()
@@ -89,7 +84,7 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
             .observe(this, {
                 it?.let {
                     //去绑定
-                    if (DeviceHelper.bind(it, scanViewModel.device.value!![modelIndex] as Bluetooth)) {
+                    if (BleUtilService.bind(it, scanViewModel.device.value!![modelIndex] as Bluetooth)) {
                         LiveEventBus.get(EventUI.BindFinish).post(true)
                     }
                 }
@@ -109,21 +104,16 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
         BluetoothController.clear()
         adapter = BleAdapter(requireContext(),  BluetoothController.getDevices(currentModel))
         listView.adapter = adapter
-        listView.onItemClickListener =
-            AdapterView.OnItemClickListener { parent, view, position, id ->
-                val b = adapter.deviceList[position]
-            }
-
 
         //手动切换连接状态
         switch.setOnCheckedChangeListener() { buttonView, isChecked ->
 
             LepuBleLog.d("setOnCheckedChangeListener ,$isChecked ,${scanViewModel.state.value}")
-            if (isChecked && scanViewModel.state.value!![modelIndex] == DeviceHelper.State.DISCONNECTED)
-                DeviceHelper.reconnect(currentModel)
+            if (isChecked && scanViewModel.state.value!![modelIndex] == BleUtilService.State.DISCONNECTED)
+                BleUtilService.reconnect(currentModel)
 
-            if (!isChecked && scanViewModel.state.value!![modelIndex] == DeviceHelper.State.CONNECTED) {
-                DeviceHelper.disconnect(currentModel, false)
+            if (!isChecked && scanViewModel.state.value!![modelIndex] == BleUtilService.State.CONNECTED) {
+                BleUtilService.disconnect(currentModel, false)
 //                DeviceHelper.disconnect(false) // 可使用于多设备时候全部断开
 
             }
@@ -132,9 +122,9 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
         //注册ViewModel
         scanViewModel.state.observe(viewLifecycleOwner, Observer {
             val b = scanViewModel.device.value!![modelIndex]
-            textView.text = "${DeviceHelper.convertState(it[modelIndex])} => ${b?.name}"
-            if (it[modelIndex] != DeviceHelper.State.CONNECTING) switch.isChecked = it[modelIndex] == DeviceHelper.State.CONNECTED
-            switch.text = DeviceHelper.convertState(it[modelIndex])
+            textView.text = "${BleUtilService.convertState(it[modelIndex])} => ${b?.name}"
+            if (it[modelIndex] != BleUtilService.State.CONNECTING) switch.isChecked = it[modelIndex] == BleUtilService.State.CONNECTED
+            switch.text = BleUtilService.convertState(it[modelIndex])
         })
         // 设备实例
         scanViewModel.device.observe(viewLifecycleOwner, Observer {
@@ -152,7 +142,7 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
                     scanViewModel._device.value = this
                 }
                 LiveEventBus.get(EventUI.ConnectingLoading).post(true)
-                DeviceHelper.connect(requireContext(), b)
+                BleUtilService.connect(requireContext(), b)
 
             }
 
@@ -183,21 +173,21 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
                 }
     }
 
-    override fun onBleStateChange(curModel: Int, state: Int) {
+    override fun onBleStateChanged(curModel: Int, state: Int) {
         LepuBleLog.d("onBleStateChange ${state}, ${scanViewModel.state.value?.joinToString()}")
+
+        if (currentModel != curModel) return
+
         scanViewModel.state.value!!.apply {
             this[modelIndex] = state
             scanViewModel._state.value = this
         }
 
-        val bluetooth = scanViewModel.device.value!![modelIndex] as Bluetooth
-        if ( bluetooth.model != curModel) return
+        if (!isMultiply || state !=  BleUtilService.State.CONNECTED)return
 
-        if (!isMultiply || state !=  DeviceHelper.State.CONNECTED)return
-
-        val any = scanViewModel.state.value?.toList()?.any { it == DeviceHelper.State.UNBOUND }
+        val any = scanViewModel.state.value?.toList()?.any { it == BleUtilService.State.UNBOUND }
         if (any == true )
-            DeviceHelper.startScan(false, 0, true)
+            BleUtilService.startScan(false, 0, true)
 
 
     }

@@ -67,7 +67,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      * 获取实时的间隔
      * 默认： 1000 ms
      */
-     var  delayMillis: Long = 1000
+    var  delayMillis: Long = 1000
 
 //    lateinit var folder: String
 
@@ -167,8 +167,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         publish()
 
         //如果是组合套装 全部重连中
-        if(BleServiceHelper.isReconnecting) {
-            if (BleServiceHelper.hasUnConnected()) BleServiceHelper.reconnect() else BleServiceHelper.isReconnecting = false
+        if(BleServiceHelper.reconnectingMulti) {
+            if (BleServiceHelper.hasUnConnected()) BleServiceHelper.reconnect() else BleServiceHelper.reconnectingMulti = false
         }
 
     }
@@ -236,7 +236,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     private fun publish() {
         LepuBleLog.d(tag, "publish=>${stateSubscriber.size}")
         for (i in stateSubscriber) {
-            i.onBleStateChange(model, calBleState())
+            i.onBleStateChanged(model, calBleState())
         }
     }
 
@@ -251,15 +251,15 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
 
     fun runRtTask() {
         LepuBleLog.d(tag, "runRtTask start..." )
-        stopRtTask()
+        rtHandler.removeCallbacks(rTask)
         rtHandler.postDelayed(rTask, 500)
-        LiveEventBus.get(EventMsgConst.RealTime.EventRealTimeStop).post(false)
+        LiveEventBus.get(EventMsgConst.RealTime.EventRealTimeStart).post(model)
     }
 
     fun stopRtTask(){
         LepuBleLog.d(tag, "stopRtTask start..." )
         rtHandler.removeCallbacks(rTask)
-        LiveEventBus.get(EventMsgConst.RealTime.EventRealTimeStop).post(true)
+        LiveEventBus.get(EventMsgConst.RealTime.EventRealTimeStop).post(model)
 
     }
 
@@ -272,7 +272,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     /**
      * 同步信息
      */
-    abstract fun syncData(type: String, value: Int)
+    abstract fun syncData(type: String, value: Any)
 
     /**
      * 获取文件列表
@@ -288,7 +288,5 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      * 重置设备
      */
     abstract fun resetDeviceInfo()
-
-
 
 }
