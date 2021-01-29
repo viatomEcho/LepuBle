@@ -59,7 +59,7 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
 
 
         if ( !isMultiply) BleUtilService.startScan()
-        else if (isMultiply && modelIndex == scanViewModel.state.value!!.size -1)BleUtilService.startScan(false, currentModel, true)
+        else if (isMultiply && modelIndex == scanViewModel.state.value!!.size -1)BleUtilService.startScanMulti(true)
 
 
 
@@ -187,7 +187,7 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
 
         val any = scanViewModel.state.value?.toList()?.any { it == BleUtilService.State.UNBOUND }
         if (any == true )
-            BleUtilService.startScan(false, 0, true)
+            BleUtilService.startScanMulti(true)
 
 
     }

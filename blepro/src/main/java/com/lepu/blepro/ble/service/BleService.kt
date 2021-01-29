@@ -144,7 +144,7 @@ class BleService: LifecycleService() {
 
             }
             else -> {
-                return throw Exception("查完此model")
+                return throw Exception("查无此model")
             }
         }
 
@@ -155,16 +155,32 @@ class BleService: LifecycleService() {
 
     private val binder = BleBinder()
 
-    /**
-     * search
-     */
-    fun startDiscover() {
+//    /**
+//     * search
+//     */
+//    fun startDiscover() {
+//        LepuBleLog.d("start discover....")
+//        stopDiscover()
+//        BluetoothController.clear()
+//
+//        isDiscovery = true
+//        scanDevice(true)
+//        LepuBleLog.d("startScan....singleScanModel:$singleScanMode, targetModel:$targetModel, needPair$needPair")
+//    }
+
+    fun startDiscover(singleScanMode: Boolean = true, targetModel: Int = this.targetModel, needPair: Boolean = false) {
+        LepuBleLog.d("start discover.....")
+        stopDiscover()
+
         BluetoothController.clear()
-        LepuBleLog.d("start discover")
-        LepuBleLog.d("startScan....singleScanModel:$singleScanMode, targetModel:$targetModel, needPair$needPair")
+
+        this.singleScanMode = singleScanMode
+        this.targetModel = targetModel
+        this.needPair = needPair
 
         isDiscovery = true
         scanDevice(true)
+        LepuBleLog.d("startScan....singleScanModel:$singleScanMode, targetModel:$targetModel, needPair$needPair")
     }
 
     /**
@@ -174,13 +190,13 @@ class BleService: LifecycleService() {
      *
      */
     fun stopDiscover() {
-        //重置
-        targetModel = vailFace.keyAt(vailFace.size() -1)
-        singleScanMode = true
-        needPair = false
-
         isDiscovery = false
         scanDevice(false)
+
+//        //重置
+//        targetModel = vailFace.keyAt(vailFace.size() -1)
+//        singleScanMode = true
+//        needPair = false
     }
 
 

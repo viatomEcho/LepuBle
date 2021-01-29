@@ -15,6 +15,7 @@ import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
+import java.lang.Exception
 
 /**
  * 蓝牙服务
@@ -145,31 +146,34 @@ class BleServiceHelper private constructor() {
      * 开始扫描
      * 注意：当前的扫描参数, 如果前一次扫描正常结束， 此次扫描相关属性将为默认值
      */
-    fun startScan() {
-        if (check()) bleService.startDiscover()
-    }
-
-    fun startScan(needPair: Boolean) {
-        if (!check()) return
-        bleService.needPair = needPair
-        bleService.startDiscover()
-    }
-
+//    fun startScan() {
+//        if (!check()) return
+//        bleService.startDiscover()
+//    }
 
 
     /**
      * 开始扫描,组合套装可用此方法来设置扫描条件
      * @param singleScanMode 是否只过滤出targetModel设备 , false时targetModel无效
-     * @param targetModel 过滤的设备Model
+     * @param targetModel 默认上一次的model， 第一次为末尾添加到VialFace的model
      *
      */
-    fun startScan(singleScanMode: Boolean, targetModel: Int, needPair: Boolean) {
+    fun startScan(needPair: Boolean = false) {
         if (!check()) return
-        bleService.singleScanMode = singleScanMode
-        bleService.targetModel = targetModel
-        bleService.needPair = needPair
-        bleService.startDiscover()
+        bleService.startDiscover(true, needPair = needPair)
     }
+
+    fun startScan(targetModel: Int, needPair: Boolean = false) {
+        if (!check()) return
+        bleService.startDiscover(true, targetModel, needPair)
+    }
+
+    fun startScanMulti(needPair: Boolean = false){
+        if (!check()) return
+        bleService.startDiscover(false, needPair = needPair)
+    }
+
+
 
 
 
@@ -365,12 +369,10 @@ class BleServiceHelper private constructor() {
 
     private fun check(): Boolean{
         if (!this::bleService.isInitialized){
-            LepuBleLog.d("Warning: bleService.isInitialized = false!!")
-            return false
+            return throw Exception("Error: bleService unInitialized")
         }
         if (bleService.vailFace.isEmpty()){
-            LepuBleLog.d("Warning: bleService.vailFace isEmpty!!")
-            return false
+            return throw Exception("Error: bleService.vailFace unInitialized")
         }
         return true
     }

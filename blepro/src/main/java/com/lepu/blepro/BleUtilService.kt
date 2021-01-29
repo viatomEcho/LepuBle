@@ -4,7 +4,7 @@ import android.app.Application
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.util.SparseArray
-import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
+import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.base.BleExport
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.LepuDevice
@@ -72,17 +72,17 @@ object BleUtilService: BleExport {
     }
 
     override fun initService(application: Application, observer: BleServiceObserver?): BleExport {
-        BleServiceHelper.initService(application, observer)
+        BleServiceHelper.BleServiceHelper.initService(application, observer)
         return this
     }
 
     override fun setRawFolder(folders: SparseArray<String>): BleExport {
-        BleServiceHelper.initRawFolder(folders)
+        BleServiceHelper.BleServiceHelper.initRawFolder(folders)
         return this
     }
 
     override fun setInterfaces(model: Int, isClear: Boolean, runRtImmediately: Boolean): BleExport {
-        BleServiceHelper.setInterfaces(model, isClear, runRtImmediately)
+        BleServiceHelper.BleServiceHelper.setInterfaces(model, isClear, runRtImmediately)
         return this
     }
 
@@ -95,84 +95,84 @@ object BleUtilService: BleExport {
     }
 
     override fun reInitBle(): BleExport {
-        BleServiceHelper.reInitBle()
+        BleServiceHelper.BleServiceHelper.reInitBle()
         return this
     }
 
-    override fun startScan() {
-        BleServiceHelper.startScan()
+    override fun startScan(targetModel: Int, needPair: Boolean) {
+        BleServiceHelper.BleServiceHelper.startScan(targetModel, needPair)
     }
 
-    override fun startScan(p: Boolean) {
-        BleServiceHelper.startScan(p)
+    override fun startScan(needPair: Boolean) {
+        BleServiceHelper.BleServiceHelper.startScan(needPair = needPair)
     }
 
-    override fun startScan(singleScanMode: Boolean, targetModel: Int, p: Boolean) {
-        BleServiceHelper.startScan(singleScanMode, targetModel, p)
+    override fun startScanMulti(needPair: Boolean) {
+        BleServiceHelper.BleServiceHelper.startScanMulti(needPair)
     }
 
     override fun hasUnConnected(): Boolean {
-        return BleServiceHelper.hasUnConnected()
+        return BleServiceHelper.BleServiceHelper.hasUnConnected()
     }
 
     override fun stopScan() {
-        BleServiceHelper.stopScan()
+        BleServiceHelper.BleServiceHelper.stopScan()
     }
 
     override fun setInterface(model: Int, isClear: Boolean, runRtImmediately: Boolean) {
-        BleServiceHelper.setInterfaces(model, isClear, runRtImmediately)
+        BleServiceHelper.BleServiceHelper.setInterfaces(model, isClear, runRtImmediately)
     }
 
     override fun connect(context: Context, b: Bluetooth) {
-        BleServiceHelper.connect(context, b.model, b.device)
+        BleServiceHelper.BleServiceHelper.connect(context, b.model, b.device)
     }
 
     override fun connect(context: Context, model: Int, b: BluetoothDevice) {
-        BleServiceHelper.connect(context, model, b)
+        BleServiceHelper.BleServiceHelper.connect(context, model, b)
     }
 
     override fun reconnect(model: Int) {
-        BleServiceHelper.reconnect(model)
+        BleServiceHelper.BleServiceHelper.reconnect(model)
     }
 
     override fun reconnect() {
-        BleServiceHelper.reconnect()
+        BleServiceHelper.BleServiceHelper.reconnect()
     }
 
     override fun disconnect(autoReconnect: Boolean) {
-        BleServiceHelper.disconnect(autoReconnect)
+        BleServiceHelper.BleServiceHelper.disconnect(autoReconnect)
     }
 
     override fun disconnect(model: Int, autoReconnect: Boolean) {
-        BleServiceHelper.disconnect(model, autoReconnect)
+        BleServiceHelper.BleServiceHelper.disconnect(model, autoReconnect)
     }
 
     override fun getBleState(model: Int): Int {
-       return BleServiceHelper.getConnectState(model)
+       return BleServiceHelper.BleServiceHelper.getConnectState(model)
     }
 
     override fun getInfo(model: Int) {
-        BleServiceHelper.getInfo(model)
+        BleServiceHelper.BleServiceHelper.getInfo(model)
     }
 
     override fun readFile(userId: String, fileName: String, model: Int) {
-        BleServiceHelper.readFile(userId, fileName, model)
+        BleServiceHelper.BleServiceHelper.readFile(userId, fileName, model)
     }
 
     override fun stopRtTask(model: Int) {
-        BleServiceHelper.stopRtTask(model)
+        BleServiceHelper.BleServiceHelper.stopRtTask(model)
     }
 
     override fun startRtTask(model: Int) {
-        BleServiceHelper.startRtTask(model)
+        BleServiceHelper.BleServiceHelper.startRtTask(model)
     }
 
     override fun syncData(model: Int, type: String, value: Any) {
-        BleServiceHelper.syncData(model, type, value)
+        BleServiceHelper.BleServiceHelper.syncData(model, type, value)
     }
 
     override fun reset(model: Int) {
-        BleServiceHelper.reset(model)
+        BleServiceHelper.BleServiceHelper.reset(model)
     }
 
     fun bind(info: Any, b: Bluetooth): Boolean{

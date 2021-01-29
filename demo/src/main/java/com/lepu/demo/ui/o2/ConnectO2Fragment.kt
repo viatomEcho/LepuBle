@@ -76,7 +76,7 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
         //订阅之后扫描
         // 组合套装 只有最后添加的fragment 开启扫描, 并且使用多设备过滤模式
         if ( !isMultiply ) BleUtilService.startScan(true)
-        else if (isMultiply && modelIndex == scanViewModel.state.value!!.size -1)BleUtilService.startScan(false, currentModel, true)
+        else if (isMultiply && modelIndex == scanViewModel.state.value!!.size -1)BleUtilService.startScanMulti( true)
 
 
 
@@ -242,7 +242,7 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
         if (!isMultiply)return
         val any = scanViewModel.state.value?.toList()?.any { it == State.UNBOUND }
         if (any == true && state == State.CONNECTED )
-            BleUtilService.startScan(false, 0, false)
+            BleUtilService.startScanMulti(false)
 
 
     }

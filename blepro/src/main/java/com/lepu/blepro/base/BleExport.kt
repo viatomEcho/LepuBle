@@ -31,20 +31,23 @@ interface BleExport {
      * 开始扫描
      *
      */
-    fun startScan()
 
-    /**
-     * 本次扫描发送配对信息
-     */
-    fun startScan(p: Boolean)
+    fun startScanMulti(needPair: Boolean = false)
+    fun startScan(targetModel: Int, needPair: Boolean = false)
+    fun startScan(needPair: Boolean = false)
 
-    /**
-     * 开始扫描,组合套装可用此方法来设置扫描条件
-     * @param singleScanMode 是否只过滤出targetModel设备 , false时targetModel无效
-     * @param targetModel 过滤的设备Model
-     *
-     */
-    fun startScan(singleScanMode: Boolean, targetModel: Int, p: Boolean)
+//    /**
+//     * 本次扫描发送配对信息
+//     */
+//    fun startScan(p: Boolean)
+//
+//    /**
+//     * 开始扫描,组合套装可用此方法来设置扫描条件
+//     * @param singleScanMode 是否只过滤出targetModel设备 , false时targetModel无效
+//     * @param targetModel 过滤的设备Model
+//     *
+//     */
+//    fun startScan(singleScanMode: Boolean, targetModel: Int, p: Boolean)
 
     /**
      * 检查是否有未连接设备，如有开启扫描

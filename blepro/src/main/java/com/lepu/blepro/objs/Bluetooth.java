@@ -49,7 +49,7 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_O2MAX = 16;
     public static final int MODEL_BPM = 17;
 
-    @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL, MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2MAX})
+    @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL, MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2MAX, MODEL_BPM})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 
@@ -97,6 +97,8 @@ public class Bluetooth implements Parcelable {
                 return MODEL_RINGO2;
             case BT_NAME_O2MAX:
                 return MODEL_O2MAX;
+            case BT_NAME_BPM:
+                return MODEL_BPM;
             default:
                 if (deviceNamePrefix.startsWith(BT_NAME_KCA))
                     return MODEL_KCA;
