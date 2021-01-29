@@ -53,12 +53,13 @@ class BleServiceHelper private constructor() {
             LepuBleLog.d("BleServiceHelper onServiceDisconnected")
         }
     }
+    //===========================================================
 
     /**
      * 在Application onCreate中初始化本单列,
      *
      */
-    fun initService(application: Application, observer: BleServiceObserver?): BleServiceHelper {
+    fun initService(application: Application, observer: BleServiceObserver?) {
 
         LepuBleLog.d("BleServiceHelper initService  start")
         BleService.observer = observer
@@ -67,21 +68,12 @@ class BleServiceHelper private constructor() {
         Intent(application, BleService::class.java).also { intent ->
             application.bindService(intent, bleConn, Context.BIND_AUTO_CREATE)
         }
-        return this
     }
 
 
-    /**
-     * 是否打印log
-     */
-    fun setLog(log: Boolean): BleServiceHelper {
-        LepuBleLog.setDebug(log)
-        return this
-    }
 
-    fun setRawFolder(folders: SparseArray<String>): BleServiceHelper{
-        rawFolder = folders
-        return this
+    fun initRawFolder(folders: SparseArray<String>){
+        this.rawFolder = folders
     }
 
 
@@ -94,11 +86,12 @@ class BleServiceHelper private constructor() {
      *  此时 BleService initInterface()不应该清空vailFace
      * o2ring、er1
      */
-    fun setInterfaces(model: Int, isClear: Boolean = true, runRtImmediately: Boolean = false): BleServiceHelper {
-        if (!this::bleService.isInitialized) return this
+    fun setInterfaces(model: Int, isClear: Boolean = true, runRtImmediately: Boolean = false) {
+        if (!this::bleService.isInitialized) return
         if (getInterface(model) == null) bleService.initInterfaces(model, isClear ,runRtImmediately)
-        return this
     }
+
+    //--------------------------------------------------------
 
 
 
@@ -106,9 +99,9 @@ class BleServiceHelper private constructor() {
      * 重新初始化蓝牙
      * 场景：蓝牙关闭状态进入页面，开启系统蓝牙后，重新初始化
      */
-    fun reInitBle(): BleServiceHelper {
-        if (!check()) return this else BleServiceHelper.bleService.reInit()
-        return this
+    fun reInitBle() {
+        if (!check()) return
+        BleServiceHelper.bleService.reInit()
     }
 
 

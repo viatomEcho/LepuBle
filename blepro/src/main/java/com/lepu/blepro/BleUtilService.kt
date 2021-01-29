@@ -1,13 +1,16 @@
 package com.lepu.blepro
 
+import android.app.Application
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.util.SparseArray
 import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleExport
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.objs.Bluetooth
+import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
 
 /**
@@ -68,8 +71,32 @@ object BleUtilService: BleExport {
 
     }
 
-    override fun reInitBle() {
+    override fun initService(application: Application, observer: BleServiceObserver?): BleExport {
+        BleServiceHelper.initService(application, observer)
+        return this
+    }
+
+    override fun setRawFolder(folders: SparseArray<String>): BleExport {
+        BleServiceHelper.initRawFolder(folders)
+        return this
+    }
+
+    override fun setInterfaces(model: Int, isClear: Boolean, runRtImmediately: Boolean): BleExport {
+        BleServiceHelper.setInterfaces(model, isClear, runRtImmediately)
+        return this
+    }
+
+    /**
+     * 是否打印log
+     */
+    override fun setLog(log: Boolean): BleExport {
+        LepuBleLog.setDebug(log)
+        return this
+    }
+
+    override fun reInitBle(): BleExport {
         BleServiceHelper.reInitBle()
+        return this
     }
 
     override fun startScan() {
@@ -174,5 +201,6 @@ object BleUtilService: BleExport {
 
     private fun bindEr1(b: Bluetooth, info: LepuDevice) {
     }
+
 
 }

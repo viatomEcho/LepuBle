@@ -1,8 +1,14 @@
 package com.lepu.blepro.base
 
+import android.app.Application
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.util.SparseArray
+import com.lepu.blepro.BleServiceHelper
+import com.lepu.blepro.BleUtilService
+import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.objs.Bluetooth
+import com.lepu.blepro.observer.BleServiceObserver
 
 /**
  * author: wujuan
@@ -10,7 +16,16 @@ import com.lepu.blepro.objs.Bluetooth
  * description:
  */
 interface BleExport {
-    fun reInitBle()
+
+
+    fun initService(application: Application, observer: BleServiceObserver?): BleExport
+    fun setRawFolder(folders: SparseArray<String>): BleExport
+
+    fun setInterfaces(model: Int, isClear: Boolean = true, runRtImmediately: Boolean = false): BleExport
+
+    fun setLog(log: Boolean): BleExport
+
+    fun reInitBle(): BleExport
 
     /**
      * 开始扫描
