@@ -12,7 +12,6 @@ import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.BleUtilService
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
@@ -22,7 +21,10 @@ import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.EventUI
 import com.lepu.demo.R
 import com.lepu.demo.ble.BleAdapter
+import com.lepu.demo.ble.BleUtilService
+import com.lepu.demo.ble.BleUtilService.State
 import com.lepu.demo.ui.scan.ScanViewModel
+
 
 /**
  * A fragment representing a list of Items.
@@ -55,7 +57,7 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
         //必须在订阅之前
         BleUtilService.setInterface(currentModel, isClear)
 
-        lifecycle.addObserver(BIOL(this, currentModel))
+        lifecycle.addObserver(BIOL(this, intArrayOf(currentModel)))
 
 
         if ( !isMultiply) BleUtilService.startScan()

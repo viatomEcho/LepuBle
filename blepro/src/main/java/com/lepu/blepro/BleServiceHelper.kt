@@ -60,7 +60,7 @@ class BleServiceHelper private constructor() {
      * 在Application onCreate中初始化本单列,
      *
      */
-    fun initService(application: Application, observer: BleServiceObserver?) {
+    fun initService(application: Application, observer: BleServiceObserver?): BleServiceHelper {
 
         LepuBleLog.d("BleServiceHelper initService  start")
         BleService.observer = observer
@@ -69,12 +69,19 @@ class BleServiceHelper private constructor() {
         Intent(application, BleService::class.java).also { intent ->
             application.bindService(intent, bleConn, Context.BIND_AUTO_CREATE)
         }
+        return this
+    }
+
+    fun initLog(log: Boolean): BleServiceHelper{
+        LepuBleLog.setDebug(log)
+        return this
     }
 
 
 
-    fun initRawFolder(folders: SparseArray<String>){
+    fun initRawFolder(folders: SparseArray<String>): BleServiceHelper{
         this.rawFolder = folders
+        return this
     }
 
 
@@ -100,9 +107,10 @@ class BleServiceHelper private constructor() {
      * 重新初始化蓝牙
      * 场景：蓝牙关闭状态进入页面，开启系统蓝牙后，重新初始化
      */
-    fun reInitBle() {
-        if (!check()) return
+    fun reInitBle(): BleServiceHelper {
+        if (!check()) return this
         BleServiceHelper.bleService.reInit()
+        return this
     }
 
 
@@ -158,16 +166,19 @@ class BleServiceHelper private constructor() {
      * @param targetModel 默认上一次的model， 第一次为末尾添加到VialFace的model
      *
      */
+    @JvmOverloads
     fun startScan(needPair: Boolean = false) {
         if (!check()) return
         bleService.startDiscover(true, needPair = needPair)
     }
 
+    @JvmOverloads
     fun startScan(targetModel: Int, needPair: Boolean = false) {
         if (!check()) return
         bleService.startDiscover(true, targetModel, needPair)
     }
 
+    @JvmOverloads
     fun startScanMulti(needPair: Boolean = false){
         if (!check()) return
         bleService.startDiscover(false, needPair = needPair)
@@ -369,16 +380,26 @@ class BleServiceHelper private constructor() {
 
     private fun check(): Boolean{
         if (!this::bleService.isInitialized){
-            return throw Exception("Error: bleService unInitialized")
+            LepuBleLog.d("Error: bleService unInitialized")
+            return false
         }
         if (bleService.vailFace.isEmpty()){
-            return throw Exception("Error: bleService.vailFace unInitialized")
+            LepuBleLog.d("Error: bleService.vailFace unInitialized")
+            return false
         }
         return true
     }
 
 
-
+//    fun subscribeAll(observer: BleChangeObserver){
+//        if (!check()) return
+//        LepuBleLog.d("getInterfaceList")
+//        for (i in 0 until bleService.vailFace.size()) {
+//            getInterface(bleService.vailFace.keyAt(i))?.let { it ->
+//               subscribeBI(it.model, observer)
+//            }
+//        }
+//    }
 
 
 }

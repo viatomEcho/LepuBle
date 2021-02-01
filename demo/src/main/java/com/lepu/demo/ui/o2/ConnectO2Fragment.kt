@@ -13,8 +13,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.BleUtilService
-import com.lepu.blepro.BleUtilService.State
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BIOL
@@ -22,6 +20,8 @@ import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.EventUI
 import com.lepu.demo.R
+import com.lepu.demo.ble.BleUtilService
+import com.lepu.demo.ble.BleUtilService.State
 import com.lepu.demo.ble.PairDevice
 import com.lepu.demo.ui.scan.ScanViewModel
 
@@ -71,7 +71,7 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
         //必须在订阅之前初始化, 同一model重复调用只会初始化一次
         BleUtilService.setInterface(currentModel, isClear, true)
         // 订阅蓝牙状态通知（实现 BleChangeObserver）
-        lifecycle.addObserver(BIOL(this, currentModel))
+        lifecycle.addObserver(BIOL(this,intArrayOf(currentModel)))
 
         //订阅之后扫描
         // 组合套装 只有最后添加的fragment 开启扫描, 并且使用多设备过滤模式
@@ -125,7 +125,7 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
                     val b =  it as Bluetooth
                     val bluetooth = scanViewModel.device.value!![modelIndex]
 
-                    if (scanViewModel.state.value!![modelIndex]  > State.UNBOUND
+                    if (scanViewModel.state.value!![modelIndex]  > BleUtilService.State.UNBOUND
                         && bluetooth != null
                         && b.name == bluetooth.name) {//已绑定
                         BleUtilService.connect(requireContext(), b)

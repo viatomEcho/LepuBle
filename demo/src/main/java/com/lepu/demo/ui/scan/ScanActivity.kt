@@ -10,11 +10,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.BleUtilService
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.EventUI
 import com.lepu.demo.R
+import com.lepu.demo.ble.BleUtilService
 import com.lepu.demo.ui.bind.ConnectEr1Fragment
 import com.lepu.demo.ui.o2.ConnectO2Fragment
 

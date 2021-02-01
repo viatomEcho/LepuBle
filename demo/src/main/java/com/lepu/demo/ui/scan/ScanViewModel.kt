@@ -3,8 +3,8 @@ package com.lepu.demo.ui.scan
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.lepu.blepro.BleUtilService
 import com.lepu.blepro.objs.Bluetooth
+import com.lepu.demo.ble.BleUtilService
 
 /**
  * author: wujuan
