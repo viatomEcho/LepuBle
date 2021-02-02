@@ -60,8 +60,9 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
         lifecycle.addObserver(BIOL(this, intArrayOf(currentModel)))
 
 
-        if ( !isMultiply) BleUtilService.startScan()
-        else if (isMultiply && modelIndex == scanViewModel.state.value!!.size -1)BleUtilService.startScanMulti(true)
+        if ( !isMultiply) BleUtilService.startScan(currentModel)
+        else if (isMultiply && modelIndex == scanViewModel.state.value!!.size -1)  BleUtilService.startScan(intArrayOf(Bluetooth.MODEL_O2RING, currentModel),true)
+
 
 
 
@@ -75,7 +76,7 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
                 if (scanViewModel.state.value!![modelIndex]  > BleUtilService.State.UNBOUND
                     && bluetooth != null
                     && b.name == bluetooth.name) {//已绑定
-                    BleUtilService.connect(requireContext(), b)
+                    BleUtilService.connect(requireActivity().application, b)
                 }
                 adapter.deviceList = BluetoothController.getDevices(currentModel)
                 adapter.notifyDataSetChanged()
@@ -112,7 +113,11 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
 
             LepuBleLog.d("setOnCheckedChangeListener ,$isChecked ,${scanViewModel.state.value}")
             if (isChecked && scanViewModel.state.value!![modelIndex] == BleUtilService.State.DISCONNECTED)
-                BleUtilService.reconnect(currentModel)
+                scanViewModel.device.value!![modelIndex]?.name?.let {
+                    BleUtilService.reconnect(currentModel,
+                        it
+                    )
+                }
 
             if (!isChecked && scanViewModel.state.value!![modelIndex] == BleUtilService.State.CONNECTED) {
                 BleUtilService.disconnect(currentModel, false)
@@ -144,7 +149,7 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
                     scanViewModel._device.value = this
                 }
                 LiveEventBus.get(EventUI.ConnectingLoading).post(true)
-                BleUtilService.connect(requireContext(), b)
+                BleUtilService.connect(requireActivity().application, b)
 
             }
 
@@ -189,7 +194,7 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
 
         val any = scanViewModel.state.value?.toList()?.any { it == BleUtilService.State.UNBOUND }
         if (any == true )
-            BleUtilService.startScanMulti(true)
+            BleUtilService.startScan(intArrayOf(Bluetooth.MODEL_O2RING, currentModel),true)
 
 
     }

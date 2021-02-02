@@ -123,7 +123,7 @@ public abstract class BaseBleManager extends BleManager {
 
     public void sendCmd(byte[] bytes) {
 
-        LepuBleLog.d("send: " + ByteArrayKt.bytesToHex(bytes));
+        LepuBleLog.d("BaseBleManager send: " + ByteArrayKt.bytesToHex(bytes));
 
         writeCharacteristic(write_char, bytes)
                 .split()

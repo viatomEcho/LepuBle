@@ -1,5 +1,6 @@
 package com.lepu.blepro.ble
 
+import android.app.Application
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -69,6 +70,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
 
     private fun sendOxyCmd(cmd: Int, bs: ByteArray){
+        LepuBleLog.d(tag, "sendOxyCmd $cmd" )
         if (curCmd != 0) {
             // busy
             LepuBleLog.d(tag, "busy: $cmd =>$curCmd")

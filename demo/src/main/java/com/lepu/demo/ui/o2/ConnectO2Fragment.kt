@@ -69,14 +69,15 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
         }
 
         //必须在订阅之前初始化, 同一model重复调用只会初始化一次
-        BleUtilService.setInterface(currentModel, isClear, true)
+        BleUtilService.setInterface(currentModel,true)
         // 订阅蓝牙状态通知（实现 BleChangeObserver）
         lifecycle.addObserver(BIOL(this,intArrayOf(currentModel)))
 
         //订阅之后扫描
         // 组合套装 只有最后添加的fragment 开启扫描, 并且使用多设备过滤模式
-        if ( !isMultiply ) BleUtilService.startScan(true)
-        else if (isMultiply && modelIndex == scanViewModel.state.value!!.size -1)BleUtilService.startScanMulti( true)
+        if ( !isMultiply ) BleUtilService.startScan(currentModel)
+        else if (isMultiply && modelIndex == scanViewModel.state.value!!.size -1)  BleUtilService.startScan(intArrayOf(Bluetooth.MODEL_O2RING, currentModel),true)
+
 
 
 
@@ -102,7 +103,7 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
                             this[modelIndex] = b
                             scanViewModel._device.value = this
                         }
-                        BleUtilService.connect(requireContext(), b)
+                        BleUtilService.connect(requireActivity().application, b)
 
                     }
 
@@ -128,7 +129,7 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
                     if (scanViewModel.state.value!![modelIndex]  > BleUtilService.State.UNBOUND
                         && bluetooth != null
                         && b.name == bluetooth.name) {//已绑定
-                        BleUtilService.connect(requireContext(), b)
+                        BleUtilService.connect(requireActivity().application, b)
                     }
                 })
 
@@ -158,7 +159,7 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
 
             connectAll.setOnClickListener {
                 val all = scanViewModel.state.value?.toList()?.all { it > State.UNBOUND}
-                if (all == true) BleUtilService.reconnect()
+//                if (all == true) BleUtilService.reconnect(intArrayOf(currentModel, Bluetooth.MODEL_ER1), arrayOf(scanViewModel.device.value[0], scanViewModel.device.value[]))
             }
         }
 
@@ -169,7 +170,11 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
 
             LepuBleLog.d("setOnCheckedChangeListener ,$isChecked ,${scanViewModel.state.value}")
             if (isChecked && scanViewModel.state.value!![modelIndex] == State.DISCONNECTED)
-                BleUtilService.reconnect(currentModel)
+                scanViewModel.device.value!![modelIndex]?.name?.let {
+                    BleUtilService.reconnect(currentModel,
+                        it
+                    )
+                }
 
             if (!isChecked && scanViewModel.state.value!![modelIndex] == State.CONNECTED) {
                 BleUtilService.disconnect(currentModel, false)
@@ -242,7 +247,7 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
         if (!isMultiply)return
         val any = scanViewModel.state.value?.toList()?.any { it == State.UNBOUND }
         if (any == true && state == State.CONNECTED )
-            BleUtilService.startScanMulti(false)
+            BleUtilService.startScan(intArrayOf(Bluetooth.MODEL_O2RING, currentModel),false)
 
 
     }

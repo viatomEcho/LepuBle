@@ -8,15 +8,15 @@ import com.lepu.blepro.utils.LepuBleLog
  * created on: 2021/1/21 10:22
  * description: 自动管理蓝牙订阅, 使用之前应保证设备对应的interface已经初始化, 否则无效
  */
-class BIOL(val observer: BleChangeObserver, private val model: IntArray): BleInterfaceLifecycle {
+class BIOL(val observer: BleChangeObserver, private var model: IntArray): BleInterfaceLifecycle {
 
     /**
      *  当lifecycleOwner OnCreate时候调用
      */
     override fun subscribeBI() {
-        LepuBleLog.d("BIOL 开始订阅蓝牙 $model")
-        model.toList().forEach {
-            BleServiceHelper.BleServiceHelper.subscribeBI(it, observer)
+        LepuBleLog.d("BIOL 开始订阅蓝牙 model${model.joinToString()}")
+        model.let {
+            for (m in model) BleServiceHelper.BleServiceHelper.subscribeBI(m, observer)
         }
 
     }
@@ -25,10 +25,17 @@ class BIOL(val observer: BleChangeObserver, private val model: IntArray): BleInt
      *  当lifecycleOwner OnCreate时候调用
      */
     override fun detachBI() {
-        model.toList().forEach {
-            BleServiceHelper.BleServiceHelper.detachBI(it, observer)
-        }
 
-        LepuBleLog.d("BIOL 已取消订阅蓝牙 $model")
+        model.let {
+            for (m in model) BleServiceHelper.BleServiceHelper.detachBI(m, observer)
+        }
+        LepuBleLog.d("BIOL 已取消订阅蓝牙 model${model?.joinToString()}")
     }
+
+    fun update(newModels: IntArray){
+
+        model = newModels
+        subscribeBI()
+    }
+
 }

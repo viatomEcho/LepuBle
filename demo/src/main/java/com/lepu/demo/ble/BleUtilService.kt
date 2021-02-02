@@ -1,5 +1,6 @@
 package com.lepu.demo.ble
 
+import android.app.Application
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.lepu.blepro.BleServiceHelper
@@ -69,8 +70,8 @@ companion object {
     }
 
 
-    fun setInterface(model: Int, isClear: Boolean = true, runRtImmediately: Boolean = false) {
-        BleServiceHelper.BleServiceHelper.setInterfaces(model, isClear, runRtImmediately)
+    fun setInterface(model: Int, runRtImmediately: Boolean = false) {
+        BleServiceHelper.BleServiceHelper.setInterfaces(model, runRtImmediately)
     }
 
     fun reInitBle() {
@@ -81,37 +82,31 @@ companion object {
         BleServiceHelper.BleServiceHelper.startScan(targetModel, needPair)
     }
 
-    fun startScan(needPair: Boolean = false) {
-        BleServiceHelper.BleServiceHelper.startScan(needPair = needPair)
+    fun startScan(targetModel: IntArray, needPair: Boolean = false) {
+        BleServiceHelper.BleServiceHelper.startScan(targetModel, needPair)
     }
 
-    fun startScanMulti(needPair: Boolean = false) {
-        BleServiceHelper.BleServiceHelper.startScanMulti(needPair)
-    }
 
-    fun hasUnConnected(): Boolean {
-        return BleServiceHelper.BleServiceHelper.hasUnConnected()
-    }
 
     fun stopScan() {
         BleServiceHelper.BleServiceHelper.stopScan()
     }
 
 
-    fun connect(context: Context, b: Bluetooth) {
+    fun connect(context: Application, b: Bluetooth) {
         BleServiceHelper.BleServiceHelper.connect(context, b.model, b.device)
     }
 
-    fun connect(context: Context, model: Int, b: BluetoothDevice) {
+    fun connect(context: Application, model: Int, b: BluetoothDevice) {
         BleServiceHelper.BleServiceHelper.connect(context, model, b)
     }
 
-    fun reconnect(model: Int) {
-        BleServiceHelper.BleServiceHelper.reconnect(model)
+    fun reconnect(model: IntArray, name : Array<String>) {
+        BleServiceHelper.BleServiceHelper.reconnect(model, name)
     }
 
-    fun reconnect() {
-        BleServiceHelper.BleServiceHelper.reconnect()
+    fun reconnect(model: Int, name : String) {
+        BleServiceHelper.BleServiceHelper.reconnect(model, name)
     }
 
     fun disconnect(autoReconnect: Boolean) {

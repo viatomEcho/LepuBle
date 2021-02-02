@@ -1,5 +1,6 @@
 package com.lepu.blepro.ble
 
+import android.app.Application
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -12,6 +13,7 @@ import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
+import java.lang.Appendable
 import kotlin.experimental.inv
 
 /**

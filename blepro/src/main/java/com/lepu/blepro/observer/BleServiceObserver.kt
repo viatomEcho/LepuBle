@@ -20,6 +20,7 @@ interface BleServiceObserver: LifecycleObserver{
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onCreate()
 
+
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun onDestroy()
 

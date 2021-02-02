@@ -41,9 +41,10 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     /**
      *  断开连接后是否开启扫描重连
      *  默认false
+     *  通过connect()重置
      *
      */
-    private var isAutoReconnect: Boolean = false
+    var isAutoReconnect: Boolean = false
 
     lateinit var manager: BaseBleManager
     lateinit var device: BluetoothDevice
@@ -120,14 +121,17 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         }
     }
 
-
-    fun connect(context: Context, @NonNull device: BluetoothDevice) {
+    /**
+     * 给isAutoReconnect 留一个设置入口
+     */
+    fun connect(context: Context, @NonNull device: BluetoothDevice, isAutoReconnect: Boolean = true) {
         if (connecting || state) {
             return
         }
         LepuBleLog.d(tag, "try connect: ${device.name}")
         this.device = device
         initManager(context, device)
+        this.isAutoReconnect = isAutoReconnect
 
 
     }
@@ -150,8 +154,9 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
             return
         }
         LepuBleLog.d(tag,"tay disconnect..." )
-        this.onDeviceDisconnected(device, ConnectionObserver.REASON_SUCCESS)
         this.isAutoReconnect = isAutoReconnect
+        this.onDeviceDisconnected(device, ConnectionObserver.REASON_SUCCESS)
+
 
     }
 
@@ -166,9 +171,21 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         connecting = false
         publish()
 
-        //如果是组合套装 全部重连中
+        BleServiceHelper.stopScan() // 出现 已经连接还在扫描
+
+        // 重连多个model时
         if(BleServiceHelper.reconnectingMulti) {
-            if (BleServiceHelper.hasUnConnected()) BleServiceHelper.reconnect() else BleServiceHelper.reconnectingMulti = false
+            LepuBleLog.d("reconnectingMulti：检查是否还有未连接的设备")
+            val scanModel = BleServiceHelper.bleService.scanModel
+            val reconnectDeviceName = BleServiceHelper.bleService.reconnectDeviceName
+            scanModel?.let {
+                if ( reconnectDeviceName!= null){
+                    if (BleServiceHelper.hasUnConnected(it))
+                        BleServiceHelper.reconnect(it,
+                            reconnectDeviceName
+                        ) else BleServiceHelper.reconnectingMulti = false
+                }
+            }
         }
 
     }
@@ -187,8 +204,12 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         connecting = false
         stopRtTask()
         publish()
+
+        //断开后
         if (isAutoReconnect){
-            //todo
+            //重开扫描, 扫描该interface的设备
+                LepuBleLog.d(tag, "onDeviceDisconnected....to do")
+            BleServiceHelper.reconnect(model, device.name)
         }
 
 
@@ -208,6 +229,13 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         state = false
 
         connecting = false
+
+
+        if (isAutoReconnect){
+            //重开扫描, 扫描该interface的设备
+            LepuBleLog.d(tag, "onDeviceFailedToConnect....to do")
+            BleServiceHelper.reconnect(model, device.name)
+        }
     }
 
 
@@ -245,7 +273,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      * {@link BleConst}
      */
     internal fun calBleState(): Int {
-        LepuBleLog.d(tag, "ble state::::$state  connecting::::$connecting")
+        LepuBleLog.d(tag, "calBleState ---model: $model, state::::$state,connecting::::$connecting")
         return if (state) Ble.State.CONNECTED else if (connecting) Ble.State.CONNECTING else Ble.State.DISCONNECTED
     }
 
