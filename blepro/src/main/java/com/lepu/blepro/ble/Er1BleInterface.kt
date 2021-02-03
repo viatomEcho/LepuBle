@@ -27,7 +27,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
         manager.setConnectionObserver(this)
         manager.setNotifyListener(this)
         manager.connect(device)
-            .useAutoConnect(true)
+            .useAutoConnect(false)
             .timeout(10000)
             .retry(3, 100)
             .done {

@@ -34,7 +34,6 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     /**
      * 是否需要发送实时指令，不会停止实时任务
      */
-    private var mIsNeedRtCmd = true
 
 
     override fun initManager(context: Context, device: BluetoothDevice) {
@@ -42,7 +41,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
         manager.setConnectionObserver(this)
         manager.setNotifyListener(this)
         manager.connect(device)
-                .useAutoConnect(true)
+                .useAutoConnect(false) // true:可能自动重连， 程序代码还在执行扫描
                 .timeout(10000)
                 .retry(3, 100)
                 .done {
@@ -53,9 +52,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
 
     override fun getRtData() {
-        if (mIsNeedRtCmd) {
-            sendOxyCmd(OxyBleCmd.OXY_CMD_RT_DATA,OxyBleCmd.getRtWave())
-        }
+       sendOxyCmd(OxyBleCmd.OXY_CMD_RT_DATA,OxyBleCmd.getRtWave())
     }
 
 

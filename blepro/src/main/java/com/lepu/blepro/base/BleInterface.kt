@@ -70,7 +70,11 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      */
     var  delayMillis: Long = 1000
 
-//    lateinit var folder: String
+    /**
+     * 实时任务状态flag
+     */
+    var isRtStop: Boolean = true
+
 
 
 
@@ -80,12 +84,11 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
             count++
             if (state) {
                 rtHandler.postDelayed(rTask, delayMillis)
-                getRtData()
+                if (!isRtStop) getRtData()
             }
         }
     }
     abstract fun getRtData()
-
 
 
     /**
@@ -132,8 +135,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         this.device = device
         initManager(context, device)
         this.isAutoReconnect = isAutoReconnect
-
-
     }
 
     abstract fun initManager(context: Context, device: BluetoothDevice)
@@ -171,8 +172,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         connecting = false
         publish()
 
-        BleServiceHelper.stopScan() // 出现 已经连接还在扫描
-
         // 重连多个model时
         if(BleServiceHelper.reconnectingMulti) {
             LepuBleLog.d("reconnectingMulti：检查是否还有未连接的设备")
@@ -206,6 +205,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         publish()
 
         //断开后
+        LepuBleLog.d(tag, "onDeviceDisconnected=====isAutoReconnect:$isAutoReconnect")
         if (isAutoReconnect){
             //重开扫描, 扫描该interface的设备
                 LepuBleLog.d(tag, "onDeviceDisconnected....to do")
@@ -230,6 +230,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
 
         connecting = false
 
+        LepuBleLog.d(tag, "onDeviceFailedToConnect=====isAutoReconnect:$isAutoReconnect")
 
         if (isAutoReconnect){
             //重开扫描, 扫描该interface的设备
@@ -280,12 +281,14 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     fun runRtTask() {
         LepuBleLog.d(tag, "runRtTask start..." )
         rtHandler.removeCallbacks(rTask)
+        isRtStop = false
         rtHandler.postDelayed(rTask, 500)
         LiveEventBus.get(EventMsgConst.RealTime.EventRealTimeStart).post(model)
     }
 
     fun stopRtTask(){
         LepuBleLog.d(tag, "stopRtTask start..." )
+        isRtStop = true
         rtHandler.removeCallbacks(rTask)
         LiveEventBus.get(EventMsgConst.RealTime.EventRealTimeStop).post(model)
 

@@ -14,6 +14,7 @@ import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
+import java.lang.Exception
 
 /**
  * 蓝牙服务
@@ -239,11 +240,11 @@ class BleServiceHelper private constructor() {
         if (!check()) return null
 
         val vailFace = bleService.vailFace
-        LepuBleLog.d(tag, "Warning: getInterface => $model, ${vailFace.size()}, isNUll = ${vailFace.get(model) == null}")
+        LepuBleLog.d(tag, "getInterface: getInterface => currentModel：$model, vailFaceSize：${vailFace.size()}, curIsNUll = ${vailFace.get(model) == null}")
         return vailFace.get(model)
     }
-    fun getInterfaces(): SparseArray<BleInterface>? {
-        if (!check()) return null
+    fun getInterfaces(): SparseArray<BleInterface> {
+        if (!check())  throw Exception("Error: bleService is null !!!")
         return bleService.vailFace
     }
     /**
@@ -257,7 +258,6 @@ class BleServiceHelper private constructor() {
         LepuBleLog.d(tag, "connect")
         getInterface(model)?.let {
             stopScan()
-
             it.connect(context, b, isAutoReconnect)
         }
     }
@@ -277,7 +277,7 @@ class BleServiceHelper private constructor() {
     }
 
     fun reconnect(scanModel: Int, name: String) {
-        LepuBleLog.d(tag, "into reconnect " )
+        LepuBleLog.d(tag, "into reconnect" )
         if (!check()) return
         bleService.reconnect(intArrayOf(scanModel), arrayOf(name))
 
@@ -318,19 +318,25 @@ class BleServiceHelper private constructor() {
     /**
      * 主动获取当前蓝牙连接状态
      */
-    fun getConnectState(model: Int): Int = if (check()) getInterface(model)?.calBleState()!! else Ble.State.UNKNOWN
+//    fun getConnectState(model: Int): Int = if (check()) getInterface(model)?.calBleState()!! else Ble.State.UNKNOWN //可能空指针
+    fun getConnectState(model: Int): Int {
+        if (!check()) return Ble.State.UNKNOWN
+        getInterface(model)?.let {
+            return it.calBleState()
+        }?: return  Ble.State.UNKNOWN
+
+    }
 
 
 
     fun hasUnConnected(model: IntArray): Boolean{
         if (!check()) return false
-        LepuBleLog.d(tag, "hasUnConnected...")
+        LepuBleLog.d(tag, "into hasUnConnected...")
         for (m in model){
             getConnectState(m).let {
                 LepuBleLog.d(tag, "$it")
                 if (it == Ble.State.DISCONNECTED) return true
             }
-
         }
         LepuBleLog.d(tag, "没有未连接设备")
         return false

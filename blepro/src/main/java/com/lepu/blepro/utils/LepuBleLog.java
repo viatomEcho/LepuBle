@@ -5,7 +5,7 @@ import android.util.Log;
 
 
 public class LepuBleLog {
-    private static final String TAG = "LepuBle";
+    private static final String TAG = "***LEPU BLE SDK***";
     private static boolean debug;
 
     private LepuBleLog() {
@@ -40,19 +40,19 @@ public class LepuBleLog {
 
     public static void d(String tag, String message) {
         if (debug) {
-            Log.d(tag, message);
+            Log.d(TAG.concat(tag), message);
         }
     }
 
     public static void w(String tag,String message) {
         if (debug) {
-            Log.w(tag, message);
+            Log.w(TAG.concat(tag), message);
         }
     }
 
     public static void e(String tag,String message) {
         if (debug) {
-            Log.e(tag, message);
+            Log.e(TAG.concat(tag), message);
         }
     }
 }

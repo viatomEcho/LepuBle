@@ -219,10 +219,7 @@ class BleService: LifecycleService() {
             LepuBleLog.d(tag,"请检查重连model && name  size")
             return
         }
-
         var reScan = false
-
-
 
         if (BleServiceHelper.BleServiceHelper.hasUnConnected(scanModel)) {
             reScan = true
@@ -231,7 +228,6 @@ class BleService: LifecycleService() {
             if (scanModel.size > 1) BleServiceHelper.BleServiceHelper.reconnectingMulti = true
             this.reconnectDeviceName = reconnectDeviceName
             startDiscover(scanModel, isReconnecting = true)
-
         }
 
         LepuBleLog.d(tag, "reconnect: => ${scanModel?.joinToString()} => ReScan: $reScan")
