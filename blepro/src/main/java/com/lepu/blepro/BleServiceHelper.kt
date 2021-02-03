@@ -243,8 +243,8 @@ class BleServiceHelper private constructor() {
         LepuBleLog.d(tag, "getInterface: getInterface => currentModel：$model, vailFaceSize：${vailFace.size()}, curIsNUll = ${vailFace.get(model) == null}")
         return vailFace.get(model)
     }
-    fun getInterfaces(): SparseArray<BleInterface> {
-        if (!check())  throw Exception("Error: bleService is null !!!")
+    fun getInterfaces(): SparseArray<BleInterface>? {
+        if (!check())  return null
         return bleService.vailFace
     }
     /**
