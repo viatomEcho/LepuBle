@@ -11,6 +11,7 @@ import android.util.SparseArray
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
+import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
@@ -341,6 +342,15 @@ class BleServiceHelper private constructor() {
 
     }
 
+
+    fun getFileList(model: Int){
+        when(model){
+            Bluetooth.MODEL_ER1 and Bluetooth.MODEL_ER2 ->{
+                getInterface(model)?.getFileList()
+            }
+            else -> LepuBleLog.d(tag, "getFileList, model$model,未被允许获取文件列表")
+        }
+    }
 
     /**
      * 读取主机文件

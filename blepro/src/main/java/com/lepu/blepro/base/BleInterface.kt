@@ -19,15 +19,17 @@ import kotlin.collections.ArrayList
 /**
  * author: wujuan
  * created on: 2021/1/20 17:41
- * description: 蓝牙指令、状态
+ * description: 蓝牙指令、状态基类
  * 一个model对应一个Interface实例互不干扰。App中通过BleChangeObserver、BleInterfaceLifecycle向指定model(可多个)的Interface发起订阅，观察者无需管理生命周期，自身销毁时自动注销订阅
  * 订阅成功后interface将通过BleChangeObserver#onBleStateChanged()发布蓝牙更新状态
  *
- *  每次发起连接将默认将isAutoReconnect赋值为true，即在断开连接回调中会重新开启扫描，重连设备
+ *  1.每次发起连接将默认将isAutoReconnect赋值为true，即在断开连接回调中会重新开启扫描，重连设备
  *
- *  如果进入到多设备重连{BleServiceHelper #isReconnectingMulti = true}则在其中一个设备连接之后再次开启扫描
+ *  2.如果进入到多设备重连{BleServiceHelper #isReconnectingMulti = true}则在其中一个设备连接之后再次开启扫描
  *
- *  通过runRtTask(),stopRtTask()控制实时任务的开关，并将发送相应的EventMsgConst.RealTime...通知
+ *  3.通过runRtTask(),stopRtTask()控制实时任务的开关，并将发送相应的EventMsgConst.RealTime...通知
+ *
+ *  4.通过自定义InterfaceEvent，发送携带model的业务通知
  *
  */
 abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener {

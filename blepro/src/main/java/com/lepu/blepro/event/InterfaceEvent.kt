@@ -16,7 +16,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         companion object{
             const val EventOxyReadFileError = "com.lepu.ble.oxy.read.file.error"
             const val EventOxyReadFileComplete = "com.lepu.ble.oxy.read.file.complete"
-            const val EventOxyReadingFileProgress = "com.lepu.ble.oxy.reading.file.progress" // 当前文件进度
+            const val EventOxyReadingFileProgress = "com.lepu.ble.oxy.reading.file.progress" // 当前文件进度 展示时：(dialogProgress / 10.0) + "%")
 
             const val EventOxyResetDeviceInfo = "com.lepu.ble.oxy.reset"
             const val EventOxySyncDeviceInfo = "com.lepu.ble.oxy.sync"
