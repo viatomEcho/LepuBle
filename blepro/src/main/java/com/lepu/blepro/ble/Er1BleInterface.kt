@@ -1,6 +1,5 @@
 package com.lepu.blepro.ble
 
-import android.app.Application
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -11,14 +10,17 @@ import com.lepu.blepro.ble.cmd.UniversalBleCmd
 import com.lepu.blepro.ble.data.Er1DataController
 import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.event.EventMsgConst
+import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
-import java.lang.Appendable
 import kotlin.experimental.inv
 
 /**
+ *
  * 蓝牙操作
  */
+
 class Er1BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Er1BleInterface"
 
@@ -57,10 +59,10 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 //        LepuBleLog.d(TAG, "received: ${response.cmd}")
         when(response.cmd) {
             UniversalBleCmd.GET_INFO -> {
-                val erInfo = LepuDevice(response.content)
+                val info = LepuDevice(response.content)
 
-                LepuBleLog.d(tag, "GET_INFO => success")
-                LiveEventBus.get(EventMsgConst.ER1.EventEr1Info).post(erInfo)
+                LepuBleLog.d(tag, "model:$model,GET_INFO => success")
+                LiveEventBus.get(InterfaceEvent.ER1.EventEr1Info).post(InterfaceEvent(model, info))
 
                 if (runRtImmediately) runRtTask()
 
@@ -70,14 +72,17 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                 val rtData = Er1BleResponse.RtData(response.content)
 
                 Er1DataController.receive(rtData.wave.wFs)
-//                LepuBleLog.d(TAG, "ER1 Controller: ${Er1DataController.dataRec.size}")
-                LiveEventBus.get(EventMsgConst.ER1.EventEr1RtData)
-                    .post(rtData)
+                LepuBleLog.d(tag, "model:$model,RT_DATA => success")
+                LiveEventBus.get(InterfaceEvent.ER1.EventEr1RtData).post(InterfaceEvent(model, rtData))
             }
 
             UniversalBleCmd.READ_FILE_LIST -> {
                 fileList = Er1BleResponse.Er1FileList(response.content)
-                LepuBleLog.d(tag, fileList.toString())
+                LepuBleLog.d(tag, "model:$model,READ_FILE_LIST => success, ${fileList.toString()}")
+                fileList?.let {
+                    LiveEventBus.get(InterfaceEvent.ER1.EventEr1FileList).post(InterfaceEvent(model, it))
+                }
+
             }
 
             UniversalBleCmd.READ_FILE_START -> {
@@ -86,6 +91,8 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                     sendCmd(UniversalBleCmd.readFileData(0))
                 } else {
                     LepuBleLog.d(tag, "read file failed：${response.pkgType}")
+                    LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadFileError).post(InterfaceEvent(model, true))
+
                 }
             }
 
@@ -93,6 +100,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                 curFile?.apply {
                     this.addContent(response.content)
                     LepuBleLog.d(tag, "read file：${curFile?.fileName}   => ${curFile?.index} / ${curFile?.fileSize}")
+                    LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadingFileProgress).post(InterfaceEvent(model, (curFile!!.index * 1000).div(curFile!!.fileSize) ))
 
                     if (this.index < this.fileSize) {
                         sendCmd(UniversalBleCmd.readFileData(this.index))
@@ -104,7 +112,12 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
             UniversalBleCmd.READ_FILE_END -> {
                 LepuBleLog.d(tag, "read file finished: ${curFile?.fileName} ==> ${curFile?.fileSize}")
+
                 curFileName = null
+                curFile?.let {
+                    LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadFileComplete).post(InterfaceEvent(model, it))
+                }?: LepuBleLog.d(tag, "model:$model,  curFile error!!")
+
                 curFile = null
             }
         }

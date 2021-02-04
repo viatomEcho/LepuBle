@@ -14,6 +14,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.event.EventMsgConst
+import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BIOL
 import com.lepu.blepro.observer.BleChangeObserver
@@ -75,7 +76,7 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
 
         //订阅之后扫描
         // 组合套装 只有最后添加的fragment 开启扫描, 并且使用多设备过滤模式
-        if ( !isMultiply ) BleUtilService.startScan(currentModel)
+        if ( !isMultiply ) BleUtilService.startScan(currentModel, true)
         else if (isMultiply && modelIndex == scanViewModel.state.value!!.size -1)  BleUtilService.startScan(intArrayOf(Bluetooth.MODEL_O2RING, currentModel),true)
 
 
@@ -110,15 +111,15 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
                 })
 
         //设备信息
-        LiveEventBus.get(EventMsgConst.Oxy.EventOxyInfo)
-            .observe(this,{
-                it?.let {
-                    //绑定
-                    if (BleUtilService.bind(it, scanViewModel.device.value!![modelIndex] as Bluetooth)) {
-                        LiveEventBus.get(EventUI.BindFinish).post(true)
-                    }
-                }
-            })
+//        LiveEventBus.get(EventMsgConst.Oxy.EventOxyInfo)
+//            .observe(this,{
+//                it?.let {
+//                    //绑定
+//                    if (BleUtilService.bind(it, scanViewModel.device.value!![modelIndex] as Bluetooth)) {
+//                        LiveEventBus.get(EventUI.BindFinish).post(true)
+//                    }
+//                }
+//            })
         //扫描通知
         LiveEventBus.get(EventMsgConst.Discovery.EventDeviceFound)
                 .observe(this, Observer {
@@ -130,6 +131,14 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
                         && bluetooth != null
                         && b.name == bluetooth.name) {//已绑定
                         BleUtilService.connect(requireActivity().application, b)
+                    }
+                })
+
+        LiveEventBus.get(InterfaceEvent.Oxy.EventOxyInfo)
+                .observe(this, {
+                    it as InterfaceEvent
+                    if (BleUtilService.bind(it.data, scanViewModel.device.value!![modelIndex] as Bluetooth)) {
+                        LiveEventBus.get(EventUI.BindFinish).post(true)
                     }
                 })
 

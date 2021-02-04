@@ -19,7 +19,15 @@ import kotlin.collections.ArrayList
 /**
  * author: wujuan
  * created on: 2021/1/20 17:41
- * description: 蓝牙指令、操作基类
+ * description: 蓝牙指令、状态
+ * 一个model对应一个Interface实例互不干扰。App中通过BleChangeObserver、BleInterfaceLifecycle向指定model(可多个)的Interface发起订阅，观察者无需管理生命周期，自身销毁时自动注销订阅
+ * 订阅成功后interface将通过BleChangeObserver#onBleStateChanged()发布蓝牙更新状态
+ *
+ *  每次发起连接将默认将isAutoReconnect赋值为true，即在断开连接回调中会重新开启扫描，重连设备
+ *
+ *  如果进入到多设备重连{BleServiceHelper #isReconnectingMulti = true}则在其中一个设备连接之后再次开启扫描
+ *
+ *  通过runRtTask(),stopRtTask()控制实时任务的开关，并将发送相应的EventMsgConst.RealTime...通知
  *
  */
 abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener {
@@ -39,9 +47,10 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
 
 
     /**
-     *  断开连接后是否开启扫描重连
+     *  断开连接后是否重新开启扫描操作重连
      *  默认false
-     *  通过connect()重置
+     *  当切换设备、解绑时应该置为false
+     *  调用connect() 可重新赋值
      *
      */
     var isAutoReconnect: Boolean = false
@@ -74,9 +83,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      * 实时任务状态flag
      */
     var isRtStop: Boolean = true
-
-
-
 
 
     inner class RtTask : Runnable {
@@ -125,7 +131,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     }
 
     /**
-     * 给isAutoReconnect 留一个设置入口
+     *
      */
     fun connect(context: Context, @NonNull device: BluetoothDevice, isAutoReconnect: Boolean = true) {
         if (connecting || state) {
@@ -173,7 +179,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         publish()
 
         // 重连多个model时
-        if(BleServiceHelper.reconnectingMulti) {
+        if(BleServiceHelper.isReconnectingMulti) {
             LepuBleLog.d("reconnectingMulti：检查是否还有未连接的设备")
             val scanModel = BleServiceHelper.bleService.scanModel
             val reconnectDeviceName = BleServiceHelper.bleService.reconnectDeviceName
@@ -182,7 +188,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
                     if (BleServiceHelper.hasUnConnected(it))
                         BleServiceHelper.reconnect(it,
                             reconnectDeviceName
-                        ) else BleServiceHelper.reconnectingMulti = false
+                        ) else BleServiceHelper.isReconnectingMulti = false
                 }
             }
         }

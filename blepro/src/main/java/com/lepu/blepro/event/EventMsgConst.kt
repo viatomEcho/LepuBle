@@ -14,6 +14,11 @@ object EventMsgConst {
         }
 
     }
+
+    /**
+     * ble realtime task
+     * 发送通知携带model
+     */
     interface RealTime{
         companion object{
             const val EventRealTimeStart = "com.lepu.ble.realtime.start"
@@ -25,17 +30,17 @@ object EventMsgConst {
     const val EventDeviceDisconnect = "com.lepu.ble.device.disconnect"
 
 
-    /**
-     * ER1 LiveDataBus Event
-     */
-    interface ER1{
-        companion object{
-            const val EventEr1Info = "com.lepu.ble.er1.info"
-            const val EventEr1RtData = "com.lepu.ble.er1.rtData"
-            const val EventEr1InvalidRtData = "com.lepu.ble.er1.invalid.rtData"
-            const val EventEr1Unbind = "com.lepu.ble.er1.unbind"
-        }
-    }
+//    /**
+//     * ER1 LiveDataBus Event
+//     */
+//    interface ER1{
+//        companion object{
+//            const val EventEr1Info = "com.lepu.ble.er1.info"
+//            const val EventEr1RtData = "com.lepu.ble.er1.rtData"
+//            const val EventEr1InvalidRtData = "com.lepu.ble.er1.invalid.rtData"
+//            const val EventEr1Unbind = "com.lepu.ble.er1.unbind"
+//        }
+//    }
 
 
 
@@ -43,33 +48,20 @@ object EventMsgConst {
     /**
      * Oxy LiveDataBus Event
      */
-    interface Oxy{
-        companion object{
-            /**
-             * 配对信息通知：发送后由外部验证.
-             * 消息格式
-             * map["com.lepu.ble.oxy.pair.device"]["com.lepu.ble.oxy.pair.scan.record"]
-             */
-            const val EventOxyPairO2Ring = "com.lepu.ble.oxy.pair.o2ring"
-            const val EventOxyKeyDevice = "com.lepu.ble.oxy.pair.device"
-            const val EventOxyKeyScanRecord = "com.lepu.ble.oxy.pair.scan.record"
-
-            /**
-             * 读文件
-             */
-            const val EventOxyReadFileError = "com.lepu.ble.oxy.read.file.error"
-            const val EventOxyReadFileComplete = "com.lepu.ble.oxy.read.file.complete"
-            const val EventOxyReadingFileProgress = "com.lepu.ble.oxy.reading.file.progress" // 当前文件进度
-
-            const val EventOxyResetDeviceInfo = "com.lepu.ble.oxy.reset"
-            const val EventOxySyncDeviceInfo = "com.lepu.ble.oxy.sync"
-
-            const val EventOxyInfo = "com.lepu.ble.oxy.info"
-
-            const val EventOxyRtData = "com.lepu.ble.oxy.rtData"
-            const val EventOxyRtDataStop = "com.lepu.ble.oxy.rtData.stop"
-        }
-    }
+//    interface Oxy{
+//        companion object{
+//            const val EventOxyReadFileError = "com.lepu.ble.oxy.read.file.error"
+//            const val EventOxyReadFileComplete = "com.lepu.ble.oxy.read.file.complete"
+//            const val EventOxyReadingFileProgress = "com.lepu.ble.oxy.reading.file.progress" // 当前文件进度
+//
+//            const val EventOxyResetDeviceInfo = "com.lepu.ble.oxy.reset"
+//            const val EventOxySyncDeviceInfo = "com.lepu.ble.oxy.sync"
+//
+//            const val EventOxyInfo = "com.lepu.ble.oxy.info"
+//
+//            const val EventOxyRtData = "com.lepu.ble.oxy.rtData"
+//        }
+//    }
 
 
     /**

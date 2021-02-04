@@ -8,8 +8,8 @@ package com.lepu.blepro.observer
 interface BleChangeObserver {
 
     /**
-     * @param curModel 通知来源的设备Model
+     * @param model 通知来源的设备Model
      * @param state 蓝牙状态 {@link Ble.State}
      */
-    fun onBleStateChanged(curModel: Int, state: Int)
+    fun onBleStateChanged(model: Int, state: Int)
 }

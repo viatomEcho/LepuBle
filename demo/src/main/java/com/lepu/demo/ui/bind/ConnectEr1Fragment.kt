@@ -13,6 +13,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.event.EventMsgConst
+import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BIOL
@@ -83,13 +84,12 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
 
             })
         // 设备信息通知
-        LiveEventBus.get(EventMsgConst.ER1.EventEr1Info)
+        LiveEventBus.get(InterfaceEvent.ER1.EventEr1Info)
             .observe(this, {
-                it?.let {
-                    //去绑定
-                    if (BleUtilService.bind(it, scanViewModel.device.value!![modelIndex] as Bluetooth)) {
-                        LiveEventBus.get(EventUI.BindFinish).post(true)
-                    }
+                it as InterfaceEvent
+                //去绑定
+                if (BleUtilService.bind(it.data, scanViewModel.device.value!![modelIndex] as Bluetooth)) {
+                    LiveEventBus.get(EventUI.BindFinish).post(true)
                 }
             })
 
