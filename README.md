@@ -1,11 +1,11 @@
 # LepuBle
-# BleSdk 接入新设备
+# Sdk开发 接入新设备
 
 - `Bluetooth`新增`BT_NAME`和`BT_MODEL`
 
 - 新增`BleInterface` `BleManager`同系列设备可公用
 
-- `EventMsgConst`中配置对应设备的事件的通知
+- `EventMsgConst` `InterfaceEvent`中配置对应interface的事件的通知
 
 - 在`BleService`中配置新增的model
 
@@ -345,6 +345,54 @@ class BleUtilService
 
         }
 ```
+## 3. 获取设备状态
+
+```kotlin
+class BleUtilService{
+		/**
+         * 先判断蓝牙状态  再判断绑定状态
+         * 返回State中的状态(0至3)
+         */
+        fun getDeviceState(model: Int): Int {
+             Bluetooth.MODEL_ER2 -> {
+                            SPUtils.getInstance(Const.CONFIG_USER).getString(Constants.ACTION_ER2_DEVICE_NAME)
+                            }
+                            else ->  throw Exception("Error: 无法识别此model：$model")
+            //todo add
+        }
+		fun getDeviceState(device: MyDevice): Int {
+            //todo add
+        }    
+} 		
+
+```
+
+## 4. 订阅蓝牙状态
+
+1. LifecycleOwner实现BleChangeObserver接口
+2. LifecycleOwner订阅Interface
+
+```java
+public class Fragment implements BleChangeObserver {
+     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //订阅interface
+        getLifecycle().addObserver(new BIOL(this, new int[]{Bluetooth.MODEL_ER2}));
+
+    }
+     /**
+     * 
+     * @param model  如果同时订阅了多个interface, 用来区别信号来源
+     * @param state 蓝牙连接状态Ble.State.CONNECTED 、 Ble.State.CONNECTING、 Ble.State.DISCONNECTED
+     */
+     @Override
+    public void onBleStateChanged(int i, int i1) {
+
+    }
+}
+```
+
 
 
 
