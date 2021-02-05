@@ -29,7 +29,7 @@ public abstract class BaseBleManager extends BleManager {
     public final static UUID notify_uuid =
             UUID.fromString("0734594A-A8E7-4B1A-A6B1-CD5243059A57");
 
-    private BluetoothGattCharacteristic write_char, notify_char;
+    public BluetoothGattCharacteristic write_char, notify_char;
 
     private NotifyListener listener;
 

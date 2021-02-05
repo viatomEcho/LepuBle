@@ -2,7 +2,6 @@ package com.lepu.demo.ble
 
 import android.app.Application
 import android.bluetooth.BluetoothDevice
-import android.content.Context
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.LepuDevice
@@ -138,7 +137,7 @@ companion object {
     }
 
     fun syncData(model: Int, type: String, value: Any) {
-        BleServiceHelper.BleServiceHelper.syncData(model, type, value)
+        BleServiceHelper.BleServiceHelper.updateSetting(model, type, value)
     }
 
     fun reset(model: Int) {

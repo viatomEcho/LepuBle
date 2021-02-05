@@ -56,23 +56,29 @@ public class OxyBleCmd {
         return buf;
     }
 
-    public static byte[] syncData(String type, int value) {
+    public static byte[] syncTime() {
         JSONObject j = new JSONObject();
         try {
-            switch (type) {
-                case SYNC_TYPE_TIME:
-                    j.put(SYNC_TYPE_TIME, makeTimeStr());
-                    break;
-                default:
-                    LepuBleLog.d("syncData type="+type+"value="+value);
-                    j.put(type, value+"");
-                    break;
-
-            }
+            j.put(SYNC_TYPE_TIME, makeTimeStr());
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
+        return sync(j);
+    }
+
+    public static byte[] updateSetting(String type, int value) {
+        JSONObject j = new JSONObject();
+        try {
+            LepuBleLog.d("syncData type="+type+"value="+value);
+            j.put(type, value+"");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return sync(j);
+
+    }
+    private static byte[] sync(JSONObject j) {
         char[] chars = j.toString().toCharArray();
         int size = chars.length;
         byte[] buf = new byte[8 + size];

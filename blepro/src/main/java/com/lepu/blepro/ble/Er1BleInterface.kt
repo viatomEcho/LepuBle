@@ -64,7 +64,10 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 LiveEventBus.get(InterfaceEvent.ER1.EventEr1Info).post(InterfaceEvent(model, info))
 
-                if (runRtImmediately) runRtTask()
+                if (runRtImmediately) {
+                    runRtTask()
+                    runRtImmediately = false
+                }
 
             }
 
@@ -165,7 +168,11 @@ class Er1BleInterface(model: Int): BleInterface(model) {
         sendCmd(UniversalBleCmd.getInfo())
     }
 
-    override fun syncData(type: String, value: Any) {
+    override fun syncTime() {
+    }
+
+    override fun updateSetting(type: String, value: Any) {
+
     }
 
 

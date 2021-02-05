@@ -63,7 +63,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     private var pool: ByteArray? = null
 
     /**
-     * 是否在获取设备信息后立即执行实时任务
+     * 是否在第一次获取设备信息后立即执行实时任务
      * 默认：false
      */
     var runRtImmediately: Boolean = false
@@ -96,7 +96,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
             }
         }
     }
-    abstract fun getRtData()
+
 
 
     /**
@@ -309,10 +309,19 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     abstract fun getInfo()
 
     /**
-     * 同步信息
+     * 同步时间
      */
-    abstract fun syncData(type: String, value: Any)
+    abstract fun syncTime()
 
+    /**
+     * 更新设置
+     */
+    abstract fun updateSetting(type: String, value: Any)
+
+    /**
+     * 获取实时
+     */
+    abstract fun getRtData()
     /**
      * 获取文件列表
      */

@@ -44,4 +44,25 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * BpmBleInterface发出的通知
+     * 包含model: model_bpm
+     */
+    interface BPM{
+        companion object{
+            const val EventBpmInfo = "com.lepu.ble.bpm.info"
+            const val EventBpmRtData = "com.lepu.ble.bpm.rtData"
+            const val EventBpmFileList = "com.lepu.ble.bpm.fileList"
+            const val EventBpmReadFileError = "com.lepu.ble.bpm.read.file.error"
+            const val EventBpmReadingFileProgress = "com.lepu.ble.bpm.reading.file.progress"
+            const val EventBpmReadFileComplete = "com.lepu.ble.bpm.read.file.complete"
+            const val EventBpmResetDeviceInfo = "com.lepu.ble.bpm.reset"
+            const val EventBpmSyncTime = "com.lepu.ble.bpm.sync.time"
+            const val EventBpmRecordData = "com.lepu.ble.bpm.record.data"
+            const val EventBpmRecordEnd = "com.lepu.ble.bpm.record.end"
+            const val EventBpmMeasureResult = "com.lepu.ble.bpm.measure.result"
+
+        }
+    }
+
 }

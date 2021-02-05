@@ -73,3 +73,9 @@ fun bytesToHex(bytes: ByteArray): String {
     }
     return String(hexChars)
 }
+fun shortToByteArray(value: Int): ByteArray {
+    return byteArrayOf(
+        (value ushr 8).toByte(),
+        value.toByte())
+}
+

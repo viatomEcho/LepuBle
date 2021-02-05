@@ -14,6 +14,7 @@ import androidx.lifecycle.LifecycleService
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
+import com.lepu.blepro.ble.BpmBleInterface
 import com.lepu.blepro.ble.OxyBleInterface
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
@@ -132,7 +133,6 @@ class BleService: LifecycleService() {
                 OxyBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
-
                     return this
                 }
             }
@@ -143,6 +143,13 @@ class BleService: LifecycleService() {
                     return this
                 }
 
+            }
+            Bluetooth.MODEL_BPM -> {
+                BpmBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+                    vailFace.put(m, this)
+                    return this
+                }
             }
 
             else -> {

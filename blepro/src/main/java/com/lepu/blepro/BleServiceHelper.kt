@@ -9,13 +9,13 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.SparseArray
 import com.lepu.blepro.base.BleInterface
+import com.lepu.blepro.ble.BpmBleInterface
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
-import java.lang.Exception
 
 /**
  * 单例的蓝牙服务帮助类，原则上只通过此类开放API
@@ -371,11 +371,19 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * 同步信息
+     * 更新设备设置
      */
-    fun syncData(model: Int, type: String, value: Any) {
+    fun updateSetting(model: Int, type: String, value: Any) {
         if (!check()) return
-        getInterface(model)?.syncData(type, value)
+        getInterface(model)?.updateSetting(type, value)
+    }
+
+    /**
+     * 同步时间
+     */
+    fun syncTime(model: Int) {
+        if (!check()) return
+        getInterface(model)?.syncTime()
     }
 
     /**
@@ -386,13 +394,6 @@ class BleServiceHelper private constructor() {
         getInterface(model)?.delayMillis = delayMillis
     }
 
-//    /**
-//     * 设置是否立即开启实时任务
-//     */
-//    fun setRunRtImmediately(model: Int, i: Boolean){
-//        if (!check()) return
-//        getInterface(model)?.runRtImmediately = i
-//    }
 
 
     /**
@@ -420,6 +421,28 @@ class BleServiceHelper private constructor() {
             return false
         }
         return true
+    }
+
+    private fun checkState(inter: BleInterface): Boolean{
+        if (!inter.state){
+            LepuBleLog.d(tag, "Error:model:${inter.model}, ble state is ${inter.state}!!!")
+            return false
+        }
+        return true
+    }
+
+    fun getBpmFileList(model: Int, map: HashMap<String, Any>){
+        if (!check()) return
+        if (model != Bluetooth.MODEL_BPM){
+            LepuBleLog.d(tag,"getBpmFileList, 无效model：$model" )
+            return
+        }
+        getInterface(model)?.let {
+            if (checkState(it)) return
+            (it as BpmBleInterface).getBpmFileList(model, map)
+
+        }
+
     }
 
 
