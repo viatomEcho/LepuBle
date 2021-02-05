@@ -261,14 +261,9 @@ class BpmBleInterface{
 }
 ```
 
-#### Api
+#### Api--BleServiceHleper
 
-```kotlin
-class BleServiceHleper{
-	fun getBpmFileList(model: Int, map: HashMap<String, Any>) //获取设备留存数据
-}
-```
-
+- 获取设备留存数据 getBpmFileList(model: Int, map: HashMap<String, Any>) 
 
 
 # APP集成指南
