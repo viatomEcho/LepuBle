@@ -191,7 +191,21 @@
 
 **主题：除停留在`绑定页`时允许存在多个设备(DeviceType)的interface，其他时候蓝牙服务中应保持只有`已绑定的当前的`设备的interface，或者没有interface。(一个DeviceType可拥有多个model，一个model对应一个Interface实例)**
 
-##  1. APP初始化
+```kotlin
+/**
+ * author: wujuan
+ * created on: 2021/1/28 19:27
+ * description: 有关BleSdk api的调用全部封装在此， 不要在其他地方直接使用BleSdk Api !!!!!
+ * 
+ */
+class BleUtilService {}
+```
+
+## 依赖
+
+api 'com.lepu.blepro:lepu-ble:0.0.5-alpha1'
+
+##  1. 初始化
 
 完成开启Service，初始化已绑定状态的当前的设备的Interface。服务完成初始化不会自动蓝牙连接，由APP进入初始化MainActivity后，MainActivity的子Fragment检查蓝牙权限后主动发起reconnect
 
