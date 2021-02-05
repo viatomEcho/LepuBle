@@ -1,5 +1,7 @@
 # LepuBle
-# Sdk开发 接入新设备
+# BleSdk
+
+## 集成新设备
 
 - `Bluetooth`新增`BT_NAME`和`BT_MODEL`
 
@@ -25,21 +27,23 @@
   }
   ```
 
-- 补充
+- 主要类说明
 
   ```kotlin
   /**
    * author: wujuan
    * created on: 2021/1/20 17:41
-   * description: 蓝牙指令、状态
+   * description: 蓝牙指令、状态基类
    * 一个model对应一个Interface实例互不干扰。App中通过BleChangeObserver、BleInterfaceLifecycle向指定model(可多个)的Interface发起订阅，观察者无需管理生命周期，自身销毁时自动注销订阅
    * 订阅成功后interface将通过BleChangeObserver#onBleStateChanged()发布蓝牙更新状态
    *
-   *  每次发起连接将默认将isAutoReconnect赋值为true，即在断开连接回调中会重新开启扫描，重连设备
+   *  1.每次发起连接将默认将isAutoReconnect赋值为true，即在断开连接回调中会重新开启扫描，重连设备
    *
-   *  如果进入到多设备重连{BleServiceHelper #isReconnectingMulti = true}则在其中一个设备连接之后再次开启扫描
+   *  2.如果进入到多设备重连{BleServiceHelper #isReconnectingMulti = true}则在其中一个设备连接之后再次开启扫描
    *
-   *  通过runRtTask(),stopRtTask()控制实时任务的开关，并将发送相应的EventMsgConst.RealTime...通知
+   *  3.通过runRtTask(),stopRtTask()控制实时任务的开关，并将发送相应的EventMsgConst.RealTime...通知
+   *
+   *  4.通过自定义InterfaceEvent，发送携带model的业务通知
    *
    */
   abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener {
@@ -70,7 +74,7 @@
       private var pool: ByteArray? = null
   
       /**
-       * 是否在获取设备信息后立即执行实时任务
+       * 是否在第一次获取设备信息后立即执行实时任务
        * 默认：false
        */
       var runRtImmediately: Boolean = false
@@ -94,6 +98,9 @@
       var isRtStop: Boolean = true
   }
   
+  ```
+
+  ```kotlin
   
   /**
    * 一个为蓝牙通讯的服务的Service, {@link BleServiceHelper}是它的帮助类
@@ -149,7 +156,9 @@
       var reconnectDeviceName: Array<String>? = null
   }
   
-  
+  ```
+
+  ```kotlin
   /**
    * 单例的蓝牙服务帮助类，原则上只通过此类开放API
    *
@@ -179,35 +188,106 @@
        * 多设备模式手动重连中
        */
       var isReconnectingMulti: Boolean = false
-  
-  
   ```
 
-  
+## 设备说明
 
+### BPM捷美瑞血压计
 
-
-# APP接入BleSdk
-
-**主题：除停留在`绑定页`时允许存在多个设备(DeviceType)的interface，其他时候蓝牙服务中应保持只有`已绑定的当前的`设备的interface，或者没有interface。(一个DeviceType可拥有多个model，一个model对应一个Interface实例)**
+#### 业务通知
 
 ```kotlin
-/**
- * author: wujuan
- * created on: 2021/1/28 19:27
- * description: 有关BleSdk api的调用全部封装在此， 不要在其他地方直接使用BleSdk Api !!!!!
- * 
- */
-class BleUtilService {}
+class BpmBleInterface{
+ private fun onResponseReceived(bytes: ByteArray) {
+        LepuBleLog.d(tag, " onResponseReceived : " + bytesToHex(bytes))
+        when(BpmBleCmd.getMsgType(bytes)) {
+            BpmBleCmd.BPMCmd.MSG_TYPE_GET_INFO -> {
+                //设备信息
+                LepuBleLog.d(tag, "model:$model,GET_INFO => success")
+                LiveEventBus.get(InterfaceEvent.BPM.EventBpmInfo).post(InterfaceEvent(model, true))
+
+                if (runRtImmediately) {
+                    runRtTask()
+                    runRtImmediately = false
+                }
+            }
+            BpmBleCmd.BPMCmd.MSG_TYPE_SET_TIME -> {
+                //同步时间
+                LepuBleLog.d(tag, "model:$model,MSG_TYPE_SET_TIME => success")
+                LiveEventBus.get(InterfaceEvent.BPM.EventBpmSyncTime).post(InterfaceEvent(model, true))
+            }
+            BpmBleCmd.BPMCmd.MSG_TYPE_GET_BP_STATE -> {
+
+                LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_BP_STATE => success")
+                //发送实时state : byte
+                LiveEventBus.get(InterfaceEvent.BPM.EventBpmRtData).post(InterfaceEvent(model, bytes[0]))
+            }
+            BpmBleCmd.BPMCmd.MSG_TYPE_GET_RECORDS -> {
+                //获取留存记录
+                LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_RECORDS => success")
+
+               BpmCmd(bytes).let {
+                   LiveEventBus.get(InterfaceEvent.BPM.EventBpmRecordData).post(InterfaceEvent(model, it ))
+
+                   if (it.type == 0xB3.toByte()) {
+                       if (bytes[11] == 0x00.toByte()) {
+                           isUserAEnd = true
+                       }
+                       if (bytes[11] == 0x01.toByte()) {
+                           isUserBEnd = true
+                       }
+                       if (isUserAEnd && isUserBEnd) {
+                           //AB都读取完成
+                           LiveEventBus.get(InterfaceEvent.BPM.EventBpmRecordEnd).post(InterfaceEvent(model, true ))
+                           syncState = true
+                       }
+                   }
+               }
+
+            }
+            BpmBleCmd.BPMCmd.MSG_TYPE_GET_RESULT -> {
+                // 返回测量数据
+                LiveEventBus.get(InterfaceEvent.BPM.EventBpmMeasureResult).post(InterfaceEvent(model, BpmCmd(bytes) ))
+            }
+            else -> {
+                //实时指标
+                LiveEventBus.get(InterfaceEvent.BPM.EventBpmMeasureResult).post(InterfaceEvent(model, BpmCmd(bytes) ))
+
+            }
+        }
+    }
+
+
+}
 ```
+
+#### Api
+
+```kotlin
+class BleServiceHleper{
+	fun getBpmFileList(model: Int, map: HashMap<String, Any>) //获取设备留存数据
+}
+```
+
+
+
+# APP集成指南
+
+主题：除停留在`绑定页`时允许存在多个设备(DeviceType)的interface，其他时候蓝牙服务中应保持只有`已绑定的当前的`设备的interface，或者没有interface。(一个DeviceType可拥有多个model，一个model对应一个Interface实例)
 
 ## 依赖
 
-api 'com.lepu.blepro:lepu-ble:0.0.5-alpha1'
+api 'com.lepu.blepro:lepu-ble:0.0.5-alpha2'
+
+**app中有关BleSdk api的调用全部封装在此， 不要在其他地方直接使用BleServiceHelper !!!!!**
+
+```kotlin
+class BleUtilService {}
+```
 
 ##  1. 初始化
 
-完成开启Service，初始化已绑定状态的当前的设备的Interface。服务完成初始化不会自动蓝牙连接，由APP进入初始化MainActivity后，MainActivity的子Fragment检查蓝牙权限后主动发起reconnect
+**主题：在Application onCreate时完成配置开启Service，初始化已绑定状态的当前的设备的Interface。服务完成初始化不会自动蓝牙连接，由APP初始化MainActivity后，MainActivity的子Fragment检查蓝牙权限后主动发起reconnect**
 
 ### 流程
 
@@ -217,11 +297,11 @@ api 'com.lepu.blepro:lepu-ble:0.0.5-alpha1'
 
   - 配置log
 
-  - 配置RawFolder--主机(model)源文件下载后保存路径
+  - 配置RawFolder--设备(model)源文件下载后保存路径
 
   - 配置ModelConfig--设备model(条件：当前Device && 已绑定)
 
-  - 配置RtConfig --设备接收getInfo后是否立即开启实时测量任务(条件：当前Device && 已绑定)
+  - 配置RtConfig --Interface接收getInfo响应后是否立即开启实时测量任务(条件：当前Device && 已绑定)
 
   - 初始化initService
 
@@ -276,7 +356,7 @@ BLUETOOTH.BLE_RAW_FOLDERS.put...//todo add
 主题：
 
 - 所有的绑定页集成到`scanActivity`拥有的Fragment中,Activity中负责公共部分，各自设备的核心绑定功能在各个Fragment中完成，通过`ViewModel`共享数据
-- 绑定业务的Fragment初始化时，应向蓝牙服务添加对应model的Interface。离开绑定页面，将比对当前设备并根据设备的绑定情况整理服务中的interface。
+- 负责绑定业务的Fragment初始化时，应向蓝牙服务添加对应model的Interface。离开绑定页面，将比对当前设备并根据设备的绑定情况整理服务中的interface。
 
 ```kotlin
 class ScanActivity : AppCompatActivity() {
@@ -359,6 +439,7 @@ class BleUtilService
 
         }
 ```
+
 ## 3. 获取设备状态
 
 ```kotlin
