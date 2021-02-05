@@ -1,5 +1,8 @@
 package com.lepu.blepro.event
 
+/**
+ * 公共的通知
+ */
 object EventMsgConst {
 
 

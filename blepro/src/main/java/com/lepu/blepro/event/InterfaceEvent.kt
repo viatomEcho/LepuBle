@@ -11,6 +11,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * Oxy LiveDataBus Event
+     * OxyBleInterface发出的通知
+     * 包含model: model_o2ring
      */
     interface Oxy{
         companion object{
@@ -26,6 +28,10 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * Er1BleInterface发出的通知
+     * 包含model: model_er1\model_duoek\model_er2
+     */
     interface ER1{
         companion object{
             const val EventEr1Info = "com.lepu.ble.er1.info"

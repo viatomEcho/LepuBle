@@ -18,7 +18,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_WEARO2 = "WearO2";
     public static final String BT_NAME_SLEEPU = "SleepU";
     public static final String BT_NAME_ER1 = "ER1";
-    public static final String BT_NAME_ER2 = "DuoEK";
+    public static final String BT_NAME_DUOEK = "DuoEK";
     public static final String BT_NAME_PULSEBIT_EX = "Pulsebit";
     public static final String BT_NAME_OXY_LINK = "Oxylink";
     public static final String BT_NAME_KIDS_O2 = "KidsO2";
@@ -28,6 +28,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_KCA = "KCA"; // 康康血压计
     public static final String BT_NAME_O2MAX = "O2M"; // O2 Max
     public static final String BT_NAME_BPM = "BPM-188"; // 捷美瑞血压计
+    public static final String BT_NAME_ER2 = "ER2";
 
 
     public static final int MODEL_UNRECOGNIZED = 0;
@@ -38,7 +39,7 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_WEARO2 = 5;
     public static final int MODEL_SLEEPU = 6;
     public static final int MODEL_ER1 = 7;
-    public static final int MODEL_ER2 = 8;
+    public static final int MODEL_DUOEK = 8;
     public static final int MODEL_PULSEBITEX = 9;
     public static final int MODEL_OXYLINK = 10;
     public static final int MODEL_KIDSO2 = 11;
@@ -48,10 +49,11 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_KCA = 15;
     public static final int MODEL_O2MAX = 16;
     public static final int MODEL_BPM = 17;
+    public static final int MODEL_ER2 = 18;
 
 
 
-    @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL, MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2MAX, MODEL_BPM})
+    @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1,MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL, MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2MAX, MODEL_BPM})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 
@@ -83,6 +85,8 @@ public class Bluetooth implements Parcelable {
                 return MODEL_SLEEPU;
             case BT_NAME_ER1:
                 return MODEL_ER1;
+            case BT_NAME_DUOEK:
+                return MODEL_DUOEK;
             case BT_NAME_ER2:
                 return MODEL_ER2;
             case BT_NAME_PULSEBIT_EX:
