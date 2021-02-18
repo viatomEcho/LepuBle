@@ -6,6 +6,8 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BpmBleCmd
 import com.lepu.blepro.ble.data.BpmCmd
+import com.lepu.blepro.ble.data.BpmDeviceInfo
+import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
@@ -89,8 +91,10 @@ class BpmBleInterface(model: Int): BleInterface(model) {
         when(BpmBleCmd.getMsgType(bytes)) {
             BpmBleCmd.BPMCmd.MSG_TYPE_GET_INFO -> {
                 //设备信息
+                val deviceInfo = BpmDeviceInfo(bytes, device.name)
+
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
-                LiveEventBus.get(InterfaceEvent.BPM.EventBpmInfo).post(InterfaceEvent(model, true))
+                LiveEventBus.get(InterfaceEvent.BPM.EventBpmInfo).post(InterfaceEvent(model, deviceInfo))
 
                 if (runRtImmediately) {
                     runRtTask()
@@ -106,7 +110,7 @@ class BpmBleInterface(model: Int): BleInterface(model) {
 
                 LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_BP_STATE => success")
                 //发送实时state : byte
-                LiveEventBus.get(InterfaceEvent.BPM.EventBpmRtData).post(InterfaceEvent(model, bytes[0]))
+                LiveEventBus.get(InterfaceEvent.BPM.EventBpmRtData).post(InterfaceEvent(model, bytes))
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_GET_RECORDS -> {
                 //获取留存记录
