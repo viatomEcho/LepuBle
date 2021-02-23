@@ -26,174 +26,178 @@
   }
   ```
 
-- 主要类说明
+## 主要类说明
 
-  ```kotlin
-  /**
-   * author: wujuan
-   * created on: 2021/1/20 17:41
-   * description: 蓝牙指令、状态基类
-   * 一个model对应一个Interface实例互不干扰。App中通过BleChangeObserver、BleInterfaceLifecycle向指定model(可多个)的Interface发起订阅，观察者无需管理生命周期，自身销毁时自动注销订阅
-   * 订阅成功后interface将通过BleChangeObserver#onBleStateChanged()发布蓝牙更新状态
-   *
-   *  1.每次发起连接将默认将isAutoReconnect赋值为true，即在断开连接回调中会重新开启扫描，重连设备
-   *
-   *  2.如果进入到多设备重连{BleServiceHelper #isReconnectingMulti = true}则在其中一个设备连接之后再次开启扫描
-   *
-   *  3.通过runRtTask(),stopRtTask()控制实时任务的开关，并将发送相应的EventMsgConst.RealTime...通知
-   *
-   *  4.通过自定义InterfaceEvent，发送携带model的业务通知
-   *
-   */
-  abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener {
-        /**
-       * 蓝牙连接状态
-       */
-      internal var state = false
-  
-  
+```kotlin
+/**
+ * author: wujuan
+ * created on: 2021/1/20 17:41
+ * description: 蓝牙指令、状态基类
+ * 一个model对应一个Interface实例互不干扰。App中通过BleChangeObserver、BleInterfaceLifecycle向指定model(可多个)的Interface发起订阅，观察者无需管理生命周期，自身销毁时自动注销订阅
+ * 订阅成功后interface将通过BleChangeObserver#onBleStateChanged()发布蓝牙更新状态
+ *
+ *  1.每次发起连接将默认将isAutoReconnect赋值为true，即在断开连接回调中会重新开启扫描，重连设备
+ *
+ *  2.如果进入到多设备重连{BleServiceHelper #isReconnectingMulti = true}则在其中一个设备连接之后再次开启扫描
+ *
+ *  3.通过runRtTask(),stopRtTask()控制实时任务的开关，并将发送相应的EventMsgConst.RealTime...通知
+ *
+ *  4.通过自定义InterfaceEvent，发送携带model的业务通知
+ *
+ */
+abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener {
       /**
-       * 连接中
-       */
-      private var connecting = false
-  
-  
-      /**
-       *  断开连接后是否重新开启扫描操作重连
-       *  默认false
-       *  当切换设备、解绑时应该置为false
-       *  调用connect() 可重新赋值
-       *
-       */
-      var isAutoReconnect: Boolean = false
-  
-      lateinit var manager: BaseBleManager
-      lateinit var device: BluetoothDevice
-  
-      private var pool: ByteArray? = null
-  
-      /**
-       * 是否在第一次获取设备信息后立即执行实时任务
-       * 默认：false
-       */
-      var runRtImmediately: Boolean = false
-  
-      /**
-       * 获取实时波形
-       */
-      private var count: Int = 0
-      private val rtHandler = Handler(Looper.getMainLooper())
-      private  var rTask: RtTask = RtTask()
-  
-      /**
-       * 获取实时的间隔
-       * 默认： 1000 ms
-       */
-      var  delayMillis: Long = 1000
-  
-      /**
-       * 实时任务状态flag
-       */
-      var isRtStop: Boolean = true
-  }
-  
-  ```
+     * 蓝牙连接状态
+     */
+    internal var state = false
 
-  ```kotlin
-  
-  /**
-   * 一个为蓝牙通讯的服务的Service, {@link BleServiceHelper}是它的帮助类
-   *
-   * 1.在Application onCreate中, 通过BleServiceHelper初始化
-   *
-   * 2.继承LifecycleService使生命周期可被观察, 通过实现{@link BleServiceObserver}可自定义订阅者，订阅者通过观察此服务的生命周期变化，在不同阶段进行相应的工作
-   *    如： 在Service OnCreate/ onDestroy时进行 数据库初始化/关闭
-   *
-   * 3.vailFace是保存BleInterface的SparseArray集合, 以设备的Model值为key, value为BleInterface
-   *
-   * 4.开启扫描时，可指定多个需要过滤的model，可指定是否发送pair配对通知
-   *   - 来自绑定时发起的扫描：APP应该只在绑定页注册foundDevice和pair通知，接收到通知后由APP进行配对及连接
-   *   - 来自重连时发起的扫描：不会发送pair和found通知。判断设备是否属于reconnectDeviceName， 是则由该model的Interface发起连接。
-   *                         如果指定扫描多个model，将进入到多设备扫描状态{BleServiceHelper #isReconnectingMulti = true}则在某一个设备连接成功后，检查是否还有未连接的设备，是则继续重新开启扫描
-   *
-   * 5. 每次发起连接前必须关闭扫描
-   *
-   */
-  
-  class BleService: LifecycleService() {
-      
-      val tag: String = "BleService"
-  
-      /**
-       * 保存可用的BleInterface集合
-       */
-      var vailFace: SparseArray<BleInterface> = SparseArray()
-  
-      /**
-       *  指定扫描的Model，扫描结果根据它的值过滤
-       *  每次开启扫描时传入指定model，被重新赋值
-       *
-       */
-      var scanModel: IntArray? = null
-  
-      /**
-       * 本次扫描是否需要发送配对信息
-       * 默认： false
-       * 开启扫描被重新赋值
-       */
-      var needPair: Boolean = false
-  
-  
-      /**
-       * 本次扫描是否来自重连(已知蓝牙名)，默认false，通过reconnect()开启扫描被赋值true
-       */
-      var isReconnectScan: Boolean = false
-  
-      /**
-       * 发起重连扫描时应匹配的蓝牙名集合
-       */
-      var reconnectDeviceName: Array<String>? = null
-  }
-  
-  ```
 
-  ```kotlin
-  /**
-   * 单例的蓝牙服务帮助类，原则上只通过此类开放API
-   *
-   * 1. 在Application onCreate()中初始化，完成必须配置(modelConfig、runRtConfig)后通过initService()开启服务#BleService。
-   *
-   *
-   */
-  class BleServiceHelper private constructor() {
-  
-      /**
-       * 下载数据的保存路径，key为model
-       */
-      var rawFolder: SparseArray<String>? = null
-  
-      /**
-       * 服务onServiceConnected()时，应该初始化的model配置。必须在initService()之前完成
-       * key为model
-       */
-      var modelConfig: SparseArray<Int> = SparseArray()
-      /**
-       * 服务onServiceConnected()时，应该初始化的model配置。必须在initService()之前完成
-       * key为model
-       */
-      var runRtConfig: SparseArray<Boolean> = SparseArray()
-  
-      /**
-       * 多设备模式手动重连中
-       */
-      var isReconnectingMulti: Boolean = false
-  ```
+    /**
+     * 连接中
+     */
+    private var connecting = false
 
-## 设备说明
+
+    /**
+     *  断开连接后是否重新开启扫描操作重连
+     *  默认false
+     *  当切换设备、解绑时应该置为false
+     *  调用connect() 可重新赋值
+     *
+     */
+    var isAutoReconnect: Boolean = false
+
+    lateinit var manager: BaseBleManager
+    lateinit var device: BluetoothDevice
+
+    private var pool: ByteArray? = null
+
+    /**
+     * 是否在第一次获取设备信息后立即执行实时任务
+     * 默认：false
+     */
+    var runRtImmediately: Boolean = false
+
+    /**
+     * 获取实时波形
+     */
+    private var count: Int = 0
+    private val rtHandler = Handler(Looper.getMainLooper())
+    private  var rTask: RtTask = RtTask()
+
+    /**
+     * 获取实时的间隔
+     * 默认： 1000 ms
+     */
+    var  delayMillis: Long = 1000
+
+    /**
+     * 实时任务状态flag
+     */
+    var isRtStop: Boolean = true
+}
+
+```
+
+```kotlin
+
+/**
+ * 一个为蓝牙通讯的服务的Service, {@link BleServiceHelper}是它的帮助类
+ *
+ * 1.在Application onCreate中, 通过BleServiceHelper初始化
+ *
+ * 2.继承LifecycleService使生命周期可被观察, 通过实现{@link BleServiceObserver}可自定义订阅者，订阅者通过观察此服务的生命周期变化，在不同阶段进行相应的工作
+ *    如： 在Service OnCreate/ onDestroy时进行 数据库初始化/关闭
+ *
+ * 3.vailFace是保存BleInterface的SparseArray集合, 以设备的Model值为key, value为BleInterface
+ *
+ * 4.开启扫描时，可指定多个需要过滤的model，可指定是否发送pair配对通知
+ *   - 来自绑定时发起的扫描：APP应该只在绑定页注册foundDevice和pair通知，接收到通知后由APP进行配对及连接
+ *   - 来自重连时发起的扫描：不会发送pair和found通知。判断设备是否属于reconnectDeviceName， 是则由该model的Interface发起连接。
+ *                         如果指定扫描多个model，将进入到多设备扫描状态{BleServiceHelper #isReconnectingMulti = true}则在某一个设备连接成功后，检查是否还有未连接的设备，是则继续重新开启扫描
+ *
+ * 5. 每次发起连接前必须关闭扫描
+ *
+ */
+
+class BleService: LifecycleService() {
+    
+    val tag: String = "BleService"
+
+    /**
+     * 保存可用的BleInterface集合
+     */
+    var vailFace: SparseArray<BleInterface> = SparseArray()
+
+    /**
+     *  指定扫描的Model，扫描结果根据它的值过滤
+     *  每次开启扫描时传入指定model，被重新赋值
+     *
+     */
+    var scanModel: IntArray? = null
+
+    /**
+     * 本次扫描是否需要发送配对信息
+     * 默认： false
+     * 开启扫描被重新赋值
+     */
+    var needPair: Boolean = false
+
+
+    /**
+     * 本次扫描是否来自重连(已知蓝牙名)，默认false，通过reconnect()开启扫描被赋值true
+     */
+    var isReconnectScan: Boolean = false
+
+    /**
+     * 发起重连扫描时应匹配的蓝牙名集合
+     */
+    var reconnectDeviceName: Array<String>? = null
+}
+
+```
+
+```kotlin
+/**
+ * 单例的蓝牙服务帮助类，原则上只通过此类开放API
+ *
+ * 1. 在Application onCreate()中初始化，完成必须配置(modelConfig、runRtConfig)后通过initService()开启服务#BleService。
+ *
+ *
+ */
+class BleServiceHelper private constructor() {
+
+    /**
+     * 下载数据的保存路径，key为model
+     */
+    var rawFolder: SparseArray<String>? = null
+
+    /**
+     * 服务onServiceConnected()时，应该初始化的model配置。必须在initService()之前完成
+     * key为model
+     */
+    var modelConfig: SparseArray<Int> = SparseArray()
+    /**
+     * 服务onServiceConnected()时，应该初始化的model配置。必须在initService()之前完成
+     * key为model
+     */
+    var runRtConfig: SparseArray<Boolean> = SparseArray()
+
+    /**
+     * 多设备模式手动重连中
+     */
+    var isReconnectingMulti: Boolean = false
+```
+
+## 特殊API说明
 
 ### BPM捷美瑞血压计
 
-# APP集成指南
+- 获取文件列表getBpmFileList(model: Int, map: HashMap<String, Any>)
+
+
+
+# APP集成BleSdk指南
 
 主题：除停留在`绑定页`时允许存在多个设备(DeviceType)的interface，其他时候蓝牙服务中应保持只有`已绑定的当前的`设备的interface，或者没有interface。(一个DeviceType可拥有多个model，一个model对应一个Interface实例)
 
@@ -258,7 +262,7 @@ class AppLifecycleImpl
 
 ```
 
-### 新增设备
+### 新增配置
 
 ```kotlin
 class BleUtilService
@@ -524,4 +528,76 @@ class BleUtilService
 主题：订阅BleService的生命周期
 
 应用：保存APP运行时的实时测量数据
+
+## 10.下载文件
+
+```kotlin
+class BleUtilService{
+		 @JvmOverloads
+        fun readFile(userId: String, fileName: String, model: Int, offset: Int = 0) {
+            BleServiceHelper.BleServiceHelper.readFile(userId, fileName, model, offset)
+        }
+
+        @JvmOverloads
+        fun readFile(userId: String, fileName: String, device: MyDevice, offset: Int = 0) {
+            when(device.deviceType.toInt()){
+                Constants.DeviceType.ER1_TYPE -> {
+                    readFile(userId, fileName, Bluetooth.MODEL_ER1, offset)
+                }
+                Constants.DeviceType.DUOEK_TYPE -> {
+                    readFile(userId, fileName, Bluetooth.MODEL_DUOEK, offset)
+                }
+                Constants.DeviceType.O2RING_TYPE -> {
+                    readFile(userId, fileName, Bluetooth.MODEL_O2RING, 0) //不支持断点下载
+                }
+                else -> throw Exception("无法识别：deviceType=${device.deviceType}")
+            }
+        }
+}
+```
+
+## 11.断点下载
+
+```java
+//获取本地文件长度，即这次读文件的偏移量
+byte[] offset = BleUtilService.Companion.getOffset(curModel, LoginUtil.getUserId(), fileList.get(0).trim());
+        BleUtilService.Companion.readFile(LoginUtil.getUserId(), fileList.get(0), myDevice, offset.length);
+```
+
+### 暂停下载
+
+```kotlin
+ /**
+ * 暂停读取文件
+ * @param model Int
+ */
+fun pauseReadFile(model: Int){
+    BleServiceHelper.BleServiceHelper.pauseReadFile(model)
+}        
+```
+
+## 继续下载
+
+```kotlin
+fun continueReadFile(model: Int, userId: String, fileName: String){
+    getOffset(model, userId, fileName)?.let {
+        LogUtils.d("continueReadFile...")
+        BleServiceHelper.BleServiceHelper.continueReadFile(model, userId, fileName, it.size)
+    }
+}
+```
+
+### 结束下载
+
+```kotlin
+/**
+* 结束读取文件
+* @param model Int
+*/
+fun cancelReadFile(model: Int){
+    BleServiceHelper.BleServiceHelper.cancelReadFile(model)
+}
+```
+
+
 
