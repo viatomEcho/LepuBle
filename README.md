@@ -203,7 +203,7 @@ class BleServiceHelper private constructor() {
 
 ## 依赖
 
-api 'com.lepu.blepro:lepu-ble:0.0.5-alpha2'
+api 'com.lepu.blepro:lepu-ble:0.0.5-alpha24'
 
 **app中有关BleSdk api的调用全部封装在此， 不要在其他地方直接使用BleServiceHelper !!!!!**
 
