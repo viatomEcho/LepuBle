@@ -97,6 +97,23 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         }
     }
 
+    /**
+     * 是否暂停读文件
+     */
+    var isPausedRF: Boolean = false
+
+    /**
+     * 是否取消读文件
+     */
+    var isCancelRF: Boolean = false
+
+    /**
+     * 开始读取时的偏移量，用于断点续传
+     * 继续读取的时候 offset = curFile.index + offset(初始赋值)
+     */
+    var offset: Int = 0;
+
+
 
 
     /**
@@ -330,11 +347,31 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     /**
      * 读文件
      */
-    abstract fun readFile(userId: String, fileName: String)
+    fun readFile(userId: String, fileName: String, offset: Int = 0){
+        this.offset = offset// 作用于断点续传
+        this.isCancelRF = false
+        this.isPausedRF = false
+        dealReadFile(userId, fileName)
+    }
+    abstract fun dealReadFile(userId: String, fileName: String)
 
     /**
      * 重置设备
      */
     abstract fun resetDeviceInfo()
+
+    /**
+     * 继续 读取文件
+     */
+    fun continueRf(userId: String, fileName: String, offset: Int){
+        this.offset = offset
+        dealContinueRF(userId, fileName)
+
+    }
+    abstract fun dealContinueRF(userId: String, fileName: String)
+
+
+
+
 
 }

@@ -3,6 +3,7 @@ package com.lepu.blepro.ble.cmd
 import android.os.Parcelable
 import com.lepu.blepro.ble.data.Er1DataController
 import com.lepu.blepro.download.DownloadHelper
+import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
 import kotlinx.android.parcel.Parcelize
 
@@ -22,7 +23,7 @@ object Er1BleResponse {
             pkgType = bytes[3]
             pkgNo = (bytes[4].toUInt() and 0xFFu).toInt()
             len = toUInt(bytes.copyOfRange(5, 7))
-            content = bytes.copyOfRange(7, 7+len)
+            content = bytes.copyOfRange(7, 7 + len)
         }
     }
 
@@ -61,6 +62,7 @@ object Er1BleResponse {
             runStatus = bytes[8]
             leadOn = (bytes[8].toUInt() and 0x07u) != 0x07u
         }
+
     }
 
     @Parcelize
@@ -109,13 +111,13 @@ object Er1BleResponse {
             val lead4 = mutableListOf<Byte>()
             for (i in 2 until bytes.size step 8) {
                 lead1.add(bytes[i])
-                lead1.add(bytes[i+1])
-                lead2.add(bytes[i+2])
-                lead2.add(bytes[i+3])
-                lead3.add(bytes[i+4])
-                lead3.add(bytes[i+5])
-                lead4.add(bytes[i+6])
-                lead4.add(bytes[i+7])
+                lead1.add(bytes[i + 1])
+                lead2.add(bytes[i + 2])
+                lead2.add(bytes[i + 3])
+                lead3.add(bytes[i + 4])
+                lead3.add(bytes[i + 5])
+                lead4.add(bytes[i + 6])
+                lead4.add(bytes[i + 7])
             }
             wave.add(lead1.toByteArray())
             wave.add(lead2.toByteArray())
@@ -130,7 +132,7 @@ object Er1BleResponse {
     }
 
 
-    class Er1File(val model: Int,  val name:String, val size: Int, private val userId: String) {
+    class Er1File(val model: Int, val name: String, val size: Int, private val userId: String) {
         var fileName: String
         var fileSize: Int
         var content: ByteArray
@@ -143,15 +145,16 @@ object Er1BleResponse {
             index = 0
         }
 
-        fun addContent(bytes: ByteArray) {
-            if (index >= fileSize) {
+        fun addContent(bytes: ByteArray, offset: Int) {
+            if (index + offset >= fileSize) {
                 return // 已下载完成
             } else {
                 System.arraycopy(bytes, 0, content, index, bytes.size)
-                DownloadHelper.writeFile(model, userId, fileName, bytes )
+                DownloadHelper.writeFile(model, userId, fileName, "dat", bytes)
 
                 index += bytes.size
             }
+            LepuBleLog.d("er1File,bytes size = ${bytes.size}, index = $index")
         }
     }
 
@@ -164,7 +167,7 @@ object Er1BleResponse {
         init {
             size=bytes[0].toUInt().toInt()
             for (i in  0 until size) {
-                fileList.add(bytes.copyOfRange(1+i*16, 17+i*16))
+                fileList.add(bytes.copyOfRange(1 + i * 16, 17 + i * 16))
             }
         }
 

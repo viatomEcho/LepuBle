@@ -8,10 +8,12 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.SparseArray
+import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.BpmBleInterface
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.observer.BleServiceObserver
@@ -221,7 +223,7 @@ class BleServiceHelper private constructor() {
         if (!check()) return null
 
         val vailFace = bleService.vailFace
-        LepuBleLog.d(tag, "getInterface: getInterface => currentModel：$model, vailFaceSize：${vailFace.size()}, curIsNUll = ${vailFace.get(model) == null}")
+        LepuBleLog.e(tag, "getInterface: getInterface => currentModel：$model, vailFaceSize：${vailFace.size()}, curIsNUll = ${vailFace.get(model) == null}")
         return vailFace.get(model)
     }
 
@@ -345,7 +347,7 @@ class BleServiceHelper private constructor() {
 
     fun getFileList(model: Int){
         when(model){
-            Bluetooth.MODEL_ER1 and Bluetooth.MODEL_ER2 ->{
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2 ->{
                 getInterface(model)?.getFileList()
             }
             else -> LepuBleLog.d(tag, "getFileList, model$model,未被允许获取文件列表")
@@ -354,12 +356,57 @@ class BleServiceHelper private constructor() {
 
     /**
      * 读取主机文件
+     * @param userId String
+     * @param fileName String
+     * @param model Int
+     * @param offset Int 开始读文件的偏移量
      */
-    fun readFile(userId: String, fileName: String, model: Int) {
+    fun readFile(userId: String, fileName: String, model: Int, offset: Int = 0) {
         if (!check()) return
-        getInterface(model)?.readFile(userId, fileName)
+        getInterface(model)?.let {
+            it.readFile(userId, fileName, offset)
+        }
 
     }
+
+    /**
+     * 取消读取文件
+     * @param model Int
+     */
+    fun cancelReadFile(model: Int){
+        if (!check()) return
+        getInterface(model)?.let {
+            it.isCancelRF = true
+            LiveEventBus.get(EventMsgConst.Download.EventIsCancel).post(model)
+        }
+    }
+
+    /**
+     * 暂停 读取文件
+     * @param model Int
+     * @param isPause Boolean
+     */
+    fun pauseReadFile(model: Int){
+        if (!check()) return
+        getInterface(model)?.let {
+            it.isPausedRF = true
+            LiveEventBus.get(EventMsgConst.Download.EventIsPaused).post(model)
+        }
+    }
+
+    /**
+     * 继续读取文件,并发送通知
+     * @param model Int
+     */
+    fun continueReadFile(model: Int,userId: String, fileName: String, offset: Int){
+        if (!check()) return
+        getInterface(model)?.let {
+            it.isPausedRF = false
+            it.continueRf(userId, fileName, offset)
+            LiveEventBus.get(EventMsgConst.Download.EventIsContinue).post(model)
+        }
+    }
+
 
     /**
      * 重置主机

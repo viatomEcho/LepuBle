@@ -29,6 +29,14 @@ object EventMsgConst {
         }
     }
 
+    interface Download{
+        companion object{
+            const val EventIsPaused = "com.lepu.ble.download.paused"
+            const val EventIsContinue = "com.lepu.ble.download.continue"
+            const val EventIsCancel = "com.lepu.ble.download.cancel"
+        }
+    }
+
 
     const val EventDeviceDisconnect = "com.lepu.ble.device.disconnect"
 

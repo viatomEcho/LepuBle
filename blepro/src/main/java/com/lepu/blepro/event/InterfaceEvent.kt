@@ -40,6 +40,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventEr1ReadFileError = "com.lepu.ble.er1.read.file.error"
             const val EventEr1ReadingFileProgress = "com.lepu.ble.er1.reading.file.progress"
             const val EventEr1ReadFileComplete = "com.lepu.ble.er1.read.file.complete"
+            const val EventEr1ReadFileCanceled = "com.lepu.ble.er1.read.file.canceled"
             const val EventEr1ResetDeviceInfo = "com.lepu.ble.er1.reset"
         }
     }

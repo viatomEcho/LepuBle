@@ -3,8 +3,10 @@ package com.lepu.blepro.download
 import android.text.TextUtils
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.objs.Bluetooth
+import com.lepu.blepro.utils.HexString
 import com.lepu.blepro.utils.LepuBleLog
 import java.io.File
+import java.io.IOException
 import java.io.RandomAccessFile
 
 /**
@@ -18,28 +20,27 @@ class DownloadHelper {
     companion object{
         private const val tag: String = "DownloadHelper"
 
-        fun writeFile(model: Int, userId: String, fileName: String, data: ByteArray){
-
+        /**
+         * er1 er2  filename 需要去空格
+         * @param model Int
+         * @param userId String
+         * @param fileName String
+         * @param suffix String
+         * @param data ByteArray
+         */
+        fun writeFile(model: Int, userId: String, fileName: String,suffix: String,  data: ByteArray){
+            val trimStr = HexString.trimStr(fileName)
             val folder = BleServiceHelper.BleServiceHelper.rawFolder?.get(model)
 
-            LepuBleLog.d(tag, "$folder, $fileName, userId=$userId")
+            LepuBleLog.d(tag, "$folder, $trimStr, userId=$userId")
             if (TextUtils.isEmpty(folder)){
                 LepuBleLog.d(tag, "保存路径有误")
                 return
             }
 
-            val mFile: File? =
-                when(model){
-                    Bluetooth.MODEL_O2RING -> {
-                        File(folder, "$userId$fileName.dat")
-                    }
-                    Bluetooth.MODEL_ER1 -> {
-                        File(folder, "$userId$fileName.dat")
-                    }
-                    else -> null
-                }
+            val mFile = File(folder, "$userId$trimStr.$suffix")
 
-            LepuBleLog.d("raw 文件 model=$model", if (mFile?.exists()!!) "存在" else "不存在")
+            LepuBleLog.d("raw 文件 model=$model, fileName = $fileName", if (mFile.exists()) "存在" else "不存在")
 
             if (!mFile.exists()) {
                 mFile.parentFile.mkdirs()
@@ -48,9 +49,11 @@ class DownloadHelper {
             var randomFile: RandomAccessFile?
             randomFile = RandomAccessFile(mFile, "rw")
             val fileLength = randomFile.length()
+            LepuBleLog.d(tag, "fileLength = $fileLength")
             randomFile.seek(fileLength)
             randomFile.write(data)
             randomFile.close()
+
         }
 
 

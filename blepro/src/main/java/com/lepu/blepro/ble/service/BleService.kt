@@ -136,7 +136,7 @@ class BleService: LifecycleService() {
                     return this
                 }
             }
-            Bluetooth.MODEL_ER1 and Bluetooth.MODEL_DUOEK and Bluetooth.MODEL_ER2 -> {
+            Bluetooth.MODEL_ER1,Bluetooth.MODEL_DUOEK,Bluetooth.MODEL_ER2 -> {
                 Er1BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)

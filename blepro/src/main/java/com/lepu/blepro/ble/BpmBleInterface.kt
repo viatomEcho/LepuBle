@@ -180,12 +180,13 @@ class BpmBleInterface(model: Int): BleInterface(model) {
 
     }
 
-    override fun readFile(userId: String, fileName: String) {
+    override fun dealReadFile(userId: String, fileName: String) {
     }
-
     override fun resetDeviceInfo() {
     }
 
+    override fun dealContinueRF(userId: String, fileName: String) {
+    }
     override fun onDeviceReady(device: BluetoothDevice) {
         super.onDeviceReady(device)
         syncTime()

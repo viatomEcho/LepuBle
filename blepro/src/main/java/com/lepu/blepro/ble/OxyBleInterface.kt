@@ -54,8 +54,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
        sendOxyCmd(OxyBleCmd.OXY_CMD_RT_DATA,OxyBleCmd.getRtWave())
     }
 
-
-    override fun readFile(userId: String, fileName: String) {
+    override fun dealReadFile(userId: String, fileName: String) {
         this.curFileName = fileName
         this.userId = userId
         LepuBleLog.d(tag, "$userId 将要读取文件 $curFileName" )
@@ -238,7 +237,8 @@ class OxyBleInterface(model: Int): BleInterface(model) {
         sendOxyCmd(OxyBleCmd.OXY_CMD_RESET, OxyBleCmd.resetDeviceInfo())
     }
 
-
+    override fun dealContinueRF(userId: String, fileName: String) {
+    }
 
     override fun onDeviceReady(device: BluetoothDevice) {
         super.onDeviceReady(device)

@@ -3,6 +3,7 @@ package com.lepu.blepro.ble
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BleCRC
 import com.lepu.blepro.ble.cmd.Er1BleResponse
@@ -48,10 +49,13 @@ class Er1BleInterface(model: Int): BleInterface(model) {
     var fileList: Er1BleResponse.Er1FileList? = null
     private var userId: String? = null
 
-    override fun readFile(userId: String, fileName: String) {
+
+    override fun dealReadFile(userId: String, fileName: String) {
         this.userId = userId
         this.curFileName =fileName
-        sendCmd(UniversalBleCmd.readFileStart(fileName.toByteArray(), 0))
+        LepuBleLog.d(tag, "dealReadFile:: $userId, $fileName, offset = $offset")
+
+        sendCmd(UniversalBleCmd.readFileStart(fileName.toByteArray(), this.offset))
     }
 
     @ExperimentalUnsignedTypes
@@ -83,7 +87,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                 fileList = Er1BleResponse.Er1FileList(response.content)
                 LepuBleLog.d(tag, "model:$model,READ_FILE_LIST => success, ${fileList.toString()}")
                 fileList?.let {
-                    LiveEventBus.get(InterfaceEvent.ER1.EventEr1FileList).post(InterfaceEvent(model, it))
+                    LiveEventBus.get(InterfaceEvent.ER1.EventEr1FileList).post(InterfaceEvent(model,it.toString()))
                 }
 
             }
@@ -101,11 +105,21 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
             UniversalBleCmd.READ_FILE_DATA -> {
                 curFile?.apply {
-                    this.addContent(response.content)
-                    LepuBleLog.d(tag, "read file：${curFile?.fileName}   => ${curFile?.index} / ${curFile?.fileSize}")
-                    LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadingFileProgress).post(InterfaceEvent(model, (curFile!!.index * 1000).div(curFile!!.fileSize) ))
 
-                    if (this.index < this.fileSize) {
+                    LepuBleLog.d(tag, "READ_FILE_DATA: paused = $isPausedRF, cancel = $isCancelRF, offset =  ${offset}, index = ${this.index}")
+
+                    //检查当前的下载状态
+                    if (isCancelRF || isPausedRF) {
+                        sendCmd(UniversalBleCmd.readFileEnd())
+                        return
+                    }
+
+                    this.addContent(response.content, offset)
+                    LepuBleLog.d(tag, "read file：${this.fileName}   => ${this.index + offset} / ${this.fileSize}")
+                    LepuBleLog.d(tag, "read file：${((this.index+ offset) * 1000).div(this.fileSize) }")
+                    LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadingFileProgress).post(InterfaceEvent(model, ((this.index+ offset) * 1000).div(this.fileSize) ))
+
+                    if (this.index + offset < this.fileSize) {
                         sendCmd(UniversalBleCmd.readFileData(this.index))
                     } else {
                         sendCmd(UniversalBleCmd.readFileEnd())
@@ -115,12 +129,14 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
             UniversalBleCmd.READ_FILE_END -> {
                 LepuBleLog.d(tag, "read file finished: ${curFile?.fileName} ==> ${curFile?.fileSize}")
+                LepuBleLog.d(tag, "read file finished: isCancel = $isCancelRF, isPause = $isPausedRF")
+
+                curFile?.let {
+                    if (isCancelRF || isPausedRF) return
+                     LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadFileComplete).post(InterfaceEvent(model, it))
+                }?: LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
 
                 curFileName = null
-                curFile?.let {
-                    LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadFileComplete).post(InterfaceEvent(model, it))
-                }?: LepuBleLog.d(tag, "model:$model,  curFile error!!")
-
                 curFile = null
             }
         }
@@ -180,6 +196,9 @@ class Er1BleInterface(model: Int): BleInterface(model) {
     override fun resetDeviceInfo() {
     }
 
+    override fun dealContinueRF(userId: String, fileName: String) {
+        dealReadFile(userId, fileName)
+    }
     /**
      * get real-time data
      */

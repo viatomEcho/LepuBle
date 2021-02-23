@@ -18,11 +18,12 @@ import androidx.lifecycle.OnLifecycleEvent
 interface BleServiceObserver: LifecycleObserver{
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun onCreate()
+    fun onServiceCreate()
 
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun onDestroy()
+    fun onServiceDestroy()
+
 
 
 }

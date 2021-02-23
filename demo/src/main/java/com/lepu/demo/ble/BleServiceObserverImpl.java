@@ -9,12 +9,12 @@ import com.lepu.blepro.observer.BleServiceObserver;
  */
 public class BleServiceObserverImpl implements BleServiceObserver {
     @Override
-    public void onCreate() {
+    public void onServiceCreate() {
 
     }
 
     @Override
-    public void onDestroy() {
+    public void onServiceDestroy() {
 
     }
 }
