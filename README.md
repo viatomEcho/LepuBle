@@ -1,4 +1,3 @@
-# LepuBle
 # BleSdk
 
 ## 集成新设备
@@ -194,78 +193,6 @@
 
 ### BPM捷美瑞血压计
 
-#### 业务通知
-
-```kotlin
-class BpmBleInterface{
- private fun onResponseReceived(bytes: ByteArray) {
-        LepuBleLog.d(tag, " onResponseReceived : " + bytesToHex(bytes))
-        when(BpmBleCmd.getMsgType(bytes)) {
-            BpmBleCmd.BPMCmd.MSG_TYPE_GET_INFO -> {
-                //设备信息
-                LepuBleLog.d(tag, "model:$model,GET_INFO => success")
-                LiveEventBus.get(InterfaceEvent.BPM.EventBpmInfo).post(InterfaceEvent(model, true))
-
-                if (runRtImmediately) {
-                    runRtTask()
-                    runRtImmediately = false
-                }
-            }
-            BpmBleCmd.BPMCmd.MSG_TYPE_SET_TIME -> {
-                //同步时间
-                LepuBleLog.d(tag, "model:$model,MSG_TYPE_SET_TIME => success")
-                LiveEventBus.get(InterfaceEvent.BPM.EventBpmSyncTime).post(InterfaceEvent(model, true))
-            }
-            BpmBleCmd.BPMCmd.MSG_TYPE_GET_BP_STATE -> {
-
-                LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_BP_STATE => success")
-                //发送实时state : byte
-                LiveEventBus.get(InterfaceEvent.BPM.EventBpmRtData).post(InterfaceEvent(model, bytes[0]))
-            }
-            BpmBleCmd.BPMCmd.MSG_TYPE_GET_RECORDS -> {
-                //获取留存记录
-                LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_RECORDS => success")
-
-               BpmCmd(bytes).let {
-                   LiveEventBus.get(InterfaceEvent.BPM.EventBpmRecordData).post(InterfaceEvent(model, it ))
-
-                   if (it.type == 0xB3.toByte()) {
-                       if (bytes[11] == 0x00.toByte()) {
-                           isUserAEnd = true
-                       }
-                       if (bytes[11] == 0x01.toByte()) {
-                           isUserBEnd = true
-                       }
-                       if (isUserAEnd && isUserBEnd) {
-                           //AB都读取完成
-                           LiveEventBus.get(InterfaceEvent.BPM.EventBpmRecordEnd).post(InterfaceEvent(model, true ))
-                           syncState = true
-                       }
-                   }
-               }
-
-            }
-            BpmBleCmd.BPMCmd.MSG_TYPE_GET_RESULT -> {
-                // 返回测量数据
-                LiveEventBus.get(InterfaceEvent.BPM.EventBpmMeasureResult).post(InterfaceEvent(model, BpmCmd(bytes) ))
-            }
-            else -> {
-                //实时指标
-                LiveEventBus.get(InterfaceEvent.BPM.EventBpmMeasureResult).post(InterfaceEvent(model, BpmCmd(bytes) ))
-
-            }
-        }
-    }
-
-
-}
-```
-
-#### Api--BleServiceHleper
-
-- 获取设备留存数据 getBpmFileList(model: Int, map: HashMap<String, Any>) 
-
-
 # APP集成指南
 
 主题：除停留在`绑定页`时允许存在多个设备(DeviceType)的interface，其他时候蓝牙服务中应保持只有`已绑定的当前的`设备的interface，或者没有interface。(一个DeviceType可拥有多个model，一个model对应一个Interface实例)
@@ -280,9 +207,9 @@ api 'com.lepu.blepro:lepu-ble:0.0.5-alpha2'
 class BleUtilService {}
 ```
 
-##  1. 初始化
+##  1. 初始化(必读)
 
-**主题：在Application onCreate时完成配置开启Service，初始化已绑定状态的当前的设备的Interface。服务完成初始化不会自动蓝牙连接，由APP初始化MainActivity后，MainActivity的子Fragment检查蓝牙权限后主动发起reconnect**
+**主题：在Application onCreate时完成配置开启Service，初始化已绑定状态的当前的设备的Interface。服务完成初始化不会自动连接蓝牙，由APP必要的时刻检查蓝牙权限后，根据设备蓝牙名主动发起reconnect**
 
 ### 流程
 
@@ -459,6 +386,8 @@ class BleUtilService{
 
 ## 4. 订阅蓝牙状态
 
+### 单设备订阅/同时多设备订阅
+
 1. LifecycleOwner实现BleChangeObserver接口
 2. LifecycleOwner订阅Interface
 
@@ -467,7 +396,7 @@ public class Fragment implements BleChangeObserver {
      @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //订阅interface
+        //订阅interface， 传入需要订阅的model的数组，同时订阅多个设备
         getLifecycle().addObserver(new BIOL(this, new int[]{Bluetooth.MODEL_ER2}));
 
     }
@@ -483,6 +412,116 @@ public class Fragment implements BleChangeObserver {
 }
 ```
 
+### 不同时多设备订阅
+
+订阅方式同上，注意要在合适的时机更新订阅需要订阅的数组，参考MyDeviceActivity
+
+## 5. 切换设备
+
+### 流程
+
+1. 断开所有连接
+2. 更新全局参数
+3. BleSdk切换Interface
+4. 更新订阅
+5. 销毁MainActivity
+6. 重连当前设备
+7. 刷新UI
+
+```java
+class MyDeviceActivity{
+	/**
+     * 切换设备
+     */
+    private void switchToDevice(MyDevice device) {
+        
+        disconnectAll();
+        BindDeviceUtils.switchToDevice(device);
+        
+        BleUtilService.Companion.switchCurrentInterfaces(device);
+        //更新订阅
+        BleUtilService.Companion.updateSubBIOL(biol);
+        //-------------------sdk
+        ActivityUtils.finishActivity(MainActivity.class);
+        
+        // connect
+        if (device.isBonded) {
+            connect(device);
+        }
+
+        refreshUI();
+    }
+}
+```
 
 
+
+## 6. 断开连接
+
+```kotlin
+class BleUtilService
+ 		/**
+         * 应用场景：切换设备时调用此方法，并且应该指定autoReconnect = false
+         * @param model Int
+         * @param autoReconnect Boolean 值 =true时，当蓝牙断开后会马上开启扫描尝试连接该model
+         */
+        fun disconnect(model: Int, autoReconnect: Boolean) {
+            BleServiceHelper.BleServiceHelper.disconnect(model, autoReconnect)
+        }
+```
+
+## 7.重连
+
+```kotlin
+class BleUtilService 		
+		/**
+         * 发起重连，通过蓝牙名发起请求连接
+         * 应用场景：1.进入设备首页，如果已经绑定立即发起重连 2.某个model被切换至当前时立即发起重连
+         * @param model Int
+         * @param name String
+         */
+        fun reconnect(model: Int, name: String) {
+            LogUtils.d("reconnect...$model")
+            //检查必须要有interface
+            BleServiceHelper.BleServiceHelper.getInterface(model)?.let {
+                // 有未连接蓝牙的设备
+                BleServiceHelper.BleServiceHelper.hasUnConnected(intArrayOf(model)).let {
+                    BleServiceHelper.BleServiceHelper.getConnectState(model).let {
+                        LogUtils.d("device state", it)
+                        //必须已绑定
+                        if (it == State.DISCONNECTED)BleServiceHelper.BleServiceHelper.reconnect(model, name)
+                    }
+                }
+
+            }?: LogUtils.e("current model $model interface is null !!!")
+        }
+```
+
+## 8.解绑
+
+```kotlin
+ fun unbound(deviceType: Int) {
+            when (deviceType) {
+             
+                Constants.DeviceType.ER1_TYPE -> {
+                    disconnect(Bluetooth.MODEL_ER1, false)
+                    SPUtils.getInstance(Constants.CONFIG_USER).remove(Constants.ACTION_ER1_DEVICE_NAME, true)
+                    SPUtils.getInstance(Constants.CONFIG_USER).remove(Constants.ACTION_ER1_DEVICE_ADDRESS, true)
+
+                    BleServiceHelper.BleServiceHelper.getInterfaces()?.remove(Bluetooth.MODEL_ER1)
+                    LogUtils.d("er1 unbind  success")
+                }
+             
+
+                //todo
+            }
+
+        }
+```
+
+## 9.BleSO
+
+主题：订阅BleService的生命周期
+
+应用：保存APP运行时的实时测量数据
 
