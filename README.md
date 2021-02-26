@@ -26,6 +26,7 @@
   }
   ```
 
+
 ## 主要类说明
 
 ```kotlin
@@ -36,7 +37,7 @@
  * 一个model对应一个Interface实例互不干扰。App中通过BleChangeObserver、BleInterfaceLifecycle向指定model(可多个)的Interface发起订阅，观察者无需管理生命周期，自身销毁时自动注销订阅
  * 订阅成功后interface将通过BleChangeObserver#onBleStateChanged()发布蓝牙更新状态
  *
- *  1.每次发起连接将默认将isAutoReconnect赋值为true，即在断开连接回调中会重新开启扫描，重连设备
+  *  1.每次发起连接将默认将isAutoReconnect赋值为true，即在断开连接回调中会重新开启扫描，重连设备。可根据需要设置
  *
  *  2.如果进入到多设备重连{BleServiceHelper #isReconnectingMulti = true}则在其中一个设备连接之后再次开启扫描
  *
@@ -44,6 +45,7 @@
  *
  *  4.通过自定义InterfaceEvent，发送携带model的业务通知
  *
+ *  5.断开连接时可重置isAutoReconnect，根据需要决定是否断开后是否重连
  */
 abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener {
       /**
@@ -189,13 +191,61 @@ class BleServiceHelper private constructor() {
     var isReconnectingMulti: Boolean = false
 ```
 
+
+
+## 通用CMD API
+
+```kotlin
+/**
+ * 获取设置信息
+ */
+abstract fun getInfo()
+
+/**
+ * 同步时间
+ */
+abstract fun syncTime()
+
+/**
+ * 更新设置
+ */
+open fun updateSetting(type: String, value: Any){}
+
+/**
+ * 获取实时
+ */
+abstract fun getRtData()
+/**
+ * 获取文件列表
+ */
+abstract fun getFileList()
+
+/**
+ * 读文件
+ */
+abstract fun dealReadFile(userId: String, fileName: String)
+
+/**
+ * 重置设备
+ */
+abstract fun resetDeviceInfo()
+
+/**
+ * 继续 读取文件
+ */
+abstract fun dealContinueRF(userId: String, fileName: String)
+```
+
 ## 特殊API说明
 
 ### BPM捷美瑞血压计
 
 - 获取文件列表getBpmFileList(model: Int, map: HashMap<String, Any>)
 
+### ER2
 
+- 设置hr开关状态setEr2SwitcherState(model: Int, hrFlag: Boolean)
+- 获取hr开关状态getEr2SwitcherState(model: Int)
 
 # APP集成BleSdk指南
 
@@ -213,7 +263,7 @@ class BleUtilService {}
 
 ##  1. 初始化(必读)
 
-**主题：在Application onCreate时完成配置开启Service，初始化已绑定状态的当前的设备的Interface。服务完成初始化不会自动连接蓝牙，由APP必要的时刻检查蓝牙权限后，根据设备蓝牙名主动发起reconnect**
+> **在Application onCreate时完成配置开启Service，初始化已绑定状态的当前的设备的Interface。服务完成初始化不会自动连接蓝牙，由APP必要的时刻检查蓝牙权限后，根据设备蓝牙名主动发起reconnect****
 
 ### 流程
 
@@ -277,12 +327,28 @@ class AppLifecycleImpl
 BLUETOOTH.BLE_RAW_FOLDERS.put...//todo add
 ```
 
-## 2. 绑定
+## 2.连接
 
-主题：
+```kotlin
+/**
+* 连接蓝牙
+* @param context Context
+* @param b Bluetooth
+* @param isAutoConnect Boolean 此次连接后，若自然断开是否再次扫描重连
+*/
+@JvmOverloads
+fun connect(context: Context, b: Bluetooth, isAutoConnect: Boolean = true) {
+    LogUtils.d("connect...${b.model}, ${b.name}")
+    BleServiceHelper.BleServiceHelper.connect(context, b.model, b.device, isAutoConnect)
+}
+```
 
-- 所有的绑定页集成到`scanActivity`拥有的Fragment中,Activity中负责公共部分，各自设备的核心绑定功能在各个Fragment中完成，通过`ViewModel`共享数据
-- 负责绑定业务的Fragment初始化时，应向蓝牙服务添加对应model的Interface。离开绑定页面，将比对当前设备并根据设备的绑定情况整理服务中的interface。
+
+
+## 3. 绑定
+
+> - 所有的绑定页集成到`scanActivity`拥有的Fragment中,Activity中负责公共部分，各自设备的核心绑定功能在各个Fragment中完成，通过`ViewModel`共享数据
+> - 负责绑定业务的Fragment初始化时，应向蓝牙服务添加对应model的Interface。离开绑定页面，将比对当前设备并根据设备的绑定情况整理服务中的interface。
 
 ```kotlin
 class ScanActivity : AppCompatActivity() {
@@ -366,7 +432,7 @@ class BleUtilService
         }
 ```
 
-## 3. 获取设备状态
+## 4. 获取设备状态
 
 ```kotlin
 class BleUtilService{
@@ -388,12 +454,12 @@ class BleUtilService{
 
 ```
 
-## 4. 订阅蓝牙状态
+## 5. 订阅蓝牙状态
 
 ### 单设备订阅/同时多设备订阅
 
-1. LifecycleOwner实现BleChangeObserver接口
-2. LifecycleOwner订阅Interface
+> 1. LifecycleOwner实现BleChangeObserver接口
+> 2. LifecycleOwner订阅Interface
 
 ```java
 public class Fragment implements BleChangeObserver {
@@ -420,17 +486,17 @@ public class Fragment implements BleChangeObserver {
 
 订阅方式同上，注意要在合适的时机更新订阅需要订阅的数组，参考MyDeviceActivity
 
-## 5. 切换设备
+## 6. 切换设备
 
 ### 流程
 
-1. 断开所有连接
-2. 更新全局参数
-3. BleSdk切换Interface
-4. 更新订阅
-5. 销毁MainActivity
-6. 重连当前设备
-7. 刷新UI
+> 1. 断开所有连接
+> 2. 更新全局参数
+> 3. BleSdk切换Interface
+> 4. 更新订阅
+> 5. 销毁MainActivity
+> 6. 重连当前设备
+> 7. 刷新UI
 
 ```java
 class MyDeviceActivity{
@@ -458,23 +524,21 @@ class MyDeviceActivity{
 }
 ```
 
-
-
-## 6. 断开连接
+## 7. 断开连接
 
 ```kotlin
 class BleUtilService
- 		/**
-         * 应用场景：切换设备时调用此方法，并且应该指定autoReconnect = false
-         * @param model Int
-         * @param autoReconnect Boolean 值 =true时，当蓝牙断开后会马上开启扫描尝试连接该model
-         */
-        fun disconnect(model: Int, autoReconnect: Boolean) {
-            BleServiceHelper.BleServiceHelper.disconnect(model, autoReconnect)
-        }
+/**
+* 应用场景：切换设备时调用此方法，并且应该指定autoReconnect = false
+* @param model Int
+* @param autoReconnect Boolean 值 =true时，当蓝牙断开后会马上开启扫描尝试连接该model
+*/
+fun disconnect(model: Int, autoReconnect: Boolean) {
+    BleServiceHelper.BleServiceHelper.disconnect(model, autoReconnect)
+}
 ```
 
-## 7.重连
+## 8.重连
 
 ```kotlin
 class BleUtilService 		
@@ -501,7 +565,7 @@ class BleUtilService
         }
 ```
 
-## 8.解绑
+## 9.解绑
 
 ```kotlin
  fun unbound(deviceType: Int) {
@@ -523,13 +587,31 @@ class BleUtilService
         }
 ```
 
-## 9.BleSO
+## 10.读文件
 
-主题：订阅BleService的生命周期
+> 重要：读文件时要停止实时任务，不管当前实时任务是否开启，SDK不会对实时状态进行处理。APP要在读文件过程的前后做好实时任务状态停止和开启的更新
 
-应用：保存APP运行时的实时测量数据
+### 获取文件列表
 
-## 10.下载文件
+```kotlin
+/**
+ * 进入读文件流程前APP要手动停止实时任务状态
+ * @param device MyDevice
+ */
+fun getFileList(device: MyDevice){
+    when(device.deviceType.toInt()){
+        Constants.DeviceType.ER1_TYPE -> {
+            getFileList(Bluetooth.MODEL_ER1)
+        }
+        Constants.DeviceType.DUOEK_TYPE -> {
+            getFileList(Bluetooth.MODEL_DUOEK)
+        }
+        else -> LogUtils.d("无法识别：deviceType=${device.deviceType}")
+    }
+}
+```
+
+### 下载文件
 
 ```kotlin
 class BleUtilService{
@@ -599,5 +681,7 @@ fun cancelReadFile(model: Int){
 }
 ```
 
+## 12.BleSO
 
+主题：订阅BleService的生命周期
 
