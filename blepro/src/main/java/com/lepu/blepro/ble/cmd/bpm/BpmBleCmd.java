@@ -1,4 +1,4 @@
-package com.lepu.blepro.ble.cmd;
+package com.lepu.blepro.ble.cmd.bpm;
 
 
 import com.lepu.blepro.utils.ByteArrayKt;

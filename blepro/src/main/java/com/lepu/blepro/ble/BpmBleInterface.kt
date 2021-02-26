@@ -4,10 +4,9 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.cmd.BpmBleCmd
+import com.lepu.blepro.ble.cmd.bpm.BpmBleCmd
 import com.lepu.blepro.ble.data.BpmCmd
 import com.lepu.blepro.ble.data.BpmDeviceInfo
-import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex

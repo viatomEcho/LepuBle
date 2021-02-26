@@ -23,13 +23,15 @@ import kotlin.collections.ArrayList
  * 一个model对应一个Interface实例互不干扰。App中通过BleChangeObserver、BleInterfaceLifecycle向指定model(可多个)的Interface发起订阅，观察者无需管理生命周期，自身销毁时自动注销订阅
  * 订阅成功后interface将通过BleChangeObserver#onBleStateChanged()发布蓝牙更新状态
  *
- *  1.每次发起连接将默认将isAutoReconnect赋值为true，即在断开连接回调中会重新开启扫描，重连设备
+ *  1.每次发起连接将默认将isAutoReconnect赋值为true，即在断开连接回调中会重新开启扫描，重连设备。可根据需要设置
  *
  *  2.如果进入到多设备重连{BleServiceHelper #isReconnectingMulti = true}则在其中一个设备连接之后再次开启扫描
  *
  *  3.通过runRtTask(),stopRtTask()控制实时任务的开关，并将发送相应的EventMsgConst.RealTime...通知
  *
  *  4.通过自定义InterfaceEvent，发送携带model的业务通知
+ *
+ *  5.断开连接时可重置isAutoReconnect，根据需要决定是否断开后是否重连
  *
  */
 abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener {
@@ -50,9 +52,9 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
 
     /**
      *  断开连接后是否重新开启扫描操作重连
-     *  默认false
+     *  interface实例此参数默认false
      *  当切换设备、解绑时应该置为false
-     *  调用connect() 可重新赋值
+     *  以后再调用connect() 可重新赋值
      *
      */
     var isAutoReconnect: Boolean = false
@@ -113,7 +115,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      */
     var offset: Int = 0;
 
-
+    abstract fun initManager(context: Context, device: BluetoothDevice)
 
 
     /**
@@ -150,22 +152,28 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     }
 
     /**
-     *
+     * 发起连接
+     * @param context Context
+     * @param device BluetoothDevice
+     * @param isAutoReconnect Boolean 默认参数值为true，目的：当设备自然断开后会重新开启扫描并尝试连接。
      */
     fun connect(context: Context, @NonNull device: BluetoothDevice, isAutoReconnect: Boolean = true) {
         if (connecting || state) {
             return
         }
-        LepuBleLog.d(tag, "try connect: ${device.name}")
+        LepuBleLog.d(tag, "try connect: ${device.name}，isAutoReconnect = $isAutoReconnect")
         this.device = device
         initManager(context, device)
         this.isAutoReconnect = isAutoReconnect
     }
 
-    abstract fun initManager(context: Context, device: BluetoothDevice)
 
 
 
+    /**
+     * 断开连接
+     * @param isAutoConnect Boolean APP主动断开连接后是否再发起扫描重连
+     */
     fun disconnect(isAutoConnect: Boolean) {
         LepuBleLog.d(tag, "into disconnect ")
 
@@ -179,7 +187,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
             LepuBleLog.d(tag, "device unInitialized")
             return
         }
-        LepuBleLog.d(tag,"tay disconnect..." )
+        LepuBleLog.d(tag,"tay disconnect..., isAutoReconnect = $isAutoReconnect" )
         this.isAutoReconnect = isAutoReconnect
         this.onDeviceDisconnected(device, ConnectionObserver.REASON_SUCCESS)
 
@@ -233,7 +241,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         LepuBleLog.d(tag, "onDeviceDisconnected=====isAutoReconnect:$isAutoReconnect")
         if (isAutoReconnect){
             //重开扫描, 扫描该interface的设备
-                LepuBleLog.d(tag, "onDeviceDisconnected....to do")
+            LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnect")
             BleServiceHelper.reconnect(model, device.name)
         }
 
@@ -333,7 +341,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     /**
      * 更新设置
      */
-    abstract fun updateSetting(type: String, value: Any)
+    open fun updateSetting(type: String, value: Any){}
 
     /**
      * 获取实时
@@ -368,6 +376,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         dealContinueRF(userId, fileName)
 
     }
+
     abstract fun dealContinueRF(userId: String, fileName: String)
 
 

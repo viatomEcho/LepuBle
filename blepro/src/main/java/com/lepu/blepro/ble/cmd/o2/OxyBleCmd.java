@@ -1,7 +1,8 @@
-package com.lepu.blepro.ble.cmd;
+package com.lepu.blepro.ble.cmd.o2;
 
 
 
+import com.lepu.blepro.ble.cmd.BleCRC;
 import com.lepu.blepro.utils.LepuBleLog;
 
 import org.json.JSONException;

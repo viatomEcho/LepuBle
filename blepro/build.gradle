@@ -65,5 +65,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-service:$lifecycle_version"
 
     implementation 'com.jeremyliao:live-event-bus-x:1.7.3'
+
+    implementation 'org.apache.commons:commons-lang3:3.8.1'
 }
 apply from: 'bintray.gradle'

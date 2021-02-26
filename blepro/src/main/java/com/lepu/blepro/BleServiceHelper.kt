@@ -11,6 +11,8 @@ import android.util.SparseArray
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.BpmBleInterface
+import com.lepu.blepro.ble.Er1BleInterface
+import com.lepu.blepro.ble.Er2BleInterface
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
@@ -18,6 +20,7 @@ import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
+import java.lang.Exception
 
 /**
  * 单例的蓝牙服务帮助类，原则上只通过此类开放API
@@ -143,7 +146,7 @@ class BleServiceHelper private constructor() {
      * 当前要设置的设备Model, 必须在initService 之后调用
      */
     fun setInterfaces(model: Int, runRtImmediately: Boolean = false) {
-        if (!check()) return
+        if (!checkService()) return
         LepuBleLog.d(tag, "setInterfaces")
         if (getInterface(model) == null) bleService.initInterfaces(model, runRtImmediately)
     }
@@ -155,7 +158,7 @@ class BleServiceHelper private constructor() {
      * 场景：蓝牙关闭状态进入页面，开启系统蓝牙后，重新初始化
      */
     fun reInitBle(): BleServiceHelper {
-        if (!check()) return this
+        if (!checkService()) return this
         BleServiceHelper.bleService.reInitBle()
         return this
     }
@@ -167,7 +170,7 @@ class BleServiceHelper private constructor() {
      *
      */
     internal fun subscribeBI(model: Int, observer: BleChangeObserver) {
-        if (!check()){
+        if (!checkService()){
             LepuBleLog.d("bleService.isInitialized  = false")
             return
         }
@@ -181,7 +184,7 @@ class BleServiceHelper private constructor() {
      * 注销蓝牙状态改变的监听
      */
     internal fun detachBI(model: Int, observer: BleChangeObserver) {
-        if (check()) getInterface(model)?.detach(observer)
+        if (checkService()) getInterface(model)?.detach(observer)
     }
 
 
@@ -192,7 +195,7 @@ class BleServiceHelper private constructor() {
      */
     @JvmOverloads
     fun startScan(scanModel: Int, needPair: Boolean = false) {
-        if (!check()) return
+        if (!checkService()) return
         bleService.startDiscover(intArrayOf(scanModel), needPair)
     }
 
@@ -201,7 +204,7 @@ class BleServiceHelper private constructor() {
      */
     @JvmOverloads
     fun startScan(scanModel: IntArray, needPair: Boolean = false) {
-        if (!check()) return
+        if (!checkService()) return
         bleService.startDiscover(scanModel, needPair)
     }
 
@@ -213,14 +216,14 @@ class BleServiceHelper private constructor() {
      *
      */
     fun stopScan() {
-        if (check()) bleService.stopDiscover()
+        if (checkService()) bleService.stopDiscover()
     }
 
     /**
      * 获取model的interface
      */
     fun getInterface(model: Int): BleInterface? {
-        if (!check()) return null
+        if (!checkService()) return null
 
         val vailFace = bleService.vailFace
         LepuBleLog.e(tag, "getInterface: getInterface => currentModel：$model, vailFaceSize：${vailFace.size()}, curIsNUll = ${vailFace.get(model) == null}")
@@ -232,7 +235,7 @@ class BleServiceHelper private constructor() {
      * @return SparseArray<BleInterface>?
      */
     fun getInterfaces(): SparseArray<BleInterface>? {
-        if (!check())  return null
+        if (!checkService())  return null
         return bleService.vailFace
     }
 
@@ -240,7 +243,7 @@ class BleServiceHelper private constructor() {
      * 发起连接，必须先停止扫描
      */
     fun connect(context: Context,model: Int, b: BluetoothDevice, isAutoReconnect: Boolean = true) {
-        if (!check()) return
+        if (!checkService()) return
 
         LepuBleLog.d(tag, "connect")
         getInterface(model)?.let {
@@ -257,7 +260,7 @@ class BleServiceHelper private constructor() {
      */
     fun reconnect(scanModel: IntArray, name: Array<String>) {
         LepuBleLog.d(tag, "into reconnect " )
-        if (!check()) return
+        if (!checkService()) return
         bleService.reconnect(scanModel, name)
 
     }
@@ -269,7 +272,7 @@ class BleServiceHelper private constructor() {
      */
     fun reconnect(scanModel: Int, name: String) {
         LepuBleLog.d(tag, "into reconnect" )
-        if (!check()) return
+        if (!checkService()) return
         bleService.reconnect(intArrayOf(scanModel), arrayOf(name))
 
     }
@@ -280,7 +283,7 @@ class BleServiceHelper private constructor() {
     fun disconnect(autoReconnect: Boolean) {
         LepuBleLog.d(tag, "into disconnect" )
 
-        if (!check()) return
+        if (!checkService()) return
         val vailFace = bleService.vailFace
         for (i in 0 until vailFace.size()) {
             getInterface(vailFace.keyAt(i))?.let { it ->
@@ -295,7 +298,7 @@ class BleServiceHelper private constructor() {
      */
     fun disconnect(model: Int, autoReconnect: Boolean) {
         LepuBleLog.d(tag, "into disconnect" )
-        if (!check()) return
+        if (!checkService()) return
         getInterface(model)?.let {
             stopScan()
             it.disconnect(autoReconnect)
@@ -308,7 +311,7 @@ class BleServiceHelper private constructor() {
      * 主动获取当前蓝牙连接状态
      */
     fun getConnectState(model: Int): Int {
-        if (!check()) return Ble.State.UNKNOWN
+        if (!checkService()) return Ble.State.UNKNOWN
         getInterface(model)?.let {
             return it.calBleState()
         }?: return  Ble.State.UNKNOWN
@@ -322,7 +325,7 @@ class BleServiceHelper private constructor() {
      * @return Boolean
      */
     fun hasUnConnected(model: IntArray): Boolean{
-        if (!check()) return false
+        if (!checkService()) return false
         LepuBleLog.d(tag, "into hasUnConnected...")
         for (m in model){
             getConnectState(m).let {
@@ -339,7 +342,7 @@ class BleServiceHelper private constructor() {
      * 获取主机信息
      */
     fun getInfo(model: Int) {
-        if (!check()) return
+        if (!checkService()) return
         getInterface(model)?.getInfo()
 
     }
@@ -362,7 +365,7 @@ class BleServiceHelper private constructor() {
      * @param offset Int 开始读文件的偏移量
      */
     fun readFile(userId: String, fileName: String, model: Int, offset: Int = 0) {
-        if (!check()) return
+        if (!checkService()) return
         getInterface(model)?.let {
             it.readFile(userId, fileName, offset)
         }
@@ -374,7 +377,7 @@ class BleServiceHelper private constructor() {
      * @param model Int
      */
     fun cancelReadFile(model: Int){
-        if (!check()) return
+        if (!checkService()) return
         getInterface(model)?.let {
             it.isCancelRF = true
             LiveEventBus.get(EventMsgConst.Download.EventIsCancel).post(model)
@@ -387,7 +390,7 @@ class BleServiceHelper private constructor() {
      * @param isPause Boolean
      */
     fun pauseReadFile(model: Int){
-        if (!check()) return
+        if (!checkService()) return
         getInterface(model)?.let {
             it.isPausedRF = true
             LiveEventBus.get(EventMsgConst.Download.EventIsPaused).post(model)
@@ -399,7 +402,7 @@ class BleServiceHelper private constructor() {
      * @param model Int
      */
     fun continueReadFile(model: Int,userId: String, fileName: String, offset: Int){
-        if (!check()) return
+        if (!checkService()) return
         getInterface(model)?.let {
             it.isPausedRF = false
             it.continueRf(userId, fileName, offset)
@@ -412,7 +415,7 @@ class BleServiceHelper private constructor() {
      * 重置主机
      */
     fun reset(model: Int) {
-        if (!check()) return
+        if (!checkService()) return
         getInterface(model)?.resetDeviceInfo()
 
     }
@@ -421,7 +424,7 @@ class BleServiceHelper private constructor() {
      * 更新设备设置
      */
     fun updateSetting(model: Int, type: String, value: Any) {
-        if (!check()) return
+        if (!checkService()) return
         getInterface(model)?.updateSetting(type, value)
     }
 
@@ -429,7 +432,7 @@ class BleServiceHelper private constructor() {
      * 同步时间
      */
     fun syncTime(model: Int) {
-        if (!check()) return
+        if (!checkService()) return
         getInterface(model)?.syncTime()
     }
 
@@ -437,7 +440,7 @@ class BleServiceHelper private constructor() {
      * 设置实时任务的间隔时间
      */
     fun setRTDelayTime(model: Int, delayMillis: Long){
-        if (!check()) return
+        if (!checkService()) return
         getInterface(model)?.delayMillis = delayMillis
     }
 
@@ -447,7 +450,7 @@ class BleServiceHelper private constructor() {
      * 开启实时任务
      */
     fun startRtTask(model: Int){
-        if (!check()) return
+        if (!checkService()) return
         getInterface(model)?.runRtTask()
     }
 
@@ -456,13 +459,13 @@ class BleServiceHelper private constructor() {
      * 移除获取实时任务
      */
     fun stopRtTask(model: Int) {
-        if (!check()) return
+        if (!checkService()) return
         getInterface(model)?.stopRtTask()
     }
 
 
 
-    private fun check(): Boolean{
+    fun checkService(): Boolean{
         if (!this::bleService.isInitialized){
             LepuBleLog.d("Error: bleService unInitialized")
             return false
@@ -479,7 +482,7 @@ class BleServiceHelper private constructor() {
     }
 
     fun getBpmFileList(model: Int, map: HashMap<String, Any>){
-        if (!check()) return
+        if (!checkService()) return
         if (model != Bluetooth.MODEL_BPM){
             LepuBleLog.d(tag,"getBpmFileList, 无效model：$model" )
             return
@@ -490,6 +493,53 @@ class BleServiceHelper private constructor() {
 
         }
 
+    }
+
+    fun isScanning(): Boolean{
+        if (!checkService()) return false
+        return bleService.isDiscovery
+    }
+
+    fun isRtStop(model: Int): Boolean{
+        if (!checkService()) return false
+        return getInterface(model)?.isRtStop ?: true
+    }
+
+    /**
+     * er2 设置hr开关状态
+     * @param model Int
+     * @param hrFlag Boolean
+     */
+    fun setEr2SwitcherState(model: Int, hrFlag: Boolean){
+        if (!checkService()) return
+        when(model){
+            Bluetooth.MODEL_ER2 -> {
+                getInterface(model)?.let {
+                    if (it is Er2BleInterface) it.setSwitcherState(hrFlag)
+                }
+            }
+            else -> {
+                LepuBleLog.d(tag, "error: setEr2SwitcherState model=$model, 不匹配")
+            }
+        }
+    }
+
+    /**
+     * er2 获取hr开关状态
+     * @param model Int
+     */
+    fun getEr2SwitcherState(model: Int){
+        if (!checkService()) return
+        when(model){
+            Bluetooth.MODEL_ER2 -> {
+                getInterface(model)?.let {
+                    if (it is Er2BleInterface) it.getSwitcherState()
+                }
+            }
+            else -> {
+                LepuBleLog.d(tag, "error: getEr2SwitcherState model=$model, 不匹配")
+            }
+        }
     }
 
 

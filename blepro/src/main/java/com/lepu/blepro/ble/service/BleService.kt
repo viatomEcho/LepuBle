@@ -136,13 +136,20 @@ class BleService: LifecycleService() {
                     return this
                 }
             }
-            Bluetooth.MODEL_ER1,Bluetooth.MODEL_DUOEK,Bluetooth.MODEL_ER2 -> {
+            Bluetooth.MODEL_ER1,Bluetooth.MODEL_DUOEK -> {
                 Er1BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
                     return this
                 }
 
+            }
+            Bluetooth.MODEL_ER2 -> {
+                Er1BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+                    vailFace.put(m, this)
+                    return this
+                }
             }
             Bluetooth.MODEL_BPM -> {
                 BpmBleInterface(m).apply {
@@ -228,7 +235,7 @@ class BleService: LifecycleService() {
 
 
 
-    private var isDiscovery : Boolean = false
+    var isDiscovery : Boolean = false
     private var bluetoothAdapter : BluetoothAdapter? = null
     private var leScanner : BluetoothLeScanner? = null
 

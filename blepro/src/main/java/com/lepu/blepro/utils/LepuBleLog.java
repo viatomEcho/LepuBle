@@ -3,9 +3,11 @@ package com.lepu.blepro.utils;
 
 import android.util.Log;
 
+import com.lepu.blepro.BuildConfig;
+
 
 public class LepuBleLog {
-    private static final String TAG = "***LEPU BLE SDK***";
+    private static final String TAG = "*ble:v" + BuildConfig.VERSION_NAME + "*"  ;
     private static boolean debug;
 
     private LepuBleLog() {

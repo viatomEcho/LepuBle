@@ -2,7 +2,7 @@ package com.lepu.blepro.ble
 
 import android.content.Context
 import com.lepu.blepro.base.BaseBleManager
-import com.lepu.blepro.ble.cmd.UniversalBleCmd
+import com.lepu.blepro.ble.cmd.er1.Er1BleCmd
 import com.lepu.blepro.utils.LepuBleLog
 
 /**
@@ -17,7 +17,7 @@ class Er1BleManager(context: Context): BaseBleManager(context) {
         LepuBleLog.d("Er1BleManager inited")
     }
     private fun getInfo() {
-        sendCmd(UniversalBleCmd.getInfo());
+        sendCmd(Er1BleCmd.getInfo());
     }
 
     private fun syncTime() {

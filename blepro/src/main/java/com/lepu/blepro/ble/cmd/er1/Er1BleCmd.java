@@ -1,12 +1,13 @@
-package com.lepu.blepro.ble.cmd;
+package com.lepu.blepro.ble.cmd.er1;
 
+import com.lepu.blepro.ble.cmd.BleCRC;
 import com.lepu.blepro.utils.ByteArrayKt;
 import com.lepu.blepro.utils.LepuBleLog;
 
 /**
  * universal command for Viatom devices
  */
-public class UniversalBleCmd {
+public class Er1BleCmd {
 
     public static int GET_INFO = 0xE1;
     public static int RESET = 0xE2;

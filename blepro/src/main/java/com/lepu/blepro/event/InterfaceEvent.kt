@@ -66,4 +66,25 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * BpmBleInterface发出的通知
+     * 包含model: model_bpm
+     */
+    interface ER2{
+        companion object{
+            const val EventEr2Info = "com.lepu.ble.er2.info"
+            const val EventEr2SetTime = "com.lepu.ble.er2.set.time"
+            const val EventEr2SetSwitcherState = "com.lepu.ble.er2.set.switcher.state"
+            const val EventEr2SwitcherState = "com.lepu.ble.er2.switcher.state"
+            const val EventEr2FactoryReset = "com.lepu.ble.er2.factory.reset"
+            const val EventEr2RtData = "com.lepu.ble.er2.realtime.data"
+            const val EventEr2FileList = "com.lepu.ble.er2.file.list"
+            const val EventEr2ReadFileError = "com.lepu.ble.er2.file.read.error"
+            const val EventEr2ReadingFileProgress = "com.lepu.ble.er2.file.reading.progress"
+            const val EventEr2ReadFileComplete = "com.lepu.ble.er2.file.read.complete"
+
+        }
+    }
+
+
 }

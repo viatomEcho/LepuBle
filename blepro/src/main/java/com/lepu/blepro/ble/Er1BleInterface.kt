@@ -3,16 +3,13 @@ package com.lepu.blepro.ble
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BleCRC
-import com.lepu.blepro.ble.cmd.Er1BleResponse
-import com.lepu.blepro.ble.cmd.UniversalBleCmd
+import com.lepu.blepro.ble.cmd.er1.Er1BleResponse
+import com.lepu.blepro.ble.cmd.er1.Er1BleCmd
 import com.lepu.blepro.ble.data.Er1DataController
 import com.lepu.blepro.ble.data.LepuDevice
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
-import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
 import kotlin.experimental.inv
@@ -54,15 +51,14 @@ class Er1BleInterface(model: Int): BleInterface(model) {
         this.userId = userId
         this.curFileName =fileName
         LepuBleLog.d(tag, "dealReadFile:: $userId, $fileName, offset = $offset")
-
-        sendCmd(UniversalBleCmd.readFileStart(fileName.toByteArray(), this.offset))
+        sendCmd(Er1BleCmd.readFileStart(fileName.toByteArray(), this.offset))
     }
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: Er1BleResponse.Er1Response) {
 //        LepuBleLog.d(TAG, "received: ${response.cmd}")
         when(response.cmd) {
-            UniversalBleCmd.GET_INFO -> {
+            Er1BleCmd.GET_INFO -> {
                 val info = LepuDevice(response.content)
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
@@ -75,7 +71,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
             }
 
-            UniversalBleCmd.RT_DATA -> {
+            Er1BleCmd.RT_DATA -> {
                 val rtData = Er1BleResponse.RtData(response.content)
 
                 Er1DataController.receive(rtData.wave.wFs)
@@ -83,7 +79,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get(InterfaceEvent.ER1.EventEr1RtData).post(InterfaceEvent(model, rtData))
             }
 
-            UniversalBleCmd.READ_FILE_LIST -> {
+            Er1BleCmd.READ_FILE_LIST -> {
                 fileList = Er1BleResponse.Er1FileList(response.content)
                 LepuBleLog.d(tag, "model:$model,READ_FILE_LIST => success, ${fileList.toString()}")
                 fileList?.let {
@@ -92,10 +88,12 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
             }
 
-            UniversalBleCmd.READ_FILE_START -> {
+            Er1BleCmd.READ_FILE_START -> {
                 if (response.pkgType == 0x01.toByte()) {
-                    curFile = userId?.let { Er1BleResponse.Er1File(model, curFileName!!, toUInt(response.content), it) }
-                    sendCmd(UniversalBleCmd.readFileData(0))
+                    curFile =  curFileName?.let {
+                        Er1BleResponse.Er1File(model, it, toUInt(response.content), userId!!)
+                    }
+                    sendCmd(Er1BleCmd.readFileData(0))
                 } else {
                     LepuBleLog.d(tag, "read file failed：${response.pkgType}")
                     LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadFileError).post(InterfaceEvent(model, true))
@@ -103,14 +101,14 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                 }
             }
 
-            UniversalBleCmd.READ_FILE_DATA -> {
+            Er1BleCmd.READ_FILE_DATA -> {
                 curFile?.apply {
 
                     LepuBleLog.d(tag, "READ_FILE_DATA: paused = $isPausedRF, cancel = $isCancelRF, offset =  ${offset}, index = ${this.index}")
 
                     //检查当前的下载状态
                     if (isCancelRF || isPausedRF) {
-                        sendCmd(UniversalBleCmd.readFileEnd())
+                        sendCmd(Er1BleCmd.readFileEnd())
                         return
                     }
 
@@ -120,23 +118,22 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadingFileProgress).post(InterfaceEvent(model, ((this.index+ offset) * 1000).div(this.fileSize) ))
 
                     if (this.index + offset < this.fileSize) {
-                        sendCmd(UniversalBleCmd.readFileData(this.index))
+                        sendCmd(Er1BleCmd.readFileData(this.index))
                     } else {
-                        sendCmd(UniversalBleCmd.readFileEnd())
+                        sendCmd(Er1BleCmd.readFileEnd())
                     }
                 }
             }
 
-            UniversalBleCmd.READ_FILE_END -> {
+            Er1BleCmd.READ_FILE_END -> {
                 LepuBleLog.d(tag, "read file finished: ${curFile?.fileName} ==> ${curFile?.fileSize}")
                 LepuBleLog.d(tag, "read file finished: isCancel = $isCancelRF, isPause = $isPausedRF")
 
+                curFileName = null// 一定要放在发通知之前
                 curFile?.let {
                     if (isCancelRF || isPausedRF) return
                      LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadFileComplete).post(InterfaceEvent(model, it))
                 }?: LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
-
-                curFileName = null
                 curFile = null
             }
         }
@@ -181,16 +178,11 @@ class Er1BleInterface(model: Int): BleInterface(model) {
      * get device info
      */
     override fun getInfo() {
-        sendCmd(UniversalBleCmd.getInfo())
+        sendCmd(Er1BleCmd.getInfo())
     }
 
     override fun syncTime() {
     }
-
-    override fun updateSetting(type: String, value: Any) {
-
-    }
-
 
 
     override fun resetDeviceInfo() {
@@ -203,7 +195,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
      * get real-time data
      */
     override fun getRtData() {
-        sendCmd(UniversalBleCmd.getRtData())
+        sendCmd(Er1BleCmd.getRtData())
     }
 
 
@@ -211,7 +203,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
      * get file list
      */
     override fun getFileList() {
-        sendCmd(UniversalBleCmd.getFileList())
+        sendCmd(Er1BleCmd.getFileList())
     }
 
 

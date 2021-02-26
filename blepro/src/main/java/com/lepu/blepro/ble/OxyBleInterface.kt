@@ -5,8 +5,8 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BleCRC
-import com.lepu.blepro.ble.cmd.OxyBleCmd
-import com.lepu.blepro.ble.cmd.OxyBleResponse
+import com.lepu.blepro.ble.cmd.o2.OxyBleCmd
+import com.lepu.blepro.ble.cmd.o2.OxyBleResponse
 import com.lepu.blepro.ble.data.OxyDataController
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
@@ -51,7 +51,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
 
     override fun getRtData() {
-       sendOxyCmd(OxyBleCmd.OXY_CMD_RT_DATA,OxyBleCmd.getRtWave())
+       sendOxyCmd(OxyBleCmd.OXY_CMD_RT_DATA, OxyBleCmd.getRtWave())
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
@@ -190,7 +190,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             OxyBleCmd.OXY_CMD_READ_END -> {
                 clearTimeout()
                 LepuBleLog.d(tag, "model:$model, 读文件完成: ${curFile?.fileName} ==> ${curFile?.fileSize}")
-                curFileName = null
+                curFileName = null // 一定要放在发通知之前
 
                 curFile?.let {
                     LiveEventBus.get(InterfaceEvent.Oxy.EventOxyReadFileComplete).post(InterfaceEvent(model, it))
@@ -230,14 +230,11 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getInfo() {
-        sendOxyCmd(OxyBleCmd.OXY_CMD_INFO,OxyBleCmd.getInfo())
+        sendOxyCmd(OxyBleCmd.OXY_CMD_INFO, OxyBleCmd.getInfo())
     }
 
     override fun resetDeviceInfo() {
         sendOxyCmd(OxyBleCmd.OXY_CMD_RESET, OxyBleCmd.resetDeviceInfo())
-    }
-
-    override fun dealContinueRF(userId: String, fileName: String) {
     }
 
     override fun onDeviceReady(device: BluetoothDevice) {
@@ -245,6 +242,9 @@ class OxyBleInterface(model: Int): BleInterface(model) {
         Timer().schedule(500) {
             syncTime()
         }
+    }
+
+    override fun dealContinueRF(userId: String, fileName: String) {
     }
 
 }
