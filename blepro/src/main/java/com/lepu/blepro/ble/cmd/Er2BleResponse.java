@@ -1,7 +1,5 @@
-package com.lepu.blepro.ble.cmd.er2;
+package com.lepu.blepro.ble.cmd;
 
-
-import com.lepu.blepro.ble.cmd.BleCRC;
 
 import java.util.Arrays;
 

@@ -5,13 +5,15 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BleCRC
-import com.lepu.blepro.ble.cmd.er1.Er1BleResponse
-import com.lepu.blepro.ble.cmd.er1.Er1BleCmd
+import com.lepu.blepro.ble.cmd.Er1BleResponse
+import com.lepu.blepro.ble.cmd.Er1BleCmd
 import com.lepu.blepro.ble.data.Er1DataController
 import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
+import java.util.*
+import kotlin.concurrent.schedule
 import kotlin.experimental.inv
 
 /**
@@ -64,10 +66,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 LiveEventBus.get(InterfaceEvent.ER1.EventEr1Info).post(InterfaceEvent(model, info))
 
-                if (runRtImmediately) {
-                    runRtTask()
-                    runRtImmediately = false
-                }
+
 
             }
 

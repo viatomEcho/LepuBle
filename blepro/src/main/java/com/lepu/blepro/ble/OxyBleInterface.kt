@@ -5,8 +5,8 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BleCRC
-import com.lepu.blepro.ble.cmd.o2.OxyBleCmd
-import com.lepu.blepro.ble.cmd.o2.OxyBleResponse
+import com.lepu.blepro.ble.cmd.OxyBleCmd
+import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.OxyDataController
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
@@ -133,12 +133,6 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success")
                 LiveEventBus.get(InterfaceEvent.Oxy.EventOxyInfo).post(InterfaceEvent(model, info))
-
-
-                if (runRtImmediately){
-                    runRtTask()
-                    runRtImmediately = false
-                }
 
             }
 

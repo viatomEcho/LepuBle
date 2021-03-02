@@ -41,11 +41,11 @@ class BleServiceHelper private constructor() {
      * key为model
      */
     var modelConfig: SparseArray<Int> = SparseArray()
-    /**
-     * 服务onServiceConnected()时，应该初始化的model配置。必须在initService()之前完成
-     * key为model
-     */
-    var runRtConfig: SparseArray<Boolean> = SparseArray()
+//    /**
+//     * 服务onServiceConnected()时，应该初始化的model配置。必须在initService()之前完成
+//     * key为model
+//     */
+//    var runRtConfig: SparseArray<Boolean> = SparseArray()
 
     /**
      * 多设备模式手动重连中
@@ -112,10 +112,10 @@ class BleServiceHelper private constructor() {
         this.modelConfig = modelConfig
         return this
     }
-    fun initRtConfig(runRtConfig: SparseArray<Boolean>): BleServiceHelper{
-        this.runRtConfig = runRtConfig
-        return this
-    }
+//    fun initRtConfig(runRtConfig: SparseArray<Boolean>): BleServiceHelper{
+//        this.runRtConfig = runRtConfig
+//        return this
+//    }
 
     /**
      * 服务连接成功时初始化vailFace
@@ -128,10 +128,12 @@ class BleServiceHelper private constructor() {
             for (i in 0 until modelConfig.size()) {
 
                 val model = modelConfig.get(modelConfig.keyAt(i))
-                runRtConfig.get(model)?.let {
-                    LepuBleLog.d("setInterfaces ===== ", "$it")
-                    setInterfaces(model, it)
-                } ?: setInterfaces(model)
+//                runRtConfig.get(model)?.let {
+//                    LepuBleLog.d("setInterfaces ===== ", "$it")
+//                    setInterfaces(model, it)
+//                } ?: setInterfaces(model)
+
+                setInterfaces(model)
 
             }
         }else{
@@ -145,10 +147,10 @@ class BleServiceHelper private constructor() {
     /**
      * 当前要设置的设备Model, 必须在initService 之后调用
      */
-    fun setInterfaces(model: Int, runRtImmediately: Boolean = false) {
+    fun setInterfaces(model: Int) {
         if (!checkService()) return
         LepuBleLog.d(tag, "setInterfaces")
-        if (getInterface(model) == null) bleService.initInterfaces(model, runRtImmediately)
+        if (getInterface(model) == null) bleService.initInterfaces(model)
     }
 
 
@@ -275,6 +277,64 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         bleService.reconnect(intArrayOf(scanModel), arrayOf(name))
 
+    }
+
+
+    /**
+     * madAddress 重连
+     * @param scanModel IntArray
+     * @param macAddress Array<String>
+     */
+    fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>) {
+        LepuBleLog.d(tag, "into reconnectByAddress " )
+        if (!checkService()) return
+        bleService.reconnectByAddress(scanModel, macAddress)
+
+    }
+
+    /**
+     * 通过MacAddress重连
+     * @param scanModel Int
+     * @param macAddress String
+     */
+    fun reconnectByAddress(scanModel: Int, macAddress: String) {
+        LepuBleLog.d(tag, "into reconnectByAddress" )
+        if (!checkService()) return
+        bleService.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress))
+
+    }
+
+    /**
+     * 获取当前连接的设备集合
+     * @return ArrayList<Int>
+     */
+    fun getCurrentConnected(): ArrayList<Int>{
+        LepuBleLog.d(tag, "into getCurrentConnected...")
+        val list: ArrayList<Int> = ArrayList()
+        if (!checkService()) return list
+
+        bleService.vailFace.let {
+            for (i in 0 until it.size()) {
+               if (isConnected(i)) list.add(i)
+            }
+        }
+        LepuBleLog.d(tag, "current connected: ${list.joinToString() }}")
+        return list
+
+    }
+
+    /**
+     * 当前设备是否连接
+     * @param model Int
+     * @return Boolean
+     */
+    fun isConnected(model: Int): Boolean{
+        if (!checkService()) return false
+
+        LepuBleLog.d(tag, "into disconnect" )
+        getInterface(model)?.let {
+            return it.state
+        }?: return false
     }
 
     /**
@@ -541,6 +601,13 @@ class BleServiceHelper private constructor() {
             }
         }
     }
+
+    fun setNeedSendRT(model: Int, isNeed: Boolean){
+        if (!checkService()) return
+        getInterface(model)?.let { it.isNeedSendRT = isNeed }
+    }
+
+
 
 
 

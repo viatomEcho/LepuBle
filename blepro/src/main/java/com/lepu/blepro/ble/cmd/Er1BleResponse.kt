@@ -1,4 +1,4 @@
-package com.lepu.blepro.ble.cmd.er1
+package com.lepu.blepro.ble.cmd
 
 import android.os.Parcelable
 import com.lepu.blepro.ble.data.Er1DataController

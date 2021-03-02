@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.cmd.bpm.BpmBleCmd
+import com.lepu.blepro.ble.cmd.BpmBleCmd
 import com.lepu.blepro.ble.data.BpmCmd
 import com.lepu.blepro.ble.data.BpmDeviceInfo
 import com.lepu.blepro.event.InterfaceEvent
@@ -95,10 +95,6 @@ class BpmBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 LiveEventBus.get(InterfaceEvent.BPM.EventBpmInfo).post(InterfaceEvent(model, deviceInfo))
 
-                if (runRtImmediately) {
-                    runRtTask()
-                    runRtImmediately = false
-                }
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_SET_TIME -> {
                 //同步时间

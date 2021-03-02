@@ -1,6 +1,6 @@
-package com.lepu.blepro.ble.cmd.er2;
+package com.lepu.blepro.ble.cmd;
 
-public class DeviceRunParameters {
+public class Er2RTParam {
 
     public static final int LENGTH = 20;
 
@@ -10,7 +10,7 @@ public class DeviceRunParameters {
     private int recordTime;
     private byte runStatus;
 
-    public DeviceRunParameters(byte[] data) {
+    public Er2RTParam(byte[] data) {
         if(data == null || data.length != LENGTH) {
             return;
         }

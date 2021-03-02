@@ -3,7 +3,7 @@ package com.lepu.demo.ble
 import android.app.Application
 import android.bluetooth.BluetoothDevice
 import com.lepu.blepro.BleServiceHelper
-import com.lepu.blepro.ble.cmd.o2.OxyBleResponse
+import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.objs.Bluetooth
@@ -70,7 +70,7 @@ companion object {
 
 
     fun setInterface(model: Int, runRtImmediately: Boolean = false) {
-        BleServiceHelper.BleServiceHelper.setInterfaces(model, runRtImmediately)
+        BleServiceHelper.BleServiceHelper.setInterfaces(model)
     }
 
     fun reInitBle() {

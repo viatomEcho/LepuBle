@@ -65,12 +65,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     private var pool: ByteArray? = null
 
     /**
-     * 是否在第一次获取设备信息后立即执行实时任务
-     * 默认：false
-     */
-    var runRtImmediately: Boolean = false
-
-    /**
      * 获取实时波形
      */
     private var count: Int = 0
@@ -88,13 +82,15 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      */
     var isRtStop: Boolean = true
 
+    var isNeedSendRT: Boolean = true
+
 
     inner class RtTask : Runnable {
         override fun run() {
             count++
             if (state) {
                 rtHandler.postDelayed(rTask, delayMillis)
-                if (!isRtStop) getRtData()
+                if (!isRtStop && isNeedSendRT) getRtData()
             }
         }
     }

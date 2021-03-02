@@ -1,24 +1,24 @@
-package com.lepu.blepro.ble.cmd.er2;
+package com.lepu.blepro.ble.cmd;
 
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 
 public class Er2RtData {
-    DeviceRunParameters parameters;
+    Er2RTParam parameters;
 
     // reserved 17 bytes
     private WaveData waveData;
 
     public Er2RtData(byte[] bytes) {
-        if (bytes == null || bytes.length < DeviceRunParameters.LENGTH) {
+        if (bytes == null || bytes.length < Er2RTParam.LENGTH) {
             return;
         }
 
-        byte[] paraData = Arrays.copyOfRange(bytes, 0, DeviceRunParameters.LENGTH);
-        parameters = new DeviceRunParameters(paraData);
+        byte[] paraData = Arrays.copyOfRange(bytes, 0, Er2RTParam.LENGTH);
+        parameters = new Er2RTParam(paraData);
 
-        byte[] waveBuf = Arrays.copyOfRange(bytes, DeviceRunParameters.LENGTH, bytes.length);
+        byte[] waveBuf = Arrays.copyOfRange(bytes, Er2RTParam.LENGTH, bytes.length);
         this.waveData = new WaveData(waveBuf);
     }
 

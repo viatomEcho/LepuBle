@@ -1,4 +1,4 @@
-package com.lepu.blepro.ble.cmd.er2;
+package com.lepu.blepro.ble.cmd;
 
 import java.util.Arrays;
 import java.util.List;

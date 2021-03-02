@@ -1,4 +1,4 @@
-package com.lepu.blepro.ble.cmd.er2
+package com.lepu.blepro.ble.cmd
 
 import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.utils.LepuBleLog

@@ -22,6 +22,7 @@ import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.ble.Er1BleInterface
+import com.lepu.blepro.ble.Er2BleInterface
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -81,6 +82,12 @@ class BleService: LifecycleService() {
      */
     var reconnectDeviceName: Array<String>? = null
 
+    /**
+     * 发起重连扫描时应匹配的蓝牙macAddress集合
+     */
+    var reconnectDeviceAddress: Array<String>? = null
+
+    var isReconnectByAddress: Boolean = false
 
 
     override fun onCreate() {
@@ -124,36 +131,32 @@ class BleService: LifecycleService() {
      * @param runRtImmediately Boolean 接收主机info响应后，是否立即开启实时监测任务
      * @return BleInterface
      */
-    fun initInterfaces(m: Int, runRtImmediately: Boolean): BleInterface {
-        LepuBleLog.d(tag, "initInterfaces start...${vailFace.size()},$m,   $runRtImmediately")
+    fun initInterfaces(m: Int): BleInterface {
+        LepuBleLog.d(tag, "initInterfaces start...${vailFace.size()},$m")
 
         vailFace.get(m)?.let { return it }
         when(m) {
             Bluetooth.MODEL_O2RING -> {
                 OxyBleInterface(m).apply {
-                    this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
                     return this
                 }
             }
             Bluetooth.MODEL_ER1,Bluetooth.MODEL_DUOEK -> {
                 Er1BleInterface(m).apply {
-                    this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
                     return this
                 }
 
             }
             Bluetooth.MODEL_ER2 -> {
-                Er1BleInterface(m).apply {
-                    this.runRtImmediately = runRtImmediately
+                Er2BleInterface(m).apply {
                     vailFace.put(m, this)
                     return this
                 }
             }
             Bluetooth.MODEL_BPM -> {
                 BpmBleInterface(m).apply {
-                    this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
                     return this
                 }
@@ -227,6 +230,34 @@ class BleService: LifecycleService() {
         if (reScan) {
             if (scanModel.size > 1) BleServiceHelper.BleServiceHelper.isReconnectingMulti = true
             this.reconnectDeviceName = reconnectDeviceName
+            this.isReconnectByAddress = false
+            startDiscover(scanModel, isReconnecting = true)
+        }
+
+        LepuBleLog.d(tag, "reconnect: => ${scanModel?.joinToString()} => ReScan: $reScan")
+    }
+
+    /**
+     * 重新连接开启扫描
+     * 必定开启 isAutoConnecting = true
+     */
+    fun reconnectByAddress(scanModel: IntArray, reconnectDeviceAddress: Array<String>) {
+
+        if (vailFace.isEmpty())return
+
+        if (scanModel.size != reconnectDeviceAddress.size){
+            LepuBleLog.d(tag,"请检查重连model && reconnectDeviceAddress  size")
+            return
+        }
+        var reScan = false
+
+        if (BleServiceHelper.BleServiceHelper.hasUnConnected(scanModel)) {
+            reScan = true
+        }
+        if (reScan) {
+            if (scanModel.size > 1) BleServiceHelper.BleServiceHelper.isReconnectingMulti = true
+            this.reconnectDeviceAddress = reconnectDeviceAddress
+            this.isReconnectByAddress = true
             startDiscover(scanModel, isReconnecting = true)
         }
 
@@ -315,8 +346,12 @@ class BleService: LifecycleService() {
             }
 
             if (BluetoothController.addDevice(b)) {
-                LepuBleLog.d(tag, "isReconnecting::$isReconnectScan, b= ${b.name}, ${b.model}, recName:${reconnectDeviceName?.joinToString()}")
-                if (isReconnectScan && reconnectDeviceName?.contains(b.name) == true){
+                LepuBleLog.d(tag, "isReconnecting::$isReconnectScan, b= ${b.name}," +
+                        " ${b.model}, isReconnectByAddress = $isReconnectByAddress , recName:${reconnectDeviceName?.joinToString()}, recAddress:${reconnectDeviceAddress?.joinToString()}")
+
+                val isContains: Boolean = if(isReconnectByAddress) reconnectDeviceAddress?.contains(b.device.address) == true else reconnectDeviceName?.contains(b.name) == true
+
+                if (isReconnectScan && isContains){
                     stopDiscover()
                     vailFace.get(b.model)?.connect(this@BleService, b.device)
                 }else{

@@ -1,10 +1,9 @@
-package com.lepu.blepro.ble.cmd.er2;
+package com.lepu.blepro.ble.cmd;
 
 
-import com.lepu.blepro.ble.cmd.BleCRC;
 import com.lepu.blepro.utils.Convertible;
 
-import static com.lepu.blepro.ble.cmd.er2.Er2BleCmd.COMMON_PKG_HEAD_LENGTH;
+import static com.lepu.blepro.ble.cmd.Er2BleCmd.COMMON_PKG_HEAD_LENGTH;
 
 public class Er2RequestPkg {
 

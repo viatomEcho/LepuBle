@@ -4,15 +4,13 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.cmd.BleCRC
-import com.lepu.blepro.ble.cmd.er1.Er1BleCmd
-import com.lepu.blepro.ble.cmd.er1.Er1BleResponse
-import com.lepu.blepro.ble.cmd.er2.*
+import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.Er2DeviceInfo
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
 import java.util.*
+import kotlin.concurrent.schedule
 import kotlin.experimental.inv
 
 /**
@@ -252,5 +250,13 @@ class Er2BleInterface(model: Int): BleInterface(model) {
 
     override fun dealContinueRF(userId: String, fileName: String) {
     }
+
+    override fun onDeviceReady(device: BluetoothDevice) {
+        super.onDeviceReady(device)
+        Timer().schedule(500) {
+            syncTime()
+        }
+    }
+
 
 }

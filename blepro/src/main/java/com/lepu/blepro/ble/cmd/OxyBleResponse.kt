@@ -1,4 +1,4 @@
-package com.lepu.blepro.ble.cmd.o2
+package com.lepu.blepro.ble.cmd
 import android.os.Parcelable
 import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.utils.ByteUtils

@@ -1,4 +1,4 @@
-package com.lepu.blepro.ble.cmd.er1;
+package com.lepu.blepro.ble.cmd;
 
 import com.lepu.blepro.ble.cmd.BleCRC;
 import com.lepu.blepro.utils.ByteArrayKt;
