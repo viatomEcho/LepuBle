@@ -4,16 +4,13 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.cmd.BleCRC
-import com.lepu.blepro.ble.cmd.Er1BleResponse
-import com.lepu.blepro.ble.cmd.Er1BleCmd
+import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.Er1DataController
 import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
 import java.util.*
-import kotlin.concurrent.schedule
 import kotlin.experimental.inv
 
 /**
@@ -66,7 +63,10 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 LiveEventBus.get(InterfaceEvent.ER1.EventEr1Info).post(InterfaceEvent(model, info))
 
-
+                if (runRtImmediately){
+                    runRtTask()
+                    runRtImmediately = false
+                }
 
             }
 
@@ -92,7 +92,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                     curFile =  curFileName?.let {
                         Er1BleResponse.Er1File(model, it, toUInt(response.content), userId!!)
                     }
-                    sendCmd(Er1BleCmd.readFileData(0))
+                    sendCmd( Er1BleCmd.readFileData(0))
                 } else {
                     LepuBleLog.d(tag, "read file failed：${response.pkgType}")
                     LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadFileError).post(InterfaceEvent(model, true))
@@ -134,6 +134,49 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                      LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadFileComplete).post(InterfaceEvent(model, it))
                 }?: LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
                 curFile = null
+            }
+            Er1BleCmd.VIBRATE_CONFIG -> {
+                LepuBleLog.d(tag, "model:$model,VIBRATE_CONFIG => success")
+                LiveEventBus.get(InterfaceEvent.ER1.EventEr1VibrateConfig).post(InterfaceEvent(model, response.content))
+
+            }
+            Er1BleCmd.SET_VIBRATE_STATE -> {
+                LepuBleLog.d(tag, "model:$model,SET_SWITCHER_STATE => success")
+                LiveEventBus.get(InterfaceEvent.ER1.EventEr1SetSwitcherState).post(
+                    InterfaceEvent(
+                        model,
+                        true
+                    )
+                )
+            }
+
+            Er1BleCmd.FACTORY_RESET -> {
+                LepuBleLog.d(tag, "model:$model,CMD_FACTORY_RESET => success")
+                LiveEventBus.get(InterfaceEvent.ER1.EventEr1ResetFactory).post(
+                    InterfaceEvent(
+                        model,
+                        true
+                    )
+                )
+            }
+
+            Er1BleCmd.FACTORY_RESET_ALL -> {
+                LepuBleLog.d(tag, "model:$model,FACTORY_RESET_ALL => success")
+                LiveEventBus.get(InterfaceEvent.ER1.EventEr1ResetFactoryAll).post(
+                    InterfaceEvent(
+                        model,
+                        true
+                    )
+                )
+            }
+            Er1BleCmd.SET_TIME -> {
+                LepuBleLog.d(tag, "model:$model,SET_TIME => success")
+                LiveEventBus.get(InterfaceEvent.ER1.EventEr1SetTime).post(
+                    InterfaceEvent(
+                        model,
+                        true
+                    )
+                )
             }
         }
     }
@@ -181,10 +224,17 @@ class Er1BleInterface(model: Int): BleInterface(model) {
     }
 
     override fun syncTime() {
+        sendCmd(Er1BleCmd.setTime())
     }
 
 
     override fun resetDeviceInfo() {
+        sendCmd(Er1BleCmd.factoryReset())
+    }
+
+
+    fun factoryRestAll() {
+        sendCmd(Er1BleCmd.factoryResetAll())
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
@@ -204,6 +254,25 @@ class Er1BleInterface(model: Int): BleInterface(model) {
     override fun getFileList() {
         sendCmd(Er1BleCmd.getFileList())
     }
+
+    fun getVibrateConfig(){
+        LepuBleLog.d(tag, "getVibrateConfig...")
+        sendCmd(Er1BleCmd.getVibrateConfig())
+
+    }
+    fun setVibrateConfig(switcher: Boolean, threshold1: Int, threshold2: Int){
+        LepuBleLog.d(tag, "setVibrateConfig...")
+        sendCmd(Er1BleCmd.setVibrate(switcher, threshold1, threshold2))
+
+    }
+
+    fun setVibrateConfig(switcher: Boolean, vector: Int, motionCount: Int,motionWindows: Int ){
+        LepuBleLog.d(tag, "setVibrateConfig...")
+        sendCmd(Er1BleCmd.setSwitcher(switcher, vector,motionCount, motionWindows))
+
+    }
+
+
 
 
 }

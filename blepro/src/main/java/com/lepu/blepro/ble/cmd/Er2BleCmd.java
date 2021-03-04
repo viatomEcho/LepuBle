@@ -41,7 +41,7 @@ public class Er2BleCmd {
 
     public static byte[] setSwitcherState(boolean switchState) {
         addNo();
-        Er2SwitcherConfig config = new Er2SwitcherConfig(switchState, VECTOR, MOTION_COUNT, MOTION_WINDOWS);
+        SwitcherConfig config = new SwitcherConfig(switchState, VECTOR, MOTION_COUNT, MOTION_WINDOWS);
 
         return getReq(CMD_SET_SWITCHER_STATE, (byte)seqNo, config.convert2Data());
     }

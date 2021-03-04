@@ -38,11 +38,7 @@ class BpmBleInterface(model: Int): BleInterface(model) {
     private var isUserAEnd: Boolean = true
     private var isUserBEnd: Boolean = true
 
-    /**
-     * 是否开启自动获取设备实时数据的标志, true开启，false关闭
-     * 获取文件列表和下载文件的时候会设置为关闭状态
-     */
-    var syncState = true
+
 
     override fun hasResponse(bytes: ByteArray?): ByteArray? {
         val bytesLeft: ByteArray? = bytes
@@ -94,6 +90,10 @@ class BpmBleInterface(model: Int): BleInterface(model) {
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 LiveEventBus.get(InterfaceEvent.BPM.EventBpmInfo).post(InterfaceEvent(model, deviceInfo))
+                if (runRtImmediately){
+                    runRtTask()
+                    runRtImmediately = false
+                }
 
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_SET_TIME -> {
@@ -105,7 +105,7 @@ class BpmBleInterface(model: Int): BleInterface(model) {
 
                 LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_BP_STATE => success")
                 //发送实时state : byte
-                LiveEventBus.get(InterfaceEvent.BPM.EventBpmRtData).post(InterfaceEvent(model, bytes))
+                LiveEventBus.get(InterfaceEvent.BPM.EventBpmState).post(InterfaceEvent(model, bytes))
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_GET_RECORDS -> {
                 //获取留存记录
@@ -124,7 +124,6 @@ class BpmBleInterface(model: Int): BleInterface(model) {
                        if (isUserAEnd && isUserBEnd) {
                            //AB都读取完成
                            LiveEventBus.get(InterfaceEvent.BPM.EventBpmRecordEnd).post(InterfaceEvent(model, true ))
-                           syncState = true
                        }
                    }
                }
@@ -136,7 +135,7 @@ class BpmBleInterface(model: Int): BleInterface(model) {
             }
             else -> {
                 //实时指标
-                LiveEventBus.get(InterfaceEvent.BPM.EventBpmMeasureResult).post(InterfaceEvent(model, BpmCmd(bytes) ))
+                LiveEventBus.get(InterfaceEvent.BPM.EventBpmRtData).post(InterfaceEvent(model, BpmCmd(bytes) ))
 
             }
         }
@@ -145,11 +144,13 @@ class BpmBleInterface(model: Int): BleInterface(model) {
 
 
     override fun getInfo() {
-        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_INFO))
+        LepuBleLog.d(tag, "getInfo...")
+        sendCmd( BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_INFO))
     }
 
     override fun syncTime() {
-        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_SET_TIME))
+        LepuBleLog.d(tag, "syncTime...")
+        sendCmd( BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_SET_TIME))
     }
 
     override fun updateSetting(type: String, value: Any) {
@@ -157,22 +158,18 @@ class BpmBleInterface(model: Int): BleInterface(model) {
 
 
     override fun getRtData() {
+        LepuBleLog.d(tag, "getRtData...")
         sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_BP_STATE))
     }
 
     override fun getFileList() {
     }
 
-    fun getBpmFileList(model: Int, map: HashMap<String, Any>){
-        if(!syncState) {
-            return
-        } else {
-            syncState = false
-        }
+    fun getBpmFileList( map: HashMap<String, Any>){
         isUserAEnd = false
         isUserBEnd = false
+        LepuBleLog.d(tag, "getBpmFileList...")
        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_RECORDS, map))
-
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
@@ -182,9 +179,17 @@ class BpmBleInterface(model: Int): BleInterface(model) {
 
     override fun dealContinueRF(userId: String, fileName: String) {
     }
-    override fun onDeviceReady(device: BluetoothDevice) {
-        super.onDeviceReady(device)
-        syncTime()
+
+
+
+    fun startBp() {
+        LepuBleLog.d(tag, "startBp...")
+        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_START_BP))
+    }
+
+    fun stopBp() {
+        LepuBleLog.d(tag, "stopBp...")
+        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_STOP_BP))
     }
 
 

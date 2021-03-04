@@ -48,14 +48,10 @@ class Er1BleManager(context: Context): BaseBleManager(context) {
     }
     override fun init() {
         syncTime()
-        getInfo()
         LepuBleLog.d("Er1BleManager inited")
-    }
-    private fun getInfo() {
-        sendCmd(Er1BleCmd.getInfo());
     }
 
     private fun syncTime() {
-
+        sendCmd(Er1BleCmd.setTime());
     }
 }

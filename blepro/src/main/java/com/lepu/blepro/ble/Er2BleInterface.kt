@@ -5,6 +5,7 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
+import com.lepu.blepro.ble.cmd.Er1BleCmd.FACTORY_RESET
 import com.lepu.blepro.ble.data.Er2DeviceInfo
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
@@ -95,6 +96,11 @@ class Er2BleInterface(model: Int): BleInterface(model) {
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 LiveEventBus.get(InterfaceEvent.ER2.EventEr2Info).post(InterfaceEvent(model, info))
+
+                if (runRtImmediately){
+                    runRtTask()
+                    runRtImmediately = false
+                }
             }
             Er2BleCmd.CMD_SET_TIME -> {
 
@@ -118,12 +124,11 @@ class Er2BleInterface(model: Int): BleInterface(model) {
             }
             Er2BleCmd.CMD_RETRIEVE_SWITCHER_STATE -> {
 
-                val config = Er2SwitcherConfig.parse(respPkg.data)
                 LepuBleLog.d(tag, "model:$model,CMD_RETRIEVE_SWITCHER_STATE => success")
                 LiveEventBus.get(InterfaceEvent.ER2.EventEr2SwitcherState).post(
                     InterfaceEvent(
                         model,
-                        config.switcher
+                        respPkg.data
                     )
                 )
             }
@@ -219,7 +224,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
         }
     }
     fun setSwitcherState(hrFlag: Boolean) {
-        sendCmd(Er2BleCmd.setSwitcherState(hrFlag))
+        sendCmd( Er2BleCmd.setSwitcherState(hrFlag))
     }
 
     fun getSwitcherState() {
@@ -251,12 +256,6 @@ class Er2BleInterface(model: Int): BleInterface(model) {
     override fun dealContinueRF(userId: String, fileName: String) {
     }
 
-    override fun onDeviceReady(device: BluetoothDevice) {
-        super.onDeviceReady(device)
-        Timer().schedule(500) {
-            syncTime()
-        }
-    }
 
 
 }

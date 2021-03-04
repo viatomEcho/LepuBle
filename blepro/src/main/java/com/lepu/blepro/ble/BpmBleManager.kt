@@ -43,11 +43,11 @@ class BpmBleManager(context: Context): BaseBleManager(context) {
     }
 
     override fun init() {
-        getInfo()
+        syncTime()
         LepuBleLog.d("BpmBleManager inited ")
     }
-    private fun getInfo() {
-        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_INFO));
+    private fun syncTime() {
+        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_SET_TIME));
     }
 
 

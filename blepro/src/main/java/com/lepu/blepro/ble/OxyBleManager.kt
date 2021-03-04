@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.util.Log
 import com.lepu.blepro.base.BaseBleManager
+import com.lepu.blepro.ble.cmd.OxyBleCmd
 import com.lepu.blepro.utils.LepuBleLog
 import java.util.*
 
@@ -49,6 +50,8 @@ class OxyBleManager(context: Context): BaseBleManager(context) {
     }
 
     override fun init() {
+        sendCmd(OxyBleCmd.syncTime())
         LepuBleLog.d("OxyBleManager inited")
     }
+
 }

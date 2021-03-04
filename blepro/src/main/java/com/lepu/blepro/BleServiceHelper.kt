@@ -13,6 +13,8 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.BpmBleInterface
 import com.lepu.blepro.ble.Er1BleInterface
 import com.lepu.blepro.ble.Er2BleInterface
+import com.lepu.blepro.ble.OxyBleInterface
+import com.lepu.blepro.ble.cmd.Er1BleCmd
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
@@ -20,7 +22,6 @@ import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
-import java.lang.Exception
 
 /**
  * 单例的蓝牙服务帮助类，原则上只通过此类开放API
@@ -41,11 +42,11 @@ class BleServiceHelper private constructor() {
      * key为model
      */
     var modelConfig: SparseArray<Int> = SparseArray()
-//    /**
-//     * 服务onServiceConnected()时，应该初始化的model配置。必须在initService()之前完成
-//     * key为model
-//     */
-//    var runRtConfig: SparseArray<Boolean> = SparseArray()
+    /**
+     * 服务onServiceConnected()时，应该初始化的model配置。必须在initService()之前完成
+     * key为model
+     */
+    var runRtConfig: SparseArray<Boolean> = SparseArray()
 
     /**
      * 多设备模式手动重连中
@@ -112,10 +113,10 @@ class BleServiceHelper private constructor() {
         this.modelConfig = modelConfig
         return this
     }
-//    fun initRtConfig(runRtConfig: SparseArray<Boolean>): BleServiceHelper{
-//        this.runRtConfig = runRtConfig
-//        return this
-//    }
+    fun initRtConfig(runRtConfig: SparseArray<Boolean>): BleServiceHelper{
+        this.runRtConfig = runRtConfig
+        return this
+    }
 
     /**
      * 服务连接成功时初始化vailFace
@@ -128,12 +129,12 @@ class BleServiceHelper private constructor() {
             for (i in 0 until modelConfig.size()) {
 
                 val model = modelConfig.get(modelConfig.keyAt(i))
-//                runRtConfig.get(model)?.let {
-//                    LepuBleLog.d("setInterfaces ===== ", "$it")
-//                    setInterfaces(model, it)
-//                } ?: setInterfaces(model)
+                runRtConfig.get(model)?.let {
+                    LepuBleLog.d("setInterfaces ===== ", "$it")
+                    setInterfaces(model, it)
+                } ?: setInterfaces(model)
 
-                setInterfaces(model)
+//                setInterfaces(model)
 
             }
         }else{
@@ -147,10 +148,10 @@ class BleServiceHelper private constructor() {
     /**
      * 当前要设置的设备Model, 必须在initService 之后调用
      */
-    fun setInterfaces(model: Int) {
+    fun setInterfaces(model: Int, runRtImmediately: Boolean = false) {
         if (!checkService()) return
         LepuBleLog.d(tag, "setInterfaces")
-        if (getInterface(model) == null) bleService.initInterfaces(model)
+        if (getInterface(model) == null) bleService.initInterfaces(model, runRtImmediately)
     }
 
 
@@ -533,13 +534,6 @@ class BleServiceHelper private constructor() {
         return true
     }
 
-    private fun checkState(inter: BleInterface): Boolean{
-        if (!inter.state){
-            LepuBleLog.d(tag, "Error:model:${inter.model}, ble state is ${inter.state}!!!")
-            return false
-        }
-        return true
-    }
 
     fun getBpmFileList(model: Int, map: HashMap<String, Any>){
         if (!checkService()) return
@@ -547,12 +541,41 @@ class BleServiceHelper private constructor() {
             LepuBleLog.d(tag,"getBpmFileList, 无效model：$model" )
             return
         }
-        getInterface(model)?.let {
-            if (checkState(it)) return
-            (it as BpmBleInterface).getBpmFileList(model, map)
-
+        getInterface(model)?.let { it1 ->
+            (it1 as BpmBleInterface).let {
+                LepuBleLog.d(tag, "it as BpmBleInterface")
+                it.getBpmFileList(map)
+            }
         }
 
+    }
+
+    fun startBpm(model: Int){
+        if (!checkService()) return
+        if (model != Bluetooth.MODEL_BPM){
+            LepuBleLog.d(tag,"startBpm, 无效model：$model" )
+            return
+        }
+        getInterface(model)?.let { it1 ->
+            (it1 as BpmBleInterface).let {
+                LepuBleLog.d(tag, "it as BpmBleInterface")
+                it.startBp()
+            }
+        }
+    }
+
+    fun stopBpm(model: Int){
+        if (!checkService()) return
+        if (model != Bluetooth.MODEL_BPM){
+            LepuBleLog.d(tag,"startBpm, 无效model：$model" )
+            return
+        }
+        getInterface(model)?.let { it1 ->
+            (it1 as BpmBleInterface).let {
+                LepuBleLog.d(tag, "it as BpmBleInterface")
+                it.stopBp()
+            }
+        }
     }
 
     fun isScanning(): Boolean{
@@ -602,11 +625,92 @@ class BleServiceHelper private constructor() {
         }
     }
 
-    fun setNeedSendRT(model: Int, isNeed: Boolean){
+
+    //er1  duoek----------------
+
+    fun getEr1VibrateConfig(model: Int){
         if (!checkService()) return
-        getInterface(model)?.let { it.isNeedSendRT = isNeed }
+        getInterface(model)?.let { ble ->
+            checkInterfaceType(model, ble).let { check ->
+                LepuBleLog.d(tag, "getEr1VibrateConfig, checkInterfaceType = $check")
+
+                (ble as Er1BleInterface).getVibrateConfig()
+            }
+        }
+
     }
 
+    fun setEr1Vibrate(model: Int, switcher: Boolean, threshold1: Int, threshold2: Int){
+        getInterface(model)?.let { ble ->
+            checkInterfaceType(model, ble).let { check ->
+                LepuBleLog.d(tag, "setEr1Vibrate, checkInterfaceType = $check")
+
+                (ble as Er1BleInterface).setVibrateConfig(switcher, threshold1, threshold2)
+            }
+        }
+
+    }
+
+    fun setEr1Vibrate(model: Int,switcher: Boolean, vector: Int, motionCount: Int,motionWindows: Int ){
+        getInterface(model)?.let { ble ->
+            checkInterfaceType(model, ble).let { check ->
+                LepuBleLog.d(tag, "setSwitcher, checkInterfaceType = $check")
+
+                (ble as Er1BleInterface).setVibrateConfig(switcher, vector, motionCount, motionWindows)
+            }
+        }
+
+    }
+
+    fun er1FactoryResetAll(model: Int) {
+        getInterface(model)?.let { ble ->
+            checkInterfaceType(model, ble).let { check ->
+                LepuBleLog.d(tag, "er1FactoryResetAll, checkInterfaceType = $check")
+
+                (ble as Er1BleInterface).factoryRestAll()
+            }
+        }
+
+    }
+
+
+    fun er1FactoryReset(model: Int) {
+        getInterface(model)?.let { ble ->
+            checkInterfaceType(model, ble).let { check ->
+                LepuBleLog.d(tag, "er1FactoryReset, checkInterfaceType = $check")
+
+                (ble as Er1BleInterface).resetDeviceInfo()
+            }
+        }
+
+    }
+
+    //------er1 duoek   end-----------------
+
+    fun checkInterfaceType(model: Int, inter: BleInterface): Boolean {
+        if (!checkService()) return false
+
+        when (model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
+                return inter is Er1BleInterface
+            }
+            Bluetooth.MODEL_ER2 -> {
+                return inter is Er2BleInterface
+            }
+            Bluetooth.MODEL_BPM -> {
+                return inter is BpmBleInterface
+            }
+            Bluetooth.MODEL_O2RING -> {
+                return inter is OxyBleInterface
+            }
+            else -> {
+                LepuBleLog.d(tag, "checkModel, 无效model：$model,${inter.javaClass}")
+                return false
+            }
+        }
+
+
+    }
 
 
 

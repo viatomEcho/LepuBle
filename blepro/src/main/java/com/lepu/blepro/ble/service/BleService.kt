@@ -131,19 +131,22 @@ class BleService: LifecycleService() {
      * @param runRtImmediately Boolean 接收主机info响应后，是否立即开启实时监测任务
      * @return BleInterface
      */
-    fun initInterfaces(m: Int): BleInterface {
+    fun initInterfaces(m: Int, runRtImmediately: Boolean = false): BleInterface {
         LepuBleLog.d(tag, "initInterfaces start...${vailFace.size()},$m")
 
         vailFace.get(m)?.let { return it }
         when(m) {
             Bluetooth.MODEL_O2RING -> {
                 OxyBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
                     return this
                 }
             }
             Bluetooth.MODEL_ER1,Bluetooth.MODEL_DUOEK -> {
                 Er1BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
                     vailFace.put(m, this)
                     return this
                 }
@@ -151,12 +154,16 @@ class BleService: LifecycleService() {
             }
             Bluetooth.MODEL_ER2 -> {
                 Er2BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
                     vailFace.put(m, this)
                     return this
                 }
             }
             Bluetooth.MODEL_BPM -> {
                 BpmBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
                     vailFace.put(m, this)
                     return this
                 }

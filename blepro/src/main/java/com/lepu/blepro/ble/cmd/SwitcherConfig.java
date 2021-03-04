@@ -3,7 +3,7 @@ package com.lepu.blepro.ble.cmd;
 
 import com.lepu.blepro.utils.Convertible;
 
-public class Er2SwitcherConfig implements Convertible {
+public class SwitcherConfig implements Convertible {
     private int switcher;
     private int vector;
     private int motionCount;
@@ -21,10 +21,10 @@ public class Er2SwitcherConfig implements Convertible {
         }
     }
 
-    public Er2SwitcherConfig() {
+    public SwitcherConfig() {
     }
 
-    public Er2SwitcherConfig(boolean state, int vector, int motionCount, int motionWindows) {
+    public SwitcherConfig(boolean state, int vector, int motionCount, int motionWindows) {
         this.switcher = state ? 1 : 0;
         this.vector = vector;
         this.motionCount = motionCount;
@@ -66,8 +66,8 @@ public class Er2SwitcherConfig implements Convertible {
         return data;
     }
 
-    public static Er2SwitcherConfig parse(byte[] data) {
-        Er2SwitcherConfig config = new Er2SwitcherConfig();
+    public static SwitcherConfig parse(byte[] data) {
+        SwitcherConfig config = new SwitcherConfig();
 
         int switcher = data[0] & 0x01;
         boolean state = (switcher == 1);

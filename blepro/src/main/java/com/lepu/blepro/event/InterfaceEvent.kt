@@ -41,7 +41,13 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventEr1ReadingFileProgress = "com.lepu.ble.er1.reading.file.progress"
             const val EventEr1ReadFileComplete = "com.lepu.ble.er1.read.file.complete"
             const val EventEr1ReadFileCanceled = "com.lepu.ble.er1.read.file.canceled"
-            const val EventEr1ResetDeviceInfo = "com.lepu.ble.er1.reset"
+            const val EventEr1ResetFactory = "com.lepu.ble.er1.reset"
+            const val EventEr1ResetFactoryAll = "com.lepu.ble.er1.reset.all"
+            const val EventEr1VibrateConfig = "com.lepu.ble.er1.vibrate.config"
+            const val EventEr1SetSwitcherState = "com.lepu.ble.er1.set.switcher.state"
+            const val EventEr1SetTime = "com.lepu.ble.er1.set.time"
+
+
         }
     }
 
@@ -53,6 +59,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         companion object{
             const val EventBpmInfo = "com.lepu.ble.bpm.info"
             const val EventBpmRtData = "com.lepu.ble.bpm.rtData"
+            const val EventBpmState = "com.lepu.ble.bpm.state"
             const val EventBpmFileList = "com.lepu.ble.bpm.fileList"
             const val EventBpmReadFileError = "com.lepu.ble.bpm.read.file.error"
             const val EventBpmReadingFileProgress = "com.lepu.ble.bpm.reading.file.progress"

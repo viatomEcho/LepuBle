@@ -82,7 +82,13 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      */
     var isRtStop: Boolean = true
 
-    var isNeedSendRT: Boolean = true
+//    var isNeedSendRT: Boolean = true
+
+    /**
+     * 初始化后是否在第一次获取设备信息后立即执行实时任务
+     * 默认：false
+     */
+    var runRtImmediately: Boolean = false
 
 
     inner class RtTask : Runnable {
@@ -90,7 +96,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
             count++
             if (state) {
                 rtHandler.postDelayed(rTask, delayMillis)
-                if (!isRtStop && isNeedSendRT) getRtData()
+//                if (!isRtStop && isNeedSendRT) getRtData()
+                if (!isRtStop) getRtData()
             }
         }
     }
@@ -280,9 +287,10 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
 
     fun sendCmd(bs: ByteArray) {
         if (!state) {
+            LepuBleLog.d(tag, "send cmd fail， state = false")
             return
         }
-        manager.sendCmd(bs)
+        manager.sendCmd( bs)
     }
 
     /**

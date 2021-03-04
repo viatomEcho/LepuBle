@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import com.lepu.blepro.base.BaseBleManager
 import com.lepu.blepro.ble.cmd.Er1BleCmd
+import com.lepu.blepro.ble.cmd.Er2BleCmd
 import com.lepu.blepro.utils.LepuBleLog
 import java.util.*
 
@@ -48,11 +49,11 @@ class Er2BleManager(context: Context): BaseBleManager(context) {
             .enqueue()
     }
     override fun init() {
-        getInfo()
+        syncTime()
         LepuBleLog.d("Er2BleManager inited")
     }
-    private fun getInfo() {
-        sendCmd(Er1BleCmd.getInfo());
+    private fun syncTime() {
+        sendCmd(Er2BleCmd.setTime());
     }
 
 }
