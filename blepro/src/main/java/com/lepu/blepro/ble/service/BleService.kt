@@ -220,6 +220,7 @@ class BleService: LifecycleService() {
      * 连接前都应调用此方法
      */
     fun stopDiscover() {
+        LepuBleLog.d(tag, "stopDiscover...")
         isDiscovery = false
         scanDevice(false)
     }

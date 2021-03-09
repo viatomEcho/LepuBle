@@ -41,13 +41,13 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     /**
      * 蓝牙连接状态
      */
-    internal var state = false
+    var state = false
 
 
     /**
      * 连接中
      */
-    private var connecting = false
+    var connecting = false
 
 
     /**
@@ -212,7 +212,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     abstract fun hasResponse(bytes: ByteArray?): ByteArray?
 
     override fun onDeviceConnected(device: BluetoothDevice) {
-        LepuBleLog.d(tag, "${device.name} connected")
+        LepuBleLog.d(tag, "onDeviceConnected ${device.name} connected")
+
         state = true
         connecting = false
         publish()
@@ -236,6 +237,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
             }
         }
 
+
     }
 
     override fun onDeviceConnecting(device: BluetoothDevice) {
@@ -247,7 +249,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
-        LepuBleLog.d(tag, "${device.name} Disconnected")
+        LepuBleLog.d(tag, "${device.name} onDeviceDisconnected")
         state = false
         connecting = false
         stopRtTask()
@@ -266,7 +268,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {
-        LepuBleLog.d(tag, "${device.name} Disconnecting")
+        LepuBleLog.d(tag, "${device.name} onDeviceDisconnecting")
         state = false
         connecting = false
 
@@ -275,7 +277,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     }
 
     override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
-        LepuBleLog.d(tag, "${device.name} FailedToConnect")
+        LepuBleLog.d(tag, "${device.name} onDeviceFailedToConnect")
         state = false
 
         connecting = false
@@ -292,7 +294,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
 
 
     override fun onDeviceReady(device: BluetoothDevice) {
-        LepuBleLog.d(tag, "${device.name} isReady")
+        LepuBleLog.d(tag, "${device.name} onDeviceReady")
         connecting = false
     }
 

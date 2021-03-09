@@ -257,7 +257,6 @@ class BleServiceHelper private constructor() {
 
         LepuBleLog.d(tag, "connect")
         getInterface(model)?.let {
-            stopScan()
             it.connect(context, b, isAutoReconnect, withUpdater)
         }
     }
@@ -269,6 +268,7 @@ class BleServiceHelper private constructor() {
     fun reconnect(scanModel: IntArray, name: Array<String>) {
         LepuBleLog.d(tag, "into reconnect " )
         if (!checkService()) return
+        stopScan()
         bleService.reconnect(scanModel, name)
 
     }
@@ -281,6 +281,7 @@ class BleServiceHelper private constructor() {
     fun reconnect(scanModel: Int, name: String) {
         LepuBleLog.d(tag, "into reconnect" )
         if (!checkService()) return
+        stopScan()
         bleService.reconnect(intArrayOf(scanModel), arrayOf(name))
 
     }
@@ -295,6 +296,7 @@ class BleServiceHelper private constructor() {
     fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, needCheckUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress " )
         if (!checkService()) return
+        stopScan()
         bleService.reconnectByAddress(needCheckUpdater, scanModel, macAddress)
 
     }
@@ -308,6 +310,7 @@ class BleServiceHelper private constructor() {
     fun reconnectByAddress(scanModel: Int, macAddress: String, needCheckUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress" )
         if (!checkService()) return
+        stopScan()
         bleService.reconnectByAddress(needCheckUpdater, intArrayOf(scanModel), arrayOf(macAddress))
 
     }
