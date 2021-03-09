@@ -148,6 +148,7 @@ class BleServiceHelper private constructor() {
     /**
      * 当前要设置的设备Model, 必须在initService 之后调用
      */
+    @JvmOverloads
     fun setInterfaces(model: Int, runRtImmediately: Boolean = false) {
         if (!checkService()) return
         LepuBleLog.d(tag, "setInterfaces")
@@ -242,20 +243,24 @@ class BleServiceHelper private constructor() {
         return bleService.vailFace
     }
 
-    /**
-     * 发起连接，必须先停止扫描
+     /**
+     *
+     * @param context Context
+     * @param model Int
+     * @param b BluetoothDevice
+     * @param isAutoReconnect Boolean
+     * @param withUpdater Boolean 检查是否是升级失败的设备
      */
-    fun connect(context: Context,model: Int, b: BluetoothDevice, isAutoReconnect: Boolean = true) {
+    @JvmOverloads
+    fun connect(context: Context,model: Int, b: BluetoothDevice, isAutoReconnect: Boolean = true, withUpdater: Boolean = false) {
         if (!checkService()) return
 
         LepuBleLog.d(tag, "connect")
         getInterface(model)?.let {
             stopScan()
-            it.connect(context, b, isAutoReconnect)
+            it.connect(context, b, isAutoReconnect, withUpdater)
         }
     }
-
-
 
 
     /**
@@ -286,10 +291,11 @@ class BleServiceHelper private constructor() {
      * @param scanModel IntArray
      * @param macAddress Array<String>
      */
-    fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>) {
+    @JvmOverloads
+    fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, needCheckUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress " )
         if (!checkService()) return
-        bleService.reconnectByAddress(scanModel, macAddress)
+        bleService.reconnectByAddress(needCheckUpdater, scanModel, macAddress)
 
     }
 
@@ -298,12 +304,15 @@ class BleServiceHelper private constructor() {
      * @param scanModel Int
      * @param macAddress String
      */
-    fun reconnectByAddress(scanModel: Int, macAddress: String) {
+    @JvmOverloads
+    fun reconnectByAddress(scanModel: Int, macAddress: String, needCheckUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress" )
         if (!checkService()) return
-        bleService.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress))
+        bleService.reconnectByAddress(needCheckUpdater, intArrayOf(scanModel), arrayOf(macAddress))
 
     }
+
+
 
     /**
      * 获取当前连接的设备集合
@@ -348,7 +357,7 @@ class BleServiceHelper private constructor() {
         val vailFace = bleService.vailFace
         for (i in 0 until vailFace.size()) {
             getInterface(vailFace.keyAt(i))?.let { it ->
-                stopScan()
+                if (bleService.isDiscovery)stopScan()
                 it.disconnect(autoReconnect)
             }
         }

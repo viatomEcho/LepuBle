@@ -48,7 +48,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
         this.userId = userId
         this.curFileName =fileName
         LepuBleLog.d(tag, "dealReadFile:: $userId, $fileName, offset = $offset")
-        sendCmd(Er2BleCmd.readFileStart(fileName.toByteArray(), this.offset))
+        sendCmd(Er2BleCmd.readFileStart(fileName.toByteArray(), 0))
     }
 
 
@@ -157,7 +157,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
             Er2BleCmd.CMD_LIST_FILE -> {
                 val fileArray = Er2FileList(respPkg.data)
 
-                LepuBleLog.d(tag, "model:$model,CMD_GET_REAL_TIME_DATA => success")
+                LepuBleLog.d(tag, "model:$model,CMD_LIST_FILE => success")
                 LiveEventBus.get(InterfaceEvent.ER2.EventEr2FileList).post(
                     InterfaceEvent(
                         model,
@@ -167,9 +167,10 @@ class Er2BleInterface(model: Int): BleInterface(model) {
             }
             Er2BleCmd.CMD_START_READ_FILE -> {
 
+                LepuBleLog.d(tag, "model:$model,CMD_START_READ_FILE => success, $respPkg")
                 if (respPkg.pkgType == 0x01.toByte()) {
                     curFile =  curFileName?.let {
-                        Er2File(model, it, toUInt(respPkg.buf), userId!!)
+                        Er2File(model, it, toUInt(respPkg.data), userId!!)
                     }
                     sendCmd(Er2BleCmd.readFileData(0))
                 } else {
@@ -194,12 +195,12 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                         return
                     }
 
-                    this.addContent(respPkg.buf, offset)
+                    this.addContent(respPkg.data)
                     LepuBleLog.d(tag, "read file：${this.fileName}   => ${this.index + offset} / ${this.fileSize}")
                     LepuBleLog.d(tag, "read file：${((this.index+ offset) * 1000).div(this.fileSize) }")
                     LiveEventBus.get(InterfaceEvent.ER2.EventEr2ReadingFileProgress).post(InterfaceEvent(model, ((this.index+ offset) * 1000).div(this.fileSize) ))
 
-                    if (this.index + offset < this.fileSize) {
+                    if (this.index < this.fileSize) {
                         sendCmd(Er2BleCmd.readFileData(this.index))
                     } else {
                         sendCmd(Er2BleCmd.readFileEnd())
@@ -212,8 +213,12 @@ class Er2BleInterface(model: Int): BleInterface(model) {
 
                 curFileName = null// 一定要放在发通知之前
                 curFile?.let {
-                    if (isCancelRF || isPausedRF) return
-                    LiveEventBus.get(InterfaceEvent.ER2.EventEr2ReadFileComplete).post(InterfaceEvent(model, it))
+                    if (it.index < it.fileSize ){
+                        if ((isCancelRF || isPausedRF) ) return
+                    }else {
+                        LiveEventBus.get(InterfaceEvent.ER2.EventEr2ReadFileComplete)
+                            .post(InterfaceEvent(model, it))
+                    }
                 }?: LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
                 curFile = null
             }
@@ -254,6 +259,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
+        readFile(userId, fileName)
     }
 
 

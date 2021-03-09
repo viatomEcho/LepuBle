@@ -132,21 +132,20 @@ object Er1BleResponse {
     }
 
 
-    class Er1File(val model: Int, val name: String, val size: Int, private val userId: String) {
+    class Er1File(val model: Int, val name: String, val size: Int, private val userId: String, var index: Int) {
         var fileName: String
         var fileSize: Int
         var content: ByteArray
-        var index: Int // 标识当前下载index
 
         init {
             fileName = name
             fileSize = size
             content = ByteArray(size)
-            index = 0
+            index = index
         }
 
-        fun addContent(bytes: ByteArray, offset: Int) {
-            if (index + offset >= fileSize) {
+        fun addContent(bytes: ByteArray) {
+            if (index >= fileSize) {
                 return // 已下载完成
             } else {
                 System.arraycopy(bytes, 0, content, index, bytes.size)
@@ -154,7 +153,7 @@ object Er1BleResponse {
 
                 index += bytes.size
             }
-            LepuBleLog.d("er1File,bytes size = ${bytes.size}, index = $index")
+            LepuBleLog.d("er1File, bytes size = ${bytes.size}, index = $index")
         }
     }
 

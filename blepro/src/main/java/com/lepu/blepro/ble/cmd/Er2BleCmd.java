@@ -96,7 +96,7 @@ public class Er2BleCmd {
         data[data.length - 3] = (byte) ((offset >> 8) & 0xFF);
         data[data.length - 2] = (byte) ((offset >> 16) & 0xFF);
         data[data.length - 1] = (byte) ((offset >> 24) & 0xFF);
-        return getReq(CMD_START_READ_FILE, (byte) 0x00, new byte[0]);
+        return getReq(CMD_START_READ_FILE, (byte) 0x00, data);
     }
 
     public static byte[] readFileData(int offset) {

@@ -21,8 +21,8 @@ class Er2File(val model: Int, val name: String, val size: Int, private val userI
         index = 0
     }
 
-    fun addContent(bytes: ByteArray, offset: Int) {
-        if (index + offset >= fileSize) {
+    fun addContent(bytes: ByteArray) {
+        if (index >= fileSize) {
             return // 已下载完成
         } else {
             System.arraycopy(bytes, 0, content, index, bytes.size)

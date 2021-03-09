@@ -23,9 +23,11 @@ import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.ble.Er1BleInterface
 import com.lepu.blepro.ble.Er2BleInterface
+import com.lepu.blepro.utils.DfuUtil
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -71,7 +73,6 @@ class BleService: LifecycleService() {
      */
     var needPair: Boolean = false
 
-
     /**
      * 本次扫描是否来自重连(已知蓝牙名)，默认false，通过reconnect()开启扫描被赋值true
      */
@@ -88,6 +89,14 @@ class BleService: LifecycleService() {
     var reconnectDeviceAddress: Array<String>? = null
 
     var isReconnectByAddress: Boolean = false
+
+
+    /**
+     * address重连时检查是否是Updater
+     */
+    var needCheckUpdater: Boolean = false
+
+
 
 
     override fun onCreate() {
@@ -248,7 +257,7 @@ class BleService: LifecycleService() {
      * 重新连接开启扫描
      * 必定开启 isAutoConnecting = true
      */
-    fun reconnectByAddress(scanModel: IntArray, reconnectDeviceAddress: Array<String>) {
+    fun reconnectByAddress(needCheckUpdater: Boolean = false, scanModel: IntArray, reconnectDeviceAddress: Array<String>) {
 
         if (vailFace.isEmpty())return
 
@@ -265,6 +274,7 @@ class BleService: LifecycleService() {
             if (scanModel.size > 1) BleServiceHelper.BleServiceHelper.isReconnectingMulti = true
             this.reconnectDeviceAddress = reconnectDeviceAddress
             this.isReconnectByAddress = true
+            this.needCheckUpdater = needCheckUpdater
             startDiscover(scanModel, isReconnecting = true)
         }
 
@@ -353,18 +363,32 @@ class BleService: LifecycleService() {
             }
 
             if (BluetoothController.addDevice(b)) {
-                LepuBleLog.d(tag, "isReconnecting::$isReconnectScan, b= ${b.name}," +
-                        " ${b.model}, isReconnectByAddress = $isReconnectByAddress , recName:${reconnectDeviceName?.joinToString()}, recAddress:${reconnectDeviceAddress?.joinToString()}")
+                LepuBleLog.d(tag, "model = ${b.model}, isReconnecting::$isReconnectScan, b= ${b.name}, recName = ${reconnectDeviceName?.joinToString()}, " +
+                        "needCheckUpdater = $needCheckUpdater,  isReconnectByAddress = $isReconnectByAddress ,  recAddress:${reconnectDeviceAddress?.joinToString()}")
+
+                LiveEventBus.get(EventMsgConst.Discovery.EventDeviceFound).post(b)
+
+
 
                 val isContains: Boolean = if(isReconnectByAddress) reconnectDeviceAddress?.contains(b.device.address) == true else reconnectDeviceName?.contains(b.name) == true
 
                 if (isReconnectScan && isContains){
                     stopDiscover()
-                    vailFace.get(b.model)?.connect(this@BleService, b.device)
-                }else{
-                    LepuBleLog.d(tag, "post found...${b.name}")
-                    LiveEventBus.get(EventMsgConst.Discovery.EventDeviceFound).post(b)
+                    vailFace.get(b.model)?.connect(this@BleService, b.device, true)
+                }else {
+                    if (needCheckUpdater && isReconnectScan && isReconnectByAddress ){
+                        reconnectDeviceAddress?.let {
+                            for (i in it){
+                                if (b.device.address == DfuUtil.getNewMac(i)){ //如果扫描到的是新蓝牙名，连接
+                                    stopDiscover()
+                                    vailFace.get(b.model)?.connect(this@BleService, b.device, isAutoReconnect = true, true )
+                                }
+                            }
+                        }
+
+                    }
                 }
+
             }
 
 
@@ -383,6 +407,24 @@ class BleService: LifecycleService() {
             }
             if (errorCode == 6) {
                 LepuBleLog.d(tag, "too frequently")
+            }
+            if (errorCode == 2){ // 连接超时，去重连扫描时候可能碰到，解决办法重启蓝牙 待验证
+                LepuBleLog.d(tag, "去重启蓝牙")
+                bluetoothAdapter?.let {
+                    it.disable()
+                    LepuBleLog.d(tag, "关闭蓝牙中...")
+                    GlobalScope.launch {
+                        delay(1000L)
+                        LepuBleLog.d(tag, "1秒后 ble state = ${it.state}")
+                        if(it.state == BluetoothAdapter.STATE_OFF){
+                            it.enable()
+                            delay(1000L)
+                            scanDevice(true)
+                        }
+                    }
+                    runBlocking { delay(1000L) }
+                }
+
             }
         }
     }

@@ -51,6 +51,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
 
     override fun getRtData() {
+        LepuBleLog.d(tag, "getRtData...")
        sendOxyCmd(OxyBleCmd.OXY_CMD_RT_DATA, OxyBleCmd.getRtWave())
     }
 
@@ -129,16 +130,18 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             }
 
             OxyBleCmd.OXY_CMD_INFO -> {
+
+
+
                 clearTimeout()
                 val info = OxyBleResponse.OxyInfo(response.content)
-
-                LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success")
-                LiveEventBus.get(InterfaceEvent.Oxy.EventOxyInfo).post(InterfaceEvent(model, info))
 
                 if (runRtImmediately) {
                     runRtTask()
                     runRtImmediately = false
                 }
+                LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success")
+                LiveEventBus.get(InterfaceEvent.Oxy.EventOxyInfo).post(InterfaceEvent(model, info))
 
             }
 
@@ -238,6 +241,12 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
+       LepuBleLog.e(tag, "o2 暂不支持断点下载")
+    }
+
+    override fun onDeviceReady(device: BluetoothDevice) {
+        super.onDeviceReady(device)
+        syncTime()
     }
 
 }

@@ -97,7 +97,7 @@ public class Er2RtData {
         return waveData;
     }
 
-    class WaveData {
+    public class WaveData {
         private int size;
         private float[] datas;
         private byte[] bytes;

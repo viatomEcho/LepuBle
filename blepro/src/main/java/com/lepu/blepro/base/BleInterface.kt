@@ -82,7 +82,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      */
     var isRtStop: Boolean = true
 
-//    var isNeedSendRT: Boolean = true
 
     /**
      * 初始化后是否在第一次获取设备信息后立即执行实时任务
@@ -91,14 +90,23 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     var runRtImmediately: Boolean = false
 
 
+    /**
+     * 记录本次连接是否来自Updater
+     */
+    private var connectWithUpdater: Boolean = false
+
+
     inner class RtTask : Runnable {
         override fun run() {
+            LepuBleLog.d(tag, "rtTask running...")
             count++
             if (state) {
                 rtHandler.postDelayed(rTask, delayMillis)
-//                if (!isRtStop && isNeedSendRT) getRtData()
-                if (!isRtStop) getRtData()
+                if (!isRtStop) getRtData() else LepuBleLog.d(tag, "isRtStop = $isRtStop")
+            }else {
+                LepuBleLog.d(tag, "ble state = false !!!!")
             }
+
         }
     }
 
@@ -160,7 +168,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      * @param device BluetoothDevice
      * @param isAutoReconnect Boolean 默认参数值为true，目的：当设备自然断开后会重新开启扫描并尝试连接。
      */
-    fun connect(context: Context, @NonNull device: BluetoothDevice, isAutoReconnect: Boolean = true) {
+    fun connect(context: Context, @NonNull device: BluetoothDevice, isAutoReconnect: Boolean = true, connectWithUpdater: Boolean = false) {
         if (connecting || state) {
             return
         }
@@ -168,6 +176,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         this.device = device
         initManager(context, device)
         this.isAutoReconnect = isAutoReconnect
+        this.connectWithUpdater = connectWithUpdater
     }
 
 
@@ -208,6 +217,10 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         connecting = false
         publish()
 
+        if (connectWithUpdater){
+            LiveEventBus.get(EventMsgConst.Updater.EventEr1BleConnected).post(model)
+        }
+
         // 重连多个model时
         if(BleServiceHelper.isReconnectingMulti) {
             LepuBleLog.d("reconnectingMulti：检查是否还有未连接的设备")
@@ -247,6 +260,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
             LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnect")
             BleServiceHelper.reconnect(model, device.name)
         }
+
 
 
     }
@@ -360,7 +374,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      * 读文件
      */
     fun readFile(userId: String, fileName: String, offset: Int = 0){
-        this.offset = offset// 作用于断点续传
+        this.offset = offset //初始赋值 本地文件长度
         this.isCancelRF = false
         this.isPausedRF = false
         dealReadFile(userId, fileName)

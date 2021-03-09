@@ -45,12 +45,11 @@ class Er1BleInterface(model: Int): BleInterface(model) {
     var fileList: Er1BleResponse.Er1FileList? = null
     private var userId: String? = null
 
-
     override fun dealReadFile(userId: String, fileName: String) {
         this.userId = userId
         this.curFileName =fileName
         LepuBleLog.d(tag, "dealReadFile:: $userId, $fileName, offset = $offset")
-        sendCmd(Er1BleCmd.readFileStart(fileName.toByteArray(), this.offset))
+        sendCmd(Er1BleCmd.readFileStart(fileName.toByteArray(), 0)) // 读开始永远是0
     }
 
     @ExperimentalUnsignedTypes
@@ -90,9 +89,9 @@ class Er1BleInterface(model: Int): BleInterface(model) {
             Er1BleCmd.READ_FILE_START -> {
                 if (response.pkgType == 0x01.toByte()) {
                     curFile =  curFileName?.let {
-                        Er1BleResponse.Er1File(model, it, toUInt(response.content), userId!!)
+                        Er1BleResponse.Er1File(model, it, toUInt(response.content), userId!!, offset)
                     }
-                    sendCmd( Er1BleCmd.readFileData(0))
+                    sendCmd( Er1BleCmd.readFileData(offset))
                 } else {
                     LepuBleLog.d(tag, "read file failed：${response.pkgType}")
                     LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadFileError).post(InterfaceEvent(model, true))
@@ -111,13 +110,12 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                         return
                     }
 
-                    this.addContent(response.content, offset)
-                    LepuBleLog.d(tag, "read file：${this.fileName}   => ${this.index + offset} / ${this.fileSize}")
-                    LepuBleLog.d(tag, "read file：${((this.index+ offset) * 1000).div(this.fileSize) }")
-                    LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadingFileProgress).post(InterfaceEvent(model, ((this.index+ offset) * 1000).div(this.fileSize) ))
+                    this.addContent(response.content)
+                    LepuBleLog.d(tag, "read file：${this.fileName}   => ${this.index } / ${this.fileSize}")
+                    LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadingFileProgress).post(InterfaceEvent(model, ((this.index) * 1000).div(this.fileSize) ))
 
-                    if (this.index + offset < this.fileSize) {
-                        sendCmd(Er1BleCmd.readFileData(this.index))
+                    if (this.index  < this.fileSize) {
+                        sendCmd(Er1BleCmd.readFileData(this.index)) // 每次读的偏移量，相对于文件总长度的
                     } else {
                         sendCmd(Er1BleCmd.readFileEnd())
                     }
@@ -130,8 +128,11 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
                 curFileName = null// 一定要放在发通知之前
                 curFile?.let {
-                    if (isCancelRF || isPausedRF) return
-                     LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadFileComplete).post(InterfaceEvent(model, it))
+                    if (it.index < it.fileSize ){
+                        if ((isCancelRF || isPausedRF) ) return
+                    }else {
+                        LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadFileComplete).post(InterfaceEvent(model, it))
+                    }
                 }?: LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
                 curFile = null
             }

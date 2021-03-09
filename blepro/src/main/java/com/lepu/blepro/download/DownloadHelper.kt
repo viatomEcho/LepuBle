@@ -49,7 +49,7 @@ class DownloadHelper {
             var randomFile: RandomAccessFile?
             randomFile = RandomAccessFile(mFile, "rw")
             val fileLength = randomFile.length()
-            LepuBleLog.d(tag, "fileLength = $fileLength")
+            LepuBleLog.d(tag, "已经存入的fileLength = $fileLength")
             randomFile.seek(fileLength)
             randomFile.write(data)
             randomFile.close()
