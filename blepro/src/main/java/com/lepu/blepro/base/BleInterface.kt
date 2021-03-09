@@ -200,7 +200,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
             return
         }
         LepuBleLog.d(tag,"tay disconnect..., isAutoReconnect = $isAutoReconnect" )
-        this.isAutoReconnect = isAutoReconnect
+        this.isAutoReconnect = isAutoConnect
         this.onDeviceDisconnected(device, ConnectionObserver.REASON_SUCCESS)
 
 
@@ -214,6 +214,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     override fun onDeviceConnected(device: BluetoothDevice) {
         LepuBleLog.d(tag, "onDeviceConnected ${device.name} connected")
 
+
+        if (BleServiceHelper.isScanning()) BleServiceHelper.stopScan()
         state = true
         connecting = false
         publish()
