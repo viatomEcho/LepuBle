@@ -268,7 +268,7 @@ class BleServiceHelper private constructor() {
     fun reconnect(scanModel: IntArray, name: Array<String>) {
         LepuBleLog.d(tag, "into reconnect " )
         if (!checkService()) return
-        stopScan()
+
         bleService.reconnect(scanModel, name)
 
     }
@@ -281,7 +281,6 @@ class BleServiceHelper private constructor() {
     fun reconnect(scanModel: Int, name: String) {
         LepuBleLog.d(tag, "into reconnect" )
         if (!checkService()) return
-        stopScan()
         bleService.reconnect(intArrayOf(scanModel), arrayOf(name))
 
     }
@@ -296,7 +295,6 @@ class BleServiceHelper private constructor() {
     fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, needCheckUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress " )
         if (!checkService()) return
-        stopScan()
         bleService.reconnectByAddress(needCheckUpdater, scanModel, macAddress)
 
     }
@@ -310,7 +308,6 @@ class BleServiceHelper private constructor() {
     fun reconnectByAddress(scanModel: Int, macAddress: String, needCheckUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress" )
         if (!checkService()) return
-        stopScan()
         bleService.reconnectByAddress(needCheckUpdater, intArrayOf(scanModel), arrayOf(macAddress))
 
     }
@@ -401,12 +398,15 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return false
         LepuBleLog.d(tag, "into hasUnConnected...")
         for (m in model){
-            getConnectState(m).let {
-                LepuBleLog.d(tag, "$it")
-                if (it == Ble.State.DISCONNECTED) return true
+            getInterface(m)?.let {
+                if (!it.state && !it.connecting) return true
             }
+//            getConnectState(m).let {
+//                LepuBleLog.d(tag, "$it")
+//                if (it == Ble.State.DISCONNECTED) return true
+//            }
         }
-        LepuBleLog.d(tag, "没有未连接设备")
+        LepuBleLog.d(tag, "没有未连接和已连接中的设备")
         return false
     }
 

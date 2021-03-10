@@ -7,6 +7,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.Er1DataController
 import com.lepu.blepro.ble.data.LepuDevice
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
@@ -273,6 +274,13 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
     }
 
+    override fun onDeviceConnected(device: BluetoothDevice) {
+        super.onDeviceConnected(device)
+        if (connectWithUpdater){
+            LiveEventBus.get(EventMsgConst.Updater.EventEr1BleConnected).post(model)
+        }
+
+    }
 
 
 

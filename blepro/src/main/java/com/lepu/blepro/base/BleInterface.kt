@@ -93,7 +93,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     /**
      * 记录本次连接是否来自Updater
      */
-    private var connectWithUpdater: Boolean = false
+    var connectWithUpdater: Boolean = false
 
 
     inner class RtTask : Runnable {
@@ -220,9 +220,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         connecting = false
         publish()
 
-        if (connectWithUpdater){
-            LiveEventBus.get(EventMsgConst.Updater.EventEr1BleConnected).post(model)
-        }
 
         // 重连多个model时
         if(BleServiceHelper.isReconnectingMulti) {

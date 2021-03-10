@@ -242,6 +242,7 @@ class BleService: LifecycleService() {
         var reScan = false
 
         if (BleServiceHelper.BleServiceHelper.hasUnConnected(scanModel)) {
+            LepuBleLog.d(tag, "reconnectByAddress 有未连接的设备::::${scanModel.joinToString()}")
             reScan = true
         }
         if (reScan) {
@@ -249,9 +250,11 @@ class BleService: LifecycleService() {
             this.reconnectDeviceName = reconnectDeviceName
             this.isReconnectByAddress = false
             startDiscover(scanModel, isReconnecting = true)
+
+            LepuBleLog.d(tag, "reconnect::::: => ${scanModel?.joinToString()} => ReScan: $reScan")
         }
 
-        LepuBleLog.d(tag, "reconnect: => ${scanModel?.joinToString()} => ReScan: $reScan")
+
     }
 
     /**
@@ -269,6 +272,7 @@ class BleService: LifecycleService() {
         var reScan = false
 
         if (BleServiceHelper.BleServiceHelper.hasUnConnected(scanModel)) {
+            LepuBleLog.d(tag, "reconnectByAddress 有未连接的设备")
             reScan = true
         }
         if (reScan) {
