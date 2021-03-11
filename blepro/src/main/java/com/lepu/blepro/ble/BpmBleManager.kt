@@ -43,7 +43,8 @@ class BpmBleManager(context: Context): BaseBleManager(context) {
     }
 
     override fun init() {
-        syncTime()
+        if (!isUpdater)
+            syncTime()
         LepuBleLog.d("BpmBleManager inited ")
     }
     private fun syncTime() {

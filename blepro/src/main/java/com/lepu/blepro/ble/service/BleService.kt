@@ -94,7 +94,7 @@ class BleService: LifecycleService() {
     /**
      * address重连时检查是否是Updater
      */
-    var needCheckUpdater: Boolean = false
+    var toConnectUpdater: Boolean = false
 
 
 
@@ -231,7 +231,7 @@ class BleService: LifecycleService() {
      * 重新连接开启扫描
      * 必定开启 isAutoConnecting = true
      */
-    fun reconnect(scanModel: IntArray, reconnectDeviceName: Array<String>) {
+    fun reconnect(scanModel: IntArray, reconnectDeviceName: Array<String>, toConnectUpdater: Boolean = false) {
 
         if (vailFace.isEmpty())return
 
@@ -249,6 +249,7 @@ class BleService: LifecycleService() {
             if (scanModel.size > 1) BleServiceHelper.BleServiceHelper.isReconnectingMulti = true
             this.reconnectDeviceName = reconnectDeviceName
             this.isReconnectByAddress = false
+            this.toConnectUpdater = toConnectUpdater
             startDiscover(scanModel, isReconnecting = true)
 
             LepuBleLog.d(tag, "reconnect::::: => ${scanModel?.joinToString()} => ReScan: $reScan")
@@ -261,7 +262,7 @@ class BleService: LifecycleService() {
      * 重新连接开启扫描
      * 必定开启 isAutoConnecting = true
      */
-    fun reconnectByAddress(needCheckUpdater: Boolean = false, scanModel: IntArray, reconnectDeviceAddress: Array<String>) {
+    fun reconnectByAddress(scanModel: IntArray, reconnectDeviceAddress: Array<String>, toConnectUpdater: Boolean = false) {
 
         if (vailFace.isEmpty())return
 
@@ -279,7 +280,7 @@ class BleService: LifecycleService() {
             if (scanModel.size > 1) BleServiceHelper.BleServiceHelper.isReconnectingMulti = true
             this.reconnectDeviceAddress = reconnectDeviceAddress
             this.isReconnectByAddress = true
-            this.needCheckUpdater = needCheckUpdater
+            this.toConnectUpdater = toConnectUpdater
             startDiscover(scanModel, isReconnecting = true)
         }
 
@@ -369,7 +370,7 @@ class BleService: LifecycleService() {
 
             if (BluetoothController.addDevice(b)) {
                 LepuBleLog.d(tag, "model = ${b.model}, isReconnecting::$isReconnectScan, b= ${b.name}, recName = ${reconnectDeviceName?.joinToString()}, " +
-                        "needCheckUpdater = $needCheckUpdater,  isReconnectByAddress = $isReconnectByAddress ,  recAddress:${reconnectDeviceAddress?.joinToString()}")
+                        "toConnectUpdater = $toConnectUpdater,  isReconnectByAddress = $isReconnectByAddress ,  recAddress:${reconnectDeviceAddress?.joinToString()}")
 
                 LiveEventBus.get(EventMsgConst.Discovery.EventDeviceFound).post(b)
 
@@ -379,18 +380,20 @@ class BleService: LifecycleService() {
 
                 if (isReconnectScan && isContains){
                     stopDiscover()
-                    vailFace.get(b.model)?.connect(this@BleService, b.device, true)
+                    vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
                 }else {
-                    if (needCheckUpdater && isReconnectScan && isReconnectByAddress ){
+                    LepuBleLog.d(tag, "不在扫描目标内...")
+                    if (isReconnectScan && isReconnectByAddress ){
                         reconnectDeviceAddress?.let {
                             for (i in it){
                                 if (b.device.address == DfuUtil.getNewMac(i)){ //如果扫描到的是新蓝牙名，连接
+
+                                    LepuBleLog.d(tag, "找到了新蓝牙名设备， 去连接Updater")
                                     stopDiscover()
-                                    vailFace.get(b.model)?.connect(this@BleService, b.device, isAutoReconnect = true, true )
+                                    vailFace.get(b.model)?.connect(this@BleService, b.device, isAutoReconnect = true, true)
                                 }
                             }
                         }
-
                     }
                 }
 

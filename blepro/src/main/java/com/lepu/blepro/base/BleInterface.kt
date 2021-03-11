@@ -93,7 +93,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     /**
      * 记录本次连接是否来自Updater
      */
-    var connectWithUpdater: Boolean = false
+    var toConnectUpdater: Boolean = false
 
 
     inner class RtTask : Runnable {
@@ -126,7 +126,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      */
     var offset: Int = 0;
 
-    abstract fun initManager(context: Context, device: BluetoothDevice)
+    abstract fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean = false)
 
 
     /**
@@ -168,15 +168,17 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      * @param device BluetoothDevice
      * @param isAutoReconnect Boolean 默认参数值为true，目的：当设备自然断开后会重新开启扫描并尝试连接。
      */
-    fun connect(context: Context, @NonNull device: BluetoothDevice, isAutoReconnect: Boolean = true, connectWithUpdater: Boolean = false) {
+    fun connect(context: Context, @NonNull device: BluetoothDevice, isAutoReconnect: Boolean = true, toConnectUpdater: Boolean = false) {
         if (connecting || state) {
             return
         }
-        LepuBleLog.d(tag, "try connect: ${device.name}，isAutoReconnect = $isAutoReconnect")
+        LepuBleLog.d(tag, "try connect: ${device.name}，isAutoReconnect = $isAutoReconnect, toConnectUpdater = $toConnectUpdater")
         this.device = device
-        initManager(context, device)
+
         this.isAutoReconnect = isAutoReconnect
-        this.connectWithUpdater = connectWithUpdater
+        this.toConnectUpdater = toConnectUpdater
+        initManager(context, device, toConnectUpdater)
+
     }
 
 
@@ -220,6 +222,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         connecting = false
         publish()
 
+        if (toConnectUpdater)
+            LiveEventBus.get(EventMsgConst.Updater.EventBleConnected).post(true)
 
         // 重连多个model时
         if(BleServiceHelper.isReconnectingMulti) {
@@ -230,7 +234,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
                 if ( reconnectDeviceName!= null){
                     if (BleServiceHelper.hasUnConnected(it))
                         BleServiceHelper.reconnect(it,
-                            reconnectDeviceName
+                            reconnectDeviceName, this.toConnectUpdater
                         ) else BleServiceHelper.isReconnectingMulti = false
                 }
             }
@@ -261,6 +265,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
             LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnect")
             BleServiceHelper.reconnect(model, device.name)
         }
+
+
 
 
 

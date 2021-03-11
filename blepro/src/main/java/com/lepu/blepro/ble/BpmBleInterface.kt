@@ -19,8 +19,9 @@ import com.lepu.blepro.utils.bytesToHex
 class BpmBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "BpmBleInterface"
 
-    override fun initManager(context: Context, device: BluetoothDevice) {
+    override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = BpmBleManager(context)
+        manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.setNotifyListener(this)
         manager.connect(device)

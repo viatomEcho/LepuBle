@@ -21,8 +21,9 @@ import kotlin.experimental.inv
  */
 class Er2BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Er2BleInterface"
-    override fun initManager(context: Context, device: BluetoothDevice) {
+    override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = Er2BleManager(context)
+        manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.setNotifyListener(this)
         manager.connect(device)

@@ -252,12 +252,12 @@ class BleServiceHelper private constructor() {
      * @param withUpdater Boolean 检查是否是升级失败的设备
      */
     @JvmOverloads
-    fun connect(context: Context,model: Int, b: BluetoothDevice, isAutoReconnect: Boolean = true, withUpdater: Boolean = false) {
+    fun connect(context: Context,model: Int, b: BluetoothDevice, isAutoReconnect: Boolean = true, toConnectUpdater: Boolean = false) {
         if (!checkService()) return
 
         LepuBleLog.d(tag, "connect")
         getInterface(model)?.let {
-            it.connect(context, b, isAutoReconnect, withUpdater)
+            it.connect(context, b, isAutoReconnect, toConnectUpdater)
         }
     }
 
@@ -265,11 +265,11 @@ class BleServiceHelper private constructor() {
     /**
      *  发起重连 允许扫描多个设备
      */
-    fun reconnect(scanModel: IntArray, name: Array<String>) {
+    fun reconnect(scanModel: IntArray, name: Array<String>, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnect " )
         if (!checkService()) return
 
-        bleService.reconnect(scanModel, name)
+        bleService.reconnect(scanModel, name, toConnectUpdater)
 
     }
 
@@ -278,10 +278,10 @@ class BleServiceHelper private constructor() {
      * @param scanModel Int
      * @param name String
      */
-    fun reconnect(scanModel: Int, name: String) {
+    fun reconnect(scanModel: Int, name: String, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnect" )
         if (!checkService()) return
-        bleService.reconnect(intArrayOf(scanModel), arrayOf(name))
+        bleService.reconnect(intArrayOf(scanModel), arrayOf(name), toConnectUpdater)
 
     }
 
@@ -292,10 +292,10 @@ class BleServiceHelper private constructor() {
      * @param macAddress Array<String>
      */
     @JvmOverloads
-    fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, needCheckUpdater: Boolean = false) {
+    fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress " )
         if (!checkService()) return
-        bleService.reconnectByAddress(needCheckUpdater, scanModel, macAddress)
+        bleService.reconnectByAddress( scanModel, macAddress, toConnectUpdater)
 
     }
 
@@ -305,46 +305,11 @@ class BleServiceHelper private constructor() {
      * @param macAddress String
      */
     @JvmOverloads
-    fun reconnectByAddress(scanModel: Int, macAddress: String, needCheckUpdater: Boolean = false) {
+    fun reconnectByAddress(scanModel: Int, macAddress: String, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress" )
         if (!checkService()) return
-        bleService.reconnectByAddress(needCheckUpdater, intArrayOf(scanModel), arrayOf(macAddress))
+        bleService.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress), toConnectUpdater)
 
-    }
-
-
-
-    /**
-     * 获取当前连接的设备集合
-     * @return ArrayList<Int>
-     */
-    fun getCurrentConnected(): ArrayList<Int>{
-        LepuBleLog.d(tag, "into getCurrentConnected...")
-        val list: ArrayList<Int> = ArrayList()
-        if (!checkService()) return list
-
-        bleService.vailFace.let {
-            for (i in 0 until it.size()) {
-               if (isConnected(i)) list.add(i)
-            }
-        }
-        LepuBleLog.d(tag, "current connected: ${list.joinToString() }}")
-        return list
-
-    }
-
-    /**
-     * 当前设备是否连接
-     * @param model Int
-     * @return Boolean
-     */
-    fun isConnected(model: Int): Boolean{
-        if (!checkService()) return false
-
-        LepuBleLog.d(tag, "into disconnect" )
-        getInterface(model)?.let {
-            return it.state
-        }?: return false
     }
 
     /**

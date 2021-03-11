@@ -9,6 +9,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.lepu.blepro.ble.data.LepuDevice;
 import com.lepu.blepro.utils.ByteArrayKt;
 import com.lepu.blepro.utils.LepuBleLog;
 
@@ -31,6 +32,8 @@ public abstract class BaseBleManager extends BleManager {
     public BluetoothGattCharacteristic write_char, notify_char;
 
     private NotifyListener listener;
+
+    boolean isUpdater = false;
 
     public void setNotifyListener(NotifyListener listener) {
         this.listener = listener;
@@ -58,7 +61,9 @@ public abstract class BaseBleManager extends BleManager {
         @Override
         public boolean isRequiredServiceSupported(@NonNull final BluetoothGatt gatt) {
 
-            LepuBleLog.d(TAG, "id:" + service_uuid +",,,,,"+ write_uuid +",,,,"+ notify_uuid);
+            LepuBleLog.d(TAG, "id:" + service_uuid +",,,,,"+ write_uuid +",,,,"+ notify_uuid + ",,,,isUpdater="+ isUpdater);
+
+
 //            final BluetoothGattService service = gatt.getService(service_uuid);
 //            if (service != null) {
 //                write_char = service.getCharacteristic(write_uuid);
@@ -82,6 +87,8 @@ public abstract class BaseBleManager extends BleManager {
 
             final BluetoothGattService service = gatt.getService(service_uuid);
             LepuBleLog.d(TAG, "service ==  " + service);
+
+            if (isUpdater && service == null ) return true;
             if (service != null) {
                 write_char = service.getCharacteristic(write_uuid);
                 notify_char = service.getCharacteristic(notify_uuid);
@@ -137,7 +144,7 @@ public abstract class BaseBleManager extends BleManager {
 //                    .add(enableNotifications(notify_char))
 //                    .done(device -> LepuBleLog.d(TAG, "Target initialized"))
 //                    .enqueue();
-
+            LepuBleLog.d(TAG, "initialize");
 
             initReqQueue();
             setNotify();
@@ -180,4 +187,11 @@ public abstract class BaseBleManager extends BleManager {
         LepuBleLog.d(TAG, message);
     }
 
+    public boolean isUpdater() {
+        return isUpdater;
+    }
+
+    public void setUpdater(boolean updater) {
+        isUpdater = updater;
+    }
 }

@@ -47,7 +47,8 @@ class Er1BleManager(context: Context): BaseBleManager(context) {
             .enqueue()
     }
     override fun init() {
-        syncTime()
+        if (!isUpdater)
+            syncTime()
         LepuBleLog.d("Er1BleManager inited")
     }
 

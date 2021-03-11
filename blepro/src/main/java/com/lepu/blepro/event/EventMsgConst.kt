@@ -39,7 +39,7 @@ object EventMsgConst {
 
     interface Updater{
         companion object{
-            const val EventEr1BleConnected = "com.lepu.ble.updater.ble.connected"
+            const val EventBleConnected = "com.lepu.ble.updater.ble.connected"
         }
     }
 

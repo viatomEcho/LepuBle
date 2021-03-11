@@ -35,8 +35,9 @@ class OxyBleInterface(model: Int): BleInterface(model) {
      */
 
 
-    override fun initManager(context: Context, device: BluetoothDevice) {
+    override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = OxyBleManager(context)
+        manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.setNotifyListener(this)
         manager.connect(device)

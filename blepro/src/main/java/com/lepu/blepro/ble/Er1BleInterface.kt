@@ -22,8 +22,9 @@ import kotlin.experimental.inv
 class Er1BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Er1BleInterface"
 
-    override fun initManager(context: Context, device: BluetoothDevice) {
+    override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = Er1BleManager(context)
+        manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.setNotifyListener(this)
         manager.connect(device)
@@ -173,6 +174,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
             }
             Er1BleCmd.SET_TIME -> {
                 LepuBleLog.d(tag, "model:$model,SET_TIME => success")
+
                 LiveEventBus.get(InterfaceEvent.ER1.EventEr1SetTime).post(
                     InterfaceEvent(
                         model,
@@ -273,15 +275,6 @@ class Er1BleInterface(model: Int): BleInterface(model) {
         sendCmd(Er1BleCmd.setSwitcher(switcher, vector,motionCount, motionWindows))
 
     }
-
-    override fun onDeviceConnected(device: BluetoothDevice) {
-        super.onDeviceConnected(device)
-        if (connectWithUpdater){
-            LiveEventBus.get(EventMsgConst.Updater.EventEr1BleConnected).post(model)
-        }
-
-    }
-
 
 
 }
