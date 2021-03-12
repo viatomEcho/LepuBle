@@ -481,6 +481,7 @@ public class Fragment implements BleChangeObserver {
 
     }
 }
+1.0.9 为修改updater版本 未验证绑定时首页的升级
 ```
 
 
