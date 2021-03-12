@@ -381,21 +381,22 @@ class BleService: LifecycleService() {
                 if (isReconnectScan && isContains){
                     stopDiscover()
                     vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
-                }else {
-                    LepuBleLog.d(tag, "不在扫描目标内...")
-                    if (isReconnectScan && isReconnectByAddress ){
-                        reconnectDeviceAddress?.let {
-                            for (i in it){
-                                if (b.device.address == DfuUtil.getNewMac(i)){ //如果扫描到的是新蓝牙名，连接
-
-                                    LepuBleLog.d(tag, "找到了新蓝牙名设备， 去连接Updater")
-                                    stopDiscover()
-                                    vailFace.get(b.model)?.connect(this@BleService, b.device, isAutoReconnect = true, true)
-                                }
-                            }
-                        }
-                    }
                 }
+//                else {
+//                    LepuBleLog.d(tag, "不在扫描目标内...")
+//                    if (isReconnectScan && isReconnectByAddress ){
+//                        reconnectDeviceAddress?.let {
+//                            for (i in it){
+//                                if (b.device.address == DfuUtil.getNewMac(i)){ //如果扫描到的是新蓝牙名，连接
+//
+//                                    LepuBleLog.d(tag, "找到了新蓝牙名设备， 去连接Updater")
+//                                    stopDiscover()
+//                                    vailFace.get(b.model)?.connect(this@BleService, b.device, isAutoReconnect = true, true)
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
 
             }
 
