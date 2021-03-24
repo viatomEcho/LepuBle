@@ -2,9 +2,10 @@
 buildscript {
     ext.kotlin_version = "1.4.20"
     repositories {
-        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
-        jcenter()
+
+        maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
         google()
+        jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.3'
@@ -21,10 +22,10 @@ buildscript {
 
 allprojects {
     repositories {
-        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
-        jcenter()
-        google()
 
+        maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
+        google()
+        jcenter()
     }
 
     // bintray 上传如果注释中有中文，可能会出现：编码GBK的不可映射字符
@@ -47,5 +48,5 @@ ext {
     compileSdkVersion = 29
     buildToolsVersion = "29.0.2"
     versionCode = 1
-    versionName = "1.0.10dev2"
+    versionName = "1.0.10dev4"
 }

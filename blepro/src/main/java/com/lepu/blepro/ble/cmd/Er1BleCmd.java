@@ -1,7 +1,12 @@
 package com.lepu.blepro.ble.cmd;
 
+import com.lepu.blepro.ble.data.TimeData;
 import com.lepu.blepro.utils.ByteArrayKt;
 import com.lepu.blepro.utils.LepuBleLog;
+
+import java.util.Date;
+
+import static com.lepu.blepro.ble.cmd.Er2BleCmd.COMMON_PKG_HEAD_LENGTH;
 
 /**
  * universal command for Viatom devices
@@ -33,18 +38,24 @@ public class Er1BleCmd {
 
 
     public static byte[] setTime() {
-        int len = 0;
 
-        byte[] cmd = new byte[8+len];
+        TimeData timeData = new TimeData(new Date());
+        byte[] data = timeData.convert2Data();
+        int cmdLength = 8 + data.length;
+
+        byte[] cmd = new byte[cmdLength];
         cmd[0] = (byte) 0xA5;
         cmd[1] = (byte) SET_TIME;
         cmd[2] = (byte) ~SET_TIME;
         cmd[3] = (byte) 0x00;
         cmd[4] = (byte) seqNo;
-        cmd[5] = (byte) 0;
-        cmd[6] = (byte) 0;
-        cmd[7] = BleCRC.calCRC8(cmd);
+        cmd[5] = (byte) (data.length & 0xFF);
+        cmd[6] = (byte) ((data.length >> 8) & 0xFF);
 
+        for(int i = 0; i < data.length; i++) {
+            cmd[i + 7] = data[i];
+        }
+        cmd[cmdLength - 1] = BleCRC.calCRC8(cmd);
         addNo();
 
         return cmd;
