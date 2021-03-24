@@ -29,6 +29,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_O2MAX = "O2M"; // O2 Max
     public static final String BT_NAME_BPM = "BPM-188"; // 捷美瑞血压计
     public static final String BT_NAME_ER2 = "ER2";
+    public static final String BT_NAME_PC100 = "PC-100"; //小企鹅后面 5位sn
 
 
     public static final int MODEL_UNRECOGNIZED = 0;
@@ -50,10 +51,13 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_O2MAX = 16;
     public static final int MODEL_BPM = 17;
     public static final int MODEL_ER2 = 18;
+    public static final int MODEL_PC100 = 19;
 
 
 
-    @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1,MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL, MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2MAX, MODEL_BPM})
+    @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU,
+            MODEL_ER1,MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL,
+            MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2MAX, MODEL_BPM,})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 

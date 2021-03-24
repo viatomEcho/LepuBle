@@ -133,10 +133,9 @@ class BleServiceHelper private constructor() {
                     LepuBleLog.d("setInterfaces ===== ", "$it")
                     setInterfaces(model, it)
                 } ?: setInterfaces(model)
-
-//                setInterfaces(model)
-
             }
+            LiveEventBus.get(EventMsgConst.Ble.EventServiceConnectedAndInterfaceInit).post(true)
+
         }else{
             LepuBleLog.d("initVailFace failed!!!")
         }

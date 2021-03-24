@@ -5,6 +5,12 @@ package com.lepu.blepro.event
  */
 object EventMsgConst {
 
+    interface Ble{
+        companion object{
+            const val EventServiceConnectedAndInterfaceInit = "com.lepu.ble.service.interface.init"
+        }
+    }
+
 
     /**
      * ble discovery
