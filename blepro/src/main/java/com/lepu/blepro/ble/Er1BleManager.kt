@@ -53,6 +53,7 @@ class Er1BleManager(context: Context): BaseBleManager(context) {
     }
 
     private fun syncTime() {
+        LepuBleLog.d("Er1 manager init : to set time")
         sendCmd(Er1BleCmd.setTime());
     }
 }
