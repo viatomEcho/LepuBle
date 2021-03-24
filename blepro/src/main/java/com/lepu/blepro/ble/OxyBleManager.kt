@@ -51,13 +51,6 @@ class OxyBleManager(context: Context): BaseBleManager(context) {
     }
 
     override fun init() {
-        syncTime()
         LepuBleLog.d("OxyBleManager inited")
     }
-
-    private fun syncTime() {
-        LepuBleLog.d("Oxy manager init : to set time")
-        sendCmd(OxyBleCmd.syncTime());
-    }
-
 }
