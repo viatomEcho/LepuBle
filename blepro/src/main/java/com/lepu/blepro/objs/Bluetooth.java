@@ -57,7 +57,7 @@ public class Bluetooth implements Parcelable {
 
     @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU,
             MODEL_ER1,MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL,
-            MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2MAX, MODEL_BPM,})
+            MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2MAX, MODEL_BPM, MODEL_PC100})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 
@@ -70,6 +70,10 @@ public class Bluetooth implements Parcelable {
             return MODEL_UNRECOGNIZED;
         }
 
+
+        if (deviceName.contains(BT_NAME_PC100)){
+            return MODEL_PC100;
+        }
         if (deviceName.split(" ").length == 0)
             return MODEL_UNRECOGNIZED;
 

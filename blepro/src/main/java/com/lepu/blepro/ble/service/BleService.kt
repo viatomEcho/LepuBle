@@ -329,6 +329,7 @@ class BleService: LifecycleService() {
                 result: ScanResult
         ) {
             super.onScanResult(callbackType, result)
+            LepuBleLog.d(tag, "leScanCallback:::${result}")
 
             val device = result.device
             var deviceName = result.device.name
