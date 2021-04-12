@@ -1,5 +1,6 @@
 package com.lepu.blepro.ble.service
 
+import PC100BleInterface
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.*
@@ -178,6 +179,15 @@ class BleService: LifecycleService() {
                 }
             }
 
+            Bluetooth.MODEL_PC100 -> {
+                PC100BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+
             else -> {
                 return throw Exception("BleService initInterfaces() 未配置此model:$m")
             }
@@ -199,7 +209,7 @@ class BleService: LifecycleService() {
     fun startDiscover(scanModel: IntArray, needPair: Boolean = false, isReconnecting :Boolean = false) {
         LepuBleLog.d(tag, "start discover.....${vailFace.size()}, $isReconnecting")
         stopDiscover()
-        if (vailFace.isEmpty())return
+
 
         BluetoothController.clear()
         this.needPair = needPair
@@ -347,12 +357,7 @@ class BleService: LifecycleService() {
                     device,
                     result.rssi
             )
-            if (vailFace.isEmpty()){
-                //切换设备 先断开连接 再clear interface
-                LepuBleLog.d(tag, "Warning: vailFace isEmpty!!")
-                stopDiscover()
-                return
-            }
+
 
             if (!filterResult(b)) return
 
@@ -380,24 +385,19 @@ class BleService: LifecycleService() {
                 val isContains: Boolean = if(isReconnectByAddress) reconnectDeviceAddress?.contains(b.device.address) == true else reconnectDeviceName?.contains(b.name) == true
 
                 if (isReconnectScan && isContains){
-                    stopDiscover()
+
+
+                    if (vailFace.isEmpty()){
+                        //切换设备 先断开连接 再clear interface
+                        LepuBleLog.d(tag, "Warning: vailFace isEmpty!!")
+                        stopDiscover()
+                        return
+                    }else{
+                        stopDiscover()
+                    }
+
                     vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
                 }
-//                else {
-//                    LepuBleLog.d(tag, "不在扫描目标内...")
-//                    if (isReconnectScan && isReconnectByAddress ){
-//                        reconnectDeviceAddress?.let {
-//                            for (i in it){
-//                                if (b.device.address == DfuUtil.getNewMac(i)){ //如果扫描到的是新蓝牙名，连接
-//
-//                                    LepuBleLog.d(tag, "找到了新蓝牙名设备， 去连接Updater")
-//                                    stopDiscover()
-//                                    vailFace.get(b.model)?.connect(this@BleService, b.device, isAutoReconnect = true, true)
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
 
             }
 
@@ -429,6 +429,7 @@ class BleService: LifecycleService() {
                         if(it.state == BluetoothAdapter.STATE_OFF){
                             it.enable()
                             delay(1000L)
+                            initBle()
                             scanDevice(true)
                         }
                     }

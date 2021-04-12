@@ -93,5 +93,22 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    interface PC100{
+        companion object{
+            const val EventPC100Info = "com.lepu.ble.pc100.info"
+            const val EventPC100FingerOut = "com.lepu.ble.pc100.finger.out"
+            const val EventPC100Spo2RtData = "com.lepu.ble.pc100.spo2.rt.data"
+            const val EventPC100Spo2GetState = "com.lepu.ble.pc100.spo2.get.state"
+            const val EventPC100Spo2Start = "com.lepu.ble.pc100.spo2.start"
+            const val EventPC100Spo2End = "com.lepu.ble.pc100.spo2.end"
+            const val EventPC100BpRtData = "com.lepu.ble.pc100.bp.rt.data"
+            const val EventPC100BpStart = "com.lepu.ble.pc100.bp.start"
+            const val EventPC100BpEnd = "com.lepu.ble.pc100.bp.end"
+            const val EventPC100BpResult = "com.lepu.ble.pc100.bp.result"
+            const val EventPC100BpGetState = "com.lepu.ble.pc100.bp.get.state"
+            const val EventPC100BpWaveData = "com.lepu.ble.pc100.bp.wave.data"
+        }
+    }
+
 
 }
