@@ -43,15 +43,18 @@ android {
         jvmTarget = '1.8'
     }
 
-
-}
-repositories {
-    flatDir {
-        dirs 'libs' //this way we can find the .aar file in libs folder
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
     }
+
+
 }
 
 dependencies {
+
+    api fileTree(include: ['*.jar'], dir: 'libs')
     def lifecycle_version = "2.2.0"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
