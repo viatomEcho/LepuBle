@@ -69,3 +69,4 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.8.1'
 }
 apply from: 'bintray.gradle'
+apply from: 'upload_nexus.gradle'

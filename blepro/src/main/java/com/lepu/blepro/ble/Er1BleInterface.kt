@@ -114,7 +114,10 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
                     this.addContent(response.content)
                     LepuBleLog.d(tag, "read file：${this.fileName}   => ${this.index } / ${this.fileSize}")
-                    LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadingFileProgress).post(InterfaceEvent(model, ((this.index) * 1000).div(this.fileSize) ))
+                    val nowSize: Long = (this.index).toLong()
+                    val size :Long= nowSize * 1000
+                    val poSize :Int= (size).div(this.fileSize).toInt()
+                    LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadingFileProgress).post(InterfaceEvent(model,poSize))
 
                     if (this.index  < this.fileSize) {
                         sendCmd(Er1BleCmd.readFileData(this.index)) // 每次读的偏移量，相对于文件总长度的
