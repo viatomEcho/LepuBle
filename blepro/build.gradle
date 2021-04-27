@@ -5,7 +5,10 @@ plugins {
     id 'kotlin-android-extensions'
     id 'kotlin-kapt'
     id 'com.novoda.bintray-release' //上传到jcenter 插件
+
 }
+apply plugin: 'com.github.dcendents.android-maven'  //添加这两行
+group='com.github.viatomEcho'  //GitHub昵称
 
 
 android {
