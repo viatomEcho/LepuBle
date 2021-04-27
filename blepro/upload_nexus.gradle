@@ -1,18 +1,59 @@
-apply plugin: 'maven-publish'
 apply plugin: 'maven'
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: RELEASE_REPOSITORY_URL) {
-                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
-            }
-            pom.project {
-                groupId GROUP
-                artifactId POM_ARTIFACT_ID
-                version VERSION_NAME
-                packaging 'aar'
+//def定义的变量才会在project中
+
+def GROUP = 'com.lepu.blepro'
+def ARTIFACT_ID = 'lepu-maven-ble'
+def VERSION_NAME = "1.0.3"
+//def VERSION_NAME = '1.0.1-SNAPSHOT'//打测试sdk上传到此目录
+
+
+//上传的目标仓库地址
+def SNAPSHOT_REPOSITORY_URL = 'http://193.169.2.140:7071/repository/maven-snapshots/'
+def RELEASE_REPOSITORY_URL = 'http://193.169.2.140:7071/repository/maven-releases/'
+def REPOSITORY_URL = VERSION_NAME.toUpperCase().endsWith("-SNAPSHOT") ? SNAPSHOT_REPOSITORY_URL : RELEASE_REPOSITORY_URL
+
+//Nexus 的私服的用户名称和密码
+def NEXUS_USERNAME = 'admin'
+def NEXUS_PASSWORD = 'cfabd50a-6e6e-4811-8f42-1ec2603dc3c9'
+
+afterEvaluate { project ->
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                pom.groupId = GROUP
+                pom.artifactId = ARTIFACT_ID
+                pom.version = VERSION_NAME
+                repository(url: REPOSITORY_URL) {
+                    authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
+                }
             }
         }
+    }
+//    task androidJavadocs(type: Javadoc) {
+//        source = android.sourceSets.main.java.srcDirs
+//        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+//    }
+//    task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+//        classifier = 'javadoc'
+//        from androidJavadocs.destinationDir
+//    }
+    task androidSourcesJar(type: Jar) {
+        classifier = 'sources'
+        from android.sourceSets.main.java.sourceFiles
+    }
+
+    //解决 JavaDoc 中文注释生成失败的问题
+    tasks.withType(Javadoc) {
+        options{
+            encoding "UTF-8"
+            charSet 'UTF-8'
+            links "http://docs.oracle.com/javase/7/docs/api"
+        }
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+    artifacts {
+        archives androidSourcesJar
+//        archives androidJavadocsJar
     }
 }
