@@ -45,6 +45,11 @@ android {
 
 
 }
+repositories {
+    flatDir {
+        dirs 'libs' //this way we can find the .aar file in libs folder
+    }
+}
 
 dependencies {
     def lifecycle_version = "2.2.0"
