@@ -69,6 +69,31 @@ class OxyBleResponse{
         }
     }
 
+    @ExperimentalUnsignedTypes
+    @Parcelize
+    class RtParam constructor(var bytes: ByteArray) : Parcelable {
+        var content: ByteArray = bytes
+        var spo2: Int
+        var battery: Int
+        var batteryState: String // 0 -> not charging; 1 -> charging; 2 -> charged
+        var pi: Int
+        var state: String //1-> lead on; 0-> lead off; other
+        var steps: Int
+        var pr: Int
+        var vector: Int
+
+        init {
+            spo2 = bytes[0].toUInt().toInt()
+            pr = bytes[1].toUInt().toInt() and 0xFF or (bytes[2].toUInt().toInt() and 0xFF) shl 8
+            steps = bytes[3].toUInt().toInt() and 0xFF or (bytes[4].toUInt().toInt() and 0xFF shl 8) or (bytes[5].toUInt().toInt() and 0xFF shl 16) or (bytes[6].toUInt().toInt() and 0xFF shl 24)
+            battery = bytes[7].toUInt().toInt()
+            batteryState = bytes[8].toUInt().toString()
+            vector = bytes[9].toUInt().toInt()
+            pi = bytes[10].toUInt().toInt() and 0xFF
+            state = bytes[11].toUInt().toString()
+        }
+    }
+
     @Parcelize
     class OxyInfo (val bytes: ByteArray) : Parcelable {
         var region: String

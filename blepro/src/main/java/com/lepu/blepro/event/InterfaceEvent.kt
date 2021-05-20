@@ -25,6 +25,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
             const val EventOxyInfo = "com.lepu.ble.oxy.info"
             const val EventOxyRtData = "com.lepu.ble.oxy.rtData"
+            const val EventOxyRtParamData = "com.lepu.ble.oxy.rt.param.Data"
         }
     }
 
