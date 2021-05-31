@@ -10,10 +10,7 @@ import android.os.IBinder
 import android.util.SparseArray
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.BpmBleInterface
-import com.lepu.blepro.ble.Er1BleInterface
-import com.lepu.blepro.ble.Er2BleInterface
-import com.lepu.blepro.ble.OxyBleInterface
+import com.lepu.blepro.ble.*
 import com.lepu.blepro.ble.cmd.Er1BleCmd
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
@@ -678,6 +675,9 @@ class BleServiceHelper private constructor() {
             }
             Bluetooth.MODEL_O2RING -> {
                 return inter is OxyBleInterface
+            }
+            Bluetooth.MODEL_BP2 ->{
+                return inter is Bp2BleInterface
             }
             else -> {
                 LepuBleLog.d(tag, "checkModel, 无效model：$model,${inter.javaClass}")

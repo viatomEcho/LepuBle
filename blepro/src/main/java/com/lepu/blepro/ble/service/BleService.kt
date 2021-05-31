@@ -14,15 +14,12 @@ import androidx.lifecycle.LifecycleService
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.BpmBleInterface
-import com.lepu.blepro.ble.OxyBleInterface
+import com.lepu.blepro.ble.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
-import com.lepu.blepro.ble.Er1BleInterface
-import com.lepu.blepro.ble.Er2BleInterface
 import com.lepu.blepro.utils.DfuUtil
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -171,6 +168,14 @@ class BleService: LifecycleService() {
             }
             Bluetooth.MODEL_BPM -> {
                 BpmBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_BP2 -> {
+                Bp2BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
                     vailFace.put(m, this)
