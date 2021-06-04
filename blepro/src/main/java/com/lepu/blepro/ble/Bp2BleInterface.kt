@@ -2,19 +2,25 @@ package com.lepu.blepro.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.util.Log
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.Bp2BleCmd
+import com.lepu.blepro.ble.cmd.Bp2BleCmd.BPMCmd.*
 import com.lepu.blepro.ble.cmd.Bp2BleResponse
+import com.lepu.blepro.ble.cmd.Er2BleCmd
 import com.lepu.blepro.ble.data.BpmCmd
 import com.lepu.blepro.ble.data.BpmDeviceInfo
 import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.CrcUtil.calCRC8
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.add
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
+import com.viatom.ktble.ble.objs.Bp2BleFile
 import com.viatom.ktble.ble.objs.Bp2DeviceInfo
+import com.viatom.ktble.ble.objs.Bp2FilePart
 import com.viatom.ktble.ble.objs.KtBleFileList
 
 /**
@@ -44,8 +50,10 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
     // 数据记录下载标志
     private var isUserAEnd: Boolean = true
     private var isUserBEnd: Boolean = true
-
-
+    var fileSize: Int = 0
+    var fileName:String=""
+    var curSize: Int = 0
+    var fileContent : ByteArray? = null
 
     override fun hasResponse(bytes: ByteArray?): ByteArray? {
         val bytesLeft: ByteArray? = bytes
@@ -79,9 +87,10 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
     private fun onResponseReceived(bytes: Bp2BleResponse.BleResponse) {
         LepuBleLog.d(tag, " onResponseReceived : " + bytes.cmd)
+
         when(bytes.cmd) {
             Bp2BleCmd.BPMCmd.CMD_INFO -> {
-                val info = Bp2DeviceInfo(bytes.content)
+                val info = Bp2DeviceInfo(bytes.content,device.name)
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 LiveEventBus.get(InterfaceEvent.BP2.EventBp2Info).post(InterfaceEvent(model, info))
 
@@ -96,40 +105,48 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
                 LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_BP_STATE => success")
                 //发送实时state : byte
-                val list  = KtBleFileList(bytes.content)
+                val list  = KtBleFileList(bytes.content,device.name)
                 LiveEventBus.get(InterfaceEvent.BP2.EventBp2FileList).post(InterfaceEvent(model, list))
             }
-//            Bp2BleCmd.BPMCmd.MSG_TYPE_GET_RECORDS -> {
-//                //获取留存记录
-//                LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_RECORDS => success")
-//
-//               BpmCmd(bytes).let {
-//                   LiveEventBus.get(InterfaceEvent.BPM.EventBpmRecordData).post(InterfaceEvent(model, it ))
-//
-//                   if (it.type == 0xB3.toByte()) {
-//                       if (bytes[11] == 0x00.toByte()) {
-//                           isUserAEnd = true
-//                       }
-//                       if (bytes[11] == 0x01.toByte()) {
-//                           isUserBEnd = true
-//                       }
-//                       if (isUserAEnd && isUserBEnd) {
-//                           //AB都读取完成
-//                           LiveEventBus.get(InterfaceEvent.BPM.EventBpmRecordEnd).post(InterfaceEvent(model, true ))
-//                       }
-//                   }
-//               }
-//
-//            }
-//            Bp2BleCmd.BPMCmd.MSG_TYPE_GET_RESULT -> {
-//                // 返回测量数据
-//                LiveEventBus.get(InterfaceEvent.BPM.EventBpmMeasureResult).post(InterfaceEvent(model, BpmCmd(bytes) ))
-//            }
-//            else -> {
-//                //实时指标
-//                LiveEventBus.get(InterfaceEvent.BPM.EventBpmRtData).post(InterfaceEvent(model, BpmCmd(bytes) ))
-//
-//            }
+
+            Bp2BleCmd.BPMCmd.CMD_FILE_READ_START -> {
+                fileContent = null;
+                fileSize = toUInt(bytes.content.copyOfRange(0,4))
+                Log.d(tag, "download file $fileName CMD_FILE_READ_START fileSize == $fileSize")
+                if (fileSize == 0) {
+                    sendCmd(fileReadEnd())
+                } else {
+                    sendCmd(fileReadPkg(0))
+                }
+            }
+
+            Bp2BleCmd.BPMCmd.CMD_FILE_READ_PKG -> {
+                curSize += bytes.len
+                val part = Bp2FilePart(fileName, fileSize, curSize)
+                fileContent = add(fileContent, bytes.content)
+                Log.d(tag, "download file $fileName CMD_FILE_READ_PKG curSize == $curSize | fileSize == $fileSize")
+
+                LiveEventBus.get(InterfaceEvent.BP2.EventBp2ReadingFileProgress).post(InterfaceEvent(model, part))
+                if (curSize < fileSize) {
+                    sendCmd(fileReadPkg(curSize))
+                } else {
+                    sendCmd(fileReadEnd())
+                }
+            }
+
+            Bp2BleCmd.BPMCmd.CMD_FILE_READ_END -> {
+                curSize = 0
+                if(fileContent == null) fileContent = ByteArray(0)
+                if(fileContent!!.isNotEmpty()) {
+                    val file : Bp2BleFile = Bp2BleFile(fileName, fileContent!!,device.name)
+                    LiveEventBus.get(InterfaceEvent.BP2.EventBp2ReadFileComplete).post(InterfaceEvent(model, file))
+                } else {
+                    //取消下载？？？
+                    //   BleMsgUtils.broadcastMsg(mService!!, BleMsg.MSG_DOWNLOAD, BleMsg.CODE_CANCEL)
+//                    LiveEventBus.get(InterfaceEvent.BP2.EventBp2ReadFileComplete).post(InterfaceEvent(model, file))
+                }
+
+            }
         }
     }
 
@@ -155,16 +172,12 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getFileList() {
-    }
-
-    fun getBpmFileList( map: HashMap<String, Any>){
-        isUserAEnd = false
-        isUserBEnd = false
-        LepuBleLog.d(tag, "getBpmFileList...")
-       sendCmd(Bp2BleCmd.getCmd(Bp2BleCmd.BPMCmd.MSG_TYPE_GET_RECORDS, map))
+        sendCmd(Bp2BleCmd.getCmd(Bp2BleCmd.BPMCmd.MSG_TYPE_GET_BP_FILE_LIST))
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
+        this.fileName = fileName
+        sendCmd(getFileStart(fileName.toByteArray(), 0))
     }
     override fun resetDeviceInfo() {
     }
@@ -174,15 +187,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
 
 
-    fun startBp() {
-        LepuBleLog.d(tag, "startBp...")
-        sendCmd(Bp2BleCmd.getCmd(Bp2BleCmd.BPMCmd.MSG_TYPE_START_BP))
-    }
 
-    fun stopBp() {
-        LepuBleLog.d(tag, "stopBp...")
-        sendCmd(Bp2BleCmd.getCmd(Bp2BleCmd.BPMCmd.MSG_TYPE_STOP_BP))
-    }
 
 
 

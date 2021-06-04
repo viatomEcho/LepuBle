@@ -6,8 +6,9 @@ import com.lepu.blepro.utils.toString
 class KtBleFileList {
     var fileNum: Int
     var fileNameList : Array<String?>
-
-    constructor(bytes: ByteArray) {
+    var deviceName: String
+    constructor(bytes: ByteArray, deviceName: String) {
+        this.deviceName = deviceName
         this.fileNum = bytes[0].toInt()
 
         fileNameList = arrayOfNulls<String>(fileNum)

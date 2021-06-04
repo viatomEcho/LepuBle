@@ -384,7 +384,7 @@ class BleServiceHelper private constructor() {
 
     fun getFileList(model: Int){
         when(model){
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2 ->{
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2,Bluetooth.MODEL_BP2 ->{
                 getInterface(model)?.getFileList()
             }
             else -> LepuBleLog.d(tag, "getFileList, model$model,未被允许获取文件列表")

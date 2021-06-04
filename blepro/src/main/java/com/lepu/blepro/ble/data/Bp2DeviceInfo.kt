@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class Bp2DeviceInfo {
+    var name: String
 
     var hwV: String //hardware version
 
@@ -29,9 +30,11 @@ class Bp2DeviceInfo {
     var snLen: Int
 
     var sn: String
-
+    var bytes:ByteArray
     @ExperimentalUnsignedTypes
-    constructor(bytes: ByteArray) {
+    constructor(bytes: ByteArray, deviceName: String) {
+        this.bytes=bytes;
+        this.name = deviceName
         this.hwV = bytes[0].toChar().toString()
         this.fmV = "${bytes[3]}.${bytes[2]}.${bytes[1]}"
         this.btlV = "${bytes[7]}.${bytes[6]}.${bytes[5]}"
