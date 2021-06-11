@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.text.TextUtils
+import android.util.Log
 import android.util.SparseArray
 import androidx.core.util.isEmpty
 import androidx.lifecycle.LifecycleService
@@ -174,7 +175,7 @@ class BleService: LifecycleService() {
                     return this
                 }
             }
-            Bluetooth.MODEL_BP2 -> {
+            Bluetooth.MODEL_BP2 ,Bluetooth.MODEL_BP2A-> {
                 Bp2BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
