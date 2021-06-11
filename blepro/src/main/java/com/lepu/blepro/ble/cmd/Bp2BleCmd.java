@@ -10,6 +10,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
+import static com.lepu.blepro.ble.cmd.BpmBleCmd.BPMCmd.CMD_TYPE_START_BP;
+import static com.lepu.blepro.ble.cmd.BpmBleCmd.BPMCmd.CMD_WRITE;
+
+
 public class Bp2BleCmd {
     public static final int MSG_TYPE_INVALID = -1;
     public final static int SET_TIME = 0xEC;
@@ -31,10 +35,19 @@ public class Bp2BleCmd {
 
 
     public static class BPMCmd {
+        public final static byte HEAD_0 = (byte) 0x02;
+        public final static byte HEAD_1 = (byte) 0x40;
+        public final static byte CMD_TYPE_START_BP = (byte) 0xA1;
+        public final static byte CMD_TYPE_STOP = (byte) 0xA2;
         private final static byte HEAD = (byte) 0xA5;
         public final static byte CMD_SET_TIME = (byte) 0xEC;
         private final static byte TYPE_NORMAL_SEND = (byte) 0x00;
         public final static byte CMD_FILE_LIST = (byte) 0xF1;
+        public final static byte CMD_RESET = (byte) 0xE2;
+        // data = state + wave
+        public final static byte CMD_BP2_RT_DATA = (byte) 0x08;
+        public final static byte CMD_BP2_RT_STATE = (byte) 0x06;
+
         // heartbeat sound
         public final static byte CMD_BP2_SET_SWITCHER_STATE = (byte) 0x0B;
         public final static byte CMD_INFO = (byte) 0xE1;
@@ -113,45 +126,76 @@ public class Bp2BleCmd {
 
 
         }
-
-        public static byte[] setConfig(boolean switchState) {
-            int len = 40;
-
-            byte[] cmd = new byte[8 + len];
-
-            cmd[0] = HEAD;
-            cmd[1] = CMD_BP2_SET_SWITCHER_STATE;
-            cmd[2] = ~CMD_BP2_SET_SWITCHER_STATE;
-            cmd[3] = TYPE_NORMAL_SEND;
-            cmd[4] = (byte) serial;
-
-            // length
-            cmd[5] = (byte) len;
-            cmd[6] = (byte) (len >> 8);
-
-            if (switchState) {
-                cmd[31] = 1;
-            }
-
-            cmd[7 + len] = CrcUtil.calCRC8(cmd);
-
-            serial++;
-
-            return cmd;
-
-        }
-
         public static byte[] startBp() {
             byte[] cmd = new byte[6];
-
-
+            cmd[0] = HEAD_0;
+            cmd[1] = HEAD_1;
+            cmd[2] = CMD_WRITE;
+            cmd[3] = (byte) 0x01; // length
+            cmd[4] = CMD_TYPE_START_BP; // cmd value
+            cmd[5] = calcNum(cmd);
             return cmd;
         }
+
+
+        public static byte[] resetAll() {
+                int len = 0;
+                byte[] cmd = new byte[8+len];
+
+                cmd[0] = HEAD;
+                cmd[1] = CMD_RESET;
+                cmd[2] = ~CMD_RESET;
+                cmd[3] = TYPE_NORMAL_SEND;
+                cmd[4] = (byte) serial;
+                // length
+                cmd[5] = (byte) len;
+                cmd[6] = (byte) (len>>8);
+                cmd[7+len] = CrcUtil.calCRC8(cmd);
+
+                serial++;
+
+                return cmd;
+
+        }
+
+        public static byte[] setConfig(boolean switchState) {
+                int len = 40;
+
+                byte[] cmd = new byte[8+len];
+
+                cmd[0] = HEAD;
+                cmd[1] = CMD_BP2_SET_SWITCHER_STATE;
+                cmd[2] = ~CMD_BP2_SET_SWITCHER_STATE;
+                cmd[3] = TYPE_NORMAL_SEND;
+                cmd[4] = (byte) serial;
+
+                // length
+                cmd[5] = (byte) len;
+                cmd[6] = (byte) (len>>8);
+
+                if(switchState) {
+                    cmd[31] = 1;
+                }
+
+                cmd[7+len] = CrcUtil.calCRC8(cmd);
+
+                serial++;
+
+                return cmd;
+
+
+        }
+
+
 
         public static byte[] stopBp() {
             byte[] cmd = new byte[6];
-
-
+            cmd[0] = HEAD_0;
+            cmd[1] = HEAD_1;
+            cmd[2] = CMD_WRITE;
+            cmd[3] = (byte) 0x01; // length
+            cmd[4] = CMD_TYPE_STOP; // cmd value
+            cmd[5] = calcNum(cmd);
             return cmd;
         }
 
@@ -302,6 +346,46 @@ public class Bp2BleCmd {
 
             return cmd;
 
+        }
+        public static byte[] getRtState() {
+                int len = 0;
+
+                byte[] cmd = new byte[8+len];
+
+                cmd[0] = HEAD;
+                cmd[1] = CMD_BP2_RT_STATE;
+                cmd[2] = ~CMD_BP2_RT_STATE;
+                cmd[3] = TYPE_NORMAL_SEND;
+                cmd[4] = (byte) serial;
+                // length
+                cmd[5] = (byte) len;
+                cmd[6] = (byte) (len>>8);
+                cmd[7+len] = CrcUtil.calCRC8(cmd);
+
+                serial++;
+
+                return cmd;
+
+
+        }
+        public static byte[] getRtData() {
+                int len = 0;
+
+                byte[] cmd = new byte[8+len];
+
+                cmd[0] = HEAD;
+                cmd[1] = CMD_BP2_RT_DATA;
+                cmd[2] = ~CMD_BP2_RT_DATA;
+                cmd[3] = TYPE_NORMAL_SEND;
+                cmd[4] = (byte) serial;
+                // length
+                cmd[5] = (byte) len;
+                cmd[6] = (byte) (len>>8);
+                cmd[7+len] = CrcUtil.calCRC8(cmd);
+
+                serial++;
+
+                return cmd;
         }
     }
 

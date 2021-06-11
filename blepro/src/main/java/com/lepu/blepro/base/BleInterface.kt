@@ -377,6 +377,9 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      */
     abstract fun getFileList()
 
+
+
+
     /**
      * 读文件
      */

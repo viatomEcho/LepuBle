@@ -8,20 +8,13 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.Bp2BleCmd
 import com.lepu.blepro.ble.cmd.Bp2BleCmd.BPMCmd.*
 import com.lepu.blepro.ble.cmd.Bp2BleResponse
-import com.lepu.blepro.ble.cmd.Er2BleCmd
-import com.lepu.blepro.ble.data.BpmCmd
-import com.lepu.blepro.ble.data.BpmDeviceInfo
-import com.lepu.blepro.ble.data.LepuDevice
+import com.lepu.blepro.ble.data.Bp2BleRtState
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.CrcUtil.calCRC8
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
-import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
-import com.viatom.ktble.ble.objs.Bp2BleFile
-import com.viatom.ktble.ble.objs.Bp2DeviceInfo
-import com.viatom.ktble.ble.objs.Bp2FilePart
-import com.viatom.ktble.ble.objs.KtBleFileList
+import com.viatom.ktble.ble.objs.*
 
 /**
  * author: wujuan
@@ -147,10 +140,81 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 }
 
             }
+
+            //实时波形
+            Bp2BleCmd.BPMCmd.CMD_BP2_RT_DATA ->{
+                if(bytes.content.size > 31) {
+                    val rtData = Bp2BleRtData(bytes.content)
+                    LiveEventBus.get(InterfaceEvent.BP2.EventBp2RtData).post(InterfaceEvent(model, rtData))
+                }
+            }
+            //实时状态
+            Bp2BleCmd.BPMCmd.CMD_BP2_RT_STATE ->{
+                val rtState = Bp2BleRtState(bytes.content)
+                LiveEventBus.get(InterfaceEvent.BP2.EventBp2State).post(InterfaceEvent(model, rtState))
+
+
+
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            Bp2BleCmd.BPMCmd.CMD_BP2_SET_SWITCHER_STATE ->{
+                //心跳音开关
+                if (bytes.type != 0x01.toByte()) {
+                    LiveEventBus.get(InterfaceEvent.BP2.EventBpSetConfigResult).post(InterfaceEvent(model, 0))
+                }else{
+                    LiveEventBus.get(InterfaceEvent.BP2.EventBpSetConfigResult).post(InterfaceEvent(model, 1))
+                }
+            }
+            Bp2BleCmd.BPMCmd.CMD_BP2_CONFIG ->{
+                //获取返回的开关状态
+                if (bytes.type != 0x01.toByte()) {
+                        LiveEventBus.get(InterfaceEvent.BP2.EventBpGetConfigResult).post(InterfaceEvent(model,0 ))
+                }else{
+                    if(bytes.content != null && bytes.content.size > 24 && bytes.content[24].toInt() == 1) {
+                        LiveEventBus.get(InterfaceEvent.BP2.EventBpGetConfigResult).post(InterfaceEvent(model,1 ))
+                    }else{
+                        LiveEventBus.get(InterfaceEvent.BP2.EventBpGetConfigResult).post(InterfaceEvent(model,0))
+                    }
+                }
+            }
+            Bp2BleCmd.BPMCmd.CMD_RESET ->{
+                //重置
+                if (bytes.type != 0x01.toByte()) {
+                    LiveEventBus.get(InterfaceEvent.BP2.EventBp2ResetDeviceInfo).post(InterfaceEvent(model, 0))
+                }else{
+                    LiveEventBus.get(InterfaceEvent.BP2.EventBp2ResetDeviceInfo).post(InterfaceEvent(model, 1))
+                }
+            }
+
+
+
         }
     }
 
-
+    fun startBp() {
+        LepuBleLog.d(tag, "getInfo...")
+        sendCmd(Bp2BleCmd.getCmd(Bp2BleCmd.BPMCmd.MSG_TYPE_START_BP))
+    }
+     fun stopBp() {
+        LepuBleLog.d(tag, "getInfo...")
+        sendCmd(Bp2BleCmd.getCmd(Bp2BleCmd.BPMCmd.MSG_TYPE_STOP_BP))
+    }
 
     override fun getInfo() {
         LepuBleLog.d(tag, "getInfo...")
@@ -165,10 +229,27 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
     override fun updateSetting(type: String, value: Any) {
     }
 
-
+    //实时波形命令
     override fun getRtData() {
         LepuBleLog.d(tag, "getRtData...")
-        sendCmd(Bp2BleCmd.getCmd(Bp2BleCmd.BPMCmd.MSG_TYPE_GET_BP_STATE))
+        sendCmd(Bp2BleCmd.BPMCmd.getRtData())
+//        sendCmd(Bp2BleCmd.BPMCmd.getRtState())//实时状态需不需要？
+    }
+    //实时状态命令
+    fun getRtState() {
+        LepuBleLog.d(tag, "getRtData...")
+        sendCmd(Bp2BleCmd.BPMCmd.getRtState())
+    }
+
+
+    fun resetAll(){
+        sendCmd(Bp2BleCmd.BPMCmd.resetAll())
+    }
+     fun setConfig(switch:Boolean){
+        sendCmd(Bp2BleCmd.BPMCmd.setConfig(switch))
+    }
+     fun getConfig(){
+        sendCmd(Bp2BleCmd.BPMCmd.getConfig())
     }
 
     override fun getFileList() {

@@ -79,18 +79,21 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface BP2{
         companion object{
-            const val EventBp2Info = "com.lepu.ble.bpm.info"
-            const val EventBp2RtData = "com.lepu.ble.bpm.rtData"
-            const val EventBp2State = "com.lepu.ble.bpm.state"
-            const val EventBp2FileList = "com.lepu.ble.bpm.fileList"
-            const val EventBp2ReadFileError = "com.lepu.ble.bpm.read.file.error"
-            const val EventBp2ReadingFileProgress = "com.lepu.ble.bpm.reading.file.progress"
-            const val EventBp2ReadFileComplete = "com.lepu.ble.bpm.read.file.complete"
-            const val EventBp2ResetDeviceInfo = "com.lepu.ble.bpm.reset"
-            const val EventBp2SyncTime = "com.lepu.ble.bpm.sync.time"
-            const val EventBp2RecordData = "com.lepu.ble.bpm.record.data"
-            const val EventBp2RecordEnd = "com.lepu.ble.bpm.record.end"
-            const val EventBp2MeasureResult = "com.lepu.ble.bpm.measure.result"
+            const val EventBp2Info = "com.lepu.ble.bp2.info"
+            const val EventBp2RtData = "com.lepu.ble.bp2.rtData"
+            const val EventBp2State = "com.lepu.ble.bp2.state"
+            const val EventBp2FileList = "com.lepu.ble.bp2.fileList"
+            const val EventBp2ReadFileError = "com.lepu.ble.bp2.read.file.error"
+            const val EventBp2ReadingFileProgress = "com.lepu.ble.bp2.reading.file.progress"
+            const val EventBp2ReadFileComplete = "com.lepu.ble.bp2.read.file.complete"
+            const val EventBp2ResetDeviceInfo = "com.lepu.ble.bp2.reset"
+            const val EventBp2SyncTime = "com.lepu.ble.bp2.sync.time"
+            const val EventBp2RecordData = "com.lepu.ble.bp2.record.data"
+            const val EventBp2RecordEnd = "com.lepu.ble.bp2.record.end"
+            const val EventBp2MeasureResult = "com.lepu.ble.bp2.measure.result"
+
+            const val EventBpSetConfigResult = "com.lepu.ble.bp2.measure.config"
+            const val EventBpGetConfigResult = "com.lepu.ble.bp2.measure.getConfig"
 
         }
     }

@@ -382,6 +382,7 @@ class BleServiceHelper private constructor() {
     }
 
 
+
     fun getFileList(model: Int){
         when(model){
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2,Bluetooth.MODEL_BP2 ->{
@@ -496,8 +497,46 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         getInterface(model)?.stopRtTask()
     }
-
-
+    fun getConfig(model: Int){
+        getInterface(model)?.let { it1 ->
+            (it1 as Bp2BleInterface).let {
+                LepuBleLog.d(tag, "it as Bp2BleInterface")
+                it.getConfig()
+            }
+        }
+    }
+    fun setConfig(model: Int,switch:Boolean){
+        getInterface(model)?.let { it1 ->
+            (it1 as Bp2BleInterface).let {
+                LepuBleLog.d(tag, "it as Bp2BleInterface")
+                it.setConfig(switch)
+            }
+        }
+    }
+    fun resetAll(model: Int){
+        getInterface(model)?.let { it1 ->
+            (it1 as Bp2BleInterface).let {
+                LepuBleLog.d(tag, "it as Bp2BleInterface")
+                it.resetAll()
+            }
+        }
+    }
+    fun startBp(model: Int) {
+        getInterface(model)?.let { it1 ->
+            (it1 as Bp2BleInterface).let {
+                LepuBleLog.d(tag, "it as Bp2BleInterface")
+                it.startBp()
+            }
+        }
+    }
+    fun stopBp(model: Int) {
+        getInterface(model)?.let { it1 ->
+            (it1 as Bp2BleInterface).let {
+                LepuBleLog.d(tag, "it as Bp2BleInterface")
+                it.stopBp()
+            }
+        }
+    }
 
     fun checkService(): Boolean{
         if (!this::bleService.isInitialized){
