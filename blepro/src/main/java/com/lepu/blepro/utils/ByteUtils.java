@@ -7,7 +7,7 @@ public class ByteUtils {
     }
 
     public static short toSignedShort(byte b1, byte b2) {
-        return (short) ((b1 & 0xff) + ((b2 & 0xff) << 8));
+        return (short) ((b1 & 0xff) + ((b2 & 0xff) << 8) );
     }
 
     public static float[] bytes2mvs(byte[] bytes) {
