@@ -69,3 +69,5 @@ dependencies {
 }
 apply from: 'bintray.gradle'
 apply from: 'upload_nexus.gradle'
+apply plugin: 'com.github.dcendents.android-maven'
+group='com.github.viatomEcho'
