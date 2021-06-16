@@ -10,10 +10,7 @@ import android.os.IBinder
 import android.util.SparseArray
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.BpmBleInterface
-import com.lepu.blepro.ble.Er1BleInterface
-import com.lepu.blepro.ble.Er2BleInterface
-import com.lepu.blepro.ble.OxyBleInterface
+import com.lepu.blepro.ble.*
 import com.lepu.blepro.ble.cmd.Er1BleCmd
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
@@ -385,9 +382,10 @@ class BleServiceHelper private constructor() {
     }
 
 
+
     fun getFileList(model: Int){
         when(model){
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2 ->{
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2,Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A ->{
                 getInterface(model)?.getFileList()
             }
             else -> LepuBleLog.d(tag, "getFileList, model$model,未被允许获取文件列表")
@@ -499,8 +497,46 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         getInterface(model)?.stopRtTask()
     }
-
-
+    fun getConfig(model: Int){
+        getInterface(model)?.let { it1 ->
+            (it1 as Bp2BleInterface).let {
+                LepuBleLog.d(tag, "it as Bp2BleInterface")
+                it.getConfig()
+            }
+        }
+    }
+    fun setConfig(model: Int,switch:Boolean){
+        getInterface(model)?.let { it1 ->
+            (it1 as Bp2BleInterface).let {
+                LepuBleLog.d(tag, "it as Bp2BleInterface")
+                it.setConfig(switch)
+            }
+        }
+    }
+    fun resetAll(model: Int){
+        getInterface(model)?.let { it1 ->
+            (it1 as Bp2BleInterface).let {
+                LepuBleLog.d(tag, "it as Bp2BleInterface")
+                it.resetAll()
+            }
+        }
+    }
+    fun startBp(model: Int) {
+        getInterface(model)?.let { it1 ->
+            (it1 as Bp2BleInterface).let {
+                LepuBleLog.d(tag, "it as Bp2BleInterface")
+                it.startBp()
+            }
+        }
+    }
+    fun stopBp(model: Int) {
+        getInterface(model)?.let { it1 ->
+            (it1 as Bp2BleInterface).let {
+                LepuBleLog.d(tag, "it as Bp2BleInterface")
+                it.stopBp()
+            }
+        }
+    }
 
     fun checkService(): Boolean{
         if (!this::bleService.isInitialized){
@@ -678,6 +714,9 @@ class BleServiceHelper private constructor() {
             }
             Bluetooth.MODEL_O2RING -> {
                 return inter is OxyBleInterface
+            }
+            Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A ->{
+                return inter is Bp2BleInterface
             }
             else -> {
                 LepuBleLog.d(tag, "checkModel, 无效model：$model,${inter.javaClass}")

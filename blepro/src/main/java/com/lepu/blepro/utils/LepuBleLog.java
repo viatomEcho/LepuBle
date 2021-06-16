@@ -3,7 +3,7 @@ package com.lepu.blepro.utils;
 
 import android.util.Log;
 
-import com.lepu.blepro.BuildConfig;
+import no.nordicsemi.android.ble.BuildConfig;
 
 
 public class LepuBleLog {

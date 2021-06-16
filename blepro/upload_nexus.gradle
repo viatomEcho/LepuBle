@@ -4,8 +4,8 @@ apply plugin: 'maven'
 
 def GROUP = 'com.lepu.blepro'
 def ARTIFACT_ID = 'lepu-maven-ble'
-def VERSION_NAME = "1.0.3"
-//def VERSION_NAME = '1.0.1-SNAPSHOT'//打测试sdk上传到此目录
+//def VERSION_NAME = "1.0.3"
+def VERSION_NAME = '1.0.4-SNAPSHOT'//打测试sdk上传到此目录
 
 
 //上传的目标仓库地址

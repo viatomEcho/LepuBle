@@ -25,6 +25,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
             const val EventOxyInfo = "com.lepu.ble.oxy.info"
             const val EventOxyRtData = "com.lepu.ble.oxy.rtData"
+            const val EventOxyRtParamData = "com.lepu.ble.oxy.rt.param.Data"
         }
     }
 
@@ -72,7 +73,30 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
         }
     }
+    /**
+     * BpmBleInterface发出的通知
+     * 包含model: model_bpm
+     */
+    interface BP2{
+        companion object{
+            const val EventBp2Info = "com.lepu.ble.bp2.info"
+            const val EventBp2RtData = "com.lepu.ble.bp2.rtData"
+            const val EventBp2State = "com.lepu.ble.bp2.state"
+            const val EventBp2FileList = "com.lepu.ble.bp2.fileList"
+            const val EventBp2ReadFileError = "com.lepu.ble.bp2.read.file.error"
+            const val EventBp2ReadingFileProgress = "com.lepu.ble.bp2.reading.file.progress"
+            const val EventBp2ReadFileComplete = "com.lepu.ble.bp2.read.file.complete"
+            const val EventBp2ResetDeviceInfo = "com.lepu.ble.bp2.reset"
+            const val EventBp2SyncTime = "com.lepu.ble.bp2.sync.time"
+            const val EventBp2RecordData = "com.lepu.ble.bp2.record.data"
+            const val EventBp2RecordEnd = "com.lepu.ble.bp2.record.end"
+            const val EventBp2MeasureResult = "com.lepu.ble.bp2.measure.result"
 
+            const val EventBpSetConfigResult = "com.lepu.ble.bp2.measure.config"
+            const val EventBpGetConfigResult = "com.lepu.ble.bp2.measure.getConfig"
+
+        }
+    }
     /**
      * BpmBleInterface发出的通知
      * 包含model: model_bpm

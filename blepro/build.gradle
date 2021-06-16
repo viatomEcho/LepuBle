@@ -4,7 +4,7 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-android-extensions'
     id 'kotlin-kapt'
-    id 'com.novoda.bintray-release' //上传到jcenter 插件
+//    id 'com.novoda.bintray-release' //上传到jcenter 插件
 }
 
 
@@ -67,7 +67,7 @@ dependencies {
 
     implementation 'org.apache.commons:commons-lang3:3.8.1'
 }
-apply from: 'bintray.gradle'
+//apply from: 'bintray.gradle'
 apply from: 'upload_nexus.gradle'
 apply plugin: 'com.github.dcendents.android-maven'
 group='com.github.viatomEcho'

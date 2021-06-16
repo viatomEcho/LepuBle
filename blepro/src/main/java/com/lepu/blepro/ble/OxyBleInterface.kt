@@ -53,7 +53,8 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
     override fun getRtData() {
         LepuBleLog.d(tag, "getRtData...")
-       sendOxyCmd(OxyBleCmd.OXY_CMD_RT_DATA, OxyBleCmd.getRtWave())
+//       sendOxyCmd(OxyBleCmd.OXY_CMD_RT_DATA, OxyBleCmd.getRtWave())// 无法支持1.4.1之前获取pi
+       sendOxyCmd(OxyBleCmd.OXY_CMD_RT_PARAM_DATA, OxyBleCmd.getRtParam())
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
@@ -153,6 +154,16 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 OxyDataController.receive(rtWave.wFs)
                 //发送实时数据
                 LiveEventBus.get(InterfaceEvent.Oxy.EventOxyRtData).post(InterfaceEvent(model, rtWave))
+
+            }
+
+            OxyBleCmd.OXY_CMD_RT_PARAM_DATA -> {
+                clearTimeout()
+                val rtParam = OxyBleResponse.RtParam(response.content)
+                //发送实时数据
+                LiveEventBus.get(InterfaceEvent.Oxy.EventOxyRtParamData).post(InterfaceEvent(model, rtParam))
+
+
 
             }
             OxyBleCmd.OXY_CMD_READ_START -> {
