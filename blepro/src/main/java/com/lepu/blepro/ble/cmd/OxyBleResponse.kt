@@ -84,7 +84,7 @@ class OxyBleResponse{
 
         init {
             spo2 = bytes[0].toUInt().toInt()
-            pr = bytes[1].toUInt().toInt() and 0xFF or (bytes[2].toUInt().toInt() and 0xFF) shl 8
+            pr = (bytes[1].toUInt().toInt() and 0xFF) or (bytes[2].toUInt().toInt() and 0xFF) shl 8
             steps = bytes[3].toUInt().toInt() and 0xFF or (bytes[4].toUInt().toInt() and 0xFF shl 8) or (bytes[5].toUInt().toInt() and 0xFF shl 16) or (bytes[6].toUInt().toInt() and 0xFF shl 24)
             battery = bytes[7].toUInt().toInt()
             batteryState = bytes[8].toUInt().toString()
