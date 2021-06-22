@@ -98,8 +98,10 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
                 LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_BP_STATE => success")
                 //发送实时state : byte
-                val list  = KtBleFileList(bytes.content,device.name)
-                LiveEventBus.get(InterfaceEvent.BP2.EventBp2FileList).post(InterfaceEvent(model, list))
+                if(bytes.content.size>0){
+                    val list  = KtBleFileList(bytes.content,device.name)
+                    LiveEventBus.get(InterfaceEvent.BP2.EventBp2FileList).post(InterfaceEvent(model, list))
+                }
             }
 
             Bp2BleCmd.BPMCmd.CMD_FILE_READ_START -> {
