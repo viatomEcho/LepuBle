@@ -2,7 +2,7 @@ package com.viatom.ktble.ble.objs
 
 import android.util.Log
 import com.lepu.blepro.utils.toString
-
+//
 class KtBleFileList {
     var fileNum: Int
     var fileNameList : Array<String?>
