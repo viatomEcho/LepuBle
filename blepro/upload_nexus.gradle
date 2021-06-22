@@ -17,7 +17,7 @@ def REPOSITORY_URL = VERSION_NAME.toUpperCase().endsWith("-SNAPSHOT") ? SNAPSHOT
 def NEXUS_USERNAME = 'admin'
 def NEXUS_PASSWORD = 'cfabd50a-6e6e-4811-8f42-1ec2603dc3c9'
 
-afterEvaluate { project ->
+/*afterEvaluate { project ->
     uploadArchives {
         repositories {
             mavenDeployer {
@@ -56,4 +56,4 @@ afterEvaluate { project ->
         archives androidSourcesJar
 //        archives androidJavadocsJar
     }
-}
+}*/
