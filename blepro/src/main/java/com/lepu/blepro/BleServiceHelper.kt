@@ -194,9 +194,9 @@ class BleServiceHelper private constructor() {
      * @param needPair Boolean
      */
     @JvmOverloads
-    fun startScan(scanModel: Int, needPair: Boolean = false) {
+    fun startScan(scanModel: Int, needPair: Boolean = false, strictModel: Boolean = true) {
         if (!checkService()) return
-        bleService.startDiscover(intArrayOf(scanModel), needPair)
+        bleService.startDiscover(intArrayOf(scanModel), needPair, strictModel)
     }
 
     /**
@@ -207,6 +207,8 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         bleService.startDiscover(scanModel, needPair)
     }
+
+
 
 
     /**

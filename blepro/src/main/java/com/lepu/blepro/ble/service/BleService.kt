@@ -201,11 +201,15 @@ class BleService: LifecycleService() {
      * @param scanModel IntArray 本次扫描过滤的model
      * @param needPair Boolean 本次扫描是否需要发送配对Event通知
      * @param isReconnecting Boolean 本次扫描是否自来重连
+     * @param strictModel Boolean 严格模式,默认开启。不使用严格模式，则可扫描未被添加到vailFace中的model
+
      */
-    fun startDiscover(scanModel: IntArray, needPair: Boolean = false, isReconnecting :Boolean = false) {
+    fun startDiscover(scanModel: IntArray, needPair: Boolean = false, isReconnecting :Boolean = false, strictModel: Boolean = true) {
         LepuBleLog.d(tag, "start discover.....${vailFace.size()}, $isReconnecting")
         stopDiscover()
-        if (vailFace.isEmpty())return
+
+        if (strictModel)
+            if (vailFace.isEmpty())return
 
         BluetoothController.clear()
         this.needPair = needPair
@@ -352,12 +356,6 @@ class BleService: LifecycleService() {
                     device,
                     result.rssi
             )
-            if (vailFace.isEmpty()){
-                //切换设备 先断开连接 再clear interface
-                LepuBleLog.d(tag, "Warning: vailFace isEmpty!!")
-                stopDiscover()
-                return
-            }
 
             if (!filterResult(b)) return
 
@@ -381,28 +379,18 @@ class BleService: LifecycleService() {
                 LiveEventBus.get(EventMsgConst.Discovery.EventDeviceFound).post(b)
 
 
-
                 val isContains: Boolean = if(isReconnectByAddress) reconnectDeviceAddress?.contains(b.device.address) == true else reconnectDeviceName?.contains(b.name) == true
 
                 if (isReconnectScan && isContains){
                     stopDiscover()
+
+                    if (vailFace.isEmpty()){
+                        LepuBleLog.d(tag, "Warning: vailFace isEmpty!!")
+                        return
+                    }
                     vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
                 }
-//                else {
-//                    LepuBleLog.d(tag, "不在扫描目标内...")
-//                    if (isReconnectScan && isReconnectByAddress ){
-//                        reconnectDeviceAddress?.let {
-//                            for (i in it){
-//                                if (b.device.address == DfuUtil.getNewMac(i)){ //如果扫描到的是新蓝牙名，连接
-//
-//                                    LepuBleLog.d(tag, "找到了新蓝牙名设备， 去连接Updater")
-//                                    stopDiscover()
-//                                    vailFace.get(b.model)?.connect(this@BleService, b.device, isAutoReconnect = true, true)
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
+
 
             }
 
