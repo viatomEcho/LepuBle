@@ -32,6 +32,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_BPM = "BPM-188"; // 捷美瑞血压计
     public static final String BT_NAME_ER2 = "ER2";
     public static final String BT_NAME_PC100 = "PC-100"; //小企鹅后面 5位sn
+    public static final String BT_NAME_PC60FW = "PC-60F_SN";//6 OEM
 
 
     public static final int MODEL_UNRECOGNIZED = 0;
@@ -55,11 +56,12 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_ER2 = 18;
     public static final int MODEL_PC100 = 19;
     public static final int MODEL_BP2A = 20;
+    public static final int MODEL_PC60FW = 21;
 
 
     @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU,
             MODEL_ER1,MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL,
-            MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2MAX, MODEL_BPM,MODEL_BP2A})
+            MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2MAX, MODEL_BPM,MODEL_BP2A,MODEL_PC60FW})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 
@@ -70,6 +72,10 @@ public class Bluetooth implements Parcelable {
 
         if (deviceName == null || deviceName.length() == 0) {
             return MODEL_UNRECOGNIZED;
+        }
+
+        if (deviceName.contains(BT_NAME_PC60FW)) {
+            return Bluetooth.MODEL_PC60FW;
         }
 
         if (deviceName.split(" ").length == 0)
@@ -119,14 +125,6 @@ public class Bluetooth implements Parcelable {
                 return MODEL_UNRECOGNIZED;
         }
     }
-
-
-
-    public static final String[] DEVICE_MODEL_NAME = {"UNKNOW", "Checkme O2", "SnoreO2", "SleepO2", "O2Ring", "WearO2", "SleepU", "VBeat", "DuoEK", "Pulsebit EX", "Oxylink", "KidsO2", BT_NAME_FETAL, "BP2", "O2NCI", "KCA", "O2 Max"};
-    public static final String[] DEVICE_PRODUCT_NAME = {"UNKNOW", "Checkme O2", "SnoreO2", "SleepO2", "O2Ring", "WearO2", "SleepU", "VisualBeat", "DuoEK", "Pulsebit EX", "Oxylink", "KidsO2", "Babytone", "BP2", "O2NCI", "KCA", "O2 Max"};
-    public static final String[] DEVICE_MODEL_NAME_INTERNAL = {
-            "unknow", "ceo2", "snoreo2", "sleepo2", "o2ring", "wearo2", "sleepu", "er1", "er2", "pulsebit_ex", "oxylink", "kidso2", BT_NAME_FETAL, "BP2", "o2nci", "KCA", "o2max"
-    };
 
 
     @MODEL

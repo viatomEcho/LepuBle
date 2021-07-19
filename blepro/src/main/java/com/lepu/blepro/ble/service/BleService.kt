@@ -184,6 +184,15 @@ class BleService: LifecycleService() {
                 }
             }
 
+            Bluetooth.MODEL_PC60FW ,Bluetooth.MODEL_PC60FW-> {
+                PC60FwBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+
             else -> {
                 return throw Exception("BleService initInterfaces() 未配置此model:$m")
             }
