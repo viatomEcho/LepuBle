@@ -120,7 +120,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     interface PC60Fw{
         companion object{
-            const val EventPC60FwRtData = "com.lepu.ble.pc60fw.rt.data"
+            const val EventPC60FwRtDataParam = "com.lepu.ble.pc60fw.rt.data.param"
+            const val EventPC60FwRtDataWave = "com.lepu.ble.pc60fw.rt.data.wave"
             const val EventPC60FwBattery = "com.lepu.ble.pc60fw.battery"
         }
     }

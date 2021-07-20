@@ -48,7 +48,7 @@ class PC60FwBleResponse{
 
     @ExperimentalUnsignedTypes
     @Parcelize
-    class RtData constructor(var byteArray: ByteArray) : Parcelable {
+    class RtDataParam constructor(var byteArray: ByteArray) : Parcelable {
         var spo2: Byte
         var pr: Short
         var pi: Short
@@ -58,6 +58,17 @@ class PC60FwBleResponse{
             pr = toSignedShort(byteArray[6], byteArray[7])
             pi = (byteArray[8].toInt() and 0x7f).toShort()
             status =  byteArray[9]
+        }
+
+
+    }
+
+    @ExperimentalUnsignedTypes
+    @Parcelize
+    class RtDataWave(var byteArray: ByteArray) : Parcelable {
+        val waveData: ByteArray
+        init {
+            waveData = byteArray.copyOfRange(5, 10).toList().asSequence().map { (it.toInt() and 0x7f).toByte() }.toList().toByteArray()
         }
 
 

@@ -5,15 +5,10 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_BATTERY_LEVEL
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_SPO2_PARAM
-import com.lepu.blepro.ble.data.OxyDataController
+import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_SPO2_WAVE
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
-import com.lepu.blepro.utils.toHex
-import com.lepu.blepro.utils.toUInt
-import java.util.*
-import kotlin.experimental.inv
 
 
 class PC60FwBleInterface(model: Int): BleInterface(model) {
@@ -85,8 +80,15 @@ class PC60FwBleInterface(model: Int): BleInterface(model) {
 //        }
 
         if (response.token == TOKEN_PO_0F && response.type == TYPE_SPO2_PARAM){
-            PC60FwBleResponse.RtData(response.bytes).let {
-                LiveEventBus.get(InterfaceEvent.PC60Fw.EventPC60FwRtData).post(InterfaceEvent(model, it))
+            PC60FwBleResponse.RtDataParam(response.bytes).let {
+                LiveEventBus.get(InterfaceEvent.PC60Fw.EventPC60FwRtDataParam).post(InterfaceEvent(model, it))
+            }
+
+        }
+
+        if (response.token == TOKEN_PO_0F && response.type == TYPE_SPO2_WAVE){
+            PC60FwBleResponse.RtDataWave(response.bytes).let {
+                LiveEventBus.get(InterfaceEvent.PC60Fw.EventPC60FwRtDataWave).post(InterfaceEvent(model, it))
             }
 
         }

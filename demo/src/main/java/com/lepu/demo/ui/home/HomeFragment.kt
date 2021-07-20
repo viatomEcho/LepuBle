@@ -1,19 +1,16 @@
 package com.lepu.demo.ui.home
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.chad.library.adapter.base.listener.OnItemClickListener
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse
 import com.lepu.blepro.event.EventMsgConst
@@ -89,10 +86,10 @@ class HomeFragment : Fragment() {
             })
 
         // ------------------PC60Fw--------------------------
-        LiveEventBus.get(InterfaceEvent.PC60Fw.EventPC60FwRtData)
+        LiveEventBus.get(InterfaceEvent.PC60Fw.EventPC60FwRtDataParam)
             .observe(this, Observer {
                 it as InterfaceEvent
-                val rtData = it.data as PC60FwBleResponse.RtData
+                val rtData = it.data as PC60FwBleResponse.RtDataParam
                 Log.d("PC60-rt","spo2 = ${rtData.spo2}，pi = ${rtData.pi}, pr = ${rtData.pr}")
 
 
