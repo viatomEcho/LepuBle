@@ -225,20 +225,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         if (toConnectUpdater)
             LiveEventBus.get(EventMsgConst.Updater.EventBleConnected).post(true)
 
-        // 重连多个model时
-        if(BleServiceHelper.isReconnectingMulti) {
-            LepuBleLog.d("reconnectingMulti：检查是否还有未连接的设备")
-            val scanModel = BleServiceHelper.bleService.scanModel
-            val reconnectDeviceName = BleServiceHelper.bleService.reconnectDeviceName
-            scanModel?.let {
-                if ( reconnectDeviceName!= null){
-                    if (BleServiceHelper.hasUnConnected(it))
-                        BleServiceHelper.reconnect(it,
-                            reconnectDeviceName, this.toConnectUpdater
-                        ) else BleServiceHelper.isReconnectingMulti = false
-                }
-            }
-        }
+
 
 
     }
@@ -263,7 +250,23 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         if (isAutoReconnect){
             //重开扫描, 扫描该interface的设备
             LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnect")
-            BleServiceHelper.reconnect(model, device.name)
+
+            if (BleServiceHelper.isReconnectingMulti){
+               val models = ArrayList<Int>()
+               val names = ArrayList<String>()
+                BleServiceHelper.bleService.vailFace.let {
+                    for (x in 0 until it.size() ){
+                        if (!it[x].state){
+                            models.add(it[x].model)
+                            names.add(it[x].device.name)
+                        }
+                    }
+                }
+
+                BleServiceHelper.reconnect(models.toIntArray(), names.toTypedArray())
+            }else {
+                BleServiceHelper.reconnect(model, device.name)
+            }
         }
 
 

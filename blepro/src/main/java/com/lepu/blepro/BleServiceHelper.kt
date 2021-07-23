@@ -291,6 +291,7 @@ class BleServiceHelper private constructor() {
     fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress " )
         if (!checkService()) return
+
         bleService.reconnectByAddress( scanModel, macAddress, toConnectUpdater)
 
     }

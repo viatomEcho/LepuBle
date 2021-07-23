@@ -250,10 +250,10 @@ class BleService: LifecycleService() {
 
         if (vailFace.isEmpty())return
 
-//        if (scanModel.size != reconnectDeviceName.size){
-//            LepuBleLog.d(tag,"请检查重连model && name  size")
-//            return
-//        }
+        if (scanModel.size != reconnectDeviceName.size){
+            LepuBleLog.d(tag,"请检查重连model && name  size")
+            return
+        }
         var reScan = false
 
         if (BleServiceHelper.BleServiceHelper.hasUnConnected(scanModel)) {
@@ -261,7 +261,6 @@ class BleService: LifecycleService() {
             reScan = true
         }
         if (reScan) {
-            if (scanModel.size > 1) BleServiceHelper.BleServiceHelper.isReconnectingMulti = true
             this.reconnectDeviceName = reconnectDeviceName
             this.isReconnectByAddress = false
             this.toConnectUpdater = toConnectUpdater
@@ -281,10 +280,10 @@ class BleService: LifecycleService() {
 
         if (vailFace.isEmpty())return
 
-//        if (scanModel.size != reconnectDeviceAddress.size){
-//            LepuBleLog.d(tag,"请检查重连model && reconnectDeviceAddress  size")
-//            return
-//        }
+        if (scanModel.size != reconnectDeviceAddress.size){
+            LepuBleLog.d(tag,"请检查重连model && reconnectDeviceAddress  size")
+            return
+        }
         var reScan = false
 
         if (BleServiceHelper.BleServiceHelper.hasUnConnected(scanModel)) {
@@ -292,7 +291,6 @@ class BleService: LifecycleService() {
             reScan = true
         }
         if (reScan) {
-            if (scanModel.size > 1) BleServiceHelper.BleServiceHelper.isReconnectingMulti = true
             this.reconnectDeviceAddress = reconnectDeviceAddress
             this.isReconnectByAddress = true
             this.toConnectUpdater = toConnectUpdater
