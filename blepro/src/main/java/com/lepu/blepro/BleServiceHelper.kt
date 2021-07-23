@@ -197,6 +197,7 @@ class BleServiceHelper private constructor() {
     fun startScan(scanModel: Int, needPair: Boolean = false) {
         if (!checkService()) return
         bleService.startDiscover(intArrayOf(scanModel), needPair)
+
     }
 
     /**
@@ -291,6 +292,7 @@ class BleServiceHelper private constructor() {
     fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress " )
         if (!checkService()) return
+
         bleService.reconnectByAddress( scanModel, macAddress, toConnectUpdater)
 
     }
@@ -727,7 +729,9 @@ class BleServiceHelper private constructor() {
 
     }
 
-
+    fun setNeedPair(needPair : Boolean){
+        BleServiceHelper.bleService.needPair = needPair
+    }
 
 
 }
