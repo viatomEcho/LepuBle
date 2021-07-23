@@ -250,10 +250,10 @@ class BleService: LifecycleService() {
 
         if (vailFace.isEmpty())return
 
-        if (scanModel.size != reconnectDeviceName.size){
-            LepuBleLog.d(tag,"请检查重连model && name  size")
-            return
-        }
+//        if (scanModel.size != reconnectDeviceName.size){
+//            LepuBleLog.d(tag,"请检查重连model && name  size")
+//            return
+//        }
         var reScan = false
 
         if (BleServiceHelper.BleServiceHelper.hasUnConnected(scanModel)) {
@@ -281,10 +281,10 @@ class BleService: LifecycleService() {
 
         if (vailFace.isEmpty())return
 
-        if (scanModel.size != reconnectDeviceAddress.size){
-            LepuBleLog.d(tag,"请检查重连model && reconnectDeviceAddress  size")
-            return
-        }
+//        if (scanModel.size != reconnectDeviceAddress.size){
+//            LepuBleLog.d(tag,"请检查重连model && reconnectDeviceAddress  size")
+//            return
+//        }
         var reScan = false
 
         if (BleServiceHelper.BleServiceHelper.hasUnConnected(scanModel)) {
