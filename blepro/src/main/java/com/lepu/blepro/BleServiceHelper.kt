@@ -197,6 +197,7 @@ class BleServiceHelper private constructor() {
     fun startScan(scanModel: Int, needPair: Boolean = false) {
         if (!checkService()) return
         bleService.startDiscover(intArrayOf(scanModel), needPair)
+
     }
 
     /**
@@ -725,6 +726,10 @@ class BleServiceHelper private constructor() {
         }
 
 
+    }
+
+    fun setNeedPair(needPair : Boolean){
+        BleServiceHelper.bleService.needPair = needPair
     }
 
 
