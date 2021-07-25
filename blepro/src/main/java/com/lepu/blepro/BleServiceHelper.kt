@@ -45,10 +45,10 @@ class BleServiceHelper private constructor() {
      */
     var runRtConfig: SparseArray<Boolean> = SparseArray()
 
-    /**
-     * 多设备模式手动重连中
-     */
-    var isReconnectingMulti: Boolean = false
+//    /**
+//     * 多设备模式手动重连中
+//     */
+//    var isReconnectingMulti: Boolean = false
 
     companion object {
         const val tag: String = "BleServiceHelper"
@@ -262,11 +262,11 @@ class BleServiceHelper private constructor() {
     /**
      *  发起重连 允许扫描多个设备
      */
-    fun reconnect(scanModel: IntArray, name: Array<String>, toConnectUpdater: Boolean = false) {
+    fun reconnect(scanModel: IntArray, name: Array<String>, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnect " )
         if (!checkService()) return
 
-        bleService.reconnect(scanModel, name, toConnectUpdater)
+        bleService.reconnect(scanModel, name, needPair, toConnectUpdater)
 
     }
 
@@ -275,10 +275,10 @@ class BleServiceHelper private constructor() {
      * @param scanModel Int
      * @param name String
      */
-    fun reconnect(scanModel: Int, name: String, toConnectUpdater: Boolean = false) {
+    fun reconnect(scanModel: Int, name: String, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnect" )
         if (!checkService()) return
-        bleService.reconnect(intArrayOf(scanModel), arrayOf(name), toConnectUpdater)
+        bleService.reconnect(intArrayOf(scanModel), arrayOf(name),needPair, toConnectUpdater)
 
     }
 
@@ -289,11 +289,11 @@ class BleServiceHelper private constructor() {
      * @param macAddress Array<String>
      */
     @JvmOverloads
-    fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, toConnectUpdater: Boolean = false) {
+    fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, needPair: Boolean,  toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress " )
         if (!checkService()) return
 
-        bleService.reconnectByAddress( scanModel, macAddress, toConnectUpdater)
+        bleService.reconnectByAddress( scanModel, macAddress,needPair, toConnectUpdater)
 
     }
 
@@ -303,10 +303,10 @@ class BleServiceHelper private constructor() {
      * @param macAddress String
      */
     @JvmOverloads
-    fun reconnectByAddress(scanModel: Int, macAddress: String, toConnectUpdater: Boolean = false) {
+    fun reconnectByAddress(scanModel: Int, macAddress: String, needPair: Boolean = false,toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress" )
         if (!checkService()) return
-        bleService.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress), toConnectUpdater)
+        bleService.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress),needPair, toConnectUpdater)
 
     }
 
@@ -370,6 +370,23 @@ class BleServiceHelper private constructor() {
 //            }
         }
         LepuBleLog.d(tag, "没有未连接和已连接中的设备")
+        return false
+    }
+
+    fun hasUnConnected(): Boolean{
+        if (!checkService()) return false
+        LepuBleLog.d(tag, "into hasUnConnected...")
+        for (x in 0 until  bleService.vailFace.size() ){
+            bleService.vailFace[bleService.vailFace.keyAt(x)]?.let {
+                it.let {
+                    LepuBleLog.d(tag, "hasUnConnected  有未连接的设备")
+
+                    if (!it.state && !it.connecting) return true
+                }
+            }
+
+        }
+        LepuBleLog.d(tag, "hasUnConnected 没有未连接的设备 ")
         return false
     }
 
@@ -731,6 +748,18 @@ class BleServiceHelper private constructor() {
 
     fun setNeedPair(needPair : Boolean){
         BleServiceHelper.bleService.needPair = needPair
+    }
+
+    fun removeReconnectName(name: String){
+        if (bleService.reconnectDeviceName.contains(name)){
+            LepuBleLog.d(tag, "从重连名单中移除 $name")
+            bleService.reconnectDeviceName.remove(name)
+        }
+
+    }
+
+    fun setStrict(isStrict : Boolean){
+        bleService.isStrict =  isStrict
     }
 
 
