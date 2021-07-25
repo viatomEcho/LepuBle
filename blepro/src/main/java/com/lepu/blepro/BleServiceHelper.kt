@@ -45,10 +45,10 @@ class BleServiceHelper private constructor() {
      */
     var runRtConfig: SparseArray<Boolean> = SparseArray()
 
-    /**
-     * 多设备模式手动重连中
-     */
-    var isReconnectingMulti: Boolean = false
+//    /**
+//     * 多设备模式手动重连中
+//     */
+//    var isReconnectingMulti: Boolean = false
 
     companion object {
         const val tag: String = "BleServiceHelper"
@@ -370,6 +370,23 @@ class BleServiceHelper private constructor() {
 //            }
         }
         LepuBleLog.d(tag, "没有未连接和已连接中的设备")
+        return false
+    }
+
+    fun hasUnConnected(): Boolean{
+        if (!checkService()) return false
+        LepuBleLog.d(tag, "into hasUnConnected...")
+        for (x in 0 until  bleService.vailFace.size() ){
+            bleService.vailFace[bleService.vailFace.keyAt(x)]?.let {
+                it.let {
+                    LepuBleLog.d(tag, "hasUnConnected  有未连接的设备")
+
+                    if (!it.state && !it.connecting) return true
+                }
+            }
+
+        }
+        LepuBleLog.d(tag, "hasUnConnected 没有未连接的设备 ")
         return false
     }
 
@@ -731,6 +748,18 @@ class BleServiceHelper private constructor() {
 
     fun setNeedPair(needPair : Boolean){
         BleServiceHelper.bleService.needPair = needPair
+    }
+
+    fun removeReconnectName(name: String){
+        if (bleService.reconnectDeviceName.contains(name)){
+            LepuBleLog.d(tag, "从重连名单中移除 $name")
+            bleService.reconnectDeviceName.remove(name)
+        }
+
+    }
+
+    fun setStrict(isStrict : Boolean){
+        bleService.isStrict =  isStrict
     }
 
 
