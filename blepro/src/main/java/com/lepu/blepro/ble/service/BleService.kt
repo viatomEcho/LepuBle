@@ -50,7 +50,7 @@ import kotlin.collections.HashMap
  *
  */
 
-class BleService: LifecycleService() {
+open class BleService: LifecycleService() {
     
     val tag: String = "BleService"
 

@@ -247,6 +247,7 @@ class LpBleUtil {
         @JvmOverloads
         fun readFile(userId: String, fileName: String, model: Int, offset: Int = 0) {
             BleServiceHelper.BleServiceHelper.readFile(userId, fileName, model, offset)
+
         }
 
         /**
@@ -305,19 +306,6 @@ class LpBleUtil {
         }
 
 
-        /**
-         * 实时任务是否暂停中
-         * @param model Int
-         * @return Boolean
-         */
-        fun isRtStop(model: Int): Boolean{
-          return BleServiceHelper.BleServiceHelper.isRtStop(model)
-        }
-
-
-        fun stopService(application: Context){
-            BleService.stopService(application)
-        }
 
 
 
