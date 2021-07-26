@@ -53,8 +53,8 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
     override fun getRtData() {
         LepuBleLog.d(tag, "getRtData...")
-//       sendOxyCmd(OxyBleCmd.OXY_CMD_RT_DATA, OxyBleCmd.getRtWave())// 无法支持1.4.1之前获取pi
-       sendOxyCmd(OxyBleCmd.OXY_CMD_RT_PARAM_DATA, OxyBleCmd.getRtParam())
+       sendOxyCmd(OxyBleCmd.OXY_CMD_RT_DATA, OxyBleCmd.getRtWave())// 无法支持1.4.1之前获取pi
+//       sendOxyCmd(OxyBleCmd.OXY_CMD_RT_PARAM_DATA, OxyBleCmd.getRtParam())
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
