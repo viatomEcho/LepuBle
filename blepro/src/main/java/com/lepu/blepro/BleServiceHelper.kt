@@ -11,7 +11,6 @@ import android.util.SparseArray
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.*
-import com.lepu.blepro.ble.cmd.Er1BleCmd
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
@@ -19,6 +18,7 @@ import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
+
 
 /**
  * 单例的蓝牙服务帮助类，原则上只通过此类开放API
@@ -751,9 +751,14 @@ class BleServiceHelper private constructor() {
     }
 
     fun removeReconnectName(name: String){
-        if (bleService.reconnectDeviceName.contains(name)){
-            LepuBleLog.d(tag, "从重连名单中移除 $name")
-            bleService.reconnectDeviceName.remove(name)
+        val iterator = bleService.reconnectDeviceName.iterator()
+        while (iterator.hasNext()) {
+            val i = iterator.next()
+            if (i == name) {
+                iterator.remove()
+                LepuBleLog.d(tag, "从重连名单中移除 $name,  list = ${bleService.reconnectDeviceName.joinToString ()}")
+
+            }
         }
 
     }
