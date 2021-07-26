@@ -67,8 +67,10 @@ class PC60FwBleResponse{
     @Parcelize
     class RtDataWave(var byteArray: ByteArray) : Parcelable {
         val waveData: ByteArray
+        val waveIntData: IntArray
         init {
             waveData = byteArray.copyOfRange(5, 10).toList().asSequence().map { (it.toInt() and 0x7f).toByte() }.toList().toByteArray()
+            waveIntData =  byteArray.copyOfRange(5, 10).toList().asSequence().map { (it.toInt() and 0x7f)}.toList().toIntArray()
         }
 
 
