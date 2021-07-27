@@ -231,7 +231,7 @@ open class BleService: LifecycleService() {
         isDiscovery = true
 
         GlobalScope.launch {
-            delay(1000)
+            delay(3000)
             scanDevice(true)
         }
 
@@ -361,7 +361,8 @@ open class BleService: LifecycleService() {
                     LepuBleLog.d(tag, "scanDevice started")
                 }
             } else {
-                if (bluetoothAdapter?.isEnabled!!) {
+                if (bluetoothAdapter?.isEnabled!! && leScanCallback != null) {
+
                     leScanner?.stopScan(leScanCallback)
                 }
             }
@@ -444,35 +445,42 @@ open class BleService: LifecycleService() {
         override fun onBatchScanResults(results: List<ScanResult>) {
         }
 
+
+
         override fun onScanFailed(errorCode: Int) {
-            LepuBleLog.d(tag, "scan error: $errorCode")
+            LepuBleLog.e(tag, "scan error: $errorCode")
             if (errorCode == SCAN_FAILED_ALREADY_STARTED) {
-                LepuBleLog.d(tag, "already start")
-            }
-            if (errorCode == SCAN_FAILED_FEATURE_UNSUPPORTED) {
-                LepuBleLog.d(tag, "scan settings not supported")
-            }
-            if (errorCode == 6) {
-                LepuBleLog.d(tag, "too frequently")
-            }
-            if (errorCode == 2){ // 连接超时，去重连扫描时候可能碰到，解决办法重启蓝牙 待验证
-                LepuBleLog.d(tag, "去重启蓝牙")
-                bluetoothAdapter?.let {
-                    it.disable()
-                    LepuBleLog.d(tag, "关闭蓝牙中...")
-                    GlobalScope.launch {
-                        delay(1000L)
-                        LepuBleLog.d(tag, "1秒后 ble state = ${it.state}")
-                        if(it.state == BluetoothAdapter.STATE_OFF){
-                            it.enable()
-                            delay(1000L)
-                            scanDevice(true)
-                        }
-                    }
-                    runBlocking { delay(1000L) }
-                }
+                LepuBleLog.e(tag, "already start")
 
             }
+            if (errorCode == SCAN_FAILED_FEATURE_UNSUPPORTED) {
+                LepuBleLog.e(tag, "scan settings not supported")
+            }
+            if (errorCode == 6) {
+                LepuBleLog.e(tag, "too frequently")
+            }
+            if (errorCode == 2){ // 连接超时，去重连扫描时候可能碰到，解决办法重启蓝牙 待验证
+                LepuBleLog.e(tag, "去重启蓝牙")
+                whenScanFail()
+
+            }
+        }
+    }
+
+    fun whenScanFail(){
+        bluetoothAdapter?.let {
+            it.disable()
+            LepuBleLog.d(tag, "关闭蓝牙中...")
+            GlobalScope.launch {
+                delay(1000L)
+                LepuBleLog.d(tag, "1秒后 ble state = ${it.state}")
+                if(it.state == BluetoothAdapter.STATE_OFF){
+                    it.enable()
+                    delay(1000L)
+                    scanDevice(true)
+                }
+            }
+            runBlocking { delay(1000L) }
         }
     }
 

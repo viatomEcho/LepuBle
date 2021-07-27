@@ -49,5 +49,5 @@ ext {
     compileSdkVersion = 29
     buildToolsVersion = "29.0.2"
     versionCode = 1
-    versionName = "1.0.23.15"
+    versionName = "1.0.23.16"
 }
