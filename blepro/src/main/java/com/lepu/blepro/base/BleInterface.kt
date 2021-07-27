@@ -253,6 +253,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
                 //重开扫描, 扫描该interface的设备
                 LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnect")
                 BleServiceHelper.reconnect(model, device.name)
+            }else{
+                BleServiceHelper.removeReconnectName(it)
             }
 
         }
