@@ -347,6 +347,8 @@ open class BleService: LifecycleService() {
     private fun scanDevice(enable: Boolean) {
         LepuBleLog.d(tag, "scanDevice => $enable")
 
+
+
         GlobalScope.launch {
 
             if (enable) {
@@ -447,6 +449,8 @@ open class BleService: LifecycleService() {
 
 
 
+
+
         override fun onScanFailed(errorCode: Int) {
             LepuBleLog.e(tag, "scan error: $errorCode")
             if (errorCode == SCAN_FAILED_ALREADY_STARTED) {
@@ -458,12 +462,13 @@ open class BleService: LifecycleService() {
             }
             if (errorCode == 6) {
                 LepuBleLog.e(tag, "too frequently")
+
             }
             if (errorCode == 2){ // 连接超时，去重连扫描时候可能碰到，解决办法重启蓝牙 待验证
                 LepuBleLog.e(tag, "去重启蓝牙")
-                whenScanFail()
 
             }
+            whenScanFail()
         }
     }
 
