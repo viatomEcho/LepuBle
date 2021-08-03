@@ -55,11 +55,13 @@ class OxyBleResponse{
                 var temp = ByteUtils.byte2UInt(waveByte[i])
                 if (temp == 156) {
                     if (i==0) {
-                        temp = ByteUtils.byte2UInt(waveByte[i+1])
+                        if ((i+1) < len)
+                          temp = ByteUtils.byte2UInt(waveByte[i+1])
                     } else if (i == len-1) {
                         temp = ByteUtils.byte2UInt(waveByte[i-1])
                     } else {
-                        temp = (ByteUtils.byte2UInt(waveByte[i-1]) + ByteUtils.byte2UInt(waveByte[i+1]))/2
+                        if ((i+1) < len)
+                            temp = (ByteUtils.byte2UInt(waveByte[i-1]) + ByteUtils.byte2UInt(waveByte[i+1]))/2
                     }
                 }
 

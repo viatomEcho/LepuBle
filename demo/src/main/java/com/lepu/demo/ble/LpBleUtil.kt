@@ -6,6 +6,8 @@ import android.content.Context
 import android.util.Log
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
+import com.lepu.blepro.ble.Bp2BleInterface
+import com.lepu.blepro.ble.cmd.Bp2BleCmd
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.objs.Bluetooth
@@ -306,11 +308,10 @@ class LpBleUtil {
         }
 
 
+        fun bp2SwitchState(model: Int, state: Int){
+           BleServiceHelper.BleServiceHelper.bp2SwitchState(model, state)
 
-
-
-
-
+        }
 
 
 

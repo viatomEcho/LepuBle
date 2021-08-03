@@ -15,7 +15,10 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.afollestad.materialdialogs.DialogAction
 import com.afollestad.materialdialogs.MaterialDialog
+import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
+import com.lepu.blepro.observer.BIOL
 import com.lepu.demo.ble.BleSO
 import com.lepu.demo.ble.LpBleUtil
 import com.permissionx.guolindev.PermissionX
@@ -43,6 +46,7 @@ class MainActivity : AppCompatActivity() {
 
 
         needPermission()
+
 
     }
 
@@ -87,12 +91,13 @@ class MainActivity : AppCompatActivity() {
         LpBleUtil.getServiceHelper()
             .initLog(BuildConfig.DEBUG)
             .initModelConfig(SparseArray<Int>().apply {
-                this.put(Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC60FW)
+                this.put(Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2)
             }) // 配置要支持的设备
             .initService(
                 application,
                 BleSO.getInstance(application)
             ) //必须在initModelConfig initRawFolder之后调用
+
     }
 
 

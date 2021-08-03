@@ -10,6 +10,7 @@ import com.lepu.blepro.ble.cmd.Bp2BleCmd.BPMCmd.*
 import com.lepu.blepro.ble.cmd.Bp2BleResponse
 import com.lepu.blepro.ble.data.Bp2BleRtState
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.CrcUtil.calCRC8
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
@@ -160,21 +161,6 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             Bp2BleCmd.BPMCmd.CMD_BP2_SET_SWITCHER_STATE ->{
                 //心跳音开关
                 if (bytes.type != 0x01.toByte()) {
@@ -204,17 +190,36 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 }
             }
 
+            Bp2BleCmd.BPMCmd.SWITCH_STATE ->{
+                //切换状态
+                LiveEventBus.get(InterfaceEvent.BP2.EventBpSwitchState).post(InterfaceEvent(model, true))
+            }
+
 
 
         }
     }
 
+
+    /**
+     * 0：进入血压测量
+     * 1：进入心电测量
+     * 2：进入历史回顾
+     * 3：进入开机预备状态
+     * 4：关机
+     * 5：进入理疗模式
+     */
+    fun switchState(state: Int){
+        LepuBleLog.e("SWITCH_STATE===$state")
+
+        sendCmd(Bp2BleCmd.BPMCmd.switchState(state))
+    }
+
+
     fun startBp() {
-        LepuBleLog.d(tag, "getInfo...")
         sendCmd(Bp2BleCmd.getCmd(Bp2BleCmd.BPMCmd.MSG_TYPE_START_BP))
     }
      fun stopBp() {
-        LepuBleLog.d(tag, "getInfo...")
         sendCmd(Bp2BleCmd.getCmd(Bp2BleCmd.BPMCmd.MSG_TYPE_STOP_BP))
     }
 

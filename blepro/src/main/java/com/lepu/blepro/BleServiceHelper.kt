@@ -775,5 +775,13 @@ class BleServiceHelper private constructor() {
        return bleService.isStrict
     }
 
+    fun bp2SwitchState(model: Int, state: Int){
+        getInterface(model)?.let {
+            it as Bp2BleInterface
+            it.switchState(state)
+        }
+
+    }
+
 
 }

@@ -12,18 +12,21 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.ble.cmd.Bp2BleCmd
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
+import com.lepu.blepro.observer.BIOL
+import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.demo.R
 import com.lepu.demo.ble.DeviceAdapter
 import com.lepu.demo.ble.LpBleUtil
 
 
-val SCAN_MODELS: IntArray = intArrayOf(Bluetooth.MODEL_PC60FW)
-class HomeFragment : Fragment() {
+val SCAN_MODELS: IntArray = intArrayOf(Bluetooth.MODEL_BP2)
+class HomeFragment : Fragment(), BleChangeObserver{
 
     private lateinit var homeViewModel: HomeViewModel
 
@@ -31,6 +34,14 @@ class HomeFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initEvent()
+        // 当BleService onServiceConnected执行后发出通知 蓝牙sdk 初始化完成
+        LiveEventBus.get(EventMsgConst.Ble.EventServiceConnectedAndInterfaceInit).observeSticky(this, Observer {
+
+            lifecycle.addObserver(BIOL(this, SCAN_MODELS))
+
+        })
+
+
     }
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -94,5 +105,25 @@ class HomeFragment : Fragment() {
 
 
             })
+
+        //bp2 同步时间
+        LiveEventBus.get(InterfaceEvent.BP2.EventBp2SyncTime)
+            .observe(this, Observer{
+                it as InterfaceEvent
+                if (it.data as Boolean)
+                    LpBleUtil.bp2SwitchState(Bluetooth.MODEL_BP2, Bp2BleCmd.SwitchState.ENTER_BP)
+
+            })
+
+
+
+    }
+
+    override fun onBleStateChanged(model: Int, state: Int) {
+
+        if (state == LpBleUtil.State.CONNECTED){
+            LpBleUtil.startRtTask(Bluetooth.MODEL_BP2)
+
+        }
     }
 }

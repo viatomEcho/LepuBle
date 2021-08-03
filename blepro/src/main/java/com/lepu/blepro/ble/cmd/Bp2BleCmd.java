@@ -19,6 +19,8 @@ public class Bp2BleCmd {
     public final static int SET_TIME = 0xEC;
     private static int seqNo = 0;
 
+
+
     private static void addNo() {
         seqNo++;
         if (seqNo >= 255) {
@@ -31,7 +33,14 @@ public class Bp2BleCmd {
     }
 
 
-
+    public static class SwitchState {
+        public final static int ENTER_BP = 0;
+        public final static int ENTER_ECG = 1;
+        public final static int ENTER_HISTORY = 2;
+        public final static int ENTER_ON = 3;
+        public final static int ENTER_OFF = 4;
+        public final static int ENTER_FISIOT = 5;
+    }
 
 
     public static class BPMCmd {
@@ -47,6 +56,16 @@ public class Bp2BleCmd {
         // data = state + wave
         public final static byte CMD_BP2_RT_DATA = (byte) 0x08;
         public final static byte CMD_BP2_RT_STATE = (byte) 0x06;
+
+        /**
+         * 0：进入血压测量
+         * 1：进入心电测量
+         * 2：进入历史回顾
+         * 3：进入开机预备状态
+         * 4：关机
+         * 5：进入理疗模式
+         */
+        public static byte SWITCH_STATE = (byte)0x09;//
 
         // heartbeat sound
         public final static byte CMD_BP2_SET_SWITCHER_STATE = (byte) 0x0B;
@@ -84,6 +103,25 @@ public class Bp2BleCmd {
             }
         }
 
+
+
+        public static byte[] switchState(int state) {
+            int len = 1;
+
+            byte[] cmd = new byte[8+len];
+            cmd[0] = (byte) 0xA5;
+            cmd[1] = (byte) SWITCH_STATE;
+            cmd[2] = (byte) ~SWITCH_STATE;
+            cmd[3] = (byte) 0x00;
+            cmd[4] = (byte) seqNo;
+            cmd[5] = (byte) 0x01;
+            cmd[6] = (byte) 0x00;
+            cmd[7] = (byte) state;
+            cmd[8] = BleCRC.calCRC8(cmd);
+
+            addNo();
+            return cmd;
+        }
 
         public static byte[] getInfo() {
             int len = 0;

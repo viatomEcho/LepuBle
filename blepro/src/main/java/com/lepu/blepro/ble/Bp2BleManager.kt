@@ -47,7 +47,7 @@ class Bp2BleManager(context: Context): BaseBleManager(context) {
         if (!isUpdater)
             syncTime()
             //            syncTime()
-        LepuBleLog.d("BpmBleManager inited ")
+        LepuBleLog.d("Bp2BleManager inited ")
     }
     private fun syncTime() {
         sendCmd(Bp2BleCmd.getCmd(Bp2BleCmd.BPMCmd.MSG_TYPE_SET_TIME));

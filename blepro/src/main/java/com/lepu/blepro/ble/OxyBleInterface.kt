@@ -233,6 +233,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     }
 
 
+
     override fun syncTime() {
         sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.syncTime())
     }
