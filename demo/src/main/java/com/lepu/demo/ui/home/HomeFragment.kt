@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.Bp2BleCmd
+import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
@@ -25,7 +26,7 @@ import com.lepu.demo.ble.DeviceAdapter
 import com.lepu.demo.ble.LpBleUtil
 
 
-val SCAN_MODELS: IntArray = intArrayOf(Bluetooth.MODEL_BP2)
+val SCAN_MODELS: IntArray = intArrayOf(Bluetooth.MODEL_O2RING)
 class HomeFragment : Fragment(), BleChangeObserver{
 
     private lateinit var homeViewModel: HomeViewModel
@@ -77,6 +78,7 @@ class HomeFragment : Fragment(), BleChangeObserver{
 
                 activity?.applicationContext?.let { it1 ->
                     LpBleUtil.connect(it1, it as Bluetooth)
+                    LpBleUtil.stopScan()
 
                 }
 
@@ -115,6 +117,25 @@ class HomeFragment : Fragment(), BleChangeObserver{
 
             })
 
+        // o2ring 同步时间
+        LiveEventBus.get(InterfaceEvent.Oxy.EventOxySyncDeviceInfo)
+            .observe(this, Observer{
+                LpBleUtil.startRtTask(Bluetooth.MODEL_O2RING)
+
+            })
+
+        // o2ring ppg
+        LiveEventBus.get(InterfaceEvent.Oxy.EventOxyPpgData)
+            .observe(this, Observer{
+                it as InterfaceEvent
+                val ppgData = it.data as OxyBleResponse.PPGData
+                ppgData.rawData.let { data ->
+                    Log.d("o2ring ppg", "ir = ${data.ir}, red = ${data.red}, motion = ${data.motion}")
+                }
+
+
+            })
+
 
 
     }
@@ -122,7 +143,9 @@ class HomeFragment : Fragment(), BleChangeObserver{
     override fun onBleStateChanged(model: Int, state: Int) {
 
         if (state == LpBleUtil.State.CONNECTED){
-            LpBleUtil.startRtTask(Bluetooth.MODEL_BP2)
+            if (SCAN_MODELS.contains(Bluetooth.MODEL_BP2))
+                 LpBleUtil.startRtTask(Bluetooth.MODEL_BP2)
+
 
         }
     }
