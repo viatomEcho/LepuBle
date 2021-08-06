@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
         LpBleUtil.getServiceHelper()
             .initLog(BuildConfig.DEBUG)
             .initModelConfig(SparseArray<Int>().apply {
-                this.put(Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2)
+                this.put(Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2RING)
             }) // 配置要支持的设备
             .initService(
                 application,

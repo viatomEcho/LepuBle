@@ -227,7 +227,19 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return null
 
         val vailFace = bleService.vailFace
-        LepuBleLog.e(tag, "getInterface: getInterface => currentModel：$model, vailFaceSize：${vailFace.size()}, curIsNUll = ${vailFace.get(model) == null}")
+        if (vailFace == null) {
+            LepuBleLog.e(
+                tag,
+                "getInterface: getInterface => currentModel：$model, vailFaceSize：${vailFace.size()}, curIsNUll = ${vailFace.get(
+                    model
+                ) == null}"
+            )
+        }else {
+            LepuBleLog.d(
+                tag,
+                "getInterface: getInterface => currentModel：$model, vailFaceSize：${vailFace.size()}}"
+            )
+        }
         return vailFace.get(model)
     }
 
