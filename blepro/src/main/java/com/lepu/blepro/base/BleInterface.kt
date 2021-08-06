@@ -172,8 +172,13 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         if (connecting || state) {
             return
         }
+        if (!isRtStop){
+            stopRtTask()
+        }
+
         LepuBleLog.d(tag, "try connect: ${device.name}，isAutoReconnect = $isAutoReconnect, toConnectUpdater = $toConnectUpdater")
         this.device = device
+
 
         this.isAutoReconnect = isAutoReconnect
         this.toConnectUpdater = toConnectUpdater

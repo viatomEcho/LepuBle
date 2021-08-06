@@ -259,6 +259,8 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
     override fun onDeviceReady(device: BluetoothDevice) {
         super.onDeviceReady(device)
+        clearTimeout()
+
         syncTime()
     }
 
