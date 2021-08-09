@@ -26,6 +26,8 @@ public class Bp2BleCmd {
         if (seqNo >= 255) {
             seqNo = 0;
         }
+
+
     }
 
     public static byte[] getCmd(int msgType) {

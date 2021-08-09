@@ -187,11 +187,23 @@ class OxyBleResponse{
     @Parcelize
     class PPGData constructor(var bytes: ByteArray) : Parcelable {
         var len: Int
-        var rawData: PpgRawData
+        var rawDataBtyes: ByteArray
+        var rawDataArray: Array<PpgRawData?>
 
         init {
             len = toUInt(bytes.copyOfRange(0, 2))
-            rawData = PpgRawData(bytes.copyOfRange(2, len + 2))
+            rawDataBtyes =  bytes.copyOfRange(2, bytes.size)
+            rawDataArray = arrayOfNulls(len)
+            for (i in 0  until len ){
+                if (bytes.size < (i * 9) + 11) break
+
+                PpgRawData(bytes.copyOfRange(2 + (i * 9), (i * 9) + 11 )).let {
+                    rawDataArray[i] = it
+                }
+            }
+
+
+
         }
     }
 

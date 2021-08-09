@@ -129,8 +129,17 @@ class HomeFragment : Fragment(), BleChangeObserver{
             .observe(this, Observer{
                 it as InterfaceEvent
                 val ppgData = it.data as OxyBleResponse.PPGData
-                ppgData.rawData.let { data ->
-                    Log.d("o2ring ppg", "ir = ${data.ir}, red = ${data.red}, motion = ${data.motion}")
+                ppgData.let { data ->
+                    Log.d("o2ring ppg", "len  = ${data.len}")
+                    Log.d("o2ring ppg", "rawDataBytes  = ${data.rawDataBtyes.joinToString() }}")
+                    data.rawDataArray.let { ar->
+                        for (d in ar){
+                            if (d != null) {
+                                Log.d("o2ring ppg", "ir = ${d.ir}, red= ${d.red}, motion = ${d.motion}")
+                            }
+
+                        }
+                    }
                 }
 
 
