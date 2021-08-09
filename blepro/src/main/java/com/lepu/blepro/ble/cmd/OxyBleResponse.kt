@@ -204,7 +204,7 @@ class OxyBleResponse{
         init {
             ir = toUInt(bytes.copyOfRange(0, 4))
             red = toUInt(bytes.copyOfRange(4, 8))
-            motion = bytes[8].toUInt().toInt()
+            motion = toUInt(bytes.copyOfRange(8, 10))
 
         }
 

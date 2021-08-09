@@ -169,8 +169,11 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             OxyBleCmd.OXY_CMD_PPG_RT_DATA -> {
                 //ppg
                 clearTimeout()
-                val ppgData = OxyBleResponse.PPGData(response.content)
-                LiveEventBus.get(InterfaceEvent.Oxy.EventOxyPpgData).post(InterfaceEvent(model, ppgData))
+                if (response.content.size > 9) {
+                    val ppgData = OxyBleResponse.PPGData(response.content)
+                    LiveEventBus.get(InterfaceEvent.Oxy.EventOxyPpgData)
+                        .post(InterfaceEvent(model, ppgData))
+                }
             }
 
             OxyBleCmd.OXY_CMD_READ_CONTENT -> {
