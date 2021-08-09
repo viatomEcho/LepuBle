@@ -131,7 +131,7 @@ class HomeFragment : Fragment(), BleChangeObserver{
                 val ppgData = it.data as OxyBleResponse.PPGData
                 ppgData.let { data ->
                     Log.d("o2ring ppg", "len  = ${data.len}")
-                    Log.d("o2ring ppg", "rawDataBytes  = ${data.rawDataBtyes.joinToString() }}")
+                    Log.d("o2ring ppg", "rawDataBytes  = ${data.rawDataBytes.joinToString() }}")
                     data.rawDataArray.let { ar->
                         for (d in ar){
                             if (d != null) {
@@ -140,6 +140,8 @@ class HomeFragment : Fragment(), BleChangeObserver{
 
                         }
                     }
+
+
                 }
 
 

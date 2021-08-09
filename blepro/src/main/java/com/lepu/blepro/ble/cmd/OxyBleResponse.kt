@@ -1,5 +1,4 @@
 package com.lepu.blepro.ble.cmd
-import android.os.Parcel
 import android.os.Parcelable
 import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.utils.ByteUtils
@@ -187,22 +186,31 @@ class OxyBleResponse{
     @Parcelize
     class PPGData constructor(var bytes: ByteArray) : Parcelable {
         var len: Int
-        var rawDataBtyes: ByteArray
+        var rawDataBytes: ByteArray
+
         var rawDataArray: Array<PpgRawData?>
+        var irArray: Array<Int?>
+        var redArray: Array<Int?>
+        var motionArray: Array<Int?>
 
         init {
             len = toUInt(bytes.copyOfRange(0, 2))
-            rawDataBtyes =  bytes.copyOfRange(2, bytes.size)
+            rawDataBytes =  bytes.copyOfRange(2, bytes.size)
             rawDataArray = arrayOfNulls(len)
+            irArray = arrayOfNulls(len)
+            redArray = arrayOfNulls(len)
+            motionArray = arrayOfNulls(len)
             for (i in 0  until len ){
                 if (bytes.size < (i * 9) + 11) break
 
                 PpgRawData(bytes.copyOfRange(2 + (i * 9), (i * 9) + 11 )).let {
                     rawDataArray[i] = it
+
+                    irArray[i] = it.ir
+                    redArray[i] = it.red
+                    motionArray[i] = it.motion
                 }
             }
-
-
 
         }
     }
