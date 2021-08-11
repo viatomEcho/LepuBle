@@ -2,10 +2,12 @@ package com.lepu.demo.ui.home
 
 import android.os.Bundle
 import android.util.Log
+import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -24,12 +26,29 @@ import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.demo.R
 import com.lepu.demo.ble.DeviceAdapter
 import com.lepu.demo.ble.LpBleUtil
+import com.lepu.demo.util.DateUtil
+import com.lepu.demo.util.FileUtil
+import com.lepu.demo.util.SdLocal
+import java.util.*
 
 
-val SCAN_MODELS: IntArray = intArrayOf(Bluetooth.MODEL_O2RING)
+val CURRENT_MODEL: Int = Bluetooth.MODEL_O2RING
+val FILE_PPG_O2RING: Int = 0
+
+val SCAN_MODELS: IntArray = intArrayOf(CURRENT_MODEL)
 class HomeFragment : Fragment(), BleChangeObserver{
 
     private lateinit var homeViewModel: HomeViewModel
+
+    var o2ringPpg: ByteArray = ByteArray(0)
+
+    var stopCollect: Boolean = false
+    var collectStartTime: Long = 0L
+    var collectEndTime: Long = 0L
+
+    var rtFilePath: SparseArray<String> = SparseArray()
+
+
 
     private lateinit var adapter: DeviceAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +81,22 @@ class HomeFragment : Fragment(), BleChangeObserver{
 
         scan.setOnClickListener {
             LpBleUtil.startScan(SCAN_MODELS)
+            clearO2ringPpg()
+            stopCollect = false
+        }
+
+        val startCollect: TextView = root.findViewById(R.id.start_collect)
+        startCollect.setOnClickListener{
+           startCollectPpg()
+
+        }
+
+
+        val stopCollect: TextView = root.findViewById(R.id.stop_collect)
+        stopCollect.setOnClickListener{
+           stopCollectPpg()
+
+
         }
 
         val rcv = root.findViewById<RecyclerView>(R.id.rcv)
@@ -86,6 +121,7 @@ class HomeFragment : Fragment(), BleChangeObserver{
         }
 
     }
+
 
 
 
@@ -120,8 +156,8 @@ class HomeFragment : Fragment(), BleChangeObserver{
         // o2ring 同步时间
         LiveEventBus.get(InterfaceEvent.Oxy.EventOxySyncDeviceInfo)
             .observe(this, Observer{
-                LpBleUtil.startRtTask(Bluetooth.MODEL_O2RING)
-
+                Toast.makeText(requireContext(), "o2ring 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.startRtTask(CURRENT_MODEL)
             })
 
         // o2ring ppg
@@ -130,16 +166,20 @@ class HomeFragment : Fragment(), BleChangeObserver{
                 it as InterfaceEvent
                 val ppgData = it.data as OxyBleResponse.PPGData
                 ppgData.let { data ->
-                    Log.d("o2ring ppg", "len  = ${data.len}")
-                    Log.d("o2ring ppg", "rawDataBytes  = ${data.rawDataBytes.joinToString() }}")
-                    data.rawDataArray.let { ar->
-                        for (d in ar){
-                            if (d != null) {
-                                Log.d("o2ring ppg", "ir = ${d.ir}, red= ${d.red}, motion = ${d.motion}")
-                            }
 
-                        }
-                    }
+                    Log.d("ppg", "len  = ${data.rawDataBytes.size}")
+                    if (!stopCollect) collectRtData(data.rawDataBytes)
+
+//                    Log.d("o2ring ppg", "rawDataBytes  = ${data.rawDataBytes.joinToString() }}")
+
+//                    data.rawDataArray.let { ar->
+//                        for (d in ar){
+//                            if (d != null) {
+//                                Log.d("o2ring ppg", "ir = ${d.ir}, red= ${d.red}, motion = ${d.motion}")
+//                            }
+//
+//                        }
+//                    }
 
 
                 }
@@ -150,14 +190,78 @@ class HomeFragment : Fragment(), BleChangeObserver{
 
 
     }
+    fun startCollectPpg(){
+
+        stopCollect = false
+
+        collectStartTime = System.currentTimeMillis()
+    }
+    fun stopCollectPpg(){
+        stopCollect = true
+        collectEndTime = System.currentTimeMillis()
+        //File
+        if (initExportFilePath()){
+            FileUtil.saveFile(rtFilePath.get(FILE_PPG_O2RING), o2ringPpg, false)
+        }
+        clearO2ringPpg()
+
+
+    }
+    /**
+     * 初始化本地文件地址
+     */
+    fun initExportFilePath(): Boolean {
+        if (collectStartTime == 0L || collectEndTime == 0L) {
+            return false
+        }
+        try {
+            val endTime = DateUtil.stringFromDate(Date(collectEndTime), "yyyyMMddHHmmss")
+
+            DateUtil.stringFromDate(Date(collectStartTime), "yyyyMMddHHmmss").let {
+                SdLocal.getDataDatPath(context, "${it}_${endTime}_o2ring_ppg").let { p ->
+                    rtFilePath.put(FILE_PPG_O2RING, p)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+        return true
+    }
+
+    /**
+     * 收集各个设备实时数组
+     */
+    fun collectRtData(rtData: ByteArray) {
+        o2ringPpg = addByteArrayData(o2ringPpg, rtData)
+
+//        Log.d("o2ring ppg", "size  = ${o2ringPpg.size}")
+
+
+    }
+    private fun addByteArrayData(oldData: ByteArray, feed: ByteArray): ByteArray {
+        return ByteArray(oldData.size + feed.size).apply {
+            oldData.copyInto(this)
+            feed.copyInto(this, oldData.size)
+        }
+    }
+
 
     override fun onBleStateChanged(model: Int, state: Int) {
 
         if (state == LpBleUtil.State.CONNECTED){
-            if (SCAN_MODELS.contains(Bluetooth.MODEL_BP2))
-                 LpBleUtil.startRtTask(Bluetooth.MODEL_BP2)
-
 
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+       clearO2ringPpg()
+    }
+
+    fun clearO2ringPpg(){
+        o2ringPpg = ByteArray(0)
+        collectStartTime = 0L
+        collectEndTime = 0L
     }
 }

@@ -7,6 +7,7 @@ import com.lepu.blepro.base.BaseBleManager
 import com.lepu.blepro.ble.cmd.Er2BleCmd
 import com.lepu.blepro.ble.cmd.OxyBleCmd
 import com.lepu.blepro.utils.LepuBleLog
+import no.nordicsemi.android.ble.PhyRequest
 import java.util.*
 
 /**
@@ -24,7 +25,7 @@ class OxyBleManager(context: Context): BaseBleManager(context) {
 
     override fun initReqQueue() {
         beginAtomicRequestQueue()
-            .add(requestMtu(23) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
+            .add(requestMtu(247) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
                 .with { device: BluetoothDevice?, mtu: Int ->
                     log(
                         Log.INFO,
@@ -36,11 +37,13 @@ class OxyBleManager(context: Context): BaseBleManager(context) {
                         Log.WARN,
                         "Requested MTU not supported: $status"
                     )
-                }) //                    .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
+             })
+            .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED))
             //                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
             //                    .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
             //                    .add(sleep(500))
             .add(enableNotifications(notify_char))
+
             .done { device: BluetoothDevice? ->
                 log(
                     Log.INFO,

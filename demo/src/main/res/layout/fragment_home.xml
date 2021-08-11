@@ -13,8 +13,32 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/start_collect"
         android:text="扫描"
+        />
+
+    <Button
+        android:id="@+id/start_collect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/scan"
+        app:layout_constraintBottom_toBottomOf="@id/scan"
+        app:layout_constraintStart_toEndOf="@id/scan"
+        app:layout_constraintEnd_toEndOf="@id/stop_collect"
+        android:layout_marginStart="20dp"
+        android:text="开始采集"
+        />
+
+    <Button
+        android:id="@+id/stop_collect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/scan"
+        app:layout_constraintBottom_toBottomOf="@id/scan"
+        app:layout_constraintStart_toEndOf="@id/start_collect"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="20dp"
+        android:text="结束采集"
         />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcv"

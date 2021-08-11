@@ -164,7 +164,7 @@ public abstract class BaseBleManager extends BleManager {
     public void setNotify() {
         setNotificationCallback(notify_char)
                 .with((device, data) -> {
-//                        LogUtils.d(device.getName() + " received: " + ByteArrayKt.bytesToHex(data.getValue()));
+                    LepuBleLog.d(TAG,device.getName() + "received==" + ByteArrayKt.bytesToHex(data.getValue()) + "size =" + ByteArrayKt.bytesToHex(data.getValue()).length());
                     listener.onNotify(device, data);
                 });
     }
@@ -172,7 +172,7 @@ public abstract class BaseBleManager extends BleManager {
     public abstract  void initReqQueue();
 
     public void sendCmd(byte[] bytes) {
-        LepuBleLog.d("BaseBleManager send: " + ByteArrayKt.bytesToHex(bytes));
+        LepuBleLog.d(TAG,"BaseBleManager send: " + ByteArrayKt.bytesToHex(bytes));
         writeCharacteristic(write_char, bytes)
                 .split()
                 .done(device -> {
