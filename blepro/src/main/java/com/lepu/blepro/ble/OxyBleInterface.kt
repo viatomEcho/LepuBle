@@ -41,8 +41,8 @@ class OxyBleInterface(model: Int): BleInterface(model) {
         manager.setNotifyListener(this)
         manager.connect(device)
                 .useAutoConnect(false) // true:可能自动重连， 程序代码还在执行扫描
-                .timeout(300)
-                .retry(1, 0)
+                .timeout(10000)
+                .retry(3, 100)
                 .done {
                     LepuBleLog.d(tag, "Device Init")
                 }
