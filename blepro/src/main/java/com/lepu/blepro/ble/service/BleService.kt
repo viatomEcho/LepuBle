@@ -150,7 +150,7 @@ open class BleService: LifecycleService() {
 
         vailFace.get(m)?.let { return it }
         when(m) {
-            Bluetooth.MODEL_O2RING -> {
+            Bluetooth.MODEL_O2RING , Bluetooth.MODEL_O2MAX-> {
                 OxyBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
