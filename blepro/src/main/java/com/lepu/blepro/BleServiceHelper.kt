@@ -795,5 +795,13 @@ class BleServiceHelper private constructor() {
 
     }
 
+    fun oxyGetPpgRt(model: Int){
+        getInterface(model)?.let {
+            it as OxyBleInterface
+            it.getPpgRT()
+        }
+
+    }
+
 
 }

@@ -14,6 +14,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.BleServiceHelper
+import com.lepu.blepro.ble.OxyBleInterface
 import com.lepu.blepro.ble.cmd.Bp2BleCmd
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse
@@ -99,6 +101,13 @@ class HomeFragment : Fragment(), BleChangeObserver{
 
         }
 
+
+        val disconnect: TextView = root.findViewById(R.id.disconnect)
+        disconnect.setOnClickListener{
+            LpBleUtil.disconnect(false)
+        }
+
+
         val rcv = root.findViewById<RecyclerView>(R.id.rcv)
         LinearLayoutManager(context).apply {
             this.orientation = LinearLayoutManager.VERTICAL
@@ -157,18 +166,25 @@ class HomeFragment : Fragment(), BleChangeObserver{
         LiveEventBus.get(InterfaceEvent.Oxy.EventOxySyncDeviceInfo)
             .observe(this, Observer{
                 Toast.makeText(requireContext(), "o2ring 完成时间同步", Toast.LENGTH_SHORT).show()
-                LpBleUtil.startRtTask(CURRENT_MODEL)
+//                LpBleUtil.startRtTask(CURRENT_MODEL)
+                LpBleUtil.oxyGetPpgRt(CURRENT_MODEL)
+                startCollectPpg()
+
+
             })
 
         // o2ring ppg
         LiveEventBus.get(InterfaceEvent.Oxy.EventOxyPpgData)
             .observe(this, Observer{
+                LpBleUtil.oxyGetPpgRt(CURRENT_MODEL)
+
+
                 it as InterfaceEvent
                 val ppgData = it.data as OxyBleResponse.PPGData
                 ppgData.let { data ->
 
                     Log.d("ppg", "len  = ${data.rawDataBytes.size}")
-                    if (!stopCollect) collectRtData(data.rawDataBytes)
+                    if (!stopCollect && collectStartTime != 0L) collectRtData(data.rawDataBytes)
 
 //                    Log.d("o2ring ppg", "rawDataBytes  = ${data.rawDataBytes.joinToString() }}")
 
@@ -201,6 +217,8 @@ class HomeFragment : Fragment(), BleChangeObserver{
         collectEndTime = System.currentTimeMillis()
         //File
         if (initExportFilePath()){
+            Log.d("collect", "file size  = ${o2ringPpg.size}")
+
             FileUtil.saveFile(rtFilePath.get(FILE_PPG_O2RING), o2ringPpg, false)
         }
         clearO2ringPpg()
@@ -235,7 +253,7 @@ class HomeFragment : Fragment(), BleChangeObserver{
     fun collectRtData(rtData: ByteArray) {
         o2ringPpg = addByteArrayData(o2ringPpg, rtData)
 
-//        Log.d("o2ring ppg", "size  = ${o2ringPpg.size}")
+        Log.d("collect", "size  = ${o2ringPpg.size}")
 
 
     }

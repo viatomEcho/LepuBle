@@ -65,6 +65,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun hasResponse(bytes: ByteArray?): ByteArray? {
+        LepuBleLog.d("hasResponse", "start")
         val bytesLeft: ByteArray? = bytes
 
         if (bytes == null || bytes.size < 8) {
@@ -91,9 +92,12 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
                 val tempBytes: ByteArray? = if (i + 8 + len == bytes.size) null else bytes.copyOfRange(i + 8 + len, bytes.size)
 
+                LepuBleLog.d("hasResponse", "end")
+
                 return hasResponse(tempBytes)
             }
         }
+        LepuBleLog.d("hasResponse", "end")
 
         return bytesLeft
     }
@@ -169,6 +173,8 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             OxyBleCmd.OXY_CMD_PPG_RT_DATA -> {
                 //ppg
                 clearTimeout()
+                LiveEventBus.get(InterfaceEvent.Oxy.EventOxyPpgRes)
+                    .post(InterfaceEvent(model, true))
                 if (response.content.size > 10) {
                     val ppgData = OxyBleResponse.PPGData(response.content)
                     LiveEventBus.get(InterfaceEvent.Oxy.EventOxyPpgData)

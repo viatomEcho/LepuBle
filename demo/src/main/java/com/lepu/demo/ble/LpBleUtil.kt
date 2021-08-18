@@ -267,7 +267,7 @@ class LpBleUtil {
         }
 
         @JvmOverloads
-        fun startRtTask(model: Int, delayMillis: Long = 300) {
+        fun startRtTask(model: Int, delayMillis: Long = 80) {
             BleServiceHelper.BleServiceHelper.setRTDelayTime(model, delayMillis)
             BleServiceHelper.BleServiceHelper.startRtTask(model)
         }
@@ -313,6 +313,9 @@ class LpBleUtil {
 
         }
 
+        fun oxyGetPpgRt(model: Int){
+            BleServiceHelper.BleServiceHelper.oxyGetPpgRt(model)
+        }
 
 
     }

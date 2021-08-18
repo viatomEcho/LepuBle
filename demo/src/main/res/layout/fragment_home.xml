@@ -36,9 +36,21 @@
         app:layout_constraintTop_toTopOf="@id/scan"
         app:layout_constraintBottom_toBottomOf="@id/scan"
         app:layout_constraintStart_toEndOf="@id/start_collect"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/disconnect"
         android:layout_marginStart="20dp"
         android:text="结束采集"
+        />
+
+    <Button
+        android:id="@+id/disconnect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/scan"
+        app:layout_constraintBottom_toBottomOf="@id/scan"
+        app:layout_constraintStart_toEndOf="@id/stop_collect"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="20dp"
+        android:text="断开"
         />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcv"
