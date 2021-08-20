@@ -65,7 +65,6 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun hasResponse(bytes: ByteArray?): ByteArray? {
-        LepuBleLog.d("hasResponse", "start")
         val bytesLeft: ByteArray? = bytes
 
         if (bytes == null || bytes.size < 8) {
@@ -97,7 +96,6 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 return hasResponse(tempBytes)
             }
         }
-        LepuBleLog.d("hasResponse", "end")
 
         return bytesLeft
     }

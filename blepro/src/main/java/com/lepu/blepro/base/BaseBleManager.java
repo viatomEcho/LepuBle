@@ -164,11 +164,11 @@ public abstract class BaseBleManager extends BleManager {
     public void setNotify() {
         setNotificationCallback(notify_char)
                 .with((device, data) -> {
-//                    LepuBleLog.d(TAG,device.getName() + "received==" + ByteArrayKt.bytesToHex(data.getValue()) + "size =" + ByteArrayKt.bytesToHex(data.getValue()).length());
+                    LepuBleLog.d(TAG,device.getName() + "received==" + ByteArrayKt.bytesToHex(data.getValue()) + "size =" + ByteArrayKt.bytesToHex(data.getValue()).length());
 
-                    LepuBleLog.d("notify", "start");
+//                    LepuBleLog.d("notify", "start");
                     listener.onNotify(device, data);
-                    LepuBleLog.d("notify", "end");
+//                    LepuBleLog.d("notify", "end");
                 });
     }
 

@@ -7,6 +7,8 @@ import com.lepu.blepro.base.BaseBleManager
 import com.lepu.blepro.ble.cmd.Er2BleCmd
 import com.lepu.blepro.ble.cmd.OxyBleCmd
 import com.lepu.blepro.utils.LepuBleLog
+import no.nordicsemi.android.ble.ConnectionPriorityRequest.CONNECTION_PRIORITY_HIGH
+import no.nordicsemi.android.ble.PhyRequest
 import java.util.*
 
 /**
@@ -36,9 +38,10 @@ class OxyBleManager(context: Context): BaseBleManager(context) {
                         Log.WARN,
                         "Requested MTU not supported: $status"
                     )
-                }) //                    .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
+                })
+//                                .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED))
             //                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
-            //                    .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
+                                .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
             //                    .add(sleep(500))
             .add(enableNotifications(notify_char))
             .done { device: BluetoothDevice? ->

@@ -7,6 +7,8 @@ import com.lepu.blepro.base.BaseBleManager
 import com.lepu.blepro.ble.cmd.Bp2BleCmd
 import com.lepu.blepro.ble.cmd.BpmBleCmd
 import com.lepu.blepro.utils.LepuBleLog
+import no.nordicsemi.android.ble.ConnectionPriorityRequest
+import no.nordicsemi.android.ble.PhyRequest
 import java.util.*
 
 /**
@@ -31,7 +33,9 @@ class Bp2BleManager(context: Context): BaseBleManager(context) {
             // .add(requestMtu(247) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
             //                            .with((device, mtu) -> log(Log.INFO, "MTU set to " + mtu))
             //                            .fail((device, status) -> log(Log.WARN, "Requested MTU not supported: " + status)))
-            //                    .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
+//            .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED))
+            .add(requestConnectionPriority(ConnectionPriorityRequest.CONNECTION_PRIORITY_HIGH))
+
             //                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
             .add(enableNotifications(notify_char))
             .done { device: BluetoothDevice? ->

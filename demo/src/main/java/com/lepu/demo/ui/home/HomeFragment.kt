@@ -17,6 +17,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.ble.OxyBleInterface
 import com.lepu.blepro.ble.cmd.Bp2BleCmd
+import com.lepu.blepro.ble.cmd.Er1BleResponse
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse
 import com.lepu.blepro.event.EventMsgConst
@@ -31,6 +32,7 @@ import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.util.DateUtil
 import com.lepu.demo.util.FileUtil
 import com.lepu.demo.util.SdLocal
+import com.viatom.ktble.ble.objs.Bp2BleRtData
 import java.util.*
 
 
@@ -44,7 +46,7 @@ class HomeFragment : Fragment(), BleChangeObserver{
 
     var o2ringPpg: ByteArray = ByteArray(0)
 
-    var stopCollect: Boolean = false
+    var stopCollect: Boolean = true
     var collectStartTime: Long = 0L
     var collectEndTime: Long = 0L
 
@@ -153,12 +155,21 @@ class HomeFragment : Fragment(), BleChangeObserver{
 
             })
 
+        LiveEventBus.get(InterfaceEvent.ER1.EventEr1SetTime)
+            .observe(this, Observer {
+                Toast.makeText(requireContext(), "ER1 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.startRtTask(Bluetooth.MODEL_ER1, 200)
+
+
+            })
+
         //bp2 同步时间
         LiveEventBus.get(InterfaceEvent.BP2.EventBp2SyncTime)
             .observe(this, Observer{
                 it as InterfaceEvent
-                if (it.data as Boolean)
-                    LpBleUtil.bp2SwitchState(Bluetooth.MODEL_BP2, Bp2BleCmd.SwitchState.ENTER_BP)
+                Toast.makeText(requireContext(), "bp2 完成时间同步", Toast.LENGTH_SHORT).show()
+
+                LpBleUtil.startRtTask(Bluetooth.MODEL_BP2)
 
             })
 
@@ -168,7 +179,7 @@ class HomeFragment : Fragment(), BleChangeObserver{
                 Toast.makeText(requireContext(), "o2ring 完成时间同步", Toast.LENGTH_SHORT).show()
 //                LpBleUtil.startRtTask(CURRENT_MODEL)
                 LpBleUtil.oxyGetPpgRt(CURRENT_MODEL)
-                startCollectPpg()
+//                startCollectPpg()
 
 
             })
@@ -186,23 +197,33 @@ class HomeFragment : Fragment(), BleChangeObserver{
                     Log.d("ppg", "len  = ${data.rawDataBytes.size}")
                     if (!stopCollect && collectStartTime != 0L) collectRtData(data.rawDataBytes)
 
-//                    Log.d("o2ring ppg", "rawDataBytes  = ${data.rawDataBytes.joinToString() }}")
+                }
 
-//                    data.rawDataArray.let { ar->
-//                        for (d in ar){
-//                            if (d != null) {
-//                                Log.d("o2ring ppg", "ir = ${d.ir}, red= ${d.red}, motion = ${d.motion}")
-//                            }
-//
-//                        }
-//                    }
 
+            })
+
+        LiveEventBus.get(InterfaceEvent.ER1.EventEr1RtData)
+            .observe(this, Observer{
+
+
+                it as InterfaceEvent
+                val er1 = it.data as Er1BleResponse.RtData
+                er1.let { data ->
+
+                    Log.d("er1data ", "len  = ${data.wave.wave.size}")
 
                 }
 
 
             })
 
+        LiveEventBus.get(InterfaceEvent.BP2.EventBp2RtData)
+            .observe(this, Observer{
+                it as InterfaceEvent
+                val bp2Rt = it.data as Bp2BleRtData
+
+                Log.d("bp2data ", "len  = ${bp2Rt.rtWave.waveData.size}")
+            })
 
 
     }

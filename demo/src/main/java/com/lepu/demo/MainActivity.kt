@@ -92,6 +92,9 @@ class MainActivity : AppCompatActivity() {
             .initLog(BuildConfig.DEBUG)
             .initModelConfig(SparseArray<Int>().apply {
                 this.put(Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2RING)
+                this.put(Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2)
+                this.put(Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1)
+                this.put(Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC60FW)
             }) // 配置要支持的设备
             .initService(
                 application,
