@@ -177,7 +177,7 @@ class HomeFragment : Fragment(), BleChangeObserver{
         LiveEventBus.get(InterfaceEvent.Oxy.EventOxySyncDeviceInfo)
             .observe(this, Observer{
                 Toast.makeText(requireContext(), "o2ring 完成时间同步", Toast.LENGTH_SHORT).show()
-//                LpBleUtil.startRtTask(CURRENT_MODEL)
+                LpBleUtil.startRtTask(CURRENT_MODEL)
                 LpBleUtil.oxyGetPpgRt(CURRENT_MODEL)
 //                startCollectPpg()
 
