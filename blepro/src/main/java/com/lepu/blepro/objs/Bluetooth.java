@@ -116,7 +116,7 @@ public class Bluetooth implements Parcelable {
             case BT_NAME_RINGO2:
                 return MODEL_RINGO2;
             case BT_NAME_O2MAX:
-                return MODEL_O2RING;
+                return MODEL_O2MAX;
             case BT_NAME_BPM:
                 return MODEL_BPM;
             default:
