@@ -14,9 +14,6 @@ class MyApplication: Application(){
     override fun onCreate() {
         super.onCreate()
         LepuBleLog.setDebug(true)
-//
-        BleServiceHelper.BleServiceHelper.initService(this, BleServiceObserverImpl())
-//                .setRawFolder()
 
 
     }

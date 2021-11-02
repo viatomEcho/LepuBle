@@ -83,7 +83,7 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
 
 
         //注册通知：配对
-        LiveEventBus.get(EventMsgConst.Discovery.EventDeviceFound_ScanRecord)
+        LiveEventBus.get<InterfaceEvent>(EventMsgConst.Discovery.EventDeviceFound_ScanRecord)
             .observe(this,
                 {
 
@@ -98,7 +98,7 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
                     LepuBleLog.d("配对结果 = $pairO2")
                     if (pairO2) {
                         //配对成功去连接(UI 包含连接与绑定的过程)
-                        LiveEventBus.get(EventUI.ConnectingLoading).post(true)
+                        LiveEventBus.get<Boolean>(EventUI.ConnectingLoading).post(true)
 
                         scanViewModel.device.value!!.apply {
                             this[modelIndex] = b
@@ -111,17 +111,17 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
                 })
 
         //设备信息
-//        LiveEventBus.get(EventMsgConst.Oxy.EventOxyInfo)
+//        LiveEventBus.get<InterfaceEvent>(EventMsgConst.Oxy.EventOxyInfo)
 //            .observe(this,{
 //                it?.let {
 //                    //绑定
 //                    if (BleUtilService.bind(it, scanViewModel.device.value!![modelIndex] as Bluetooth)) {
-//                        LiveEventBus.get(EventUI.BindFinish).post(true)
+//                        LiveEventBus.get<Boolean>(EventUI.BindFinish).post(true)
 //                    }
 //                }
 //            })
         //扫描通知
-        LiveEventBus.get(EventMsgConst.Discovery.EventDeviceFound)
+        LiveEventBus.get<InterfaceEvent>(EventMsgConst.Discovery.EventDeviceFound)
                 .observe(this, Observer {
                     // 如果已绑定 则重连
                     val b =  it as Bluetooth
@@ -134,11 +134,11 @@ class ConnectO2Fragment : Fragment(), BleChangeObserver{
                     }
                 })
 
-        LiveEventBus.get(InterfaceEvent.Oxy.EventOxyInfo)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo)
                 .observe(this, {
                     it as InterfaceEvent
                     if (BleUtilService.bind(it.data, scanViewModel.device.value!![modelIndex] as Bluetooth)) {
-                        LiveEventBus.get(EventUI.BindFinish).post(true)
+                        LiveEventBus.get<Boolean>(EventUI.BindFinish).post(true)
                     }
                 })
 

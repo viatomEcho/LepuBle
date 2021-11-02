@@ -223,7 +223,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         publish()
 
         if (toConnectUpdater)
-            LiveEventBus.get(EventMsgConst.Updater.EventBleConnected).post(true)
+            LiveEventBus.get<Boolean>(EventMsgConst.Updater.EventBleConnected).post(true)
 
         // 重连多个model时
         if(BleServiceHelper.isReconnectingMulti) {
@@ -341,14 +341,14 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
         rtHandler.removeCallbacks(rTask)
         isRtStop = false
         rtHandler.postDelayed(rTask, 500)
-        LiveEventBus.get(EventMsgConst.RealTime.EventRealTimeStart).post(model)
+        LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStart).post(model)
     }
 
     fun stopRtTask(){
         LepuBleLog.d(tag, "stopRtTask start..." )
         isRtStop = true
         rtHandler.removeCallbacks(rTask)
-        LiveEventBus.get(EventMsgConst.RealTime.EventRealTimeStop).post(model)
+        LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStop).post(model)
 
     }
 

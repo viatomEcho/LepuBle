@@ -96,7 +96,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                 val info = Er2DeviceInfo(device.name, device.address, respPkg.data)
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
-                LiveEventBus.get(InterfaceEvent.ER2.EventEr2Info).post(InterfaceEvent(model, info))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2Info).post(InterfaceEvent(model, info))
 
                 if (runRtImmediately){
                     runRtTask()
@@ -106,7 +106,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
             Er2BleCmd.CMD_SET_TIME -> {
 
                 LepuBleLog.d(tag, "model:$model,CMD_SET_TIME => success")
-                LiveEventBus.get(InterfaceEvent.ER2.EventEr2SetTime).post(
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetTime).post(
                     InterfaceEvent(
                         model,
                         true
@@ -116,7 +116,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
             Er2BleCmd.CMD_SET_SWITCHER_STATE -> {
 
                 LepuBleLog.d(tag, "model:$model,CMD_SET_SWITCHER_STATE => success")
-                LiveEventBus.get(InterfaceEvent.ER2.EventEr2SetSwitcherState).post(
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetSwitcherState).post(
                     InterfaceEvent(
                         model,
                         true
@@ -126,7 +126,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
             Er2BleCmd.CMD_RETRIEVE_SWITCHER_STATE -> {
 
                 LepuBleLog.d(tag, "model:$model,CMD_RETRIEVE_SWITCHER_STATE => success")
-                LiveEventBus.get(InterfaceEvent.ER2.EventEr2SwitcherState).post(
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SwitcherState).post(
                     InterfaceEvent(
                         model,
                         respPkg.data
@@ -136,7 +136,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
             Er2BleCmd.CMD_FACTORY_RESET -> {
 
                 LepuBleLog.d(tag, "model:$model,CMD_FACTORY_RESET => success")
-                LiveEventBus.get(InterfaceEvent.ER2.EventEr2FactoryReset).post(
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FactoryReset).post(
                     InterfaceEvent(
                         model,
                         true
@@ -148,7 +148,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                 val rtData = Er2RtData(respPkg.data)
 
                 LepuBleLog.d(tag, "model:$model,CMD_GET_REAL_TIME_DATA => success")
-                LiveEventBus.get(InterfaceEvent.ER2.EventEr2RtData).post(
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2RtData).post(
                     InterfaceEvent(
                         model,
                         rtData
@@ -159,7 +159,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                 val fileArray = Er2FileList(respPkg.data)
 
                 LepuBleLog.d(tag, "model:$model,CMD_LIST_FILE => success")
-                LiveEventBus.get(InterfaceEvent.ER2.EventEr2FileList).post(
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FileList).post(
                     InterfaceEvent(
                         model,
                         fileArray
@@ -176,7 +176,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                     sendCmd(Er2BleCmd.readFileData(0))
                 } else {
                     LepuBleLog.d(tag, "read file failed：${respPkg.pkgType}")
-                    LiveEventBus.get(InterfaceEvent.ER2.EventEr2ReadFileError).post(
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileError).post(
                         InterfaceEvent(
                             model,
                             true
@@ -199,7 +199,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                     this.addContent(respPkg.data)
                     LepuBleLog.d(tag, "read file：${this.fileName}   => ${this.index + offset} / ${this.fileSize}")
                     LepuBleLog.d(tag, "read file：${((this.index+ offset) * 1000).div(this.fileSize) }")
-                    LiveEventBus.get(InterfaceEvent.ER2.EventEr2ReadingFileProgress).post(InterfaceEvent(model, ((this.index+ offset) * 1000).div(this.fileSize) ))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadingFileProgress).post(InterfaceEvent(model, ((this.index+ offset) * 1000).div(this.fileSize) ))
 
                     if (this.index < this.fileSize) {
                         sendCmd(Er2BleCmd.readFileData(this.index))
@@ -217,7 +217,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                     if (it.index < it.fileSize ){
                         if ((isCancelRF || isPausedRF) ) return
                     }else {
-                        LiveEventBus.get(InterfaceEvent.ER2.EventEr2ReadFileComplete)
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileComplete)
                             .post(InterfaceEvent(model, it))
                     }
                 }?: LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")

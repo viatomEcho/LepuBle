@@ -50,11 +50,11 @@ class ScanActivity : AppCompatActivity() {
 
 
         initUI()
-        LiveEventBus.get(EventUI.ConnectingLoading)
+        LiveEventBus.get<Boolean>(EventUI.ConnectingLoading)
                 .observe(this, Observer {
                     if (it as Boolean) processBindDevice()
                 })
-        LiveEventBus.get(EventUI.BindFinish)
+        LiveEventBus.get<Boolean>(EventUI.BindFinish)
                 .observe(this, Observer {
                     if (it as Boolean) finishBind()
                 })

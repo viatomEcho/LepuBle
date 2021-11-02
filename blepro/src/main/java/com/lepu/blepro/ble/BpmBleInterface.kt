@@ -90,7 +90,7 @@ class BpmBleInterface(model: Int): BleInterface(model) {
                 val deviceInfo = BpmDeviceInfo(bytes, device.name)
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
-                LiveEventBus.get(InterfaceEvent.BPM.EventBpmInfo).post(InterfaceEvent(model, deviceInfo))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmInfo).post(InterfaceEvent(model, deviceInfo))
                 if (runRtImmediately){
                     runRtTask()
                     runRtImmediately = false
@@ -100,20 +100,20 @@ class BpmBleInterface(model: Int): BleInterface(model) {
             BpmBleCmd.BPMCmd.MSG_TYPE_SET_TIME -> {
                 //同步时间
                 LepuBleLog.d(tag, "model:$model,MSG_TYPE_SET_TIME => success")
-                LiveEventBus.get(InterfaceEvent.BPM.EventBpmSyncTime).post(InterfaceEvent(model, true))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmSyncTime).post(InterfaceEvent(model, true))
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_GET_BP_STATE -> {
 
                 LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_BP_STATE => success")
                 //发送实时state : byte
-                LiveEventBus.get(InterfaceEvent.BPM.EventBpmState).post(InterfaceEvent(model, bytes))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmState).post(InterfaceEvent(model, bytes))
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_GET_RECORDS -> {
                 //获取留存记录
                 LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_RECORDS => success")
 
                BpmCmd(bytes).let {
-                   LiveEventBus.get(InterfaceEvent.BPM.EventBpmRecordData).post(InterfaceEvent(model, it ))
+                   LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordData).post(InterfaceEvent(model, it ))
 
                    if (it.type == 0xB3.toByte()) {
                        if (bytes[11] == 0x00.toByte()) {
@@ -124,7 +124,7 @@ class BpmBleInterface(model: Int): BleInterface(model) {
                        }
                        if (isUserAEnd && isUserBEnd) {
                            //AB都读取完成
-                           LiveEventBus.get(InterfaceEvent.BPM.EventBpmRecordEnd).post(InterfaceEvent(model, true ))
+                           LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordEnd).post(InterfaceEvent(model, true ))
                        }
                    }
                }
@@ -132,11 +132,11 @@ class BpmBleInterface(model: Int): BleInterface(model) {
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_GET_RESULT -> {
                 // 返回测量数据
-                LiveEventBus.get(InterfaceEvent.BPM.EventBpmMeasureResult).post(InterfaceEvent(model, BpmCmd(bytes) ))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmMeasureResult).post(InterfaceEvent(model, BpmCmd(bytes) ))
             }
             else -> {
                 //实时指标
-                LiveEventBus.get(InterfaceEvent.BPM.EventBpmRtData).post(InterfaceEvent(model, BpmCmd(bytes) ))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRtData).post(InterfaceEvent(model, BpmCmd(bytes) ))
 
             }
         }

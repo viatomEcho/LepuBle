@@ -1,6 +1,5 @@
 package com.lepu.demo;
 
-import org.greenrobot.eventbus.EventBus;
 
 /**
  * author: wujuan

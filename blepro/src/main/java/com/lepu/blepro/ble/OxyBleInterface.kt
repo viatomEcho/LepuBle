@@ -127,7 +127,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 clearTimeout()
 
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_PARA_SYNC => success")
-                LiveEventBus.get(InterfaceEvent.Oxy.EventOxySyncDeviceInfo).post(InterfaceEvent(model, true))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxySyncDeviceInfo).post(InterfaceEvent(model, true))
 
             }
 
@@ -143,7 +143,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                     runRtImmediately = false
                 }
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success")
-                LiveEventBus.get(InterfaceEvent.Oxy.EventOxyInfo).post(InterfaceEvent(model, info))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo).post(InterfaceEvent(model, info))
 
             }
 
@@ -153,7 +153,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
                 OxyDataController.receive(rtWave.wFs)
                 //发送实时数据
-                LiveEventBus.get(InterfaceEvent.Oxy.EventOxyRtData).post(InterfaceEvent(model, rtWave))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtData).post(InterfaceEvent(model, rtWave))
 
             }
 
@@ -161,7 +161,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 clearTimeout()
                 val rtParam = OxyBleResponse.RtParam(response.content)
                 //发送实时数据
-                LiveEventBus.get(InterfaceEvent.Oxy.EventOxyRtParamData).post(InterfaceEvent(model, rtParam))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamData).post(InterfaceEvent(model, rtParam))
 
 
 
@@ -180,7 +180,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                     }
 
                 } else {
-                    LiveEventBus.get(InterfaceEvent.Oxy.EventOxyReadFileError).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError).post(InterfaceEvent(model, true))
                     LepuBleLog.d(tag, "model:$model, 读文件失败：${response.content.toHex()}")
                 }
             }
@@ -192,7 +192,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
                     this.addContent(response.content)
 
-                    LiveEventBus.get(InterfaceEvent.Oxy.EventOxyReadingFileProgress).post(InterfaceEvent(model, (curFile!!.index * 1000).div(curFile!!.fileSize)))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadingFileProgress).post(InterfaceEvent(model, (curFile!!.index * 1000).div(curFile!!.fileSize)))
                     LepuBleLog.d(tag, "model:$model, 读文件中：${curFile?.fileName}   => ${curFile?.index} / ${curFile?.fileSize}")
 
                     if (this.index < this.fileSize) {
@@ -208,7 +208,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 curFileName = null // 一定要放在发通知之前
 
                 curFile?.let {
-                    LiveEventBus.get(InterfaceEvent.Oxy.EventOxyReadFileComplete).post(InterfaceEvent(model, it))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileComplete).post(InterfaceEvent(model, it))
                 } ?: LepuBleLog.d(tag, "model:$model,  curFile error!!")
 
                 curFile = null
@@ -219,7 +219,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 clearTimeout()
                 LepuBleLog.d(tag, "model:$model,  OXY_CMD_RESET => success")
 
-                LiveEventBus.get(InterfaceEvent.Oxy.EventOxyResetDeviceInfo).post(InterfaceEvent(model, true))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyResetDeviceInfo).post(InterfaceEvent(model, true))
             }
 
             else -> {

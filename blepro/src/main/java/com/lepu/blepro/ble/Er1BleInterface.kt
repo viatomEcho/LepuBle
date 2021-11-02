@@ -62,7 +62,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                 val info = LepuDevice(response.content)
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
-                LiveEventBus.get(InterfaceEvent.ER1.EventEr1Info).post(InterfaceEvent(model, info))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1Info).post(InterfaceEvent(model, info))
 
                 if (runRtImmediately){
                     runRtTask()
@@ -76,14 +76,14 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
                 Er1DataController.receive(rtData.wave.wFs)
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success")
-                LiveEventBus.get(InterfaceEvent.ER1.EventEr1RtData).post(InterfaceEvent(model, rtData))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1RtData).post(InterfaceEvent(model, rtData))
             }
 
             Er1BleCmd.READ_FILE_LIST -> {
                 fileList = Er1BleResponse.Er1FileList(response.content)
                 LepuBleLog.d(tag, "model:$model,READ_FILE_LIST => success, ${fileList.toString()}")
                 fileList?.let {
-                    LiveEventBus.get(InterfaceEvent.ER1.EventEr1FileList).post(InterfaceEvent(model,it.toString()))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1FileList).post(InterfaceEvent(model,it.toString()))
                 }
 
             }
@@ -96,7 +96,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                     sendCmd( Er1BleCmd.readFileData(offset))
                 } else {
                     LepuBleLog.d(tag, "read file failed：${response.pkgType}")
-                    LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadFileError).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileError).post(InterfaceEvent(model, true))
 
                 }
             }
@@ -117,7 +117,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                     val nowSize: Long = (this.index).toLong()
                     val size :Long= nowSize * 1000
                     val poSize :Int= (size).div(this.fileSize).toInt()
-                    LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadingFileProgress).post(InterfaceEvent(model,poSize))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadingFileProgress).post(InterfaceEvent(model,poSize))
 
                     if (this.index  < this.fileSize) {
                         sendCmd(Er1BleCmd.readFileData(this.index)) // 每次读的偏移量，相对于文件总长度的
@@ -136,19 +136,19 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                     if (it.index < it.fileSize ){
                         if ((isCancelRF || isPausedRF) ) return
                     }else {
-                        LiveEventBus.get(InterfaceEvent.ER1.EventEr1ReadFileComplete).post(InterfaceEvent(model, it))
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileComplete).post(InterfaceEvent(model, it))
                     }
                 }?: LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
                 curFile = null
             }
             Er1BleCmd.VIBRATE_CONFIG -> {
                 LepuBleLog.d(tag, "model:$model,VIBRATE_CONFIG => success")
-                LiveEventBus.get(InterfaceEvent.ER1.EventEr1VibrateConfig).post(InterfaceEvent(model, response.content))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1VibrateConfig).post(InterfaceEvent(model, response.content))
 
             }
             Er1BleCmd.SET_VIBRATE_STATE -> {
                 LepuBleLog.d(tag, "model:$model,SET_SWITCHER_STATE => success")
-                LiveEventBus.get(InterfaceEvent.ER1.EventEr1SetSwitcherState).post(
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetSwitcherState).post(
                     InterfaceEvent(
                         model,
                         true
@@ -158,7 +158,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
             Er1BleCmd.FACTORY_RESET -> {
                 LepuBleLog.d(tag, "model:$model,CMD_FACTORY_RESET => success")
-                LiveEventBus.get(InterfaceEvent.ER1.EventEr1ResetFactory).post(
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ResetFactory).post(
                     InterfaceEvent(
                         model,
                         true
@@ -168,7 +168,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
             Er1BleCmd.FACTORY_RESET_ALL -> {
                 LepuBleLog.d(tag, "model:$model,FACTORY_RESET_ALL => success")
-                LiveEventBus.get(InterfaceEvent.ER1.EventEr1ResetFactoryAll).post(
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ResetFactoryAll).post(
                     InterfaceEvent(
                         model,
                         true
@@ -178,7 +178,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
             Er1BleCmd.SET_TIME -> {
                 LepuBleLog.d(tag, "model:$model,SET_TIME => success")
 
-                LiveEventBus.get(InterfaceEvent.ER1.EventEr1SetTime).post(
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetTime).post(
                     InterfaceEvent(
                         model,
                         true

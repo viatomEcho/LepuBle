@@ -131,7 +131,7 @@ class BleServiceHelper private constructor() {
                     setInterfaces(model, it)
                 } ?: setInterfaces(model)
             }
-            LiveEventBus.get(EventMsgConst.Ble.EventServiceConnectedAndInterfaceInit).post(true)
+            LiveEventBus.get<Boolean>(EventMsgConst.Ble.EventServiceConnectedAndInterfaceInit).post(true)
 
         }else{
             LepuBleLog.d("initVailFace failed!!!")
@@ -415,7 +415,7 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         getInterface(model)?.let {
             it.isCancelRF = true
-            LiveEventBus.get(EventMsgConst.Download.EventIsCancel).post(model)
+            LiveEventBus.get<Int>(EventMsgConst.Download.EventIsCancel).post(model)
         }
     }
 
@@ -428,7 +428,7 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         getInterface(model)?.let {
             it.isPausedRF = true
-            LiveEventBus.get(EventMsgConst.Download.EventIsPaused).post(model)
+            LiveEventBus.get<Int>(EventMsgConst.Download.EventIsPaused).post(model)
         }
     }
 
@@ -441,7 +441,7 @@ class BleServiceHelper private constructor() {
         getInterface(model)?.let {
             it.isPausedRF = false
             it.continueRf(userId, fileName, offset)
-            LiveEventBus.get(EventMsgConst.Download.EventIsContinue).post(model)
+            LiveEventBus.get<Int>(EventMsgConst.Download.EventIsContinue).post(model)
         }
     }
 

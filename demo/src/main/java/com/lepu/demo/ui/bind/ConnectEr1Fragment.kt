@@ -69,7 +69,7 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
 
 
         //扫描通知
-        LiveEventBus.get(EventMsgConst.Discovery.EventDeviceFound)
+        LiveEventBus.get<InterfaceEvent>(EventMsgConst.Discovery.EventDeviceFound)
             .observe(this, Observer { it ->
                 val b =  it as Bluetooth
                 val bluetooth = scanViewModel.device.value!![modelIndex]
@@ -84,12 +84,12 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
 
             })
         // 设备信息通知
-        LiveEventBus.get(InterfaceEvent.ER1.EventEr1Info)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1Info)
             .observe(this, {
                 it as InterfaceEvent
                 //去绑定
                 if (BleUtilService.bind(it.data, scanViewModel.device.value!![modelIndex] as Bluetooth)) {
-                    LiveEventBus.get(EventUI.BindFinish).post(true)
+                    LiveEventBus.get<Boolean>(EventUI.BindFinish).post(true)
                 }
             })
 
@@ -148,7 +148,7 @@ class ConnectEr1Fragment : Fragment(), BleChangeObserver{
                     this[modelIndex] = b
                     scanViewModel._device.value = this
                 }
-                LiveEventBus.get(EventUI.ConnectingLoading).post(true)
+                LiveEventBus.get<Boolean>(EventUI.ConnectingLoading).post(true)
                 BleUtilService.connect(requireActivity().application, b)
 
             }

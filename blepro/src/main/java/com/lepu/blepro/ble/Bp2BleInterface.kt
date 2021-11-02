@@ -85,14 +85,14 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             Bp2BleCmd.BPMCmd.CMD_INFO -> {
                 val info = Bp2DeviceInfo(bytes.content,device.name)
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
-                LiveEventBus.get(InterfaceEvent.BP2.EventBp2Info).post(InterfaceEvent(model, info))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Info).post(InterfaceEvent(model, info))
 
 
             }
             Bp2BleCmd.BPMCmd.CMD_SET_TIME -> {
                 //同步时间
                 LepuBleLog.d(tag, "model:$model,MSG_TYPE_SET_TIME => success")
-                LiveEventBus.get(InterfaceEvent.BP2.EventBp2SyncTime).post(InterfaceEvent(model, true))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SyncTime).post(InterfaceEvent(model, true))
             }
             Bp2BleCmd.BPMCmd.CMD_FILE_LIST -> {
 
@@ -100,7 +100,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 //发送实时state : byte
                 if(bytes.content.size>0){
                     val list  = KtBleFileList(bytes.content,device.name)
-                    LiveEventBus.get(InterfaceEvent.BP2.EventBp2FileList).post(InterfaceEvent(model, list))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList).post(InterfaceEvent(model, list))
                 }
             }
 
@@ -121,7 +121,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 fileContent = add(fileContent, bytes.content)
                 Log.d(tag, "download file $fileName CMD_FILE_READ_PKG curSize == $curSize | fileSize == $fileSize")
 
-                LiveEventBus.get(InterfaceEvent.BP2.EventBp2ReadingFileProgress).post(InterfaceEvent(model, part))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadingFileProgress).post(InterfaceEvent(model, part))
                 if (curSize < fileSize) {
                     sendCmd(fileReadPkg(curSize))
                 } else {
@@ -134,7 +134,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 if(fileContent == null) fileContent = ByteArray(0)
                 if(fileContent!!.isNotEmpty()) {
                     val file : Bp2BleFile = Bp2BleFile(fileName, fileContent!!,device.name)
-                    LiveEventBus.get(InterfaceEvent.BP2.EventBp2ReadFileComplete).post(InterfaceEvent(model, file))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileComplete).post(InterfaceEvent(model, file))
                 } else {
                     //取消下载？？？
                     //   BleMsgUtils.broadcastMsg(mService!!, BleMsg.MSG_DOWNLOAD, BleMsg.CODE_CANCEL)
@@ -147,13 +147,13 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             Bp2BleCmd.BPMCmd.CMD_BP2_RT_DATA ->{
                 if(bytes.content.size > 31) {
                     val rtData = Bp2BleRtData(bytes.content)
-                    LiveEventBus.get(InterfaceEvent.BP2.EventBp2RtData).post(InterfaceEvent(model, rtData))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData).post(InterfaceEvent(model, rtData))
                 }
             }
             //实时状态
             Bp2BleCmd.BPMCmd.CMD_BP2_RT_STATE ->{
                 val rtState = Bp2BleRtState(bytes.content)
-                LiveEventBus.get(InterfaceEvent.BP2.EventBp2State).post(InterfaceEvent(model, rtState))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2State).post(InterfaceEvent(model, rtState))
 
 
 
@@ -178,29 +178,29 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             Bp2BleCmd.BPMCmd.CMD_BP2_SET_SWITCHER_STATE ->{
                 //心跳音开关
                 if (bytes.type != 0x01.toByte()) {
-                    LiveEventBus.get(InterfaceEvent.BP2.EventBpSetConfigResult).post(InterfaceEvent(model, 0))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSetConfigResult).post(InterfaceEvent(model, 0))
                 }else{
-                    LiveEventBus.get(InterfaceEvent.BP2.EventBpSetConfigResult).post(InterfaceEvent(model, 1))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSetConfigResult).post(InterfaceEvent(model, 1))
                 }
             }
             Bp2BleCmd.BPMCmd.CMD_BP2_CONFIG ->{
                 //获取返回的开关状态
                 if (bytes.type != 0x01.toByte()) {
-                        LiveEventBus.get(InterfaceEvent.BP2.EventBpGetConfigResult).post(InterfaceEvent(model,0 ))
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult).post(InterfaceEvent(model,0 ))
                 }else{
                     if(bytes.content != null && bytes.content.size > 24 && bytes.content[24].toInt() == 1) {
-                        LiveEventBus.get(InterfaceEvent.BP2.EventBpGetConfigResult).post(InterfaceEvent(model,1 ))
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult).post(InterfaceEvent(model,1 ))
                     }else{
-                        LiveEventBus.get(InterfaceEvent.BP2.EventBpGetConfigResult).post(InterfaceEvent(model,0))
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult).post(InterfaceEvent(model,0))
                     }
                 }
             }
             Bp2BleCmd.BPMCmd.CMD_RESET ->{
                 //重置
                 if (bytes.type != 0x01.toByte()) {
-                    LiveEventBus.get(InterfaceEvent.BP2.EventBp2ResetDeviceInfo).post(InterfaceEvent(model, 0))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ResetDeviceInfo).post(InterfaceEvent(model, 0))
                 }else{
-                    LiveEventBus.get(InterfaceEvent.BP2.EventBp2ResetDeviceInfo).post(InterfaceEvent(model, 1))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ResetDeviceInfo).post(InterfaceEvent(model, 1))
                 }
             }
 

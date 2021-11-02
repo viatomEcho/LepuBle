@@ -368,7 +368,7 @@ class BleService: LifecycleService() {
                     this[EventMsgConst.Discovery.EventDeviceFound_ScanRecord] = it
 
                     LepuBleLog.d(tag, "post paring...${b.name}")
-                    LiveEventBus.get(EventMsgConst.Discovery.EventDeviceFound_ScanRecord).post(this)
+                    LiveEventBus.get<HashMap<String, Any>>(EventMsgConst.Discovery.EventDeviceFound_ScanRecord).post(this)
 
                 }
 
@@ -378,7 +378,7 @@ class BleService: LifecycleService() {
                 LepuBleLog.d(tag, "model = ${b.model}, isReconnecting::$isReconnectScan, b= ${b.name}, recName = ${reconnectDeviceName?.joinToString()}, " +
                         "toConnectUpdater = $toConnectUpdater,  isReconnectByAddress = $isReconnectByAddress ,  recAddress:${reconnectDeviceAddress?.joinToString()}")
 
-                LiveEventBus.get(EventMsgConst.Discovery.EventDeviceFound).post(b)
+                LiveEventBus.get<Bluetooth>(EventMsgConst.Discovery.EventDeviceFound).post(b)
 
 
 
