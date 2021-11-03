@@ -17,7 +17,6 @@ import com.lepu.blepro.utils.CrcUtil.calCRC8
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
 import com.lepu.blepro.utils.toUInt
-import com.viatom.ktble.ble.objs.*
 
 /**
  * author: wujuan
