@@ -67,9 +67,9 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     /**
      * 获取实时波形
      */
-    private var count: Int = 0
     private val rtHandler = Handler(Looper.getMainLooper())
     private  var rTask: RtTask = RtTask()
+
 
     /**
      * 获取实时的间隔
@@ -81,6 +81,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      * 实时任务状态flag
      */
     var isRtStop: Boolean = true
+
+
 
 
     /**
@@ -96,10 +98,12 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     var toConnectUpdater: Boolean = false
 
 
+
+
+
     inner class RtTask : Runnable {
         override fun run() {
             LepuBleLog.d(tag, "rtTask running...")
-            count++
             if (state) {
                 rtHandler.postDelayed(rTask, delayMillis)
                 if (!isRtStop) getRtData() else LepuBleLog.d(tag, "isRtStop = $isRtStop")
@@ -109,6 +113,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
 
         }
     }
+
 
     /**
      * 是否暂停读文件

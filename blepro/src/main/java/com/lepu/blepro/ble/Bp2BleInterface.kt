@@ -2,13 +2,17 @@ package com.lepu.blepro.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.Bp2BleCmd
 import com.lepu.blepro.ble.cmd.Bp2BleCmd.BPMCmd.*
 import com.lepu.blepro.ble.cmd.Bp2BleResponse
+import com.lepu.blepro.ble.data.Bp2BleRtData
 import com.lepu.blepro.ble.data.Bp2BleRtState
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.CrcUtil.calCRC8
 import com.lepu.blepro.utils.LepuBleLog
@@ -23,6 +27,41 @@ import com.viatom.ktble.ble.objs.*
  */
 class Bp2BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Bp2BleInterface"
+
+
+    var isRtSateStop: Boolean = true
+
+    private  var rStateTask: RtSateTask = RtSateTask()
+    private val rtStateHandler = Handler(Looper.getMainLooper())
+
+    inner class RtSateTask : Runnable {
+        override fun run() {
+            LepuBleLog.d(tag, "RtSateTask running...")
+            if (state) {
+                rtStateHandler.postDelayed(rStateTask, delayMillis)
+                if (!isRtSateStop) getBpState() else LepuBleLog.d(tag, "isRtSateStop = $isRtSateStop")
+            }else {
+                LepuBleLog.d(tag, "ble state = false !!!!")
+            }
+
+        }
+    }
+    fun runRtSateTask() {
+        LepuBleLog.d(tag, "runRtSateTask start..." )
+        rtStateHandler.removeCallbacks(rStateTask)
+        isRtSateStop = false
+        rtStateHandler.postDelayed(rStateTask, 500)
+        LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStateStart).post(model)
+    }
+
+    fun stopRtStateTask(){
+        LepuBleLog.d(tag, "stopRtStateTask start..." )
+        isRtSateStop = true
+        rtStateHandler.removeCallbacks(rStateTask)
+        LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStateStop).post(model)
+
+    }
+
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = Bp2BleManager(context)
@@ -81,32 +120,39 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
     private fun onResponseReceived(bytes: Bp2BleResponse.BleResponse) {
         LepuBleLog.d(tag, " onResponseReceived : " + bytes.cmd)
 
-        when(bytes.cmd) {
+        when (bytes.cmd) {
             Bp2BleCmd.BPMCmd.CMD_INFO -> {
-                val info = Bp2DeviceInfo(bytes.content,device.name)
+                val info = Bp2DeviceInfo(bytes.content, device.name)
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Info).post(InterfaceEvent(model, info))
-
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Info)
+                    .post(InterfaceEvent(model, info))
+                if (runRtImmediately) {
+                    runRtTask()
+                    runRtSateTask()
+                    runRtImmediately = false
+                }
 
             }
             Bp2BleCmd.BPMCmd.CMD_SET_TIME -> {
                 //同步时间
                 LepuBleLog.d(tag, "model:$model,MSG_TYPE_SET_TIME => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SyncTime).post(InterfaceEvent(model, true))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SyncTime)
+                    .post(InterfaceEvent(model, true))
             }
             Bp2BleCmd.BPMCmd.CMD_FILE_LIST -> {
 
                 LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_BP_STATE => success")
                 //发送实时state : byte
-                if(bytes.content.size>0){
-                    val list  = KtBleFileList(bytes.content,device.name)
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList).post(InterfaceEvent(model, list))
+                if (bytes.content.size > 0) {
+                    val list = KtBleFileList(bytes.content, device.name)
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList)
+                        .post(InterfaceEvent(model, list))
                 }
             }
 
             Bp2BleCmd.BPMCmd.CMD_FILE_READ_START -> {
                 fileContent = null;
-                fileSize = toUInt(bytes.content.copyOfRange(0,4))
+                fileSize = toUInt(bytes.content.copyOfRange(0, 4))
                 Log.d(tag, "download file $fileName CMD_FILE_READ_START fileSize == $fileSize")
                 if (fileSize == 0) {
                     sendCmd(fileReadEnd())
@@ -119,9 +165,13 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 curSize += bytes.len
                 val part = Bp2FilePart(fileName, fileSize, curSize)
                 fileContent = add(fileContent, bytes.content)
-                Log.d(tag, "download file $fileName CMD_FILE_READ_PKG curSize == $curSize | fileSize == $fileSize")
+                Log.d(
+                    tag,
+                    "download file $fileName CMD_FILE_READ_PKG curSize == $curSize | fileSize == $fileSize"
+                )
 
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadingFileProgress).post(InterfaceEvent(model, part))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadingFileProgress)
+                    .post(InterfaceEvent(model, part))
                 if (curSize < fileSize) {
                     sendCmd(fileReadPkg(curSize))
                 } else {
@@ -131,10 +181,11 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
             Bp2BleCmd.BPMCmd.CMD_FILE_READ_END -> {
                 curSize = 0
-                if(fileContent == null) fileContent = ByteArray(0)
-                if(fileContent!!.isNotEmpty()) {
-                    val file : Bp2BleFile = Bp2BleFile(fileName, fileContent!!,device.name)
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileComplete).post(InterfaceEvent(model, file))
+                if (fileContent == null) fileContent = ByteArray(0)
+                if (fileContent!!.isNotEmpty()) {
+                    val file: Bp2BleFile = Bp2BleFile(fileName, fileContent!!, device.name)
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileComplete)
+                        .post(InterfaceEvent(model, file))
                 } else {
                     //取消下载？？？
                     //   BleMsgUtils.broadcastMsg(mService!!, BleMsg.MSG_DOWNLOAD, BleMsg.CODE_CANCEL)
@@ -144,69 +195,65 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             }
 
             //实时波形
-            Bp2BleCmd.BPMCmd.CMD_BP2_RT_DATA ->{
-                if(bytes.content.size > 31) {
+            Bp2BleCmd.BPMCmd.CMD_BP2_RT_DATA -> {
+                if (bytes.content.size > 31) {
                     val rtData = Bp2BleRtData(bytes.content)
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData).post(InterfaceEvent(model, rtData))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData)
+                        .post(InterfaceEvent(model, rtData))
                 }
             }
             //实时状态
-            Bp2BleCmd.BPMCmd.CMD_BP2_RT_STATE ->{
+            Bp2BleCmd.BPMCmd.CMD_BP2_RT_STATE -> {
                 val rtState = Bp2BleRtState(bytes.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2State).post(InterfaceEvent(model, rtState))
-
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2State)
+                    .post(InterfaceEvent(model, rtState))
 
 
             }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            Bp2BleCmd.BPMCmd.CMD_BP2_SET_SWITCHER_STATE ->{
+            Bp2BleCmd.BPMCmd.CMD_BP2_SET_SWITCHER_STATE -> {
                 //心跳音开关
                 if (bytes.type != 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSetConfigResult).post(InterfaceEvent(model, 0))
-                }else{
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSetConfigResult).post(InterfaceEvent(model, 1))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSetConfigResult)
+                        .post(InterfaceEvent(model, 0))
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSetConfigResult)
+                        .post(InterfaceEvent(model, 1))
                 }
             }
-            Bp2BleCmd.BPMCmd.CMD_BP2_CONFIG ->{
+            Bp2BleCmd.BPMCmd.CMD_BP2_CONFIG -> {
                 //获取返回的开关状态
                 if (bytes.type != 0x01.toByte()) {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult).post(InterfaceEvent(model,0 ))
-                }else{
-                    if(bytes.content != null && bytes.content.size > 24 && bytes.content[24].toInt() == 1) {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult).post(InterfaceEvent(model,1 ))
-                    }else{
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult).post(InterfaceEvent(model,0))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
+                        .post(InterfaceEvent(model, 0))
+                } else {
+                    if (bytes.content != null && bytes.content.size > 24 && bytes.content[24].toInt() == 1) {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
+                            .post(InterfaceEvent(model, 1))
+                    } else {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
+                            .post(InterfaceEvent(model, 0))
                     }
                 }
             }
-            Bp2BleCmd.BPMCmd.CMD_RESET ->{
+            Bp2BleCmd.BPMCmd.CMD_RESET -> {
                 //重置
                 if (bytes.type != 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ResetDeviceInfo).post(InterfaceEvent(model, 0))
-                }else{
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ResetDeviceInfo).post(InterfaceEvent(model, 1))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ResetDeviceInfo)
+                        .post(InterfaceEvent(model, 0))
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ResetDeviceInfo)
+                        .post(InterfaceEvent(model, 1))
                 }
             }
 
 
-
         }
+    }
+
+    override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
+        stopRtStateTask()
+        super.onDeviceDisconnected(device, reason)
     }
 
     fun startBp() {

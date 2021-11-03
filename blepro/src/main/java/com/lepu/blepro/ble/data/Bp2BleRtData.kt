@@ -1,6 +1,4 @@
-package com.viatom.ktble.ble.objs
-
-import com.lepu.blepro.ble.data.Bp2BleRtState
+package com.lepu.blepro.ble.data
 
 class Bp2BleRtData {
 

@@ -30,8 +30,14 @@ object EventMsgConst {
      */
     interface RealTime{
         companion object{
+            //实时波形
             const val EventRealTimeStart = "com.lepu.ble.realtime.start"
             const val EventRealTimeStop = "com.lepu.ble.realtime.stop"
+
+
+            //bp2 获取实时状态
+            const val EventRealTimeStateStart = "com.lepu.ble.realtime.state.start"
+            const val EventRealTimeStateStop = "com.lepu.ble.realtime.state.stop"
         }
     }
 

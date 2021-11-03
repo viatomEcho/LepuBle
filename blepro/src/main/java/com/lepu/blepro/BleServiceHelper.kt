@@ -7,11 +7,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
+import android.util.Log
 import android.util.SparseArray
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.*
-import com.lepu.blepro.ble.cmd.Er1BleCmd
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
@@ -486,7 +486,13 @@ class BleServiceHelper private constructor() {
      */
     fun startRtTask(model: Int){
         if (!checkService()) return
-        getInterface(model)?.runRtTask()
+        getInterface(model)?.let {
+            it.runRtTask()
+            if (model == Bluetooth.MODEL_BP2){
+                Log.d(tag, "is bp2 model , to run rtStateTask....")
+                bp2RunRtStateTask(model)
+            }
+        }
     }
 
 
@@ -495,7 +501,13 @@ class BleServiceHelper private constructor() {
      */
     fun stopRtTask(model: Int) {
         if (!checkService()) return
-        getInterface(model)?.stopRtTask()
+        getInterface(model)?.let {
+            it.stopRtTask()
+            if (model == Bluetooth.MODEL_BP2){
+                Log.d(tag, "is bp2 model , to stop rtStateTask....")
+                bp2StopRtStateTask(model)
+            }
+        }
     }
     fun getConfig(model: Int){
         getInterface(model)?.let { it1 ->
@@ -725,6 +737,31 @@ class BleServiceHelper private constructor() {
         }
 
 
+    }
+
+    /**
+     * 获取BP2 开启实时状态
+     */
+    fun bp2RunRtStateTask(model: Int){
+        if (!checkService()) return
+        getInterface(model)?.let {
+            if (checkInterfaceType(model, it)){
+                it as Bp2BleInterface
+                it.runRtSateTask()
+            }
+        }
+    }
+    /**
+     * 获取BP2 关闭实时状态
+     */
+    fun bp2StopRtStateTask(model: Int){
+        if (!checkService()) return
+        getInterface(model)?.let {
+            if (checkInterfaceType(model, it)){
+                it as Bp2BleInterface
+                it.stopRtStateTask()
+            }
+        }
     }
 
 
