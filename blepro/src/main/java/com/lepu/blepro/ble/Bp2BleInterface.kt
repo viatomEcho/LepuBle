@@ -200,6 +200,12 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                     val rtData = Bp2BleRtData(bytes.content)
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData)
                         .post(InterfaceEvent(model, rtData))
+                }else {
+                    if (isRtSateStop) {
+                        val rtState = Bp2BleRtState(bytes.content)
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2State)
+                            .post(InterfaceEvent(model, rtState))
+                    }
                 }
             }
             //实时状态
@@ -252,7 +258,8 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
-        stopRtStateTask()
+        if (!isRtSateStop)
+            stopRtStateTask()
         super.onDeviceDisconnected(device, reason)
     }
 

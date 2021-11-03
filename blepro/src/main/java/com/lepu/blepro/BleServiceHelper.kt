@@ -484,11 +484,11 @@ class BleServiceHelper private constructor() {
     /**
      * 开启实时任务
      */
-    fun startRtTask(model: Int){
+    fun startRtTask(model: Int, runStateTask: Boolean = false){
         if (!checkService()) return
         getInterface(model)?.let {
             it.runRtTask()
-            if (model == Bluetooth.MODEL_BP2){
+            if (runStateTask && model == Bluetooth.MODEL_BP2){
                 Log.d(tag, "is bp2 model , to run rtStateTask....")
                 bp2RunRtStateTask(model)
             }
@@ -499,11 +499,11 @@ class BleServiceHelper private constructor() {
     /**
      * 移除获取实时任务
      */
-    fun stopRtTask(model: Int) {
+    fun stopRtTask(model: Int, stopStateTask: Boolean = false) {
         if (!checkService()) return
         getInterface(model)?.let {
             it.stopRtTask()
-            if (model == Bluetooth.MODEL_BP2){
+            if (stopStateTask && model == Bluetooth.MODEL_BP2){
                 Log.d(tag, "is bp2 model , to stop rtStateTask....")
                 bp2StopRtStateTask(model)
             }
