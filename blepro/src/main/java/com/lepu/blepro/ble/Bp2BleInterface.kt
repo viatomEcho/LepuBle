@@ -10,8 +10,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.Bp2BleCmd
 import com.lepu.blepro.ble.cmd.Bp2BleCmd.BPMCmd.*
 import com.lepu.blepro.ble.cmd.Bp2BleResponse
-import com.lepu.blepro.ble.data.Bp2BleRtData
-import com.lepu.blepro.ble.data.Bp2BleRtState
+import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.CrcUtil.calCRC8
@@ -200,12 +199,8 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                     val rtData = Bp2BleRtData(bytes.content)
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData)
                         .post(InterfaceEvent(model, rtData))
-                }else {
-                    if (isRtSateStop) {
-                        val rtState = Bp2BleRtState(bytes.content)
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2State)
-                            .post(InterfaceEvent(model, rtState))
-                    }
+                }else{
+                    Log.d(tag, "bytes.content.size < 31")
                 }
             }
             //实时状态

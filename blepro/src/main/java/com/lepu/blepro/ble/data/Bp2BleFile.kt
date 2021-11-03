@@ -1,4 +1,4 @@
-package com.viatom.ktble.ble.objs
+package com.lepu.blepro.ble.data
 
 class Bp2BleFile {
     var name: String
