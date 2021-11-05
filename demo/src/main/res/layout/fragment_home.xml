@@ -6,48 +6,65 @@
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment">
 
-    <TextView
-        android:id="@+id/text_home"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/o2ring"
+        android:id="@+id/scan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="200dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/er1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ER1"
-        android:layout_marginTop="20dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/o2ring"
-         />
-
-    <Button
-        android:id="@+id/multiply"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ER1 + O2Ring"
-        android:layout_marginTop="20dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/er1"
+        app:layout_constraintEnd_toStartOf="@id/start_collect"
+        android:text="扫描"
         />
+
+    <Button
+        android:id="@+id/start_collect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/scan"
+        app:layout_constraintBottom_toBottomOf="@id/scan"
+        app:layout_constraintStart_toEndOf="@id/scan"
+        app:layout_constraintEnd_toEndOf="@id/stop_collect"
+        android:layout_marginStart="20dp"
+        android:text="开始采集"
+        />
+
+    <Button
+        android:id="@+id/stop_collect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/scan"
+        app:layout_constraintBottom_toBottomOf="@id/scan"
+        app:layout_constraintStart_toEndOf="@id/start_collect"
+        app:layout_constraintEnd_toEndOf="@id/disconnect"
+        android:layout_marginStart="20dp"
+        android:text="结束采集"
+        />
+
+    <Button
+        android:id="@+id/disconnect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/scan"
+        app:layout_constraintBottom_toBottomOf="@id/scan"
+        app:layout_constraintStart_toEndOf="@id/stop_collect"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="20dp"
+        android:text="断开"
+        />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcv"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scan"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="20dp"
+
+        >
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

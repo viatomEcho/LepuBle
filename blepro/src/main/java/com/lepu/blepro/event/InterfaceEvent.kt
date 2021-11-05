@@ -26,6 +26,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventOxyInfo = "com.lepu.ble.oxy.info"
             const val EventOxyRtData = "com.lepu.ble.oxy.rtData"
             const val EventOxyRtParamData = "com.lepu.ble.oxy.rt.param.Data"
+            const val EventOxyPpgData = "com.lepu.ble.oxy.ppg.data"
+            const val EventOxyPpgRes = "com.lepu.ble.oxy.ppg.res"
         }
     }
 
@@ -94,6 +96,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
             const val EventBpSetConfigResult = "com.lepu.ble.bp2.measure.config"
             const val EventBpGetConfigResult = "com.lepu.ble.bp2.measure.getConfig"
+            const val EventBpSwitchState = "com.lepu.ble.bp2.switch.state"
 
         }
     }
@@ -114,6 +117,15 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventEr2ReadingFileProgress = "com.lepu.ble.er2.file.reading.progress"
             const val EventEr2ReadFileComplete = "com.lepu.ble.er2.file.read.complete"
 
+        }
+    }
+
+
+    interface PC60Fw{
+        companion object{
+            const val EventPC60FwRtDataParam = "com.lepu.ble.pc60fw.rt.data.param"
+            const val EventPC60FwRtDataWave = "com.lepu.ble.pc60fw.rt.data.wave"
+            const val EventPC60FwBattery = "com.lepu.ble.pc60fw.battery"
         }
     }
 

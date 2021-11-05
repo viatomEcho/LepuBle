@@ -13,7 +13,6 @@ import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toHex
 import com.lepu.blepro.utils.toUInt
-import java.util.*
 import kotlin.experimental.inv
 
 
@@ -52,20 +51,6 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     }
 
 
-    override fun getRtData() {
-        LepuBleLog.d(tag, "getRtData...")
-//       sendOxyCmd(OxyBleCmd.OXY_CMD_RT_DATA, OxyBleCmd.getRtWave())// 无法支持1.4.1之前获取pi
-       sendOxyCmd(OxyBleCmd.OXY_CMD_RT_PARAM_DATA, OxyBleCmd.getRtParam())
-    }
-
-    override fun dealReadFile(userId: String, fileName: String) {
-        this.curFileName = fileName
-        this.userId = userId
-        LepuBleLog.d(tag, "$userId 将要读取文件 $curFileName")
-//        20201210095928
-//        AA03FC00000F003230323031323130303935393238004C
-        sendOxyCmd(OxyBleCmd.OXY_CMD_READ_START, OxyBleCmd.readFileStart(fileName))
-    }
 
 
     private fun sendOxyCmd(cmd: Int, bs: ByteArray){
@@ -106,6 +91,8 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 onResponseReceived(bleResponse)
 
                 val tempBytes: ByteArray? = if (i + 8 + len == bytes.size) null else bytes.copyOfRange(i + 8 + len, bytes.size)
+
+                LepuBleLog.d("hasResponse", "end")
 
                 return hasResponse(tempBytes)
             }
@@ -158,13 +145,11 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
             }
 
-            OxyBleCmd.OXY_CMD_RT_PARAM_DATA -> {
+            OxyBleCmd.OXY_CMD_PI_RT_DATA -> {
                 clearTimeout()
                 val rtParam = OxyBleResponse.RtParam(response.content)
                 //发送实时数据
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamData).post(InterfaceEvent(model, rtParam))
-
-
 
             }
             OxyBleCmd.OXY_CMD_READ_START -> {
@@ -183,6 +168,19 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 } else {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError).post(InterfaceEvent(model, true))
                     LepuBleLog.d(tag, "model:$model, 读文件失败：${response.content.toHex()}")
+                }
+            }
+            OxyBleCmd.OXY_CMD_PPG_RT_DATA -> {
+                //ppg
+                clearTimeout()
+
+                if (response.content.size > 10) {
+                    val ppgData = OxyBleResponse.PPGData(response.content)
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
+                        .post(InterfaceEvent(model, ppgData))
+                }else{
+                    LiveEventBus.getget<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgRes)
+                        .post(InterfaceEvent(model, true))
                 }
             }
 
@@ -233,6 +231,26 @@ class OxyBleInterface(model: Int): BleInterface(model) {
         curCmd = 0
     }
 
+    override fun getRtData() {
+        LepuBleLog.d(tag, "getRtData...")
+//       sendOxyCmd(OxyBleCmd.OXY_CMD_RT_DATA, OxyBleCmd.getRtWave())// 无法支持1.4.1之前获取pi
+//       sendOxyCmd(OxyBleCmd.OXY_CMD_PI_RT_DATA, OxyBleCmd.getPiAndRTWave())
+        getPpgRT()
+    }
+
+    fun getPpgRT(){
+        sendOxyCmd(OxyBleCmd.OXY_CMD_PPG_RT_DATA, OxyBleCmd.getPpgRt())
+    }
+
+    override fun dealReadFile(userId: String, fileName: String) {
+        this.curFileName = fileName
+        this.userId = userId
+        LepuBleLog.d(tag, "$userId 将要读取文件 $curFileName")
+//        20201210095928
+//        AA03FC00000F003230323031323130303935393238004C
+        sendOxyCmd(OxyBleCmd.OXY_CMD_READ_START, OxyBleCmd.readFileStart(fileName))
+    }
+
 
     override fun syncTime() {
         sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.syncTime())
@@ -264,6 +282,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
     override fun onDeviceReady(device: BluetoothDevice) {
         super.onDeviceReady(device)
+        clearTimeout()
         syncTime()
     }
 

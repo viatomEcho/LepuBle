@@ -55,11 +55,13 @@ class OxyBleResponse{
                 var temp = ByteUtils.byte2UInt(waveByte[i])
                 if (temp == 156) {
                     if (i==0) {
-                        temp = ByteUtils.byte2UInt(waveByte[i+1])
+                        if ((i+1) < len)
+                          temp = ByteUtils.byte2UInt(waveByte[i+1])
                     } else if (i == len-1) {
                         temp = ByteUtils.byte2UInt(waveByte[i-1])
                     } else {
-                        temp = (ByteUtils.byte2UInt(waveByte[i-1]) + ByteUtils.byte2UInt(waveByte[i+1]))/2
+                        if ((i+1) < len)
+                            temp = (ByteUtils.byte2UInt(waveByte[i-1]) + ByteUtils.byte2UInt(waveByte[i+1]))/2
                     }
                 }
 
@@ -179,5 +181,53 @@ class OxyBleResponse{
             }
         }
     }
+
+    @ExperimentalUnsignedTypes
+    @Parcelize
+    class PPGData constructor(var bytes: ByteArray) : Parcelable {
+        var len: Int
+        var rawDataBytes: ByteArray
+
+        var rawDataArray: Array<PpgRawData?>
+        var irArray: Array<Int?>
+        var redArray: Array<Int?>
+        var motionArray: Array<Int?>
+
+        init {
+            len = toUInt(bytes.copyOfRange(0, 2))
+            rawDataBytes =  bytes.copyOfRange(2, bytes.size)
+            rawDataArray = arrayOfNulls(len)
+            irArray = arrayOfNulls(len)
+            redArray = arrayOfNulls(len)
+            motionArray = arrayOfNulls(len)
+            for (i in 0  until len ){
+                if (bytes.size < (i * 9) + 11) break
+
+                PpgRawData(bytes.copyOfRange(2 + (i * 9), (i * 9) + 11 )).let {
+                    rawDataArray[i] = it
+
+                    irArray[i] = it.ir
+                    redArray[i] = it.red
+                    motionArray[i] = it.motion
+                }
+            }
+
+        }
+    }
+
+    @ExperimentalUnsignedTypes
+    @Parcelize
+    class PpgRawData(var bytes: ByteArray): Parcelable  {
+        var ir : Int
+        var red : Int
+        var motion : Int
+        init {
+            ir = toUInt(bytes.copyOfRange(0, 4))
+            red = toUInt(bytes.copyOfRange(4, 8))
+            motion = bytes[8].toUInt().toInt()
+        }
+
+    }
+
 
 }

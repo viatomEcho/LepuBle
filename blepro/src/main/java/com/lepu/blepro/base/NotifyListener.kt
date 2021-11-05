@@ -8,7 +8,7 @@ import no.nordicsemi.android.ble.data.Data
  * created on: 2021/1/21 14:42
  * description:
  */
-internal interface NotifyListener {
+interface NotifyListener {
 
     fun onNotify(device: BluetoothDevice?, data: Data?)
 

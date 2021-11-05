@@ -20,6 +20,7 @@ import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
 
+
 /**
  * 单例的蓝牙服务帮助类，原则上只通过此类开放API
  *
@@ -226,7 +227,19 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return null
 
         val vailFace = bleService.vailFace
-        LepuBleLog.e(tag, "getInterface: getInterface => currentModel：$model, vailFaceSize：${vailFace.size()}, curIsNUll = ${vailFace.get(model) == null}")
+        if (vailFace == null) {
+            LepuBleLog.e(
+                tag,
+                "getInterface: getInterface => currentModel：$model, vailFaceSize：${vailFace.size()}, curIsNUll = ${vailFace.get(
+                    model
+                ) == null}"
+            )
+        }else {
+            LepuBleLog.d(
+                tag,
+                "getInterface: getInterface => currentModel：$model, vailFaceSize：${vailFace.size()}}"
+            )
+        }
         return vailFace.get(model)
     }
 
@@ -261,11 +274,11 @@ class BleServiceHelper private constructor() {
     /**
      *  发起重连 允许扫描多个设备
      */
-    fun reconnect(scanModel: IntArray, name: Array<String>, toConnectUpdater: Boolean = false) {
+    fun reconnect(scanModel: IntArray, name: Array<String>, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnect " )
         if (!checkService()) return
 
-        bleService.reconnect(scanModel, name, toConnectUpdater)
+        bleService.reconnect(scanModel, name, needPair, toConnectUpdater)
 
     }
 
@@ -274,10 +287,10 @@ class BleServiceHelper private constructor() {
      * @param scanModel Int
      * @param name String
      */
-    fun reconnect(scanModel: Int, name: String, toConnectUpdater: Boolean = false) {
+    fun reconnect(scanModel: Int, name: String, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnect" )
         if (!checkService()) return
-        bleService.reconnect(intArrayOf(scanModel), arrayOf(name), toConnectUpdater)
+        bleService.reconnect(intArrayOf(scanModel), arrayOf(name),needPair, toConnectUpdater)
 
     }
 
@@ -288,10 +301,11 @@ class BleServiceHelper private constructor() {
      * @param macAddress Array<String>
      */
     @JvmOverloads
-    fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, toConnectUpdater: Boolean = false) {
+    fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, needPair: Boolean,  toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress " )
         if (!checkService()) return
-        bleService.reconnectByAddress( scanModel, macAddress, toConnectUpdater)
+
+        bleService.reconnectByAddress( scanModel, macAddress,needPair, toConnectUpdater)
 
     }
 
@@ -301,10 +315,10 @@ class BleServiceHelper private constructor() {
      * @param macAddress String
      */
     @JvmOverloads
-    fun reconnectByAddress(scanModel: Int, macAddress: String, toConnectUpdater: Boolean = false) {
+    fun reconnectByAddress(scanModel: Int, macAddress: String, needPair: Boolean = false,toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress" )
         if (!checkService()) return
-        bleService.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress), toConnectUpdater)
+        bleService.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress),needPair, toConnectUpdater)
 
     }
 
@@ -368,6 +382,23 @@ class BleServiceHelper private constructor() {
 //            }
         }
         LepuBleLog.d(tag, "没有未连接和已连接中的设备")
+        return false
+    }
+
+    fun hasUnConnected(): Boolean{
+        if (!checkService()) return false
+        LepuBleLog.d(tag, "into hasUnConnected...")
+        for (x in 0 until  bleService.vailFace.size() ){
+            bleService.vailFace[bleService.vailFace.keyAt(x)]?.let {
+                it.let {
+                    LepuBleLog.d(tag, "hasUnConnected  有未连接的设备")
+
+                    if (!it.state && !it.connecting) return true
+                }
+            }
+
+        }
+        LepuBleLog.d(tag, "hasUnConnected 没有未连接的设备 ")
         return false
     }
 
@@ -797,6 +828,17 @@ class BleServiceHelper private constructor() {
 
     }
 
+    fun setNeedPair(needPair : Boolean){
+        BleServiceHelper.bleService.needPair = needPair
+    }
+
+    fun removeReconnectName(name: String){
+        val iterator = bleService.reconnectDeviceName.iterator()
+        while (iterator.hasNext()) {
+            val i = iterator.next()
+            if (i == name) {
+                iterator.remove()
+                LepuBleLog.d(tag, "从重连名单中移除 $name,  list = ${bleService.reconnectDeviceName.joinToString ()}")
     /**
      * 获取BP2 开启实时状态
      */
@@ -813,6 +855,38 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.e(tag, "model error")
         }
 
+            }
+        }
+
+    }
+
+
+    fun getReconnectDeviceName(): ArrayList<String>{
+       return bleService.reconnectDeviceName
+    }
+    fun setStrict(isStrict : Boolean){
+        bleService.isStrict =  isStrict
+    }
+
+    fun isStrict(): Boolean{
+       return bleService.isStrict
+    }
+
+    fun bp2SwitchState(model: Int, state: Int){
+        getInterface(model)?.let {
+            it as Bp2BleInterface
+            it.switchState(state)
+        }
+
+    }
+
+    fun oxyGetPpgRt(model: Int){
+        getInterface(model)?.let {
+            it as OxyBleInterface
+            it.getPpgRT()
+        }
+
+    }
     }
     /**
      * 获取BP2 关闭实时状态
