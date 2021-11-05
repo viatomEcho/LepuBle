@@ -92,6 +92,8 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             return bytes
         }
 
+        LepuBleLog.e(tag, "bytes.size = ${bytes.size}")
+
         loop@ for (i in 0 until bytes.size-7) {
             if (bytes[i] != 0xA5.toByte() || bytes[i+1] != bytes[i+2].inv()) {
                 continue@loop
@@ -108,6 +110,8 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 val bleResponse = Bp2BleResponse.BleResponse(temp)
                 onResponseReceived(bleResponse)
                 val tempBytes: ByteArray? = if (i+8+len == bytes.size) null else bytes.copyOfRange(i + 8 + len, bytes.size)
+
+
                 return hasResponse(tempBytes)
             }
         }
@@ -116,7 +120,8 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
 
     private fun onResponseReceived(bytes: Bp2BleResponse.BleResponse) {
-        LepuBleLog.d(tag, " onResponseReceived : " + bytes.cmd)
+        LepuBleLog.d(tag, "onResponseReceived : " + bytes.cmd)
+        LepuBleLog.e(tag, "onResponseReceived content.size = ${bytes.content.size}")
 
         when (bytes.cmd) {
             Bp2BleCmd.BPMCmd.CMD_INFO -> {

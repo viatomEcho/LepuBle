@@ -164,7 +164,7 @@ public abstract class BaseBleManager extends BleManager {
     public void setNotify() {
         setNotificationCallback(notify_char)
                 .with((device, data) -> {
-//                        LogUtils.d(device.getName() + " received: " + ByteArrayKt.bytesToHex(data.getValue()));
+                        LepuBleLog.e(device.getName() + " received: " + ByteArrayKt.bytesToHex(data.getValue()));
                     listener.onNotify(device, data);
                 });
     }
