@@ -488,9 +488,14 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         getInterface(model)?.let {
             it.runRtTask()
-            if (runStateTask && model == Bluetooth.MODEL_BP2){
-                Log.d(tag, "is bp2 model , to run rtStateTask....")
-                bp2RunRtStateTask(model)
+            if (runStateTask){
+                when(model){
+                    Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A ->{
+                       LepuBleLog.d(tag, "is bp2 model , to run rtStateTask....")
+                        bp2RunRtStateTask(model)
+                    }
+                }
+
             }
         }
     }
@@ -503,50 +508,70 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         getInterface(model)?.let {
             it.stopRtTask()
-            if (stopStateTask && model == Bluetooth.MODEL_BP2){
-                Log.d(tag, "is bp2 model , to stop rtStateTask....")
-                bp2StopRtStateTask(model)
+            if (stopStateTask){
+                when(model) {
+                    Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
+                       LepuBleLog.d(tag, "is bp2 model , to stop rtStateTask....")
+                        bp2StopRtStateTask(model)
+                    }
+                }
             }
         }
     }
-    fun getConfig(model: Int){
-        getInterface(model)?.let { it1 ->
-            (it1 as Bp2BleInterface).let {
-                LepuBleLog.d(tag, "it as Bp2BleInterface")
-                it.getConfig()
+    fun bp2GetConfig(model: Int){
+        when(model){
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A ->{
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2BleInterface")
+                        it.getConfig()
+                    }
+                }
             }
+            else -> LepuBleLog.e(tag, "bp2GetConfig model error")
+
         }
+
     }
-    fun setConfig(model: Int,switch:Boolean){
-        getInterface(model)?.let { it1 ->
-            (it1 as Bp2BleInterface).let {
-                LepuBleLog.d(tag, "it as Bp2BleInterface")
-                it.setConfig(switch)
+    fun bp2SetConfig(model: Int, switch: Boolean){
+        when(model){
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2BleInterface")
+                        it.setConfig(switch)
+                    }
+                }
             }
+            else -> LepuBleLog.e(tag, "bp2SetConfig model error")
         }
-    }
-    fun resetAll(model: Int){
-        getInterface(model)?.let { it1 ->
-            (it1 as Bp2BleInterface).let {
-                LepuBleLog.d(tag, "it as Bp2BleInterface")
-                it.resetAll()
-            }
-        }
+
     }
     fun startBp(model: Int) {
-        getInterface(model)?.let { it1 ->
-            (it1 as Bp2BleInterface).let {
-                LepuBleLog.d(tag, "it as Bp2BleInterface")
-                it.startBp()
+        when(model){
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A ->{
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2BleInterface")
+                        it.startBp()
+                    }
+                }
             }
+            else -> LepuBleLog.e(tag, "startBp model error  ")
         }
+
     }
     fun stopBp(model: Int) {
-        getInterface(model)?.let { it1 ->
-            (it1 as Bp2BleInterface).let {
-                LepuBleLog.d(tag, "it as Bp2BleInterface")
-                it.stopBp()
+        when(model) {
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2BleInterface")
+                        it.stopBp()
+                    }
+                }
             }
+            else -> LepuBleLog.e(tag, "stopBp model error ")
         }
     }
 
@@ -654,60 +679,93 @@ class BleServiceHelper private constructor() {
 
     fun getEr1VibrateConfig(model: Int){
         if (!checkService()) return
-        getInterface(model)?.let { ble ->
-            checkInterfaceType(model, ble).let { check ->
-                LepuBleLog.d(tag, "getEr1VibrateConfig, checkInterfaceType = $check")
-
-                (ble as Er1BleInterface).getVibrateConfig()
+        when(model){
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK ->{
+                getInterface(model)?.let { ble ->
+                    (ble as Er1BleInterface).getVibrateConfig()
+                }
             }
+            else -> LepuBleLog.e(tag, "model error")
         }
 
     }
 
     fun setEr1Vibrate(model: Int, switcher: Boolean, threshold1: Int, threshold2: Int){
-        getInterface(model)?.let { ble ->
-            checkInterfaceType(model, ble).let { check ->
-                LepuBleLog.d(tag, "setEr1Vibrate, checkInterfaceType = $check")
-
-                (ble as Er1BleInterface).setVibrateConfig(switcher, threshold1, threshold2)
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
+                getInterface(model)?.let { ble ->
+                    (ble as Er1BleInterface).setVibrateConfig(switcher, threshold1, threshold2)
+                }
             }
+            else -> LepuBleLog.e(tag, "model error")
+
         }
 
     }
 
     fun setEr1Vibrate(model: Int,switcher: Boolean, vector: Int, motionCount: Int,motionWindows: Int ){
-        getInterface(model)?.let { ble ->
-            checkInterfaceType(model, ble).let { check ->
-                LepuBleLog.d(tag, "setSwitcher, checkInterfaceType = $check")
-
-                (ble as Er1BleInterface).setVibrateConfig(switcher, vector, motionCount, motionWindows)
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
+                getInterface(model)?.let { ble ->
+                    (ble as Er1BleInterface).setVibrateConfig(switcher, vector, motionCount, motionWindows)
+                }
             }
-        }
+            else -> LepuBleLog.e(tag, "model error")
 
+        }
     }
 
-    fun er1FactoryResetAll(model: Int) {
+    /**
+     * 恢复出厂设置
+     */
+    fun factoryReset(model: Int){
         getInterface(model)?.let { ble ->
-            checkInterfaceType(model, ble).let { check ->
-                LepuBleLog.d(tag, "er1FactoryResetAll, checkInterfaceType = $check")
-
-                (ble as Er1BleInterface).factoryRestAll()
+            when(model){
+                Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
+                    (ble as Er1BleInterface).factoryReset()
+                }
+                Bluetooth.MODEL_O2RING -> {
+                    (ble as OxyBleInterface).factoryReset()
+                }
+                Bluetooth.MODEL_ER2 -> {
+                    (ble as Er2BleInterface).factoryReset()
+                }
+                Bluetooth.MODEL_BPM -> {
+                    (ble as BpmBleInterface).factoryReset()
+                }
+                Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
+                    (ble as Bp2BleInterface).factoryReset()
+                }
             }
         }
+    }
 
+    /**
+     * 清除设备信息
+     */
+    fun resetDeviceInfo(model: Int){
+        getInterface(model)?.let { ble ->
+            when(model){
+                Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
+                    (ble as Er1BleInterface).resetDeviceInfo()
+                }
+                Bluetooth.MODEL_O2RING -> {
+                    (ble as OxyBleInterface).resetDeviceInfo()
+                }
+                Bluetooth.MODEL_ER2 -> {
+                    (ble as Er2BleInterface).resetDeviceInfo()
+                }
+                Bluetooth.MODEL_BPM -> {
+                    (ble as BpmBleInterface).resetDeviceInfo()
+                }
+                Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
+                    (ble as Bp2BleInterface).resetDeviceInfo()
+                }
+            }
+        }
     }
 
 
-    fun er1FactoryReset(model: Int) {
-        getInterface(model)?.let { ble ->
-            checkInterfaceType(model, ble).let { check ->
-                LepuBleLog.d(tag, "er1FactoryReset, checkInterfaceType = $check")
-
-                (ble as Er1BleInterface).resetDeviceInfo()
-            }
-        }
-
-    }
 
     //------er1 duoek   end-----------------
 
@@ -744,27 +802,34 @@ class BleServiceHelper private constructor() {
      */
     fun bp2RunRtStateTask(model: Int){
         if (!checkService()) return
-        getInterface(model)?.let {
-            if (checkInterfaceType(model, it)){
-                it as Bp2BleInterface
-                it.runRtSateTask()
+
+        when(model){
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A ->{
+                getInterface(model)?.let {
+                    it as Bp2BleInterface
+                    it.runRtSateTask()
+                }
             }
+            else -> LepuBleLog.e(tag, "model error")
         }
+
     }
     /**
      * 获取BP2 关闭实时状态
      */
     fun bp2StopRtStateTask(model: Int){
         if (!checkService()) return
-        getInterface(model)?.let {
-            if (checkInterfaceType(model, it)){
-                it as Bp2BleInterface
-                it.stopRtStateTask()
+        when(model) {
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
+                getInterface(model)?.let {
+                        it as Bp2BleInterface
+                        it.stopRtStateTask()
+                }
             }
+            else -> LepuBleLog.e(tag, "model error")
         }
+
     }
-
-
 
 
 }

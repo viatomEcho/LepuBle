@@ -239,8 +239,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
         sendCmd(Er1BleCmd.factoryReset())
     }
 
-
-    fun factoryRestAll() {
+    override fun factoryReset() {
         sendCmd(Er1BleCmd.factoryResetAll())
     }
 

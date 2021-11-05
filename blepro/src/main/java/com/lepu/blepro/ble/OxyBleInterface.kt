@@ -2,6 +2,7 @@ package com.lepu.blepro.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.util.Log
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BleCRC
@@ -242,10 +243,15 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
     }
     override fun getFileList() {
+        LepuBleLog.e(tag, "getFileList Not yet implemented")
     }
 
     override fun getInfo() {
         sendOxyCmd(OxyBleCmd.OXY_CMD_INFO, OxyBleCmd.getInfo())
+    }
+
+    override fun factoryReset() {
+        LepuBleLog.e(tag, "factoryReset Not yet implemented")
     }
 
     override fun resetDeviceInfo() {

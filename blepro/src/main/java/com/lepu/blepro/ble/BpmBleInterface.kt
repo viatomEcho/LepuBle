@@ -2,6 +2,7 @@ package com.lepu.blepro.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.util.Log
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BpmBleCmd
@@ -174,14 +175,23 @@ class BpmBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealReadFile Not yet implemented")
+
     }
     override fun resetDeviceInfo() {
+        LepuBleLog.e(tag, "resetDeviceInfo Not yet implemented")
+
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealContinueRF Not yet implemented")
+
     }
 
+    override fun factoryReset() {
+        LepuBleLog.e(tag, "factoryReset Not yet implemented")
 
+    }
 
     fun startBp() {
         LepuBleLog.d(tag, "startBp...")

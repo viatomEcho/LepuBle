@@ -402,6 +402,11 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     abstract fun resetDeviceInfo()
 
     /**
+     * 恢复出厂设置
+     */
+    abstract fun factoryReset()
+
+    /**
      * 继续 读取文件
      */
     fun continueRf(userId: String, fileName: String, offset: Int){

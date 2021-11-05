@@ -2,6 +2,7 @@ package com.lepu.blepro.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.util.Log
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
@@ -253,7 +254,9 @@ class Er2BleInterface(model: Int): BleInterface(model) {
         sendCmd(Er2BleCmd.listFiles())
     }
 
-
+    override fun factoryReset() {
+        LepuBleLog.e(tag, "factoryReset Not yet implemented")
+    }
 
     override fun resetDeviceInfo() {
         sendCmd(Er2BleCmd.factoryReset())

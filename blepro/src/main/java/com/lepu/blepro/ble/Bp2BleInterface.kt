@@ -8,7 +8,6 @@ import android.util.Log
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.Bp2BleCmd
-import com.lepu.blepro.ble.cmd.Bp2BleCmd.BPMCmd.*
 import com.lepu.blepro.ble.cmd.Bp2BleResponse
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.EventMsgConst
@@ -17,6 +16,7 @@ import com.lepu.blepro.utils.CrcUtil.calCRC8
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
 import com.lepu.blepro.utils.toUInt
+import kotlin.experimental.inv
 
 /**
  * author: wujuan
@@ -37,7 +37,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             LepuBleLog.d(tag, "RtSateTask running...")
             if (state) {
                 rtStateHandler.postDelayed(rStateTask, delayMillis)
-                if (!isRtSateStop) getBpState() else LepuBleLog.d(tag, "isRtSateStop = $isRtSateStop")
+                if (!isRtSateStop) Bp2BleCmd.BPMCmd.getBpState() else LepuBleLog.d(tag, "isRtSateStop = $isRtSateStop")
             }else {
                 LepuBleLog.d(tag, "ble state = false !!!!")
             }
@@ -93,7 +93,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
         }
 
         loop@ for (i in 0 until bytes.size-7) {
-            if (bytes[i] != 0xA5.toByte()) {
+            if (bytes[i] != 0xA5.toByte() || bytes[i+1] != bytes[i+2].inv()) {
                 continue@loop
             }
 
@@ -153,9 +153,9 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 fileSize = toUInt(bytes.content.copyOfRange(0, 4))
                 Log.d(tag, "download file $fileName CMD_FILE_READ_START fileSize == $fileSize")
                 if (fileSize == 0) {
-                    sendCmd(fileReadEnd())
+                    sendCmd(Bp2BleCmd.BPMCmd.fileReadEnd())
                 } else {
-                    sendCmd(fileReadPkg(0))
+                    sendCmd(Bp2BleCmd.BPMCmd.fileReadPkg(0))
                 }
             }
 
@@ -171,9 +171,9 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadingFileProgress)
                     .post(InterfaceEvent(model, part))
                 if (curSize < fileSize) {
-                    sendCmd(fileReadPkg(curSize))
+                    sendCmd(Bp2BleCmd.BPMCmd.fileReadPkg(curSize))
                 } else {
-                    sendCmd(fileReadEnd())
+                    sendCmd(Bp2BleCmd.BPMCmd.fileReadEnd())
                 }
             }
 
@@ -239,10 +239,10 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             Bp2BleCmd.BPMCmd.CMD_RESET -> {
                 //重置
                 if (bytes.type != 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ResetDeviceInfo)
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FactoryReset)
                         .post(InterfaceEvent(model, 0))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ResetDeviceInfo)
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FactoryReset)
                         .post(InterfaceEvent(model, 1))
                 }
             }
@@ -292,6 +292,9 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
     }
 
 
+    /**
+     *
+     */
     fun resetAll(){
         sendCmd(Bp2BleCmd.BPMCmd.resetAll())
     }
@@ -308,9 +311,13 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
     override fun dealReadFile(userId: String, fileName: String) {
         this.fileName = fileName
-        sendCmd(getFileStart(fileName.toByteArray(), 0))
+        sendCmd(Bp2BleCmd.BPMCmd.getFileStart(fileName.toByteArray(), 0))
     }
     override fun resetDeviceInfo() {
+    }
+
+    override fun factoryReset() {
+        sendCmd(Bp2BleCmd.BPMCmd.resetAll())
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {

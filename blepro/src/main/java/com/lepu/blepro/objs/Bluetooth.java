@@ -28,10 +28,41 @@ public class Bluetooth implements Parcelable {
 
     public static final String BT_NAME_RINGO2 = "O2NCI";
     public static final String BT_NAME_KCA = "KCA"; // 康康血压计
-    public static final String BT_NAME_O2MAX = "O2M"; // O2 Max
+    public static final String BT_NAME_O2M = "O2M"; // O2 Max
     public static final String BT_NAME_BPM = "BPM-188"; // 捷美瑞血压计
     public static final String BT_NAME_ER2 = "ER2";
     public static final String BT_NAME_PC100 = "PC-100"; //小企鹅后面 5位sn
+
+
+    public static final String BT_NAME_ER1_N = "ER1";
+    public static final String FETAL_DEVICE_NAME = "MD1000AF4";//7 OEM
+    public static final String BT_NAME_BABY_O2 = "BabyO2";
+    public static final String BT_NAME_OXY_SMART = "OxySmart";
+    public static final String BT_NAME_TV221U = "VTM 20F";//4 OEM
+    public static final String BT_NAME_PC60FW = "PC-60F_SN";//6 OEM
+    public static final String BT_NAME_AOJ20A = "AOJ-20A";//2 OEM
+    public static final String BT_NAME_OXYFIT = "Oxyfit";
+    public static final String BT_NAME_VCOMIN = "VCOMIN";//3 OEM
+    public static final String BT_NAME_CHECK_POD = "Checkme Pod";
+    public static final String BT_NAME_BODY_FAT = "Viatom";//1 OEM
+    private static final String BT_NAME_BABYTONE = "Babytone";
+    public static final String BT_NAME__BODY_FAT = "Body Fat";
+    public static final String BT_NAME_CHECKME_O2M = "Checkme O2 Max";
+    public static final String BT_NAME_BPM_B02 = "BPM-B02";
+    private static final String BT_NAME_BPM_PRODUCT = " B02T";
+    public static final String BT_NAME_LEM = "LEM1";
+    public static final String BT_NAME_LEM_M1 = "M1";
+    public static final String BT_NAME_FHR = "FHR-666(BLE)";//OEM
+    public static final String BT_NAME_FHR_P600L = "Babytone";//OEM
+    public static final String BT_NAME_BABYO2N = "BabyO2N";//盒子版BabyO2
+    public static final String BT_NAME_BABYO2S2 = "BabyO2 S2";//盒子版BabyO2N S2
+    public static final String BT_NAME_PC60FW_NEW = "PC-60FW";//显示名
+    public static final String BT_NAME_BP2T = "BP2T";
+    public static final String BT_NAME_BP2W = "BP2W";
+    public static final String BT_NAME_DEVICES_ER2 = "ER2";//新增ER2【产线用】
+    public static final String BT_NAME_STATION = "Station";//BabyO2盒子升级专用
+    public static final String BT_NAME_POD2B = "POD-2B_SN";//POD-2B_SN7295【蓝牙名】
+    public static final String BT_NAME_POD2W = "POD-2W";//【显示名】
 
 
     public static final int MODEL_UNRECOGNIZED = 0;
@@ -109,7 +140,7 @@ public class Bluetooth implements Parcelable {
                 return MODEL_BP2A;
             case BT_NAME_RINGO2:
                 return MODEL_RINGO2;
-            case BT_NAME_O2MAX:
+            case BT_NAME_O2M:
                 return MODEL_O2MAX;
             case BT_NAME_BPM:
                 return MODEL_BPM;

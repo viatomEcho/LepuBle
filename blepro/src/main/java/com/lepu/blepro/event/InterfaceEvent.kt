@@ -86,7 +86,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBp2ReadFileError = "com.lepu.ble.bp2.read.file.error"
             const val EventBp2ReadingFileProgress = "com.lepu.ble.bp2.reading.file.progress"
             const val EventBp2ReadFileComplete = "com.lepu.ble.bp2.read.file.complete"
-            const val EventBp2ResetDeviceInfo = "com.lepu.ble.bp2.reset"
+            const val EventBp2FactoryReset = "com.lepu.ble.bp2.factory.reset"
             const val EventBp2SyncTime = "com.lepu.ble.bp2.sync.time"
             const val EventBp2RecordData = "com.lepu.ble.bp2.record.data"
             const val EventBp2RecordEnd = "com.lepu.ble.bp2.record.end"
