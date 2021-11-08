@@ -172,11 +172,10 @@ public abstract class BaseBleManager extends BleManager {
     public abstract  void initReqQueue();
 
     public void sendCmd(byte[] bytes) {
-        LepuBleLog.d(TAG,"BaseBleManager send: " + ByteArrayKt.bytesToHex(bytes));
         writeCharacteristic(write_char, bytes)
                 .split()
                 .done(device -> {
-//                    LogUtils.d(device.getName() + " send: " + ByteArrayKt.bytesToHex(bytes));
+                    LepuBleLog.e(device.getName() + " send: " + ByteArrayKt.bytesToHex(bytes));
                 })
                 .enqueue();
     }

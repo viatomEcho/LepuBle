@@ -40,7 +40,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_BABY_O2 = "BabyO2";
     public static final String BT_NAME_OXY_SMART = "OxySmart";
     public static final String BT_NAME_TV221U = "VTM 20F";//4 OEM
-    public static final String BT_NAME_PC60FW = "PC-60F_SN";//6 OEM
+    public static final String BT_NAME_PC60FW_SN = "PC-60F_SN";//6 OEM
     public static final String BT_NAME_AOJ20A = "AOJ-20A";//2 OEM
     public static final String BT_NAME_OXYFIT = "Oxyfit";
     public static final String BT_NAME_VCOMIN = "VCOMIN";//3 OEM

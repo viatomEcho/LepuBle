@@ -9,38 +9,46 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.BleServiceHelper
-import com.lepu.blepro.ble.OxyBleInterface
-import com.lepu.blepro.ble.cmd.Bp2BleCmd
 import com.lepu.blepro.ble.cmd.Er1BleResponse
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse
+import com.lepu.blepro.ble.data.Bp2BleRtData
+import com.lepu.blepro.ble.data.Bp2DataEcgIng
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BIOL
 import com.lepu.blepro.observer.BleChangeObserver
+import com.lepu.blepro.utils.ByteUtils
+import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.demo.CURRENT_MODEL
+import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
+import com.lepu.demo.SCAN_MODELS
 import com.lepu.demo.ble.DeviceAdapter
 import com.lepu.demo.ble.LpBleUtil
+import com.lepu.demo.data.DataController
 import com.lepu.demo.util.DateUtil
 import com.lepu.demo.util.FileUtil
 import com.lepu.demo.util.SdLocal
-import com.viatom.ktble.ble.objs.Bp2BleRtData
 import java.util.*
 
 
-val CURRENT_MODEL: Int = Bluetooth.MODEL_O2RING
+
 val FILE_PPG_O2RING: Int = 0
 
-val SCAN_MODELS: IntArray = intArrayOf(CURRENT_MODEL)
-class HomeFragment : Fragment(), BleChangeObserver{
+
+class HomeFragment : Fragment(){
+
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private lateinit var homeViewModel: HomeViewModel
 
@@ -58,12 +66,6 @@ class HomeFragment : Fragment(), BleChangeObserver{
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initEvent()
-        // 当BleService onServiceConnected执行后发出通知 蓝牙sdk 初始化完成
-        LiveEventBus.get(EventMsgConst.Ble.EventServiceConnectedAndInterfaceInit).observeSticky(this, Observer {
-
-            lifecycle.addObserver(BIOL(this, SCAN_MODELS))
-
-        })
 
 
     }
@@ -138,7 +140,7 @@ class HomeFragment : Fragment(), BleChangeObserver{
 
     private fun initEvent(){
         //扫描通知
-        LiveEventBus.get(EventMsgConst.Discovery.EventDeviceFound)
+        LiveEventBus.get<Bluetooth>(EventMsgConst.Discovery.EventDeviceFound)
             .observe(this, Observer {
                 adapter.setNewInstance(BluetoothController.getDevices())
                 adapter.notifyDataSetChanged()
@@ -146,7 +148,7 @@ class HomeFragment : Fragment(), BleChangeObserver{
             })
 
         // ------------------PC60Fw--------------------------
-        LiveEventBus.get(InterfaceEvent.PC60Fw.EventPC60FwRtDataParam)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataParam)
             .observe(this, Observer {
                 it as InterfaceEvent
                 val rtData = it.data as PC60FwBleResponse.RtDataParam
@@ -155,7 +157,7 @@ class HomeFragment : Fragment(), BleChangeObserver{
 
             })
 
-        LiveEventBus.get(InterfaceEvent.ER1.EventEr1SetTime)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetTime)
             .observe(this, Observer {
                 Toast.makeText(requireContext(), "ER1 完成时间同步", Toast.LENGTH_SHORT).show()
                 LpBleUtil.startRtTask(Bluetooth.MODEL_ER1, 200)
@@ -163,29 +165,55 @@ class HomeFragment : Fragment(), BleChangeObserver{
 
             })
 
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1RtData)
+            .observe(this, Observer{
+
+
+                it as InterfaceEvent
+                val er1 = it.data as Er1BleResponse.RtData
+                er1.let { data ->
+
+                    Log.d("er1data ", "len  = ${data.wave.wave.size}")
+
+                }
+
+
+            })
+
+
+
         //bp2 同步时间
-        LiveEventBus.get(InterfaceEvent.BP2.EventBp2SyncTime)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SyncTime)
             .observe(this, Observer{
                 it as InterfaceEvent
                 Toast.makeText(requireContext(), "bp2 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(CURRENT_MODEL)
 
-                LpBleUtil.startRtTask(Bluetooth.MODEL_BP2)
+//                LpBleUtil.startRtTask(Bluetooth.MODEL_BP2, 500)
 
             })
 
         // o2ring 同步时间
-        LiveEventBus.get(InterfaceEvent.Oxy.EventOxySyncDeviceInfo)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxySyncDeviceInfo)
             .observe(this, Observer{
                 Toast.makeText(requireContext(), "o2ring 完成时间同步", Toast.LENGTH_SHORT).show()
-                LpBleUtil.startRtTask(CURRENT_MODEL)
-                LpBleUtil.oxyGetPpgRt(CURRENT_MODEL)
+//                LpBleUtil.startRtTask(CURRENT_MODEL)
+//                LpBleUtil.oxyGetPpgRt(CURRENT_MODEL)
 //                startCollectPpg()
+                LpBleUtil.getInfo(CURRENT_MODEL)
 
 
             })
 
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo).observe(this, { event ->
+            (event.data as OxyBleResponse.OxyInfo).let {
+                LepuBleLog.d("o2ring device info = $it")
+                mainViewModel._oxyInfo.value = it
+            }
+        })
+
         // o2ring ppg
-        LiveEventBus.get(InterfaceEvent.Oxy.EventOxyPpgData)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
             .observe(this, Observer{
                 LpBleUtil.oxyGetPpgRt(CURRENT_MODEL)
 
@@ -202,28 +230,7 @@ class HomeFragment : Fragment(), BleChangeObserver{
 
             })
 
-        LiveEventBus.get(InterfaceEvent.ER1.EventEr1RtData)
-            .observe(this, Observer{
 
-
-                it as InterfaceEvent
-                val er1 = it.data as Er1BleResponse.RtData
-                er1.let { data ->
-
-                    Log.d("er1data ", "len  = ${data.wave.wave.size}")
-
-                }
-
-
-            })
-
-        LiveEventBus.get(InterfaceEvent.BP2.EventBp2RtData)
-            .observe(this, Observer{
-                it as InterfaceEvent
-                val bp2Rt = it.data as Bp2BleRtData
-
-                Log.d("bp2data ", "len  = ${bp2Rt.rtWave.waveData.size}")
-            })
 
 
     }
@@ -286,12 +293,7 @@ class HomeFragment : Fragment(), BleChangeObserver{
     }
 
 
-    override fun onBleStateChanged(model: Int, state: Int) {
 
-        if (state == LpBleUtil.State.CONNECTED){
-
-        }
-    }
 
     override fun onDestroy() {
         super.onDestroy()

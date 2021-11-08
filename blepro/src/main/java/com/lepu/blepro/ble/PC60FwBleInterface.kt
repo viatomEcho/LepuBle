@@ -81,14 +81,14 @@ class PC60FwBleInterface(model: Int): BleInterface(model) {
 
         if (response.token == TOKEN_PO_0F && response.type == TYPE_SPO2_PARAM){
             PC60FwBleResponse.RtDataParam(response.bytes).let {
-                LiveEventBus.get(InterfaceEvent.PC60Fw.EventPC60FwRtDataParam).post(InterfaceEvent(model, it))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataParam).post(InterfaceEvent(model, it))
             }
 
         }
 
         if (response.token == TOKEN_PO_0F && response.type == TYPE_SPO2_WAVE){
             PC60FwBleResponse.RtDataWave(response.bytes).let {
-                LiveEventBus.get(InterfaceEvent.PC60Fw.EventPC60FwRtDataWave).post(InterfaceEvent(model, it))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataWave).post(InterfaceEvent(model, it))
             }
 
         }
@@ -111,6 +111,11 @@ class PC60FwBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun resetDeviceInfo() {
+    }
+
+    override fun factoryReset() {
+        LepuBleLog.e(tag, "Not yet implemented ")
+
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {

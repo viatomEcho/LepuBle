@@ -7,8 +7,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.SparseArray
+import androidx.activity.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -17,17 +19,33 @@ import com.afollestad.materialdialogs.DialogAction
 import com.afollestad.materialdialogs.MaterialDialog
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.event.EventMsgConst
+import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BIOL
+import com.lepu.blepro.observer.BleChangeObserver
+import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.ble.BleSO
 import com.lepu.demo.ble.LpBleUtil
 import com.permissionx.guolindev.PermissionX
+import java.util.*
+
 const val CHECK_BLE_REQUEST_CODE = 6001
-class MainActivity : AppCompatActivity() {
+val CURRENT_MODEL: Int = Bluetooth.MODEL_O2RING
+val SCAN_MODELS: IntArray = intArrayOf(CURRENT_MODEL)
+class MainActivity : AppCompatActivity() , BleChangeObserver {
+
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // 当BleService onServiceConnected执行后发出通知 蓝牙sdk 初始化完成
+        LiveEventBus.get<Boolean>(EventMsgConst.Ble.EventServiceConnectedAndInterfaceInit).observeSticky(this, Observer {
+
+            lifecycle.addObserver(BIOL(this, SCAN_MODELS))
+
+        })
 
 
 
@@ -92,15 +110,33 @@ class MainActivity : AppCompatActivity() {
             .initLog(BuildConfig.DEBUG)
             .initModelConfig(SparseArray<Int>().apply {
                 this.put(Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2RING)
-                this.put(Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2)
-                this.put(Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1)
-                this.put(Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC60FW)
+//                this.put(Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2)
+//                this.put(Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1)
+//                this.put(Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC60FW)
             }) // 配置要支持的设备
             .initService(
                 application,
                 BleSO.getInstance(application)
             ) //必须在initModelConfig initRawFolder之后调用
 
+    }
+
+    override fun onBleStateChanged(model: Int, state: Int) {
+
+        LepuBleLog.d("onBleStateChanged model = $model, state = $state")
+
+
+        viewModel._bleState.value = state == LpBleUtil.State.CONNECTED
+
+        when(state){
+            LpBleUtil.State.CONNECTED ->{
+                if (LpBleUtil.isRtStop(CURRENT_MODEL))
+                    LpBleUtil.startRtTask(CURRENT_MODEL)
+            }
+            LpBleUtil.State.DISCONNECTED ->{
+                LpBleUtil.stopRtTask(CURRENT_MODEL)
+            }
+        }
     }
 
 

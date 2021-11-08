@@ -92,8 +92,6 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             return bytes
         }
 
-        LepuBleLog.e(tag, "bytes.size = ${bytes.size}")
-
         loop@ for (i in 0 until bytes.size-7) {
             if (bytes[i] != 0xA5.toByte() || bytes[i+1] != bytes[i+2].inv()) {
                 continue@loop
@@ -121,7 +119,6 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
     private fun onResponseReceived(bytes: Bp2BleResponse.BleResponse) {
         LepuBleLog.d(tag, "onResponseReceived : " + bytes.cmd)
-        LepuBleLog.e(tag, "onResponseReceived content.size = ${bytes.content.size}")
 
         when (bytes.cmd) {
             Bp2BleCmd.BPMCmd.CMD_INFO -> {
@@ -252,6 +249,13 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 }
             }
 
+            Bp2BleCmd.BPMCmd.SWITCH_STATE ->{
+                //切换状态
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSwitchState).post(InterfaceEvent(model, true))
+            }
+
+
+
 
         }
     }
@@ -327,6 +331,22 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
     override fun dealContinueRF(userId: String, fileName: String) {
     }
+
+
+    /**
+     * 0：进入血压测量
+     * 1：进入心电测量
+     * 2：进入历史回顾
+     * 3：进入开机预备状态
+     * 4：关机
+     * 5：进入理疗模式
+     */
+    fun switchState(state: Int){
+        LepuBleLog.e("SWITCH_STATE===$state")
+
+        sendCmd(Bp2BleCmd.BPMCmd.switchState(state))
+    }
+
 
 
 

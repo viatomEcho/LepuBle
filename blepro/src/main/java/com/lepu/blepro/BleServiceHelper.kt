@@ -46,10 +46,6 @@ class BleServiceHelper private constructor() {
      */
     var runRtConfig: SparseArray<Boolean> = SparseArray()
 
-    /**
-     * 多设备模式手动重连中
-     */
-    var isReconnectingMulti: Boolean = false
 
     companion object {
         const val tag: String = "BleServiceHelper"
@@ -530,6 +526,23 @@ class BleServiceHelper private constructor() {
             }
         }
     }
+    /**
+     * 获取BP2 关闭实时状态
+     */
+    fun bp2StopRtStateTask(model: Int){
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
+                getInterface(model)?.let {
+                    it as Bp2BleInterface
+                    it.stopRtStateTask()
+                }
+            }
+            else -> LepuBleLog.e(tag, "model error")
+        }
+
+    }
+
 
 
     /**
@@ -827,18 +840,6 @@ class BleServiceHelper private constructor() {
 
 
     }
-
-    fun setNeedPair(needPair : Boolean){
-        BleServiceHelper.bleService.needPair = needPair
-    }
-
-    fun removeReconnectName(name: String){
-        val iterator = bleService.reconnectDeviceName.iterator()
-        while (iterator.hasNext()) {
-            val i = iterator.next()
-            if (i == name) {
-                iterator.remove()
-                LepuBleLog.d(tag, "从重连名单中移除 $name,  list = ${bleService.reconnectDeviceName.joinToString ()}")
     /**
      * 获取BP2 开启实时状态
      */
@@ -855,10 +856,27 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.e(tag, "model error")
         }
 
-            }
-        }
 
     }
+
+    fun setNeedPair(needPair : Boolean){
+        BleServiceHelper.bleService.needPair = needPair
+    }
+
+    fun removeReconnectName(name: String) {
+        val iterator = bleService.reconnectDeviceName.iterator()
+        while (iterator.hasNext()) {
+            val i = iterator.next()
+            if (i == name) {
+                iterator.remove()
+                LepuBleLog.d(
+                    tag,
+                    "从重连名单中移除 $name,  list = ${bleService.reconnectDeviceName.joinToString()}"
+                )
+            }
+        }
+    }
+
 
 
     fun getReconnectDeviceName(): ArrayList<String>{
@@ -885,25 +903,9 @@ class BleServiceHelper private constructor() {
             it as OxyBleInterface
             it.getPpgRT()
         }
+    }
 
-    }
-    }
-    /**
-     * 获取BP2 关闭实时状态
-     */
-    fun bp2StopRtStateTask(model: Int){
-        if (!checkService()) return
-        when(model) {
-            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
-                getInterface(model)?.let {
-                        it as Bp2BleInterface
-                        it.stopRtStateTask()
-                }
-            }
-            else -> LepuBleLog.e(tag, "model error")
-        }
 
-    }
 
 
 }

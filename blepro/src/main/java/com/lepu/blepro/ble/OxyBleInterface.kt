@@ -2,13 +2,11 @@ package com.lepu.blepro.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
-import android.util.Log
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BleCRC
 import com.lepu.blepro.ble.cmd.OxyBleCmd
 import com.lepu.blepro.ble.cmd.OxyBleResponse
-import com.lepu.blepro.ble.data.OxyDataController
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toHex
@@ -28,6 +26,10 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     private var userId: String? = null
     
     var curCmd: Int = 0
+
+    var isPpgRt: Boolean = false
+
+    var isPiRt: Boolean = false
 
 
     /**
@@ -135,16 +137,17 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
             }
 
+            // 1.4.1之前没有PI 有波形
             OxyBleCmd.OXY_CMD_RT_DATA -> {
                 clearTimeout()
                 val rtWave = OxyBleResponse.RtWave(response.content)
 
-                OxyDataController.receive(rtWave.wFs)
                 //发送实时数据
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtData).post(InterfaceEvent(model, rtWave))
 
             }
 
+            // 有pi 没有波形
             OxyBleCmd.OXY_CMD_PI_RT_DATA -> {
                 clearTimeout()
                 val rtParam = OxyBleResponse.RtParam(response.content)
@@ -179,7 +182,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
                         .post(InterfaceEvent(model, ppgData))
                 }else{
-                    LiveEventBus.getget<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgRes)
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgRes)
                         .post(InterfaceEvent(model, true))
                 }
             }
@@ -231,11 +234,22 @@ class OxyBleInterface(model: Int): BleInterface(model) {
         curCmd = 0
     }
 
+    /**
+     *
+
+     */
     override fun getRtData() {
-        LepuBleLog.d(tag, "getRtData...")
-//       sendOxyCmd(OxyBleCmd.OXY_CMD_RT_DATA, OxyBleCmd.getRtWave())// 无法支持1.4.1之前获取pi
-//       sendOxyCmd(OxyBleCmd.OXY_CMD_PI_RT_DATA, OxyBleCmd.getPiAndRTWave())
-        getPpgRT()
+        LepuBleLog.d(tag, "getRtData...isPpgRt = $isPpgRt")
+        if (isPpgRt){
+            getPpgRT()
+            return
+        }
+        if (isPiRt){
+            sendOxyCmd(OxyBleCmd.OXY_CMD_PI_RT_DATA, OxyBleCmd.getPiAndRTWave())
+            return
+        }
+
+        sendOxyCmd(OxyBleCmd.OXY_CMD_RT_DATA, OxyBleCmd.getRtWave())// 无法支持1.4.1之前获取pi
     }
 
     fun getPpgRT(){

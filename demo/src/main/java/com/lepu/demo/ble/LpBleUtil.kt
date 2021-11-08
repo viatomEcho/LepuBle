@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.util.Log
 import com.lepu.blepro.BleServiceHelper
+import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.Bp2BleInterface
 import com.lepu.blepro.ble.cmd.Bp2BleCmd
@@ -75,42 +76,42 @@ class LpBleUtil {
         }
 
         fun getServiceHelper(): BleServiceHelper {
-            return BleServiceHelper.BleServiceHelper
+            return BleServiceHelper
         }
 
         fun setInterface(model: Int){
-            BleServiceHelper.BleServiceHelper.getInterfaces()?.clear()
-            BleServiceHelper.BleServiceHelper.setInterfaces(model)
+            BleServiceHelper.getInterfaces()?.clear()
+            BleServiceHelper.setInterfaces(model)
         }
 
         fun  getInterface(model: Int): BleInterface?{
 
-           return BleServiceHelper.BleServiceHelper.getInterface(model)
+           return BleServiceHelper.getInterface(model)
         }
 
         /**
          * 重启蓝牙后调用
          */
         fun reInitBle() {
-            BleServiceHelper.BleServiceHelper.reInitBle()
+            BleServiceHelper.reInitBle()
         }
 
         @JvmOverloads
         fun startScan(scanModel: Int, needPair: Boolean = false) {
 
-            BleServiceHelper.BleServiceHelper.startScan(scanModel, needPair)
+            BleServiceHelper.startScan(scanModel, needPair)
         }
 
         @JvmOverloads
         fun startScan(scanModel: IntArray, needPair: Boolean = false) {
 
-            BleServiceHelper.BleServiceHelper.startScan(scanModel, needPair)
+            BleServiceHelper.startScan(scanModel, needPair)
         }
 
 
         fun stopScan() {
             Log.d(TAG, "stopScan...")
-            BleServiceHelper.BleServiceHelper.stopScan()
+            BleServiceHelper.stopScan()
         }
 
         /**
@@ -122,12 +123,12 @@ class LpBleUtil {
         @JvmOverloads
         fun connect(context: Context, b: Bluetooth, isAutoConnect: Boolean = true, toConnectUpdater: Boolean = false) {
             Log.d(TAG, "connect...${b.model}, ${b.name}, isAutoConnect = $isAutoConnect, withUpdater = $toConnectUpdater")
-            BleServiceHelper.BleServiceHelper.connect(context, b.model, b.device, isAutoConnect, toConnectUpdater)
+            BleServiceHelper.connect(context, b.model, b.device, isAutoConnect, toConnectUpdater)
         }
 
         @JvmOverloads
         fun connect(context: Context, model: Int, b: BluetoothDevice, isAutoConnect: Boolean = true, toConnectUpdater: Boolean = false) {
-            BleServiceHelper.BleServiceHelper.connect(context, model, b, isAutoConnect, toConnectUpdater)
+            BleServiceHelper.connect(context, model, b, isAutoConnect, toConnectUpdater)
         }
 
 
@@ -148,7 +149,7 @@ class LpBleUtil {
                 //检查必须要有interface
                 if (isDisconnected(model)) {
                     Log.d(TAG, "去重连...")
-                    BleServiceHelper.BleServiceHelper.reconnect(model, name, toConnectUpdater)
+                    BleServiceHelper.reconnect(model, name, toConnectUpdater)
                 }else{
                     Log.d(TAG, "蓝牙处于连接状态，reconnect 不往下进行 ")
                 }
@@ -167,9 +168,9 @@ class LpBleUtil {
         @JvmOverloads
         fun reconnectByMac(model: Int, macAddress: String) {
             if(macAddress.isNotEmpty() && BluetoothAdapter.checkBluetoothAddress(macAddress)) {
-                BleServiceHelper.BleServiceHelper.getConnectState(model).let {
+                BleServiceHelper.getConnectState(model).let {
                     if (it == State.DISCONNECTED)
-                        BleServiceHelper.BleServiceHelper.reconnectByAddress(model, macAddress)
+                        BleServiceHelper.reconnectByAddress(model, macAddress)
                 }
 
             }
@@ -178,7 +179,7 @@ class LpBleUtil {
         fun connectUpdaterByMac(model: Int, macAddress: String) {
             if(macAddress.isNotEmpty() && BluetoothAdapter.checkBluetoothAddress(macAddress)) {
 
-                BleServiceHelper.BleServiceHelper.reconnectByAddress(model, macAddress, true)
+                BleServiceHelper.reconnectByAddress(model, macAddress, true)
             }
         }
 
@@ -190,7 +191,7 @@ class LpBleUtil {
          */
         fun disconnect(autoReconnect: Boolean) {
             Log.d(TAG, "disconnect all")
-            BleServiceHelper.BleServiceHelper.disconnect(autoReconnect)
+            BleServiceHelper.disconnect(autoReconnect)
         }
 
 
@@ -201,7 +202,7 @@ class LpBleUtil {
          * @param autoReconnect Boolean 值 =true时，当蓝牙断开后会马上开启扫描尝试连接该model
          */
         fun disconnect(model: Int, autoReconnect: Boolean) {
-            BleServiceHelper.BleServiceHelper.disconnect(model, autoReconnect)
+            BleServiceHelper.disconnect(model, autoReconnect)
         }
 
 
@@ -210,7 +211,7 @@ class LpBleUtil {
          * 设备蓝牙的连接状态：  未连接时不能代表绑定状态
          */
         fun getBleState(model: Int): Int {
-            return BleServiceHelper.BleServiceHelper.getConnectState(model)
+            return BleServiceHelper.getConnectState(model)
         }
 
         /**
@@ -219,12 +220,12 @@ class LpBleUtil {
          */
         fun getInfo(model: Int) {
             Log.d(TAG, "getInfo")
-            BleServiceHelper.BleServiceHelper.getInterface(model)?.let {
+            BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.BleServiceHelper.getInfo(model)
+                BleServiceHelper.getInfo(model)
             }
 
         }
@@ -235,7 +236,7 @@ class LpBleUtil {
          * @param model Int
          */
         fun getFileList(model: Int){
-            BleServiceHelper.BleServiceHelper.getFileList(model)
+            BleServiceHelper.getFileList(model)
 
         }
 
@@ -248,7 +249,7 @@ class LpBleUtil {
          */
         @JvmOverloads
         fun readFile(userId: String, fileName: String, model: Int, offset: Int = 0) {
-            BleServiceHelper.BleServiceHelper.readFile(userId, fileName, model, offset)
+            BleServiceHelper.readFile(userId, fileName, model, offset)
 
         }
 
@@ -257,21 +258,24 @@ class LpBleUtil {
          * @param model Int
          */
         fun stopRtTask(model: Int) {
-            BleServiceHelper.BleServiceHelper.stopRtTask(model)
+            BleServiceHelper.stopRtTask(model)
         }
 
         fun stopRtTask(models: IntArray) {
             for (m in models){
-                BleServiceHelper.BleServiceHelper.stopRtTask(m)
+                BleServiceHelper.stopRtTask(m)
             }
         }
 
         @JvmOverloads
         fun startRtTask(model: Int, delayMillis: Long = 200) {
-            BleServiceHelper.BleServiceHelper.setRTDelayTime(model, delayMillis)
-            BleServiceHelper.BleServiceHelper.startRtTask(model)
+            BleServiceHelper.setRTDelayTime(model, delayMillis)
+            BleServiceHelper.startRtTask(model)
         }
 
+        fun isRtStop(model: Int): Boolean{
+            return BleServiceHelper.isRtStop(model)
+        }
 
         /**
          *
@@ -309,12 +313,12 @@ class LpBleUtil {
 
 
         fun bp2SwitchState(model: Int, state: Int){
-           BleServiceHelper.BleServiceHelper.bp2SwitchState(model, state)
+           BleServiceHelper.bp2SwitchState(model, state)
 
         }
 
         fun oxyGetPpgRt(model: Int){
-            BleServiceHelper.BleServiceHelper.oxyGetPpgRt(model)
+            BleServiceHelper.oxyGetPpgRt(model)
         }
 
 

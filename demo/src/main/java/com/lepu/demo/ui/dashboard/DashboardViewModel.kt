@@ -3,11 +3,17 @@ package com.lepu.demo.ui.dashboard
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.lepu.demo.ble.LpBleUtil
 
 class DashboardViewModel : ViewModel() {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is dashboard Fragment"
+
+    // draw ecg
+    val dataSrc: MutableLiveData<FloatArray> by lazy {
+        MutableLiveData<FloatArray>()
     }
-    val text: LiveData<String> = _text
+
+    val hr: MutableLiveData<Int> by lazy {
+        MutableLiveData<Int>()
+    }
 }

@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.lepu.demo.ui.notifications.NotificationsFragment"
+        android:name="com.lepu.demo.ui.notifications.OxyDashboardFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_oxy_dashboard" />
 </navigation>

@@ -1,17 +1,16 @@
-package com.lepu.blepro.ble.data;
+package com.lepu.demo.data;
 
 public final class OxyDataController {
-
     public static int index = 0;
 
     public static int maxIndex;
     public static float mm2px;
 
-    public static int[] defaultIs = new int[]{121,121,121,121,121};
+    public static int[] defaultIs = new int[]{121, 121, 121, 121, 121};
 
     public static int[] iniDataSrc(int size) {
         int[] ints = new int[size];
-        for (int i =0; i<size; i++) {
+        for (int i = 0; i < size; i++) {
             ints[i] = 121;
         }
 
@@ -30,7 +29,7 @@ public final class OxyDataController {
             src = defaultIs;
         }
 
-        for (int i = 0; i<fs.length; i++) {
+        for (int i = 0; i < fs.length; i++) {
             int tempIndex = (index + i) % src.length;
             src[tempIndex] = fs[i];
         }
@@ -39,7 +38,6 @@ public final class OxyDataController {
 
         return src;
     }
-
 
     synchronized public static void receive(int[] fs) {
         if (fs == null || fs.length == 0) {
@@ -62,7 +60,7 @@ public final class OxyDataController {
         int[] res = new int[n];
         int[] temp = new int[dataRec.length - n];
         System.arraycopy(dataRec, 0, res, 0, n);
-        System.arraycopy(dataRec, n, temp, 0, dataRec.length-n);
+        System.arraycopy(dataRec, n, temp, 0, dataRec.length - n);
 
         dataRec = temp;
 
