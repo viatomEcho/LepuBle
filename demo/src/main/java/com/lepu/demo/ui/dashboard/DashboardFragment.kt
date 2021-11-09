@@ -74,7 +74,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
 
             waveHandler.postDelayed(this, interval.toLong())
-            LepuBleLog.d("DataRec: ${DataController.dataRec.size}, delayed $interval")
+//            LepuBleLog.d("DataRec: ${DataController.dataRec.size}, delayed $interval")
 
             val temp = DataController.draw(5)
             viewModel.dataSrc.value = DataController.feed(viewModel.dataSrc.value, temp)
@@ -201,7 +201,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         val mm2px = 25.4f / dm.xdpi
         DataController.mm2px = mm2px
 
-        LepuBleLog.d("max index: $index", "mm2px: $mm2px")
+//        LepuBleLog.d("max index: $index", "mm2px: $mm2px")
 
         binding.ecgBkg.measure(0, 0)
         ecgBkg = EcgBkg(context)
