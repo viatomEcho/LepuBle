@@ -9,6 +9,11 @@ import com.lepu.blepro.ble.cmd.BpmBleCmd
 import com.lepu.blepro.utils.LepuBleLog
 import no.nordicsemi.android.ble.ConnectionPriorityRequest
 import no.nordicsemi.android.ble.PhyRequest
+import no.nordicsemi.android.ble.callback.DataReceivedCallback
+import no.nordicsemi.android.ble.callback.FailCallback
+import no.nordicsemi.android.ble.callback.MtuCallback
+import no.nordicsemi.android.ble.callback.SuccessCallback
+import no.nordicsemi.android.ble.data.Data
 import java.util.*
 
 /**
@@ -29,14 +34,19 @@ class Bp2BleManager(context: Context): BaseBleManager(context) {
 
     override fun initReqQueue() {
 
-        beginAtomicRequestQueue()
-            // .add(requestMtu(247) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
-            //                            .with((device, mtu) -> log(Log.INFO, "MTU set to " + mtu))
-            //                            .fail((device, status) -> log(Log.WARN, "Requested MTU not supported: " + status)))
-//            .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED))
-            .add(requestConnectionPriority(ConnectionPriorityRequest.CONNECTION_PRIORITY_HIGH))
 
+        // You may enqueue multiple operations. A queue ensures that all operations are
+        // performed one after another, but it is not required.
+        beginAtomicRequestQueue()
+            .add(requestMtu(23) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
+                .with { device: BluetoothDevice?, mtu: Int ->
+                    log(Log.INFO, "MTU set to $mtu")
+                }
+                .fail { device: BluetoothDevice?, status: Int ->
+                    log(Log.WARN, "Requested MTU not supported: $status")
+                }) //                    .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
             //                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
+            //                    .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
             .add(enableNotifications(notify_char))
             .done { device: BluetoothDevice? ->
                 log(
@@ -45,6 +55,23 @@ class Bp2BleManager(context: Context): BaseBleManager(context) {
                 )
             }
             .enqueue()
+
+//        beginAtomicRequestQueue()
+//            // .add(requestMtu(247) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
+//            //                            .with((device, mtu) -> log(Log.INFO, "MTU set to " + mtu))
+//            //                            .fail((device, status) -> log(Log.WARN, "Requested MTU not supported: " + status)))
+////            .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED))
+//            .add(requestConnectionPriority(ConnectionPriorityRequest.CONNECTION_PRIORITY_HIGH))
+//
+//            //                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
+//            .add(enableNotifications(notify_char))
+//            .done { device: BluetoothDevice? ->
+//                log(
+//                    Log.INFO,
+//                    "Target initialized"
+//                )
+//            }
+//            .enqueue()
     }
 
     override fun init() {
