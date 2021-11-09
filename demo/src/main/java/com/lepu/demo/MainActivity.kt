@@ -30,7 +30,8 @@ import com.permissionx.guolindev.PermissionX
 import java.util.*
 
 const val CHECK_BLE_REQUEST_CODE = 6001
-val CURRENT_MODEL: Int = Bluetooth.MODEL_O2RING
+//val CURRENT_MODEL: Int = Bluetooth.MODEL_O2RING
+val CURRENT_MODEL: Int = Bluetooth.MODEL_BP2
 val SCAN_MODELS: IntArray = intArrayOf(CURRENT_MODEL)
 class MainActivity : AppCompatActivity() , BleChangeObserver {
 
@@ -110,7 +111,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             .initLog(BuildConfig.DEBUG)
             .initModelConfig(SparseArray<Int>().apply {
                 this.put(Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2RING)
-//                this.put(Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2)
+                this.put(Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2)
 //                this.put(Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1)
 //                this.put(Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC60FW)
             }) // 配置要支持的设备

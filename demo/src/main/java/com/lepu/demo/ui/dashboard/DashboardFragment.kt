@@ -145,23 +145,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             })
         //----------------------------bp2 end------------------------------------------
 
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtData).observe(this,{ event ->
-            (event.data as OxyBleResponse.RtWave).let { rtWave ->
-                viewModel.hr.value = rtWave.pr
-
-                rtWave.wFs?.map {
-                    it.toFloat()
-                }.let {
-                    if (it != null) {
-                        DataController.receive(it.toFloatArray())
-                    }
-                }
-
-
-
-            }
-        })
-
     }
 
     private fun initView() {

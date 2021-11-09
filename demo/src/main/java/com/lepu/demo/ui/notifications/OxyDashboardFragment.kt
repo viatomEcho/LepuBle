@@ -166,8 +166,6 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
         viewModel.pr.observe(viewLifecycleOwner, {
             if (it == 0) {
                 binding.tvPr.text = "?"
-
-
             } else {
                 binding.tvPr.text = it.toString()
             }
