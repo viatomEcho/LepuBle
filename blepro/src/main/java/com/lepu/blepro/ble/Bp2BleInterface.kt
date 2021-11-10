@@ -196,13 +196,9 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
             //实时波形
             Bp2BleCmd.BPMCmd.CMD_BP2_RT_DATA -> {
-                if (bytes.content.size > 31) {
-                    val rtData = Bp2BleRtData(bytes.content)
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData)
-                        .post(InterfaceEvent(model, rtData))
-                }else{
-                    Log.d(tag, "bytes.content.size < 31")
-                }
+                val rtData = Bp2Response.RtData(bytes.content)
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData)
+                    .post(InterfaceEvent(model, rtData))
             }
             //实时状态
             Bp2BleCmd.BPMCmd.CMD_BP2_RT_STATE -> {

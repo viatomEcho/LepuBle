@@ -10,7 +10,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,15 +18,10 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.Er1BleResponse
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse
-import com.lepu.blepro.ble.data.Bp2BleRtData
-import com.lepu.blepro.ble.data.Bp2DataEcgIng
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
-import com.lepu.blepro.observer.BIOL
-import com.lepu.blepro.observer.BleChangeObserver
-import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.CURRENT_MODEL
 import com.lepu.demo.MainViewModel
@@ -35,7 +29,6 @@ import com.lepu.demo.R
 import com.lepu.demo.SCAN_MODELS
 import com.lepu.demo.ble.DeviceAdapter
 import com.lepu.demo.ble.LpBleUtil
-import com.lepu.demo.data.DataController
 import com.lepu.demo.util.DateUtil
 import com.lepu.demo.util.FileUtil
 import com.lepu.demo.util.SdLocal

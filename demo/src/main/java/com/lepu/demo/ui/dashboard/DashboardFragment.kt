@@ -2,29 +2,20 @@ package com.lepu.demo.ui.dashboard
 
 import android.os.Bundle
 import android.os.Handler
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.RelativeLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.ble.cmd.OxyBleResponse
-import com.lepu.blepro.ble.data.Bp2BleRtData
-import com.lepu.blepro.ble.data.Bp2DataEcgIng
+import com.lepu.blepro.ble.data.Bp2Response
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
-import com.lepu.blepro.observer.BIOL
-import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.CURRENT_MODEL
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
-import com.lepu.demo.SCAN_MODELS
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.data.DataController
 import com.lepu.demo.databinding.FragmentDashboardBinding
@@ -120,27 +111,20 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         })
 
         //------------------------------bp2------------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData)
-            .observe(this, Observer{
-                val bp2Rt = it.data as Bp2BleRtData
-
-//                Log.d("bp2data bp", "len  = ${bp2Rt.rtWave.waveData.size}")
-            })
-
 
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData)
-            .observe(this, Observer{
-                val bp2Rt = it.data as Bp2BleRtData
+            .observe(this, Observer{ event ->
+                val bp2Rt = event.data as Bp2Response.RtData
 
-                val d = Bp2DataEcgIng(bp2Rt.rtWave.waveData)
+                bp2Rt.wave.dataEcging?.let {
+                    LepuBleLog.d("bp2 ecg hr = ${it.hr}")
+                    LepuBleLog.d("bp2 ecg waveLen = ${ bp2Rt.wave.waveLen}")
 
-                LepuBleLog.d("bp2 ecg hr = ${d.hr}")
-                LepuBleLog.d("bp2 ecg waveformSize = ${bp2Rt.rtWave.waveformSize}")
+                    viewModel.hr.value = it.hr
+                    DataController.receive(bp2Rt.wave.waveFs)
+                }
 
-                viewModel.hr.value = d.hr
 
-                val mvs = ByteUtils.bytes2mvs(bp2Rt.rtWave.waveform)
-                DataController.receive(mvs)
 
             })
         //----------------------------bp2 end------------------------------------------
