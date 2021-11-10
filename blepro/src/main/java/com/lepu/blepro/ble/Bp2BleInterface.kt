@@ -197,6 +197,10 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             //实时波形
             Bp2BleCmd.BPMCmd.CMD_BP2_RT_DATA -> {
                 val rtData = Bp2Response.RtData(bytes.content)
+                rtData.wave.waveFs?.let {
+                    Er1DataController.receive(it)
+                }
+
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData)
                     .post(InterfaceEvent(model, rtData))
             }
