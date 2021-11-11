@@ -134,6 +134,8 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
             }
             Bp2BleCmd.BPMCmd.CMD_SET_TIME -> {
+                LepuBleLog.d(tag, "onResponseReceived SET_TIME")
+
                 //同步时间
                 LepuBleLog.d(tag, "model:$model,MSG_TYPE_SET_TIME => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SyncTime)
