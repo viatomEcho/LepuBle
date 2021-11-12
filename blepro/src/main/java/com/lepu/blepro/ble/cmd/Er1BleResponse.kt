@@ -9,7 +9,7 @@ import kotlinx.android.parcel.Parcelize
 
 object Er1BleResponse {
 
-    @ExperimentalUnsignedTypes
+    
     @Parcelize
     class Er1Response constructor(var bytes: ByteArray) : Parcelable {
         var cmd: Int
@@ -29,7 +29,6 @@ object Er1BleResponse {
 
 
     @Parcelize
-    @ExperimentalUnsignedTypes
     class RtData constructor(var bytes: ByteArray) : Parcelable {
         var content: ByteArray = bytes
         var param: RtParam
@@ -41,7 +40,6 @@ object Er1BleResponse {
         }
     }
 
-    @ExperimentalUnsignedTypes
     @Parcelize
     class RtParam constructor(var bytes: ByteArray) : Parcelable {
         var hr: Int
@@ -66,7 +64,6 @@ object Er1BleResponse {
     }
 
     @Parcelize
-    @ExperimentalUnsignedTypes
     class RtWave constructor(var bytes: ByteArray) : Parcelable {
         var content: ByteArray = bytes
         var len: Int
@@ -83,7 +80,7 @@ object Er1BleResponse {
         }
     }
 
-    @ExperimentalUnsignedTypes
+    
     class Er3RtData constructor(var bytes: ByteArray) {
         var content: ByteArray = bytes
         var param: RtParam
@@ -95,7 +92,7 @@ object Er1BleResponse {
         }
     }
 
-    @ExperimentalUnsignedTypes
+    
     class Er3RtWave constructor(var bytes: ByteArray) {
         var content: ByteArray = bytes
         var len: Int
@@ -157,7 +154,7 @@ object Er1BleResponse {
         }
     }
 
-    @ExperimentalUnsignedTypes
+    
     @Parcelize
     class Er1FileList constructor(var bytes: ByteArray) : Parcelable {
         var size: Int

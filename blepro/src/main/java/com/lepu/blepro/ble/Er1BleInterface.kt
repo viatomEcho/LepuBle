@@ -89,6 +89,12 @@ class Er1BleInterface(model: Int): BleInterface(model) {
             }
 
             Er1BleCmd.READ_FILE_START -> {
+                //检查当前的下载状态
+                if (isCancelRF || isPausedRF) {
+                    sendCmd(Er1BleCmd.readFileEnd())
+                    return
+                }
+
                 if (response.pkgType == 0x01.toByte()) {
                     curFile =  curFileName?.let {
                         Er1BleResponse.Er1File(model, it, toUInt(response.content), userId!!, offset)

@@ -9,6 +9,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.Bp2BleCmd
 import com.lepu.blepro.ble.cmd.Bp2BleResponse
+import com.lepu.blepro.ble.cmd.Er1BleCmd
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
@@ -117,13 +118,18 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
     }
 
 
-    private fun onResponseReceived(bytes: Bp2BleResponse.BleResponse) {
-        LepuBleLog.d(tag, "onResponseReceived : " + bytes.cmd)
+    private fun onResponseReceived(bleResponse: Bp2BleResponse.BleResponse) {
+        LepuBleLog.d(tag, "onResponseReceived : " + bleResponse.cmd)
 
-        when (bytes.cmd) {
+
+
+        when (bleResponse.cmd) {
             Bp2BleCmd.BPMCmd.CMD_INFO -> {
-                val info = Bp2DeviceInfo(bytes.content, device.name)
-                LepuBleLog.d(tag, "model:$model,GET_INFO => success")
+
+                LepuBleLog.d(tag, "model:$model,CMD_INFO => success")
+
+
+                val info = Bp2DeviceInfo(bleResponse.content, device.name)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Info)
                     .post(InterfaceEvent(model, info))
                 if (runRtImmediately) {
@@ -134,28 +140,44 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
             }
             Bp2BleCmd.BPMCmd.CMD_SET_TIME -> {
-                LepuBleLog.d(tag, "onResponseReceived SET_TIME")
-
                 //同步时间
-                LepuBleLog.d(tag, "model:$model,MSG_TYPE_SET_TIME => success")
+                LepuBleLog.d(tag, "model:$model,CMD_SET_TIME => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SyncTime)
                     .post(InterfaceEvent(model, true))
             }
             Bp2BleCmd.BPMCmd.CMD_FILE_LIST -> {
 
-                LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_BP_STATE => success")
+                LepuBleLog.d(tag, "model:$model,CMD_FILE_LIST => success")
                 //发送实时state : byte
-                if (bytes.content.size > 0) {
-                    val list = KtBleFileList(bytes.content, device.name)
+                if (bleResponse.content.isNotEmpty()) {
+                    val list = KtBleFileList(bleResponse.content, device.name)
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList)
                         .post(InterfaceEvent(model, list))
                 }
             }
 
             Bp2BleCmd.BPMCmd.CMD_FILE_READ_START -> {
-                fileContent = null;
-                fileSize = toUInt(bytes.content.copyOfRange(0, 4))
-                Log.d(tag, "download file $fileName CMD_FILE_READ_START fileSize == $fileSize")
+                LepuBleLog.d(tag, "model:$model,CMD_FILE_READ_START => success")
+
+                //检查当前的下载状态
+                if (isCancelRF || isPausedRF) {
+                    sendCmd(Bp2BleCmd.BPMCmd.fileReadEnd())
+                    return
+                }
+
+                //检查返回是否异常
+                if (bleResponse.type != Bp2BleResponse.BleResponse.TYPE_RESPONSE){
+
+                    LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, CMD_FILE_READ_START => error")
+
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileError)
+                        .post(InterfaceEvent(model, fileName))
+                    return
+                }
+
+                fileContent = null
+                fileSize = toUInt(bleResponse.content.copyOfRange(0, 4))
+                LepuBleLog.d(tag, "download file $fileName CMD_FILE_READ_START fileSize == $fileSize")
                 if (fileSize == 0) {
                     sendCmd(Bp2BleCmd.BPMCmd.fileReadEnd())
                 } else {
@@ -164,13 +186,19 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             }
 
             Bp2BleCmd.BPMCmd.CMD_FILE_READ_PKG -> {
-                curSize += bytes.len
+                LepuBleLog.d(tag, "model:$model,CMD_FILE_READ_PKG => success")
+
+                //检查当前的下载状态
+                if (isCancelRF || isPausedRF) {
+                    sendCmd(Bp2BleCmd.BPMCmd.fileReadEnd())
+                    return
+                }
+
+
+                curSize += bleResponse.len
                 val part = Bp2FilePart(fileName, fileSize, curSize)
-                fileContent = add(fileContent, bytes.content)
-                Log.d(
-                    tag,
-                    "download file $fileName CMD_FILE_READ_PKG curSize == $curSize | fileSize == $fileSize"
-                )
+                fileContent = add(fileContent, bleResponse.content)
+                LepuBleLog.d(tag, "download file $fileName CMD_FILE_READ_PKG curSize == $curSize | fileSize == $fileSize")
 
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadingFileProgress)
                     .post(InterfaceEvent(model, part))
@@ -182,24 +210,33 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             }
 
             Bp2BleCmd.BPMCmd.CMD_FILE_READ_END -> {
+                LepuBleLog.d(tag, "model:$model,CMD_FILE_READ_END => success")
+
                 curSize = 0
                 if (fileContent == null) fileContent = ByteArray(0)
-                if (fileContent!!.isNotEmpty()) {
-                    val file: Bp2BleFile = Bp2BleFile(fileName, fileContent!!, device.name)
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileComplete)
-                        .post(InterfaceEvent(model, file))
-                } else {
-                    //取消下载？？？
-                    //   BleMsgUtils.broadcastMsg(mService!!, BleMsg.MSG_DOWNLOAD, BleMsg.CODE_CANCEL)
-//                    LiveEventBus.get(InterfaceEvent.BP2.EventBp2ReadFileComplete).post(InterfaceEvent(model, file))
+
+                if (isCancelRF || isPausedRF){
+                    LepuBleLog.d(tag, "已经取消/暂停下载 isCancelRF = $isCancelRF, isPausedRF = $isPausedRF" )
+                    return
                 }
+
+                fileContent?.let {
+                    if (it.isNotEmpty()) {
+                        val file = Bp2BleFile(fileName, it, device.name)
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileComplete)
+                            .post(InterfaceEvent(model, file))
+                    }
+                }
+
 
             }
 
             //实时波形
             Bp2BleCmd.BPMCmd.CMD_BP2_RT_DATA -> {
-                if (bytes.content.size > 31) {
-                    val rtData = Bp2BleRtData(bytes.content)
+                LepuBleLog.d(tag, "model:$model,CMD_BP2_RT_DATA => success")
+
+                if (bleResponse.content.size > 31) {
+                    val rtData = Bp2BleRtData(bleResponse.content)
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData)
                         .post(InterfaceEvent(model, rtData))
                 }else{
@@ -208,16 +245,19 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             }
             //实时状态
             Bp2BleCmd.BPMCmd.CMD_BP2_RT_STATE -> {
-                val rtState = Bp2BleRtState(bytes.content)
+                LepuBleLog.d(tag, "model:$model,CMD_BP2_RT_STATE => success")
+
+                val rtState = Bp2BleRtState(bleResponse.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2State)
                     .post(InterfaceEvent(model, rtState))
-
 
             }
 
             Bp2BleCmd.BPMCmd.CMD_BP2_SET_SWITCHER_STATE -> {
+                LepuBleLog.d(tag, "model:$model,CMD_BP2_SET_SWITCHER_STATE => success")
+
                 //心跳音开关
-                if (bytes.type != 0x01.toByte()) {
+                if (bleResponse.type != 0x01.toByte()) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSetConfigResult)
                         .post(InterfaceEvent(model, 0))
                 } else {
@@ -226,12 +266,14 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 }
             }
             Bp2BleCmd.BPMCmd.CMD_BP2_CONFIG -> {
+                LepuBleLog.d(tag, "model:$model,CMD_BP2_CONFIG => success")
+
                 //获取返回的开关状态
-                if (bytes.type != 0x01.toByte()) {
+                if (bleResponse.type != 0x01.toByte()) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
                         .post(InterfaceEvent(model, 0))
                 } else {
-                    if (bytes.content != null && bytes.content.size > 24 && bytes.content[24].toInt() == 1) {
+                    if (bleResponse.content.size > 24 && bleResponse.content[24].toInt() == 1) {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
                             .post(InterfaceEvent(model, 1))
                     } else {
@@ -241,8 +283,10 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 }
             }
             Bp2BleCmd.BPMCmd.CMD_RESET -> {
+                LepuBleLog.d(tag, "model:$model,CMD_RESET => success")
+
                 //重置
-                if (bytes.type != 0x01.toByte()) {
+                if (bleResponse.type != 0x01.toByte()) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FactoryReset)
                         .post(InterfaceEvent(model, 0))
                 } else {
@@ -252,6 +296,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             }
 
             Bp2BleCmd.BPMCmd.SWITCH_STATE ->{
+                LepuBleLog.d(tag, "model:$model,SWITCH_STATE => success")
                 //切换状态
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSwitchState).post(InterfaceEvent(model, true))
             }
@@ -269,11 +314,11 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
     }
 
     fun startBp() {
-        LepuBleLog.d(tag, "getInfo...")
+        LepuBleLog.d(tag, "startBp...")
         sendCmd(Bp2BleCmd.getCmd(Bp2BleCmd.BPMCmd.MSG_TYPE_START_BP))
     }
      fun stopBp() {
-        LepuBleLog.d(tag, "getInfo...")
+        LepuBleLog.d(tag, "stopBp...")
         sendCmd(Bp2BleCmd.getCmd(Bp2BleCmd.BPMCmd.MSG_TYPE_STOP_BP))
     }
 
@@ -344,7 +389,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
      * 5：进入理疗模式
      */
     fun switchState(state: Int){
-        LepuBleLog.e("SWITCH_STATE===$state")
+        LepuBleLog.e("enter  switchState： SWITCH_STATE===$state")
 
         sendCmd(Bp2BleCmd.BPMCmd.switchState(state))
     }

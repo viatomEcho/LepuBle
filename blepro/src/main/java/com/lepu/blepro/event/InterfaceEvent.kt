@@ -94,9 +94,14 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBp2RecordEnd = "com.lepu.ble.bp2.record.end"
             const val EventBp2MeasureResult = "com.lepu.ble.bp2.measure.result"
 
+            /**
+             * 1 设置成功， 0 设置失败
+             */
             const val EventBpSetConfigResult = "com.lepu.ble.bp2.measure.config"
             const val EventBpGetConfigResult = "com.lepu.ble.bp2.measure.getConfig"
             const val EventBpSwitchState = "com.lepu.ble.bp2.switch.state"
+
+
 
         }
     }
