@@ -9,7 +9,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.Bp2BleCmd
 import com.lepu.blepro.ble.cmd.Bp2BleResponse
-import com.lepu.blepro.ble.cmd.Er1BleCmd
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
@@ -66,7 +65,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
         manager = Bp2BleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
-        manager.setNotifyListener(this)
+        manager.notifyListener = this
         manager.connect(device)
                 .useAutoConnect(false)
                 .timeout(10000)
@@ -348,13 +347,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
     }
 
 
-    /**
-     *
-     */
-    fun resetAll(){
-        sendCmd(Bp2BleCmd.BPMCmd.resetAll())
-    }
-     fun setConfig(switch:Boolean){
+    fun setConfig(switch:Boolean){
         sendCmd(Bp2BleCmd.BPMCmd.setConfig(switch))
     }
      fun getConfig(){
@@ -369,11 +362,16 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
         this.fileName = fileName
         sendCmd(Bp2BleCmd.BPMCmd.getFileStart(fileName.toByteArray(), 0))
     }
-    override fun resetDeviceInfo() {
+    override fun reset() {
+        sendCmd(Bp2BleCmd.BPMCmd.reset())
     }
 
     override fun factoryReset() {
-        sendCmd(Bp2BleCmd.BPMCmd.resetAll())
+        sendCmd(Bp2BleCmd.BPMCmd.factoryReset())
+    }
+
+    override fun factoryResetAll() {
+        sendCmd(Bp2BleCmd.BPMCmd.factoryResetAll())
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
@@ -393,14 +391,6 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
         sendCmd(Bp2BleCmd.BPMCmd.switchState(state))
     }
-
-
-
-
-
-
-
-
 
 
 }

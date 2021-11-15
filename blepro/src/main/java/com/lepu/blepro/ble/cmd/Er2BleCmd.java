@@ -14,6 +14,7 @@ public class Er2BleCmd {
     public final static byte CMD_RETRIEVE_DEVICE_INFO = (byte) 0xE1;
     public final static byte CMD_LOCK_FLASH = (byte) 0xEB;
     public final static byte CMD_BURN_SN_CODE = (byte) 0xEA;
+    public final static byte CMD_RESET = (byte) 0xE2;
     public final static byte CMD_FACTORY_RESET_ALL = (byte) 0xEE;
     public final static byte CMD_FACTORY_RESET = (byte) 0xE3;
     public final static byte CMD_GET_BATTERY = (byte) 0xE4;
@@ -72,9 +73,14 @@ public class Er2BleCmd {
         return getReq(CMD_FACTORY_RESET, (byte)seqNo, new byte[0]);
     }
 
-    public static byte[] resetAll() {
+    public static byte[] factoryResetAll() {
         addNo();
         return getReq(CMD_FACTORY_RESET_ALL, (byte)seqNo, new byte[0]);
+    }
+
+    public static byte[] reset() {
+        addNo();
+        return getReq(CMD_RESET, (byte)seqNo, new byte[0]);
     }
 
     public static byte[] getRtData() {

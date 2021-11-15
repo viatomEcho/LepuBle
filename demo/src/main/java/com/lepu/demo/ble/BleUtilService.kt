@@ -2,7 +2,7 @@ package com.lepu.demo.ble
 
 import android.app.Application
 import android.bluetooth.BluetoothDevice
-import com.lepu.blepro.BleServiceHelper
+import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.constants.Ble
@@ -70,78 +70,78 @@ companion object {
 
 
     fun setInterface(model: Int, runRtImmediately: Boolean = false) {
-        BleServiceHelper.BleServiceHelper.setInterfaces(model)
+        BleServiceHelper.setInterfaces(model)
     }
 
     fun reInitBle() {
-        BleServiceHelper.BleServiceHelper.reInitBle()
+        BleServiceHelper.reInitBle()
     }
 
     fun startScan(targetModel: Int, needPair: Boolean = false) {
-        BleServiceHelper.BleServiceHelper.startScan(targetModel, needPair)
+        BleServiceHelper.startScan(targetModel, needPair)
     }
 
     fun startScan(targetModel: IntArray, needPair: Boolean = false) {
-        BleServiceHelper.BleServiceHelper.startScan(targetModel, needPair)
+        BleServiceHelper.startScan(targetModel, needPair)
     }
 
 
 
     fun stopScan() {
-        BleServiceHelper.BleServiceHelper.stopScan()
+        BleServiceHelper.stopScan()
     }
 
 
     fun connect(context: Application, b: Bluetooth) {
-        BleServiceHelper.BleServiceHelper.connect(context, b.model, b.device)
+        BleServiceHelper.connect(context, b.model, b.device)
     }
 
     fun connect(context: Application, model: Int, b: BluetoothDevice) {
-        BleServiceHelper.BleServiceHelper.connect(context, model, b)
+        BleServiceHelper.connect(context, model, b)
     }
 
     fun reconnect(model: IntArray, name : Array<String>) {
-        BleServiceHelper.BleServiceHelper.reconnect(model, name)
+        BleServiceHelper.reconnect(model, name)
     }
 
     fun reconnect(model: Int, name : String) {
-        BleServiceHelper.BleServiceHelper.reconnect(model, name)
+        BleServiceHelper.reconnect(model, name)
     }
 
     fun disconnect(autoReconnect: Boolean) {
-        BleServiceHelper.BleServiceHelper.disconnect(autoReconnect)
+        BleServiceHelper.disconnect(autoReconnect)
     }
 
     fun disconnect(model: Int, autoReconnect: Boolean) {
-        BleServiceHelper.BleServiceHelper.disconnect(model, autoReconnect)
+        BleServiceHelper.disconnect(model, autoReconnect)
     }
 
     fun getBleState(model: Int): Int {
-        return BleServiceHelper.BleServiceHelper.getConnectState(model)
+        return BleServiceHelper.getConnectState(model)
     }
 
     fun getInfo(model: Int) {
-        BleServiceHelper.BleServiceHelper.getInfo(model)
+        BleServiceHelper.getInfo(model)
     }
 
     fun readFile(userId: String, fileName: String, model: Int) {
-        BleServiceHelper.BleServiceHelper.readFile(userId, fileName, model)
+        BleServiceHelper.readFile(userId, fileName, model)
     }
 
     fun stopRtTask(model: Int) {
-        BleServiceHelper.BleServiceHelper.stopRtTask(model)
+        BleServiceHelper.stopRtTask(model)
     }
 
     fun startRtTask(model: Int) {
-        BleServiceHelper.BleServiceHelper.startRtTask(model)
+        BleServiceHelper.startRtTask(model)
     }
 
     fun syncData(model: Int, type: String, value: Any) {
-        BleServiceHelper.BleServiceHelper.updateSetting(model, type, value)
+        BleServiceHelper.updateSetting(model, type, value)
     }
 
     fun reset(model: Int) {
-        BleServiceHelper.BleServiceHelper.reset(model)
+        BleServiceHelper.reset(model)
     }
 
     fun bind(info: Any, b: Bluetooth): Boolean {

@@ -6,10 +6,12 @@ import android.bluetooth.le.*
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
 import android.text.TextUtils
 import android.util.Log
 import android.util.SparseArray
+import androidx.annotation.RequiresApi
 import androidx.core.util.isEmpty
 import androidx.lifecycle.LifecycleService
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -79,7 +81,8 @@ open class BleService: LifecycleService() {
     var isReconnectScan: Boolean = false
 
     /**
-     * 发起重连扫描时应匹配的蓝牙名集合
+     * 发起重连扫描时应匹配的蓝牙名的集合
+     *
      */
     var reconnectDeviceName: ArrayList<String> = ArrayList()
 
@@ -284,6 +287,8 @@ open class BleService: LifecycleService() {
     /**
      * 重新连接开启扫描
      * 必定开启 isAutoConnecting = true
+     *
+     * 现在的多设备重连，无法SDK自动完成所有的设备的重连，需要连接一个后再次调用重连 去连另一个
      */
     fun reconnect( scanModel : IntArray,reconnectDeviceName: Array<String>, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
 
@@ -292,11 +297,12 @@ open class BleService: LifecycleService() {
         var reScan = false
 
         if (BleServiceHelper.BleServiceHelper.hasUnConnected()) {
-            LepuBleLog.d(tag, "reconnectByName 有未连接的设备....}")
+            LepuBleLog.d(tag, "reconnectByName 有未连接的设备....")
             reScan = true
         }
         if (reScan) {
             this.reconnectDeviceName.addAll(reconnectDeviceName.asList())
+
             this.isReconnectByAddress = false
             this.toConnectUpdater = toConnectUpdater
             this.needPair = needPair
@@ -329,6 +335,7 @@ open class BleService: LifecycleService() {
         }
         if (reScan) {
             this.reconnectDeviceAddress.addAll(reconnectDeviceAddress.toList())
+
             this.isReconnectByAddress = true
             this.needPair = needPair
             this.toConnectUpdater = toConnectUpdater
@@ -344,6 +351,7 @@ open class BleService: LifecycleService() {
     private var bluetoothAdapter : BluetoothAdapter? = null
     private var leScanner : BluetoothLeScanner? = null
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun scanDevice(enable: Boolean) {
         LepuBleLog.d(tag, "scanDevice => $enable")
 
@@ -424,14 +432,14 @@ open class BleService: LifecycleService() {
             }
 
             if (BluetoothController.addDevice(b)) {
-                LepuBleLog.d(tag, "model = ${b.model}, isReconnecting::$isReconnectScan, b= ${b.name}, recName = ${reconnectDeviceName?.joinToString()}, " +
-                        "toConnectUpdater = $toConnectUpdater,  isReconnectByAddress = $isReconnectByAddress ,  recAddress:${reconnectDeviceAddress?.joinToString()}")
+                LepuBleLog.d(tag, "model = ${b.model}, isReconnecting::$isReconnectScan, b= ${b.name}, recName = ${reconnectDeviceName.joinToString()}, " +
+                        "toConnectUpdater = $toConnectUpdater,  isReconnectByAddress = $isReconnectByAddress ,  recAddress:${reconnectDeviceAddress.joinToString()}")
 
                 LiveEventBus.get<Bluetooth>(EventMsgConst.Discovery.EventDeviceFound).post(b)
 
 
 
-                val isContains: Boolean = if(isReconnectByAddress) reconnectDeviceAddress?.contains(b.device.address) == true else reconnectDeviceName.contains(b.name)
+                val isContains: Boolean = if(isReconnectByAddress) reconnectDeviceAddress.contains(b.device.address) else reconnectDeviceName.contains(b.name)
 
                 if (isReconnectScan && isContains){
                     stopDiscover()

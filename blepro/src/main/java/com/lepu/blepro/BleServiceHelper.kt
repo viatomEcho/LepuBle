@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
-import android.util.Log
 import android.util.SparseArray
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
@@ -279,7 +278,7 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * 发起重连
+     * 发起重连 一次只连一个
      * @param scanModel Int
      * @param name String
      */
@@ -387,7 +386,7 @@ class BleServiceHelper private constructor() {
         for (x in 0 until  bleService.vailFace.size() ){
             bleService.vailFace[bleService.vailFace.keyAt(x)]?.let {
                 it.let {
-                    LepuBleLog.d(tag, "hasUnConnected  有未连接的设备")
+                    LepuBleLog.d(tag, "hasUnConnected  有未连接的设备: model = ${it.model}")
 
                     if (!it.state && !it.connecting) return true
                 }
@@ -472,15 +471,6 @@ class BleServiceHelper private constructor() {
         }
     }
 
-
-    /**
-     * 重置主机
-     */
-    fun reset(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.resetDeviceInfo()
-
-    }
 
     /**
      * 更新设备设置
@@ -760,6 +750,31 @@ class BleServiceHelper private constructor() {
     }
 
     /**
+     * 恢复生产出厂状态
+     */
+    fun factoryResetAll(model: Int){
+        getInterface(model)?.let { ble ->
+            when(model){
+                Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
+                    (ble as Er1BleInterface).factoryResetAll()
+                }
+                Bluetooth.MODEL_O2RING -> {
+                    (ble as OxyBleInterface).factoryResetAll()
+                }
+                Bluetooth.MODEL_ER2 -> {
+                    (ble as Er2BleInterface).factoryResetAll()
+                }
+                Bluetooth.MODEL_BPM -> {
+                    (ble as BpmBleInterface).factoryResetAll()
+                }
+                Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
+                    (ble as Bp2BleInterface).factoryResetAll()
+                }
+            }
+        }
+    }
+
+    /**
      * 恢复出厂设置
      */
     fun factoryReset(model: Int){
@@ -785,25 +800,25 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * 清除设备信息
+     * 设备复位
      */
-    fun resetDeviceInfo(model: Int){
+    fun reset(model: Int){
         getInterface(model)?.let { ble ->
             when(model){
                 Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
-                    (ble as Er1BleInterface).resetDeviceInfo()
+                    (ble as Er1BleInterface).reset()
                 }
                 Bluetooth.MODEL_O2RING -> {
-                    (ble as OxyBleInterface).resetDeviceInfo()
+                    (ble as OxyBleInterface).reset()
                 }
                 Bluetooth.MODEL_ER2 -> {
-                    (ble as Er2BleInterface).resetDeviceInfo()
+                    (ble as Er2BleInterface).reset()
                 }
                 Bluetooth.MODEL_BPM -> {
-                    (ble as BpmBleInterface).resetDeviceInfo()
+                    (ble as BpmBleInterface).reset()
                 }
                 Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
-                    (ble as Bp2BleInterface).resetDeviceInfo()
+                    (ble as Bp2BleInterface).reset()
                 }
             }
         }
@@ -872,6 +887,20 @@ class BleServiceHelper private constructor() {
                 LepuBleLog.d(
                     tag,
                     "从重连名单中移除 $name,  list = ${bleService.reconnectDeviceName.joinToString()}"
+                )
+            }
+        }
+    }
+
+    fun removeReconnectAddress(address: String) {
+        val iterator = bleService.reconnectDeviceAddress.iterator()
+        while (iterator.hasNext()) {
+            val i = iterator.next()
+            if (i == address) {
+                iterator.remove()
+                LepuBleLog.d(
+                    tag,
+                    "从重连名单中移除 $address,  list = ${bleService.reconnectDeviceAddress.joinToString()}"
                 )
             }
         }

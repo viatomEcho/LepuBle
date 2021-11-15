@@ -26,7 +26,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
         manager = Er2BleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
-        manager.setNotifyListener(this)
+        manager.notifyListener = this
         manager.connect(device)
             .useAutoConnect(false)
             .timeout(10000)
@@ -255,11 +255,15 @@ class Er2BleInterface(model: Int): BleInterface(model) {
     }
 
     override fun factoryReset() {
-        LepuBleLog.e(tag, "factoryReset Not yet implemented")
+        sendCmd(Er2BleCmd.factoryReset())
     }
 
-    override fun resetDeviceInfo() {
-        sendCmd(Er2BleCmd.factoryReset())
+    override fun reset() {
+        sendCmd(Er2BleCmd.reset())
+    }
+
+    override fun factoryResetAll() {
+        sendCmd(Er2BleCmd.factoryResetAll())
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {

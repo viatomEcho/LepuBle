@@ -34,7 +34,7 @@ import kotlin.collections.ArrayList
  *  5.断开连接时可重置isAutoReconnect，根据需要决定是否断开后是否重连
  *
  */
-abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener {
+abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
     private val tag = "BleInterface"
 
@@ -59,7 +59,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
      */
     var isAutoReconnect: Boolean = false
 
-    lateinit var manager: BaseBleManager
+    lateinit var manager: LpBleManager
     lateinit var device: BluetoothDevice
 
     private var pool: ByteArray? = null
@@ -236,10 +236,12 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
             LiveEventBus.get<Boolean>(EventMsgConst.Updater.EventBleConnected).post(true)
 
         BleServiceHelper.removeReconnectName(device.name)
+        BleServiceHelper.removeReconnectAddress(device.address)
 
 
 
     }
+
 
     override fun onDeviceConnecting(device: BluetoothDevice) {
         LepuBleLog.d(tag, "${device.name} Connecting")
@@ -311,7 +313,10 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
             return
         }
         manager.sendCmd( bs)
+
+
     }
+
 
     /**
      * 发布蓝牙状态改变通知
@@ -391,14 +396,19 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener 
     abstract fun dealReadFile(userId: String, fileName: String)
 
     /**
-     * 重置设备
+     *  设备复位
      */
-    abstract fun resetDeviceInfo()
+    abstract fun reset()
 
     /**
      * 恢复出厂设置
      */
     abstract fun factoryReset()
+
+    /**
+     * 恢复生产出厂状态
+     */
+    abstract fun factoryResetAll()
 
     /**
      * 继续 读取文件

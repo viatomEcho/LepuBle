@@ -141,6 +141,15 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             }
             LpBleUtil.State.DISCONNECTED ->{
                 LpBleUtil.stopRtTask(CURRENT_MODEL)
+
+//                viewModel.model.value?.let { model ->
+//                    LpBleUtil.getInterface(model)?.let {
+//                        LpBleUtil.reconnect(model, it.device.name)
+//                    }
+//
+//                }
+
+
             }
         }
     }

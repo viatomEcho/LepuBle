@@ -14,6 +14,7 @@ import static com.lepu.blepro.ble.cmd.Er2BleCmd.COMMON_PKG_HEAD_LENGTH;
 public class Er1BleCmd {
 
     public final static int GET_INFO = 0xE1;
+    public final static int RESET = 0xE2;
     public final static int FACTORY_RESET = 0xE3;
     public final static int FACTORY_RESET_ALL = 0xEE;
     public final static int BURN_FACTORY_INFO = 0xEA;
@@ -145,6 +146,25 @@ public class Er1BleCmd {
         cmd[10] = (byte) (motionWindows & 0xFF);
         cmd[11] = (byte) ((motionWindows >> 8) & 0xFF);
         cmd[12] = BleCRC.calCRC8(cmd);
+        addNo();
+
+        LepuBleLog.d(ByteArrayKt.bytesToHex(cmd));
+        return cmd;
+    }
+
+
+    public static byte[] reset() {
+        int len = 0;
+
+        byte[] cmd = new byte[8+len];
+        cmd[0] = (byte) 0xA5;
+        cmd[1] = (byte) RESET;
+        cmd[2] = (byte) ~RESET;
+        cmd[3] = (byte) 0x00;
+        cmd[4] = (byte) seqNo;
+        cmd[5] = (byte) 0x00;
+        cmd[6] = (byte) 0x00;
+        cmd[7] = BleCRC.calCRC8(cmd);
         addNo();
 
         LepuBleLog.d(ByteArrayKt.bytesToHex(cmd));

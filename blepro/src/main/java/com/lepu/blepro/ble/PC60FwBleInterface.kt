@@ -19,7 +19,7 @@ class PC60FwBleInterface(model: Int): BleInterface(model) {
         manager = PC60FwBleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
-        manager.setNotifyListener(this)
+        manager.notifyListener = this
         manager.connect(device)
                 .useAutoConnect(false) // true:可能自动重连， 程序代码还在执行扫描
                 .timeout(10000)
@@ -110,12 +110,16 @@ class PC60FwBleInterface(model: Int): BleInterface(model) {
     override fun dealReadFile(userId: String, fileName: String) {
     }
 
-    override fun resetDeviceInfo() {
+    override fun reset() {
+        TODO("Not yet implemented")
     }
 
     override fun factoryReset() {
-        LepuBleLog.e(tag, "Not yet implemented ")
+        TODO("Not yet implemented")
+    }
 
+    override fun factoryResetAll() {
+        TODO("Not yet implemented")
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {

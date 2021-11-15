@@ -41,7 +41,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
         manager = OxyBleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
-        manager.setNotifyListener(this)
+        manager.notifyListener = this
         manager.connect(device)
                 .useAutoConnect(false) // true:可能自动重连， 程序代码还在执行扫描
                 .timeout(10000)
@@ -286,8 +286,13 @@ class OxyBleInterface(model: Int): BleInterface(model) {
         LepuBleLog.e(tag, "factoryReset Not yet implemented")
     }
 
-    override fun resetDeviceInfo() {
-        sendOxyCmd(OxyBleCmd.OXY_CMD_RESET, OxyBleCmd.resetDeviceInfo())
+    override fun factoryResetAll() {
+        sendOxyCmd(OxyBleCmd.OXY_CMD_RESET, OxyBleCmd.factoryResetAll())
+    }
+
+    override fun reset() {
+        LepuBleLog.e(tag, "reset Not yet implemented")
+
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {

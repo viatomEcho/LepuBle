@@ -1,15 +1,15 @@
 package com.lepu.blepro.base;
 
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
-import android.content.pm.LauncherApps;
+import android.os.Handler;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.lepu.blepro.ble.data.LepuDevice;
 import com.lepu.blepro.utils.ByteArrayKt;
 import com.lepu.blepro.utils.LepuBleLog;
 
@@ -17,6 +17,8 @@ import java.util.UUID;
 
 import no.nordicsemi.android.ble.BleManager;
 import no.nordicsemi.android.ble.RequestQueue;
+import no.nordicsemi.android.ble.callback.BeforeCallback;
+import no.nordicsemi.android.ble.callback.FailCallback;
 
 /**
  * author: wujuan
@@ -39,8 +41,18 @@ public abstract class BaseBleManager extends BleManager {
         this.listener = listener;
     }
 
+
+
+
+
     public BaseBleManager(@NonNull final Context context) {
         super(context);
+        initUUID();
+
+    }
+
+    public BaseBleManager(@NonNull Context context, @NonNull Handler handler){
+        super(context, handler);
         initUUID();
 
     }
@@ -53,10 +65,16 @@ public abstract class BaseBleManager extends BleManager {
         return new MyManagerGattCallback();
     }
 
+
+
     /**
      * BluetoothGatt callbacks object.
      */
     private class MyManagerGattCallback extends BleManagerGattCallback {
+
+
+
+
 
         @Override
         public boolean isRequiredServiceSupported(@NonNull final BluetoothGatt gatt) {
@@ -146,7 +164,7 @@ public abstract class BaseBleManager extends BleManager {
 //                    .enqueue();
             LepuBleLog.d(TAG, "initialize");
 
-            initReqQueue();
+            dealReqQueue();
             setNotify();
             BaseBleManager.this.init();
 
@@ -169,9 +187,36 @@ public abstract class BaseBleManager extends BleManager {
                 });
     }
 
-    public abstract  void initReqQueue();
+    public RequestQueue buildRequest(){
+       return beginAtomicRequestQueue()
+                .add(requestMtu(23) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
+                        .with((device, mtu) -> log(Log.INFO, "MTU set to " + mtu))
+                        .fail((device, status) -> log(Log.WARN, "Requested MTU not supported: " + status)))
+//                    .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
+//                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
+//                    .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
+                .add(enableNotifications(notify_char))
+               .before(new BeforeCallback() {
+                   @Override
+                   public void onRequestStarted(@NonNull BluetoothDevice device) {
+                       LepuBleLog.d(TAG, "onRequestStarted...");
+                   }
+               })
+                .fail(new FailCallback() {
+                    @Override
+                    public void onRequestFailed(@NonNull BluetoothDevice device, int status) {
+                        LepuBleLog.d(TAG, "onRequestFailed...");
+                    }
+                })
+                .done(device -> log(Log.INFO, "Target initialized"));
+
+    }
+
+    public abstract  void dealReqQueue();
 
     public void sendCmd(byte[] bytes) {
+
+
         writeCharacteristic(write_char, bytes)
                 .split()
                 .done(device -> {

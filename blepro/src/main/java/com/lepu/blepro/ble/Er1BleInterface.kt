@@ -26,7 +26,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
         manager = Er1BleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
-        manager.setNotifyListener(this)
+        manager.notifyListener = this
         manager.connect(device)
             .useAutoConnect(false)
             .timeout(10000)
@@ -241,11 +241,15 @@ class Er1BleInterface(model: Int): BleInterface(model) {
     }
 
 
-    override fun resetDeviceInfo() {
-        sendCmd(Er1BleCmd.factoryReset())
+    override fun reset() {
+        sendCmd(Er1BleCmd.reset())
     }
 
     override fun factoryReset() {
+        sendCmd(Er1BleCmd.factoryReset())
+    }
+
+    override fun factoryResetAll() {
         sendCmd(Er1BleCmd.factoryResetAll())
     }
 

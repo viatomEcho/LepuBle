@@ -4,8 +4,10 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.util.Log
 import com.lepu.blepro.base.BaseBleManager
+import com.lepu.blepro.base.LpBleManager
 import com.lepu.blepro.ble.cmd.BpmBleCmd
 import com.lepu.blepro.utils.LepuBleLog
+import no.nordicsemi.android.ble.RequestQueue
 import java.util.*
 
 /**
@@ -13,7 +15,7 @@ import java.util.*
  * created on: 2021/2/5 15:14
  * description:
  */
-class BpmBleManager(context: Context): BaseBleManager(context) {
+class BpmBleManager(context: Context): LpBleManager(context) {
 
     override fun initUUID() {
         service_uuid =
@@ -24,29 +26,36 @@ class BpmBleManager(context: Context): BaseBleManager(context) {
             UUID.fromString("00002AF0-0000-1000-8000-00805F9B34FB")
     }
 
-    override fun initReqQueue() {
 
-        beginAtomicRequestQueue()
-            // .add(requestMtu(247) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
-            //                            .with((device, mtu) -> log(Log.INFO, "MTU set to " + mtu))
-            //                            .fail((device, status) -> log(Log.WARN, "Requested MTU not supported: " + status)))
-            //                    .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
-            //                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
-            .add(enableNotifications(notify_char))
-            .done { device: BluetoothDevice? ->
-                log(
-                    Log.INFO,
-                    "Target initialized"
-                )
-            }
-            .enqueue()
+    override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {
+        return requestQueue
     }
+//
+//    override fun dealReqQueue() {
+//
+//        beginAtomicRequestQueue()
+//            // .add(requestMtu(247) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
+//            //                            .with((device, mtu) -> log(Log.INFO, "MTU set to " + mtu))
+//            //                            .fail((device, status) -> log(Log.WARN, "Requested MTU not supported: " + status)))
+//            //                    .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
+//            //                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
+//            .add(enableNotifications(notify_char))
+//            .done { device: BluetoothDevice? ->
+//                log(
+//                    Log.INFO,
+//                    "Target initialized"
+//                )
+//            }
+//            .enqueue()
+//    }
 
-    override fun init() {
+
+    override fun initialize() {
         if (!isUpdater)
             syncTime()
         LepuBleLog.d("BpmBleManager inited ")
     }
+
     private fun syncTime() {
         sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_SET_TIME));
     }

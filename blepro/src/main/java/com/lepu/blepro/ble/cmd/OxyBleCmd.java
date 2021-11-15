@@ -195,7 +195,7 @@ public class OxyBleCmd {
         return buf;
     }
 
-    public static byte[] resetDeviceInfo() {
+    public static byte[] factoryResetAll() {
         byte[] buf = new byte[8];
         buf[0] = (byte) 0xAA;
         buf[1] = (byte) OXY_CMD_RESET;

@@ -55,6 +55,8 @@ public class Bp2BleCmd {
         private final static byte TYPE_NORMAL_SEND = (byte) 0x00;
         public final static byte CMD_FILE_LIST = (byte) 0xF1;
         public final static byte CMD_RESET = (byte) 0xE2;
+        public final static byte CMD_FACTORY_RESET = (byte) 0xE3;
+        public final static byte CMD_FACTORY_RESET_ALL = (byte) 0xEE;
         // data = state + wave
         public final static byte CMD_BP2_RT_DATA = (byte) 0x08;
         public final static byte CMD_BP2_RT_STATE = (byte) 0x06;
@@ -178,25 +180,66 @@ public class Bp2BleCmd {
         }
 
 
-        public static byte[] resetAll() {
-                int len = 0;
-                byte[] cmd = new byte[8+len];
+        public static byte[] reset() {
+            int len = 0;
+            byte[] cmd = new byte[8+len];
 
-                cmd[0] = HEAD;
-                cmd[1] = CMD_RESET;
-                cmd[2] = ~CMD_RESET;
-                cmd[3] = TYPE_NORMAL_SEND;
-                cmd[4] = (byte) serial;
-                // length
-                cmd[5] = (byte) len;
-                cmd[6] = (byte) (len>>8);
-                cmd[7+len] = CrcUtil.calCRC8(cmd);
+            cmd[0] = HEAD;
+            cmd[1] = CMD_RESET;
+            cmd[2] = ~CMD_RESET;
+            cmd[3] = TYPE_NORMAL_SEND;
+            cmd[4] = (byte) serial;
+            // length
+            cmd[5] = (byte) len;
+            cmd[6] = (byte) (len>>8);
+            cmd[7+len] = CrcUtil.calCRC8(cmd);
 
-                serial++;
+            serial++;
 
-                return cmd;
+            return cmd;
 
         }
+
+        public static byte[] factoryReset() {
+            int len = 0;
+            byte[] cmd = new byte[8+len];
+
+            cmd[0] = HEAD;
+            cmd[1] = CMD_FACTORY_RESET;
+            cmd[2] = ~CMD_FACTORY_RESET;
+            cmd[3] = TYPE_NORMAL_SEND;
+            cmd[4] = (byte) serial;
+            // length
+            cmd[5] = (byte) len;
+            cmd[6] = (byte) (len>>8);
+            cmd[7+len] = CrcUtil.calCRC8(cmd);
+
+            serial++;
+
+            return cmd;
+
+        }
+
+        public static byte[] factoryResetAll() {
+            int len = 0;
+            byte[] cmd = new byte[8+len];
+
+            cmd[0] = HEAD;
+            cmd[1] = CMD_FACTORY_RESET_ALL;
+            cmd[2] = ~CMD_FACTORY_RESET_ALL;
+            cmd[3] = TYPE_NORMAL_SEND;
+            cmd[4] = (byte) serial;
+            // length
+            cmd[5] = (byte) len;
+            cmd[6] = (byte) (len>>8);
+            cmd[7+len] = CrcUtil.calCRC8(cmd);
+
+            serial++;
+
+            return cmd;
+
+        }
+
 
         public static byte[] setConfig(boolean switchState) {
                 int len = 40;

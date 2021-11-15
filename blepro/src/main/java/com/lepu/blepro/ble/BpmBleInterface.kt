@@ -24,7 +24,7 @@ class BpmBleInterface(model: Int): BleInterface(model) {
         manager = BpmBleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
-        manager.setNotifyListener(this)
+        manager.notifyListener = this
         manager.connect(device)
                 .useAutoConnect(false)
                 .timeout(10000)
@@ -178,19 +178,25 @@ class BpmBleInterface(model: Int): BleInterface(model) {
         LepuBleLog.e(tag, "dealReadFile Not yet implemented")
 
     }
-    override fun resetDeviceInfo() {
-        LepuBleLog.e(tag, "resetDeviceInfo Not yet implemented")
 
-    }
 
     override fun dealContinueRF(userId: String, fileName: String) {
         LepuBleLog.e(tag, "dealContinueRF Not yet implemented")
 
     }
 
+
+    override fun reset() {
+        LepuBleLog.e(tag, "reset Not yet implemented")
+
+    }
     override fun factoryReset() {
         LepuBleLog.e(tag, "factoryReset Not yet implemented")
 
+    }
+
+    override fun factoryResetAll() {
+        LepuBleLog.e(tag, "factoryResetAll Not yet implemented")
     }
 
     fun startBp() {
