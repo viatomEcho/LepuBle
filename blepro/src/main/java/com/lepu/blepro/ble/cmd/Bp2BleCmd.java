@@ -76,10 +76,25 @@ public class Bp2BleCmd {
         public final static byte CMD_INFO = (byte) 0xE1;
         public final static byte CMD_BP2_CONFIG = (byte) 0x00;
         private static int serial = 0;
+
+
+        public final static int MSG_TYPE_SET_SWITCHER_STATE = 0x0B;
+        public final static int MSG_TYPE_GET_CONFIG = 0x00;
+        public final static int MSG_TYPE_RESET = 0xE2;
+        public final static int MSG_TYPE_FACTORY_RESET = 0xE3;
+        public final static int MSG_TYPE_FACTORY_RESET_ALL = 0xEE;
+        public final static int MSG_TYPE_SWITCH_STATE = 0x09;
         public final static int MSG_TYPE_GET_INFO = 0x03;
         public final static int MSG_TYPE_SET_TIME = 0x04;
         public final static int MSG_TYPE_START_BP = 0x15;
         public final static int MSG_TYPE_STOP_BP = 0x16;
+        public final static int MSG_TYPE_BP2_RT_DATA = 0x08;
+        public final static int MSG_TYPE_BP2_RT_STATE = 0x06;
+        public final static int MSG_TYPE_READ_START = 0xF2;//开始
+        public final static int MSG_TYPE_READ_PKG =  0xF3;//读取中
+        public final static int MSG_TYPE_READ_END =  0xF4;//结束
+
+
         public final static int MSG_TYPE_GET_BP_STATE = 0x18;//实施波形状态
         public final static int MSG_TYPE_GET_BP_FILE_LIST = 0xF1;//获取文件列表
 
@@ -430,7 +445,7 @@ public class Bp2BleCmd {
             return cmd;
 
         }
-        public static byte[] getRtState() {
+        public static byte[] getRtBpState() {
                 int len = 0;
 
                 byte[] cmd = new byte[8+len];

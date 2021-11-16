@@ -25,7 +25,6 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
     private var userId: String? = null
     
-    var curCmd: Int = 0
 
     var isPpgRt: Boolean = false
 
@@ -60,7 +59,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
         if (curCmd !== 0) {
             // busy
-            LepuBleLog.d("BaseBleManager", "busy: " + cmd.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
+            LepuBleLog.d(tag, "busy: " + cmd.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
             return
         }
         sendCmd(bs)
@@ -299,10 +298,6 @@ class OxyBleInterface(model: Int): BleInterface(model) {
        LepuBleLog.e(tag, "o2 暂不支持断点下载")
     }
 
-    override fun onDeviceReady(device: BluetoothDevice) {
-        super.onDeviceReady(device)
-        clearTimeout()
-        syncTime()
-    }
+
 
 }

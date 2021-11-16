@@ -157,16 +157,9 @@ abstract class LpBleManager(context: Context): BleManager(context) {
             //                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
             //                    .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
             .add(enableNotifications(notify_char))
-            .before { 
-                LepuBleLog.d(MANAGER_TAG, "onRequestStarted...")
-            }
-            .fail { device, status -> 
-                LepuBleLog.d(MANAGER_TAG, "onRequestFailed...name = ${device.name} , status = $status")
-            }
             .done { device: BluetoothDevice? ->
                 log(Log.INFO, "Target initialized")
             }
-        
         dealReqQueue(queue).enqueue()
     }
 
@@ -180,6 +173,9 @@ abstract class LpBleManager(context: Context): BleManager(context) {
             .split()
             .done { device: BluetoothDevice ->
                 LepuBleLog.e(device.name + "send cmd:" + bytesToHex(bytes))
+            }.fail { device, status ->
+
+
             }
             .enqueue()
     }

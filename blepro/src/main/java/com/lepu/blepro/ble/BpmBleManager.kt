@@ -51,8 +51,8 @@ class BpmBleManager(context: Context): LpBleManager(context) {
 
 
     override fun initialize() {
-        if (!isUpdater)
-            syncTime()
+//        if (!isUpdater)
+//            syncTime()
         LepuBleLog.d("BpmBleManager inited ")
     }
 

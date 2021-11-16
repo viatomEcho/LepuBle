@@ -54,8 +54,7 @@ class PC60FwBleManager(context: Context): LpBleManager(context) {
     }
 
     override fun initialize() {
-        if (!isUpdater)
-            LepuBleLog.d("PC60FW BleManager inited")
+        LepuBleLog.d("PC60FW BleManager inited")
     }
 
 }

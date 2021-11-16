@@ -61,18 +61,13 @@ class Bp2BleManager(context: Context): LpBleManager(context) {
 //    }
 
     override fun initialize() {
-        if (!isUpdater)
-            syncTime()
-        //            syncTime()
+//        if (!isUpdater)
+//            syncTime()
         LepuBleLog.d("Bp2BleManager inited ")
     }
 
     private fun syncTime() {
         sendCmd(Bp2BleCmd.getCmd(Bp2BleCmd.BPMCmd.MSG_TYPE_SET_TIME));
-    }
-
-    private fun getInfo() {
-        sendCmd(Bp2BleCmd.getCmd(Bp2BleCmd.BPMCmd.MSG_TYPE_GET_INFO));
     }
 
 

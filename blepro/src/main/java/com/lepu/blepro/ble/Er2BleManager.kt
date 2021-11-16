@@ -56,8 +56,8 @@ class Er2BleManager(context: Context): LpBleManager(context) {
     }
 
     override fun initialize() {
-        if (!isUpdater)
-            syncTime()
+//        if (!isUpdater)
+//            syncTime()
         LepuBleLog.d("Er2BleManager inited")
     }
 

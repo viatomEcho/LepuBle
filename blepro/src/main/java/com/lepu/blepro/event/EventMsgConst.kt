@@ -55,5 +55,12 @@ object EventMsgConst {
         }
     }
 
+    interface Cmd{
+        companion object{
+            const val EventCmdResponseTimeOut = "com.lepu.ble.cmd.response.timeout"
+        }
+    }
+
+
 
 }

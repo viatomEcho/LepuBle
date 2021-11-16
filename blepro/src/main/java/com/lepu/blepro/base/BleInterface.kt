@@ -12,6 +12,7 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
+import kotlinx.coroutines.Job
 import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
 import kotlin.collections.ArrayList
@@ -73,9 +74,9 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
     /**
      * 获取实时的间隔
-     * 默认： 1000 ms
+     * 默认： 500 ms
      */
-    var  delayMillis: Long = 1000
+    var  delayMillis: Long = 500
 
     /**
      * 实时任务状态flag
@@ -96,6 +97,15 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      * 记录本次连接是否来自Updater
      */
     var toConnectUpdater: Boolean = false
+
+    /**
+     * cmd响应超时
+     */
+    var cmdTimeout: Job? = null
+
+    var curCmd = 0
+
+
 
 
 
@@ -302,12 +312,15 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     override fun onDeviceReady(device: BluetoothDevice) {
         LepuBleLog.d(tag, "${device.name} onDeviceReady")
         connecting = false
+        clearCmdTimeout()
+
+        if (!manager.isUpdater) syncTime()
     }
 
 
 
 
-    fun sendCmd(bs: ByteArray) {
+    open fun sendCmd(bs: ByteArray) {
         if (!state) {
             LepuBleLog.d(tag, "send cmd fail， state = false")
             return
@@ -315,6 +328,11 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         manager.sendCmd( bs)
 
 
+    }
+    fun clearCmdTimeout() {
+        curCmd = 0
+        cmdTimeout?.cancel()
+        cmdTimeout = null
     }
 
 
