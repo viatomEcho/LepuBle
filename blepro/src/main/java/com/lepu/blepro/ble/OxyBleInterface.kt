@@ -234,8 +234,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     }
 
     /**
-     *
-
+     * 注意默认发没有PI的波形命令
      */
     override fun getRtData() {
         LepuBleLog.d(tag, "getRtData...isPpgRt = $isPpgRt")
