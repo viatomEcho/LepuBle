@@ -28,7 +28,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
     var isPpgRt: Boolean = false
 
-    var isPiRt: Boolean = false
+    var isPiRt: Boolean = true
 
 
     /**

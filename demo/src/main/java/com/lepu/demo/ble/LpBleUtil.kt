@@ -1,5 +1,6 @@
 package com.lepu.demo.ble
 
+import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Context
@@ -12,6 +13,9 @@ import com.lepu.blepro.ble.cmd.Bp2BleCmd
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.objs.Bluetooth
+import com.lepu.demo.BuildConfig
+import com.lepu.demo.cofig.Constant
+import com.lepu.demo.cofig.Constant.BluetoothConfig
 
 class LpBleUtil {
     interface State {
@@ -79,8 +83,32 @@ class LpBleUtil {
             return BleServiceHelper
         }
 
-        fun setInterface(model: Int){
-            BleServiceHelper.getInterfaces()?.clear()
+
+        /**
+         * 初始化蓝牙服务
+         * @param application Application
+         */
+        fun initBle(application: Application) {
+
+            getServiceHelper()
+                .initLog(BuildConfig.DEBUG)
+//                .initModelConfig(Constant.BluetoothConfig.SUPPORT_FACES) // 配置要支持的设备
+
+                .initService(
+                    application,
+                    BleSO.getInstance(application)
+                ) //必须在initModelConfig initRawFolder之后调用
+        }
+
+        fun clearInterface(){
+            BleServiceHelper.getInterfaces()?.let {
+                it.clear()
+            }
+        }
+
+
+        fun setInterface(model: Int, needClear: Boolean){
+            clearInterface()
             BleServiceHelper.setInterfaces(model)
         }
 
@@ -97,15 +125,15 @@ class LpBleUtil {
         }
 
         @JvmOverloads
-        fun startScan(scanModel: Int, needPair: Boolean = false) {
+        fun startScan(scanModel: Int, needPair: Boolean = false, isStrict: Boolean = false) {
 
-            BleServiceHelper.startScan(scanModel, needPair)
+            BleServiceHelper.startScan(scanModel, needPair, isStrict)
         }
 
         @JvmOverloads
-        fun startScan(scanModel: IntArray, needPair: Boolean = false) {
+        fun startScan(scanModel: IntArray, needPair: Boolean = false, isStrict: Boolean = false) {
 
-            BleServiceHelper.startScan(scanModel, needPair)
+            BleServiceHelper.startScan(scanModel, needPair, isStrict)
         }
 
 
@@ -267,8 +295,24 @@ class LpBleUtil {
             }
         }
 
+        fun stopRtTask(){
+            if(BluetoothConfig.singleConnect && BluetoothConfig.currentModel.isNotEmpty()){
+                    stopRtTask(BluetoothConfig.currentModel[0])
+
+            }
+        }
+
+        fun startRtTask(delayMillis: Long = 200){
+            if(BluetoothConfig.singleConnect && BluetoothConfig.currentModel.isNotEmpty()){
+                    startRtTask(BluetoothConfig.currentModel[0], delayMillis)
+
+            }
+        }
+
         @JvmOverloads
         fun startRtTask(model: Int, delayMillis: Long = 200) {
+
+
             BleServiceHelper.setRTDelayTime(model, delayMillis)
             BleServiceHelper.startRtTask(model)
         }

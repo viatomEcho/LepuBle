@@ -8,4 +8,19 @@
         <item name="cardElevation">4dp</item>
         <item name="cardCornerRadius">5dp</item>
     </style>
+
+    <style name="dialog_style" parent="android:Widget.ProgressBar">
+        <!-- 设置未浮动窗口 -->
+        <item name="android:windowIsFloating">true</item>
+        <!-- 设置无边框 -->
+        <item name="android:windowFrame">@null</item>
+        <!-- 设置无标题 -->
+        <item name="android:windowNoTitle">true</item>
+        <!-- 设置完全透明-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!-- 设置屏幕变暗 -->
+        <item name="android:backgroundDimEnabled">true</item>
+        <!-- 是否有遮盖 -->
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
 </resources>

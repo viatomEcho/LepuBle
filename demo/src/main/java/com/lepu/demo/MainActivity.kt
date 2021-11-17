@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.SparseArray
+import android.widget.Toast
 import androidx.activity.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
@@ -19,10 +20,14 @@ import com.afollestad.materialdialogs.DialogAction
 import com.afollestad.materialdialogs.MaterialDialog
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.Bp2BleResponse
+import com.lepu.blepro.ble.cmd.Er1BleResponse
+import com.lepu.blepro.ble.cmd.OxyBleResponse
+import com.lepu.blepro.ble.cmd.PC60FwBleResponse
 import com.lepu.blepro.ble.data.Bp2BleRtData
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
+import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BIOL
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.ByteUtils
@@ -30,28 +35,23 @@ import com.lepu.blepro.utils.HexString
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.ble.BleSO
 import com.lepu.demo.ble.LpBleUtil
+import com.lepu.demo.cofig.Constant
+import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.CHECK_BLE_REQUEST_CODE
+import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.SUPPORT_MODELS
+import com.lepu.demo.data.OxyDataController
+import com.lepu.demo.util.CollectUtil
 import com.permissionx.guolindev.PermissionX
 import java.util.*
 
-const val CHECK_BLE_REQUEST_CODE = 6001
-//val CURRENT_MODEL: Int = Bluetooth.MODEL_O2RING
-val CURRENT_MODEL: Int = Bluetooth.MODEL_BP2
-val SCAN_MODELS: IntArray = intArrayOf(CURRENT_MODEL)
 class MainActivity : AppCompatActivity() , BleChangeObserver {
+    private val TAG: String = "MainActivity"
 
     private val viewModel: MainViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        // 当BleService onServiceConnected执行后发出通知 蓝牙sdk 初始化完成
-        LiveEventBus.get<Boolean>(EventMsgConst.Ble.EventServiceConnectedAndInterfaceInit).observeSticky(this, Observer {
-
-            lifecycle.addObserver(BIOL(this, SCAN_MODELS))
-
-        })
-
 
 
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
@@ -66,14 +66,124 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+        applicationContext?.let { context ->
+            CollectUtil.getInstance(context).let {
+                it.initCurrentCollectDuration()
+            }
+        }
 
-
+        subscribeUi()
         needPermission()
-        split()
+        initLiveEvent()
+//        split()
 
 
     }
+    /**
+     * ble sdk 服务启动完成后, 现在是点去连接时候才初始化interface  所以这里注释
+     */
+    private fun afterLpBleInit(){
+        // ble service 初始完成后添加订阅才有效
+//        lifecycle.addObserver(BIOL(this, SUPPORT_MODELS))
 
+//        viewModel._scanning.value = true
+
+
+    }
+    private fun subscribeUi() {
+
+        //手机ble状态,
+        viewModel.bleEnable.observe(this, Observer{
+
+            if (it) {
+                //ble service
+                if (Constant.BluetoothConfig.bleSdkServiceEnable) afterLpBleInit()
+                else LpBleUtil.initBle(application)
+            }
+
+        })
+
+
+        // 开启/关闭扫描
+        viewModel.scanning.observe(this, {
+            if (it){
+               LpBleUtil.startScan(SUPPORT_MODELS)
+            } else LpBleUtil.stopScan()
+
+        })
+
+    }
+    private fun initLiveEvent(){
+        // 当BleService onServiceConnected执行后发出通知 蓝牙sdk 初始化完成
+        LiveEventBus.get<Boolean>(EventMsgConst.Ble.EventServiceConnectedAndInterfaceInit).observe(this, Observer {
+            Constant.BluetoothConfig.bleSdkServiceEnable = true
+            afterLpBleInit()
+        })
+
+
+
+        // ------------------PC60Fw--------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataParam)
+            .observe(this, Observer {
+                it as InterfaceEvent
+                val rtData = it.data as PC60FwBleResponse.RtDataParam
+                Log.d("PC60-rt","spo2 = ${rtData.spo2}，pi = ${rtData.pi}, pr = ${rtData.pr}")
+
+
+            })
+        //-------------------------PC60Fw------------------------
+
+
+
+        //-------------------------ER1---------------------------
+
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetTime)
+            .observe(this, Observer {
+                Toast.makeText(this, "ER1 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.startRtTask(Bluetooth.MODEL_ER1, 200)
+            })
+        //-------------------------ER1---------------------------
+
+
+
+        //-------------------------bp2---------------------------
+        //bp2 同步时间
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SyncTime)
+            .observe(this, {
+                Toast.makeText(this, "bp2 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+
+//                LpBleUtil.startRtTask(Bluetooth.MODEL_BP2, 500)
+
+            })
+
+        //-------------------------bp2---------------------------
+
+
+        //-------------------------o2ring---------------------------
+
+
+        // o2ring 同步时间
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxySyncDeviceInfo)
+            .observe(this, {
+                Toast.makeText(this, "o2ring 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+
+            })
+
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo).observe(this, { event ->
+            (event.data as OxyBleResponse.OxyInfo).let {
+                viewModel._oxyInfo.value = it
+                LpBleUtil.startRtTask()
+            }
+        })
+
+        //-------------------------o2ring---------------------------
+
+
+
+
+    }
     private fun needPermission(){
         PermissionX.init(this)
             .permissions(
@@ -105,49 +215,25 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 //权限OK, 检查蓝牙状态
                 if (allGranted)
                     checkBluetooth(CHECK_BLE_REQUEST_CODE).let {
-                       if (it)initBLE()
+                        LepuBleLog.d(TAG, "蓝牙状态 $it")
+                        viewModel._bleEnable.value = true
                     }
             }
 
     }
 
-    private fun initBLE(){
-        LpBleUtil.getServiceHelper()
-            .initLog(BuildConfig.DEBUG)
-            .initModelConfig(SparseArray<Int>().apply {
-                this.put(Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2RING)
-                this.put(Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2)
-//                this.put(Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1)
-//                this.put(Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC60FW)
-            }) // 配置要支持的设备
-            .initService(
-                application,
-                BleSO.getInstance(application)
-            ) //必须在initModelConfig initRawFolder之后调用
-
-    }
 
     override fun onBleStateChanged(model: Int, state: Int) {
-
         LepuBleLog.d("onBleStateChanged model = $model, state = $state")
-
-
         viewModel._bleState.value = state == LpBleUtil.State.CONNECTED
 
         when(state){
             LpBleUtil.State.CONNECTED ->{
-                if (LpBleUtil.isRtStop(CURRENT_MODEL))
-                    LpBleUtil.startRtTask(CURRENT_MODEL)
+                if (LpBleUtil.isRtStop(model))
+                    LpBleUtil.startRtTask(model)
             }
             LpBleUtil.State.DISCONNECTED ->{
-                LpBleUtil.stopRtTask(CURRENT_MODEL)
-
-//                viewModel.model.value?.let { model ->
-//                    LpBleUtil.getInterface(model)?.let {
-//                        LpBleUtil.reconnect(model, it.device.name)
-//                    }
-//
-//                }
+                LpBleUtil.stopRtTask(model)
 
 
             }
@@ -194,6 +280,16 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
 
 
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == CHECK_BLE_REQUEST_CODE) {
+            //重启蓝牙权限后
+            LpBleUtil.reInitBle()
+            viewModel._bleEnable.value = true
+        }
     }
 
 }

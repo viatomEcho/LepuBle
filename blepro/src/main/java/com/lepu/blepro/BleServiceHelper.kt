@@ -190,8 +190,9 @@ class BleServiceHelper private constructor() {
      * @param needPair Boolean
      */
     @JvmOverloads
-    fun startScan(scanModel: Int, needPair: Boolean = false) {
+    fun startScan(scanModel: Int, needPair: Boolean = false, isStrict: Boolean = false) {
         if (!checkService()) return
+        bleService.isStrict = isStrict
         bleService.startDiscover(intArrayOf(scanModel), needPair)
     }
 
@@ -199,8 +200,9 @@ class BleServiceHelper private constructor() {
      * 开始扫描 多设备
      */
     @JvmOverloads
-    fun startScan(scanModel: IntArray, needPair: Boolean = false) {
+    fun startScan(scanModel: IntArray, needPair: Boolean = false, isStrict: Boolean = false) {
         if (!checkService()) return
+        bleService.isStrict = isStrict
         bleService.startDiscover(scanModel, needPair)
     }
 
@@ -222,20 +224,14 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return null
 
         val vailFace = bleService.vailFace
-        if (vailFace == null) {
-            LepuBleLog.e(
-                tag,
-                "getInterface: getInterface => currentModel：$model, vailFaceSize：${vailFace.size()}, curIsNUll = ${vailFace.get(
-                    model
-                ) == null}"
-            )
-        }else {
-            LepuBleLog.d(
-                tag,
-                "getInterface: getInterface => currentModel：$model, vailFaceSize：${vailFace.size()}}"
-            )
+        LepuBleLog.d(tag, "getInterface: getInterface => currentModel：$model, vailFaceSize：${vailFace.size()}}")
+        vailFace.get(model)?.let {
+            return vailFace.get(model)
+        }?: kotlin.run {
+            LepuBleLog.e("current model unsupported!!")
+            return null
         }
-        return vailFace.get(model)
+
     }
 
     /**

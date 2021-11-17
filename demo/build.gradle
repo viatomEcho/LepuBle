@@ -16,6 +16,9 @@ android {
         versionCode rootProject.versionCode
         versionName rootProject.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        buildConfigField ("String","APP_VERSION","\"${rootProject.versionName}\"")
+
     }
     buildTypes {
         release {
@@ -69,6 +72,17 @@ dependencies {
 
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     implementation 'io.github.jeremyliao:live-event-bus-x:1.8.0'
+
+
+
+    //room
+    implementation "androidx.room:room-runtime:2.3.0-rc01"
+    kapt "androidx.room:room-compiler:2.3.0-alpha01"
+    implementation "androidx.room:room-ktx:2.3.0-rc01"
+    implementation "androidx.room:room-testing:2.3.0-rc01"
+
+
+    implementation "com.google.code.gson:gson:2.8.7"
 
 
 }

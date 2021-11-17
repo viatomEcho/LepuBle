@@ -318,8 +318,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     }
 
 
-
-
     open fun sendCmd(bs: ByteArray) {
         if (!state) {
             LepuBleLog.d(tag, "send cmd fail， state = false")

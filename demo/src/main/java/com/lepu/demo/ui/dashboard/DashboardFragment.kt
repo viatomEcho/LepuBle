@@ -2,6 +2,7 @@ package com.lepu.demo.ui.dashboard
 
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,20 +13,21 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.ble.cmd.Er1BleResponse
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.Bp2BleRtData
 import com.lepu.blepro.ble.data.Bp2DataEcgIng
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BIOL
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.LepuBleLog
-import com.lepu.demo.CURRENT_MODEL
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
-import com.lepu.demo.SCAN_MODELS
 import com.lepu.demo.ble.LpBleUtil
+import com.lepu.demo.cofig.Constant
 import com.lepu.demo.data.DataController
 import com.lepu.demo.databinding.FragmentDashboardBinding
 import com.lepu.demo.views.EcgBkg
@@ -42,9 +44,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
     private lateinit var ecgBkg: EcgBkg
     private lateinit var ecgView: EcgView
-
-
-    private lateinit var oxyView: OxyView
 
 
     /**
@@ -98,6 +97,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
 
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
@@ -112,11 +112,17 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
     private fun initLiveEvent(){
         LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStart).observeSticky(this, {
-            startWave()
+            when(it){
+                Bluetooth.MODEL_BP2 ->  startWave()
+            }
+
         })
 
         LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStop).observeSticky(this, {
-            stopWave()
+            when(it){
+                Bluetooth.MODEL_BP2 ->  stopWave()
+            }
+
         })
 
         //------------------------------bp2------------------------------------
@@ -144,6 +150,20 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
             })
         //----------------------------bp2 end------------------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1RtData)
+            .observe(this, Observer{
+
+
+                it as InterfaceEvent
+                val er1 = it.data as Er1BleResponse.RtData
+                er1.let { data ->
+
+                    Log.d("er1data ", "len  = ${data.wave.wave.size}")
+
+                }
+
+
+            })
 
     }
 
@@ -177,10 +197,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
         binding.btStartRt.setOnClickListener {
 
-            LpBleUtil.startRtTask(CURRENT_MODEL, 500)
+            LpBleUtil.startRtTask()
         }
         binding.btStopRt.setOnClickListener {
-            LpBleUtil.stopRtTask(CURRENT_MODEL)
+            LpBleUtil.stopRtTask()
         }
 
 
@@ -212,6 +232,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         binding.ecgView.addView(ecgView)
 
     }
+
 
 
 }

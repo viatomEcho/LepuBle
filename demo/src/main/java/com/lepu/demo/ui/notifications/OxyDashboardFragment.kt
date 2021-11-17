@@ -2,7 +2,9 @@ package com.lepu.demo.ui.notifications
 
 import android.content.Context.VIBRATOR_SERVICE
 import android.os.*
+import android.util.Log
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.hi.dhl.jdatabinding.binding
@@ -11,7 +13,6 @@ import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.demo.data.OxyDataController
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
-import com.lepu.demo.CURRENT_MODEL
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
 import com.lepu.demo.ble.LpBleUtil
@@ -19,8 +20,8 @@ import com.lepu.demo.data.DataController
 import com.lepu.demo.databinding.FragmentOxyDashboardBinding
 import com.lepu.demo.views.OxyView
 import kotlin.math.floor
-import androidx.annotation.RequiresApi
 import com.lepu.blepro.event.EventMsgConst
+import com.lepu.blepro.objs.Bluetooth
 
 
 class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
@@ -32,6 +33,9 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
 
 
     private lateinit var oxyView: OxyView
+
+
+
 
     /**
      * rt ecg wave
@@ -86,6 +90,7 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        initClickListener()
         initLiveEvent()
 
 
@@ -95,59 +100,84 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
     private fun initLiveEvent() {
 
         LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStart).observeSticky(this, {
-            startWave()
+            when(it){
+                Bluetooth.MODEL_O2RING -> startWave()
+            }
+
         })
 
         LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStop).observeSticky(this, {
-            stopWave()
+            when(it){
+                Bluetooth.MODEL_O2RING -> stopWave()
+            }
         })
+
 
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtData).observeForever { event ->
             (event.data as OxyBleResponse.RtWave).let { rtWave ->
-
-                viewModel.pr.value?.let { pr ->
-                    if (pr != 0 && rtWave.pr == 0) {
-                        alarm()
-                    }
-
-                    if (pr != 0 && rtWave.pr != 0) {
-                        mainViewModel.oxyInfo.value?.let {
-                            if (rtWave.pr >= it.hrHighThr || rtWave.pr <= it.hrLowThr)
-                                alarm()
-                        }
-                    }
-
+                activity?.let {
+//                    mainViewModel.openCollectSwitchByO2ring(rtWave.wFs)
 
                 }
+
+
+
+                toPlayAlarm(rtWave.pr)
+
                 viewModel.pr.value = rtWave.pr
                 viewModel.spo2.value = rtWave.spo2
                 LepuBleLog.d("o2ring pr = ${rtWave.pr}, spo2 = ${rtWave.spo2}")
 
                 OxyDataController.receive(rtWave.wFs)
-
-
             }
         }
 
+
+        // o2ring ppg
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
+            .observe(this, {
+
+                LpBleUtil.oxyGetPpgRt(it.model)
+
+                it as InterfaceEvent
+                val ppgData = it.data as OxyBleResponse.PPGData
+                ppgData.let { data ->
+                    Log.d("ppg", "len  = ${data.rawDataBytes.size}")
+                }
+
+            })
+
+
+
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun alarm(){
-        LepuBleLog.d("alarm...")
-        context?.let {
-            val vibrator = it.getSystemService(VIBRATOR_SERVICE) as Vibrator
-
-            vibrator.vibrate(VibrationEffect.createWaveform(longArrayOf(0L, 2000L, 200L,  3000L), -1))
-
+    private fun toPlayAlarm(newPr: Int){
+        mainViewModel.oxyPrAlarmFlag.value?.let { flag ->
+            if (flag) {
+                viewModel.pr.value?.let { pr ->
+                    if (pr != 0 && newPr == 0) context?.let { it1 ->
+                        mainViewModel.playAlarm(
+                            it1
+                        )
+                    }
+                    if (pr != 0 && newPr != 0) {
+                        mainViewModel.oxyInfo.value?.let {
+                            if (newPr >= it.hrHighThr || newPr <= it.hrLowThr)
+                                context?.let { it1 ->
+                                    mainViewModel.playAlarm(it1)
+                                }
+                        }
+                    }
+                }
+            }
         }
     }
 
     private fun initView() {
         binding.oxiView.post {
             initOxyView()
-//            mainViewModel.bleState.value?.let {
-//                if (it) startWave()
-//            }
         }
 
         mainViewModel.bleState.observe(viewLifecycleOwner, {
@@ -182,11 +212,10 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
 
 
         binding.getRtData.setOnClickListener {
-
-            LpBleUtil.startRtTask(CURRENT_MODEL)
+            LpBleUtil.startRtTask()
         }
         binding.stopRtData.setOnClickListener {
-            LpBleUtil.stopRtTask(CURRENT_MODEL)
+            LpBleUtil.stopRtTask()
         }
 
 
@@ -222,5 +251,14 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
         binding.oxiView.addView(oxyView)
 
         viewModel.dataSrc.value = OxyDataController.iniDataSrc(index)
+    }
+
+    fun initClickListener(){
+        binding.startCollect.setOnClickListener {
+            context?.let { it1 -> mainViewModel.startPreCollect(it1) }
+        }
+        binding.stopCollect.setOnClickListener {
+            context?.let { it1 -> mainViewModel.breakCollecting(it1) }
+        }
     }
 }

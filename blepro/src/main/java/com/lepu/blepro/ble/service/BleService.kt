@@ -224,7 +224,8 @@ open class BleService: LifecycleService() {
     fun startDiscover(scanModel: IntArray, needPair: Boolean = false, isReconnecting :Boolean = false) {
         LepuBleLog.d(tag, "start discover.....${vailFace.size()}, needPair = $needPair, isReconnecting = $isReconnecting")
         stopDiscover()
-        if (vailFace.isEmpty())return
+
+        if (vailFace.isEmpty() && isReconnecting)return
 
         BluetoothController.clear()
         this.needPair = needPair
@@ -351,7 +352,6 @@ open class BleService: LifecycleService() {
     private var bluetoothAdapter : BluetoothAdapter? = null
     private var leScanner : BluetoothLeScanner? = null
 
-    @RequiresApi(Build.VERSION_CODES.M)
     private fun scanDevice(enable: Boolean) {
         LepuBleLog.d(tag, "scanDevice => $enable")
 
@@ -408,12 +408,12 @@ open class BleService: LifecycleService() {
                     device,
                     result.rssi
             )
-            if (vailFace.isEmpty()){
-                //切换设备 先断开连接 再clear interface
-                LepuBleLog.d(tag, "Warning: vailFace isEmpty!!")
-                stopDiscover()
-                return
-            }
+//            if (vailFace.isEmpty()){
+//                //切换设备 先断开连接 再clear interface
+//                LepuBleLog.d(tag, "Warning: vailFace isEmpty!!")
+//                stopDiscover()
+//                return
+//            }
 
             if(isStrict)
                 if (!filterResult(b)) return
