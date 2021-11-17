@@ -116,19 +116,21 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtData).observeForever { event ->
             (event.data as OxyBleResponse.RtWave).let { rtWave ->
                 activity?.let {
-//                    mainViewModel.openCollectSwitchByO2ring(rtWave.wFs)
+                    //接收数据 开始添加采集数据
+                    mainViewModel.checkStartCollect(it, rtWave.waveByte)
 
+                    toPlayAlarm(rtWave.pr)
+
+                    viewModel.pr.value = rtWave.pr
+                    viewModel.spo2.value = rtWave.spo2
+                    LepuBleLog.d("o2ring pr = ${rtWave.pr}, spo2 = ${rtWave.spo2}")
+
+                    OxyDataController.receive(rtWave.wFs)
                 }
 
 
 
-                toPlayAlarm(rtWave.pr)
 
-                viewModel.pr.value = rtWave.pr
-                viewModel.spo2.value = rtWave.spo2
-                LepuBleLog.d("o2ring pr = ${rtWave.pr}, spo2 = ${rtWave.spo2}")
-
-                OxyDataController.receive(rtWave.wFs)
             }
         }
 

@@ -156,10 +156,10 @@ class MainViewModel: ViewModel() {
 
 
 
-    @Synchronized fun openCollectSwitchByO2ring(activity: Activity, wave: ByteArray?){
+    @Synchronized fun checkStartCollect(activity: Activity, wave: ByteArray?){
         if (preingCollect.value == true ){
 
-            if (wave != null && wave.isNotEmpty()) {
+            if (wave != null) {
 
                 //可以采集数据了
 
@@ -181,7 +181,7 @@ class MainViewModel: ViewModel() {
                 ToastUtil.showToast(activity,"wave.isEmpty")
             }
         }else{
-            ToastUtil.showToast(activity,"preingCollect  false")
+//            ToastUtil.showToast(activity,"preingCollect  false")
         }
     }
 
