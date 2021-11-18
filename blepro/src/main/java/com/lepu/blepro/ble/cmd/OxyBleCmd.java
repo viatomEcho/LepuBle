@@ -15,7 +15,7 @@ public class OxyBleCmd {
     public static int OXY_CMD_PARA_SYNC = 0x16;
     public static int OXY_CMD_RT_DATA = 0x1B;  //没有pi
     public static int OXY_CMD_PI_RT_DATA = 0x17;
-    public static int OXY_CMD_RESET = 0x18;
+    public static int OXY_CMD_FACTORY_RESET = 0x18;
     public static int OXY_CMD_READ_START = 0x03;
     public static int OXY_CMD_READ_CONTENT = 0x04;
     public static int OXY_CMD_READ_END = 0x05;
@@ -195,11 +195,11 @@ public class OxyBleCmd {
         return buf;
     }
 
-    public static byte[] factoryResetAll() {
+    public static byte[] factoryReset() {
         byte[] buf = new byte[8];
         buf[0] = (byte) 0xAA;
-        buf[1] = (byte) OXY_CMD_RESET;
-        buf[2] = (byte) ~OXY_CMD_RESET;
+        buf[1] = (byte) OXY_CMD_FACTORY_RESET;
+        buf[2] = (byte) ~OXY_CMD_FACTORY_RESET;
 
         buf[7] = BleCRC.calCRC8(buf);
 

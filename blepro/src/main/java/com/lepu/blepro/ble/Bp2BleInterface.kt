@@ -292,10 +292,34 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
                 //重置
                 if (bleResponse.type != 0x01.toByte()) {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Reset)
+                        .post(InterfaceEvent(model, 0))
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Reset)
+                        .post(InterfaceEvent(model, 1))
+                }
+            }
+            CMD_FACTORY_RESET -> {
+                LepuBleLog.d(tag, "model:$model,CMD_FACTORY_RESET => success")
+
+                //重置
+                if (bleResponse.type != 0x01.toByte()) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FactoryReset)
                         .post(InterfaceEvent(model, 0))
                 } else {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FactoryReset)
+                        .post(InterfaceEvent(model, 1))
+                }
+            }
+            CMD_FACTORY_RESET_ALL -> {
+                LepuBleLog.d(tag, "model:$model,CMD_FACTORY_RESET_ALL => success")
+
+                //重置
+                if (bleResponse.type != 0x01.toByte()) {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FactoryResetAll)
+                        .post(InterfaceEvent(model, 0))
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FactoryResetAll)
                         .post(InterfaceEvent(model, 1))
                 }
             }

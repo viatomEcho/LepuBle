@@ -162,6 +162,16 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                 )
             }
 
+            Er1BleCmd.RESET -> {
+                LepuBleLog.d(tag, "model:$model,RESET => success")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1Reset).post(
+                    InterfaceEvent(
+                        model,
+                        true
+                    )
+                )
+            }
+
             Er1BleCmd.FACTORY_RESET -> {
                 LepuBleLog.d(tag, "model:$model,CMD_FACTORY_RESET => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ResetFactory).post(

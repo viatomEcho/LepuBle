@@ -216,11 +216,11 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
             }
 
-            OxyBleCmd.OXY_CMD_RESET -> {
+            OxyBleCmd.OXY_CMD_FACTORY_RESET -> {
                 clearTimeout()
-                LepuBleLog.d(tag, "model:$model,  OXY_CMD_RESET => success")
+                LepuBleLog.d(tag, "model:$model,  OXY_CMD_FACTORY_RESET => success")
 
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyResetDeviceInfo).post(InterfaceEvent(model, true))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyFactoryReset).post(InterfaceEvent(model, true))
             }
 
             else -> {
@@ -281,11 +281,11 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun factoryReset() {
-        LepuBleLog.e(tag, "factoryReset Not yet implemented")
+        sendOxyCmd(OxyBleCmd.OXY_CMD_FACTORY_RESET, OxyBleCmd.factoryReset())
     }
 
     override fun factoryResetAll() {
-        sendOxyCmd(OxyBleCmd.OXY_CMD_RESET, OxyBleCmd.factoryResetAll())
+        LepuBleLog.e(tag, "factoryReset Not yet implemented")
     }
 
     override fun reset() {
