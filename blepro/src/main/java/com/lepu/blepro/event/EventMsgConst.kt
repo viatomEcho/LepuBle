@@ -8,6 +8,7 @@ object EventMsgConst {
     interface Ble{
         companion object{
             const val EventServiceConnectedAndInterfaceInit = "com.lepu.ble.service.interface.init"
+            const val EventBleDeviceReady = "com.lepu.ble.device.ready"
         }
     }
 

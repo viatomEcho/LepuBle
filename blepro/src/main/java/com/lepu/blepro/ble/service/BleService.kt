@@ -203,6 +203,23 @@ open class BleService: LifecycleService() {
                 }
             }
 
+            Bluetooth.MODEL_PC80B -> {
+                PC80BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_FHR -> {
+                FhrBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+
             else -> {
                 return throw Exception("BleService initInterfaces() 未配置此model:$m")
             }

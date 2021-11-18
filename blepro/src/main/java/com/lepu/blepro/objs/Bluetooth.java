@@ -64,6 +64,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_STATION = "Station";//BabyO2盒子升级专用
     public static final String BT_NAME_POD2B = "POD-2B_SN";//POD-2B_SN7295【蓝牙名】
     public static final String BT_NAME_POD2W = "POD-2W";//【显示名】
+    public static final String BT_NAME_PC80B = "PC80B";
 
 
     public static final int MODEL_UNRECOGNIZED = 0;
@@ -88,11 +89,13 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_PC100 = 19;
     public static final int MODEL_BP2A = 20;
     public static final int MODEL_PC60FW = 21;
+    public static final int MODEL_PC80B = 22;
+    public static final int MODEL_FHR = 23;
 
 
     @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU,
             MODEL_ER1,MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL,
-            MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2MAX, MODEL_BPM,MODEL_BP2A,MODEL_PC60FW})
+            MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2MAX, MODEL_BPM,MODEL_BP2A,MODEL_PC60FW,MODEL_PC80B,MODEL_FHR})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 
@@ -153,6 +156,10 @@ public class Bluetooth implements Parcelable {
             default:
                 if (deviceNamePrefix.startsWith(BT_NAME_KCA))
                     return MODEL_KCA;
+                else if (deviceNamePrefix.startsWith(BT_NAME_PC80B))
+                    return MODEL_PC80B;
+                else if (deviceNamePrefix.startsWith(BT_NAME_FHR))
+                    return MODEL_FHR;
                 return MODEL_UNRECOGNIZED;
         }
     }

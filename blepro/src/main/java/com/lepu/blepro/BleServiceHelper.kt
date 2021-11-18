@@ -843,6 +843,12 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A ->{
                 return inter is Bp2BleInterface
             }
+            Bluetooth.MODEL_PC80B -> {
+                return inter is PC80BleInterface
+            }
+            Bluetooth.MODEL_FHR -> {
+                return inter is FhrBleInterface
+            }
             else -> {
                 LepuBleLog.d(tag, "checkModel, 无效model：$model,${inter.javaClass}")
                 return false
@@ -930,7 +936,17 @@ class BleServiceHelper private constructor() {
         }
     }
 
-
+    /**
+     * PC80B心跳包 电量查询
+     */
+    fun sendHeartbeat(model: Int) {
+        getInterface(model)?.let { it1 ->
+            (it1 as PC80BleInterface).let {
+                LepuBleLog.d(tag, "it as PC80BleInterface")
+                it.sendHeartbeat()
+            }
+        }
+    }
 
 
 }

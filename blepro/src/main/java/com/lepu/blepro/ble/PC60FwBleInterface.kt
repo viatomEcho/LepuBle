@@ -5,8 +5,10 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
+import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_BATTERY_LEVEL
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_SPO2_PARAM
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_SPO2_WAVE
+import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_WORKING_STATUS
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 
@@ -72,23 +74,31 @@ class PC60FwBleInterface(model: Int): BleInterface(model) {
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: PC60FwBleResponse.PC60FwResponse) {
-//        if (response.token == TOKEN_EPI_F0 && response.type == TYPE_BATTERY_LEVEL){
-//           PC60FwBleResponse.Battery(response.bytes).let {
-//               LiveEventBus.get(InterfaceEvent.PC60Fw.EventPC60FwBattery).post(InterfaceEvent(model, it ))
-//           }
-//
-//        }
+        if (response.token == TOKEN_EPI_F0 && response.type == TYPE_BATTERY_LEVEL){
+           PC60FwBleResponse.Battery(response.content).let {
+               LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwBattery).post(InterfaceEvent(model, it))
+           }
+
+        }
 
         if (response.token == TOKEN_PO_0F && response.type == TYPE_SPO2_PARAM){
-            PC60FwBleResponse.RtDataParam(response.bytes).let {
+            PC60FwBleResponse.RtDataParam(response.content).let {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataParam).post(InterfaceEvent(model, it))
             }
 
         }
 
         if (response.token == TOKEN_PO_0F && response.type == TYPE_SPO2_WAVE){
-            PC60FwBleResponse.RtDataWave(response.bytes).let {
+            PC60FwBleResponse.RtDataWave(response.content).let {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataWave).post(InterfaceEvent(model, it))
+            }
+
+        }
+
+        if (response.token == TOKEN_PO_0F && response.type == TYPE_WORKING_STATUS){
+            PC60FwBleResponse.WorkingStatus(response.content).let {
+                LepuBleLog.d(tag, "model:$model,WORK_STATUS_DATA => success")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwWorkingStatus).post(InterfaceEvent(model, it))
             }
 
         }
@@ -99,6 +109,7 @@ class PC60FwBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun syncTime() {
+
     }
 
     override fun getRtData() {

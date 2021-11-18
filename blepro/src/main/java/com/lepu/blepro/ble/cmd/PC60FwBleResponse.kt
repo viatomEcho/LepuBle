@@ -54,10 +54,10 @@ class PC60FwBleResponse{
         var pi: Short
         var status: Byte
         init {
-            spo2 =  byteArray[5]
-            pr = toSignedShort(byteArray[6], byteArray[7])
-            pi = (byteArray[8].toInt() and 0x7f).toShort()
-            status =  byteArray[9]
+            spo2 =  byteArray[0]
+            pr = toSignedShort(byteArray[1], byteArray[2])
+            pi = (byteArray[3].toInt() and 0x7f).toShort()
+            status =  byteArray[4]
         }
 
 
@@ -69,8 +69,8 @@ class PC60FwBleResponse{
         val waveData: ByteArray
         val waveIntData: IntArray
         init {
-            waveData = byteArray.copyOfRange(5, 10).toList().asSequence().map { (it.toInt() and 0x7f).toByte() }.toList().toByteArray()
-            waveIntData =  byteArray.copyOfRange(5, 10).toList().asSequence().map { (it.toInt() and 0x7f)}.toList().toIntArray()
+            waveData = byteArray.copyOfRange(0, 5).toList().asSequence().map { (it.toInt() and 0x7f).toByte() }.toList().toByteArray()
+            waveIntData =  byteArray.copyOfRange(0, 5).toList().asSequence().map { (it.toInt() and 0x7f)}.toList().toIntArray()
         }
 
 
@@ -81,10 +81,30 @@ class PC60FwBleResponse{
     class Battery constructor(var byteArray: ByteArray) : Parcelable {
         var batteryLevel: Byte
         init {
-            batteryLevel  = byteArray[5]
+            batteryLevel  = byteArray[0]
         }
     }
 
+    @Parcelize
+    @ExperimentalUnsignedTypes
+    class WorkingStatus constructor(var bytes: ByteArray) : Parcelable {
+        var mode: Int
+        var step: Int
+        var para1: Int
+        var para2: Int
+
+        // 模式 : 0x01点测 0x02连续 0x03菜单
+        init {
+            var index = 0
+            mode = (bytes[index].toUInt() and 0xFFu).toInt()
+            index++
+            step = (bytes[index].toUInt() and 0xFFu).toInt()
+            index++
+            para1 = (bytes[index].toUInt() and 0xFFu).toInt()
+            index++
+            para2 = (bytes[index].toUInt() and 0xFFu).toInt()
+        }
+    }
 
 }
 

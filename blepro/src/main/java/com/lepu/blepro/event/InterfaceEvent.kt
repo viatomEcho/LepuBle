@@ -131,8 +131,32 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventPC60FwRtDataParam = "com.lepu.ble.pc60fw.rt.data.param"
             const val EventPC60FwRtDataWave = "com.lepu.ble.pc60fw.rt.data.wave"
             const val EventPC60FwBattery = "com.lepu.ble.pc60fw.battery"
+            const val EventPC60FwWorkingStatus = "com.lepu.ble.pc60fw.working.status"
         }
     }
+
+    /**
+     * PC80BleInterface发出的通知
+     * 包含model: model_pc80b
+     */
+    interface PC80B{
+        companion object{
+            const val EventPc80bBatLevel = "com.lepu.ble.pc80b.bat.level"
+            const val EventPc80bDeviceInfo = "com.lepu.ble.pc80b.device.info"
+            const val EventPc80bTrackData = "com.lepu.ble.pc80b.track.data"
+            const val EventPc80bReadFileError = "com.lepu.ble.pc80b.file.read.error"
+            const val EventPc80bReadingFileProgress = "com.lepu.ble.pc80b.file.reading.progress"
+            const val EventPc80bReadFileComplete = "com.lepu.ble.pc80b.file.read.complete"
+        }
+    }
+
+    interface FHR{
+        companion object{
+            const val EventFhrDeviceInfo = "com.lepu.ble.fhr.device.info"
+            const val EventFhrDeviceData = "com.lepu.ble.fhr.device.data"
+        }
+    }
+
 
 
 }
