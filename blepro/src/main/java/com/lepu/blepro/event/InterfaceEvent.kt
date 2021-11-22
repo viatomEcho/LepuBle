@@ -158,7 +158,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     interface FHR{
         companion object{
             const val EventFhrDeviceInfo = "com.lepu.ble.fhr.device.info"
-            const val EventFhrDeviceData = "com.lepu.ble.fhr.device.data"
+            const val EventFhrAudioData = "com.lepu.ble.fhr.audio.data"
         }
     }
 

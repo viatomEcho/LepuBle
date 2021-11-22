@@ -170,7 +170,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     }
 
     override fun onNotify(device: BluetoothDevice?, data: Data?) {
-        if (model == Bluetooth.MODEL_FHR) {
+        if (model == Bluetooth.MODEL_FHR || model == Bluetooth.MODEL_BPW1) {
             hasResponse(data?.value) // 胎心仪数据长度不一致，直接获取
         } else {
             data?.value?.apply {

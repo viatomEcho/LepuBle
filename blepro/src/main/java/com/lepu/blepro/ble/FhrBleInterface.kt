@@ -63,7 +63,7 @@ class FhrBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.FHR.EventFhrDeviceInfo).post(InterfaceEvent(model, info))
             }
             0x0a -> {
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.FHR.EventFhrDeviceData).post(InterfaceEvent(model, response.content))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.FHR.EventFhrAudioData).post(InterfaceEvent(model, response.content))
             }
         }
 

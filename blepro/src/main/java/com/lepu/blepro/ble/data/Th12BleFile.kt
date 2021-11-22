@@ -4,16 +4,17 @@ import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.bytesToSignedShort
 import com.lepu.blepro.utils.toUInt
 
-class Th12BleFile(val byteArray: ByteArray) {
+class Th12BleFile(val fileName: String, val byteArray: ByteArray) {
 
     private val leadNameTable = arrayOf("NULL", "I", "II", "NULL", "NULL", "NULL", "NULL",
         "V1", "V2", "V3", "V4", "V5", "V6", "Pacer")
 
-    var sampleRate: Int                  // 采样率
-    private var range: Int               // 电压范围
-    private var precision: Int           // 电压数值
+    var samplingRate: Int                // 采样率
+    var range: Int                       // 电压范围
+    var precision: Int                   // 电压数值
     var adcGain: Float                   // adc增益
     var leadNum: Int                     // 导联数量
+    var samplingNum: Int                 // 每导联采样点数
 
     var leadNames: Array<String?>        // 导联名称
 
@@ -25,11 +26,11 @@ class Th12BleFile(val byteArray: ByteArray) {
     var minute: String
     var second: String
 
-    var originalEcgData: ByteArray
-    private var leadEcgData: Array<ByteArray?>
+    var originalEcgData: ByteArray        // 原始心电数据
+    var leadEcgData: Array<ByteArray?>    // 分组导联数据
 
     init {
-        sampleRate = toUInt(byteArray.copyOfRange(17, 19))
+        samplingRate = toUInt(byteArray.copyOfRange(17, 19))
         range = toUInt(byteArray.copyOfRange(19, 23))
         precision = toUInt(byteArray.copyOfRange(23, 27))
         adcGain = precision.div(range.toFloat()).times(1000)
@@ -51,11 +52,11 @@ class Th12BleFile(val byteArray: ByteArray) {
         second = bytesToHex(byteArrayOf(byteArray[59]))
 
         originalEcgData = getOriginalEcgData(byteArray.copyOfRange(2901, validLength))
-
+        samplingNum = originalEcgData.size/2/leadNum
         leadEcgData = arrayOfNulls(leadNum)
         for (i in 0 until leadNum) {
             leadEcgData[i] = ByteArray(originalEcgData.size/leadNum)
-            for (j in 0 until originalEcgData.size/2/leadNum) {
+            for (j in 0 until samplingNum) {
                 leadEcgData[i]?.set(j*2, originalEcgData[j*2*leadNum + i*2])
                 leadEcgData[i]?.set(j*2+1, originalEcgData[j*2*leadNum + i*2+1])
             }
@@ -94,7 +95,7 @@ class Th12BleFile(val byteArray: ByteArray) {
         return ecgByteArray
     }
 
-    fun getLeadData(leadName: String): ShortArray {
+    fun getEachLeadData(leadName: String): ShortArray {
         var index = 0
         when(leadName) {
             "I" -> index = 0
@@ -156,10 +157,29 @@ class Th12BleFile(val byteArray: ByteArray) {
         return leadData
     }
 
+    fun getMitHeadData(): Array<String?> {
+        val date = "$day/$month/$year"
+        val time = "$hour:$minute:$second"
+        var sumCrcs = arrayOfNulls<Short>(leadNames.size)
+        for (i in sumCrcs.indices) {
+            sumCrcs[i] = 0
+            for (j in 0 until samplingNum) {
+                sumCrcs[i] =
+                    sumCrcs[i]?.plus(bytesToSignedShort(leadEcgData[i]!![j*2], leadEcgData[i]!![j*2+1]))?.toShort()
+            }
+        }
+        var headData = arrayOfNulls<String>(leadNum+1)
+        headData[0] = "$fileName $leadNum $samplingRate $samplingNum $time $date"
+        for (i in 1 until headData.size) {
+            headData[i] = fileName + " 16 " + adcGain + " 16 0 " + bytesToSignedShort(leadEcgData[i-1]!![0], leadEcgData[i-1]!![1]) + " " + sumCrcs[i-1] + " 0 " + leadNames[i-1]
+        }
+        return headData
+    }
+
     override fun toString(): String {
         val string = """
             download file:
-            rate: $sampleRate
+            samplingRate: $samplingRate
             range: $range
             precision: $precision
             leadNum: $leadNum

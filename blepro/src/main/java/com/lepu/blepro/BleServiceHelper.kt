@@ -406,12 +406,8 @@ class BleServiceHelper private constructor() {
 
 
     fun getFileList(model: Int){
-        when(model){
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2,Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A ->{
-                getInterface(model)?.getFileList()
-            }
-            else -> LepuBleLog.d(tag, "getFileList, model$model,未被允许获取文件列表")
-        }
+        if (!checkService()) return
+        getInterface(model)?.getFileList()
     }
 
     /**
@@ -492,7 +488,29 @@ class BleServiceHelper private constructor() {
         getInterface(model)?.delayMillis = delayMillis
     }
 
+    /**
+     * 恢复生产出厂状态
+     */
+    fun factoryResetAll(model: Int){
+        if (!checkService()) return
+        getInterface(model)?.factoryResetAll()
+    }
 
+    /**
+     * 恢复出厂设置
+     */
+    fun factoryReset(model: Int){
+        if (!checkService()) return
+        getInterface(model)?.factoryReset()
+    }
+
+    /**
+     * 设备复位
+     */
+    fun reset(model: Int){
+        if (!checkService()) return
+        getInterface(model)?.reset()
+    }
 
     /**
      * 开启实时任务
@@ -549,6 +567,7 @@ class BleServiceHelper private constructor() {
         }
     }
     fun bp2GetConfig(model: Int){
+        if (!checkService()) return
         when(model){
             Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A ->{
                 getInterface(model)?.let { it1 ->
@@ -564,6 +583,7 @@ class BleServiceHelper private constructor() {
 
     }
     fun bp2SetConfig(model: Int, switch: Boolean){
+        if (!checkService()) return
         when(model){
             Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
                 getInterface(model)?.let { it1 ->
@@ -578,10 +598,19 @@ class BleServiceHelper private constructor() {
 
     }
     fun startBp(model: Int) {
+        if (!checkService()) return
         when(model){
             Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A ->{
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2BleInterface")
+                        it.startBp()
+                    }
+                }
+            }
+            Bluetooth.MODEL_BPM ->{
+                getInterface(model)?.let { it1 ->
+                    (it1 as BpmBleInterface).let {
                         LepuBleLog.d(tag, "it as Bp2BleInterface")
                         it.startBp()
                     }
@@ -592,10 +621,19 @@ class BleServiceHelper private constructor() {
 
     }
     fun stopBp(model: Int) {
+        if (!checkService()) return
         when(model) {
             Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2BleInterface")
+                        it.stopBp()
+                    }
+                }
+            }
+            Bluetooth.MODEL_BPM -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as BpmBleInterface).let {
                         LepuBleLog.d(tag, "it as Bp2BleInterface")
                         it.stopBp()
                     }
@@ -627,34 +665,6 @@ class BleServiceHelper private constructor() {
             }
         }
 
-    }
-
-    fun startBpm(model: Int){
-        if (!checkService()) return
-        if (model != Bluetooth.MODEL_BPM){
-            LepuBleLog.d(tag,"startBpm, 无效model：$model" )
-            return
-        }
-        getInterface(model)?.let { it1 ->
-            (it1 as BpmBleInterface).let {
-                LepuBleLog.d(tag, "it as BpmBleInterface")
-                it.startBp()
-            }
-        }
-    }
-
-    fun stopBpm(model: Int){
-        if (!checkService()) return
-        if (model != Bluetooth.MODEL_BPM){
-            LepuBleLog.d(tag,"startBpm, 无效model：$model" )
-            return
-        }
-        getInterface(model)?.let { it1 ->
-            (it1 as BpmBleInterface).let {
-                LepuBleLog.d(tag, "it as BpmBleInterface")
-                it.stopBp()
-            }
-        }
     }
 
     fun isScanning(): Boolean{
@@ -721,6 +731,7 @@ class BleServiceHelper private constructor() {
     }
 
     fun setEr1Vibrate(model: Int, switcher: Boolean, threshold1: Int, threshold2: Int){
+        if (!checkService()) return
         when(model) {
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
                 getInterface(model)?.let { ble ->
@@ -734,6 +745,7 @@ class BleServiceHelper private constructor() {
     }
 
     fun setEr1Vibrate(model: Int,switcher: Boolean, vector: Int, motionCount: Int,motionWindows: Int ){
+        if (!checkService()) return
         when(model) {
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
                 getInterface(model)?.let { ble ->
@@ -744,83 +756,6 @@ class BleServiceHelper private constructor() {
 
         }
     }
-
-    /**
-     * 恢复生产出厂状态
-     */
-    fun factoryResetAll(model: Int){
-        getInterface(model)?.let { ble ->
-            when(model){
-                Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
-                    (ble as Er1BleInterface).factoryResetAll()
-                }
-                Bluetooth.MODEL_O2RING -> {
-                    (ble as OxyBleInterface).factoryResetAll()
-                }
-                Bluetooth.MODEL_ER2 -> {
-                    (ble as Er2BleInterface).factoryResetAll()
-                }
-                Bluetooth.MODEL_BPM -> {
-                    (ble as BpmBleInterface).factoryResetAll()
-                }
-                Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
-                    (ble as Bp2BleInterface).factoryResetAll()
-                }
-            }
-        }
-    }
-
-    /**
-     * 恢复出厂设置
-     */
-    fun factoryReset(model: Int){
-        getInterface(model)?.let { ble ->
-            when(model){
-                Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
-                    (ble as Er1BleInterface).factoryReset()
-                }
-                Bluetooth.MODEL_O2RING -> {
-                    (ble as OxyBleInterface).factoryReset()
-                }
-                Bluetooth.MODEL_ER2 -> {
-                    (ble as Er2BleInterface).factoryReset()
-                }
-                Bluetooth.MODEL_BPM -> {
-                    (ble as BpmBleInterface).factoryReset()
-                }
-                Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
-                    (ble as Bp2BleInterface).factoryReset()
-                }
-            }
-        }
-    }
-
-    /**
-     * 设备复位
-     */
-    fun reset(model: Int){
-        getInterface(model)?.let { ble ->
-            when(model){
-                Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
-                    (ble as Er1BleInterface).reset()
-                }
-                Bluetooth.MODEL_O2RING -> {
-                    (ble as OxyBleInterface).reset()
-                }
-                Bluetooth.MODEL_ER2 -> {
-                    (ble as Er2BleInterface).reset()
-                }
-                Bluetooth.MODEL_BPM -> {
-                    (ble as BpmBleInterface).reset()
-                }
-                Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
-                    (ble as Bp2BleInterface).reset()
-                }
-            }
-        }
-    }
-
-
 
     //------er1 duoek   end-----------------
 
@@ -842,6 +777,9 @@ class BleServiceHelper private constructor() {
             }
             Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A ->{
                 return inter is Bp2BleInterface
+            }
+            Bluetooth.MODEL_PC60FW -> {
+                return inter is PC60FwBleInterface
             }
             Bluetooth.MODEL_PC80B -> {
                 return inter is PC80BleInterface
