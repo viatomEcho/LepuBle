@@ -103,7 +103,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      */
     var cmdTimeout: Job? = null
 
-    var curCmd = 0
+    var curCmd = -1
 
 
 
@@ -328,9 +328,10 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
     }
     fun clearCmdTimeout() {
-        curCmd = 0
+        curCmd = -1
         cmdTimeout?.cancel()
         cmdTimeout = null
+        LepuBleLog.d("clearCmdTimeout")
     }
 
 

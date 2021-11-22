@@ -57,7 +57,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     private fun sendOxyCmd(cmd: Int, bs: ByteArray){
         LepuBleLog.d(tag, "sendOxyCmd $cmd")
 
-        if (curCmd !== 0) {
+        if (curCmd != -1) {
             // busy
             LepuBleLog.d(tag, "busy: " + cmd.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
             return
