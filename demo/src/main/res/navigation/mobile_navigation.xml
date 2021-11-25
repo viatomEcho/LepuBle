@@ -23,4 +23,10 @@
         android:name="com.lepu.demo.ui.notifications.OxyDashboardFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_oxy_dashboard" />
+
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="com.lepu.demo.ui.settings.SettingsFragment"
+        android:label="@string/title_settings"
+        tools:layout="@layout/fragment_settings" />
 </navigation>

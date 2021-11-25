@@ -39,6 +39,7 @@ class BleServiceHelper private constructor() {
      * key为model
      */
     var modelConfig: SparseArray<Int> = SparseArray()
+
     /**
      * 服务onServiceConnected()时，应该初始化的model配置。必须在initService()之前完成
      * key为model
@@ -96,7 +97,6 @@ class BleServiceHelper private constructor() {
     }
 
 
-
     fun initRawFolder(folders: SparseArray<String>): BleServiceHelper{
         this.rawFolder = folders
         LepuBleLog.d(folders.toString())
@@ -136,7 +136,6 @@ class BleServiceHelper private constructor() {
     }
 
 
-
     /**
      * 当前要设置的设备Model, 必须在initService 之后调用
      */
@@ -146,7 +145,6 @@ class BleServiceHelper private constructor() {
         LepuBleLog.d(tag, "setInterfaces")
         if (getInterface(model) == null) bleService.initInterfaces(model, runRtImmediately)
     }
-
 
 
     /**
@@ -160,10 +158,8 @@ class BleServiceHelper private constructor() {
     }
 
 
-
     /**
      * 注册蓝牙状态改变的监听
-     *
      */
     internal fun subscribeBI(model: Int, observer: BleChangeObserver) {
         if (!checkService()){
@@ -172,8 +168,6 @@ class BleServiceHelper private constructor() {
         }
         getInterface(model)?.onSubscribe(observer)
     }
-
-
 
 
     /**
@@ -211,7 +205,6 @@ class BleServiceHelper private constructor() {
      * 停止扫描
      * 连接之前调用该方法，并会重置扫描条件为默认值
      * 组合套装时,targetModel 会被重置为末尾添加的model
-     *
      */
     fun stopScan() {
         if (checkService()) bleService.stopDiscover()
@@ -244,13 +237,15 @@ class BleServiceHelper private constructor() {
     }
 
      /**
-     *
-     * @param context Context
-     * @param model Int
-     * @param b BluetoothDevice
-     * @param isAutoReconnect Boolean
-     * @param withUpdater Boolean 检查是否是升级失败的设备
-     */
+      *
+      * @param context Context
+      * @param model Int
+      * @param b BluetoothDevice
+      * @param isAutoReconnect Boolean
+      * @param withUpdater Boolean 检查是否是升级失败的设备
+      *
+      * 连接成功后自动同步时间（pc80b,pc60fw,胎心仪设备没有同步时间设置，发送EventMsgConst.Ble.EventBleDeviceReady）
+      */
     @JvmOverloads
     fun connect(context: Context,model: Int, b: BluetoothDevice, isAutoReconnect: Boolean = true, toConnectUpdater: Boolean = false) {
         if (!checkService()) return
@@ -265,6 +260,7 @@ class BleServiceHelper private constructor() {
     /**
      *  发起重连 允许扫描多个设备
      */
+    @JvmOverloads
     fun reconnect(scanModel: IntArray, name: Array<String>, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnect " )
         if (!checkService()) return
@@ -278,6 +274,7 @@ class BleServiceHelper private constructor() {
      * @param scanModel Int
      * @param name String
      */
+    @JvmOverloads
     fun reconnect(scanModel: Int, name: String, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnect" )
         if (!checkService()) return
@@ -403,8 +400,9 @@ class BleServiceHelper private constructor() {
 
     }
 
-
-
+    /**
+     * 获取设备文件列表
+     */
     fun getFileList(model: Int){
         if (!checkService()) return
         getInterface(model)?.getFileList()
@@ -417,6 +415,7 @@ class BleServiceHelper private constructor() {
      * @param model Int
      * @param offset Int 开始读文件的偏移量
      */
+    @JvmOverloads
     fun readFile(userId: String, fileName: String, model: Int, offset: Int = 0) {
         if (!checkService()) return
         getInterface(model)?.let {
@@ -515,6 +514,7 @@ class BleServiceHelper private constructor() {
     /**
      * 开启实时任务
      */
+    @JvmOverloads
     fun startRtTask(model: Int, runStateTask: Boolean = false){
         if (!checkService()) return
         getInterface(model)?.let {
@@ -530,6 +530,7 @@ class BleServiceHelper private constructor() {
             }
         }
     }
+
     /**
      * 获取BP2 关闭实时状态
      */
@@ -548,10 +549,10 @@ class BleServiceHelper private constructor() {
     }
 
 
-
     /**
      * 移除获取实时任务
      */
+    @JvmOverloads
     fun stopRtTask(model: Int, stopStateTask: Boolean = false) {
         if (!checkService()) return
         getInterface(model)?.let {
@@ -572,7 +573,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A ->{
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2BleInterface")
+                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2GetConfig")
                         it.getConfig()
                     }
                 }
@@ -588,7 +589,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2BleInterface")
+                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2SetConfig")
                         it.setConfig(switch)
                     }
                 }
@@ -597,13 +598,17 @@ class BleServiceHelper private constructor() {
         }
 
     }
+
+    /**
+     * 开始测量血压
+     */
     fun startBp(model: Int) {
         if (!checkService()) return
         when(model){
             Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A ->{
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2BleInterface")
+                        LepuBleLog.d(tag, "it as Bp2BleInterface--startBp")
                         it.startBp()
                     }
                 }
@@ -611,7 +616,15 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BPM ->{
                 getInterface(model)?.let { it1 ->
                     (it1 as BpmBleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2BleInterface")
+                        LepuBleLog.d(tag, "it as BpmBleInterface--startBp")
+                        it.startBp()
+                    }
+                }
+            }
+            Bluetooth.MODEL_BPW1 ->{
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bpw1BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bpw1BleInterface--startBp")
                         it.startBp()
                     }
                 }
@@ -620,13 +633,17 @@ class BleServiceHelper private constructor() {
         }
 
     }
+
+    /**
+     * 停止测量血压
+     */
     fun stopBp(model: Int) {
         if (!checkService()) return
         when(model) {
             Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2BleInterface")
+                        LepuBleLog.d(tag, "it as Bp2BleInterface--stopBp")
                         it.stopBp()
                     }
                 }
@@ -634,7 +651,15 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BPM -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as BpmBleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2BleInterface")
+                        LepuBleLog.d(tag, "it as BpmBleInterface--stopBp")
+                        it.stopBp()
+                    }
+                }
+            }
+            Bluetooth.MODEL_BPW1 ->{
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bpw1BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bpw1BleInterface--stopBp")
                         it.stopBp()
                     }
                 }
@@ -652,6 +677,9 @@ class BleServiceHelper private constructor() {
     }
 
 
+    /**
+     * 获取Bpm设备文件列表
+     */
     fun getBpmFileList(model: Int, map: HashMap<String, Any>){
         if (!checkService()) return
         if (model != Bluetooth.MODEL_BPM){
@@ -660,7 +688,7 @@ class BleServiceHelper private constructor() {
         }
         getInterface(model)?.let { it1 ->
             (it1 as BpmBleInterface).let {
-                LepuBleLog.d(tag, "it as BpmBleInterface")
+                LepuBleLog.d(tag, "it as BpmBleInterface--getBpmFileList")
                 it.getBpmFileList(map)
             }
         }
@@ -787,6 +815,9 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_FHR -> {
                 return inter is FhrBleInterface
             }
+            Bluetooth.MODEL_BPW1 -> {
+                return inter is Bpw1BleInterface
+            }
             else -> {
                 LepuBleLog.d(tag, "checkModel, 无效model：$model,${inter.javaClass}")
                 return false
@@ -795,6 +826,7 @@ class BleServiceHelper private constructor() {
 
 
     }
+
     /**
      * 获取BP2 开启实时状态
      */
@@ -847,7 +879,6 @@ class BleServiceHelper private constructor() {
     }
 
 
-
     fun getReconnectDeviceName(): ArrayList<String>{
        return bleService.reconnectDeviceName
     }
@@ -880,11 +911,47 @@ class BleServiceHelper private constructor() {
     fun sendHeartbeat(model: Int) {
         getInterface(model)?.let { it1 ->
             (it1 as PC80BleInterface).let {
-                LepuBleLog.d(tag, "it as PC80BleInterface")
+                LepuBleLog.d(tag, "it as PC80BleInterface--sendHeartbeat")
                 it.sendHeartbeat()
             }
         }
     }
 
+    /**
+     * Bpw1设置定时测量血压时间
+     * @param measureTime Array<String?> 字符串格式："startHH,startMM,stopHH,stopMM,interval,serialNum,totalNum"
+     */
+    fun setMeasureTime(model: Int, measureTime: Array<String?>) {
+        getInterface(model)?.let { it1 ->
+            (it1 as Bpw1BleInterface).let {
+                LepuBleLog.d(tag, "it as Bpw1BleInterface--setMeasureTime")
+                it.setMeasureTime(measureTime)
+            }
+        }
+    }
+
+    /**
+     * Bpw1获取定时测量血压时间
+     */
+    fun getMeasureTime(model: Int) {
+        getInterface(model)?.let { it1 ->
+            (it1 as Bpw1BleInterface).let {
+                LepuBleLog.d(tag, "it as Bpw1BleInterface--getMeasureTime")
+                it.getMeasureTime()
+            }
+        }
+    }
+
+    /**
+     * Bpw1设置定时测量开关
+     */
+    fun setTimingSwitch(model: Int, timingSwitch: Boolean) {
+        getInterface(model)?.let { it1 ->
+            (it1 as Bpw1BleInterface).let {
+                LepuBleLog.d(tag, "it as Bpw1BleInterface--setTimingSwitch")
+                it.setTimingSwitch(timingSwitch)
+            }
+        }
+    }
 
 }

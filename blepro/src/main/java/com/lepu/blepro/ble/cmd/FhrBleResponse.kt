@@ -27,14 +27,14 @@ object FhrBleResponse {
         var hr: Int             // 心率数据（心率测量范围为60~240，0表示无信号，255表示超出量程）
         var volume: Int         // 音量数据
         var strength: Int       // 心音强度数据
-        var batLevel: Int       // 电量数据
+        var battery: Int        // 电量数据
 
         init {
             deviceName = toString(bytes.copyOfRange(1, 5))
             hr = (bytes[7].toUInt() and 0xFFu).toInt()
             volume = (bytes[8].toUInt() and 0xFFu).toInt()
             strength = (bytes[9].toUInt() and 0xFFu).toInt()
-            batLevel = (bytes[10].toUInt() and 0xFFu).toInt()
+            battery = (bytes[10].toUInt() and 0xFFu).toInt()
         }
     }
 

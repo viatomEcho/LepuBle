@@ -52,12 +52,10 @@ class PC60FwBleResponse{
         var spo2: Byte
         var pr: Short
         var pi: Short
-        var status: Byte
         init {
             spo2 =  byteArray[0]
             pr = toSignedShort(byteArray[1], byteArray[2])
-            pi = (byteArray[3].toInt() and 0x7f).toShort()
-            status =  byteArray[4]
+            pi = (byteArray[3].toInt() and 0xff).toShort()
         }
 
 

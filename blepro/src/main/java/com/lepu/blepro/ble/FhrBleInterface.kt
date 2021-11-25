@@ -84,12 +84,11 @@ class FhrBleInterface(model: Int): BleInterface(model) {
                 onResponseReceived(bleResponse)
             } else if (bytes[4] == 0x0A.toByte()) {
                 for (i in bytes.indices)
-                    tempBytes.set(i, bytes[i])
+                    tempBytes[i] = bytes[i]
             }
         } else if (bytes.size == 3) {
-            tempBytes.set(20, bytes[0])
-            tempBytes.set(21, bytes[1])
-            tempBytes.set(22, bytes[2])
+            for (i in bytes.indices)
+                tempBytes[i+20] = bytes[i]
             val bleResponse = FhrBleResponse.FhrResponse(tempBytes)
             onResponseReceived(bleResponse)
         }

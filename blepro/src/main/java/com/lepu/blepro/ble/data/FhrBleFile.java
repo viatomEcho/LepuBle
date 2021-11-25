@@ -4,11 +4,11 @@ import com.lepu.blepro.utils.PCMCovWavUtil;
 
 public class FhrBleFile {
 
-    private int[] indexTable={
+    private static int[] indexTable={
             -1, -1, -1, -1, 2, 4, 6, 8,
             -1, -1, -1, -1, 2, 4, 6, 8};
 
-    private int[] stepsizeTable = {
+    private static int[] stepsizeTable = {
             7, 8, 9, 10, 11, 12, 13, 14, 16, 17,
             19, 21, 23, 25, 28, 31, 34, 37, 41, 45,
             50, 55, 60, 66, 73, 80, 88, 97, 107, 118,
@@ -19,7 +19,7 @@ public class FhrBleFile {
             5894, 6484, 7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899,
             15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767};
 
-    private short[] rsSample8Coff1 = {
+    private static short[] rsSample8Coff1 = {
             0, 0, 0, 32767, 1, 0, 0, 0,
             -22, 347, -2263, 31759, 3482, -584, 50, -1,
             -25, 484, -3379, 28865, 8069, -1378, 134, -2,
@@ -31,9 +31,9 @@ public class FhrBleFile {
             0, 0, 0, 0, 32767, 1, 0, 0
     };
 
-    private RSP8_CONTEXT RspCont_obj8 = null;
+    private static RSP8_CONTEXT RspCont_obj8 = null;
 
-    public byte[] decoder(byte[] aFileBytes) {
+    public static byte[] decode(byte[] aFileBytes) {
         byte[] pcmFileBytes = new byte[aFileBytes.length*4];
         byte[] delta = new byte[2];
         int index = 0;
@@ -76,7 +76,7 @@ public class FhrBleFile {
         return pcmFileBytes;
     }
 
-    public byte[] resample(byte[] pcmFileBytes) {
+    public static byte[] resample(byte[] pcmFileBytes) {
         byte[] tempFileBytes = new byte[pcmFileBytes.length*5];
         try {
             resample8_init();
@@ -140,7 +140,7 @@ public class FhrBleFile {
         }
     }
 
-    private void resample8_init() {
+    private static void resample8_init() {
         RspCont_obj8 = new RSP8_CONTEXT();
         RspCont_obj8.nch = 1;
         RspCont_obj8.insample = 2000;
@@ -149,7 +149,7 @@ public class FhrBleFile {
         RspCont_obj8.LpScl = (134217728 / 8000) + 1;
     }
 
-    private void Resample8Up(short[] inData, int len) {
+    private static void Resample8Up(short[] inData, int len) {
         int i, nch, coff, div_ou, out_data;
 
         nch = RspCont_obj8.nch - 1;
@@ -201,7 +201,7 @@ public class FhrBleFile {
         }
     }
 
-    private int clip_8(int a, int amin, int amax) {
+    private static int clip_8(int a, int amin, int amax) {
         if (a < amin)
             return amin;
         else if (a > amax)
@@ -210,7 +210,7 @@ public class FhrBleFile {
             return a;
     }
 
-    class RSP8_CONTEXT {
+    static class RSP8_CONTEXT {
         short[] bufL = new short[24+1];
         short[] bufR = new short[24+1];
 
@@ -234,7 +234,7 @@ public class FhrBleFile {
     /**
      * 转换音频文件
      */
-    public byte[] convertAudio(byte[] pcmFileBytes) {
+    public static byte[] convertWav(byte[] pcmFileBytes) {
         try {
             int size = pcmFileBytes.length;
 
@@ -244,7 +244,7 @@ public class FhrBleFile {
             header.fileLength = size + (44 - 8);
             header.FmtHdrLeth = 16;
             header.BitsPerSample = 16;
-            header.Channels = 2;
+            header.Channels = 1;
             header.FormatTag = 0x0001;
             header.SamplesPerSec = 8000;
             header.BlockAlign = (short)(header.Channels * header.BitsPerSample / 8);
@@ -267,7 +267,7 @@ public class FhrBleFile {
         }
     }
 
-    private byte[] Hex2ByteDTX(int l) {
+    private static byte[] Hex2ByteDTX(int l) {
         int len = 2;
         byte[] b = new byte[len];
         for (int i=0; i<len; i++) {
@@ -276,7 +276,7 @@ public class FhrBleFile {
         return b;
     }
 
-    private short[] toShortArray(byte[] src) {
+    private static short[] toShortArray(byte[] src) {
 
         int count = src.length >> 1;
         short[] dest = new short[count];

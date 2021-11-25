@@ -9,25 +9,25 @@ class Th12BleFile(val fileName: String, val byteArray: ByteArray) {
     private val leadNameTable = arrayOf("NULL", "I", "II", "NULL", "NULL", "NULL", "NULL",
         "V1", "V2", "V3", "V4", "V5", "V6", "Pacer")
 
-    var samplingRate: Int                // 采样率
-    var range: Int                       // 电压范围
-    var precision: Int                   // 电压数值
-    var adcGain: Float                   // adc增益
-    var leadNum: Int                     // 导联数量
-    var samplingNum: Int                 // 每导联采样点数
+    private var samplingRate: Int                // 采样率
+    private var range: Int                       // 电压范围
+    private var precision: Int                   // 电压数值
+    private var adcGain: Float                   // adc增益
+    private var leadNum: Int                     // 导联数量
+    private var samplingNum: Int                 // 每导联采样点数
 
-    var leadNames: Array<String?>        // 导联名称
+    private var leadNames: Array<String?>        // 导联名称
 
-    var year: String
-    var month: String
-    var day: String
+    private var year: String
+    private var month: String
+    private var day: String
 
-    var hour: String
-    var minute: String
-    var second: String
+    private var hour: String
+    private var minute: String
+    private var second: String
 
-    var originalEcgData: ByteArray        // 原始心电数据
-    var leadEcgData: Array<ByteArray?>    // 分组导联数据
+    private var originalEcgData: ByteArray        // 原始心电数据
+    private var leadEcgData: Array<ByteArray?>    // 分组导联数据
 
     init {
         samplingRate = toUInt(byteArray.copyOfRange(17, 19))
@@ -61,6 +61,18 @@ class Th12BleFile(val fileName: String, val byteArray: ByteArray) {
                 leadEcgData[i]?.set(j*2+1, originalEcgData[j*2*leadNum + i*2+1])
             }
         }
+    }
+
+    fun getFileCreateTime(): String {
+        return "$year-$month-$day $hour:$minute:$second"
+    }
+
+    fun getEcgTime(): Int {
+        return samplingNum/samplingRate
+    }
+
+    fun getOriginalEcgData(): ByteArray {
+        return originalEcgData
     }
 
     private fun getOriginalEcgData(byteArray: ByteArray): ByteArray {
@@ -171,26 +183,8 @@ class Th12BleFile(val fileName: String, val byteArray: ByteArray) {
         var headData = arrayOfNulls<String>(leadNum+1)
         headData[0] = "$fileName $leadNum $samplingRate $samplingNum $time $date"
         for (i in 1 until headData.size) {
-            headData[i] = fileName + " 16 " + adcGain + " 16 0 " + bytesToSignedShort(leadEcgData[i-1]!![0], leadEcgData[i-1]!![1]) + " " + sumCrcs[i-1] + " 0 " + leadNames[i-1]
+            headData[i] = fileName + ".dat 16 " + adcGain + " 16 0 " + bytesToSignedShort(leadEcgData[i-1]!![0], leadEcgData[i-1]!![1]) + " " + sumCrcs[i-1] + " 0 " + leadNames[i-1]
         }
         return headData
-    }
-
-    override fun toString(): String {
-        val string = """
-            download file:
-            samplingRate: $samplingRate
-            range: $range
-            precision: $precision
-            leadNum: $leadNum
-            leadNames: $leadNames
-            year: $year
-            month: $month
-            day: $day
-            hour: $hour
-            minute: $minute
-            second: $second
-        """
-        return string
     }
 }

@@ -103,7 +103,7 @@ class PC80BleInterface(model: Int): BleInterface(model) {
 
                     if (response.len == 1) {
                         if (this.index != this.fileSize){
-                            LepuBleLog.d(tag, "model:$model,DATA_MESS EventEr1ReadFileError")
+                            LepuBleLog.d(tag, "model:$model,DATA_MESS EventPc80bReadFileError")
                             sendCmd(PC80BleCmd.responseDataMess(this.seqNo, PC80BleCmd.NAK))
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadFileError).post(InterfaceEvent(model, true))
                         }else {

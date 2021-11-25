@@ -263,8 +263,8 @@ object PC80BleResponse {
     @Parcelize
     @ExperimentalUnsignedTypes
     class ScpEcgFile(var bytes: ByteArray) : Parcelable {
-        var crc: Int              // 全部记录的校验CRC值
-        var len: Int              // 全部记录的长度
+        var crc: Int            // 全部记录的校验CRC值
+        var len: Int            // 全部记录的长度
         var section0: Section0  // 数据段指针
         var section1: Section1  // 头信息
         var section2: Section2  // Huffman表段

@@ -10,6 +10,7 @@ import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.Bp2BleInterface
 import com.lepu.blepro.ble.cmd.Bp2BleCmd
+import com.lepu.blepro.ble.cmd.Bpw1BleResponse
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.objs.Bluetooth
@@ -365,6 +366,58 @@ class LpBleUtil {
             BleServiceHelper.oxyGetPpgRt(model)
         }
 
+        fun startBp(model: Int) {
+            Log.d(TAG, "startBp")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.startBp(model)
+            }
+
+        }
+        fun stopBp(model: Int) {
+            Log.d(TAG, "stopBp")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.stopBp(model)
+            }
+
+        }
+        fun setMeasureTime(model: Int, measureTime: Array<String?>) {
+            Log.d(TAG, "setMeasureTime")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.setMeasureTime(model, measureTime)
+            }
+        }
+        fun getMeasureTime(model: Int) {
+            Log.d(TAG, "getMeasureTime")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.getMeasureTime(model)
+            }
+        }
+        fun setTimingSwitch(model: Int, timingSwitch: Boolean) {
+            Log.d(TAG, "setTimingSwitch")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.setTimingSwitch(model, timingSwitch)
+            }
+        }
 
     }
 
