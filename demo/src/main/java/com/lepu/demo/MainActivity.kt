@@ -153,7 +153,14 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 Toast.makeText(this, "bp2 完成时间同步", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
 
-//                LpBleUtil.startRtTask(Bluetooth.MODEL_BP2, 500)
+            })
+
+        //bp2 info
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Info)
+            .observe(this, {
+                Toast.makeText(this, "bp2 获取设备信息成功", Toast.LENGTH_SHORT).show()
+
+                LpBleUtil.startRtTask(it.model)
 
             })
 
@@ -174,7 +181,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo).observe(this, { event ->
             (event.data as OxyBleResponse.OxyInfo).let {
                 viewModel._oxyInfo.value = it
-                LpBleUtil.startRtTask()
+                LpBleUtil.startRtTask(event.model)
             }
         })
 
@@ -229,8 +236,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
         when(state){
             LpBleUtil.State.CONNECTED ->{
-                if (LpBleUtil.isRtStop(model))
-                    LpBleUtil.startRtTask(model)
             }
             LpBleUtil.State.DISCONNECTED ->{
                 LpBleUtil.stopRtTask(model)

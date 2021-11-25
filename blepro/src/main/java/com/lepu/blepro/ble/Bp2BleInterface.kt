@@ -124,12 +124,11 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
     private fun onResponseReceived(bleResponse: Bp2BleResponse.BleResponse) {
         LepuBleLog.d(tag, "onResponseReceived : " + bleResponse.cmd)
 
-        if (curCmd == 0) {
-            LepuBleLog.e(tag, "error curCmd = 0")
+        if (curCmd == -1) {
+            LepuBleLog.e(tag, "onResponseReceived error curCmd = -1")
             return
         }
         clearCmdTimeout()
-
         when (bleResponse.cmd) {
             CMD_INFO -> {
                 LepuBleLog.d(tag, "model:$model,CMD_INFO => success")
@@ -299,6 +298,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                         .post(InterfaceEvent(model, 1))
                 }
             }
+
             CMD_FACTORY_RESET -> {
                 LepuBleLog.d(tag, "model:$model,CMD_FACTORY_RESET => success")
 
@@ -311,6 +311,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                         .post(InterfaceEvent(model, 1))
                 }
             }
+
             CMD_FACTORY_RESET_ALL -> {
                 LepuBleLog.d(tag, "model:$model,CMD_FACTORY_RESET_ALL => success")
 
@@ -334,6 +335,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
 
         }
+
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
@@ -345,29 +347,36 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
 
     fun sendCmd(cmd: Int, bs: ByteArray) {
-        if (curCmd != 0) {
+        if (curCmd == MSG_TYPE_BP2_RT_DATA && isRtStop  || curCmd == MSG_TYPE_BP2_RT_STATE && isRtSateStop){
+            //实时已经停止, 实时切换到下载文件调用停止实时后应该延迟发送获取文件列表
+            curCmd = -1
+        }
+
+        if (curCmd != -1) {
             // busy
-            LepuBleLog.e(tag, "cmd busy: ${cmd}, curCmd => $curCmd")
+            LepuBleLog.e(tag, "cmd busy:: to send cmd = $cmd, str = ${getCmdStr(cmd)}, curCmd => $curCmd")
             return
         }
 
-        this.curCmd = cmd
+
         super.sendCmd(bs)
+        this.curCmd = cmd
 
         cmdTimeout = GlobalScope.launch {
             delay(3000)
             // timeout
-            if (curCmd != 0){
-                LepuBleLog.e(tag, "cmd timeout: $curCmd")
+            if (curCmd != -1){
+                LepuBleLog.e(tag, "cmd timeout: $curCmd, str = ${getCmdStr(curCmd)}")
                 LiveEventBus.get<InterfaceEvent>(EventMsgConst.Cmd.EventCmdResponseTimeOut).post(InterfaceEvent(model, curCmd))
             }
-            curCmd = 0
+            curCmd = -1
 
         }
 
 
-    }
 
+
+    }
 
 
 
