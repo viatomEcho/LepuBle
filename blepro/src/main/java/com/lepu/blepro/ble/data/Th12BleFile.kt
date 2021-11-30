@@ -4,32 +4,37 @@ import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.bytesToSignedShort
 import com.lepu.blepro.utils.toUInt
 
-class Th12BleFile(val fileName: String, val byteArray: ByteArray) {
+class Th12BleFile(val fileName: String) {
 
     private val leadNameTable = arrayOf("NULL", "I", "II", "NULL", "NULL", "NULL", "NULL",
         "V1", "V2", "V3", "V4", "V5", "V6", "Pacer")
 
-    private var samplingRate: Int                // 采样率
-    private var range: Int                       // 电压范围
-    private var precision: Int                   // 电压数值
-    private var adcGain: Float                   // adc增益
-    private var leadNum: Int                     // 导联数量
-    private var samplingNum: Int                 // 每导联采样点数
+    private var headDataLen: Int = 2901              // 头文件长度
+    private var samplingRate: Int = 250              // 采样率
+    private var range: Int = 50000                   // 电压范围
+    private var precision: Int = 32768               // 电压数值
+    private var adcGain: Float = 655.36f             // adc增益
+    private var leadNum: Int = 9                     // 导联数量
+    private var samplingNum: Int = 0                 // 每导联采样点数
+    private var validLength: Int = 0                 // 文件有效长度
 
-    private var leadNames: Array<String?>        // 导联名称
+    private lateinit var leadNames: Array<String?>   // 导联名称
 
-    private var year: String
-    private var month: String
-    private var day: String
+    private lateinit var year: String
+    private lateinit var month: String
+    private lateinit var day: String
 
-    private var hour: String
-    private var minute: String
-    private var second: String
+    private lateinit var hour: String
+    private lateinit var minute: String
+    private lateinit var second: String
 
-    private var originalEcgData: ByteArray        // 原始心电数据
-    private var leadEcgData: Array<ByteArray?>    // 分组导联数据
+    private lateinit var sumCrcs: Array<Short?>
+    private lateinit var initDatas: Array<Short?>
 
-    init {
+    private var index = 0
+
+    fun parseHeadData(byteArray: ByteArray) {
+        if (byteArray.size < headDataLen) return
         samplingRate = toUInt(byteArray.copyOfRange(17, 19))
         range = toUInt(byteArray.copyOfRange(19, 23))
         precision = toUInt(byteArray.copyOfRange(23, 27))
@@ -41,7 +46,11 @@ class Th12BleFile(val fileName: String, val byteArray: ByteArray) {
         for (i in leadNames.indices) {
             leadNames[i] = leadNameTable[leadNameByteArray[i].toInt()]
         }
-        var validLength = toUInt(byteArray.copyOfRange(49, 53))
+
+        sumCrcs = arrayOfNulls(leadNum)
+        initDatas = arrayOfNulls(leadNum)
+
+        validLength = toUInt(byteArray.copyOfRange(49, 53))
 
         year = bytesToHex(byteArray.copyOfRange(53, 55))
         month = bytesToHex(byteArrayOf(byteArray[55]))
@@ -50,17 +59,10 @@ class Th12BleFile(val fileName: String, val byteArray: ByteArray) {
         hour = bytesToHex(byteArrayOf(byteArray[57]))
         minute = bytesToHex(byteArrayOf(byteArray[58]))
         second = bytesToHex(byteArrayOf(byteArray[59]))
+    }
 
-        originalEcgData = getOriginalEcgData(byteArray.copyOfRange(2901, validLength))
-        samplingNum = originalEcgData.size/2/leadNum
-        leadEcgData = arrayOfNulls(leadNum)
-        for (i in 0 until leadNum) {
-            leadEcgData[i] = ByteArray(originalEcgData.size/leadNum)
-            for (j in 0 until samplingNum) {
-                leadEcgData[i]?.set(j*2, originalEcgData[j*2*leadNum + i*2])
-                leadEcgData[i]?.set(j*2+1, originalEcgData[j*2*leadNum + i*2+1])
-            }
-        }
+    fun getValidLength(): Int {
+        return validLength - headDataLen
     }
 
     fun getFileCreateTime(): String {
@@ -71,119 +73,33 @@ class Th12BleFile(val fileName: String, val byteArray: ByteArray) {
         return samplingNum/samplingRate
     }
 
-    fun getOriginalEcgData(): ByteArray {
-        return originalEcgData
-    }
+    fun getTwoSecondEcgData(byteArray: ByteArray): ByteArray {
+        var ecgData = byteArray.copyOfRange(8, byteArray.size)
+        if (index == 0) {
+            for (i in 0 until leadNum) {
+                initDatas[i] = bytesToSignedShort(ecgData[i*2], ecgData[i*2+1])
+                sumCrcs[i] = 0
+            }
+        }
 
-    private fun getOriginalEcgData(byteArray: ByteArray): ByteArray {
-        val interval = 8 + 500 * 2 * leadNum // 每2秒数据大小(数据头+导联数据)
-        val headCount = byteArray.size/interval
-        val ecgLength = byteArray.size - headCount*8 // 导联数据 = 数据内容 - 数据头
-        var ecgByteArray = ByteArray(ecgLength)
-        var headByteArray = ByteArray(headCount*8)
-        for (i in 0 until headCount) {
-            System.arraycopy(
-                byteArray,
-                i * interval,
-                headByteArray,
-                i * 8,
-                8)
-            if (i == (headCount - 1)) {
-                System.arraycopy(
-                    byteArray,
-                    8 + i * interval,
-                    ecgByteArray,
-                    i * (interval - 8),
-                    ecgLength - i * (interval - 8))
-            } else {
-                System.arraycopy(
-                    byteArray,
-                    8 + i * interval,
-                    ecgByteArray,
-                    i * (interval - 8),
-                    interval - 8)
-            }
+        for (i in sumCrcs.indices) {
+            for (j in 0 until (ecgData.size/2/leadNum))
+                sumCrcs[i] =
+                    sumCrcs[i]?.plus(bytesToSignedShort(ecgData[j*leadNum*2+i*2], ecgData[j*leadNum*2+i*2+1]))?.toShort()
         }
-        return ecgByteArray
-    }
 
-    fun getEachLeadData(leadName: String): ShortArray {
-        var index = 0
-        when(leadName) {
-            "I" -> index = 0
-            "II" -> index = 1
-            "V1" -> index = 2
-            "V2" -> index = 3
-            "V3" -> index = 4
-            "V4" -> index = 5
-            "V5" -> index = 6
-            "V6" -> index = 7
-            "Pacer" -> index = 8
-            "III" -> index = 9
-            "aVR" -> index = 10
-            "aVL" -> index = 11
-            "aVF" -> index = 12
-        }
-        var leadData = ShortArray(originalEcgData.size/2/leadNum)
-        if (index < 9) {
-            for (i in leadData.indices) {
-                leadData[i] = bytesToSignedShort(leadEcgData[index]!![i*2], leadEcgData[index]!![i*2+1])
-            }
-        } else {
-            // 其余四导计算获得
-            leadData = getOtherLeadData(leadName)
-        }
-        return leadData
-    }
-
-    private fun getOtherLeadData(leadName: String): ShortArray {
-        var leadData = ShortArray(originalEcgData.size/2/leadNum)
-        var leadDataI = ShortArray(originalEcgData.size/2/leadNum)
-        var leadDataII = ShortArray(originalEcgData.size/2/leadNum)
-        for (i in leadData.indices) {
-            leadDataI[i] = bytesToSignedShort(leadEcgData[0]!![i*2], leadEcgData[0]!![i*2+1])
-            leadDataII[i] = bytesToSignedShort(leadEcgData[1]!![i*2], leadEcgData[1]!![i*2+1])
-        }
-        when(leadName) {
-            "III" -> { // III = II - I
-                for (i in leadData.indices) {
-                    leadData[i] = (leadDataII[i] - leadDataI[i]).toShort()
-                }
-            }
-            "aVR" -> { // aVR = -(II + I)/2
-                for (i in leadData.indices) {
-                    leadData[i] = (-(leadDataII[i] + leadDataI[i])/2).toShort()
-                }
-            }
-            "aVL" -> { // aVL = I - II/2
-                for (i in leadData.indices) {
-                    leadData[i] = (leadDataI[i] - leadDataII[i]/2).toShort()
-                }
-            }
-            "aVF" -> { // aVF = II - I/2
-                for (i in leadData.indices) {
-                    leadData[i] = (leadDataII[i] - leadDataI[i]/2).toShort()
-                }
-            }
-        }
-        return leadData
+        index++
+        samplingNum = (validLength-headDataLen-index*8)/2/leadNum
+        return ecgData
     }
 
     fun getMitHeadData(): Array<String?> {
         val date = "$day/$month/$year"
         val time = "$hour:$minute:$second"
-        var sumCrcs = arrayOfNulls<Short>(leadNames.size)
-        for (i in sumCrcs.indices) {
-            sumCrcs[i] = 0
-            for (j in 0 until samplingNum) {
-                sumCrcs[i] =
-                    sumCrcs[i]?.plus(bytesToSignedShort(leadEcgData[i]!![j*2], leadEcgData[i]!![j*2+1]))?.toShort()
-            }
-        }
         var headData = arrayOfNulls<String>(leadNum+1)
         headData[0] = "$fileName $leadNum $samplingRate $samplingNum $time $date"
         for (i in 1 until headData.size) {
-            headData[i] = fileName + ".dat 16 " + adcGain + " 16 0 " + bytesToSignedShort(leadEcgData[i-1]!![0], leadEcgData[i-1]!![1]) + " " + sumCrcs[i-1] + " 0 " + leadNames[i-1]
+            headData[i] = fileName + ".dat 16 " + adcGain + " 16 0 " + initDatas[i-1] + " " + sumCrcs[i-1] + " 0 " + leadNames[i-1]
         }
         return headData
     }

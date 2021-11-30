@@ -2,6 +2,8 @@ package com.lepu.blepro.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
@@ -21,6 +23,11 @@ class Bpw1BleInterface(model: Int): BleInterface(model) {
     private lateinit var measureTime: Array<String?>
 
     var fileList: Bpw1BleResponse.Bpw1FileList? = null
+
+    private val delayTime = 2000L
+    private val handler = Handler(Looper.getMainLooper())
+    private var alreadySendDelayCmd: Boolean = true // 延迟指令发送标志，false拦截操作
+    private var measureTimeIndex = 0 // 设置定时测量时间完成标志
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
@@ -66,27 +73,61 @@ class Bpw1BleInterface(model: Int): BleInterface(model) {
                                 when(Bpw1BleCmd.mCurrentCmd) {
                                     Bpw1BleCmd.SET_TIME -> {
                                         LepuBleLog.d(tag, "model:$model,SET_TIME => success")
-                                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1SetTime).post(
+
+                                        alreadySendDelayCmd = false
+                                        handler.postDelayed(
+                                            {
+                                                alreadySendDelayCmd = true
+                                                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1SetTime).post(InterfaceEvent(model, true))
+                                            }, delayTime)
+                                        LepuBleLog.d(tag, "SET_TIME => LiveEventBus  EventBpw1SetTime")
+                                    }
+                                    Bpw1BleCmd.SET_MEASURE_TIME -> {
+                                        LepuBleLog.d(
+                                            tag,
+                                            "model:$model,SET_MEASURE_TIME => success"
+                                        )
+                                        measureTimeIndex++
+                                        if (measureTimeIndex == measureTime.size) {
+                                            measureTimeIndex = 0
+                                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1SetMeasureTime)
+                                                .post(
+                                                    InterfaceEvent(model, true)
+                                                )
+                                            LepuBleLog.d(
+                                                tag,
+                                                "SET_MEASURE_TIME => LiveEventBus  EventBpw1SetMeasureTime"
+                                            )
+                                        }
+                                    }
+                                    Bpw1BleCmd.SET_TIMING_SWITCH -> {
+                                        LepuBleLog.d(tag, "model:$model,SET_TIMING_SWITCH => success")
+                                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1SetTimingSwitch).post(
                                             InterfaceEvent(model, true)
                                         )
-                                        LepuBleLog.d(tag, "SET_TIME => LiveEventBus  EventBpw1SetTime")
+                                        LepuBleLog.d(tag, "SET_TIMING_SWITCH => LiveEventBus  EventBpw1SetTimingSwitch")
                                     }
                                 }
                             }
                             1 -> {
-                                // 返回
+                                alreadySendDelayCmd = false
+                                // 设备返回主界面后执行未响应的消息
                                 LepuBleLog.d(tag, "model:$model,Bpw1BleCmd.mCurrentCmd => " + Bpw1BleCmd.mCurrentCmd)
-                                Thread.sleep(2000)
-                                when(Bpw1BleCmd.mCurrentCmd) {
-                                    Bpw1BleCmd.GET_FILE_LIST -> getFileList()
-                                    Bpw1BleCmd.CLEAR_FILE_LIST -> clearFileList()
-                                    Bpw1BleCmd.GET_MEASURE_TIME -> getMeasureTime()
-                                    Bpw1BleCmd.GET_DEVICE_INFO -> getInfo()
-                                    Bpw1BleCmd.FACTORY_RESET -> factoryReset()
-                                    Bpw1BleCmd.SET_TIME -> syncTime()
-                                    Bpw1BleCmd.SET_MEASURE_TIME -> setMeasureTime(measureTime)
-                                    Bpw1BleCmd.SET_TIMING_SWITCH -> setTimingSwitch(timingSwitch)
-                                }
+
+                                handler.postDelayed(
+                                    {
+                                        alreadySendDelayCmd = true
+                                        when(Bpw1BleCmd.mCurrentCmd) {
+                                            Bpw1BleCmd.GET_FILE_LIST -> getFileList()
+                                            Bpw1BleCmd.CLEAR_FILE_LIST -> clearFileList()
+                                            Bpw1BleCmd.GET_MEASURE_TIME -> getMeasureTime()
+                                            Bpw1BleCmd.GET_DEVICE_INFO -> getInfo()
+                                            Bpw1BleCmd.FACTORY_RESET -> factoryReset()
+                                            Bpw1BleCmd.SET_TIME -> syncTime()
+                                            Bpw1BleCmd.SET_MEASURE_TIME -> setMeasureTime(measureTime)
+                                            Bpw1BleCmd.SET_TIMING_SWITCH -> setTimingSwitch(timingSwitch)
+                                        }
+                                    }, delayTime)
                             }
                         }
                     }
@@ -159,8 +200,7 @@ class Bpw1BleInterface(model: Int): BleInterface(model) {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1GetMeasureTime).post(
                             InterfaceEvent(model, data)
                         )
-
-                        LepuBleLog.d(tag, "GET_MEASURE_TIME => LiveEventBus  EventBpw1DeviceInfo")
+                        LepuBleLog.d(tag, "GET_MEASURE_TIME => LiveEventBus  EventBpw1GetMeasureTime")
                     }
                 }
             }
@@ -208,11 +248,17 @@ class Bpw1BleInterface(model: Int): BleInterface(model) {
      * get device info
      */
     override fun getInfo() {
-        sendCmd(Bpw1BleCmd.getDeviceInfo())
+        if (alreadySendDelayCmd)
+            sendCmd(Bpw1BleCmd.getDeviceInfo())
     }
 
     override fun syncTime() {
-        sendCmd(Bpw1BleCmd.setTime())
+        alreadySendDelayCmd = false
+        handler.postDelayed(
+            {
+                alreadySendDelayCmd = true
+                sendCmd(Bpw1BleCmd.setTime())
+            }, delayTime)
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
@@ -227,31 +273,42 @@ class Bpw1BleInterface(model: Int): BleInterface(model) {
      * get file list
      */
     override fun getFileList() {
-        sendCmd(Bpw1BleCmd.getFileList())
+        if (alreadySendDelayCmd)
+            sendCmd(Bpw1BleCmd.getFileList())
     }
 
     fun clearFileList() {
-        sendCmd(Bpw1BleCmd.clearFileList())
+        if (alreadySendDelayCmd)
+            sendCmd(Bpw1BleCmd.clearFileList())
     }
     fun startBp() {
-        sendCmd(Bpw1BleCmd.startBp())
+        if (alreadySendDelayCmd)
+            sendCmd(Bpw1BleCmd.startBp())
     }
     fun stopBp() {
-        sendCmd(Bpw1BleCmd.stopBp())
+        if (alreadySendDelayCmd)
+            sendCmd(Bpw1BleCmd.stopBp())
     }
     fun getMeasureTime() {
-        sendCmd(Bpw1BleCmd.getMeasureTime())
+        if (alreadySendDelayCmd)
+            sendCmd(Bpw1BleCmd.getMeasureTime())
     }
     fun setMeasureTime(measureTime: Array<String?>) {
+        if (!alreadySendDelayCmd) return
         this.measureTime = measureTime
+        var index = 0
         for (time in measureTime) {
             var data = time?.split(",")
             if (data!!.size < 7) continue
-            sendCmd(Bpw1BleCmd.setMeasureTime(data[0].toInt(), data[1].toInt(), data[2].toInt(), data[3].toInt(), data[4].toInt(), data[5].toInt(), data[6].toInt()))
-            Thread.sleep(1000)
+            handler.postDelayed(
+                {
+                    sendCmd(Bpw1BleCmd.setMeasureTime(data[0].toInt(), data[1].toInt(), data[2].toInt(), data[3].toInt(), data[4].toInt(), data[5].toInt(), data[6].toInt()))
+                }, delayTime*index)
+            index++
         }
     }
     fun setTimingSwitch(timingSwitch: Boolean) {
+        if (!alreadySendDelayCmd) return
         this.timingSwitch = timingSwitch
         sendCmd(Bpw1BleCmd.setTimingSwitch(timingSwitch))
     }
