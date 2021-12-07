@@ -170,7 +170,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     }
 
     override fun onNotify(device: BluetoothDevice?, data: Data?) {
-        if (model == Bluetooth.MODEL_FHR || model == Bluetooth.MODEL_BPW1) {
+        if (model == Bluetooth.MODEL_FHR) {
             hasResponse(data?.value) // 胎心仪数据长度不一致，直接获取
         } else {
             data?.value?.apply {
@@ -248,7 +248,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         publish()
 
         if (toConnectUpdater)
-            LiveEventBus.get<Boolean>(EventMsgConst.Updater.EventBleConnected).post(true)
+            LiveEventBus.get<BluetoothDevice>(EventMsgConst.Updater.EventBleConnected).post(device)
 
         BleServiceHelper.removeReconnectName(device.name)
         BleServiceHelper.removeReconnectAddress(device.address)

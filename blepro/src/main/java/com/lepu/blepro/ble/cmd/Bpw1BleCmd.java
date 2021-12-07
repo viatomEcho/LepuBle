@@ -1,5 +1,7 @@
 package com.lepu.blepro.ble.cmd;
 
+import com.lepu.blepro.utils.CrcUtil;
+
 import java.util.Calendar;
 
 /**
@@ -45,7 +47,7 @@ public class Bpw1BleCmd {
         cmd[2] = (byte) 0x02;
         cmd[3] = (byte) MEASURE_REQUEST;
         cmd[4] = (byte) 0x00;
-        cmd[5] = (byte) 0x02;
+        cmd[5] = CrcUtil.calBpw1CHK(cmd);
         return cmd;
     }
     public static byte[] stopBp() {
@@ -56,7 +58,7 @@ public class Bpw1BleCmd {
         cmd[2] = (byte) 0x02;
         cmd[3] = (byte) MEASURE_REQUEST;
         cmd[4] = (byte) 0x01;
-        cmd[5] = (byte) 0x03;
+        cmd[5] = CrcUtil.calBpw1CHK(cmd);
         return cmd;
     }
     public static byte[] getFileList() {
@@ -67,7 +69,7 @@ public class Bpw1BleCmd {
         cmd[2] = (byte) 0x02;
         cmd[3] = (byte) GET_FILE_LIST;
         cmd[4] = (byte) 0x00;
-        cmd[5] = (byte) 0x03;
+        cmd[5] = CrcUtil.calBpw1CHK(cmd);
         return cmd;
     }
     public static byte[] clearFileList() {
@@ -78,7 +80,7 @@ public class Bpw1BleCmd {
         cmd[2] = (byte) 0x02;
         cmd[3] = (byte) CLEAR_FILE_LIST;
         cmd[4] = (byte) 0x00;
-        cmd[5] = (byte) 0x00;
+        cmd[5] = CrcUtil.calBpw1CHK(cmd);
         return cmd;
     }
     public static byte[] getMeasureTime() {
@@ -89,7 +91,7 @@ public class Bpw1BleCmd {
         cmd[2] = (byte) 0x02;
         cmd[3] = (byte) GET_MEASURE_TIME;
         cmd[4] = (byte) 0x01;
-        cmd[5] = (byte) 0x00;
+        cmd[5] = CrcUtil.calBpw1CHK(cmd);
         return cmd;
     }
     public static byte[] getDeviceInfo() {
@@ -100,7 +102,7 @@ public class Bpw1BleCmd {
         cmd[2] = (byte) 0x02;
         cmd[3] = (byte) GET_DEVICE_INFO;
         cmd[4] = (byte) 0x00;
-        cmd[5] = (byte) 0x06;
+        cmd[5] = CrcUtil.calBpw1CHK(cmd);
         return cmd;
     }
     public static byte[] factoryReset() {
@@ -111,7 +113,7 @@ public class Bpw1BleCmd {
         cmd[2] = (byte) 0x02;
         cmd[3] = (byte) FACTORY_RESET;
         cmd[4] = (byte) 0xAA;
-        cmd[5] = (byte) 0xA8;
+        cmd[5] = CrcUtil.calBpw1CHK(cmd);
         return cmd;
     }
 
@@ -130,7 +132,7 @@ public class Bpw1BleCmd {
         cmd[7] = (byte) calendar.get(Calendar.HOUR_OF_DAY);
         cmd[8] = (byte) calendar.get(Calendar.MINUTE);
         cmd[9] = (byte) calendar.get(Calendar.SECOND);
-        cmd[10] = (byte) 0x00;
+        cmd[10] = CrcUtil.calBpw1CHK(cmd);
         return cmd;
     }
 
@@ -147,7 +149,7 @@ public class Bpw1BleCmd {
         cmd[7] = (byte) stopMM;
         cmd[8] = (byte)((serialNum << 4 | totalCount));
         cmd[9] = (byte) interval;
-        cmd[10] = (byte) 0x00;
+        cmd[10] = CrcUtil.calBpw1CHK(cmd);
         return cmd;
     }
 
@@ -166,7 +168,7 @@ public class Bpw1BleCmd {
         cmd[7] = (byte) 0x00;
         cmd[8] = (byte) 0x00;
         cmd[9] = (byte) 0x00;
-        cmd[10] = (byte) 0x00;
+        cmd[10] = CrcUtil.calBpw1CHK(cmd);
         return cmd;
     }
 

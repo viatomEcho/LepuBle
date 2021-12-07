@@ -31,6 +31,7 @@ class BleServiceHelper private constructor() {
 
     /**
      * 下载数据的保存路径，key为model
+     * 目前SDK会保存Er1，Oxy原始文件
      */
     var rawFolder: SparseArray<String>? = null
 
@@ -116,7 +117,7 @@ class BleServiceHelper private constructor() {
      * @return BleServiceHelper
      */
     private fun initCurrentFace(): BleServiceHelper{
-        if (this::bleService.isInitialized ) {
+        if (this::bleService.isInitialized) {
 
             LepuBleLog.d("initVailFace", "${modelConfig.size()}")
             for (i in 0 until modelConfig.size()) {
@@ -232,22 +233,22 @@ class BleServiceHelper private constructor() {
      * @return SparseArray<BleInterface>?
      */
     fun getInterfaces(): SparseArray<BleInterface>? {
-        if (!checkService())  return null
+        if (!checkService()) return null
         return bleService.vailFace
     }
 
-     /**
-      *
-      * @param context Context
-      * @param model Int
-      * @param b BluetoothDevice
-      * @param isAutoReconnect Boolean
-      * @param withUpdater Boolean 检查是否是升级失败的设备
-      *
-      * 连接成功后自动同步时间（pc80b,pc60fw,胎心仪设备没有同步时间设置，发送EventMsgConst.Ble.EventBleDeviceReady）
-      */
-    @JvmOverloads
-    fun connect(context: Context,model: Int, b: BluetoothDevice, isAutoReconnect: Boolean = true, toConnectUpdater: Boolean = false) {
+    /**
+     *
+     * @param context Context
+     * @param model Int
+     * @param b BluetoothDevice
+     * @param isAutoReconnect Boolean
+     * @param toConnectUpdater Boolean 检查是否是连接升级失败的设备（Er1设备升级失败，蓝牙名是Er1 updater）
+     *
+     * 连接成功后自动同步时间（pc80b,pc60fw,胎心仪设备没有同步时间设置，发送EventMsgConst.Ble.EventBleDeviceReady）
+     */
+     @JvmOverloads
+     fun connect(context: Context, model: Int, b: BluetoothDevice, isAutoReconnect: Boolean = true, toConnectUpdater: Boolean = false) {
         if (!checkService()) return
 
         LepuBleLog.d(tag, "connect")
@@ -278,7 +279,7 @@ class BleServiceHelper private constructor() {
     fun reconnect(scanModel: Int, name: String, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnect" )
         if (!checkService()) return
-        bleService.reconnect(intArrayOf(scanModel), arrayOf(name),needPair, toConnectUpdater)
+        bleService.reconnect(intArrayOf(scanModel), arrayOf(name), needPair, toConnectUpdater)
 
     }
 
@@ -289,11 +290,11 @@ class BleServiceHelper private constructor() {
      * @param macAddress Array<String>
      */
     @JvmOverloads
-    fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, needPair: Boolean,  toConnectUpdater: Boolean = false) {
+    fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, needPair: Boolean, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress " )
         if (!checkService()) return
 
-        bleService.reconnectByAddress( scanModel, macAddress,needPair, toConnectUpdater)
+        bleService.reconnectByAddress(scanModel, macAddress, needPair, toConnectUpdater)
 
     }
 
@@ -303,10 +304,10 @@ class BleServiceHelper private constructor() {
      * @param macAddress String
      */
     @JvmOverloads
-    fun reconnectByAddress(scanModel: Int, macAddress: String, needPair: Boolean = false,toConnectUpdater: Boolean = false) {
+    fun reconnectByAddress(scanModel: Int, macAddress: String, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress" )
         if (!checkService()) return
-        bleService.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress),needPair, toConnectUpdater)
+        bleService.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress), needPair, toConnectUpdater)
 
     }
 
@@ -347,7 +348,7 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return Ble.State.UNKNOWN
         getInterface(model)?.let {
             return it.calBleState()
-        }?: return  Ble.State.UNKNOWN
+        }?: return Ble.State.UNKNOWN
 
     }
 
@@ -515,19 +516,10 @@ class BleServiceHelper private constructor() {
      * 开启实时任务
      */
     @JvmOverloads
-    fun startRtTask(model: Int, runStateTask: Boolean = false){
+    fun startRtTask(model: Int){
         if (!checkService()) return
         getInterface(model)?.let {
             it.runRtTask()
-            if (runStateTask){
-                when(model){
-                    Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A ->{
-                       LepuBleLog.d(tag, "is bp2 model , to run rtStateTask....")
-                        bp2RunRtStateTask(model)
-                    }
-                }
-
-            }
         }
     }
 
@@ -553,18 +545,10 @@ class BleServiceHelper private constructor() {
      * 移除获取实时任务
      */
     @JvmOverloads
-    fun stopRtTask(model: Int, stopStateTask: Boolean = false) {
+    fun stopRtTask(model: Int) {
         if (!checkService()) return
         getInterface(model)?.let {
             it.stopRtTask()
-            if (stopStateTask){
-                when(model) {
-                    Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
-                       LepuBleLog.d(tag, "is bp2 model , to stop rtStateTask....")
-                        bp2StopRtStateTask(model)
-                    }
-                }
-            }
         }
     }
     fun bp2GetConfig(model: Int){
@@ -817,6 +801,9 @@ class BleServiceHelper private constructor() {
             }
             Bluetooth.MODEL_BPW1 -> {
                 return inter is Bpw1BleInterface
+            }
+            Bluetooth.MODEL_MY_SCALE -> {
+                return inter is MyScaleBleInterface
             }
             else -> {
                 LepuBleLog.d(tag, "checkModel, 无效model：$model,${inter.javaClass}")

@@ -6,12 +6,9 @@ import android.bluetooth.le.*
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
-import android.os.Build
 import android.os.IBinder
 import android.text.TextUtils
-import android.util.Log
 import android.util.SparseArray
-import androidx.annotation.RequiresApi
 import androidx.core.util.isEmpty
 import androidx.lifecycle.LifecycleService
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -23,13 +20,11 @@ import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
-import com.lepu.blepro.utils.DfuUtil
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.*
-import java.util.stream.Collectors.toList
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -194,7 +189,7 @@ open class BleService: LifecycleService() {
                 }
             }
 
-            Bluetooth.MODEL_PC60FW ,Bluetooth.MODEL_PC60FW-> {
+            Bluetooth.MODEL_PC60FW -> {
                 PC60FwBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -221,6 +216,14 @@ open class BleService: LifecycleService() {
             }
             Bluetooth.MODEL_BPW1 -> {
                 Bpw1BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_MY_SCALE -> {
+                MyScaleBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
                     vailFace.put(m, this)
@@ -470,6 +473,13 @@ open class BleService: LifecycleService() {
                     stopDiscover()
                     LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
                     vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
+                } else {
+                    if (isReconnectScan) {
+                        LepuBleLog.d(tag, "找到了新蓝牙名设备， 去连接Updater${b.name}")
+                        if (b.name.contains("ER1 Updater")) { //如果扫描到的是新蓝牙名，连接
+                            LiveEventBus.get<Bluetooth>(EventMsgConst.Discovery.EventDeviceFound_ER1_UPDATE).post(b)
+                        }
+                    }
                 }
 
             }

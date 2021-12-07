@@ -93,6 +93,63 @@ class Th12BleFile(val fileName: String) {
         return ecgData
     }
 
+    fun getTwoSecondLeadData(leadName: String, ecgData: ByteArray): ShortArray {
+        var index = 0
+        when(leadName) {
+            "I" -> index = 0
+            "II" -> index = 1
+            "V1" -> index = 2
+            "V2" -> index = 3
+            "V3" -> index = 4
+            "V4" -> index = 5
+            "V5" -> index = 6
+            "V6" -> index = 7
+            "Pacer" -> index = 8
+            "III" -> index = 9
+            "aVR" -> index = 10
+            "aVL" -> index = 11
+            "aVF" -> index = 12
+        }
+//        var ecgData = byteArray.copyOfRange(8, byteArray.size)
+        var leadData = ShortArray(ecgData.size/2/leadNum)
+        var leadDataI = ShortArray(ecgData.size/2/leadNum)
+        var leadDataII = ShortArray(ecgData.size/2/leadNum)
+
+        if (index < 9) {
+            for (i in leadData.indices) {
+                leadData[i] = bytesToSignedShort(ecgData[index*2+leadNum*2*i], ecgData[index*2+leadNum*2*i+1])
+            }
+        } else {
+            for (i in leadData.indices) {
+                leadDataI[i] = bytesToSignedShort(ecgData[leadNum*2*i], ecgData[leadNum*2*i+1])
+                leadDataII[i] = bytesToSignedShort(ecgData[2+leadNum*2*i], ecgData[2+leadNum*2*i+1])
+            }
+            when(leadName) {
+                "III" -> { // III = II - I
+                    for (i in leadData.indices) {
+                        leadData[i] = (leadDataII[i] - leadDataI[i]).toShort()
+                    }
+                }
+                "aVR" -> { // aVR = -(II + I)/2
+                    for (i in leadData.indices) {
+                        leadData[i] = (-(leadDataII[i] + leadDataI[i])/2).toShort()
+                    }
+                }
+                "aVL" -> { // aVL = I - II/2
+                    for (i in leadData.indices) {
+                        leadData[i] = (leadDataI[i] - leadDataII[i]/2).toShort()
+                    }
+                }
+                "aVF" -> { // aVF = II - I/2
+                    for (i in leadData.indices) {
+                        leadData[i] = (leadDataII[i] - leadDataI[i]/2).toShort()
+                    }
+                }
+            }
+        }
+        return leadData
+    }
+
     fun getMitHeadData(): Array<String?> {
         val date = "$day/$month/$year"
         val time = "$hour:$minute:$second"

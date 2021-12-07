@@ -94,4 +94,71 @@ public class CrcUtil {
         }
         return crc;
     }
+
+    /**
+     * Generate CRC16 code (FHR)
+     * @param buf Data buffer
+     * @return CRC16 code, return 0 when the parameter is error
+     */
+    public static int calCRC16(byte[] buf) {
+        if (buf == null || buf.length == 0) {
+            return 0;
+        }
+
+        short wCRCin = 0x0000;
+        short wCPoly = 0x1021;
+        byte wChar = 0;
+
+        for(int i=0; i<buf.length; i++) {
+            wChar = buf[i];
+            wCRCin ^= (wChar << 8);
+            for(int j=0; j<8; j++) {
+                if((wCRCin & 0x8000) != 0)
+                    wCRCin = (short) ((wCRCin << 1) ^ wCPoly);
+                else
+                    wCRCin = (short) (wCRCin << 1);
+            }
+        }
+
+        return wCRCin;
+    }
+
+    /**
+     * Generate bpw1 chk
+     * @param buf Data buffer
+     * @return chk
+     */
+    public static byte calBpw1CHK(byte[] buf) {
+        if (buf == null || buf.length == 0) {
+            return 0;
+        }
+
+        byte crc = 0;
+
+        for (int i = 1; i < buf.length - 1; i++) {
+            crc = (byte) (crc ^ (buf[i]));
+        }
+        return crc;
+    }
+
+    /**
+     * Generate aeroI crc
+     * @param buf Data buffer
+     * @return chk
+     */
+    public static int calMyScaleCHK(byte[] buf) {
+        if (buf == null || buf.length == 0) {
+            return 0;
+        }
+
+        int crc = 0;
+
+        for (int i = 2; i < buf.length - 1; i++) {
+            crc += buf[i] & 0xFF;
+        }
+        crc = crc & 0x1F;
+
+        return crc;
+    }
+
 }

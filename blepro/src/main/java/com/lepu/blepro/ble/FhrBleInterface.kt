@@ -50,8 +50,8 @@ class FhrBleInterface(model: Int): BleInterface(model) {
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: FhrBleResponse.FhrResponse) {
         LepuBleLog.d(tag, "received cmd : ${response.cmd}")
-        //音频数据 byte[5]=0x0a：a55a0013 0a 911e12b34e19b790808088879a06b0 900000
-        //设备数据 byte[5]=0x04：a55a000f 04 0450363533050500030006014a4200
+        //音频数据 byte[5]=0x0a：a55a0013 0a 911e12b34e19b790808088879a06b0 900000  23
+        //设备数据 byte[5]=0x04：a55a000f 04 0450363533050500030006014a4200         20
         LepuBleLog.d(tag, "received len : ${response.len}")
         LepuBleLog.d(tag, "received content : ${bytesToHex(response.content)}")
         LepuBleLog.d(tag, "received bytes : ${bytesToHex(response.bytes)}")
@@ -94,6 +94,39 @@ class FhrBleInterface(model: Int): BleInterface(model) {
         }
 
         return bytesLeft
+
+        /*val bytesLeft: ByteArray? = bytes
+
+        if (bytes == null || bytes.size < 5) {
+            return bytes
+        }
+
+        loop@ for (i in 0 until bytes.size-4) {
+            if (bytes[i] != 0xA5.toByte() || bytes[i+1] != 0x5A.toByte()) {
+                continue@loop
+            }
+
+            // need content length
+            val len = toUInt(bytes.copyOfRange(i+2, i+4))
+            if (i+4+len > bytes.size) {
+                continue@loop
+            }
+
+            val temp: ByteArray = bytes.copyOfRange(i, i+4+len)
+            val crc16 = toUInt(bytes.copyOfRange(bytes.size - 2, bytes.size))
+            LepuBleLog.d(tag, "crc16 : ${crc16}")
+            LepuBleLog.d(tag, "CrcUtil.calCRC16(temp) : ${CrcUtil.calCRC16(temp)}")
+            if (crc16 == CrcUtil.calCRC16(temp)) {
+                val bleResponse = FhrBleResponse.FhrResponse(temp)
+                onResponseReceived(bleResponse)
+
+                val tempBytes: ByteArray? = if (i+4+len == bytes.size) null else bytes.copyOfRange(i+4+len, bytes.size)
+
+                return hasResponse(tempBytes)
+            }
+        }
+
+        return bytesLeft*/
     }
 
     /**

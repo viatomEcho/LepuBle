@@ -22,7 +22,7 @@ class BIOL(val observer: BleChangeObserver, private var model: IntArray): BleInt
     }
 
     /**
-     *  当lifecycleOwner OnCreate时候调用
+     *  当lifecycleOwner OnDestroy时候调用
      */
     override fun detachBI() {
 

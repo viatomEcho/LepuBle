@@ -212,7 +212,7 @@ class Bpw1BleInterface(model: Int): BleInterface(model) {
 
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun hasResponse(bytes: ByteArray?): ByteArray? {
-        val bytesLeft: ByteArray? = bytes
+        /*val bytesLeft: ByteArray? = bytes
 
         if (bytes == null) return bytes
 
@@ -238,6 +238,36 @@ class Bpw1BleInterface(model: Int): BleInterface(model) {
             else -> {
                 val bleResponse = Bpw1BleResponse.Bpw1Response(bytes)
                 onResponseReceived(bleResponse)
+            }
+        }
+
+        return bytesLeft*/
+
+        val bytesLeft: ByteArray? = bytes
+
+        if (bytes == null || bytes.size < 4) {
+            return bytes
+        }
+
+        loop@ for (i in 0 until bytes.size-3) {
+            if (bytes[i] != 0x5A.toByte() || bytes[i+1] != 0x00.toByte()) {
+                continue@loop
+            }
+
+            // need content length
+            val len = toUInt(bytes.copyOfRange(i+2, i+3))
+            if (i+4+len > bytes.size) {
+                continue@loop
+            }
+
+            val temp: ByteArray = bytes.copyOfRange(i, i+4+len)
+            if (temp.last() == CrcUtil.calBpw1CHK(temp)) {
+                val bleResponse = Bpw1BleResponse.Bpw1Response(temp)
+                onResponseReceived(bleResponse)
+
+                val tempBytes: ByteArray? = if (i+4+len == bytes.size) null else bytes.copyOfRange(i+4+len, bytes.size)
+
+                return hasResponse(tempBytes)
             }
         }
 

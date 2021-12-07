@@ -48,10 +48,10 @@ task clean(type: Delete) {
 
 //bp2  测试稳定版1.0.30.0.11
 ext {
-    minSdkVersion = 23
+    minSdkVersion = 21
     targetSdkVersion = 29
     compileSdkVersion = 29
     buildToolsVersion = "29.0.2"
     versionCode = 1
-    versionName = "2.0.0.2" //第三位是0 表示测试版， 非0为发布版
+    versionName = "2.0.0.3" //第三位是0 表示测试版， 非0为发布版
 }
