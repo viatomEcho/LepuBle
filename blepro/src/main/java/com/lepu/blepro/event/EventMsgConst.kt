@@ -18,10 +18,11 @@ object EventMsgConst {
      */
     interface Discovery{
         companion object{
-            const val EventDeviceFound = "com.lepu.ble.device.found"  // 扫描到设备会发送 Bluetooth
-            const val EventDeviceFound_Device = "com.lepu.ble.device.found.device"  // 开始扫描设置需要配对信息会发送 Bluetooth
-            const val EventDeviceFound_ScanRecord = "com.lepu.ble.device.found.scanResult"  // 开始扫描设置需要配对信息会发送 ScanRecord
-            const val EventDeviceFound_ER1_UPDATE = "com.lepu.ble.device.found.er1Update" // 扫描到er1 updater设备会发送
+            const val EventDeviceFound = "com.lepu.ble.device.found"
+            const val EventDeviceFound_Device = "com.lepu.ble.device.found.device"
+            const val EventDeviceFound_ScanRecord = "com.lepu.ble.device.found.scanResult"
+            const val EventDeviceFoundForUnRegister = "com.lepu.ble.device.found.unregister" //不需要添加model
+            const val EventDeviceFound_ScanRecordUnRegister = "com.lepu.ble.device.found.scanResult.unregister"
         }
 
     }

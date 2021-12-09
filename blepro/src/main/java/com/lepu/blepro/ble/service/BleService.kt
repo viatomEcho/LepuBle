@@ -1,6 +1,7 @@
 package com.lepu.blepro.ble.service
 
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.*
 import android.content.Context
@@ -95,9 +96,16 @@ open class BleService: LifecycleService() {
     var toConnectUpdater: Boolean = false
 
     /**
-     * 扫描通知严格模式
+     * 扫描通知严格模式(非严格模式 可以不添加)
      */
     var isStrict: Boolean = false
+
+    /**
+     * 是否返回没有注册的蓝牙名的设备
+     */
+    var isScanUnRegister: Boolean = false
+
+
 
 
 
@@ -438,6 +446,26 @@ open class BleService: LifecycleService() {
             if (TextUtils.isEmpty(deviceName)) {
                 deviceName = BluetoothController.getDeviceName(deviceAddress)
             }
+
+            if (isScanUnRegister){
+
+                if (needPair)
+                    result.scanRecord?.let {
+                        HashMap<String, Any>().apply {
+                            this[EventMsgConst.Discovery.EventDeviceFound_Device] = device
+                            this[EventMsgConst.Discovery.EventDeviceFound_ScanRecord] = it
+
+                            LepuBleLog.d(tag, "post paring...${device.name}")
+                            LiveEventBus.get<HashMap<String, Any>>(EventMsgConst.Discovery.EventDeviceFound_ScanRecordUnRegister).post(this)
+
+                        }
+
+                    }
+
+                LiveEventBus.get<BluetoothDevice>(EventMsgConst.Discovery.EventDeviceFoundForUnRegister).post(device)
+                return
+            }
+
             @Bluetooth.MODEL val model: Int = Bluetooth.getDeviceModel(deviceName)
             if (model == Bluetooth.MODEL_UNRECOGNIZED) {
                 return
