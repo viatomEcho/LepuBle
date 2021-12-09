@@ -1,9 +1,3 @@
-## `SDK接入` 
-
-![image-20211203091443200](C:\Users\chenyongfeng\AppData\Roaming\Typora\typora-user-images\image-20211203091443200.png)
-
-
-
 ## `版本` 
 
 第三位是0 表示测试版， 非0为发布版
@@ -11,6 +5,7 @@
 - 2.0.0.1 添加Pc80b，Pc60fw，Th12，胎心仪Fhr设备
 - 2.0.0.2 合并vihealth sdk分支，添加血压手表Bpw1设备
 - 2.0.0.3 修改minsdk=21，th12获取导联数据，er1 updater设备扫描通知
+- 2.0.0.4 
 
 
 
@@ -47,13 +42,15 @@
 
 - `reInitBle()` ：重新初始化蓝牙
 
-- `startScan(scanModel: Int, needPair: Boolean = false, isStrict: Boolean = false)` 
+- `startScan(scanModel: Int, needPair: Boolean = false, isStrict: Boolean = false， isScanUnRegister: Boolean = false)` 
 
   > 开始扫描，单个model设备
   >
   > needPair：本次扫描是否需要发送配对信息，默认是false
   >
   > isStrict：本次扫描是否是严格模式（严格模式下只会发送scanModel的扫描结果信息），默认是false
+  >
+  > isScanUnRegister：本次扫描是否返回SDK没有的model蓝牙名的设备
 
 - `startScan(scanModel: IntArray, needPair: Boolean = false, isStrict: Boolean = false)` ：开始扫描，多个model设备
 
@@ -89,6 +86,8 @@
 
 - `reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, needPair: Boolean, toConnectUpdater: Boolean = false)` ：重新连接多个model设备
 
+  >**蓝牙名称一致的设备重连必须使用蓝牙地址重连方法** ，蓝牙名一样的设备目前有Pc80b，胎心仪Fhr，血压手表Bpw1
+
 - `disconnect(autoReconnect: Boolean)` ：所有设备断开连接
 
 - `disconnect(model: Int, autoReconnect: Boolean)` ：单设备断开连接
@@ -101,7 +100,7 @@
 
 - `getFileList(model: Int)` ：获取设备文件列表
 
-- `readFile(userId: String, fileName: String, model: Int, offset: Int = 0)` ：读取主机文件
+- `readFile(userId: String, fileName: String, model: Int, offset: Int = 0)` ：读取主机文件，进入读文件流程前APP要手动停止实时任务状态
 
 - `cancelReadFile(model: Int)` ：取消读取主机文件
 
@@ -121,11 +120,15 @@
 
 - `startRtTask(model: Int)` ：开启实时监测任务
 
-- `stopRtTask(model: Int, stopStateTask: Boolean = false)` ：停止实时监测任务
+- `stopRtTask(model: Int, sendCmd: () -> Unit = {})` 
+
+  > 停止实时监测任务
+  >
+  > sendCmd：停止实时后指定执行方法
 
 - `isRtStop(model: Int)` ：是否已停止实时监测任务
 
-- `startBp(model: Int)` ：开始测量血压，支持设备有Bp2，Bp2a，Bpm，Bpw1
+- `startBp(model: Int)` ：开始测量血压，支持设备有Bpm，Bpw1
 
 - `stopBp(model: Int)` ：停止测量血压
 
@@ -373,8 +376,11 @@ object EventMsgConst {
     interface Discovery{
         companion object{
             const val EventDeviceFound = "com.lepu.ble.device.found"  // 扫描到设备会发送 Bluetooth
-            const val EventDeviceFound_Device = "com.lepu.ble.device.found.device"  // 开始扫描设置需要配对信息会发送 Bluetooth
-            const val EventDeviceFound_ScanRecord = "com.lepu.ble.device.found.scanResult"  // 开始扫描设置需要配对信息会发送 ScanRecord
+            const val EventDeviceFound_Device = "com.lepu.ble.device.found.device"  // 开始扫描设置需要配对的信息 BluetoothDevice
+            const val EventDeviceFound_ScanRecord = "com.lepu.ble.device.found.scanResult"  // 开始扫描设置需要配对的信息 ScanRecord
+            const val EventDeviceFound_ER1_UPDATE = "com.lepu.ble.device.found.er1Update"  // 扫描到er1 updater设备会发送
+            const val EventDeviceFoundForUnRegister = "com.lepu.ble.device.found.unregister"  // 不需要添加model BluetoothDevice
+            const val EventDeviceFound_ScanRecordUnRegister = "com.lepu.ble.device.found.scanResult.unregister"
         }
 
     }
@@ -415,7 +421,6 @@ object EventMsgConst {
             const val EventCmdResponseTimeOut = "com.lepu.ble.cmd.response.timeout"  // 指令响应超时会发送
         }
     }
-
 }
 ```
 
