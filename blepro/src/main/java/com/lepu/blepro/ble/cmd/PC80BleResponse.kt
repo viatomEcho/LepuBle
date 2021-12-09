@@ -52,6 +52,16 @@ object PC80BleResponse {
             }
             sn = "XBN00NK03553"
         }
+
+        override fun toString(): String {
+            return """
+                PC80BleResponse.DeviceInfo
+                softwareV: $softwareV
+                hardwareV: $hardwareV
+                algorithmV: $algorithmV
+                sn: $sn
+            """
+        }
     }
 
     @Parcelize
@@ -129,6 +139,19 @@ object PC80BleResponse {
             leadOff = (bytes[5].toInt() and 0x80) shr 7
             dataType = bytes[5].toInt() and 0x07
             data = RtData(bytes.copyOfRange(6, bytes.size), dataType)
+        }
+
+        override fun toString(): String {
+            return """
+                RtTrackData:
+                seqNo: $seqNo
+                gain: $gain
+                channel: $channel
+                measure: $measure
+                stage: $stage
+                leadOff: $leadOff
+                dataType: $dataType
+            """
         }
     }
     @Parcelize

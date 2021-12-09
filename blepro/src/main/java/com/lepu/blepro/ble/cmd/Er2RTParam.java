@@ -70,4 +70,15 @@ public class Er2RTParam {
         byte runStatus = getRunStatus();
         return (runStatus >> 4) & 0x0F;
     }
+
+    @Override
+    public String toString() {
+        return "Er2RTParam{" +
+                "hr=" + hr +
+                ", sysFlag=" + sysFlag +
+                ", percent=" + percent +
+                ", recordTime=" + recordTime +
+                ", runStatus=" + runStatus +
+                '}';
+    }
 }

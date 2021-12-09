@@ -238,6 +238,16 @@ class BleServiceHelper private constructor() {
     }
 
     /**
+     * 判断设备名重连是否符合标准：过滤pc80b,fhr,bpw1
+     */
+    fun canReconnectByName(model: Int): Boolean {
+        return when(model) {
+            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_FHR, Bluetooth.MODEL_BPW1 -> false
+            else -> true
+        }
+    }
+
+    /**
      *
      * @param context Context
      * @param model Int
@@ -374,10 +384,10 @@ class BleServiceHelper private constructor() {
         return false
     }
 
-    fun hasUnConnected(): Boolean{
+    fun hasUnConnected(): Boolean {
         if (!checkService()) return false
         LepuBleLog.d(tag, "into hasUnConnected...")
-        for (x in 0 until  bleService.vailFace.size() ){
+        for (x in 0 until bleService.vailFace.size()) {
             bleService.vailFace[bleService.vailFace.keyAt(x)]?.let {
                 it.let {
                     LepuBleLog.d(tag, "hasUnConnected  有未连接的设备: model = ${it.model}")
@@ -545,10 +555,12 @@ class BleServiceHelper private constructor() {
      * 移除获取实时任务
      */
     @JvmOverloads
-    fun stopRtTask(model: Int) {
+    fun stopRtTask(model: Int, sendCmd: () -> Unit = {}) {
         if (!checkService()) return
         getInterface(model)?.let {
-            it.stopRtTask()
+            it.stopRtTask {
+                sendCmd.invoke()
+            }
         }
     }
     fun bp2GetConfig(model: Int){
@@ -589,14 +601,6 @@ class BleServiceHelper private constructor() {
     fun startBp(model: Int) {
         if (!checkService()) return
         when(model){
-            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A ->{
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bp2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2BleInterface--startBp")
-                        it.startBp()
-                    }
-                }
-            }
             Bluetooth.MODEL_BPM ->{
                 getInterface(model)?.let { it1 ->
                     (it1 as BpmBleInterface).let {
@@ -624,14 +628,6 @@ class BleServiceHelper private constructor() {
     fun stopBp(model: Int) {
         if (!checkService()) return
         when(model) {
-            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bp2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2BleInterface--stopBp")
-                        it.stopBp()
-                    }
-                }
-            }
             Bluetooth.MODEL_BPM -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as BpmBleInterface).let {
@@ -802,8 +798,11 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BPW1 -> {
                 return inter is Bpw1BleInterface
             }
-            Bluetooth.MODEL_MY_SCALE -> {
-                return inter is MyScaleBleInterface
+            Bluetooth.MODEL_F4_SCALE -> {
+                return inter is F4ScaleBleInterface
+            }
+            Bluetooth.MODEL_F5_SCALE -> {
+                return inter is F5ScaleBleInterface
             }
             else -> {
                 LepuBleLog.d(tag, "checkModel, 无效model：$model,${inter.javaClass}")

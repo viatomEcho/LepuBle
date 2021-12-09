@@ -222,8 +222,16 @@ open class BleService: LifecycleService() {
                     return this
                 }
             }
-            Bluetooth.MODEL_MY_SCALE -> {
-                MyScaleBleInterface(m).apply {
+            Bluetooth.MODEL_F4_SCALE -> {
+                F4ScaleBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_F5_SCALE -> {
+                F5ScaleBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
                     vailFace.put(m, this)
@@ -318,8 +326,10 @@ open class BleService: LifecycleService() {
      * 必定开启 isAutoConnecting = true
      *
      * 现在的多设备重连，无法SDK自动完成所有的设备的重连，需要连接一个后再次调用重连 去连另一个
+     *
+     * 蓝牙名一致的设备重连不能使用蓝牙名重连方法
      */
-    fun reconnect( scanModel : IntArray,reconnectDeviceName: Array<String>, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
+    fun reconnect(scanModel : IntArray,reconnectDeviceName: Array<String>, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
 
         if (vailFace.isEmpty())return
 
@@ -335,7 +345,7 @@ open class BleService: LifecycleService() {
             this.isReconnectByAddress = false
             this.toConnectUpdater = toConnectUpdater
             this.needPair = needPair
-            startDiscover(scanModel,needPair, isReconnecting = true)
+            startDiscover(scanModel, needPair, isReconnecting = true)
 
             LepuBleLog.d(tag, "reconnectByName: => ${reconnectDeviceName.joinToString()} => ReScan: $reScan")
         }
@@ -347,6 +357,8 @@ open class BleService: LifecycleService() {
     /**
      * 重新连接开启扫描
      * 必定开启 isAutoConnecting = true
+     *
+     * 蓝牙名一致的设备重连必须使用蓝牙地址重连方法
      */
     fun reconnectByAddress(scanModel: IntArray, reconnectDeviceAddress: Array<String>, needPair: Boolean,  toConnectUpdater: Boolean = false) {
 
@@ -471,8 +483,18 @@ open class BleService: LifecycleService() {
 
                 if (isReconnectScan && isContains){
                     stopDiscover()
-                    LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
-                    vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
+                    if (isReconnectByAddress) {
+                        vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
+                        LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
+                    } else {
+                        if (BleServiceHelper.BleServiceHelper.canReconnectByName(b.model)) {
+                            vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
+                            LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
+                        } else {
+                            LepuBleLog.d(tag, "发现需要重连的设备不可使用蓝牙名重连 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
+                        }
+                    }
+
                 } else {
                     if (isReconnectScan) {
                         LepuBleLog.d(tag, "找到了新蓝牙名设备， 去连接Updater${b.name}")
@@ -542,8 +564,6 @@ open class BleService: LifecycleService() {
         LepuBleLog.d(tag, "scanModel:${scanModel?.joinToString()}, b.model${b.model}")
         return scanModel?.contains(b.model) ?: return false
     }
-
-
 
     override fun onBind(p0: Intent): IBinder {
         super.onBind(p0)

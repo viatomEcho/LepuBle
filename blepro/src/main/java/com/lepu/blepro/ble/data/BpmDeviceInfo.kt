@@ -1,5 +1,6 @@
 package com.lepu.blepro.ble.data
 
+import java.text.SimpleDateFormat
 import java.util.*
 
 class BpmDeviceInfo {
@@ -19,4 +20,16 @@ class BpmDeviceInfo {
     }
 
     fun getFwVersion() = "${mainVersion}.${secondVersion}"
+
+    override fun toString(): String {
+        val format = SimpleDateFormat("HH:mm:ss MMM dd, yyyy", Locale.getDefault())
+        val dateStr = format.format(lastDate)
+        return """
+            BpmDeviceInfo:
+            mainVersion: $mainVersion
+            secondVersion: $secondVersion
+            lastDate: $dateStr
+        """
+    }
+
 }

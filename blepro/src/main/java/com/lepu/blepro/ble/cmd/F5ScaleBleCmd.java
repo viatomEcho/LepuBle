@@ -3,7 +3,7 @@ package com.lepu.blepro.ble.cmd;
 /**
  * universal command for Viatom devices
  */
-public class MyScaleBleCmd {
+public class F5ScaleBleCmd {
 
     // response
     public final static int WEIGHT_DATA = 0xD5;

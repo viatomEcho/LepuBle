@@ -11,14 +11,14 @@ import com.lepu.blepro.utils.*
  * 蓝牙操作
  */
 
-class MyScaleBleInterface(model: Int): BleInterface(model) {
-    private val tag: String = "MyScaleBleInterface"
+class F5ScaleBleInterface(model: Int): BleInterface(model) {
+    private val tag: String = "F5ScaleBleInterface"
 
     private lateinit var context: Context
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
-        manager = MyScaleBleManager(context)
+        manager = F5ScaleBleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -46,28 +46,34 @@ class MyScaleBleInterface(model: Int): BleInterface(model) {
     }
 
     @ExperimentalUnsignedTypes
-    private fun onResponseReceived(response: MyScaleBleResponse.MyScaleResponse) {
+    private fun onResponseReceived(response: F5ScaleBleResponse.F5ScaleResponse) {
         LepuBleLog.d(tag, "received cmd : " + bytesToHex(response.bytes))
 
         when(response.cmd) {
-            MyScaleBleCmd.WEIGHT_DATA -> {
+            F5ScaleBleCmd.WEIGHT_DATA -> {
                 LepuBleLog.d(tag, "model:$model,WEIGHT_DATA => success")
-                var info = MyScaleBleResponse.WeightData(response.content)
+                var info = F5ScaleBleResponse.WeightData(response.content)
                 LepuBleLog.d(tag, "model:$model,WEIGHT_DATA => info.toString() == " + info.toString())
             }
-            MyScaleBleCmd.IMPEDANCE_DATA -> {
+            F5ScaleBleCmd.IMPEDANCE_DATA -> {
                 LepuBleLog.d(tag, "model:$model,IMPEDANCE_DATA => success")
-                var info = MyScaleBleResponse.ImpedanceData(response.content)
-                LepuBleLog.d(tag, "model:$model,WEIGHT_DATA => info.toString() == " + info.toString())
+                var info = F5ScaleBleResponse.ImpedanceData(response.content)
+                LepuBleLog.d(tag, "model:$model,IMPEDANCE_DATA => info.toString() == " + info.toString())
             }
-            MyScaleBleCmd.UNSTABLE_DATA -> {
+            F5ScaleBleCmd.UNSTABLE_DATA -> {
                 LepuBleLog.d(tag, "model:$model,UNSTABLE_DATA => success")
+                var info = F5ScaleBleResponse.StableData(response.content)
+                LepuBleLog.d(tag, "model:$model,UNSTABLE_DATA => info.toString() == " + info.toString())
             }
-            MyScaleBleCmd.OTHER_DATA -> {
+            F5ScaleBleCmd.OTHER_DATA -> {
                 LepuBleLog.d(tag, "model:$model,OTHER_DATA => success")
+                var info = F5ScaleBleResponse.HrData(response.content)
+                LepuBleLog.d(tag, "model:$model,OTHER_DATA => info.toString() == " + info.toString())
             }
-            MyScaleBleCmd.HISTORY_DATA -> {
+            F5ScaleBleCmd.HISTORY_DATA -> {
                 LepuBleLog.d(tag, "model:$model,HISTORY_DATA => success")
+                var info = F5ScaleBleResponse.HistoryData(response.content)
+                LepuBleLog.d(tag, "model:$model,HISTORY_DATA => info.toString() == " + info.toString())
             }
         }
 
@@ -94,10 +100,10 @@ class MyScaleBleInterface(model: Int): BleInterface(model) {
 
             val temp: ByteArray = bytes.copyOfRange(i, i+4+len)
 
-            val crc = (temp.last().toUInt() and 0xFFu).toInt()
+            val crc = (temp.last().toUInt() and 0x1Fu).toInt()
 
-            if (crc == CrcUtil.calMyScaleCHK(temp)) {
-                val bleResponse = MyScaleBleResponse.MyScaleResponse(temp)
+            if (crc == CrcUtil.calF5ScaleCHK(temp)) {
+                val bleResponse = F5ScaleBleResponse.F5ScaleResponse(temp)
                 onResponseReceived(bleResponse)
 
                 val tempBytes: ByteArray? = if (i+4+len == bytes.size) null else bytes.copyOfRange(i+4+len, bytes.size)

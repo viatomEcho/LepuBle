@@ -359,7 +359,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
         }
 
 
-        super.sendCmd(bs)
+        if (!super.sendCmd(bs)) return // 发送指令被拦截，不往下执行
         this.curCmd = cmd
 
         cmdTimeout = GlobalScope.launch {
@@ -376,17 +376,6 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
 
 
-    }
-
-
-
-    fun startBp() {
-        LepuBleLog.d(tag, "startBp...")
-        sendCmd(MSG_TYPE_START_BP, Bp2BleCmd.getCmd(MSG_TYPE_START_BP))
-    }
-     fun stopBp() {
-        LepuBleLog.d(tag, "stopBp...")
-        sendCmd(MSG_TYPE_STOP_BP, Bp2BleCmd.getCmd(MSG_TYPE_STOP_BP))
     }
 
     override fun getInfo() {

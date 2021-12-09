@@ -105,21 +105,19 @@ public class CrcUtil {
             return 0;
         }
 
-        short wCRCin = 0x0000;
-        short wCPoly = 0x1021;
-        byte wChar = 0;
+        int wCRCin = 0x0000;
+        int wCPoly = 0x1021;
 
-        for(int i=0; i<buf.length; i++) {
-            wChar = buf[i];
-            wCRCin ^= (wChar << 8);
-            for(int j=0; j<8; j++) {
-                if((wCRCin & 0x8000) != 0)
-                    wCRCin = (short) ((wCRCin << 1) ^ wCPoly);
-                else
-                    wCRCin = (short) (wCRCin << 1);
+        for (byte b : buf) {
+            wCRCin ^= (b << 8);
+            for(int i=0; i<8; i++) {
+               if (((wCRCin & 0x8000) >> 15) == 1) {
+                   wCRCin = (wCRCin << 1) ^ wCPoly;
+               } else {
+                   wCRCin = (wCRCin << 1);
+               }
             }
         }
-
         return wCRCin;
     }
 
@@ -146,7 +144,7 @@ public class CrcUtil {
      * @param buf Data buffer
      * @return chk
      */
-    public static int calMyScaleCHK(byte[] buf) {
+    public static int calF5ScaleCHK(byte[] buf) {
         if (buf == null || buf.length == 0) {
             return 0;
         }

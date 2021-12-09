@@ -23,7 +23,7 @@ class KtBleFileList {
     }
 
     override fun toString(): String {
-        var str : String = "["
+        var str : String = "KtBleFileList["
 
         for (s : String? in fileNameList) {
             str += s

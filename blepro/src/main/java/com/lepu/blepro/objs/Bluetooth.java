@@ -18,39 +18,32 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_WEARO2 = "WearO2";
     public static final String BT_NAME_SLEEPU = "SleepU";
     public static final String BT_NAME_ER1 = "ER1";
+    public static final String BT_NAME_ER1_N = "VBeat";
     public static final String BT_NAME_DUOEK = "DuoEK";
     public static final String BT_NAME_PULSEBIT_EX = "Pulsebit";
     public static final String BT_NAME_OXY_LINK = "Oxylink";
     public static final String BT_NAME_KIDS_O2 = "KidsO2";
-    public static final String BT_NAME_FETAL = "MD1000AF4";
-    public static final String BT_NAME_BP2 = "BP2";
-    public static final String BT_NAME_BP2A = "BP2A";
-
-    public static final String BT_NAME_RINGO2 = "O2NCI";
-    public static final String BT_NAME_KCA = "KCA"; // 康康血压计
-    public static final String BT_NAME_O2M = "O2M"; // O2 Max
-    public static final String BT_NAME_BPM = "BPM-188"; // 捷美瑞血压计
-    public static final String BT_NAME_ER2 = "ER2";
-    public static final String BT_NAME_PC100 = "PC-100"; //小企鹅后面 5位sn
-    public static final String BT_NAME_PC60FW = "PC-60F_SN";//6 OEM
-
-
-    public static final String BT_NAME_ER1_N = "ER1";
     public static final String FETAL_DEVICE_NAME = "MD1000AF4";//7 OEM
     public static final String BT_NAME_BABY_O2 = "BabyO2";
     public static final String BT_NAME_OXY_SMART = "OxySmart";
     public static final String BT_NAME_TV221U = "VTM 20F";//4 OEM
-    public static final String BT_NAME_PC60FW_SN = "PC-60F_SN";//6 OEM
+    public static final String BT_NAME_PC100 = "PC-100:";//5 OEM   小企鹅后面 5位sn
+    public static final String BT_NAME_PC60FW = "PC-60F_SN";//6 OEM
     public static final String BT_NAME_AOJ20A = "AOJ-20A";//2 OEM
+    public static final String BT_NAME_BP2 = "BP2";
     public static final String BT_NAME_OXYFIT = "Oxyfit";
     public static final String BT_NAME_VCOMIN = "VCOMIN";//3 OEM
     public static final String BT_NAME_CHECK_POD = "Checkme Pod";
+    public static final String BT_NAME_BP2A = "BP2A";
     public static final String BT_NAME_BODY_FAT = "Viatom";//1 OEM
-    private static final String BT_NAME_BABYTONE = "Babytone";
-    public static final String BT_NAME__BODY_FAT = "Body Fat";
+    private static final String BABYTONE = "Babytone";
+    public static final String DEVICE_NAME_BODY_FAT = "Body Fat";
+    public static final String BT_NAME_O2M = "O2M"; // O2 Max
     public static final String BT_NAME_CHECKME_O2M = "Checkme O2 Max";
+    public static final String BT_NAME_BPM = "BPM-188"; // 捷美瑞血压计
     public static final String BT_NAME_BPM_B02 = "BPM-B02";
-    private static final String BT_NAME_BPM_PRODUCT = " B02T";
+    //    private static final String BPM_PRODUCT_NAME = " B02T";
+    public static final String BPM_PRODUCT_NAME = " B02T/B02S";
     public static final String BT_NAME_LEM = "LEM1";
     public static final String BT_NAME_LEM_M1 = "M1";
     public static final String BT_NAME_FHR = "FHR-666(BLE)";//OEM
@@ -64,9 +57,19 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_STATION = "Station";//BabyO2盒子升级专用
     public static final String BT_NAME_POD2B = "POD-2B_SN";//POD-2B_SN7295【蓝牙名】
     public static final String BT_NAME_POD2W = "POD-2W";//【显示名】
+    public static final String BT_NAME_PC_60NW = "PC-60NW-1_SN";//【蓝牙名】 + SN后六位
+    public static final String BT_NAME_PC_60NW_W = "PC-60NW-1";//显示名
+    public static final String BT_NAME_POD_1W = "POD-1_SN";//【蓝牙名】 + SN后四位
+    public static final String BT_NAME_POD_1W_W = "POD-1W";//显示名
+    public static final String BT_NAME_PC_60B = "PC-60B_SN";//【蓝牙名】 + SN后六位 PC-60B_SN000007
+    public static final String BT_NAME_PC_60B_B = "PC-60B";//显示名
+
+    public static final String BT_NAME_RINGO2 = "O2NCI";
+    public static final String BT_NAME_KCA = "KCA"; // 康康血压计
     public static final String BT_NAME_PC80B = "PC80B";
     public static final String BT_NAME_BPW1 = "BPW1"; // 金亿帝血压手表
-    public static final String BT_NAME_MY_SCALE = "MY_SCALE"; // F5体脂秤
+    public static final String BT_NAME_F4_SCALE = "MY_SCALE"; // F4体脂秤
+    public static final String BT_NAME_F5_SCALE = "MY_SCALE"; // F5体脂秤
 
 
     public static final int MODEL_UNRECOGNIZED = 0;
@@ -83,23 +86,48 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_KIDSO2 = 11;
     public static final int MODEL_FETAL = 12;
     public static final int MODEL_BP2 = 13;
-    public static final int MODEL_RINGO2 = 14;
-    public static final int MODEL_KCA = 15;
-    public static final int MODEL_O2MAX = 16;
-    public static final int MODEL_BPM = 17;
-    public static final int MODEL_ER2 = 18;
-    public static final int MODEL_PC100 = 19;
-    public static final int MODEL_BP2A = 20;
-    public static final int MODEL_PC60FW = 21;
-    public static final int MODEL_PC80B = 22;
-    public static final int MODEL_FHR = 23;
-    public static final int MODEL_BPW1 = 24;
-    public static final int MODEL_MY_SCALE = 25;
+    public static final int MODEL_OXYSMART = 14;
+    public static final int MODEL_TV221U = 15;
+    public static final int MODEL_ER1_N = 16;
+    public static final int MODEL_PC100 = 17;
+    public static final int MODEL_AOJ20A = 18;
+    public static final int MODEL_BABYO2 = 19;
+    public static final int MODEL_OXYFIT = 20;
+    public static final int MODEL_VCOMIN = 21;
+    public static final int MODEL_CHECK_POD = 22;
+    public static final int MODEL_BP2A = 23;
+    public static final int MODEL_BODY_FAT = 24;
+    //O2plus
+    public static final int MODEL_O2M = 25;
+    public static final int MODEL_BPM = 26;
+    public static final int MODEL_LEM = 27;
+    public static final int MODEL_P600L = 28;
+    public static final int MODEL_BABYO2N = 29;
+    public static final int MODEL_PC60FW = 30;
+    public static final int MODEL_BP2T = 31;
+    public static final int MODEL_BP2W = 32;
+    public static final int MODEL_ER2 = 33;
+    public static final int MODEL_STATION = 34;
+    public static final int MODEL_POD2B = 35;
+
+    public static final int MODEL_PC_60NW= 36;
+    public static final int MODEL_POD_1W= 37;
+    public static final int MODEL_PC_60B= 38;
+
+    public static final int MODEL_RINGO2 = 39;
+    public static final int MODEL_KCA = 40;
+    public static final int MODEL_O2MAX = 41;
+    public static final int MODEL_PC80B = 42;
+    public static final int MODEL_FHR = 43;
+    public static final int MODEL_BPW1 = 44;
+    public static final int MODEL_F4_SCALE = 45;
+    public static final int MODEL_F5_SCALE = 46;
 
 
     @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU,
             MODEL_ER1,MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL,
-            MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2MAX, MODEL_BPM,MODEL_BP2A,MODEL_PC60FW,MODEL_PC80B,MODEL_FHR,MODEL_BPW1,MODEL_MY_SCALE})
+            MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2MAX, MODEL_BPM,MODEL_BP2A,MODEL_PC60FW,MODEL_PC80B,MODEL_FHR,MODEL_BPW1,
+            MODEL_F4_SCALE,MODEL_F5_SCALE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 
@@ -110,10 +138,6 @@ public class Bluetooth implements Parcelable {
 
         if (deviceName == null || deviceName.length() == 0) {
             return MODEL_UNRECOGNIZED;
-        }
-
-        if (deviceName.contains(BT_NAME_MY_SCALE)) {
-            return Bluetooth.MODEL_MY_SCALE;
         }
 
         if (deviceName.contains(BT_NAME_PC60FW)) {
@@ -141,7 +165,7 @@ public class Bluetooth implements Parcelable {
                 return MODEL_ER1;
             case BT_NAME_DUOEK:
                 return MODEL_DUOEK;
-            case BT_NAME_ER2:
+            case BT_NAME_DEVICES_ER2:
                 return MODEL_ER2;
             case BT_NAME_PULSEBIT_EX:
                 return MODEL_PULSEBITEX;
@@ -149,20 +173,24 @@ public class Bluetooth implements Parcelable {
                 return MODEL_OXYLINK;
             case BT_NAME_KIDS_O2:
                 return MODEL_KIDSO2;
-            case BT_NAME_FETAL:
+            case FETAL_DEVICE_NAME:
                 return MODEL_FETAL;
             case BT_NAME_BP2:
                 return MODEL_BP2;
             case BT_NAME_BP2A:
-                return MODEL_BP2;
+                return MODEL_BP2A;
             case BT_NAME_RINGO2:
                 return MODEL_RINGO2;
             case BT_NAME_O2M:
                 return MODEL_O2MAX;
             case BT_NAME_BPM:
                 return MODEL_BPM;
-                case BT_NAME_BPW1:
+            case BT_NAME_BPW1:
                 return MODEL_BPW1;
+//            case BT_NAME_F4_SCALE:
+//                return MODEL_F4_SCALE;
+//            case BT_NAME_F5_SCALE:
+//                return MODEL_F5_SCALE;
             default:
                 if (deviceNamePrefix.startsWith(BT_NAME_KCA))
                     return MODEL_KCA;

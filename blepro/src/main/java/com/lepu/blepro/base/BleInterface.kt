@@ -13,7 +13,10 @@ import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
 import kotlin.collections.ArrayList
@@ -45,6 +48,10 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      */
     var state = false
 
+    /**
+     * manage ready状态
+     */
+    var ready = false
 
     /**
      * 连接中
@@ -239,7 +246,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     abstract fun hasResponse(bytes: ByteArray?): ByteArray?
 
     override fun onDeviceConnected(device: BluetoothDevice) {
-        LepuBleLog.d(tag, "onDeviceConnected ${device.name} connected")
+        LepuBleLog.d(tag, "onDeviceConnected ${device.name} connected, ready: $ready")
 
 
         if (BleServiceHelper.isScanning()) BleServiceHelper.stopScan()
@@ -270,18 +277,33 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         LepuBleLog.d(tag, "${device.name} onDeviceDisconnected")
         state = false
         connecting = false
+        ready = false
         stopRtTask()
         publish()
 
         //断开后
         LepuBleLog.d(tag, "onDeviceDisconnected=====isAutoReconnect:$isAutoReconnect")
-        device?.name?.let {
-            if (isAutoReconnect ){
-                //重开扫描, 扫描该interface的设备
-                LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnect")
-                BleServiceHelper.reconnect(model, device.name)
-            }else{
-                BleServiceHelper.removeReconnectName(it)
+        if (BleServiceHelper.canReconnectByName(model)) {
+            device?.name?.let {
+                if (isAutoReconnect){
+                    //重开扫描, 扫描该interface的设备
+                    LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnect")
+                    BleServiceHelper.reconnect(model, it)
+                }else{
+                    BleServiceHelper.removeReconnectName(it)
+                }
+
+            }
+        } else {
+            device?.address?.let {
+                if (isAutoReconnect){
+                    //重开扫描, 扫描该interface的设备
+                    LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByAddress")
+                    BleServiceHelper.reconnectByAddress(model, it)
+                }else{
+                    BleServiceHelper.removeReconnectAddress(it)
+                }
+
             }
 
         }
@@ -315,8 +337,10 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
 
     override fun onDeviceReady(device: BluetoothDevice) {
-        LepuBleLog.d(tag, "${device.name} onDeviceReady")
+        LepuBleLog.d(tag, "${device.name} onDeviceReady, state: $state")
         connecting = false
+        ready = true
+        publish()
         clearCmdTimeout()
 
         if (model == Bluetooth.MODEL_PC80B
@@ -329,14 +353,14 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     }
 
 
-    open fun sendCmd(bs: ByteArray) {
-        if (!state) {
+    open fun sendCmd(bs: ByteArray): Boolean {
+        if (!state && !ready) {
             LepuBleLog.d(tag, "send cmd fail， state = false")
-            return
+            return false
         }
         manager.sendCmd( bs)
 
-
+        return true
     }
     fun clearCmdTimeout() {
         curCmd = -1
@@ -364,24 +388,28 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      * {@link BleConst}
      */
     internal fun calBleState(): Int {
-        LepuBleLog.d(tag, "calBleState ---model: $model, state::::$state,connecting::::$connecting")
-        return if (state) Ble.State.CONNECTED else if (connecting) Ble.State.CONNECTING else Ble.State.DISCONNECTED
+        LepuBleLog.d(tag, "calBleState ---model: $model, state::::$state, ready::::$ready, connecting::::$connecting")
+        return if (state && ready) Ble.State.CONNECTED else if (connecting) Ble.State.CONNECTING else Ble.State.DISCONNECTED
     }
 
     fun runRtTask() {
-        LepuBleLog.d(tag, "startRtTask" )
+        LepuBleLog.d(tag, "startRtTask")
         rtHandler.removeCallbacks(rTask)
         isRtStop = false
         rtHandler.postDelayed(rTask, 500)
         LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStart).post(model)
     }
 
-    fun stopRtTask(){
-        LepuBleLog.d(tag, "stopRtTask start..." )
+    fun stopRtTask(sendCmd:() -> Unit = {}){
+        LepuBleLog.d(tag, "stopRtTask start...")
         isRtStop = true
         rtHandler.removeCallbacks(rTask)
-        LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStop).post(model)
-
+        GlobalScope.launch {
+            delay(500)
+            sendCmd.invoke()
+            LepuBleLog.d(tag, "stopRtTask invoke start...")
+            LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStop).post(model)
+        }
     }
 
 

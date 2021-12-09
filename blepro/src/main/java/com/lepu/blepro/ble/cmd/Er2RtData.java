@@ -93,6 +93,10 @@ public class Er2RtData {
         }
     }
 
+    public Er2RTParam getRtParam() {
+        return parameters;
+    }
+
     public WaveData getWaveData() {
         return waveData;
     }

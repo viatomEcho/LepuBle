@@ -27,4 +27,12 @@ public class Er2FileList {
     public List<String> listFileName() {
         return Arrays.asList(fileNames);
     }
+
+    @Override
+    public String toString() {
+        return "Er2FileList{" +
+                "fileNum=" + fileNum +
+                ", fileNames=" + Arrays.toString(fileNames) +
+                '}';
+    }
 }

@@ -6,12 +6,7 @@ import com.lepu.blepro.utils.LepuBleLog
 import no.nordicsemi.android.ble.RequestQueue
 import java.util.*
 
-/**
- * author: wujuan
- * created on: 2021/1/27 10:22
- * description:
- */
-class MyScaleBleManager(context: Context): LpBleManager(context) {
+class F5ScaleBleManager(context: Context): LpBleManager(context) {
     override fun initUUID() {
         service_uuid = UUID.fromString("0000FFB0-0000-1000-8000-00805F9B34FB")
         write_uuid = UUID.fromString("0000FFB1-0000-1000-8000-00805F9B34FB")
@@ -19,7 +14,7 @@ class MyScaleBleManager(context: Context): LpBleManager(context) {
     }
 
     override fun initialize() {
-        LepuBleLog.d("AeroIBleManager inited")
+        LepuBleLog.d("F5ScaleBleManager inited")
     }
 
     override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {

@@ -61,6 +61,17 @@ object Er1BleResponse {
             leadOn = (bytes[8].toUInt() and 0x07u) != 0x07u
         }
 
+        override fun toString(): String {
+            return """
+                RtParam:
+                sysFlag: $sysFlag
+                battery: $battery
+                recordTime: $recordTime
+                runStatus: $runStatus
+                leadOn: $leadOn
+            """
+        }
+
     }
 
     @Parcelize
@@ -168,7 +179,7 @@ object Er1BleResponse {
         }
 
         override fun toString(): String {
-            var str = ""
+            var str = "Er1FileList: "
             for (bs in fileList) {
                 str += String(bs)
                 str += ","
