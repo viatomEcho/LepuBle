@@ -79,3 +79,9 @@ fun shortToByteArray(value: Int): ByteArray {
         value.toByte())
 }
 
+/*
+ * 两个字节转有符号数 小端模式
+ */
+fun bytesToSignedShort(byte1: Byte, byte2: Byte):Short {
+    return ((byte2.toInt() shl 8) or (byte1.toInt() and 0xFF)).toShort()
+}

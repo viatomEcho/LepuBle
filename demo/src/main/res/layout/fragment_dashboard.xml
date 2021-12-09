@@ -34,6 +34,13 @@
                 android:layout_marginStart="20dp"
                 />
 
+            <Button
+                android:id="@+id/file_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="文件列表"
+                android:layout_marginStart="20dp"
+                />
 
         </LinearLayout>
 

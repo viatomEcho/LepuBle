@@ -9,6 +9,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
+import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
@@ -103,7 +104,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      */
     var cmdTimeout: Job? = null
 
-    var curCmd = 0
+    var curCmd = -1
 
 
 
@@ -169,11 +170,15 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     }
 
     override fun onNotify(device: BluetoothDevice?, data: Data?) {
-        data?.value?.apply {
-            pool = add(pool, this)
-        }
-        pool?.apply {
-            pool = hasResponse(pool)
+        if (model == Bluetooth.MODEL_FHR) {
+            hasResponse(data?.value) // 胎心仪数据长度不一致，直接获取
+        } else {
+            data?.value?.apply {
+                pool = add(pool, this)
+            }
+            pool?.apply {
+                pool = hasResponse(pool)
+            }
         }
     }
 
@@ -243,7 +248,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         publish()
 
         if (toConnectUpdater)
-            LiveEventBus.get<Boolean>(EventMsgConst.Updater.EventBleConnected).post(true)
+            LiveEventBus.get<BluetoothDevice>(EventMsgConst.Updater.EventBleConnected).post(device)
 
         BleServiceHelper.removeReconnectName(device.name)
         BleServiceHelper.removeReconnectAddress(device.address)
@@ -314,7 +319,13 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         connecting = false
         clearCmdTimeout()
 
-        if (!manager.isUpdater) syncTime()
+        if (model == Bluetooth.MODEL_PC80B
+            || model == Bluetooth.MODEL_PC60FW
+            || model == Bluetooth.MODEL_FHR) { // 部分设备没有同步时间命令，发送此消息通知获取设备信息，进行绑定操作
+            LiveEventBus.get<Boolean>(EventMsgConst.Ble.EventBleDeviceReady).post(true)
+        } else {
+            if (!manager.isUpdater) syncTime()
+        }
     }
 
 
@@ -328,9 +339,10 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
     }
     fun clearCmdTimeout() {
-        curCmd = 0
+        curCmd = -1
         cmdTimeout?.cancel()
         cmdTimeout = null
+        LepuBleLog.d("clearCmdTimeout")
     }
 
 

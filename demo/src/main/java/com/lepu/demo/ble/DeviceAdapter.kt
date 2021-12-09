@@ -12,6 +12,6 @@ import com.lepu.demo.R
 class DeviceAdapter(layoutResId: Int, data: MutableList<Bluetooth>?) : BaseQuickAdapter<Bluetooth, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(holder: BaseViewHolder, item: Bluetooth) {
-        holder.setText(R.id.name, item.name)
+        holder.setText(R.id.name, item.name + "  " + item.macAddr)
     }
 }

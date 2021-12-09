@@ -11,12 +11,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.Er1BleResponse
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.Bp2BleRtData
 import com.lepu.blepro.ble.data.Bp2DataEcgIng
+import com.lepu.blepro.ble.data.KtBleFileList
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
@@ -33,9 +35,12 @@ import com.lepu.demo.databinding.FragmentDashboardBinding
 import com.lepu.demo.views.EcgBkg
 import com.lepu.demo.views.EcgView
 import com.lepu.demo.views.OxyView
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.floor
 
 class DashboardFragment : Fragment(R.layout.fragment_dashboard){
+    val TAG: String = "DashboardFragment"
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val viewModel: DashboardViewModel by activityViewModels()
@@ -149,6 +154,17 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 DataController.receive(mvs)
 
             })
+
+
+
+
+
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList).observe(this, { event ->
+            (event.data as KtBleFileList).let {
+                LepuBleLog.d(TAG, "bp2 fileList => ${it.toString()}")
+            }
+        })
+
         //----------------------------bp2 end------------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1RtData)
             .observe(this, Observer{
@@ -210,6 +226,25 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 ecgView.invalidate()
             }
         })
+
+        binding.fileList.setOnClickListener {
+            lifecycleScope.launch {
+
+                if (Constant.BluetoothConfig.singleConnect)
+                Constant.BluetoothConfig.currentModel[0].let {
+                    LpBleUtil.stopRtTask(it)
+
+
+                    delay(1000)
+                    if(LpBleUtil.isRtStop(it)){
+                        //可能这1秒时间， 切到实时页面开启了实时
+                        LpBleUtil.getFileList(it)
+                    }
+
+                }
+            }
+
+        }
     }
 
     private fun initEcgView() {

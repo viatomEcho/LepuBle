@@ -134,10 +134,30 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                     )
                 )
             }
+            Er2BleCmd.CMD_RESET -> {
+
+                LepuBleLog.d(tag, "model:$model,CMD_RESET => success")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2Reset).post(
+                    InterfaceEvent(
+                        model,
+                        true
+                    )
+                )
+            }
             Er2BleCmd.CMD_FACTORY_RESET -> {
 
                 LepuBleLog.d(tag, "model:$model,CMD_FACTORY_RESET => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FactoryReset).post(
+                    InterfaceEvent(
+                        model,
+                        true
+                    )
+                )
+            }
+            Er2BleCmd.CMD_FACTORY_RESET_ALL -> {
+
+                LepuBleLog.d(tag, "model:$model,CMD_FACTORY_RESET_ALL => success")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FactoryResetAll).post(
                     InterfaceEvent(
                         model,
                         true

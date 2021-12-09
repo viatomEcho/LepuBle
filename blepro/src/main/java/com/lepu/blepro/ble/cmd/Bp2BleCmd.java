@@ -105,6 +105,24 @@ public class Bp2BleCmd {
         public final static byte CMD_FILE_READ_PKG = (byte) 0xF3;//读取中
         public final static byte CMD_FILE_READ_END = (byte) 0xF4;//结束
 
+
+        public static String getCmdStr(int cmd){
+            if (cmd == MSG_TYPE_GET_BP_FILE_LIST){
+                return "获取文件列表";
+            }else if (cmd == MSG_TYPE_READ_START){
+                return "开始读文件";
+            }else if (cmd == MSG_TYPE_GET_CONFIG){
+                return "获取配置";
+            }else if (cmd == MSG_TYPE_SET_TIME){
+                return "同步时间";
+            }else if (cmd == MSG_TYPE_GET_INFO){
+                return "设备信息";
+            }
+            else {
+                return String.valueOf(cmd);
+            }
+        }
+
         public static byte[] getCmd(int msgType) {
             switch (msgType) {
                 case BPMCmd.MSG_TYPE_GET_INFO:

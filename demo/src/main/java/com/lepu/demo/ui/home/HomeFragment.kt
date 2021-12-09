@@ -18,10 +18,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.ble.data.KtBleFileList
 import com.lepu.blepro.event.EventMsgConst
+import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BIOL
+import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.MainActivity
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
@@ -113,6 +116,9 @@ class HomeFragment : Fragment(R.layout.fragment_home){
             }
         }
 
+
+
+
     }
 
 
@@ -126,6 +132,8 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                 adapter.notifyDataSetChanged()
 
             })
+
+
 
     }
 

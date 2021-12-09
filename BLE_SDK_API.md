@@ -1,12 +1,193 @@
-package com.lepu.blepro.event
+## `SDK接入` 
 
-import com.jeremyliao.liveeventbus.core.LiveEvent
+![image-20211203091443200](C:\Users\chenyongfeng\AppData\Roaming\Typora\typora-user-images\image-20211203091443200.png)
 
-/**
- * author: wujuan
- * created on: 2021/2/3 18:35
- * description: 从interface发送的业务通知，都要携带model。App使用时通过model区分同功能系列的不同设备
- */
+
+
+## `版本` 
+
+第三位是0 表示测试版， 非0为发布版
+
+- 2.0.0.1 添加Pc80b，Pc60fw，Th12，胎心仪Fhr设备
+- 2.0.0.2 合并vihealth sdk分支，添加血压手表Bpw1设备
+- 2.0.0.3 修改minsdk=21，th12获取导联数据，er1 updater设备扫描通知
+
+
+
+## `主要类说明` 
+
+- `BleServiceHelper` ：初始化SDK，扫描，连接，断连，重连等
+- `InterfaceEvent` ，`EventMsgConst` ：监听LiveEventBus消息接收数据
+- `BIOL` ：订阅蓝牙状态监听
+- `BleChangeObserver` ：监听蓝牙状态，必须订阅蓝牙状态监听，否则无法接收蓝牙状态
+- `BleServiceObserver` ：监听蓝牙服务状态
+- 每个model对应一个interface，由app管理interface
+
+
+
+## `BleServiceHelper` 
+
+初始化sdk：
+
+- `initLog(log: Boolean)` ：配置sdk log打印开关
+
+- `initRawFolder(folders: SparseArray<String>)` ：配置下载数据的保存路径，key为model
+
+- `initModelConfig(modelConfig: SparseArray<Int>)` ：配置model，key为model
+
+- `initRtConfig(runRtConfig: SparseArray<Boolean>)` ：配置接收主机信息后，是否立即开启实时监测任务，key为model
+
+- `initService(application: Application, observer: BleServiceObserver?)` 
+  
+  > 在initLog()，initRawFolder()，initModelConfig()，initRtConfig()之后调用
+  >
+  > 启动BleService蓝牙通讯服务
+
+其他接口：
+
+- `reInitBle()` ：重新初始化蓝牙
+
+- `startScan(scanModel: Int, needPair: Boolean = false, isStrict: Boolean = false)` 
+
+  > 开始扫描，单个model设备
+  >
+  > needPair：本次扫描是否需要发送配对信息，默认是false
+  >
+  > isStrict：本次扫描是否是严格模式（严格模式下只会发送scanModel的扫描结果信息），默认是false
+
+- `startScan(scanModel: IntArray, needPair: Boolean = false, isStrict: Boolean = false)` ：开始扫描，多个model设备
+
+- `stopScan()` ：停止扫描
+
+- `setInterfaces(model: Int, runRtImmediately: Boolean = false)` 
+
+  > 在initService()之后调用，**连接设备前需要设置** 
+  >
+  > 设置model的interface
+  >
+  > runRtImmediately：是否立即开启实时监测任务，默认是false
+
+- `getInterface(model: Int)` ：获取model的interface
+
+- `getInterfaces()` ：获取服务中所有的interface
+
+- `connect(context: Context, model: Int, b: BluetoothDevice, isAutoReconnect: Boolean = true, toConnectUpdater: Boolean = false)`  
+
+  > 连接成功后自动同步时间，但Pc80b，Pc60fw，胎心仪Fhr设备没有同步时间设置，连接成功后直接发送EventMsgConst.Ble.EventBleDeviceReady
+  >
+  > 每次发起**连接前必须关闭扫描** 
+  >
+  > isAutoReconnect：是否自动重连，默认是true
+  >
+  > toConnectUpdater：检查是否是连接升级失败的设备，默认是false
+
+- `reconnect(scanModel: Int, name: String, needPair: Boolean = false, toConnectUpdater: Boolean = false)` ：通过**蓝牙设备名称** 重新连接，单个model设备
+
+- `reconnect(scanModel: IntArray, name: Array<String>, needPair: Boolean = false, toConnectUpdater: Boolean = false)` ：重新连接多个model设备
+
+- `reconnectByAddress(scanModel: Int, macAddress: String, needPair: Boolean = false, toConnectUpdater: Boolean = false)` ：通过**蓝牙地址** 重新连接，单个model设备
+
+- `reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, needPair: Boolean, toConnectUpdater: Boolean = false)` ：重新连接多个model设备
+
+- `disconnect(autoReconnect: Boolean)` ：所有设备断开连接
+
+- `disconnect(model: Int, autoReconnect: Boolean)` ：单设备断开连接
+
+- `getConnectState(model: Int)` ：获取model连接状态
+
+- `syncTime(model: Int)` ：同步时间
+
+- `getInfo(model: Int)` ：获取主机信息
+
+- `getFileList(model: Int)` ：获取设备文件列表
+
+- `readFile(userId: String, fileName: String, model: Int, offset: Int = 0)` ：读取主机文件
+
+- `cancelReadFile(model: Int)` ：取消读取主机文件
+
+- `pauseReadFile(model: Int)` ：暂停读取主机文件
+
+- `continueReadFile(model: Int, userId: String, fileName: String, offset: Int)` ：继续读取主机文件
+
+- `factoryResetAll(model: Int)` ：恢复生产出厂状态
+
+- `factoryReset(model: Int)` ：恢复出厂设置
+
+- `reset(model: Int)` ：设备复位
+
+- `updateSetting(model: Int, type: String, value: Any)` ：更新设备设置
+
+- `setRTDelayTime(model: Int, delayMillis: Long)` ：设置实时监测任务的间隔时间
+
+- `startRtTask(model: Int)` ：开启实时监测任务
+
+- `stopRtTask(model: Int, stopStateTask: Boolean = false)` ：停止实时监测任务
+
+- `isRtStop(model: Int)` ：是否已停止实时监测任务
+
+- `startBp(model: Int)` ：开始测量血压，支持设备有Bp2，Bp2a，Bpm，Bpw1
+
+- `stopBp(model: Int)` ：停止测量血压
+
+- `bp2SetConfig(model: Int, switch: Boolean)` ：设置Bp2心跳音开关
+
+- `bp2GetConfig(model: Int)` ：获取Bp2心跳音开关信息
+
+- `getBpmFileList(model: Int, map: HashMap<String, Any>)` ：获取Bpm设备文件列表
+
+- `setEr2SwitcherState(model: Int, hrFlag: Boolean)` ：设置Er2心跳音开关
+
+- `getEr2SwitcherState(model: Int)` ：获取Er2心跳音开关信息
+
+- `getEr1VibrateConfig(model: Int)` ：获取Er1，Duoek配置信息
+
+- `setEr1Vibrate(model: Int, switcher: Boolean, threshold1: Int, threshold2: Int)` 
+  
+  > 设置Er1配置信息
+  >
+  > switcher：心率震动开关
+  >
+  > threshold1：心率阈值1
+  >
+  > threshold2：心率阈值2
+  
+- `setEr1Vibrate(model: Int, switcher: Boolean, vector: Int, motionCount: Int, motionWindows: Int)` 
+
+  > 设置Duoek配置信息
+  >
+  > switcher：心跳音开关
+  >
+  > vector：加速度阈值
+  >
+  > motionCount：加速度检测次数
+  >
+  > motionWindows：加速度检测窗口
+
+- `bp2SwitchState(model: Int, state: Int)` 
+  
+  > 切换Bp2设备状态
+  >
+  > state：0 进入血压测量，1 进入心电测量，2 进入历史回顾，3 进入开机预备状态，4 关机，5 进入理疗模式
+  
+- `oxyGetPpgRt(model: Int)` ：获取血氧戒指O2Ring原始数据
+
+- `sendHeartbeat(model: Int)` ：发送心跳包查询电量，支持设备有Pc80b
+
+- `setMeasureTime(model: Int, measureTime: Array<String?>)` 
+  
+  > 设置定时测量血压时间，支持设备有Bpw1
+  >
+  > String格式："startHH,startMM,stopHH,stopMM,interval,serialNum,totalNum"
+  
+- `getMeasureTime(model: Int)` ：获取定时测量血压时间，支持设备有Bpw1
+
+- `setTimingSwitch(model: Int, timingSwitch: Boolean)` ：设置定时测量血压开关，支持设备有Bpw1
+
+
+
+## `InterfaceEvent` 
+
+```
 class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
@@ -169,3 +350,129 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
 }
+```
+
+
+
+## `EventMsgConst` 
+
+```
+object EventMsgConst {
+
+    interface Ble{
+        companion object{
+            const val EventServiceConnectedAndInterfaceInit = "com.lepu.ble.service.interface.init"  // 服务连接后初始化interface成功会发送 true
+            const val EventBleDeviceReady = "com.lepu.ble.device.ready"  // 没有同步时间的设备连接成功后会发送 true
+        }
+    }
+
+
+    /**
+     * ble discovery
+     */
+    interface Discovery{
+        companion object{
+            const val EventDeviceFound = "com.lepu.ble.device.found"  // 扫描到设备会发送 Bluetooth
+            const val EventDeviceFound_Device = "com.lepu.ble.device.found.device"  // 开始扫描设置需要配对信息会发送 Bluetooth
+            const val EventDeviceFound_ScanRecord = "com.lepu.ble.device.found.scanResult"  // 开始扫描设置需要配对信息会发送 ScanRecord
+        }
+
+    }
+
+    /**
+     * ble realtime task
+     * 发送通知携带model
+     */
+    interface RealTime{
+        companion object{
+            //实时波形
+            const val EventRealTimeStart = "com.lepu.ble.realtime.start"  // 开启实时监测任务后会发送 model
+            const val EventRealTimeStop = "com.lepu.ble.realtime.stop"  // 停止实时监测任务后会发送 model
+
+
+            //bp2 获取实时状态
+            const val EventRealTimeStateStart = "com.lepu.ble.realtime.state.start"
+            const val EventRealTimeStateStop = "com.lepu.ble.realtime.state.stop"
+        }
+    }
+
+    interface Download{
+        companion object{
+            const val EventIsPaused = "com.lepu.ble.download.paused"  // 暂停下载设备文件会发送
+            const val EventIsContinue = "com.lepu.ble.download.continue"  // 停止下载设备文件会发送
+            const val EventIsCancel = "com.lepu.ble.download.cancel"  // 取消下载设备文件会发送
+        }
+    }
+
+    interface Updater{
+        companion object{
+            const val EventBleConnected = "com.lepu.ble.updater.ble.connected"  // 升级设备连接成功会发送
+        }
+    }
+
+    interface Cmd{
+        companion object{
+            const val EventCmdResponseTimeOut = "com.lepu.ble.cmd.response.timeout"  // 指令响应超时会发送
+        }
+    }
+
+}
+```
+
+
+
+## `TH12` 
+
+th12存储文件格式说明：文件头+数据内容
+
+数据内容是从文件头(固定2901个字节)结束开始追加，每次追加**两秒数据**(数据头8个字节+导联数据9000个字节)
+
+* `Th12BleFile(fileName: String)` 创建对象
+
+* `parseHeadData(byteArray: ByteArray)` 
+
+  > 解析文件头数据
+  >
+  > 传入参数：设备.dat文件的前2901字节
+
+* `getValidLength()` ：获取文件有效心电长度
+
+* `getTwoSecondEcgData(byteArray: ByteArray)` 
+
+  >传入参数：9008字节原始数据
+  >
+  >返回值：9000字节心电数据
+
+* `getMitHeadData()` ：转Mit格式的.hea文件内容
+
+* `getTwoSecondLeadData(leadName: String, ecgData: ByteArray)` 
+
+  >传入参数：导联名称，9000字节心电数据
+  >
+  >返回值：导联采样点数值
+  >
+  >导联名称： I, II, V1, V2, V3, V4, V5, V6, Pacer, III, aVR, aVL, aVF
+  >
+  >mv = 采样点数值 / 655.36
+
+* `getFileCreateTime()` 
+
+  > 获取文件创建时间
+  >
+  > 时间格式yyyy-mm-dd hh:mm:ss
+
+* `getEcgTime()` ：心电时长，单位为秒
+
+
+
+## `胎心仪FHR` 
+
+* `FhrBleFile` 静态类 
+
+  采集的音频数据byte[]（二进制文件内容）
+
+  ---> `decode()` 得到解压后的音频数据，采样率为2000（返回数据可存储为后缀名`.pcm` 文件）
+
+  ---> `resample()` 得到变采样后的音频数据（2000 --->8000，返回数据可存储为后缀名`.pcm` 文件）
+
+  ---> `convertWav()` 得到可播放音频数据（返回数据可存储为后缀名`.wav` 文件）

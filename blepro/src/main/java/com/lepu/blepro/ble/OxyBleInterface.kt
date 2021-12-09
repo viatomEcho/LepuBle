@@ -57,7 +57,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     private fun sendOxyCmd(cmd: Int, bs: ByteArray){
         LepuBleLog.d(tag, "sendOxyCmd $cmd")
 
-        if (curCmd !== 0) {
+        if (curCmd != -1) {
             // busy
             LepuBleLog.d(tag, "busy: " + cmd.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
             return
@@ -107,7 +107,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: OxyBleResponse.OxyResponse) {
         LepuBleLog.d(tag, "Response: $curCmd, ${response.content.toHex()}")
-        if (curCmd == 0) {
+        if (curCmd == -1) {
             return
         }
 
@@ -216,11 +216,11 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
             }
 
-            OxyBleCmd.OXY_CMD_RESET -> {
+            OxyBleCmd.OXY_CMD_FACTORY_RESET -> {
                 clearTimeout()
-                LepuBleLog.d(tag, "model:$model,  OXY_CMD_RESET => success")
+                LepuBleLog.d(tag, "model:$model,  OXY_CMD_FACTORY_RESET => success")
 
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyResetDeviceInfo).post(InterfaceEvent(model, true))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyFactoryReset).post(InterfaceEvent(model, true))
             }
 
             else -> {
@@ -230,7 +230,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     }
 
     private fun clearTimeout() {
-        curCmd = 0
+        curCmd = -1
     }
 
     /**
@@ -281,11 +281,11 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun factoryReset() {
-        LepuBleLog.e(tag, "factoryReset Not yet implemented")
+        sendOxyCmd(OxyBleCmd.OXY_CMD_FACTORY_RESET, OxyBleCmd.factoryReset())
     }
 
     override fun factoryResetAll() {
-        sendOxyCmd(OxyBleCmd.OXY_CMD_RESET, OxyBleCmd.factoryResetAll())
+        LepuBleLog.e(tag, "factoryReset Not yet implemented")
     }
 
     override fun reset() {
