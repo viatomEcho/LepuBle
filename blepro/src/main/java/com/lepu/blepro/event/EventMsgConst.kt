@@ -20,6 +20,8 @@ object EventMsgConst {
             const val EventDeviceFound = "com.lepu.ble.device.found"
             const val EventDeviceFound_Device = "com.lepu.ble.device.found.device"
             const val EventDeviceFound_ScanRecord = "com.lepu.ble.device.found.scanResult"
+            const val EventDeviceFoundForUnRegister = "com.lepu.ble.device.found.unregister" //不需要添加model
+            const val EventDeviceFound_ScanRecordUnRegister = "com.lepu.ble.device.found.scanResult.unregister"
         }
 
     }

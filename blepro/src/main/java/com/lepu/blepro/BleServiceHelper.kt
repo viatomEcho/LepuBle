@@ -190,9 +190,10 @@ class BleServiceHelper private constructor() {
      * @param needPair Boolean
      */
     @JvmOverloads
-    fun startScan(scanModel: Int, needPair: Boolean = false, isStrict: Boolean = false) {
+    fun startScan(scanModel: Int, needPair: Boolean = false, isStrict: Boolean = false, isScanUnRegister: Boolean) {
         if (!checkService()) return
         bleService.isStrict = isStrict
+        bleService.isScanUnRegister = isScanUnRegister
         bleService.startDiscover(intArrayOf(scanModel), needPair)
     }
 
@@ -205,6 +206,7 @@ class BleServiceHelper private constructor() {
         bleService.isStrict = isStrict
         bleService.startDiscover(scanModel, needPair)
     }
+
 
 
     /**
