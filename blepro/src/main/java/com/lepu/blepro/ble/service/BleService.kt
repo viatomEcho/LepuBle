@@ -7,6 +7,7 @@ import android.bluetooth.le.*
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
 import android.text.TextUtils
 import android.util.SparseArray
@@ -409,10 +410,16 @@ open class BleService: LifecycleService() {
 
             if (enable) {
                 if (bluetoothAdapter?.isEnabled!!) {
-                    val settings: ScanSettings = ScanSettings.Builder()
+                    val settings: ScanSettings = if (Build.VERSION.SDK_INT >= 23) {
+                        ScanSettings.Builder()
                             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                             .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
                             .build()
+                    }else {
+                        ScanSettings.Builder()
+                            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                            .build()
+                    }
                     //                    List<ScanFilter> filters = new ArrayList<ScanFilter>();
                     //                    filters.add(new ScanFilter.Builder().build());
                     leScanner?.startScan(null, settings, leScanCallback)
@@ -462,7 +469,7 @@ open class BleService: LifecycleService() {
 
                     }
 
-                LiveEventBus.get<BluetoothDevice>(EventMsgConst.Discovery.EventDeviceFoundForUnRegister).post(device)
+                LiveEventBus.get<ScanResult>(EventMsgConst.Discovery.EventDeviceFoundForUnRegister).post(result)
                 return
             }
 
