@@ -8,8 +8,6 @@ import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.Bpw1BleResponse
 import com.lepu.blepro.event.InterfaceEvent
-import com.lepu.blepro.objs.Bluetooth
-import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.databinding.FragmentSettingsBinding
 
 /**
@@ -21,7 +19,7 @@ import com.lepu.demo.databinding.FragmentSettingsBinding
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private val binding: FragmentSettingsBinding by binding()
-    private var measureTime = arrayOfNulls<String>(3)
+    private lateinit var measureTime: Array<String?>
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -30,30 +28,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun initView() {
-        binding.btGetInfo.setOnClickListener {
-            LpBleUtil.getInfo(Bluetooth.MODEL_BPW1)
+        binding.er1GetConfig.setOnClickListener {
         }
-        binding.btGetList.setOnClickListener {
-            LpBleUtil.getFileList(Bluetooth.MODEL_BPW1)
+        binding.er1SetConfig.setOnClickListener {
+
         }
-        binding.btStartBp.setOnClickListener {
-            LpBleUtil.startBp(Bluetooth.MODEL_BPW1)
-        }
-        binding.btStopBp.setOnClickListener {
-            LpBleUtil.stopBp(Bluetooth.MODEL_BPW1)
-        }
-        binding.btSetMeasureTime.setOnClickListener {
-            measureTime[0] = "1,0,5,0,120,1,3"
-            measureTime[1] = "6,0,12,0,150,2,3"
-            measureTime[2] = "15,0,20,0,240,3,3"
-            LpBleUtil.setMeasureTime(Bluetooth.MODEL_BPW1, measureTime)
-        }
-        binding.btGetMeasureTime.setOnClickListener {
-            LpBleUtil.getMeasureTime(Bluetooth.MODEL_BPW1)
-        }
-        binding.btSetTimingSwitch.setOnClickListener {
-            LpBleUtil.setTimingSwitch(Bluetooth.MODEL_BPW1, true)
-        }
+
+
     }
 
     private fun initLiveEvent() {

@@ -12,6 +12,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lepu.blepro.ble.cmd.OxyBleResponse
+import com.lepu.blepro.ble.cmd.PC80BleResponse
+import com.lepu.blepro.ble.data.Bp2DeviceInfo
+import com.lepu.blepro.ble.data.BpmDeviceInfo
+import com.lepu.blepro.ble.data.Er2DeviceInfo
+import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.O2RING_MODEL
@@ -64,8 +69,26 @@ class MainViewModel: ViewModel() {
     }
     val bleState: LiveData<Boolean> = _bleState
 
+    var runWave = false
 
+    /**
+     * 设备信息
+     */
+    // 心电产品
+    val _er1Info = MutableLiveData<LepuDevice>()
+    val er1Info: LiveData<LepuDevice> = _er1Info
 
+    val _er2Info = MutableLiveData<Er2DeviceInfo>()
+    val er2Info: LiveData<Er2DeviceInfo> = _er2Info
+
+    val _pc80bInfo = MutableLiveData<PC80BleResponse.DeviceInfo>()
+    val pc80bInfo: LiveData<PC80BleResponse.DeviceInfo> = _pc80bInfo
+
+    val _bp2Info = MutableLiveData<Bp2DeviceInfo>()
+    val bp2Info: LiveData<Bp2DeviceInfo> = _bp2Info
+
+    val _bpmInfo = MutableLiveData<BpmDeviceInfo>()
+    val bpmInfo: LiveData<BpmDeviceInfo> = _bpmInfo
 
     val _oxyInfo = MutableLiveData<OxyBleResponse.OxyInfo>()
     val oxyInfo: LiveData<OxyBleResponse.OxyInfo> = _oxyInfo
@@ -79,6 +102,9 @@ class MainViewModel: ViewModel() {
     /**
      * 当前蓝牙
      */
+    val _curBluetooth = MutableLiveData<DeviceEntity?>()
+    var curBluetooth: LiveData<DeviceEntity?> = _curBluetooth
+
     val _o2ringCurBluetooth = MutableLiveData<DeviceEntity?>()
     var o2ringCurBluetooth: LiveData<DeviceEntity?> = _o2ringCurBluetooth
 

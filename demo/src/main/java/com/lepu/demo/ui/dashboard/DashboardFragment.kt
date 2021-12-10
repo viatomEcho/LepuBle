@@ -1,29 +1,20 @@
 package com.lepu.demo.ui.dashboard
 
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.RelativeLayout
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.ble.cmd.Er1BleResponse
-import com.lepu.blepro.ble.cmd.OxyBleResponse
-import com.lepu.blepro.ble.data.Bp2BleRtData
-import com.lepu.blepro.ble.data.Bp2DataEcgIng
-import com.lepu.blepro.ble.data.KtBleFileList
+import com.lepu.blepro.ble.cmd.*
+import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
-import com.lepu.blepro.observer.BIOL
-import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.MainViewModel
@@ -31,12 +22,11 @@ import com.lepu.demo.R
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.data.DataController
+import com.lepu.demo.data.OxyDataController
 import com.lepu.demo.databinding.FragmentDashboardBinding
 import com.lepu.demo.views.EcgBkg
 import com.lepu.demo.views.EcgView
 import com.lepu.demo.views.OxyView
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.math.floor
 
 class DashboardFragment : Fragment(R.layout.fragment_dashboard){
@@ -47,18 +37,21 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
     private val binding: FragmentDashboardBinding by binding()
 
+    // 心电产品
     private lateinit var ecgBkg: EcgBkg
     private lateinit var ecgView: EcgView
 
+    // 血氧产品
+    private lateinit var oxyView: OxyView
 
     /**
-     * rt ecg wave
+     * rt wave
      */
     private val waveHandler = Handler()
 
-    inner class WaveTask : Runnable {
+    inner class EcgWaveTask : Runnable {
         override fun run() {
-            if (!runWave) {
+            if (!mainViewModel.runWave) {
                 return
             }
 
@@ -81,28 +74,57 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 //            LepuBleLog.d("DataRec: ${DataController.dataRec.size}, delayed $interval")
 
             val temp = DataController.draw(5)
-            viewModel.dataSrc.value = DataController.feed(viewModel.dataSrc.value, temp)
+            viewModel.dataEcgSrc.value = DataController.feed(viewModel.dataEcgSrc.value, temp)
+        }
+    }
+    inner class OxyWaveTask : Runnable {
+        override fun run() {
+            if (!mainViewModel.runWave) {
+                return
+            }
+
+            val interval: Int = when {
+                OxyDataController.dataRec.size > 250 -> {
+                    30
+                }
+                OxyDataController.dataRec.size > 150 -> {
+                    35
+                }
+                OxyDataController.dataRec.size > 75 -> {
+                    40
+                }
+                else -> {
+                    45
+                }
+            }
+
+            waveHandler.postDelayed(this, interval.toLong())
+//            LepuBleLog.d("DataRec: ${OxyDataController.dataRec.size}, delayed $interval")
+
+            val temp = OxyDataController.draw(5)
+            viewModel.dataOxySrc.value = OxyDataController.feed(viewModel.dataOxySrc.value, temp)
         }
     }
 
-    private var runWave = false
-    private fun startWave() {
-        if (runWave) {
+    private fun startWave(model: Int) {
+        if (mainViewModel.runWave) {
             return
         }
-        runWave = true
-        waveHandler.post(WaveTask())
+        mainViewModel.runWave = true
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_BP2 -> waveHandler.post(EcgWaveTask())
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW -> waveHandler.post(OxyWaveTask())
+        }
+
     }
 
     private fun stopWave() {
-        runWave = false
+        mainViewModel.runWave = false
         DataController.clear()
+        OxyDataController.clear()
     }
 
-
-
-
-
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
@@ -110,141 +132,304 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         }
         initView()
         initLiveEvent()
-
-
-
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun initLiveEvent(){
         LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStart).observeSticky(this, {
-            when(it){
-                Bluetooth.MODEL_BP2 ->  startWave()
-            }
-
+            startWave(it)
         })
 
         LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStop).observeSticky(this, {
-            when(it){
-                Bluetooth.MODEL_BP2 ->  stopWave()
-            }
-
+            stopWave()
         })
 
-        //------------------------------bp2------------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData)
-            .observe(this, Observer{
-                val bp2Rt = it.data as Bp2BleRtData
-
-//                Log.d("bp2data bp", "len  = ${bp2Rt.rtWave.waveData.size}")
+        //------------------------------er1 duoek------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1RtData)
+            .observe(this, {
+                val rtData = it.data as Er1BleResponse.RtData
+                rtData.let { data ->
+                    Log.d("er1 data ", "len = ${data.wave.wave.size}")
+                    DataController.receive(data.wave.wFs)
+                    binding.dataStr.text = data.param.toString()
+                    viewModel.ecgHr.value = data.param.hr
+                }
             })
-
-
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1FileList).observe(this, { event ->
+            (event.data as Er1BleResponse.Er1FileList).let {
+                binding.dataStr.text = it.toString()
+            }
+        })
+        //------------------------------er2------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2RtData)
+            .observe(this, {
+                val rtData = it.data as Er2RtData
+                rtData.let { data ->
+                    Log.d("er2 data ", "len = ${data.waveData.size}")
+                    DataController.receive(data.waveData.datas)
+                    binding.dataStr.text = data.rtParam.toString()
+                    viewModel.ecgHr.value = data.hr
+                }
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FileList).observe(this, { event ->
+            (event.data as Er2FileList).let {
+                binding.dataStr.text = it.toString()
+            }
+        })
+        //------------------------------pc80b------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bTrackData)
+            .observe(this, {
+                val rtData = it.data as PC80BleResponse.RtTrackData
+                rtData.let { data ->
+                    DataController.receive(data.data.ecgData!!.wFs)
+                    binding.dataStr.text = data.toString()
+                }
+            })
+        //------------------------------bp2 bp2a------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData)
-            .observe(this, Observer{
+            .observe(this, {
                 val bp2Rt = it.data as Bp2BleRtData
 
-                val d = Bp2DataEcgIng(bp2Rt.rtWave.waveData)
+                var data: Any
+                when(bp2Rt.rtWave.waveDataType) {
+                    0 -> {
+                        data = Bp2DataBpIng(bp2Rt.rtWave.waveData)
+                        viewModel.ps.value = data.pressure
+                    }
+                    1 -> {
+                        data = Bp2DataBpResult(bp2Rt.rtWave.waveData)
+                        viewModel.ps.value = data.pressure
+                        viewModel.sys.value = data.sys
+                        viewModel.dia.value = data.dia
+                        viewModel.mean.value = data.mean
+                        viewModel.bpPr.value = data.pr
+                    }
+                    2 -> {
+                        data = Bp2DataEcgIng(bp2Rt.rtWave.waveData)
+                        LepuBleLog.d("bp2 ecg hr = ${data.hr}")
+                        viewModel.ecgHr.value = data.hr
+                    }
+                    3 -> {
+                        data = Bp2DataEcgResult(bp2Rt.rtWave.waveData)
+                        viewModel.ecgHr.value = data.hr
+                    }
+                    else -> data = ""
+                }
 
-                LepuBleLog.d("bp2 ecg hr = ${d.hr}")
                 LepuBleLog.d("bp2 ecg waveformSize = ${bp2Rt.rtWave.waveformSize}")
-
-                viewModel.hr.value = d.hr
 
                 val mvs = ByteUtils.bytes2mvs(bp2Rt.rtWave.waveform)
                 DataController.receive(mvs)
 
+                binding.dataStr.text = "state: " + bp2Rt.rtWave.waveDataType + " " + data.toString()
+
             })
-
-
-
-
-
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList).observe(this, { event ->
             (event.data as KtBleFileList).let {
-                LepuBleLog.d(TAG, "bp2 fileList => ${it.toString()}")
+                binding.dataStr.text = it.toString()
             }
         })
+        //------------------------------bpm------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRtData)
+            .observe(this, {
+                val rtData = it.data as BpmCmd
+                rtData.let { data ->
+                    viewModel.ps.value = (data.data[0].toUInt() and 0xFFu).toInt()
+                }
+            })
 
-        //----------------------------bp2 end------------------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1RtData)
-            .observe(this, Observer{
+        //------------------------------o2ring------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtData).observeForever { event ->
+            (event.data as OxyBleResponse.RtWave).let { rtWave ->
+                activity?.let {
+                    //接收数据 开始添加采集数据
+                    mainViewModel.checkStartCollect(it, rtWave.waveByte)
 
+                    toPlayAlarm(rtWave.pr)
 
-                it as InterfaceEvent
-                val er1 = it.data as Er1BleResponse.RtData
-                er1.let { data ->
+                    viewModel.oxyPr.value = rtWave.pr
+                    viewModel.spo2.value = rtWave.spo2
+                    LepuBleLog.d("o2ring pr = ${rtWave.pr}, spo2 = ${rtWave.spo2}")
 
-                    Log.d("er1data ", "len  = ${data.wave.wave.size}")
+                    OxyDataController.receive(rtWave.wFs)
+                }
+            }
+        }
+        // o2ring ppg
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
+            .observe(this, {
 
+                LpBleUtil.oxyGetPpgRt(it.model)
+
+                val ppgData = it.data as OxyBleResponse.PPGData
+                ppgData.let { data ->
+                    Log.d("ppg", "len  = ${data.rawDataBytes.size}")
                 }
 
-
+            })
+        //------------------------------pc60fw------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataWave)
+            .observe(this, {
+                val rtWave = it.data as PC60FwBleResponse.RtDataWave
+                OxyDataController.receive(rtWave.waveIntData)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataParam)
+            .observe(this, {
+                val rtData = it.data as PC60FwBleResponse.RtDataParam
+                viewModel.oxyPr.value = rtData.pr.toInt()
+                viewModel.spo2.value = rtData.spo2.toInt()
             })
 
     }
 
     private fun initView() {
-        binding.ecgBkg.post{
-            initEcgView()
-        }
 
+        mainViewModel.curBluetooth.observe(viewLifecycleOwner, {
+            when (it!!.modelNo) {
+                Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2, Bluetooth.MODEL_PC80B -> {
+                    binding.ecgLayout.visibility = View.VISIBLE
+                    binding.bpLayout.visibility = View.GONE
+                    binding.oxyLayout.visibility = View.GONE
+                }
+                Bluetooth.MODEL_BP2 -> {
+                    binding.bpLayout.visibility = View.VISIBLE
+                    binding.ecgLayout.visibility = View.VISIBLE
+                    binding.oxyLayout.visibility = View.GONE
+                }
+                Bluetooth.MODEL_BPM -> {
+                    binding.bpLayout.visibility = View.VISIBLE
+                    binding.ecgLayout.visibility = View.GONE
+                    binding.oxyLayout.visibility = View.GONE
+                }
+                Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW -> {
+                    binding.oxyLayout.visibility = View.VISIBLE
+                    binding.ecgLayout.visibility = View.GONE
+                    binding.bpLayout.visibility = View.GONE
+                }
+            }
+        })
         mainViewModel.bleState.observe(viewLifecycleOwner, {
             it?.let {
                 if (it) {
                     binding.bleState.setImageResource(R.mipmap.bluetooth_ok)
+                    binding.bpBleState.setImageResource(R.mipmap.bluetooth_ok)
+                    binding.oxyBleState.setImageResource(R.mipmap.bluetooth_ok)
                     binding.ecgView.visibility = View.VISIBLE
+                    binding.oxyView.visibility = View.VISIBLE
 
                 } else {
                     binding.bleState.setImageResource(R.mipmap.bluetooth_error)
+                    binding.bpBleState.setImageResource(R.mipmap.bluetooth_error)
+                    binding.oxyBleState.setImageResource(R.mipmap.bluetooth_error)
                     binding.ecgView.visibility = View.INVISIBLE
+                    binding.oxyView.visibility = View.INVISIBLE
                 }
             }
 
         })
 
-        viewModel.hr.observe(viewLifecycleOwner, {
+        //------------------------------ecg------------------------------
+        binding.ecgBkg.post{
+            initEcgView()
+        }
+        viewModel.ecgHr.observe(viewLifecycleOwner, {
             if (it == 0) {
                 binding.hr.text = "?"
             } else {
                 binding.hr.text = it.toString()
             }
         })
-
-
-        binding.btStartRt.setOnClickListener {
-
+        binding.startRtEcg.setOnClickListener {
             LpBleUtil.startRtTask()
         }
-        binding.btStopRt.setOnClickListener {
-            LpBleUtil.stopRtTask()
+        binding.stopRtEcg.setOnClickListener {
+            // 停止实时任务后去获取设备列表
+            LpBleUtil.stopRtTask {
+                LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0])
+            }
         }
-
-
-        viewModel.dataSrc.observe(viewLifecycleOwner, {
+        viewModel.dataEcgSrc.observe(viewLifecycleOwner, {
             if (this::ecgView.isInitialized) {
                 ecgView.setDataSrc(it)
                 ecgView.invalidate()
             }
         })
 
-        binding.fileList.setOnClickListener {
-            lifecycleScope.launch {
-
-                if (Constant.BluetoothConfig.singleConnect)
-                Constant.BluetoothConfig.currentModel[0].let {
-                    LpBleUtil.stopRtTask(it)
-
-
-                    delay(1000)
-                    if(LpBleUtil.isRtStop(it)){
-                        //可能这1秒时间， 切到实时页面开启了实时
-                        LpBleUtil.getFileList(it)
-                    }
-
-                }
-            }
-
+        //------------------------------bp------------------------------
+        binding.startBp.setOnClickListener {
+            LpBleUtil.startBp(mainViewModel.curBluetooth.value!!.modelNo)
         }
+        binding.stopBp.setOnClickListener {
+            LpBleUtil.stopBp(mainViewModel.curBluetooth.value!!.modelNo)
+        }
+        viewModel.ps.observe(viewLifecycleOwner, {
+            if (it == 0) {
+                binding.tvPrBp.text = "?"
+            } else {
+                binding.tvPrBp.text = it.toString()
+            }
+        })
+        viewModel.sys.observe(viewLifecycleOwner, {
+            if (it == 0) {
+                binding.tvSys.text = "?"
+            } else {
+                binding.tvSys.text = it.toString()
+            }
+        })
+        viewModel.dia.observe(viewLifecycleOwner, {
+            if (it == 0) {
+                binding.tvDia.text = "?"
+            } else {
+                binding.tvDia.text = it.toString()
+            }
+        })
+        viewModel.mean.observe(viewLifecycleOwner, {
+            if (it == 0) {
+                binding.tvMean.text = "?"
+            } else {
+                binding.tvMean.text = it.toString()
+            }
+        })
+        viewModel.bpPr.observe(viewLifecycleOwner, {
+            if (it == 0) {
+                binding.tvPrBp.text = "?"
+            } else {
+                binding.tvPrBp.text = it.toString()
+            }
+        })
+
+        //------------------------------oxy------------------------------
+        binding.oxyView.post{
+            initOxyView()
+        }
+        viewModel.oxyPr.observe(viewLifecycleOwner, {
+            if (it == 0) {
+                binding.tvPr.text = "?"
+            } else {
+                binding.tvPr.text = it.toString()
+            }
+        })
+        viewModel.spo2.observe(viewLifecycleOwner, {
+            if (it == 0) {
+                binding.tvOxy.text = "?"
+            } else {
+                binding.tvOxy.text = it.toString()
+            }
+        })
+        binding.startRtOxy.setOnClickListener {
+            LpBleUtil.startRtTask()
+        }
+        binding.stopRtOxy.setOnClickListener {
+            LpBleUtil.stopRtTask()
+        }
+        viewModel.dataOxySrc.observe(viewLifecycleOwner, {
+            if (this::oxyView.isInitialized) {
+                oxyView.setDataSrc(it)
+                oxyView.invalidate()
+
+            }
+        })
+
     }
 
     private fun initEcgView() {
@@ -268,6 +453,45 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
     }
 
+    private fun initOxyView() {
+        // cal screen
+        val dm = resources.displayMetrics
+        val index = floor(binding.oxyView.width / dm.xdpi * 25.4 / 25 * 125).toInt()
+        OxyDataController.maxIndex = index
 
+        val mm2px = 25.4f / dm.xdpi
+        OxyDataController.mm2px = mm2px
+
+//        LogUtils.d("max index: $index", "mm2px: $mm2px")
+
+        binding.oxyView.measure(0, 0)
+        oxyView = OxyView(context)
+        binding.oxyView.addView(oxyView)
+
+        viewModel.dataOxySrc.value = OxyDataController.iniDataSrc(index)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun toPlayAlarm(newPr: Int){
+        mainViewModel.oxyPrAlarmFlag.value?.let { flag ->
+            if (flag) {
+                viewModel.oxyPr.value?.let { pr ->
+                    if (pr != 0 && newPr == 0) context?.let { it1 ->
+                        mainViewModel.playAlarm(
+                            it1
+                        )
+                    }
+                    if (pr != 0 && newPr != 0) {
+                        mainViewModel.oxyInfo.value?.let {
+                            if (newPr >= it.hrHighThr || newPr <= it.hrLowThr)
+                                context?.let { it1 ->
+                                    mainViewModel.playAlarm(it1)
+                                }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 }

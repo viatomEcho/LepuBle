@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.util.SparseArray
 import android.widget.Toast
 import androidx.activity.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -19,40 +18,31 @@ import androidx.navigation.ui.setupWithNavController
 import com.afollestad.materialdialogs.DialogAction
 import com.afollestad.materialdialogs.MaterialDialog
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.ble.cmd.Bp2BleResponse
-import com.lepu.blepro.ble.cmd.Er1BleResponse
-import com.lepu.blepro.ble.cmd.OxyBleResponse
-import com.lepu.blepro.ble.cmd.PC60FwBleResponse
-import com.lepu.blepro.ble.data.Bp2BleRtData
+import com.lepu.blepro.ble.cmd.*
+import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
-import com.lepu.blepro.objs.Bluetooth
-import com.lepu.blepro.objs.BluetoothController
-import com.lepu.blepro.observer.BIOL
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.HexString
 import com.lepu.blepro.utils.LepuBleLog
-import com.lepu.demo.ble.BleSO
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.CHECK_BLE_REQUEST_CODE
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.SUPPORT_MODELS
-import com.lepu.demo.data.OxyDataController
 import com.lepu.demo.util.CollectUtil
 import com.permissionx.guolindev.PermissionX
 import java.util.*
+
 
 class MainActivity : AppCompatActivity() , BleChangeObserver {
     private val TAG: String = "MainActivity"
 
     private val viewModel: MainViewModel by viewModels()
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
 
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
 
@@ -77,8 +67,8 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         initLiveEvent()
 //        split()
 
-
     }
+
     /**
      * ble sdk 服务启动完成后, 现在是点去连接时候才初始化interface  所以这里注释
      */
@@ -88,8 +78,8 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
 //        viewModel._scanning.value = true
 
-
     }
+
     private fun subscribeUi() {
 
         //手机ble状态,
@@ -103,7 +93,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
         })
 
-
         // 开启/关闭扫描
         viewModel.scanning.observe(this, {
             if (it){
@@ -113,6 +102,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         })
 
     }
+
     private fun initLiveEvent(){
         // 当BleService onServiceConnected执行后发出通知 蓝牙sdk 初始化完成
         LiveEventBus.get<Boolean>(EventMsgConst.Ble.EventServiceConnectedAndInterfaceInit).observe(this, Observer {
@@ -120,52 +110,75 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             afterLpBleInit()
         })
 
-
-
-        // ------------------PC60Fw--------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataParam)
-            .observe(this, Observer {
-                it as InterfaceEvent
-                val rtData = it.data as PC60FwBleResponse.RtDataParam
-                Log.d("PC60-rt","spo2 = ${rtData.spo2}，pi = ${rtData.pi}, pr = ${rtData.pr}")
-
-
-            })
-        //-------------------------PC60Fw------------------------
-
-
-
-        //-------------------------ER1---------------------------
-
+        //-------------------------er1---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetTime)
-            .observe(this, Observer {
-                Toast.makeText(this, "ER1 完成时间同步", Toast.LENGTH_SHORT).show()
-                LpBleUtil.startRtTask(Bluetooth.MODEL_ER1, 200)
+            .observe(this, {
+                Toast.makeText(this, "er1 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
             })
-        //-------------------------ER1---------------------------
-
-
-
-        //-------------------------bp2---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1Info)
+            .observe(this, { event ->
+                (event.data as LepuDevice).let {
+                    Toast.makeText(this, "er1 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._er1Info.value = it
+                }
+            })
+        //-------------------------er2---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetTime)
+            .observe(this, {
+                Toast.makeText(this, "er2 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2Info)
+            .observe(this, { event ->
+                (event.data as Er2DeviceInfo).let {
+                    Toast.makeText(this, "er2 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._er2Info.value = it
+                }
+            })
+        //-------------------------fhr---------------------------
+        //-------------------------pc60fw---------------------------
+        //-------------------------pc80b---------------------------
+        LiveEventBus.get<Boolean>(EventMsgConst.Ble.EventBleDeviceReady)
+            .observe(this, {
+                Toast.makeText(this, "EventBleDeviceReady 连接成功", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(viewModel.curBluetooth.value!!.modelNo)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bDeviceInfo)
+            .observe(this, { event ->
+                (event.data as PC80BleResponse.DeviceInfo).let {
+                    Toast.makeText(this, "pc80b 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._pc80bInfo.value = it
+                }
+            })
+        //-------------------------bp2 bp2a---------------------------
         //bp2 同步时间
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SyncTime)
             .observe(this, {
                 Toast.makeText(this, "bp2 完成时间同步", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
-
             })
-
         //bp2 info
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Info)
-            .observe(this, {
-                Toast.makeText(this, "bp2 获取设备信息成功", Toast.LENGTH_SHORT).show()
-
-                LpBleUtil.startRtTask(it.model)
-
+            .observe(this, { event ->
+                (event.data as Bp2DeviceInfo).let {
+                    Toast.makeText(this, "bp2 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._bp2Info.value = it
+                }
             })
-
-        //-------------------------bp2---------------------------
-
+        //-------------------------bpm---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmSyncTime)
+            .observe(this, {
+                Toast.makeText(this, "bpm 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmInfo)
+            .observe(this, { event ->
+                (event.data as BpmDeviceInfo).let {
+                    Toast.makeText(this, "bpm 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._bpmInfo.value = it
+                }
+            })
 
         //-------------------------o2ring---------------------------
 
@@ -181,7 +194,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo).observe(this, { event ->
             (event.data as OxyBleResponse.OxyInfo).let {
                 viewModel._oxyInfo.value = it
-                LpBleUtil.startRtTask(event.model)
             }
         })
 

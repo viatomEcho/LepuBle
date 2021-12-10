@@ -30,15 +30,23 @@
             android:text="断开"
             />
 
-
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ble_device"
+            android:text="蓝牙设备"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/scan"
+            android:layout_marginTop="20dp"
+            android:textSize="20sp"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/ble_state"
-            android:text="连接状态"
+            android:text="蓝牙连接状态"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/scan"
+            app:layout_constraintTop_toBottomOf="@id/ble_device"
             android:layout_marginTop="20dp"
             android:textSize="20sp"/>
 

@@ -5,7 +5,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "records")
-data class RecordEntity @JvmOverloads constructor(
+data class RecordEntity(
         @PrimaryKey(autoGenerate = true)
         val id: Long = 0,
         val startTime: Long,

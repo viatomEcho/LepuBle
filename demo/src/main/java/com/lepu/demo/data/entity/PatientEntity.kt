@@ -10,8 +10,7 @@ import kotlinx.android.parcel.Parcelize
  * description:
  */
 @Entity(tableName = "patient")
-@Parcelize
-data class PatientEntity @JvmOverloads constructor(
+data class PatientEntity(
     @PrimaryKey(autoGenerate = true)
     var patientId: Long = 0,
     var name: String,
@@ -22,4 +21,4 @@ data class PatientEntity @JvmOverloads constructor(
     var medicalHistory: String,
     var symptom: List<String>,
     var remark: String
-) : Parcelable
+)

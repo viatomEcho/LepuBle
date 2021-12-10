@@ -1,6 +1,5 @@
 package com.lepu.demo.ui.notifications
 
-import android.content.Context.VIBRATOR_SERVICE
 import android.os.*
 import android.util.Log
 import android.view.View
@@ -141,7 +140,6 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
 
                 LpBleUtil.oxyGetPpgRt(it.model)
 
-                it as InterfaceEvent
                 val ppgData = it.data as OxyBleResponse.PPGData
                 ppgData.let { data ->
                     Log.d("ppg", "len  = ${data.rawDataBytes.size}")

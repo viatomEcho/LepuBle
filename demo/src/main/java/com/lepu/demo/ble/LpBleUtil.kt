@@ -8,14 +8,9 @@ import android.util.Log
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.Bp2BleInterface
-import com.lepu.blepro.ble.cmd.Bp2BleCmd
-import com.lepu.blepro.ble.cmd.Bpw1BleResponse
-import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.demo.BuildConfig
-import com.lepu.demo.cofig.Constant
 import com.lepu.demo.cofig.Constant.BluetoothConfig
 
 class LpBleUtil {
@@ -258,7 +253,46 @@ class LpBleUtil {
             }
 
         }
-
+        fun updateSetting(model: Int, type: String, value: Any) {
+            Log.d(TAG, "updateSetting")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.updateSetting(model, type, value)
+            }
+        }
+        fun reset(model: Int) {
+            Log.d(TAG, "reset")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.reset(model)
+            }
+        }
+        fun factoryReset(model: Int) {
+            Log.d(TAG, "factoryReset")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.factoryReset(model)
+            }
+        }
+        fun factoryResetAll(model: Int) {
+            Log.d(TAG, "factoryResetAll")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.factoryResetAll(model)
+            }
+        }
 
         /**
          *
@@ -286,19 +320,26 @@ class LpBleUtil {
          *
          * @param model Int
          */
-        fun stopRtTask(model: Int) {
-            BleServiceHelper.stopRtTask(model)
+        @JvmOverloads
+        fun stopRtTask(model: Int, sendCmd: () -> Unit = {}) {
+            BleServiceHelper.stopRtTask(model){
+                sendCmd.invoke()
+            }
         }
-
-        fun stopRtTask(models: IntArray) {
+        @JvmOverloads
+        fun stopRtTask(models: IntArray, sendCmd: () -> Unit = {}) {
             for (m in models){
-                BleServiceHelper.stopRtTask(m)
+                BleServiceHelper.stopRtTask(m) {
+                    sendCmd.invoke()
+                }
             }
         }
 
-        fun stopRtTask(){
+        fun stopRtTask(sendCmd: () -> Unit = {}){
             if(BluetoothConfig.singleConnect && BluetoothConfig.currentModel.isNotEmpty()){
-                    stopRtTask(BluetoothConfig.currentModel[0])
+                    stopRtTask(BluetoothConfig.currentModel[0]){
+                        sendCmd.invoke()
+                    }
 
             }
         }
