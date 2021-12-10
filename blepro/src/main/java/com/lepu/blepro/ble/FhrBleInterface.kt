@@ -49,13 +49,13 @@ class FhrBleInterface(model: Int): BleInterface(model) {
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: FhrBleResponse.FhrResponse) {
-        LepuBleLog.d(tag, "received cmd : ${response.cmd}")
+//        LepuBleLog.d(tag, "received cmd : ${response.cmd}")
         //音频数据 byte[5]=0x0a：a55a0013 0a 911e12b34e19b790808088879a06b0 900000  23
         //设备数据 byte[5]=0x04：a55a000f 04 0450363533050500030006014a4200         20
-        LepuBleLog.d(tag, "received len : ${response.len}")
-        LepuBleLog.d(tag, "received content : ${bytesToHex(response.content)}")
-        LepuBleLog.d(tag, "received bytes : ${bytesToHex(response.bytes)}")
-        LepuBleLog.d(tag, "received bytes.size : ${response.bytes.size}")
+//        LepuBleLog.d(tag, "received len : ${response.len}")
+//        LepuBleLog.d(tag, "received content : ${bytesToHex(response.content)}")
+//        LepuBleLog.d(tag, "received bytes : ${bytesToHex(response.bytes)}")
+//        LepuBleLog.d(tag, "received bytes.size : ${response.bytes.size}")
 
         when (response.cmd) {
             0x04 -> {
