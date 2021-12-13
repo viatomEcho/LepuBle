@@ -598,7 +598,13 @@ open class BleService: LifecycleService() {
         @JvmStatic
         fun startService(context: Context) {
             LepuBleLog.d("startService")
-            Intent(context, BleService::class.java).also { intent -> context.startService(intent)}
+            Intent(context, BleService::class.java).also { intent ->
+                if (Build.VERSION.SDK_INT >= 26) {
+                    context.startForegroundService(intent)
+                }else{
+                    context.startService(intent)
+                }
+            }
         }
 
         @JvmStatic
