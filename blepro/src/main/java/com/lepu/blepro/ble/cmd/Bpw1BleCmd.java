@@ -147,7 +147,7 @@ public class Bpw1BleCmd {
         cmd[5] = (byte) startMM;
         cmd[6] = (byte) stopHH;
         cmd[7] = (byte) stopMM;
-        cmd[8] = (byte)((serialNum << 4 | totalCount));
+        cmd[8] = (byte) (serialNum << 4 | totalCount);
         cmd[9] = (byte) interval;
         cmd[10] = CrcUtil.calBpw1CHK(cmd);
         return cmd;

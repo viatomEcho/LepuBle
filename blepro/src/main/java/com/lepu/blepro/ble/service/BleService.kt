@@ -1,5 +1,7 @@
 package com.lepu.blepro.ble.service
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
@@ -11,6 +13,7 @@ import android.os.Build
 import android.os.IBinder
 import android.text.TextUtils
 import android.util.SparseArray
+import androidx.core.app.NotificationCompat
 import androidx.core.util.isEmpty
 import androidx.lifecycle.LifecycleService
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -116,6 +119,22 @@ open class BleService: LifecycleService() {
         LepuBleLog.d(tag, "BleService onCreated")
         addObserver()
         initBle()
+        startForeground()
+
+    }
+
+    /**
+     * android 8.0 startForegroundService后需要startForeground
+     */
+    private fun startForeground() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel("foreground_service", "后台服务", NotificationManager.IMPORTANCE_NONE)
+            channel.setShowBadge(false)
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.createNotificationChannel(channel)
+            val notification = NotificationCompat.Builder(this, "foreground_service").setContentTitle("").setContentText("").build()
+            startForeground(1, notification)
+        }
     }
 
     /**
@@ -157,7 +176,7 @@ open class BleService: LifecycleService() {
 
         vailFace.get(m)?.let { return it }
         when(m) {
-            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2MAX -> {
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M -> {
                 OxyBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
@@ -617,14 +636,23 @@ open class BleService: LifecycleService() {
 
         @JvmStatic
         fun startService(context: Context) {
-            LepuBleLog.d("startService")
-            Intent(context, BleService::class.java).also { intent -> context.startService(intent)}
+            LepuBleLog.d("BleService", "startService")
+            Intent(context, BleService::class.java).also { intent ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(intent)
+                } else {
+                    context.startService(intent)
+                }
+            }
+            observer?.onServiceCreate()
         }
 
         @JvmStatic
         fun stopService(context: Context) {
+            LepuBleLog.d("BleService", "stopService")
             val intent = Intent(context, BleService::class.java)
             context.stopService(intent)
+            observer?.onServiceDestroy()
         }
 
     }

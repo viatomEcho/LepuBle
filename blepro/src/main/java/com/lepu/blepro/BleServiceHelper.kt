@@ -76,6 +76,15 @@ class BleServiceHelper private constructor() {
     //===========================================================
 
     /**
+     * 停止服务
+     */
+    fun stopService(application: Application) {
+        application.unbindService(bleConn)
+        BleService.stopService(application)
+        LepuBleLog.d("BleServiceHelper stopService")
+    }
+
+    /**
      * 在Application onCreate中初始化本单列,
      *
      */
@@ -244,7 +253,7 @@ class BleServiceHelper private constructor() {
      */
     fun canReconnectByName(model: Int): Boolean {
         return when(model) {
-            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_FHR, Bluetooth.MODEL_BPW1 -> false
+            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_FHR, Bluetooth.MODEL_BPW1, Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F5_SCALE -> false
             else -> true
         }
     }

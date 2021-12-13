@@ -101,7 +101,7 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_O2M = 25;
     public static final int MODEL_BPM = 26;
     public static final int MODEL_LEM = 27;
-    public static final int MODEL_P600L = 28;
+    public static final int MODEL_FHR = 28;
     public static final int MODEL_BABYO2N = 29;
     public static final int MODEL_PC60FW = 30;
     public static final int MODEL_BP2T = 31;
@@ -116,18 +116,18 @@ public class Bluetooth implements Parcelable {
 
     public static final int MODEL_RINGO2 = 39;
     public static final int MODEL_KCA = 40;
-    public static final int MODEL_O2MAX = 41;
-    public static final int MODEL_PC80B = 42;
-    public static final int MODEL_FHR = 43;
-    public static final int MODEL_BPW1 = 44;
-    public static final int MODEL_F4_SCALE = 45;
-    public static final int MODEL_F5_SCALE = 46;
+    public static final int MODEL_PC80B = 41;
+    public static final int MODEL_BPW1 = 42;
+    public static final int MODEL_F4_SCALE = 43;
+    public static final int MODEL_F5_SCALE = 44;
 
 
-    @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU,
-            MODEL_ER1,MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL,
-            MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2MAX, MODEL_BPM,MODEL_BP2A,MODEL_PC60FW,MODEL_PC80B,MODEL_FHR,MODEL_BPW1,
-            MODEL_F4_SCALE,MODEL_F5_SCALE})
+    @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER1_N,
+            MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL, MODEL_BABYO2, MODEL_OXYSMART,
+            MODEL_TV221U, MODEL_PC100, MODEL_AOJ20A, MODEL_OXYFIT, MODEL_VCOMIN, MODEL_CHECK_POD, MODEL_BODY_FAT, MODEL_LEM,
+            MODEL_BABYO2N, MODEL_BP2T, MODEL_BP2W, MODEL_STATION, MODEL_POD2B, MODEL_PC_60NW, MODEL_POD_1W, MODEL_PC_60B,
+            MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2M, MODEL_BPM,MODEL_BP2A, MODEL_PC60FW, MODEL_PC80B, MODEL_FHR, MODEL_BPW1,
+            MODEL_F4_SCALE, MODEL_F5_SCALE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 
@@ -142,6 +142,32 @@ public class Bluetooth implements Parcelable {
 
         if (deviceName.contains(BT_NAME_PC60FW)) {
             return Bluetooth.MODEL_PC60FW;
+        } else if (FETAL_DEVICE_NAME.equals(deviceName)) {
+            return MODEL_FETAL;
+        } else if (BT_NAME_TV221U.equals(deviceName)) {
+            return MODEL_TV221U;
+        } else if (deviceName.contains(BT_NAME_PC100)) {
+            return MODEL_PC100;
+        } else if (BT_NAME_AOJ20A.equals(deviceName)) {
+            return MODEL_AOJ20A;
+        } else if (deviceName.contains(BT_NAME_VCOMIN)) {
+            return MODEL_VCOMIN;
+        } else if (deviceName.contains(BT_NAME_CHECK_POD)) {
+            return MODEL_CHECK_POD;
+        } else if (BT_NAME_BODY_FAT.equals(deviceName)) {
+            return MODEL_BODY_FAT;
+        } else if (deviceName.contains(BT_NAME_POD2B)) {
+            return MODEL_POD2B;
+        } else if (deviceName.contains(BT_NAME_PC_60NW)){
+            return MODEL_PC_60NW;
+        } else if (deviceName.contains(BT_NAME_POD_1W)) {
+            return MODEL_POD_1W;
+        } else if (deviceName.contains(BT_NAME_PC_60B)){
+            return MODEL_PC_60B;
+        } else if (deviceName.contains(BT_NAME_KCA)) {
+            return MODEL_KCA;
+        } else if (deviceName.contains(BT_NAME_PC80B)) {
+            return MODEL_PC80B;
         }
 
         if (deviceName.split(" ").length == 0)
@@ -163,41 +189,53 @@ public class Bluetooth implements Parcelable {
                 return MODEL_SLEEPU;
             case BT_NAME_ER1:
                 return MODEL_ER1;
+            case BT_NAME_ER1_N:
+                return MODEL_ER1_N;
             case BT_NAME_DUOEK:
                 return MODEL_DUOEK;
             case BT_NAME_DEVICES_ER2:
-                return MODEL_ER2;
+                return MODEL_ER2; // vihealth MODEL_DEVICE_ER2
             case BT_NAME_PULSEBIT_EX:
                 return MODEL_PULSEBITEX;
             case BT_NAME_OXY_LINK:
                 return MODEL_OXYLINK;
             case BT_NAME_KIDS_O2:
                 return MODEL_KIDSO2;
-            case FETAL_DEVICE_NAME:
-                return MODEL_FETAL;
+            case BT_NAME_BABY_O2:
+                return MODEL_BABYO2;
+            case BT_NAME_OXY_SMART:
+                return MODEL_OXYSMART;
+            case BT_NAME_OXYFIT:
+                return MODEL_OXYFIT;
             case BT_NAME_BP2:
                 return MODEL_BP2;
             case BT_NAME_BP2A:
                 return MODEL_BP2A;
+            case BT_NAME_BP2T:
+                return MODEL_BP2T;
+            case BT_NAME_BP2W:
+                return MODEL_BP2W;
             case BT_NAME_RINGO2:
                 return MODEL_RINGO2;
             case BT_NAME_O2M:
-                return MODEL_O2MAX;
+                return MODEL_O2M;
+            case BT_NAME_LEM:
+                return MODEL_LEM;
             case BT_NAME_BPM:
                 return MODEL_BPM;
+            case BT_NAME_FHR:
+                return MODEL_FHR; // vihealth MODEL_P600L
+            case BT_NAME_BABYO2N:
+                return MODEL_BABYO2N;
+            case BT_NAME_STATION:
+                return MODEL_STATION;
             case BT_NAME_BPW1:
                 return MODEL_BPW1;
-//            case BT_NAME_F4_SCALE:
-//                return MODEL_F4_SCALE;
+            case BT_NAME_F4_SCALE:
+                return MODEL_F4_SCALE;
 //            case BT_NAME_F5_SCALE:
 //                return MODEL_F5_SCALE;
             default:
-                if (deviceNamePrefix.startsWith(BT_NAME_KCA))
-                    return MODEL_KCA;
-                else if (deviceNamePrefix.startsWith(BT_NAME_PC80B))
-                    return MODEL_PC80B;
-                else if (deviceNamePrefix.startsWith(BT_NAME_FHR))
-                    return MODEL_FHR;
                 return MODEL_UNRECOGNIZED;
         }
     }
