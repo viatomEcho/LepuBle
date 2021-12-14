@@ -107,7 +107,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: OxyBleResponse.OxyResponse) {
         LepuBleLog.d(tag, "Response: $curCmd, ${response.content.toHex()}")
-        if (curCmd == 0) {
+        if (curCmd == -1) {
             return
         }
 
@@ -230,7 +230,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     }
 
     private fun clearTimeout() {
-        curCmd = 0
+        curCmd = -1
     }
 
     /**

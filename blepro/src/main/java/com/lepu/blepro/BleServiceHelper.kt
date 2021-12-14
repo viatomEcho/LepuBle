@@ -95,7 +95,14 @@ class BleServiceHelper private constructor() {
         return this
     }
 
-
+    /**
+     * 停止服务
+     */
+    fun stopService(application: Application) {
+        application.unbindService(bleConn)
+        BleService.stopService(application)
+        LepuBleLog.d("BleServiceHelper stopService")
+    }
 
     fun initRawFolder(folders: SparseArray<String>): BleServiceHelper{
         this.rawFolder = folders
