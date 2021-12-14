@@ -133,7 +133,7 @@ open class BleService: LifecycleService() {
             val notification = NotificationCompat.Builder(this, "foreground_service").build()
             startForeground(1, notification)
             // 开启后自动移除通知 偶发崩溃
-//            stopForeground(true)
+            stopForeground(true)
         }
     }
 
