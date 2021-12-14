@@ -118,6 +118,11 @@ open class BleService: LifecycleService() {
         startForeground()
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        startForeground()
+        return super.onStartCommand(intent, flags, startId)
+    }
+
     /**
      * android 8.0 startForegroundService后需要startForeground
      */
