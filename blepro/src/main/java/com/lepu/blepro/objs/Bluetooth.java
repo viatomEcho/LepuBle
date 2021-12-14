@@ -79,13 +79,12 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_OXYLINK = 10;
     public static final int MODEL_KIDSO2 = 11;
     public static final int MODEL_FETAL = 12;
-    public static final int MODEL_BP2 = 13;
+    public static final int MODEL_BP2 = 19;
     public static final int MODEL_RINGO2 = 14;
     public static final int MODEL_KCA = 15;
     public static final int MODEL_O2MAX = 16;
     public static final int MODEL_BPM = 17;
     public static final int MODEL_ER2 = 18;
-    public static final int MODEL_PC100 = 19;
     public static final int MODEL_BP2A = 20;
     public static final int MODEL_PC60FW = 21;
 
