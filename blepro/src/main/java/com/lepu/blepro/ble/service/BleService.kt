@@ -123,6 +123,11 @@ open class BleService: LifecycleService() {
 
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        startForeground()
+        return super.onStartCommand(intent, flags, startId)
+    }
+
     /**
      * android 8.0 startForegroundService后需要startForeground
      */
@@ -130,10 +135,15 @@ open class BleService: LifecycleService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel("foreground_service", "后台服务", NotificationManager.IMPORTANCE_NONE)
             channel.setShowBadge(false)
+            channel.setSound(null, null)
+            channel.enableVibration(false)
+            channel.enableLights(false)
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
-            val notification = NotificationCompat.Builder(this, "foreground_service").setContentTitle("").setContentText("").build()
+            val notification = NotificationCompat.Builder(this, "foreground_service").build()
             startForeground(1, notification)
+            // 开启后自动移除通知 偶发崩溃
+            stopForeground(true)
         }
     }
 
@@ -644,7 +654,9 @@ open class BleService: LifecycleService() {
                     context.startService(intent)
                 }
             }
-            observer?.onServiceCreate()
+            observer?.let {
+                it.onServiceCreate()
+            }
         }
 
         @JvmStatic
@@ -652,7 +664,9 @@ open class BleService: LifecycleService() {
             LepuBleLog.d("BleService", "stopService")
             val intent = Intent(context, BleService::class.java)
             context.stopService(intent)
-            observer?.onServiceDestroy()
+            observer?.let {
+                it.onServiceDestroy()
+            }
         }
 
     }

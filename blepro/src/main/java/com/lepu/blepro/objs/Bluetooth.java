@@ -85,13 +85,13 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_OXYLINK = 10;
     public static final int MODEL_KIDSO2 = 11;
     public static final int MODEL_FETAL = 12;
-    public static final int MODEL_BP2 = 13;
+    public static final int MODEL_BABYO2 = 13;
     public static final int MODEL_OXYSMART = 14;
     public static final int MODEL_TV221U = 15;
     public static final int MODEL_ER1_N = 16;
     public static final int MODEL_PC100 = 17;
     public static final int MODEL_AOJ20A = 18;
-    public static final int MODEL_BABYO2 = 19;
+    public static final int MODEL_BP2 = 19;
     public static final int MODEL_OXYFIT = 20;
     public static final int MODEL_VCOMIN = 21;
     public static final int MODEL_CHECK_POD = 22;
@@ -231,8 +231,8 @@ public class Bluetooth implements Parcelable {
                 return MODEL_STATION;
             case BT_NAME_BPW1:
                 return MODEL_BPW1;
-            case BT_NAME_F4_SCALE:
-                return MODEL_F4_SCALE;
+//            case BT_NAME_F4_SCALE:
+//                return MODEL_F4_SCALE;
 //            case BT_NAME_F5_SCALE:
 //                return MODEL_F5_SCALE;
             default:
