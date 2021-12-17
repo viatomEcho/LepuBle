@@ -96,4 +96,23 @@ public class Er2DeviceInfo {
     public byte[] getData() {
         return data;
     }
+
+    @Override
+    public String toString() {
+        return "Er2DeviceInfo{" +
+                "deviceName='" + deviceName + '\'' +
+                ", deviceMacAddress='" + deviceMacAddress + '\'' +
+                ", hwVersion='" + hwVersion + '\'' +
+                ", fwVersion='" + fwVersion + '\'' +
+                ", blVersion='" + blVersion + '\'' +
+                ", branchCode='" + branchCode + '\'' +
+                ", deviceType=" + deviceType +
+                ", protocolVersion='" + protocolVersion + '\'' +
+                ", currentTime=" + currentTime +
+                ", protocolDataMaxLen=" + protocolDataMaxLen +
+                ", snLength=" + snLength +
+                ", serialNum='" + serialNum + '\'' +
+                ", data=" + Arrays.toString(data) +
+                '}';
+    }
 }

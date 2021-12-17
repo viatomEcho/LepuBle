@@ -46,8 +46,18 @@ class LepuDevice constructor(var bytes: ByteArray) : Parcelable {
 
     override fun toString(): String {
         return """
-            $deviceType: $fwV => $curTime
-            $sn
+            LepuDevice :
+            hwV : $hwV
+            fwV : $fwV
+            btlV : $btlV
+            branchCode : $branchCode
+            fileV : $fileV
+            deviceType : $deviceType
+            protocolV : $protocolV
+            curTime : $curTime
+            protocolMaxLen : $protocolMaxLen
+            snLen : $snLen
+            sn : $sn
         """.trimIndent()
     }
 }

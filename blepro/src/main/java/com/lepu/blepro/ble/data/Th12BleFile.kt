@@ -4,7 +4,7 @@ import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.bytesToSignedShort
 import com.lepu.blepro.utils.toUInt
 
-class Th12BleFile(val fileName: String) {
+class Th12BleFile() {
 
     private val leadNameTable = arrayOf("NULL", "I", "II", "NULL", "NULL", "NULL", "NULL",
         "V1", "V2", "V3", "V4", "V5", "V6", "Pacer")
@@ -150,7 +150,7 @@ class Th12BleFile(val fileName: String) {
         return leadData
     }
 
-    fun getMitHeadData(): Array<String?> {
+    fun getMitHeadData(fileName: String): Array<String?> {
         val date = "$day/$month/$year"
         val time = "$hour:$minute:$second"
         var headData = arrayOfNulls<String>(leadNum+1)

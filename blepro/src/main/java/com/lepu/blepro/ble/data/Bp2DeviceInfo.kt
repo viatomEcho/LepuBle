@@ -56,17 +56,19 @@ class Bp2DeviceInfo {
         val dateStr = format.format(d)
 
         val string = """
-            Device Info:
-            hardware version: $hwV
-            firmware version: $fmV
-            bootloader version $btlV
-            branch code: $branchCode
-            device type: $deviceType
-            protocol version: $protocolV
-            current time: $dateStr
-            protocol max len: $protocolMaxLen
-            sn: $sn
-        """
+            Bp2DeviceInfo :
+            name : $name
+            hwV : $hwV
+            fmV : $fmV
+            btlV : $btlV
+            branchCode : $branchCode
+            deviceType : $deviceType
+            protocolV : $protocolV
+            curTime : $curTime
+            protocolMaxLen : $protocolMaxLen
+            snLen : $snLen
+            sn : $sn
+        """.trimIndent()
         return string
     }
 

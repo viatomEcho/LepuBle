@@ -60,7 +60,7 @@ object PC80BleResponse {
                 hardwareV: $hardwareV
                 algorithmV: $algorithmV
                 sn: $sn
-            """
+            """.trimIndent()
         }
     }
 

@@ -148,7 +148,27 @@ class OxyBleResponse{
         }
 
         override fun toString(): String {
-            return "OxyInfo(bytes=${bytes.contentToString()}, region='$region', model='$model', hwVersion='$hwVersion', swVersion='$swVersion', btlVersion='$btlVersion', pedTar=$pedTar, sn='$sn', curTime='$curTime', batteryState='$batteryState', oxiThr=$oxiThr, motor='$motor', mode='$mode', fileList='$fileList', oxiSwitch=$oxiSwitch, hrSwitch=$hrSwitch)"
+            return """
+                OxyInfo : 
+                region = $region
+                model = $model
+                hwVersion = $hwVersion
+                swVersion = $swVersion
+                btlVersion = $btlVersion
+                pedTar = $pedTar
+                sn = $sn
+                curTime = $curTime
+                batteryState = $batteryState
+                batteryValue = $batteryValue
+                oxiSwitch = $oxiSwitch
+                oxiThr = $oxiThr
+                motor = $motor
+                mode = $mode
+                fileList = $fileList
+                hrSwitch = $hrSwitch
+                hrLowThr = $hrLowThr
+                hrHighThr = $hrHighThr
+            """.trimIndent()
         }
 
     }

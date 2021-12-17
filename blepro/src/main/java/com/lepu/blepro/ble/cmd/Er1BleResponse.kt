@@ -179,7 +179,7 @@ object Er1BleResponse {
         }
 
         override fun toString(): String {
-            var str = "Er1FileList: "
+            var str = ""
             for (bs in fileList) {
                 str += String(bs)
                 str += ","

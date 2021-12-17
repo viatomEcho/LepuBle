@@ -29,7 +29,7 @@ class BpmDeviceInfo {
             mainVersion: $mainVersion
             secondVersion: $secondVersion
             lastDate: $dateStr
-        """
+        """.trimIndent()
     }
 
 }
