@@ -114,12 +114,12 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_POD_1W= 37;
     public static final int MODEL_PC_60B= 38;
 
-    public static final int MODEL_RINGO2 = 39;
-    public static final int MODEL_KCA = 40;
-    public static final int MODEL_PC80B = 41;
-    public static final int MODEL_BPW1 = 42;
-    public static final int MODEL_F4_SCALE = 43;
-    public static final int MODEL_F5_SCALE = 44;
+    public static final int MODEL_RINGO2 = 41;
+    public static final int MODEL_KCA = 42;
+    public static final int MODEL_PC80B = 43;
+    public static final int MODEL_BPW1 = 44;
+    public static final int MODEL_F4_SCALE = 45;
+    public static final int MODEL_F5_SCALE = 46;
 
 
     @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER1_N,

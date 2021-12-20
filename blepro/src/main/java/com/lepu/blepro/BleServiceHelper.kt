@@ -361,6 +361,16 @@ class BleServiceHelper private constructor() {
 
     }
 
+    /**
+     * 获取发送的指令字符串
+     */
+    fun getSendCmd(model: Int): String {
+        if (!checkService()) return ""
+        getInterface(model)?.let {
+            return it.getSendCmd()
+        }
+        return ""
+    }
 
     /**
      * 主动获取当前蓝牙连接状态

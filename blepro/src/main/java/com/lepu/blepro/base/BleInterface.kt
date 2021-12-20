@@ -13,6 +13,7 @@ import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
+import com.lepu.blepro.utils.bytesToHex
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -42,6 +43,8 @@ import kotlin.collections.ArrayList
 abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
     private val tag = "BleInterface"
+
+    private var sendCmdString = ""
 
     /**
      * 蓝牙连接状态
@@ -177,15 +180,11 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     }
 
     override fun onNotify(device: BluetoothDevice?, data: Data?) {
-        if (model == Bluetooth.MODEL_FHR) {
-            hasResponse(data?.value) // 胎心仪数据长度不一致，直接获取
-        } else {
-            data?.value?.apply {
-                pool = add(pool, this)
-            }
-            pool?.apply {
-                pool = hasResponse(pool)
-            }
+        data?.value?.apply {
+            pool = add(pool, this)
+        }
+        pool?.apply {
+            pool = hasResponse(pool)
         }
     }
 
@@ -358,10 +357,17 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             LepuBleLog.d(tag, "send cmd fail， state = false")
             return false
         }
-        manager.sendCmd( bs)
+        manager.sendCmd(bs)
+
+        sendCmdString = bytesToHex(bs)
 
         return true
     }
+
+    fun getSendCmd(): String {
+        return sendCmdString
+    }
+
     fun clearCmdTimeout() {
         curCmd = -1
         cmdTimeout?.cancel()

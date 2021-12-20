@@ -14,7 +14,7 @@ object FhrBleResponse {
         var content: ByteArray  // 内容
 
         init {
-            len = ((bytes[2].toInt() and 0x0F) shl 8) + ((bytes[3].toUInt() and 0xFFu).toInt())
+            len = ((bytes[2].toUInt() and 0x0Fu).toInt() shl 8) + ((bytes[3].toUInt() and 0xFFu).toInt())
             cmd = (bytes[4].toUInt() and 0xFFu).toInt()
             content = bytes.copyOfRange(5, bytes.size - 2)
         }
@@ -35,6 +35,16 @@ object FhrBleResponse {
             volume = (bytes[8].toUInt() and 0xFFu).toInt()
             strength = (bytes[9].toUInt() and 0xFFu).toInt()
             battery = (bytes[10].toUInt() and 0xFFu).toInt()
+        }
+
+        override fun toString(): String {
+            return """
+                deviceName : $deviceName
+                hr : $hr
+                volume : $volume
+                strength : $strength
+                battery : $battery
+            """
         }
     }
 

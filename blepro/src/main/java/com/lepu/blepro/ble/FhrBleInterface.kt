@@ -76,27 +76,6 @@ class FhrBleInterface(model: Int): BleInterface(model) {
     override fun hasResponse(bytes: ByteArray?): ByteArray? {
         val bytesLeft: ByteArray? = bytes
 
-        if (bytes == null) return bytes
-
-        if (bytes.size == 20) {
-            if (bytes[4] == 0x04.toByte()) {
-                val bleResponse = FhrBleResponse.FhrResponse(bytes)
-                onResponseReceived(bleResponse)
-            } else if (bytes[4] == 0x0A.toByte()) {
-                for (i in bytes.indices)
-                    tempBytes[i] = bytes[i]
-            }
-        } else if (bytes.size == 3) {
-            for (i in bytes.indices)
-                tempBytes[i+20] = bytes[i]
-            val bleResponse = FhrBleResponse.FhrResponse(tempBytes)
-            onResponseReceived(bleResponse)
-        }
-
-        return bytesLeft
-
-        /*val bytesLeft: ByteArray? = bytes
-
         if (bytes == null || bytes.size < 5) {
             return bytes
         }
@@ -107,26 +86,33 @@ class FhrBleInterface(model: Int): BleInterface(model) {
             }
 
             // need content length
-            val len = toUInt(bytes.copyOfRange(i+2, i+4))
+            var len = ((bytes[i+2].toUInt() and 0x0Fu).toInt() shl 8) + ((bytes[i+3].toUInt() and 0xFFu).toInt())  // 大端模式
+            if (len == 15) {
+                len += 1
+            }
+
             if (i+4+len > bytes.size) {
                 continue@loop
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i+4+len)
-            val crc16 = toUInt(bytes.copyOfRange(bytes.size - 2, bytes.size))
-            LepuBleLog.d(tag, "crc16 : ${crc16}")
-            LepuBleLog.d(tag, "CrcUtil.calCRC16(temp) : ${CrcUtil.calCRC16(temp)}")
-            if (crc16 == CrcUtil.calCRC16(temp)) {
+
+            // 16位校验有问题 暂时不进行校验
+//            val crc16 = toUInt(bytes.copyOfRange(bytes.size - 2, bytes.size))  // 小端模式
+//            val crc16 = ((bytes[bytes.size - 2].toUInt() and 0x0Fu).toInt() shl 8) + ((bytes[bytes.size - 1].toUInt() and 0xFFu).toInt())  // 大端模式
+//            LepuBleLog.d(tag, "crc16 : ${crc16}")
+//            LepuBleLog.d(tag, "CrcUtil.calCRC16(temp) : ${CrcUtil.calCRC16(temp)}")
+//            if (crc16 == CrcUtil.calCRC16(temp)) {
                 val bleResponse = FhrBleResponse.FhrResponse(temp)
                 onResponseReceived(bleResponse)
 
                 val tempBytes: ByteArray? = if (i+4+len == bytes.size) null else bytes.copyOfRange(i+4+len, bytes.size)
 
                 return hasResponse(tempBytes)
-            }
+//            }
         }
 
-        return bytesLeft*/
+        return bytesLeft
     }
 
     /**
