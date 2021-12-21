@@ -69,7 +69,7 @@ object Er1BleResponse {
                 recordTime: $recordTime
                 runStatus: $runStatus
                 leadOn: $leadOn
-            """
+            """.trimIndent()
         }
 
     }

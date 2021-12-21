@@ -34,6 +34,6 @@ public class KtBleBattery constructor(bytes: ByteArray) {
             state: $s
             percent: $percent
             voltage: $vol
-        """
+        """.trimIndent()
     }
 }

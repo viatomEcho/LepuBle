@@ -37,8 +37,11 @@ object Bpw1BleResponse {
 
         override fun toString(): String {
             val string = """
-            DeviceInfo battery: $battery timingSwitch: $timingSwitch fileListSize: $fileListSize
-            """
+            DeviceInfo 
+            battery: $battery 
+            timingSwitch: $timingSwitch 
+            fileListSize: $fileListSize
+            """.trimIndent()
             return string
         }
     }
@@ -65,9 +68,11 @@ object Bpw1BleResponse {
 
         override fun toString(): String {
             val string = """
-            MeasureTime serialNum: $serialNum totalNum: $totalNum
+            MeasureTime 
+            serialNum: $serialNum 
+            totalNum: $totalNum
             time: $startHH : $startMM -  $stopHH : $stopMM
-            """
+            """.trimIndent()
             return string
         }
     }
@@ -107,9 +112,13 @@ object Bpw1BleResponse {
 
         override fun toString(): String {
             val string = """
-            BpData date: $year $month $day $hour $minute 
-            sys: $sys dia: $dia pul: $pul fg: $fg 
-            """
+            BpData 
+            date: $year $month $day $hour $minute 
+            sys: $sys 
+            dia: $dia 
+            pul: $pul 
+            fg: $fg 
+            """.trimIndent()
             return string
         }
     }
@@ -165,9 +174,10 @@ object Bpw1BleResponse {
             for (file in fileList)
                 temp += "date: " + file?.year + " " + file?.month +  " "  + file?.day + " " + file?.hour +  " "  + file?.minute + " sys: " + file?.sys + " dia: " + file?.dia + " pul: " + file?.pul + " fg: " + file?.fg + "\n"
             val string = """
-            Bpw1FileList size: $listSize
+            Bpw1FileList 
+            size: $listSize
             $temp
-        """
+        """.trimIndent()
             return string
         }
     }

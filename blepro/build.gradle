@@ -66,6 +66,8 @@ dependencies {
     implementation 'io.github.jeremyliao:live-event-bus-x:1.8.0'
 
     implementation 'org.apache.commons:commons-lang3:3.8.1'
+
+    compileOnly files('libs/ICBodyFatAlgorithms.aar')
 }
 //apply from: 'bintray.gradle'
 apply from: 'upload_nexus.gradle'

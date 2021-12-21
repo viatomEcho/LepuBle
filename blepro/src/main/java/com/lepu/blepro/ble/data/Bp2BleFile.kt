@@ -21,7 +21,7 @@ class Bp2BleFile {
             file type: $type
             file size: $size
             device name: $deviceName
-        """
+        """.trimIndent()
         return string
     }
 }

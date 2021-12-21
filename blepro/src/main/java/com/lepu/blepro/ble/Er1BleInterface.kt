@@ -292,7 +292,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
     }
 
-    fun setVibrateConfig(switcher: Boolean, vector: Int, motionCount: Int,motionWindows: Int ){
+    fun setVibrateConfig(switcher: Boolean, vector: Int, motionCount: Int, motionWindows: Int){
         LepuBleLog.d(tag, "setVibrateConfig...")
         sendCmd(Er1BleCmd.setSwitcher(switcher, vector,motionCount, motionWindows))
 

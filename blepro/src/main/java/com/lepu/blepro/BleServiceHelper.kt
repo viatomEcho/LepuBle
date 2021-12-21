@@ -11,6 +11,7 @@ import android.util.SparseArray
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.*
+import com.lepu.blepro.ble.data.ICUserInfo
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
@@ -898,6 +899,7 @@ class BleServiceHelper private constructor() {
     }
 
     fun bp2SwitchState(model: Int, state: Int){
+        if (!checkService()) return
         getInterface(model)?.let {
             it as Bp2BleInterface
             it.switchState(state)
@@ -906,6 +908,7 @@ class BleServiceHelper private constructor() {
     }
 
     fun oxyGetPpgRt(model: Int){
+        if (!checkService()) return
         getInterface(model)?.let {
             it as OxyBleInterface
             it.getPpgRT()
@@ -916,6 +919,7 @@ class BleServiceHelper private constructor() {
      * PC80B心跳包 电量查询
      */
     fun sendHeartbeat(model: Int) {
+        if (!checkService()) return
         getInterface(model)?.let { it1 ->
             (it1 as PC80BleInterface).let {
                 LepuBleLog.d(tag, "it as PC80BleInterface--sendHeartbeat")
@@ -929,6 +933,7 @@ class BleServiceHelper private constructor() {
      * @param measureTime Array<String?> 字符串格式："startHH,startMM,stopHH,stopMM,interval,serialNum,totalNum"
      */
     fun setMeasureTime(model: Int, measureTime: Array<String?>) {
+        if (!checkService()) return
         getInterface(model)?.let { it1 ->
             (it1 as Bpw1BleInterface).let {
                 LepuBleLog.d(tag, "it as Bpw1BleInterface--setMeasureTime")
@@ -941,6 +946,7 @@ class BleServiceHelper private constructor() {
      * Bpw1获取定时测量血压时间
      */
     fun getMeasureTime(model: Int) {
+        if (!checkService()) return
         getInterface(model)?.let { it1 ->
             (it1 as Bpw1BleInterface).let {
                 LepuBleLog.d(tag, "it as Bpw1BleInterface--getMeasureTime")
@@ -953,11 +959,54 @@ class BleServiceHelper private constructor() {
      * Bpw1设置定时测量开关
      */
     fun setTimingSwitch(model: Int, timingSwitch: Boolean) {
+        if (!checkService()) return
         getInterface(model)?.let { it1 ->
             (it1 as Bpw1BleInterface).let {
                 LepuBleLog.d(tag, "it as Bpw1BleInterface--setTimingSwitch")
                 it.setTimingSwitch(timingSwitch)
             }
+        }
+    }
+
+    /**
+     * F4,F5体脂秤
+     */
+    fun setUserInfo(model: Int, userInfo: ICUserInfo) {
+        if (!checkService()) return
+
+        when(model){
+            Bluetooth.MODEL_F4_SCALE -> {
+                getInterface(model)?.let {
+                    it as F4ScaleBleInterface
+                    it.setUserInfo(userInfo)
+                }
+            }
+            Bluetooth.MODEL_F5_SCALE -> {
+                getInterface(model)?.let {
+                    it as F5ScaleBleInterface
+                    it.setUserInfo(userInfo)
+                }
+            }
+            else -> LepuBleLog.e(tag, "model error")
+        }
+    }
+    fun setUserList(model: Int, userList: List<ICUserInfo>) {
+        if (!checkService()) return
+
+        when(model){
+            Bluetooth.MODEL_F4_SCALE -> {
+                getInterface(model)?.let {
+                    it as F4ScaleBleInterface
+                    it.setUserList(userList)
+                }
+            }
+            Bluetooth.MODEL_F5_SCALE -> {
+                getInterface(model)?.let {
+                    it as F5ScaleBleInterface
+                    it.setUserList(userList)
+                }
+            }
+            else -> LepuBleLog.e(tag, "model error")
         }
     }
 

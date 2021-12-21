@@ -44,7 +44,7 @@ object FhrBleResponse {
                 volume : $volume
                 strength : $strength
                 battery : $battery
-            """
+            """.trimIndent()
         }
     }
 

@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
+import com.lepu.blepro.ble.data.ICUserInfo
 import com.lepu.blepro.utils.*
 
 /**
@@ -15,6 +16,7 @@ class F4ScaleBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "F4ScaleBleInterface"
 
     private lateinit var context: Context
+    private var userInfo = ICUserInfo()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
@@ -52,28 +54,30 @@ class F4ScaleBleInterface(model: Int): BleInterface(model) {
         when(response.cmd) {
             F4ScaleBleCmd.A0 -> {
                 LepuBleLog.d(tag, "model:$model,A0 => success")
-//                var info = F5ScaleBleResponse.WeightData(response.content)
-//                LepuBleLog.d(tag, "model:$model,A0 => info.toString() == " + info.toString())
+                sendCmd(F4ScaleBleCmd.responsePackage(response.packageNo))
             }
             F4ScaleBleCmd.A1 -> {
                 LepuBleLog.d(tag, "model:$model,A1 => success")
-//                var info = F5ScaleBleResponse.ImpedanceData(response.content)
-//                LepuBleLog.d(tag, "model:$model,WEIGHT_DATA => info.toString() == " + info.toString())
+                sendCmd(F4ScaleBleCmd.responsePackage(response.packageNo))
+                var info = F4ScaleBleResponse.BasicData(response.content)
+                LepuBleLog.d(tag, "model:$model,BasicData => info.toString() == $info")
             }
             F4ScaleBleCmd.A2 -> {
                 LepuBleLog.d(tag, "model:$model,A2 => success")
-                var info = F4ScaleBleResponse.WeightData(response.content)
-                LepuBleLog.d(tag, "model:$model,WEIGHT_DATA => info.toString() == " + info.toString())
+                var info = F4ScaleBleResponse.StableData(response.content)
+                LepuBleLog.d(tag, "model:$model,StableData => info.toString() == $info")
             }
             F4ScaleBleCmd.A3 -> {
                 LepuBleLog.d(tag, "model:$model,A3 => success")
-//                var info = F5ScaleBleResponse.HrData(response.content)
-//                LepuBleLog.d(tag, "model:$model,WEIGHT_DATA => info.toString() == " + info.toString())
+                sendCmd(F4ScaleBleCmd.responsePackage(response.packageNo))
+                var info = F4ScaleBleResponse.WeightData(response.content)
+                LepuBleLog.d(tag, "model:$model,WEIGHT_DATA => info.toString() == $info")
             }
             F4ScaleBleCmd.A4 -> {
                 LepuBleLog.d(tag, "model:$model,A4 => success")
-//                var info = F5ScaleBleResponse.HistoryData(response.content)
-//                LepuBleLog.d(tag, "model:$model,WEIGHT_DATA => info.toString() == " + info.toString())
+                sendCmd(F4ScaleBleCmd.responsePackage(response.packageNo))
+                var info = F4ScaleBleResponse.HistoryData(response.content)
+                LepuBleLog.d(tag, "model:$model,HistoryData => info.toString() == $info")
             }
         }
 
@@ -86,7 +90,7 @@ class F4ScaleBleInterface(model: Int): BleInterface(model) {
         if (bytes == null || bytes.size < 4) {
             return bytes
         }
-//        LepuBleLog.d(tag, "Device Init  " + bytesToHex(bytes))
+        LepuBleLog.d(tag, "Device Init  " + bytesToHex(bytes))
 
         loop@ for (i in 0 until bytes.size-3) {
 
@@ -119,7 +123,8 @@ class F4ScaleBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun syncTime() {
-
+        sendCmd(F4ScaleBleCmd.updateUserInfo(userInfo.userIndex, userInfo.height, (userInfo.weight*100).toInt(), userInfo.age, userInfo.sex.value))
+        LepuBleLog.d(tag, "----------syncTime------------")
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
@@ -134,6 +139,13 @@ class F4ScaleBleInterface(model: Int): BleInterface(model) {
      * get file list
      */
     override fun getFileList() {
+    }
+
+    fun setUserInfo(userInfo: ICUserInfo) {
+        this.userInfo = userInfo
+    }
+    fun setUserList(userList: List<ICUserInfo>) {
+        sendCmd(F4ScaleBleCmd.setUserList(userList))
     }
 
 }

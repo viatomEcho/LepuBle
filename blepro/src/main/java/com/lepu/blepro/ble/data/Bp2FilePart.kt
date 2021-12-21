@@ -18,9 +18,10 @@ class Bp2FilePart {
         val string = """
             
             download file: $name
-            total: $fileSize; current: $curSize
+            total: $fileSize; 
+            current: $curSize
             percent: $percent
-        """
+        """.trimIndent()
         return string
     }
 }

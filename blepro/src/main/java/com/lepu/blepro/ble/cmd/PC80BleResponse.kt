@@ -151,7 +151,7 @@ object PC80BleResponse {
                 stage: $stage
                 leadOff: $leadOff
                 dataType: $dataType
-            """
+            """.trimIndent()
         }
     }
     @Parcelize
