@@ -639,6 +639,14 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
+            Bluetooth.MODEL_PC100 ->{
+                getInterface(model)?.let { it1 ->
+                    (it1 as Pc100BleInterface).let {
+                        LepuBleLog.d(tag, "it as Pc100BleInterface--startBp")
+                        it.startBp()
+                    }
+                }
+            }
             else -> LepuBleLog.e(tag, "startBp model error  ")
         }
 
@@ -662,6 +670,14 @@ class BleServiceHelper private constructor() {
                 getInterface(model)?.let { it1 ->
                     (it1 as Bpw1BleInterface).let {
                         LepuBleLog.d(tag, "it as Bpw1BleInterface--stopBp")
+                        it.stopBp()
+                    }
+                }
+            }
+            Bluetooth.MODEL_PC100 ->{
+                getInterface(model)?.let { it1 ->
+                    (it1 as Pc100BleInterface).let {
+                        LepuBleLog.d(tag, "it as Pc100BleInterface--startBp")
                         it.stopBp()
                     }
                 }
@@ -976,15 +992,19 @@ class BleServiceHelper private constructor() {
 
         when(model){
             Bluetooth.MODEL_F4_SCALE -> {
-                getInterface(model)?.let {
-                    it as F4ScaleBleInterface
-                    it.setUserInfo(userInfo)
+                getInterface(model)?.let { it1 ->
+                    (it1 as F4ScaleBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bpw1BleInterface--setTimingSwitch")
+                        it.setUserInfo(userInfo)
+                    }
                 }
             }
             Bluetooth.MODEL_F5_SCALE -> {
-                getInterface(model)?.let {
-                    it as F5ScaleBleInterface
-                    it.setUserInfo(userInfo)
+                getInterface(model)?.let { it1 ->
+                    (it1 as F5ScaleBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bpw1BleInterface--setTimingSwitch")
+                        it.setUserInfo(userInfo)
+                    }
                 }
             }
             else -> LepuBleLog.e(tag, "model error")
@@ -1007,6 +1027,33 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.e(tag, "model error")
+        }
+    }
+
+    fun getBpState(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_PC100 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Pc100BleInterface).let {
+                        LepuBleLog.d(tag, "it as PC80BleInterface--sendHeartbeat")
+                        it.getBpState()
+                    }
+                }
+            }
+        }
+    }
+    fun getBoState(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_PC100 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Pc100BleInterface).let {
+                        LepuBleLog.d(tag, "it as PC80BleInterface--sendHeartbeat")
+                        it.getBoState()
+                    }
+                }
+            }
         }
     }
 

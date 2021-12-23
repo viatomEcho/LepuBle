@@ -1,6 +1,6 @@
 package com.lepu.blepro.ble.data
 
-data class BpmCmd(val byteArray: ByteArray)  {
+data class BpmCmd(val byteArray: ByteArray) {
 
     val length = byteArray[3].toInt()
     val type = byteArray[4]

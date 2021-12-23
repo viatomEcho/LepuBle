@@ -114,7 +114,7 @@ class BpmBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_RECORDS => success")
 
                BpmCmd(bytes).let {
-                   LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordData).post(InterfaceEvent(model, it ))
+                   LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordData).post(InterfaceEvent(model, it))
 
                    if (it.type == 0xB3.toByte()) {
                        if (bytes[11] == 0x00.toByte()) {
@@ -125,7 +125,7 @@ class BpmBleInterface(model: Int): BleInterface(model) {
                        }
                        if (isUserAEnd && isUserBEnd) {
                            //AB都读取完成
-                           LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordEnd).post(InterfaceEvent(model, true ))
+                           LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordEnd).post(InterfaceEvent(model, true))
                        }
                    }
                }
@@ -133,11 +133,11 @@ class BpmBleInterface(model: Int): BleInterface(model) {
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_GET_RESULT -> {
                 // 返回测量数据
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmMeasureResult).post(InterfaceEvent(model, BpmCmd(bytes) ))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmMeasureResult).post(InterfaceEvent(model, BpmCmd(bytes)))
             }
             else -> {
                 //实时指标
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRtData).post(InterfaceEvent(model, BpmCmd(bytes) ))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRtData).post(InterfaceEvent(model, BpmCmd(bytes)))
 
             }
         }
@@ -147,12 +147,12 @@ class BpmBleInterface(model: Int): BleInterface(model) {
 
     override fun getInfo() {
         LepuBleLog.d(tag, "getInfo...")
-        sendCmd( BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_INFO))
+        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_INFO))
     }
 
     override fun syncTime() {
         LepuBleLog.d(tag, "syncTime...")
-        sendCmd( BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_SET_TIME))
+        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_SET_TIME))
     }
 
     override fun updateSetting(type: String, value: Any) {
@@ -165,13 +165,14 @@ class BpmBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getFileList() {
+        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_RECORDS))
     }
 
-    fun getBpmFileList( map: HashMap<String, Any>){
+    fun getBpmFileList(map: HashMap<String, Any>){
         isUserAEnd = false
         isUserBEnd = false
         LepuBleLog.d(tag, "getBpmFileList...")
-       sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_RECORDS, map))
+        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_RECORDS, map))
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
