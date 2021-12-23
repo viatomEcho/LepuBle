@@ -13,10 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.cmd.PC80BleResponse
-import com.lepu.blepro.ble.data.Bp2DeviceInfo
-import com.lepu.blepro.ble.data.BpmDeviceInfo
-import com.lepu.blepro.ble.data.Er2DeviceInfo
-import com.lepu.blepro.ble.data.LepuDevice
+import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.O2RING_MODEL
@@ -92,6 +89,9 @@ class MainViewModel: ViewModel() {
 
     val _oxyInfo = MutableLiveData<OxyBleResponse.OxyInfo>()
     val oxyInfo: LiveData<OxyBleResponse.OxyInfo> = _oxyInfo
+
+    val _pc100Info = MutableLiveData<Pc100DeviceInfo>()
+    val pc100Info: LiveData<Pc100DeviceInfo> = _pc100Info
 
     val _oxyPrAlarmFlag = MutableLiveData<Boolean>().apply { value = false }
     val oxyPrAlarmFlag: LiveData<Boolean> = _oxyPrAlarmFlag

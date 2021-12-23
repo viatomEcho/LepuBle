@@ -16,8 +16,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:text="扫描"
-            />
+            android:text="扫描"/>
 
         <Button
             android:id="@+id/disconnect"
@@ -27,8 +26,45 @@
             app:layout_constraintBottom_toBottomOf="@id/scan"
             app:layout_constraintStart_toEndOf="@id/scan"
             android:layout_marginStart="20dp"
-            android:text="断开"
-            />
+            android:text="断开"/>
+
+        <Button
+            android:id="@+id/reconnectByName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/scan"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="名称重连"/>
+
+        <Button
+            android:id="@+id/reconnectByAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/reconnectByName"
+            app:layout_constraintBottom_toBottomOf="@id/reconnectByName"
+            app:layout_constraintStart_toEndOf="@id/reconnectByName"
+            android:layout_marginStart="20dp"
+            android:text="地址重连"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ble_split"
+            android:hint="筛选设备"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/reconnectByName"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="200dp"
+            android:textSize="20sp"/>
+        <Button
+            android:id="@+id/ble_split_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/ble_split"
+            app:layout_constraintBottom_toBottomOf="@id/ble_split"
+            app:layout_constraintStart_toEndOf="@id/ble_split"
+            android:layout_marginStart="20dp"
+            android:text="确定"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -36,7 +72,7 @@
             android:id="@+id/ble_device"
             android:text="蓝牙设备"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/scan"
+            app:layout_constraintTop_toBottomOf="@id/ble_split"
             android:layout_marginTop="20dp"
             android:textSize="20sp"/>
 
@@ -58,9 +94,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ble_state"
             android:layout_marginTop="20dp"
-            android:textSize="20sp"
-
-            />
+            android:textSize="20sp"/>
         <TextView
             android:layout_width="80dp"
             android:layout_height="wrap_content"
@@ -71,8 +105,7 @@
             app:layout_constraintTop_toTopOf="@id/duration_tag"
             android:layout_marginStart="10dp"
             android:inputType="number"
-            android:imeOptions="actionDone"
-            />
+            android:imeOptions="actionDone"/>
 
 
         <androidx.recyclerview.widget.RecyclerView
@@ -82,9 +115,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/duration_tag"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginTop="20dp"
-
-            >
+            android:layout_marginTop="20dp">
 
         </androidx.recyclerview.widget.RecyclerView>
 

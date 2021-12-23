@@ -8,6 +8,7 @@ import android.util.Log
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
+import com.lepu.blepro.ble.data.ICUserInfo
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.demo.BuildConfig
@@ -94,6 +95,10 @@ class LpBleUtil {
                     application,
                     BleSO.getInstance(application)
                 ) //必须在initModelConfig initRawFolder之后调用
+        }
+
+        fun stopService(application: Application) {
+            BleServiceHelper.stopService(application)
         }
 
         fun clearInterface(){
@@ -236,6 +241,10 @@ class LpBleUtil {
          */
         fun getBleState(model: Int): Int {
             return BleServiceHelper.getConnectState(model)
+        }
+
+        fun getSendCmd(model: Int): String {
+            return BleServiceHelper.getSendCmd(model)
         }
 
         /**
@@ -397,10 +406,31 @@ class LpBleUtil {
            return getInterface(model)?.isAutoReconnect ?: false
         }
 
+        fun setEr1Vibrate(model: Int, switcher: Boolean, threshold1: Int, threshold2: Int){
+            BleServiceHelper.setEr1Vibrate(model, switcher, threshold1, threshold2)
+        }
+        fun setDuoekVibrate(model: Int,switcher: Boolean, vector: Int, motionCount: Int,motionWindows: Int ){
+            BleServiceHelper.setEr1Vibrate(model, switcher, vector, motionCount, motionWindows)
+        }
+        fun getEr1VibrateConfig(model: Int) {
+            BleServiceHelper.getEr1VibrateConfig(model)
+        }
 
+        fun setEr2SwitcherState(model: Int, hrFlag: Boolean){
+            BleServiceHelper.setEr2SwitcherState(model, hrFlag)
+        }
+        fun getEr2SwitcherState(model: Int){
+            BleServiceHelper.getEr2SwitcherState(model)
+        }
+
+        fun bp2SetConfig(model: Int, switchState: Boolean){
+            BleServiceHelper.bp2SetConfig(model, switchState)
+        }
+        fun bp2GetConfig(model: Int){
+            BleServiceHelper.bp2GetConfig(model)
+        }
         fun bp2SwitchState(model: Int, state: Int){
            BleServiceHelper.bp2SwitchState(model, state)
-
         }
 
         fun oxyGetPpgRt(model: Int){
@@ -459,6 +489,50 @@ class LpBleUtil {
                 BleServiceHelper.setTimingSwitch(model, timingSwitch)
             }
         }
+
+        fun setUserInfo(model: Int, userInfo: ICUserInfo) {
+            Log.d(TAG, "setUserInfo")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.setUserInfo(model, userInfo)
+            }
+        }
+
+        fun setUserList(model: Int, userList: List<ICUserInfo>) {
+            Log.d(TAG, "setUserInfo")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.setUserList(model, userList)
+            }
+        }
+
+        fun getBpState(model: Int) {
+            Log.d(TAG, "getBpState")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.getBpState(model)
+            }
+        }
+        fun getBoState(model: Int) {
+            Log.d(TAG, "getBoState")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.getBoState(model)
+            }
+        }
+
 
     }
 

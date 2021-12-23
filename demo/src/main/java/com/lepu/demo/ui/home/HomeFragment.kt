@@ -58,21 +58,22 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     showDialog(activity)
                 }
             }
+        }
 
-
-
+        binding.bleSplitBtn.setOnClickListener {
+            splitDevices(binding.bleSplit.text.toString())
         }
 
         binding.scan.setOnClickListener {
             mainViewModel._scanning.value = true
             binding.rcv.visibility = View.VISIBLE
-
         }
 
         binding.disconnect.setOnClickListener{
             LpBleUtil.disconnect(false)
         }
-
+        binding.reconnectByName.setOnClickListener {
+        }
 
         LinearLayoutManager(context).apply {
             this.orientation = LinearLayoutManager.VERTICAL
@@ -113,23 +114,36 @@ class HomeFragment : Fragment(R.layout.fragment_home){
 
     }
 
+    var splitDevice: ArrayList<Bluetooth> = arrayListOf()
 
+    private fun splitDevices(name: String) {
+        splitDevice.clear()
+        for (b in BluetoothController.getDevices()) {
+            if (b.name.contains(name, true)) {
+                splitDevice.add(b)
+            }
+        }
+
+        adapter.setNewInstance(splitDevice)
+        adapter.notifyDataSetChanged()
+
+    }
 
 
     private fun initEvent(){
         //扫描通知
         LiveEventBus.get<Bluetooth>(EventMsgConst.Discovery.EventDeviceFound)
             .observe(this,  {
-                adapter.setNewInstance(BluetoothController.getDevices())
-                adapter.notifyDataSetChanged()
-
+//                adapter.setNewInstance(BluetoothController.getDevices())
+//                adapter.notifyDataSetChanged()
+                splitDevices(binding.bleSplit.text.toString())
             })
 
 
 
     }
 
-    private fun showDialog(activity: Activity, ){
+    private fun showDialog(activity: Activity){
 
         CollectUtil.getInstance(activity.applicationContext).let { collectUtil ->
 

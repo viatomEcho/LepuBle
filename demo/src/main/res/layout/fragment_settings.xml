@@ -4,128 +4,226 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.settings.SettingsFragment">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorGrayBg"
-        android:padding="5dp"
-        android:orientation="vertical">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_margin="@dimen/dp_10"
-            android:text="私有方法测试"/>
-
+        android:layout_height="match_parent">
         <LinearLayout
-            android:id="@+id/er1_duoek_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/colorGrayBg"
+            android:padding="5dp"
             android:orientation="vertical">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="er1/duoek"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <Button
-                    android:id="@+id/er1_get_config"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Get Config"/>
+                android:gravity="center"
+                android:layout_margin="@dimen/dp_10"
+                android:text="私有方法测试"/>
 
-                <Button
-                    android:id="@+id/er1_set_config"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Set Config"
-                    android:layout_marginStart="20dp"/>
-            </LinearLayout>
             <LinearLayout
-                android:id="@+id/er2_layout"
+                android:id="@+id/er1_duoek_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="er2"/>
+                    android:text="er1/duoek"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <Button
-                        android:id="@+id/er2_get_config"
+                        android:id="@+id/er1_set_config"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Get Config"/>
+                        android:text="设置参数er1"/>
 
                     <Button
-                        android:id="@+id/er2_set_config"
+                        android:id="@+id/duoek_set_config"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Set Config"
+                        android:text="设置参数duoek"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/bp2_bp2a_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <TextView
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/er1_get_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取配置"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/er2_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="bp2/bp2A"/>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <Button
-                        android:id="@+id/bp2_get_config"
-                        android:layout_width="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Get Config"/>
+                        android:text="er2"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <Button
+                            android:id="@+id/er2_get_config"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="获取配置"/>
 
-                    <Button
-                        android:id="@+id/bp2_set_config"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Set Config"
-                        android:layout_marginStart="20dp"/>
+                        <Button
+                            android:id="@+id/er2_set_config"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="心跳音"
+                            android:layout_marginStart="20dp"/>
+                    </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/bpm_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <TextView
+                <LinearLayout
+                    android:id="@+id/bp2_bp2a_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="bpm"/>
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="bp2/bp2A"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <Button
+                            android:id="@+id/bp2_set_state"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="设备状态"/>
+                        <Button
+                            android:id="@+id/bp2_get_config"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="获取配置"
+                            android:layout_marginStart="20dp"/>
+                        <Button
+                            android:id="@+id/bp2_set_config"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="心跳音"
+                            android:layout_marginStart="20dp"/>
+                    </LinearLayout>
+                </LinearLayout>
                 <LinearLayout
+                    android:id="@+id/o2_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <Button
-                        android:id="@+id/bpm_get_config"
-                        android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Get Config"/>
+                        android:text="o2"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <Button
+                            android:id="@+id/o2_get_config"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Get Config"/>
 
-                    <Button
-                        android:id="@+id/bpm_set_config"
-                        android:layout_width="wrap_content"
+                        <Button
+                            android:id="@+id/o2_set_config"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Set Config"
+                            android:layout_marginStart="20dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/pc60fw_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Set Config"
-                        android:layout_marginStart="20dp"/>
+                        android:text="pc60fw"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <Button
+                            android:id="@+id/pc60fw_get_config"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Get Config"/>
+
+                        <Button
+                            android:id="@+id/pc60fw_set_config"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Set Config"
+                            android:layout_marginStart="20dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/scale_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="scale"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <Button
+                            android:id="@+id/scale_user_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="当前用户"/>
+
+                        <Button
+                            android:id="@+id/scale_user_list"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="用户列表"
+                            android:layout_marginStart="20dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/pc100_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="pc100"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <Button
+                            android:id="@+id/pc100_bp_state"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="血压状态"/>
+                        <Button
+                            android:id="@+id/pc100_bo_state"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="血氧状态"
+                            android:layout_marginStart="20dp"/>
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/send_cmd"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/content"/>
         </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/content"/>
-    </LinearLayout>
-
+    </androidx.core.widget.NestedScrollView>
 </layout>

@@ -38,6 +38,12 @@
                     android:layout_marginStart="20dp"/>
 
             </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_margin="@dimen/dp_10"
+                android:text="读文件"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -59,6 +65,12 @@
                     android:text="Continute"
                     android:layout_marginStart="20dp"/>
             </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_margin="@dimen/dp_10"
+                android:text="设置"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -91,9 +103,25 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/send_cmd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10"
+                android:textSize="20sp"/>
+
+            <TextView
                 android:id="@+id/info"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/process"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10"
+                android:textSize="20sp"/>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

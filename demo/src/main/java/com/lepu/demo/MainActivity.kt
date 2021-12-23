@@ -181,8 +181,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             })
 
         //-------------------------o2ring---------------------------
-
-
         // o2ring 同步时间
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxySyncDeviceInfo)
             .observe(this, {
@@ -197,10 +195,14 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             }
         })
 
-        //-------------------------o2ring---------------------------
-
-
-
+        //-------------------------pc100---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100DeviceInfo)
+            .observe(this, { event ->
+                (event.data as Pc100DeviceInfo).let {
+                    Toast.makeText(this, "pc100 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._pc100Info.value = it
+                }
+            })
 
     }
     private fun needPermission(){
