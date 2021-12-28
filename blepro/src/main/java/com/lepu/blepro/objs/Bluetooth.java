@@ -70,6 +70,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_BPW1 = "BPW1"; // 金亿帝血压手表
     public static final String BT_NAME_F4_SCALE = "MY_SCALE"; // F4体脂秤
     public static final String BT_NAME_F5_SCALE = "MY_SCALE"; // F5体脂秤
+    public static final String BT_NAME_WATCH_4G = "Le-W3"; // 4g手表
 
 
     public static final int MODEL_UNRECOGNIZED = 0;
@@ -120,6 +121,7 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_BPW1 = 44;
     public static final int MODEL_F4_SCALE = 45;
     public static final int MODEL_F5_SCALE = 46;
+    public static final int MODEL_WATCH_4G = 47;
 
 
     @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER1_N,
@@ -127,7 +129,7 @@ public class Bluetooth implements Parcelable {
             MODEL_TV221U, MODEL_PC100, MODEL_AOJ20A, MODEL_OXYFIT, MODEL_VCOMIN, MODEL_CHECK_POD, MODEL_BODY_FAT, MODEL_LEM,
             MODEL_BABYO2N, MODEL_BP2T, MODEL_BP2W, MODEL_STATION, MODEL_POD2B, MODEL_PC_60NW, MODEL_POD_1W, MODEL_PC_60B,
             MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2M, MODEL_BPM,MODEL_BP2A, MODEL_PC60FW, MODEL_PC80B, MODEL_FHR, MODEL_BPW1,
-            MODEL_F4_SCALE, MODEL_F5_SCALE})
+            MODEL_F4_SCALE, MODEL_F5_SCALE, MODEL_WATCH_4G})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 
@@ -168,6 +170,8 @@ public class Bluetooth implements Parcelable {
             return MODEL_KCA;
         } else if (deviceName.contains(BT_NAME_PC80B)) {
             return MODEL_PC80B;
+        } else if (deviceName.contains(BT_NAME_WATCH_4G)) {
+            return MODEL_WATCH_4G;
         }
 
         if (deviceName.split(" ").length == 0)

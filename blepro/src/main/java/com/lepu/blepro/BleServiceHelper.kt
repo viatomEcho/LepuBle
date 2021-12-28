@@ -723,6 +723,30 @@ class BleServiceHelper private constructor() {
         return getInterface(model)?.isRtStop ?: true
     }
 
+    fun boundDevice(model: Int) {
+        if (!checkService()) return
+        when(model){
+            Bluetooth.MODEL_WATCH_4G -> {
+                getInterface(model)?.let {
+                    if (it is Watch4gBleInterface) it.boundDevice()
+                }
+            }
+            else -> {
+                LepuBleLog.d(tag, "error: boundDevice model=$model, 不匹配")
+            }
+        }
+    }
+    fun setBleMtu(model: Int, mtu: Int){
+        if (!checkService()) return
+        getInterface(model)?.setBleMtu(mtu)
+    }
+    fun getBleMtu(model: Int): Int{
+        var mtu = 0
+        if (!checkService()) return mtu
+        mtu = getInterface(model)?.getBleMtu()!!
+        return mtu
+    }
+
     /**
      * er2 设置hr开关状态
      * @param model Int

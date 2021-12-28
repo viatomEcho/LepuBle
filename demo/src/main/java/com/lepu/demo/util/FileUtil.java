@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
-import com.lepu.blepro.ble.data.Th12BleFileSmall;
 import com.lepu.blepro.ble.data.Th12BleFile;
 import com.lepu.blepro.utils.LepuBleLog;
 
@@ -162,7 +161,7 @@ public class FileUtil {
         }
     }
 
-    public static void readFileAll(Context context) {
+    /*public static void readFileAll(Context context) {
         File file = new File(context.getExternalFilesDir(null).getAbsolutePath() + "/th12/");
         file = new File(file, "HolterECGData_1.dat");
         File file2 = new File(context.getExternalFilesDir(null).getAbsolutePath() + "/th12/");
@@ -187,10 +186,10 @@ public class FileUtil {
             e.printStackTrace();
         }
 
-    }
+    }*/
 
     public static void readFile(Context context) {
-        Th12BleFile th12BleFile = new Th12BleFile("HolterECGData");
+        Th12BleFile th12BleFile = new Th12BleFile();
 
         File file = new File(context.getExternalFilesDir(null).getAbsolutePath() + "/th12/");
         file = new File(file, "HolterECGData_1.dat");
@@ -227,10 +226,10 @@ public class FileUtil {
                 if (index == total)
                     break;
             }
-            Log.d("test12345", "th12BleFile.getFileName() == " + th12BleFile.getFileName());
+            Log.d("test12345", "th12BleFile.getFileCreateTime() == " + th12BleFile.getFileCreateTime());
             Log.d("test12345", "th12BleFile.getEcgTime() == " + th12BleFile.getEcgTime());
 
-            String[] strings = th12BleFile.getMitHeadData();
+            String[] strings = th12BleFile.getMitHeadData(th12BleFile.getFileCreateTime());
             for (int i=0; i<strings.length; i++) {
                 Log.d("test12345", "------------strings[i] == " + strings[i]);
             }

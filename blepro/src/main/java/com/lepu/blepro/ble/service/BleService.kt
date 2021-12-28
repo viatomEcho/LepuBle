@@ -109,8 +109,7 @@ open class BleService: LifecycleService() {
      */
     var isScanUnRegister: Boolean = false
 
-
-
+    var support2MPhy: Boolean = false
 
 
 
@@ -173,6 +172,10 @@ open class BleService: LifecycleService() {
         bluetoothAdapter = bluetoothManager.adapter
         leScanner = bluetoothAdapter?.bluetoothLeScanner
         LepuBleLog.d(tag, "initBle success")
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            support2MPhy = bluetoothAdapter!!.isLe2MPhySupported
+        }
     }
 
     /**
@@ -278,6 +281,15 @@ open class BleService: LifecycleService() {
             }
             Bluetooth.MODEL_PC100 -> {
                 Pc100BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+
+            Bluetooth.MODEL_WATCH_4G -> {
+                Watch4gBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
                     vailFace.put(m, this)
