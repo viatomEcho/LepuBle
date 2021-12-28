@@ -247,6 +247,13 @@ class LpBleUtil {
             return BleServiceHelper.getSendCmd(model)
         }
 
+        fun getBleMtu(model: Int): Int {
+            return BleServiceHelper.getBleMtu(model)
+        }
+        fun setBleMtu(model: Int, mtu: Int) {
+            BleServiceHelper.setBleMtu(model, mtu)
+        }
+
         /**
          *
          * @param model Int

@@ -19,7 +19,7 @@ import java.util.*
  * @Date 2021/11/12 16:59
  */
 
-const val MANAGER_TAG = "BaseBleManager"
+const val MANAGER_TAG = "LpBleManager"
 
 abstract class LpBleManager(context: Context): BleManager(context) {
 
@@ -27,7 +27,9 @@ abstract class LpBleManager(context: Context): BleManager(context) {
     lateinit var service_uuid: UUID
     lateinit var write_uuid: UUID
     lateinit var notify_uuid: UUID
+//    var indicate_uuid: UUID = UUID.fromString("0000FFB3-0000-1000-8000-00805F9B34FB")
 
+//    var indicate_char: BluetoothGattCharacteristic? = null
     var write_char: BluetoothGattCharacteristic? = null
 
     var notify_char:BluetoothGattCharacteristic? = null
@@ -61,9 +63,11 @@ abstract class LpBleManager(context: Context): BleManager(context) {
                 LepuBleLog.d(MANAGER_TAG, "service ==  $service")
                 
                 service?.let {
+//                    indicate_char = service.getCharacteristic(indicate_uuid)
                     write_char = service.getCharacteristic(write_uuid)
                     notify_char = service.getCharacteristic(notify_uuid)
                     
+//                    LepuBleLog.d(MANAGER_TAG, "indicate_char ==  $indicate_char")
                     LepuBleLog.d(MANAGER_TAG, "writeChar ==  $write_char")
                     LepuBleLog.d(MANAGER_TAG, "notifyChar ==  $notify_char")
                 }?: kotlin.run { 
@@ -113,34 +117,53 @@ abstract class LpBleManager(context: Context): BleManager(context) {
 
             }
 
+            override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int) {
+                super.onMtuChanged(gatt, mtu)
+                log(Log.INFO, "onMtuChanged mtu == $mtu")
+            }
 
 
             override fun onDeviceDisconnected() {
+//                indicate_char = null
                 write_char = null
                 notify_char = null
             }
 
         }
     }
-   fun setNotify() {
-       setNotificationCallback(notify_char)
-           .with { device: BluetoothDevice, data: Data ->
+    fun setNotify() {
+        setNotificationCallback(notify_char)
+            .with { device: BluetoothDevice, data: Data ->
 
-               data.value?.let {
-                   LepuBleLog.d(MANAGER_TAG, device.name + "received==" + bytesToHex(it) + " size=" + bytesToHex(data.value!!).length)
+                data.value?.let {
+                    LepuBleLog.d(MANAGER_TAG, device.name + " NotificationCallback received==" + bytesToHex(it) + " size=" + bytesToHex(data.value!!).length)
 
-               }?: kotlin.run {
-                   log(Log.WARN, "NotificationCallback data.value == null")
-               }
+                }?: kotlin.run {
+                    log(Log.WARN, "NotificationCallback data.value == null")
+                }
 
-               notifyListener?.let {
+                notifyListener?.let {
                    it.onNotify(device, data)
-               }?: kotlin.run {
-                   log(Log.WARN, "NotificationCallback listener == null")
-               }
-           }
+                }?: kotlin.run {
+                    log(Log.WARN, "NotificationCallback listener == null")
+                }
+            }
 
-   }
+        /*setIndicationCallback(indicate_char).with { device, data ->
+            data.value?.let {
+                LepuBleLog.d(MANAGER_TAG, device.name + " IndicationCallback received==" + bytesToHex(it) + " size=" + bytesToHex(data.value!!).length)
+
+            }?: kotlin.run {
+                log(Log.WARN, "IndicationCallback data.value == null")
+            }
+
+            notifyListener?.let {
+                it.onNotify(device, data)
+            }?: kotlin.run {
+                log(Log.WARN, "IndicationCallback listener == null")
+            }
+        }*/
+    }
 
     open fun buildRequestQueue() {
         LepuBleLog.d(MANAGER_TAG, "buildRequestQueue...")
@@ -157,10 +180,27 @@ abstract class LpBleManager(context: Context): BleManager(context) {
             //                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
             //                    .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
             .add(enableNotifications(notify_char))
+//            .add(enableIndications(indicate_char))
             .done { device: BluetoothDevice? ->
                 log(Log.INFO, "Target initialized")
             }
         dealReqQueue(queue).enqueue()
+    }
+
+    fun setBleMtu(mtu1: Int) {
+        log(Log.INFO, "setBleMtu")
+        beginAtomicRequestQueue().add(requestMtu(mtu1) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
+            .with { device: BluetoothDevice?, mtu: Int ->
+                log(Log.INFO, "MTU set to $mtu")
+            }
+            .fail { device: BluetoothDevice?, status: Int ->
+                log(Log.WARN, "Requested MTU not supported: $status")
+            })
+            .enqueue()
+    }
+
+    fun getBleMtu(): Int {
+        return mtu
     }
 
     /**
@@ -172,7 +212,7 @@ abstract class LpBleManager(context: Context): BleManager(context) {
         writeCharacteristic(write_char, bytes)
             .split()
             .done { device: BluetoothDevice ->
-                LepuBleLog.e(device.name + "send cmd:" + bytesToHex(bytes))
+                LepuBleLog.e(device.name + " send cmd:" + bytesToHex(bytes))
             }.fail { device, status ->
 
 

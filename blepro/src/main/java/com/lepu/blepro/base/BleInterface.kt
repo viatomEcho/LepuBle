@@ -369,6 +369,14 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         return sendCmdString
     }
 
+    fun setBleMtu(mtu: Int) {
+        manager.setBleMtu(mtu)
+    }
+
+    fun getBleMtu(): Int {
+        return manager.getBleMtu()
+    }
+
     fun clearCmdTimeout() {
         curCmd = -1
         cmdTimeout?.cancel()

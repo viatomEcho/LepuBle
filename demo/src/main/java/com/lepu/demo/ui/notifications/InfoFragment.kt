@@ -105,6 +105,16 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
         }
 
+        binding.getMtu.setOnClickListener {
+            binding.sendCmd.text = "mtu : " + LpBleUtil.getBleMtu(Constant.BluetoothConfig.currentModel[0])
+        }
+        binding.setMtu.setOnClickListener {
+            var mtu = 0
+            if (binding.mtuText.text.toString() != "")
+                mtu = binding.mtuText.text.toString().toInt()
+            LpBleUtil.setBleMtu(Constant.BluetoothConfig.currentModel[0], mtu)
+        }
+
     }
 
     private fun initEvent(){

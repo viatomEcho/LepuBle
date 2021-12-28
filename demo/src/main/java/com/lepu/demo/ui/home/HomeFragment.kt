@@ -73,6 +73,15 @@ class HomeFragment : Fragment(R.layout.fragment_home){
             LpBleUtil.disconnect(false)
         }
         binding.reconnectByName.setOnClickListener {
+
+            mainViewModel.curBluetooth.value?.let { it1 ->
+                LpBleUtil.reconnect(currentModel[0], it1.deviceName)
+            }
+        }
+        binding.reconnectByAddress.setOnClickListener {
+            mainViewModel.curBluetooth.value?.let { it1 ->
+                LpBleUtil.reconnectByMac(currentModel[0], it1.deviceMacAddress)
+            }
         }
 
         LinearLayoutManager(context).apply {

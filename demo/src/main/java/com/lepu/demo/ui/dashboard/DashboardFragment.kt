@@ -112,7 +112,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         }
         mainViewModel.runWave = true
         when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_BP2 -> waveHandler.post(EcgWaveTask())
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2 -> waveHandler.post(EcgWaveTask())
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW -> waveHandler.post(OxyWaveTask())
         }
 
