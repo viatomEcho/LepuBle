@@ -1,6 +1,6 @@
 package com.lepu.blepro.ble.cmd;
 
-import com.lepu.blepro.ble.data.ICUserInfo;
+import com.lepu.blepro.ble.data.FscaleUserInfo;
 import com.lepu.blepro.utils.CrcUtil;
 import com.lepu.blepro.utils.DateUtil;
 
@@ -84,7 +84,7 @@ public class F4ScaleBleCmd {
         return cmd;
     }
 
-    public static byte[] setUserList(List<ICUserInfo> userInfos) {
+    public static byte[] setUserList(List<FscaleUserInfo> userInfos) {
         int count = userInfos.size();
         int len = 2 + count*4;
         byte[] cmd = new byte[4 + len];

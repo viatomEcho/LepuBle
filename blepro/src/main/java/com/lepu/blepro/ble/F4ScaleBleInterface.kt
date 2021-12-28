@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.ble.data.ICUserInfo
+import com.lepu.blepro.ble.data.FscaleUserInfo
 import com.lepu.blepro.utils.*
 
 /**
@@ -16,7 +16,7 @@ class F4ScaleBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "F4ScaleBleInterface"
 
     private lateinit var context: Context
-    private var userInfo = ICUserInfo()
+    private var userInfo = FscaleUserInfo()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
@@ -141,10 +141,10 @@ class F4ScaleBleInterface(model: Int): BleInterface(model) {
     override fun getFileList() {
     }
 
-    fun setUserInfo(userInfo: ICUserInfo) {
+    fun setUserInfo(userInfo: FscaleUserInfo) {
         this.userInfo = userInfo
     }
-    fun setUserList(userList: List<ICUserInfo>) {
+    fun setUserList(userList: List<FscaleUserInfo>) {
         sendCmd(F4ScaleBleCmd.setUserList(userList))
     }
 

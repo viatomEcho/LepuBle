@@ -11,7 +11,7 @@ import android.util.SparseArray
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.*
-import com.lepu.blepro.ble.data.ICUserInfo
+import com.lepu.blepro.ble.data.FscaleUserInfo
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
@@ -998,7 +998,7 @@ class BleServiceHelper private constructor() {
     /**
      * F4,F5体脂秤
      */
-    fun setUserInfo(model: Int, userInfo: ICUserInfo) {
+    fun setUserInfo(model: Int, userInfo: FscaleUserInfo) {
         if (!checkService()) return
 
         when(model){
@@ -1021,7 +1021,7 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.e(tag, "model error")
         }
     }
-    fun setUserList(model: Int, userList: List<ICUserInfo>) {
+    fun setUserList(model: Int, userList: List<FscaleUserInfo>) {
         if (!checkService()) return
 
         when(model){

@@ -8,7 +8,7 @@ import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.Bpw1BleResponse
 import com.lepu.blepro.ble.cmd.Pc100BleResponse
-import com.lepu.blepro.ble.data.ICUserInfo
+import com.lepu.blepro.ble.data.FscaleUserInfo
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.bytesToHex
@@ -83,17 +83,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
         //-------------------------F4,F5-----------------------
         binding.scaleUserInfo.setOnClickListener {
-            var userInfo = ICUserInfo()
+            var userInfo = FscaleUserInfo()
             LpBleUtil.setUserInfo(Bluetooth.MODEL_F5_SCALE, userInfo)
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
         }
         binding.scaleUserList.setOnClickListener {
-            var userList = arrayListOf<ICUserInfo>()
-            userList.add(ICUserInfo())
-            userList.add(ICUserInfo())
-            userList.add(ICUserInfo())
-            userList.add(ICUserInfo())
-            userList.add(ICUserInfo())
+            var userList = arrayListOf<FscaleUserInfo>()
+            userList.add(FscaleUserInfo())
+            userList.add(FscaleUserInfo())
+            userList.add(FscaleUserInfo())
+            userList.add(FscaleUserInfo())
+            userList.add(FscaleUserInfo())
             LpBleUtil.setUserList(Bluetooth.MODEL_F5_SCALE, userList)
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
         }

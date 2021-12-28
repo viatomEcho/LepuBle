@@ -6,7 +6,7 @@ import com.icomon.icbodyfatalgorithms.ICBodyFatAlgorithmsPeopleType;
 import com.icomon.icbodyfatalgorithms.ICBodyFatAlgorithmsSex;
 import com.icomon.icbodyfatalgorithms.ICBodyFatAlgorithmsType;
 
-public class ICUserInfo implements Cloneable {
+public class FscaleUserInfo implements Cloneable {
     public Integer userIndex = 1;
     public Integer height = 172;
     public double weight = 60.0D;
@@ -21,7 +21,7 @@ public class ICUserInfo implements Cloneable {
     public boolean enableMeasureBalance;
     public boolean enableMeasureGravity;
 
-    public ICUserInfo() {
+    public FscaleUserInfo() {
         this.sex = ICBodyFatAlgorithmsSex.Male;
         this.peopleType = ICBodyFatAlgorithmsPeopleType.ICBodyFatAlgorithmsPeopleTypeNormal;
         this.bfaType = ICBodyFatAlgorithmsType.ICBodyFatAlgorithmsTypeWLA07;
@@ -33,9 +33,9 @@ public class ICUserInfo implements Cloneable {
         this.weightDirection = 0;
     }
 
-    public ICUserInfo clone() {
+    public FscaleUserInfo clone() {
         try {
-            return (ICUserInfo)super.clone();
+            return (FscaleUserInfo)super.clone();
         } catch (CloneNotSupportedException var2) {
             var2.printStackTrace();
             return null;
@@ -151,7 +151,7 @@ public class ICUserInfo implements Cloneable {
     }
 
     public boolean equals(@Nullable Object obj) {
-        ICUserInfo user = (ICUserInfo)obj;
+        FscaleUserInfo user = (FscaleUserInfo)obj;
         if (user.height != this.height) {
             return false;
         } else if (user.weight - this.weight <= 0.001D && user.weight - this.weight >= -0.001D) {

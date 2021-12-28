@@ -8,7 +8,7 @@ import android.util.Log
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.data.ICUserInfo
+import com.lepu.blepro.ble.data.FscaleUserInfo
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.demo.BuildConfig
@@ -497,7 +497,7 @@ class LpBleUtil {
             }
         }
 
-        fun setUserInfo(model: Int, userInfo: ICUserInfo) {
+        fun setUserInfo(model: Int, userInfo: FscaleUserInfo) {
             Log.d(TAG, "setUserInfo")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
@@ -508,7 +508,7 @@ class LpBleUtil {
             }
         }
 
-        fun setUserList(model: Int, userList: List<ICUserInfo>) {
+        fun setUserList(model: Int, userList: List<FscaleUserInfo>) {
             Log.d(TAG, "setUserInfo")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){

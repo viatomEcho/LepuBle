@@ -6,8 +6,8 @@ import com.icomon.icbodyfatalgorithms.ICBodyFatAlgorithms
 import com.icomon.icbodyfatalgorithms.ICBodyFatAlgorithmsParams
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.ble.data.ICUserInfo
-import com.lepu.blepro.ble.data.ICWeightData
+import com.lepu.blepro.ble.data.FscaleUserInfo
+import com.lepu.blepro.ble.data.FscaleWeightData
 import com.lepu.blepro.utils.*
 
 /**
@@ -19,8 +19,8 @@ class F5ScaleBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "F5ScaleBleInterface"
 
     private lateinit var context: Context
-    private var userInfo = ICUserInfo()
-    private var weightData = ICWeightData()
+    private var userInfo = FscaleUserInfo()
+    private var weightData = FscaleWeightData()
 
     private var receivedCount = 0
 
@@ -201,11 +201,11 @@ class F5ScaleBleInterface(model: Int): BleInterface(model) {
     override fun getFileList() {
     }
 
-    fun setUserInfo(userInfo: ICUserInfo) {
+    fun setUserInfo(userInfo: FscaleUserInfo) {
         this.userInfo = userInfo
         sendCmd(F5ScaleBleCmd.setUserInfo(0, userInfo.userIndex, userInfo.height, (userInfo.weight*100).toInt(), userInfo.age, userInfo.sex.value))
     }
-    fun setUserList(userList: List<ICUserInfo>) {
+    fun setUserList(userList: List<FscaleUserInfo>) {
         for (userInfo in userList) {
             sendCmd(F5ScaleBleCmd.setUserList(userInfo.userIndex, userInfo.height, (userInfo.weight*100).toInt(), userInfo.age, userInfo.sex.value))
         }
