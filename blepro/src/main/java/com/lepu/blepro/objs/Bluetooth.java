@@ -71,6 +71,11 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_F4_SCALE = "MY_SCALE"; // F4体脂秤
     public static final String BT_NAME_F5_SCALE = "MY_SCALE"; // F5体脂秤
 
+    public static final String BT_NAME_PC66A = "PC-66A";
+    public static final String BT_NAME_PC66B = "PC-66B";
+    public static final String BT_NAME_PC68A = "PC-68A";
+    public static final String BT_NAME_PC68B = "PC-68B";
+
 
     public static final int MODEL_UNRECOGNIZED = 0;
     public static final int MODEL_CHECKO2 = 1;
@@ -121,13 +126,15 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_F4_SCALE = 45;
     public static final int MODEL_F5_SCALE = 46;
 
+    public static final int MODEL_PC_6N = 47;
+
 
     @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER1_N,
             MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL, MODEL_BABYO2, MODEL_OXYSMART,
             MODEL_TV221U, MODEL_PC100, MODEL_AOJ20A, MODEL_OXYFIT, MODEL_VCOMIN, MODEL_CHECK_POD, MODEL_BODY_FAT, MODEL_LEM,
             MODEL_BABYO2N, MODEL_BP2T, MODEL_BP2W, MODEL_STATION, MODEL_POD2B, MODEL_PC_60NW, MODEL_POD_1W, MODEL_PC_60B,
             MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2M, MODEL_BPM,MODEL_BP2A, MODEL_PC60FW, MODEL_PC80B, MODEL_FHR, MODEL_BPW1,
-            MODEL_F4_SCALE, MODEL_F5_SCALE})
+            MODEL_F4_SCALE, MODEL_F5_SCALE, MODEL_PC_6N})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 
@@ -168,6 +175,9 @@ public class Bluetooth implements Parcelable {
             return MODEL_KCA;
         } else if (deviceName.contains(BT_NAME_PC80B)) {
             return MODEL_PC80B;
+        } else if (deviceName.contains(BT_NAME_PC66A) || deviceName.contains(BT_NAME_PC66B)
+                || deviceName.contains(BT_NAME_PC68A) || deviceName.contains(BT_NAME_PC68B)) {
+            return MODEL_PC_6N;
         }
 
         if (deviceName.split(" ").length == 0)

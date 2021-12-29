@@ -41,7 +41,7 @@ class DashboardViewModel : ViewModel() {
     val spo2: MutableLiveData<Int> by lazy {
         MutableLiveData<Int>()
     }
-    val pi: MutableLiveData<Int> by lazy {
-        MutableLiveData<Int>()
+    val pi: MutableLiveData<Float> by lazy {
+        MutableLiveData<Float>()
     }
 }

@@ -113,7 +113,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         mainViewModel.runWave = true
         when(model) {
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2 -> waveHandler.post(EcgWaveTask())
-            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC_6N -> waveHandler.post(OxyWaveTask())
         }
 
     }
@@ -279,6 +279,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val rtData = it.data as PC60FwBleResponse.RtDataParam
                 viewModel.oxyPr.value = rtData.pr.toInt()
                 viewModel.spo2.value = rtData.spo2.toInt()
+                viewModel.pi.value = rtData.pi.toInt().div(10f)
             })
 
         //------------------------------pc100------------------------------
@@ -292,7 +293,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val rtData = it.data as Pc100BleResponse.RtBoParam
                 viewModel.oxyPr.value = rtData.pr
                 viewModel.spo2.value = rtData.spo2
-                viewModel.pi.value = rtData.pi
+                viewModel.pi.value = rtData.pi.div(10f)
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpRtData)
             .observe(this, {
@@ -341,7 +342,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.ecgLayout.visibility = View.GONE
                     binding.oxyLayout.visibility = View.GONE
                 }
-                Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW -> {
+                Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC_6N -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE
@@ -462,7 +463,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         })
         viewModel.pi.observe(viewLifecycleOwner, {
-            if (it == 0) {
+            if (it == 0f) {
                 binding.tvPi.text = "?"
             } else {
                 binding.tvPi.text = it.toString()

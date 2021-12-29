@@ -59,6 +59,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         mainViewModel.pc100Info.observe(viewLifecycleOwner, {
             binding.info.text = it.toString()
         })
+        mainViewModel.pc6nInfo.observe(viewLifecycleOwner, {
+            binding.info.text = it.toString()
+        })
         // 公共方法测试
         // 获取设备信息
         binding.getInfo.setOnClickListener {

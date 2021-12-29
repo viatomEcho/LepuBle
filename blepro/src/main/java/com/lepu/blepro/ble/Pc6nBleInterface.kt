@@ -6,19 +6,23 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_BATTERY_LEVEL
+import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_DEVICE_INFO
+import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_DEVICE_SN
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_SPO2_PARAM
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_SPO2_WAVE
-import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_WORKING_STATUS
+import com.lepu.blepro.ble.data.Pc6nDeviceInfo
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.bytesToHex
 
 
-class PC60FwBleInterface(model: Int): BleInterface(model) {
+class Pc6nBleInterface(model: Int): BleInterface(model) {
     
-    private val tag: String = "PC60FwBleInterface"
+    private val tag: String = "Pc6nBleInterface"
+    private var pc6nDevice = Pc6nDeviceInfo()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = PC60FwBleManager(context)
+        manager = Pc6nBleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -31,9 +35,6 @@ class PC60FwBleInterface(model: Int): BleInterface(model) {
                 }
                 .enqueue()
     }
-
-
-
 
     override fun hasResponse(bytes: ByteArray?): ByteArray? {
         val bytesLeft: ByteArray? = bytes
@@ -68,46 +69,59 @@ class PC60FwBleInterface(model: Int): BleInterface(model) {
         return bytesLeft
     }
 
-
-
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: PC60FwBleResponse.PC60FwResponse) {
         if (response.token == TOKEN_EPI_F0 && response.type == TYPE_BATTERY_LEVEL){
+            LepuBleLog.d(tag, "model:$model,EventPC60FwBattery => success")
            PC60FwBleResponse.Battery(response.content).let {
                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwBattery).post(InterfaceEvent(model, it))
+               LepuBleLog.d(tag, "it.batteryLevel == " + it.batteryLevel)
            }
-
+        }
+        if (response.token == TOKEN_EPI_F0 && response.type == TYPE_DEVICE_SN){
+            LepuBleLog.d(tag, "model:$model,TYPE_DEVICE_SN => success")
+            pc6nDevice.sn = com.lepu.blepro.utils.toString(response.content)
+            LepuBleLog.d(tag, "toString == " + com.lepu.blepro.utils.toString(response.content))
+        }
+        if (response.token == TOKEN_EPI_F0 && response.type == TYPE_DEVICE_INFO){
+            LepuBleLog.d(tag, "model:$model,TYPE_DEVICE_INFO => success")
+            PC60FwBleResponse.DeviceInfo(response.content).let {
+                pc6nDevice.deviceName = it.deviceName
+                pc6nDevice.hardwareV = it.hardwareV
+                pc6nDevice.softwareV = it.softwareV
+                LepuBleLog.d(tag, "it.deviceName == " + it.deviceName)
+                LepuBleLog.d(tag, "it.hardwareV == " + it.hardwareV)
+                LepuBleLog.d(tag, "it.softwareV == " + it.softwareV)
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo).post(InterfaceEvent(model, pc6nDevice))
+            }
         }
 
         if (response.token == TOKEN_PO_0F && response.type == TYPE_SPO2_PARAM){
+            LepuBleLog.d(tag, "model:$model,EventPC60FwRtDataParam => success")
             PC60FwBleResponse.RtDataParam(response.content).let {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataParam).post(InterfaceEvent(model, it))
+                LepuBleLog.d(tag, "it.pi == " + it.pi)
+                LepuBleLog.d(tag, "it.pr == " + it.pr)
+                LepuBleLog.d(tag, "it.spo2 == " + it.spo2)
             }
-
         }
 
         if (response.token == TOKEN_PO_0F && response.type == TYPE_SPO2_WAVE){
+            LepuBleLog.d(tag, "model:$model,EventPC60FwRtDataWave => success")
+            LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
             PC60FwBleResponse.RtDataWave(response.content).let {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataWave).post(InterfaceEvent(model, it))
             }
-
-        }
-
-        if (response.token == TOKEN_PO_0F && response.type == TYPE_WORKING_STATUS){
-            PC60FwBleResponse.WorkingStatus(response.content).let {
-                LepuBleLog.d(tag, "model:$model,WORK_STATUS_DATA => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwWorkingStatus).post(InterfaceEvent(model, it))
-            }
-
         }
     }
 
 
     override fun getInfo() {
+        sendCmd(Pc6nBleCmd.getDeviceSN())
+        sendCmd(Pc6nBleCmd.getDeviceInfo())
     }
 
     override fun syncTime() {
-
     }
 
     override fun getRtData() {

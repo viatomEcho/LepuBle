@@ -2,6 +2,7 @@ package com.lepu.blepro.ble.cmd
 
 import android.os.Parcelable
 import com.lepu.blepro.utils.ByteUtils.toSignedShort
+import com.lepu.blepro.utils.bytesToHex
 import kotlinx.android.parcel.Parcelize
 
 
@@ -15,6 +16,8 @@ class PC60FwBleResponse{
         companion object {
             const val TYPE_SPO2_PARAM = 0x01.toByte()
             const val TYPE_SPO2_WAVE = 0x02.toByte()
+            const val TYPE_DEVICE_INFO = 0x01.toByte()
+            const val TYPE_DEVICE_SN = 0x02.toByte()
             const val TYPE_BATTERY_LEVEL = 0x03.toByte()
             const val TYPE_WORKING_STATUS = 0x21.toByte()
         }
@@ -44,6 +47,23 @@ class PC60FwBleResponse{
             return false
         }
 
+    }
+
+    @Parcelize
+    @ExperimentalUnsignedTypes
+    class DeviceInfo constructor(var bytes: ByteArray) : Parcelable {
+        var softwareV: String   // 软件版本
+        var hardwareV: String   // 硬件版本
+        var deviceName: String  // 设备名称
+
+        init {
+            var index = 0
+            softwareV = bytesToHex(bytes.copyOfRange(index, index + 2))
+            index += 2
+            hardwareV = bytesToHex(byteArrayOf(bytes[index]))
+            index++
+            deviceName = com.lepu.blepro.utils.toString(bytes.copyOfRange(index, bytes.size))
+        }
     }
 
     @ExperimentalUnsignedTypes

@@ -93,6 +93,9 @@ class MainViewModel: ViewModel() {
     val _pc100Info = MutableLiveData<Pc100DeviceInfo>()
     val pc100Info: LiveData<Pc100DeviceInfo> = _pc100Info
 
+    val _pc6nInfo = MutableLiveData<Pc6nDeviceInfo>()
+    val pc6nInfo: LiveData<Pc6nDeviceInfo> = _pc6nInfo
+
     val _oxyPrAlarmFlag = MutableLiveData<Boolean>().apply { value = false }
     val oxyPrAlarmFlag: LiveData<Boolean> = _oxyPrAlarmFlag
 

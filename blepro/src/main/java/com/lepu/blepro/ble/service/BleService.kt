@@ -287,6 +287,14 @@ open class BleService: LifecycleService() {
                     return this
                 }
             }
+            Bluetooth.MODEL_PC_6N -> {
+                Pc6nBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
 
             else -> {
                 return throw Exception("BleService initInterfaces() 未配置此model:$m")

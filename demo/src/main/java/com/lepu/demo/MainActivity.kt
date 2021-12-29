@@ -204,6 +204,15 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 }
             })
 
+        //-------------------------pc6n---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo)
+            .observe(this, { event ->
+                (event.data as Pc6nDeviceInfo).let {
+                    Toast.makeText(this, "pc6n 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._pc6nInfo.value = it
+                }
+            })
+
     }
     private fun needPermission(){
         PermissionX.init(this)
