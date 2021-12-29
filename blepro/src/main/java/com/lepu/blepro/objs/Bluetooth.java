@@ -170,7 +170,7 @@ public class Bluetooth implements Parcelable {
             return MODEL_KCA;
         } else if (deviceName.contains(BT_NAME_PC80B)) {
             return MODEL_PC80B;
-        } else if (deviceName.contains(BT_NAME_WATCH_4G)) {
+        } else if (deviceName.contains(BT_NAME_WATCH_4G)/* || deviceName.contains(BT_NAME_DEVICES_ER2)*/) {
             return MODEL_WATCH_4G;
         }
 

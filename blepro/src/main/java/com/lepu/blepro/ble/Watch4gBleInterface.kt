@@ -6,6 +6,8 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.Er2DeviceInfo
+import com.lepu.blepro.ble.data.Watch4gFile
+import com.lepu.blepro.ble.data.Watch4gFileList
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
@@ -42,6 +44,7 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
     var curFileName: String? = null
     private var userId: String? = null
     var curFile: Er2File? = null
+    var curFile4g: Watch4gFile? = null
 
     override fun dealReadFile(userId: String, fileName: String) {
         this.userId = userId
@@ -193,7 +196,7 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
                 )
             }
             Watch4gBleCmd.CMD_LIST_FILE -> {
-                val fileArray = Er2FileList(respPkg.data)
+                /*val fileArray = Watch4gFileList(respPkg.data)
 
                 LepuBleLog.d(tag, "model:$model,CMD_LIST_FILE => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FileList).post(
@@ -201,14 +204,20 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
                         model,
                         fileArray
                     )
-                )
+                )*/
             }
             Watch4gBleCmd.CMD_START_READ_FILE -> {
 
                 LepuBleLog.d(tag, "model:$model,CMD_START_READ_FILE => success, $respPkg")
                 if (respPkg.pkgType == 0x01.toByte()) {
-                    curFile =  curFileName?.let {
-                        Er2File(model, it, toUInt(respPkg.data), userId!!)
+                    if (curFileName?.equals("ecgrecord.list") == true) {
+                        curFile4g =  curFileName?.let {
+                            Watch4gFile(model, it, toUInt(respPkg.data))
+                        }
+                    } else {
+                        curFile =  curFileName?.let {
+                            Er2File(model, it, toUInt(respPkg.data), userId!!)
+                        }
                     }
                     sendCmd(Watch4gBleCmd.readFileData(0))
                 } else {
@@ -223,25 +232,48 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
 
             }
             Watch4gBleCmd.CMD_READ_FILE_CONTENT -> {
-                curFile?.apply {
+                if (curFileName?.equals("ecgrecord.list") == true) {
+                    curFile4g?.apply {
 
-                    LepuBleLog.d(tag, "CMD_READ_FILE_CONTENT: paused = $isPausedRF, cancel = $isCancelRF, offset =  ${offset}, index = ${this.index}")
+                        LepuBleLog.d(tag, "CMD_READ_FILE_CONTENT: paused = $isPausedRF, cancel = $isCancelRF, offset =  ${offset}, index = ${this.index}")
 
-                    //检查当前的下载状态
-                    if (isCancelRF || isPausedRF) {
-                        sendCmd(Er1BleCmd.readFileEnd())
-                        return
+                        //检查当前的下载状态
+                        if (isCancelRF || isPausedRF) {
+                            sendCmd(Er1BleCmd.readFileEnd())
+                            return
+                        }
+
+                        this.addContent(respPkg.data)
+                        LepuBleLog.d(tag, "read file：${this.fileName}   => ${this.index + offset} / ${this.fileSize}")
+                        LepuBleLog.d(tag, "read file：${((this.index+ offset) * 1000).div(this.fileSize) }")
+
+                        if (this.index < this.fileSize) {
+                            sendCmd(Watch4gBleCmd.readFileData(this.index))
+                        } else {
+                            sendCmd(Watch4gBleCmd.readFileEnd())
+                        }
                     }
+                } else {
+                    curFile?.apply {
 
-                    this.addContent(respPkg.data)
-                    LepuBleLog.d(tag, "read file：${this.fileName}   => ${this.index + offset} / ${this.fileSize}")
-                    LepuBleLog.d(tag, "read file：${((this.index+ offset) * 1000).div(this.fileSize) }")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadingFileProgress).post(InterfaceEvent(model, ((this.index+ offset) * 1000).div(this.fileSize) ))
+                        LepuBleLog.d(tag, "CMD_READ_FILE_CONTENT: paused = $isPausedRF, cancel = $isCancelRF, offset =  ${offset}, index = ${this.index}")
 
-                    if (this.index < this.fileSize) {
-                        sendCmd(Watch4gBleCmd.readFileData(this.index))
-                    } else {
-                        sendCmd(Watch4gBleCmd.readFileEnd())
+                        //检查当前的下载状态
+                        if (isCancelRF || isPausedRF) {
+                            sendCmd(Er1BleCmd.readFileEnd())
+                            return
+                        }
+
+                        this.addContent(respPkg.data)
+                        LepuBleLog.d(tag, "read file：${this.fileName}   => ${this.index + offset} / ${this.fileSize}")
+                        LepuBleLog.d(tag, "read file：${((this.index+ offset) * 1000).div(this.fileSize) }")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadingFileProgress).post(InterfaceEvent(model, ((this.index+ offset) * 1000).div(this.fileSize) ))
+
+                        if (this.index < this.fileSize) {
+                            sendCmd(Watch4gBleCmd.readFileData(this.index))
+                        } else {
+                            sendCmd(Watch4gBleCmd.readFileEnd())
+                        }
                     }
                 }
             }
@@ -249,16 +281,37 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "read file finished: ${curFile?.fileName} ==> ${curFile?.fileSize}")
                 LepuBleLog.d(tag, "read file finished: isCancel = $isCancelRF, isPause = $isPausedRF")
 
-                curFileName = null// 一定要放在发通知之前
-                curFile?.let {
-                    if (it.index < it.fileSize ){
-                        if ((isCancelRF || isPausedRF) ) return
-                    }else {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileComplete)
-                            .post(InterfaceEvent(model, it))
-                    }
-                }?: LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
-                curFile = null
+                if (curFileName?.equals("ecgrecord.list") == true) {
+                    curFileName = null// 一定要放在发通知之前
+                    curFile4g?.let {
+                        if (it.index < it.fileSize ){
+                            if ((isCancelRF || isPausedRF) ) return
+                        }else {
+                            val fileArray =
+                                Watch4gFileList(it.content)
+
+                            LepuBleLog.d(tag, "model:$model,CMD_LIST_FILE => success")
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FileList).post(
+                                InterfaceEvent(
+                                    model,
+                                    fileArray
+                                )
+                            )
+                        }
+                    }?: LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
+                    curFile4g = null
+                } else {
+                    curFileName = null// 一定要放在发通知之前
+                    curFile?.let {
+                        if (it.index < it.fileSize ){
+                            if ((isCancelRF || isPausedRF) ) return
+                        }else {
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileComplete)
+                                .post(InterfaceEvent(model, it))
+                        }
+                    }?: LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
+                    curFile = null
+                }
             }
 
             else -> {
@@ -291,7 +344,9 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getFileList() {
-        sendCmd(Watch4gBleCmd.listFiles())
+        curFileName = "ecgrecord.list"
+        sendCmd(Watch4gBleCmd.readFileStart(curFileName?.toByteArray(), 0))
+//        sendCmd(Watch4gBleCmd.listFiles())
     }
 
     override fun factoryReset() {
