@@ -677,7 +677,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PC100 ->{
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc100BleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc100BleInterface--startBp")
+                        LepuBleLog.d(tag, "it as Pc100BleInterface--stopBp")
                         it.stopBp()
                     }
                 }

@@ -59,9 +59,10 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                             pc100Device = Pc100DeviceInfo()
                         }
                         val str = toString(response.content).split(":")
-                        pc100Device?.deviceName = str[0]
+                        pc100Device?.deviceName = toString(response.content)
                         pc100Device?.sn = str[1]
-                        LepuBleLog.d(tag, "model:$model,HAND_SHAKE deviceName => " + toString(response.content))
+                        LepuBleLog.d(tag, "model:$model,HAND_SHAKE deviceName => " + pc100Device?.deviceName)
+                        LepuBleLog.d(tag, "model:$model,HAND_SHAKE sn => " + pc100Device?.sn)
                     }
                     Pc100BleCmd.GET_DEVICE_ID -> {
                         LepuBleLog.d(tag, "model:$model,GET_DEVICE_ID => success")
