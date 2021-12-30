@@ -11,7 +11,7 @@ public class Watch4gFileList {
         fileNames = new String[fileNum];
         for(int i = 0; i < fileNum; i++) {
             byte[] tmeData = Arrays.copyOfRange(data, (i * 44) + 10, (i + 1) * 44 + 10);
-            int year = tmeData[0]&0xFF + (tmeData[1]&0xFF << 8);
+            int year = (tmeData[0] & 0xFF) + ((tmeData[1] & 0xFF) << 8);
             int month = tmeData[2]&0xFF;
             int day = tmeData[3]&0xFF;
             int hour = tmeData[4]&0xFF;

@@ -180,6 +180,9 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     }
 
     override fun onNotify(device: BluetoothDevice?, data: Data?) {
+
+        LiveEventBus.get<ByteArray>(EventMsgConst.Ble.EventBleDeviceCmdReceive).post(data?.value)
+
         data?.value?.apply {
             pool = add(pool, this)
         }
@@ -362,6 +365,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         manager.sendCmd(bs)
 
         sendCmdString = bytesToHex(bs)
+
+        LiveEventBus.get<ByteArray>(EventMsgConst.Ble.EventBleDeviceCmdSend).post(bs)
 
         return true
     }
