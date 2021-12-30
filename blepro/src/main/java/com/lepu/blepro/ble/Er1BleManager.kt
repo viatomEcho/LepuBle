@@ -38,6 +38,15 @@ class Er1BleManager(context: Context): LpBleManager(context) {
                         log(Log.WARN, "Er1BleManager Requested PHY not supported: $status")
                     })
                 .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
+        } else {
+            requestQueue.add(requestMtu(247)
+                .with { device: BluetoothDevice?, mtu: Int ->
+                    log(Log.INFO, "Er1BleManager MTU set to $mtu")
+                }
+                .fail { device: BluetoothDevice?, status: Int ->
+                    log(Log.WARN, "Er1BleManager Requested MTU not supported: $status")
+                })
+                .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
         }
         return requestQueue
     }
