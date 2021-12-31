@@ -9,6 +9,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.Bpw1BleResponse
 import com.lepu.blepro.ble.cmd.Pc100BleResponse
 import com.lepu.blepro.ble.data.ICUserInfo
+import com.lepu.blepro.ble.data.Watch4gServer
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.bytesToHex
@@ -107,6 +108,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
         }
 
+        binding.watch4gSetConfig.setOnClickListener {
+            LpBleUtil.setConfig(Bluetooth.MODEL_WATCH_4G, "192.168.1.33", 6000)
+        }
+        binding.watch4gGetConfig.setOnClickListener {
+            LpBleUtil.getConfig(Bluetooth.MODEL_WATCH_4G)
+        }
+
     }
 
     private fun initLiveEvent() {
@@ -126,6 +134,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this, {
                 var data = it.data as Pc100BleResponse.BpStatus
                 binding.content.text = data.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2GetConfig)
+            .observe(this, {
+                var data = it.data as ByteArray
+                var server = Watch4gServer(data)
+                binding.content.text = server.toString()
             })
 
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1SetTime)

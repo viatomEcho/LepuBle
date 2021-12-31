@@ -1081,4 +1081,31 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    fun setConfig(model: Int, addr: String, port: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_WATCH_4G -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Watch4gBleInterface).let {
+                        LepuBleLog.d(tag, "it as Watch4gBleInterface--setConfig")
+                        it.setConfig(addr, port)
+                    }
+                }
+            }
+        }
+    }
+
+    fun getConfig(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_WATCH_4G -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Watch4gBleInterface).let {
+                        LepuBleLog.d(tag, "it as Watch4gBleInterface--getConfig")
+                        it.getConfig()
+                    }
+                }
+            }
+        }
+    }
 }

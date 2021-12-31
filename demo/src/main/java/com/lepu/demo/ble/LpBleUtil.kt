@@ -540,6 +540,26 @@ class LpBleUtil {
             }
         }
 
+        fun setConfig(model: Int, addr: String, port: Int) {
+            Log.d(TAG, "setConfig")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.setConfig(model, addr, port)
+            }
+        }
+        fun getConfig(model: Int) {
+            Log.d(TAG, "getConfig")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.getConfig(model)
+            }
+        }
 
     }
 

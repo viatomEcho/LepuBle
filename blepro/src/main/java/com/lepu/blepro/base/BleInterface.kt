@@ -181,10 +181,9 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
     override fun onNotify(device: BluetoothDevice?, data: Data?) {
 
-        LiveEventBus.get<ByteArray>(EventMsgConst.Ble.EventBleDeviceCmdReceive).post(data?.value)
-
         data?.value?.apply {
             pool = add(pool, this)
+            LiveEventBus.get<ByteArray>(EventMsgConst.Ble.EventBleDeviceCmdReceive).post(this)
         }
         pool?.apply {
             pool = hasResponse(pool)

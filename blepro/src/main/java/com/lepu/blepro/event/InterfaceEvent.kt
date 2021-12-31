@@ -100,6 +100,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventEr2BoundDevice = "com.lepu.ble.er2.bound.device"                   // 绑定设置回调 boolean
             const val EventEr2SetSwitcherState = "com.lepu.ble.er2.set.switcher.state"        // 设置心跳音 true
             const val EventEr2SwitcherState = "com.lepu.ble.er2.switcher.state"               // 配置参数 byte数组
+            const val EventEr2GetConfig = "com.lepu.ble.er2.get.config"                       // 获取配置参数
+            const val EventEr2SetConfig = "com.lepu.ble.er2.set.config"                       // 配置参数
             const val EventEr2Reset = "com.lepu.ble.er2.reset"                                // 复位 true
             const val EventEr2FactoryReset = "com.lepu.ble.er2.factory.reset"                 // 恢复出厂设置 true
             const val EventEr2FactoryResetAll = "com.lepu.ble.er2.factory.reset.all"          // 恢复生产出厂状态 true

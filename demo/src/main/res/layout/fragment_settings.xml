@@ -214,6 +214,33 @@
                             android:layout_marginStart="20dp"/>
                     </LinearLayout>
                 </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/watch_4g_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="4g手表"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <Button
+                            android:id="@+id/watch_4g_get_config"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="获取配置"/>
+                        <Button
+                            android:id="@+id/watch_4g_set_config"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="设置服务器"
+                            android:layout_marginStart="20dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
             </LinearLayout>
 
             <TextView

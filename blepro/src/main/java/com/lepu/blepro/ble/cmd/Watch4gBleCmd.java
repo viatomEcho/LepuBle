@@ -9,7 +9,9 @@ public class Watch4gBleCmd {
     public final static int COMMON_PKG_HEAD_LENGTH = 7;
     public final static int MIN_PKG_LENGTH = COMMON_PKG_HEAD_LENGTH + 1;
 
-    public final static byte CMD_RETRIEVE_SWITCHER_STATE = 0x00;
+    public final static byte CMD_GET_CONFIG = 0x00;
+    public final static byte CMD_SET_SYSTEM_SETTINGS = 0x01;
+    public final static byte CMD_SET_CONFIG = 0x02;
     public final static byte CMD_SET_SWITCHER_STATE = 0x04;
     public final static byte CMD_RETRIEVE_DEVICE_INFO = (byte) 0xE1;
     public final static byte CMD_LOCK_FLASH = (byte) 0xEB;
@@ -47,9 +49,9 @@ public class Watch4gBleCmd {
         return getReq(CMD_SET_SWITCHER_STATE, (byte)seqNo, config.convert2Data());
     }
 
-    public static byte[] getSwitcherState() {
+    public static byte[] getConfig() {
         addNo();
-        return getReq(CMD_RETRIEVE_SWITCHER_STATE, (byte)seqNo, new byte[0]);
+        return getReq(CMD_GET_CONFIG, (byte)seqNo, new byte[0]);
     }
 
     public static byte[] getDeviceInfo() {
@@ -122,6 +124,19 @@ public class Watch4gBleCmd {
 
     public static byte[] readFileEnd() {
         return getReq(CMD_END_READ_FILE, (byte) 0x00, new byte[0]);
+    }
+
+    public static byte[] setConfig(byte[] addr, int port) {
+        addNo();
+        int len = addr.length;
+        byte[] data = new byte[5+len];
+        data[2] = (byte) len;
+        for (int i=0; i<len; i++) {
+            data[3+i] = addr[i];
+        }
+        data[data.length -2] = (byte) (port & 0xFF);
+        data[data.length -1] = (byte) ((port >> 8) & 0xFF);
+        return getReq(CMD_SET_CONFIG, (byte)seqNo, data);
     }
 
     private static byte[] getReq(byte cmd,  byte pkgNo, byte[] data) {

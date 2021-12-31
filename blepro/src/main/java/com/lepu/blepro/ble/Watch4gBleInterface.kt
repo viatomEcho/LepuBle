@@ -143,13 +143,23 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
                     )
                 )
             }
-            Watch4gBleCmd.CMD_RETRIEVE_SWITCHER_STATE -> {
+            Watch4gBleCmd.CMD_GET_CONFIG -> {
 
-                LepuBleLog.d(tag, "model:$model,CMD_RETRIEVE_SWITCHER_STATE => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SwitcherState).post(
+                LepuBleLog.d(tag, "model:$model,CMD_GET_CONFIG => success")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2GetConfig).post(
                     InterfaceEvent(
                         model,
                         respPkg.data
+                    )
+                )
+            }
+            Watch4gBleCmd.CMD_SET_CONFIG -> {
+
+                LepuBleLog.d(tag, "model:$model,CMD_SET_CONFIG => success")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetConfig).post(
+                    InterfaceEvent(
+                        model,
+                        true
                     )
                 )
             }
@@ -196,7 +206,8 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
                 )
             }
             Watch4gBleCmd.CMD_LIST_FILE -> {
-                /*val fileArray = Watch4gFileList(respPkg.data)
+//                val fileArray = Watch4gFileList(respPkg.data)
+                /*val fileArray = Er2FileList(respPkg.data)
 
                 LepuBleLog.d(tag, "model:$model,CMD_LIST_FILE => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FileList).post(
@@ -323,8 +334,11 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
         sendCmd(Watch4gBleCmd.setSwitcherState(hrFlag))
     }
 
-    fun getSwitcherState() {
-        sendCmd(Watch4gBleCmd.getSwitcherState())
+    fun setConfig(addr: String, port: Int) {
+        sendCmd(Watch4gBleCmd.setConfig(addr.toByteArray(), port))
+    }
+    fun getConfig() {
+        sendCmd(Watch4gBleCmd.getConfig())
     }
 
     fun boundDevice() {
