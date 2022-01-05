@@ -15,7 +15,7 @@ class Watch4gServer(var data: ByteArray) {
         serverAddrType = data[2].toInt()
         len = data[3].toInt()
         addr = toString(data.copyOfRange(4, 4+len))
-        port = toUInt(data.copyOfRange(4+len, data.size))
+        port = toUInt(data.copyOfRange(4+len, 6+len))
 
     }
 

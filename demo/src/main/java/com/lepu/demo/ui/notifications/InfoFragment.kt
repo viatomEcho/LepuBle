@@ -148,7 +148,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         //--------------------------------er2-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FileList)
             .observe(this, { event ->
-                (event.data as Er2FileList).let {
+                (event.data as Watch4gFileList).let {
                     binding.info.text = it.toString()
                     for (fileName in it.fileNames) {
                         if (fileName.contains("R")) {
@@ -157,6 +157,15 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     }
                     Toast.makeText(context, "er2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 }
+                /*(event.data as Er2FileList).let {
+                    binding.info.text = it.toString()
+                    for (fileName in it.fileNames) {
+                        if (fileName.contains("R")) {
+                            fileNames.add(fileName)
+                        }
+                    }
+                    Toast.makeText(context, "er2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                }*/
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadingFileProgress)
             .observe(this, { event ->

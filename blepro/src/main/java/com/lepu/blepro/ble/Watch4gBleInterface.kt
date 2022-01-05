@@ -8,6 +8,7 @@ import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.Er2DeviceInfo
 import com.lepu.blepro.ble.data.Watch4gFile
 import com.lepu.blepro.ble.data.Watch4gFileList
+import com.lepu.blepro.ble.data.Watch4gRtData
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
@@ -94,6 +95,7 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
     private fun onResponseReceived(respPkg: Er2BleResponse) {
         when(respPkg.cmd) {
             Watch4gBleCmd.CMD_RETRIEVE_DEVICE_INFO -> {
+                if (respPkg.data==null) return
                 val info = Er2DeviceInfo(device.name, device.address, respPkg.data)
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
@@ -115,7 +117,7 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
                 )
             }
             Watch4gBleCmd.CMD_BOUND_DEVICE -> {
-
+                if (respPkg.data==null) return
                 LepuBleLog.d(tag, "model:$model,CMD_BOUND_DEVICE => success")
                 if (respPkg.data[0].toInt() == 0) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2BoundDevice).post(
@@ -144,7 +146,7 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
                 )
             }
             Watch4gBleCmd.CMD_GET_CONFIG -> {
-
+                if (respPkg.data==null) return
                 LepuBleLog.d(tag, "model:$model,CMD_GET_CONFIG => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2GetConfig).post(
                     InterfaceEvent(
@@ -194,8 +196,8 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
                 )
             }
             Watch4gBleCmd.CMD_GET_REAL_TIME_DATA -> {
-
-                val rtData = Er2RtData(respPkg.data)
+                if (respPkg.data==null) return
+                val rtData = Watch4gRtData(respPkg.data)
 
                 LepuBleLog.d(tag, "model:$model,CMD_GET_REAL_TIME_DATA => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2RtData).post(
@@ -218,7 +220,7 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
                 )*/
             }
             Watch4gBleCmd.CMD_START_READ_FILE -> {
-
+                if (respPkg.data==null) return
                 LepuBleLog.d(tag, "model:$model,CMD_START_READ_FILE => success, $respPkg")
                 if (respPkg.pkgType == 0x01.toByte()) {
                     if (curFileName?.equals("ecgrecord.list") == true) {
@@ -243,6 +245,7 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
 
             }
             Watch4gBleCmd.CMD_READ_FILE_CONTENT -> {
+                if (respPkg.data==null) return
                 if (curFileName?.equals("ecgrecord.list") == true) {
                     curFile4g?.apply {
 
@@ -255,8 +258,8 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
                         }
 
                         this.addContent(respPkg.data)
-                        LepuBleLog.d(tag, "read file：${this.fileName}   => ${this.index + offset} / ${this.fileSize}")
-                        LepuBleLog.d(tag, "read file：${((this.index+ offset) * 1000).div(this.fileSize) }")
+//                        LepuBleLog.d(tag, "read file：${this.fileName}   => ${this.index + offset} / ${this.fileSize}")
+//                        LepuBleLog.d(tag, "read file：${((this.index+ offset) * 1000).div(this.fileSize) }")
 
                         if (this.index < this.fileSize) {
                             sendCmd(Watch4gBleCmd.readFileData(this.index))

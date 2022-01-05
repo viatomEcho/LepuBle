@@ -112,7 +112,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         }
         mainViewModel.runWave = true
         when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2 -> waveHandler.post(EcgWaveTask())
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2, Bluetooth.MODEL_WATCH_4G -> waveHandler.post(EcgWaveTask())
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW -> waveHandler.post(OxyWaveTask())
         }
 
@@ -163,7 +163,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         //------------------------------er2------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2RtData)
             .observe(this, {
-                val rtData = it.data as Er2RtData
+//                val rtData = it.data as Er2RtData
+                val rtData = it.data as Watch4gRtData
                 rtData.let { data ->
                     Log.d("er2 data ", "len = ${data.waveData.size}")
                     DataController.receive(data.waveData.datas)
@@ -172,9 +173,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FileList).observe(this, { event ->
-            (event.data as Er2FileList).let {
+            (event.data as Watch4gFileList).let {
                 binding.dataStr.text = it.toString()
             }
+            /*(event.data as Er2FileList).let {
+                binding.dataStr.text = it.toString()
+            }*/
         })
         //------------------------------pc80b------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bTrackData)
@@ -326,7 +330,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
         mainViewModel.curBluetooth.observe(viewLifecycleOwner, {
             when (it!!.modelNo) {
-                Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2, Bluetooth.MODEL_PC80B -> {
+                Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2, Bluetooth.MODEL_PC80B, Bluetooth.MODEL_WATCH_4G -> {
                     binding.ecgLayout.visibility = View.VISIBLE
                     binding.bpLayout.visibility = View.GONE
                     binding.oxyLayout.visibility = View.GONE
