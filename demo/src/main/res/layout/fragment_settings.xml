@@ -238,6 +238,12 @@
                             android:layout_height="wrap_content"
                             android:text="设置服务器"
                             android:layout_marginStart="20dp"/>
+                        <Button
+                            android:id="@+id/watch_4g_bound"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="绑定"
+                            android:layout_marginStart="20dp"/>
                     </LinearLayout>
                 </LinearLayout>
 

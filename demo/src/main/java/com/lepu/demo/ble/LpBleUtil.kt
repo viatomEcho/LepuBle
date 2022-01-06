@@ -560,6 +560,16 @@ class LpBleUtil {
                 BleServiceHelper.getConfig(model)
             }
         }
+        fun boundDevice(model: Int) {
+            Log.d(TAG, "boundDevice")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.boundDevice(model)
+            }
+        }
 
     }
 

@@ -114,6 +114,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.watch4gGetConfig.setOnClickListener {
             LpBleUtil.getConfig(Bluetooth.MODEL_WATCH_4G)
         }
+        binding.watch4gBound.setOnClickListener {
+            LpBleUtil.boundDevice(Bluetooth.MODEL_WATCH_4G)
+        }
 
     }
 
