@@ -8,6 +8,7 @@ import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.Bpw1BleResponse
 import com.lepu.blepro.ble.cmd.Pc100BleResponse
+import com.lepu.blepro.ble.data.Bp2Config
 import com.lepu.blepro.ble.data.FscaleUserInfo
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
@@ -29,11 +30,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private var switchState = false
     private var state = 0
+    private var volume = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
         initLiveEvent()
+        LpBleUtil.bp2GetConfig(Constant.BluetoothConfig.currentModel[0])
     }
 
     private fun initView() {
@@ -42,11 +45,19 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             switchState = !switchState
             LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, 0, 0)
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            var temp = "关"
+            if (switchState)
+                temp = "开"
+            binding.er1SetConfig.text = "声音" + temp
         }
         binding.duoekSetConfig.setOnClickListener {
             switchState = !switchState
             LpBleUtil.setDuoekVibrate(Constant.BluetoothConfig.currentModel[0], switchState, 0, 0, 0)
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            var temp = "关"
+            if (switchState)
+                temp = "开"
+            binding.duoekSetConfig.text = "声音" + temp
         }
         binding.er1GetConfig.setOnClickListener {
             LpBleUtil.getEr1VibrateConfig(Constant.BluetoothConfig.currentModel[0])
@@ -61,15 +72,20 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             switchState = !switchState
             LpBleUtil.setEr2SwitcherState(Constant.BluetoothConfig.currentModel[0], switchState)
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            var temp = "关"
+            if (switchState)
+                temp = "开"
+            binding.er2SetConfig.text = "声音" + temp
         }
 
         //-------------------------bp2/bp2A--------------------
         binding.bp2SetState.setOnClickListener {
-            LpBleUtil.bp2SwitchState(Constant.BluetoothConfig.currentModel[0], state)
-            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             state++
             if (state > 5)
                 state = 0
+            LpBleUtil.bp2SwitchState(Constant.BluetoothConfig.currentModel[0], state)
+            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.bp2SetState.text = "设备状态" + state
         }
         binding.bp2GetConfig.setOnClickListener {
             LpBleUtil.bp2GetConfig(Constant.BluetoothConfig.currentModel[0])
@@ -77,8 +93,16 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
         binding.bp2SetConfig.setOnClickListener {
             switchState = !switchState
-            LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], switchState)
+            LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], switchState, volume)
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+        }
+        binding.bp2SetVolume.setOnClickListener {
+            volume++
+            if (volume > 3)
+                volume = 0
+            LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], switchState, volume)
+            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.bp2SetVolume.text = "音量" + volume
         }
 
         //-------------------------F4,F5-----------------------
@@ -110,9 +134,21 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun initLiveEvent() {
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSetConfigResult)
             .observe(this, {
                 binding.content.text = (it.data as Int).toString()
+                LpBleUtil.bp2GetConfig(Constant.BluetoothConfig.currentModel[0])
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
+            .observe(this, {
+//                var config = it.data as Bp2Config
+//                binding.content.text = config.toString()
+//                switchState = config.switchState
+//                volume = config.volume
+//                binding.bp2SetConfig.text = "声音关"
+//                binding.bp2SetVolume.text = "音量" + volume
+//                if (switchState)
+//                    binding.bp2SetConfig.text = "声音开"
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1VibrateConfig)
             .observe(this, {

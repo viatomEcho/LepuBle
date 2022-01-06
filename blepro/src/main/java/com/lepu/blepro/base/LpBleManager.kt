@@ -209,13 +209,13 @@ abstract class LpBleManager(context: Context): BleManager(context) {
     abstract fun dealReqQueue(requestQueue: RequestQueue): RequestQueue
 
     open fun sendCmd(bytes: ByteArray) {
+        LepuBleLog.e("sendCmd--------------" + bytesToHex(bytes))
         writeCharacteristic(write_char, bytes)
             .split()
             .done { device: BluetoothDevice ->
-                LepuBleLog.e(device.name + " send cmd:" + bytesToHex(bytes))
+                LepuBleLog.e(device.name + " done send cmd:" + bytesToHex(bytes))
             }.fail { device, status ->
-
-
+                LepuBleLog.e(device.name + " fail send cmd:" + bytesToHex(bytes))
             }
             .enqueue()
     }

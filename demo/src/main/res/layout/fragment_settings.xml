@@ -76,7 +76,7 @@
                             android:id="@+id/er2_set_config"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="心跳音"
+                            android:text="声音"
                             android:layout_marginStart="20dp"/>
                     </LinearLayout>
                 </LinearLayout>
@@ -103,11 +103,20 @@
                             android:layout_height="wrap_content"
                             android:text="获取配置"
                             android:layout_marginStart="20dp"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
                         <Button
                             android:id="@+id/bp2_set_config"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="心跳音"
+                            android:text="声音" />
+                        <Button
+                            android:id="@+id/bp2_set_volume"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="音量"
                             android:layout_marginStart="20dp"/>
                     </LinearLayout>
                 </LinearLayout>

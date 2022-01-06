@@ -274,7 +274,7 @@ public class Bp2BleCmd {
         }
 
 
-        public static byte[] setConfig(boolean switchState) {
+        public static byte[] setConfig(boolean switchState, int volume) {
                 int len = 40;
 
                 byte[] cmd = new byte[8+len];
@@ -292,7 +292,7 @@ public class Bp2BleCmd {
                 if(switchState) {
                     cmd[31] = 1;
                 }
-
+                cmd[33] = (byte) volume;
                 cmd[7+len] = CrcUtil.calCRC8(cmd);
 
                 serial++;

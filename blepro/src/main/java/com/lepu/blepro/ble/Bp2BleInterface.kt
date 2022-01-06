@@ -277,6 +277,10 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
                         .post(InterfaceEvent(model, 0))
                 } else {
+
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
+//                        .post(InterfaceEvent(model, Bp2Config(bleResponse.content)))
+
                     if (bleResponse.content.size > 24 && bleResponse.content[24].toInt() == 1) {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
                             .post(InterfaceEvent(model, 1))
@@ -404,8 +408,8 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
     }
 
 
-    fun setConfig(switch:Boolean){
-        sendCmd(MSG_TYPE_SET_SWITCHER_STATE, Bp2BleCmd.BPMCmd.setConfig(switch))
+    fun setConfig(switch:Boolean, volume: Int){
+        sendCmd(MSG_TYPE_SET_SWITCHER_STATE, Bp2BleCmd.BPMCmd.setConfig(switch, volume))
     }
      fun getConfig(){
         sendCmd(MSG_TYPE_GET_CONFIG, Bp2BleCmd.BPMCmd.getConfig())

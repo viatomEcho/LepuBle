@@ -601,14 +601,15 @@ class BleServiceHelper private constructor() {
         }
 
     }
-    fun bp2SetConfig(model: Int, switch: Boolean){
+    @JvmOverloads
+    fun bp2SetConfig(model: Int, switch: Boolean, volume: Int = 2){
         if (!checkService()) return
         when(model){
             Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2BleInterface).let {
                         LepuBleLog.d(tag, "it as Bp2BleInterface--bp2SetConfig")
-                        it.setConfig(switch)
+                        it.setConfig(switch, volume)
                     }
                 }
             }
@@ -1005,7 +1006,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_F4_SCALE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as F4ScaleBleInterface).let {
-                        LepuBleLog.d(tag, "it as Bpw1BleInterface--setTimingSwitch")
+                        LepuBleLog.d(tag, "it as F4ScaleBleInterface--setUserInfo")
                         it.setUserInfo(userInfo)
                     }
                 }
@@ -1013,7 +1014,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_F5_SCALE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as F5ScaleBleInterface).let {
-                        LepuBleLog.d(tag, "it as Bpw1BleInterface--setTimingSwitch")
+                        LepuBleLog.d(tag, "it as F5ScaleBleInterface--setUserInfo")
                         it.setUserInfo(userInfo)
                     }
                 }
@@ -1047,7 +1048,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PC100 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc100BleInterface).let {
-                        LepuBleLog.d(tag, "it as PC80BleInterface--sendHeartbeat")
+                        LepuBleLog.d(tag, "it as Pc100BleInterface--getBpState")
                         it.getBpState()
                     }
                 }
@@ -1060,7 +1061,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PC100 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc100BleInterface).let {
-                        LepuBleLog.d(tag, "it as PC80BleInterface--sendHeartbeat")
+                        LepuBleLog.d(tag, "it as Pc100BleInterface--getBoState")
                         it.getBoState()
                     }
                 }

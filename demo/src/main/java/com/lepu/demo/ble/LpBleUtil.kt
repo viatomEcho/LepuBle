@@ -430,8 +430,9 @@ class LpBleUtil {
             BleServiceHelper.getEr2SwitcherState(model)
         }
 
-        fun bp2SetConfig(model: Int, switchState: Boolean){
-            BleServiceHelper.bp2SetConfig(model, switchState)
+        @JvmOverloads
+        fun bp2SetConfig(model: Int, switchState: Boolean, volume: Int = 2){
+            BleServiceHelper.bp2SetConfig(model, switchState, volume)
         }
         fun bp2GetConfig(model: Int){
             BleServiceHelper.bp2GetConfig(model)
