@@ -25,6 +25,28 @@
   > 蓝牙名一致不进行蓝牙名重连
   >
   > demo添加api测试部分
+  
+- 2.0.0.9
+
+  >Android8.0启动服务问题
+  >
+  >添加停止蓝牙服务BleService接口
+  >
+  >扫描识别vihealth设备
+  
+- 2.0.0.10
+
+  >Android8.0启动服务后移除服务通知
+  
+- 2.0.0.11
+
+  >添加Pc100，Pc66b设备
+  >
+  >er1，er2设置mtu为247
+  >
+  >添加bp2音量设置
+  >
+  >附加文档和源码
 
 
 
@@ -59,6 +81,8 @@
 
 其他接口：
 
+- `stopService(application: Application)` ：停止蓝牙服务BleService
+
 - `reInitBle()` ：重新初始化蓝牙
 
 - `startScan(scanModel: Int, needPair: Boolean = false, isStrict: Boolean = false， isScanUnRegister: Boolean = false)` 
@@ -89,7 +113,7 @@
 
 - `connect(context: Context, model: Int, b: BluetoothDevice, isAutoReconnect: Boolean = true, toConnectUpdater: Boolean = false)`  
 
-  > 连接成功后自动同步时间，但Pc80b，Pc60fw，胎心仪Fhr设备没有同步时间设置，连接成功后直接发送EventMsgConst.Ble.EventBleDeviceReady
+  > 连接成功后自动同步时间，但Pc80b，Pc60fw，胎心仪Fhr，Pc100，Pc66b设备没有同步时间设置，连接成功后直接发送EventMsgConst.Ble.EventBleDeviceReady
   >
   > 每次发起**连接前必须关闭扫描** 
   >
@@ -147,11 +171,17 @@
 
 - `isRtStop(model: Int)` ：是否已停止实时监测任务
 
-- `startBp(model: Int)` ：开始测量血压，支持设备有Bpm，Bpw1
+- `startBp(model: Int)` ：开始测量血压，支持设备有Bpm，Bpw1，Pc100
 
 - `stopBp(model: Int)` ：停止测量血压
 
-- `bp2SetConfig(model: Int, switch: Boolean)` ：设置Bp2心跳音开关
+- `bp2SetConfig(model: Int, switch: Boolean, volume: Int = 2)` 
+
+  > 设置Bp2配置信息
+  >
+  > switch：声音开关
+  >
+  > volume：声音大小（0-3）
 
 - `bp2GetConfig(model: Int)` ：获取Bp2心跳音开关信息
 
@@ -314,8 +344,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * PC60FwBleInterface发出的通知
-     * 包含model: model_pc60fw
+     * PC60FwBleInterface，Pc6nBleInterface发出的通知
+     * 包含model: model_pc60fw，model_pc_6n
      */
     interface PC60Fw{
         companion object{
@@ -323,6 +353,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventPC60FwRtDataWave = "com.lepu.ble.pc60fw.rt.data.wave"       // 血氧波形 PC60FwBleResponse.RtDataWave
             const val EventPC60FwBattery = "com.lepu.ble.pc60fw.battery"               // 电池电量 PC60FwBleResponse.Battery
             const val EventPC60FwWorkingStatus = "com.lepu.ble.pc60fw.working.status"  // 工作状态 PC60FwBleResponse.WorkingStatus
+            const val EventPC60FwDeviceInfo = "com.lepu.ble.pc60fw.device.info"        // 设备信息 Pc6nDeviceInfo
         }
     }
 
@@ -368,6 +399,24 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBpw1MeasureResult = "com.lepu.ble.bpw1.measure.result"                // 测量结果 Bpw1BleResponse.BpData
             const val EventBpw1GetFileListComplete = "com.lepu.ble.bpw1.get.file.list.complete"  // 传输文件完成 Bpw1BleResponse.BpData
             const val EventBpw1GetMeasureTime = "com.lepu.ble.bpw1.get.measure.time"             // 获取定时测量血压时间 Bpw1BleResponse.MeasureTime
+        }
+    }
+    
+    /**
+     * PC100BleInterface发出的通知
+     * 包含model: model_pc100
+     */
+    interface PC100{
+        companion object{
+            const val EventPc100DeviceInfo = "com.lepu.ble.pc100.device.info"         // 设备信息 Pc100DeviceInfo
+            const val EventPc100BpResult = "com.lepu.ble.pc100.bp.result"             // 血压测量结果 Pc100BleResponse.BpResult
+            const val EventPc100BpErrorResult = "com.lepu.ble.pc100.bp.error.result"  // 血压测量错误结果 Pc100BleResponse.BpResultError
+            const val EventPc100BpStart = "com.lepu.ble.pc100.bp.start"               // 血压开始测量 true
+            const val EventPc100BpStop = "com.lepu.ble.pc100.bp.stop"                 // 血压停止测量 true
+            const val EventPc100BpStatus = "com.lepu.ble.pc100.bp.status"             // 血压测量状态 Pc100BleResponse.BpStatus
+            const val EventPc100BpRtData = "com.lepu.ble.pc100.bp.rtdata"             // 血压实时测量值 Pc100BleResponse.RtBpData
+            const val EventPc100BoRtWave = "com.lepu.ble.pc100.bo.rtwave"             // 血氧实时波形数据 byte数组
+            const val EventPc100BoRtParam = "com.lepu.ble.pc100.bo.rtparam"           // 血氧实时测量值 Pc100BleResponse.RtBoParam
         }
     }
 
