@@ -12,8 +12,10 @@ import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_S
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_SPO2_WAVE
 import com.lepu.blepro.ble.data.Pc6nDeviceInfo
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.utils.CrcUtil
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
+import com.lepu.blepro.utils.toUInt
 
 
 class Pc6nBleInterface(model: Int): BleInterface(model) {
@@ -51,20 +53,20 @@ class Pc6nBleInterface(model: Int): BleInterface(model) {
                 continue@loop
             }
 
-            val length = bytes[i + 3]
-            if (length < 0) {
+            // need content length
+            val len = toUInt(bytes.copyOfRange(i+3, i+4))
+            if ((len < 0) || (i+4+len > bytes.size)) {
                 continue@loop
             }
-            if (i + 4 + length > bytes.size) {
-                return bytes.copyOfRange(i, bytes.size)
+
+            val temp: ByteArray = bytes.copyOfRange(i, i+4+len)
+            if (temp.last() == CrcUtil.calCRC8PC(temp)) {
+                val bleResponse = PC60FwBleResponse.PC60FwResponse(temp)
+                onResponseReceived(bleResponse)
+                val tempBytes: ByteArray? = if (i+4+len == bytes.size) null else bytes.copyOfRange(i+4+len, bytes.size)
+
+                return hasResponse(tempBytes)
             }
-
-            val temp: ByteArray = bytes.copyOfRange(i, i + 4 + length)
-
-            val bleResponse = PC60FwBleResponse.PC60FwResponse(temp)
-            onResponseReceived(bleResponse)
-            val tempBytes: ByteArray? = bytes.copyOfRange(i + 4 + length, bytes.size)
-            return hasResponse(tempBytes)
         }
         return bytesLeft
     }

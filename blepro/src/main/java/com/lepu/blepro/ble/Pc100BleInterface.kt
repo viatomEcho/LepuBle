@@ -247,18 +247,18 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             }
 
             // need content length
-            val len = toUInt(bytes.copyOfRange(i+3, i+4)) - 1
+            val len = toUInt(bytes.copyOfRange(i+3, i+4))
 //            Log.d(TAG, "want bytes length: $len")
-            if (i+5+len > bytes.size) {
+            if (i+4+len > bytes.size) {
                 continue@loop
             }
 
-            val temp: ByteArray = bytes.copyOfRange(i, i+5+len)
+            val temp: ByteArray = bytes.copyOfRange(i, i+4+len)
             if (temp.last() == CrcUtil.calCRC8PC(temp)) {
                 val bleResponse = Pc100BleResponse.Pc100Response(temp)
 //                LepuBleLog.d(TAG, "get response: ${temp.toHex()}" )
                 onResponseReceived(bleResponse)
-                val tempBytes: ByteArray? = if (i+5+len == bytes.size) null else bytes.copyOfRange(i+5+len, bytes.size)
+                val tempBytes: ByteArray? = if (i+4+len == bytes.size) null else bytes.copyOfRange(i+4+len, bytes.size)
 
                 return hasResponse(tempBytes)
             }

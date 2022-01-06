@@ -9,13 +9,17 @@ import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_B
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_SPO2_PARAM
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_SPO2_WAVE
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_WORKING_STATUS
+import com.lepu.blepro.ble.data.Pc6nDeviceInfo
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.utils.CrcUtil
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.toUInt
 
 
 class PC60FwBleInterface(model: Int): BleInterface(model) {
     
     private val tag: String = "PC60FwBleInterface"
+    private var pc6nDevice = Pc6nDeviceInfo()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = PC60FwBleManager(context)
@@ -50,20 +54,20 @@ class PC60FwBleInterface(model: Int): BleInterface(model) {
                 continue@loop
             }
 
-            val length = bytes[i + 3]
-            if (length < 0) {
+            // need content length
+            val len = toUInt(bytes.copyOfRange(i+3, i+4))
+            if ((len < 0) || (i+4+len > bytes.size)) {
                 continue@loop
             }
-            if (i + 4 + length > bytes.size) {
-                return bytes.copyOfRange(i, bytes.size)
+
+            val temp: ByteArray = bytes.copyOfRange(i, i+4+len)
+            if (temp.last() == CrcUtil.calCRC8PC(temp)) {
+                val bleResponse = PC60FwBleResponse.PC60FwResponse(temp)
+                onResponseReceived(bleResponse)
+                val tempBytes: ByteArray? = if (i+4+len == bytes.size) null else bytes.copyOfRange(i+4+len, bytes.size)
+
+                return hasResponse(tempBytes)
             }
-
-            val temp: ByteArray = bytes.copyOfRange(i, i + 4 + length)
-
-            val bleResponse = PC60FwBleResponse.PC60FwResponse(temp)
-            onResponseReceived(bleResponse)
-            val tempBytes: ByteArray? = bytes.copyOfRange(i + 4 + length, bytes.size)
-            return hasResponse(tempBytes)
         }
         return bytesLeft
     }
@@ -100,10 +104,30 @@ class PC60FwBleInterface(model: Int): BleInterface(model) {
             }
 
         }
+
+        if (response.token == TOKEN_EPI_F0 && response.type == PC60FwBleResponse.PC60FwResponse.TYPE_DEVICE_SN){
+            LepuBleLog.d(tag, "model:$model,TYPE_DEVICE_SN => success")
+            pc6nDevice.sn = com.lepu.blepro.utils.toString(response.content)
+            LepuBleLog.d(tag, "toString == " + com.lepu.blepro.utils.toString(response.content))
+        }
+        if (response.token == TOKEN_EPI_F0 && response.type == PC60FwBleResponse.PC60FwResponse.TYPE_DEVICE_INFO){
+            LepuBleLog.d(tag, "model:$model,TYPE_DEVICE_INFO => success")
+            PC60FwBleResponse.DeviceInfo(response.content).let {
+                pc6nDevice.deviceName = it.deviceName
+                pc6nDevice.hardwareV = it.hardwareV
+                pc6nDevice.softwareV = it.softwareV
+                LepuBleLog.d(tag, "it.deviceName == " + it.deviceName)
+                LepuBleLog.d(tag, "it.hardwareV == " + it.hardwareV)
+                LepuBleLog.d(tag, "it.softwareV == " + it.softwareV)
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo).post(InterfaceEvent(model, pc6nDevice))
+            }
+        }
     }
 
 
     override fun getInfo() {
+        sendCmd(Pc6nBleCmd.getDeviceSN())
+        sendCmd(Pc6nBleCmd.getDeviceInfo())
     }
 
     override fun syncTime() {
