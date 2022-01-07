@@ -27,10 +27,12 @@ public class Er2DeviceInfo {
         this.data = data;
         char c = (char) data[0];
         hwVersion = String.valueOf(c);
-        fwVersion = "".concat(String.valueOf(data[3]))
+        fwVersion = "".concat(String.valueOf(data[4]))
+                .concat(String.valueOf(data[3]))
                 .concat(".").concat(String.valueOf(data[2]))
                 .concat(".").concat(String.valueOf(data[1]));
-        blVersion = "".concat(String.valueOf(data[7]))
+        blVersion = "".concat(String.valueOf(data[8]))
+                .concat(String.valueOf(data[7]))
                 .concat(".").concat(String.valueOf(data[6]))
                 .concat(".").concat(String.valueOf(data[5]));
         byte[] tmpBranchCodeData = Arrays.copyOfRange(data, 9, 17);
