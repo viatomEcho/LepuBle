@@ -80,6 +80,12 @@ class PC80BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,GET_RATE response.len => " + response.len)
             }
 
+            PC80BleCmd.VERSION_SET -> {
+                LepuBleLog.d(tag, "model:$model,TRANS_SET => success")
+//                sendCmd(PC80BleCmd.versionSet(PC80BleCmd.ACK))
+            }
+
+
             // 建立会话应答
             PC80BleCmd.TRANS_SET -> {
                 LepuBleLog.d(tag, "model:$model,TRANS_SET => success")
@@ -100,7 +106,8 @@ class PC80BleInterface(model: Int): BleInterface(model) {
                     val poSize :Int= (size).div(this.fileSize).toInt()
                     LepuBleLog.d(tag, "model:$model,DATA_MESS info poSize => $poSize")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadingFileProgress).post(InterfaceEvent(model, poSize))
-
+                    LepuBleLog.d(tag, "model======:${response.len}:${this.index}:${this.fileSize}")
+                    sendCmd(PC80BleCmd.responseDataMess(this.seqNo, PC80BleCmd.ACK))
                     if (response.len == 1) {
                         if (this.index != this.fileSize){
                             LepuBleLog.d(tag, "model:$model,DATA_MESS EventPc80bReadFileError")
