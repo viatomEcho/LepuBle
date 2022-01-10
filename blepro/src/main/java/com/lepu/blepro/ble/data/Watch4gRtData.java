@@ -109,6 +109,24 @@ public class Watch4gRtData {
         private int size;
         private float[] datas;
         private byte[] bytes;
+        int n1 = 0;
+        float mv1 = 0;
+
+        public int getN1() {
+            return n1;
+        }
+
+        public void setN1(int n1) {
+            this.n1 = n1;
+        }
+
+        public float getMv1() {
+            return mv1;
+        }
+
+        public void setMv1(float mv1) {
+            this.mv1 = mv1;
+        }
 
         public WaveData(byte[] bytes) {
             if (bytes == null || bytes.length < 2) {
@@ -136,18 +154,20 @@ public class Watch4gRtData {
         }
 
         private float byteTomV(byte a, byte b) {
-            if (a == (byte) 0xff && b == (byte) 0x7f)
+            if (a == (byte) 0xff && b == (byte) 0x7f) {
                 return 0f;
+            }
 
             int n = ((a & 0xFF) | (short) (b << 8));
 
 //        float mv = (float) (n*12.7*1800*1.03)/(10*227*4096);
 //            float mv = (float) (n * (1.0035 * 1800) / (4096 * 178.74));
 
-            float mv = (float) (n*0.00275*2);
+            float mv = (float) (n*0.00275);
 
 //        float mv = (float) (n * 0.002467);
-
+            n1 = n;
+            mv1 = mv;
             Log.d("test12345", "----------n------------" + n);
             Log.d("test12345", "----------mv------------" + mv);
 

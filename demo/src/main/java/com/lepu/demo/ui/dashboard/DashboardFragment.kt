@@ -134,6 +134,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         initLiveEvent()
     }
 
+    var temp = ""
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initLiveEvent(){
         LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStart).observeSticky(this, {
@@ -168,7 +170,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 rtData.let { data ->
                     Log.d("er2 data ", "len = ${data.waveData.size}")
                     DataController.receive(data.waveData.datas)
-                    binding.dataStr.text = data.rtParam.toString()
+
+                    temp += "\n n == " + data.waveData.n1 + " mv == " + data.waveData.mv1
+                    binding.dataStr.text = data.rtParam.toString() + temp
                     viewModel.ecgHr.value = data.hr
                 }
             })

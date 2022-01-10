@@ -361,9 +361,15 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getFileList() {
+        offset = 0
+        isCancelRF = false
+        isPausedRF = false
         curFileName = "ecgrecord.list"
         sendCmd(Watch4gBleCmd.readFileStart(curFileName?.toByteArray(), 0))
 //        sendCmd(Watch4gBleCmd.listFiles())
+    }
+    fun deleteFile(fileName: String) {
+        sendCmd(Watch4gBleCmd.deleteFile(fileName.toByteArray()))
     }
 
     override fun factoryReset() {

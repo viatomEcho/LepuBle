@@ -495,6 +495,18 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    fun deleteFile(model: Int, fileName: String) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_WATCH_4G -> {
+                getInterface(model)?.let {
+                    it as Watch4gBleInterface
+                    it.deleteFile(fileName)
+                }
+            }
+            else -> LepuBleLog.e(tag, "model error")
+        }
+    }
 
     /**
      * 更新设备设置

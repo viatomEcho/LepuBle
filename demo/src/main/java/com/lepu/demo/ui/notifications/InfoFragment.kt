@@ -13,6 +13,7 @@ import com.lepu.blepro.ble.cmd.Er2FileList
 import com.lepu.blepro.ble.cmd.Pc100BleResponse
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.objs.Bluetooth
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
 import com.lepu.demo.ble.LpBleUtil
@@ -85,6 +86,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         binding.continueRf.setOnClickListener {
 
         }
+        // 删除文件
+        binding.deleteFile.setOnClickListener {
+            LpBleUtil.deleteFile(Constant.BluetoothConfig.currentModel[0], fileNames[0])
+        }
         // 更新配置
         binding.updateSet.setOnClickListener {
 
@@ -148,24 +153,27 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         //--------------------------------er2-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FileList)
             .observe(this, { event ->
-                (event.data as Watch4gFileList).let {
-                    binding.info.text = it.toString()
-                    for (fileName in it.fileNames) {
-                        if (fileName.contains("R")) {
-                            fileNames.add(fileName)
+                if (event.model == Bluetooth.MODEL_WATCH_4G) {
+                    (event.data as Watch4gFileList).let {
+                        binding.info.text = it.toString()
+                        for (fileName in it.fileNames) {
+                            if (fileName.contains("R")) {
+                                fileNames.add(fileName)
+                            }
                         }
+                        Toast.makeText(context, "4g手表 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                     }
-                    Toast.makeText(context, "er2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                } else {
+                    (event.data as Er2FileList).let {
+                        binding.info.text = it.toString()
+                        for (fileName in it.fileNames) {
+                            if (fileName.contains("R")) {
+                                fileNames.add(fileName)
+                            }
+                        }
+                        Toast.makeText(context, "er2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                    }
                 }
-                /*(event.data as Er2FileList).let {
-                    binding.info.text = it.toString()
-                    for (fileName in it.fileNames) {
-                        if (fileName.contains("R")) {
-                            fileNames.add(fileName)
-                        }
-                    }
-                    Toast.makeText(context, "er2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                }*/
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadingFileProgress)
             .observe(this, { event ->

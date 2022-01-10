@@ -310,6 +310,17 @@ class LpBleUtil {
             }
         }
 
+        fun deleteFile(model: Int, fileName: String) {
+            Log.d(TAG, "deleteFile")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.deleteFile(model, fileName)
+            }
+        }
+
         /**
          *
          * @param model Int

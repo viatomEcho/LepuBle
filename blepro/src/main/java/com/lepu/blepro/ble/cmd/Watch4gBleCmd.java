@@ -27,6 +27,7 @@ public class Watch4gBleCmd {
     public final static byte CMD_START_READ_FILE = (byte) 0xF2;
     public final static byte CMD_READ_FILE_CONTENT = (byte) 0xF3;
     public final static byte CMD_END_READ_FILE = (byte) 0xF4;
+    public final static byte CMD_DELETE_FILE = (byte) 0xF8;
 
     public final static byte CMD_BOUND_DEVICE = (byte) 0x03;
 
@@ -68,6 +69,11 @@ public class Watch4gBleCmd {
     public static byte[] listFiles() {
         addNo();
         return getReq(CMD_LIST_FILE, (byte)seqNo, new byte[0]);
+    }
+
+    public static byte[] deleteFile(byte[] fileName) {
+        addNo();
+        return getReq(CMD_DELETE_FILE, (byte)seqNo, fileName);
     }
 
     public static byte[] factoryReset() {
