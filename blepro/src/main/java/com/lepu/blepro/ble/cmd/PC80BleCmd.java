@@ -77,7 +77,16 @@ public class PC80BleCmd {
         cmd[4] = CrcUtil.calCRC8PC(cmd);
         return cmd;
     }
-
+    //传输协议版本设置
+    public static byte[] versionSet(int res) {
+        byte[] cmd = new byte[5];
+        cmd[0] = (byte) 0xA5;
+        cmd[1] = (byte) VERSION_SET;
+        cmd[2] = (byte) 0x01;
+        cmd[3] = (byte) res;
+        cmd[4] = CrcUtil.calCRC8PC(cmd);
+        return cmd;
+    }
     // 用于数据传输应答
     // ACK 0x00 接收正确
     // NAK 0x01 接收有误
