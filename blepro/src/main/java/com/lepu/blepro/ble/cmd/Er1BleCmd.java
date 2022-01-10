@@ -305,4 +305,40 @@ public class Er1BleCmd {
         LepuBleLog.d(ByteArrayKt.bytesToHex(cmd));
         return cmd;
     }
+    public static byte[] burnFactoryInfo(byte[] config) {
+        int len = config.length;
+        byte[] cmd = new byte[8+len];
+        cmd[0] = (byte) 0xA5;
+        cmd[1] = (byte) BURN_FACTORY_INFO;
+        cmd[2] = (byte) ~BURN_FACTORY_INFO;
+        cmd[3] = (byte) 0x00;
+        cmd[4] = (byte) seqNo;
+        cmd[5] = (byte) (len & 0xFF);
+        cmd[6] = (byte) ((len >> 8) & 0xFF);
+
+        for(int i = 0; i < len; i++) {
+            cmd[i + 7] = config[i];
+        }
+        cmd[cmd.length - 1] = BleCRC.calCRC8(cmd);
+        addNo();
+
+        LepuBleLog.d(ByteArrayKt.bytesToHex(cmd));
+        return cmd;
+    }
+    public static byte[] burnLockFlash() {
+        int len = 0;
+        byte[] cmd = new byte[8+len];
+        cmd[0] = (byte) 0xA5;
+        cmd[1] = (byte) BURN_LOCK_FLASH;
+        cmd[2] = (byte) ~BURN_LOCK_FLASH;
+        cmd[3] = (byte) 0x00;
+        cmd[4] = (byte) seqNo;
+        cmd[5] = (byte) 0x00;
+        cmd[6] = (byte) 0x00;
+        cmd[7] = BleCRC.calCRC8(cmd);
+        addNo();
+
+        LepuBleLog.d(ByteArrayKt.bytesToHex(cmd));
+        return cmd;
+    }
 }

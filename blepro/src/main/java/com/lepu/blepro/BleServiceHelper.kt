@@ -1069,4 +1069,31 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    fun burnFactoryInfo(model: Int, data: ByteArray) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Er1BleInterface).let {
+                        LepuBleLog.d(tag, "it as Er1BleInterface--burnFactoryInfo")
+                        it.burnFactoryInfo(data)
+                    }
+                }
+            }
+        }
+    }
+    fun burnLockFlash(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Er1BleInterface).let {
+                        LepuBleLog.d(tag, "it as Er1BleInterface--lockFlash")
+                        it.burnLockFlash()
+                    }
+                }
+            }
+        }
+    }
+
 }

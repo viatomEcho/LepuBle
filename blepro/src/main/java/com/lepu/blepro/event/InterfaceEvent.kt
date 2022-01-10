@@ -47,6 +47,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventEr1VibrateConfig = "com.lepu.ble.er1.vibrate.config"               // 配置参数 byte数组
             const val EventEr1SetSwitcherState = "com.lepu.ble.er1.set.switcher.state"        // 设置心跳音开关 true
             const val EventEr1SetTime = "com.lepu.ble.er1.set.time"                           // 同步时间 true
+            const val EventEr1BurnFactoryInfo = "com.lepu.ble.er1.burn.factory.info"          // 烧录出厂信息 true
+            const val EventEr1BurnLockFlash = "com.lepu.ble.er1.burn.lock.flash"              // 加密Flash true
         }
     }
 

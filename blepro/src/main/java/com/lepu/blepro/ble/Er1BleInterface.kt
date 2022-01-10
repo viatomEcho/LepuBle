@@ -201,6 +201,26 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                     )
                 )
             }
+            Er1BleCmd.BURN_FACTORY_INFO -> {
+                LepuBleLog.d(tag, "model:$model,BURN_FACTORY_INFO => success")
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnFactoryInfo).post(
+                    InterfaceEvent(
+                        model,
+                        true
+                    )
+                )
+            }
+            Er1BleCmd.BURN_LOCK_FLASH -> {
+                LepuBleLog.d(tag, "model:$model,BURN_LOCK_FLASH => success")
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnLockFlash).post(
+                    InterfaceEvent(
+                        model,
+                        true
+                    )
+                )
+            }
         }
     }
 
@@ -296,6 +316,15 @@ class Er1BleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "setVibrateConfig...")
         sendCmd(Er1BleCmd.setSwitcher(switcher, vector,motionCount, motionWindows))
 
+    }
+
+    fun burnFactoryInfo(data: ByteArray) {
+        LepuBleLog.d(tag, "burnFactoryInfo...")
+        sendCmd(Er1BleCmd.burnFactoryInfo(data))
+    }
+    fun burnLockFlash() {
+        LepuBleLog.d(tag, "burnLockFlash...")
+        sendCmd(Er1BleCmd.burnLockFlash())
     }
 
 
