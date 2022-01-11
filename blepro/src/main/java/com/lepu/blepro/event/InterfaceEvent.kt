@@ -187,4 +187,26 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * Er2BleInterface发出的通知
+     * 包含model: model_er2
+     */
+    interface LeW3{
+        companion object{
+            const val EventLeW3Info = "com.lepu.ble.lew3.info"                                  // 设备信息 LepuDevice
+            const val EventLeW3SetTime = "com.lepu.ble.lew3.set.time"                           // 同步时间 true
+            const val EventLeW3BoundDevice = "com.lepu.ble.lew3.bound.device"                   // 请求绑定设备
+            const val EventLeW3GetConfig = "com.lepu.ble.lew3.get.config"                       // 获取配置信息
+            const val EventLeW3SetConfig = "com.lepu.ble.lew3.set.config"                       // 设置配置信息
+            const val EventLeW3Reset = "com.lepu.ble.lew3.reset"                                // 复位 true
+            const val EventLeW3FactoryReset = "com.lepu.ble.lew3.factory.reset"                 // 恢复出厂设置 true
+            const val EventLeW3FactoryResetAll = "com.lepu.ble.lew3.factory.reset.all"          // 恢复生产出厂状态 true
+            const val EventLeW3RtData = "com.lepu.ble.lew3.realtime.data"                       // 实时数据 LeW3RtData
+            const val EventLeW3FileList = "com.lepu.ble.lew3.file.list"                         // 文件列表 LeW3FileList
+            const val EventLeW3ReadFileError = "com.lepu.ble.lew3.file.read.error"              // 传输文件出错 true
+            const val EventLeW3ReadingFileProgress = "com.lepu.ble.lew3.file.reading.progress"  // 传输文件进度 int(0-100)
+            const val EventLeW3ReadFileComplete = "com.lepu.ble.lew3.file.read.complete"        // 传输文件完成 LeW3File
+        }
+    }
+
 }
