@@ -541,6 +541,36 @@ class LpBleUtil {
             }
         }
 
+        fun setApConfig(model: Int, type: Int, config: Int) {
+            Log.d(TAG, "setApConfig")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.setAp20Config(model, type, config)
+            }
+        }
+        fun getApConfig(model: Int, type: Int) {
+            Log.d(TAG, "getApConfig")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.getAp20Config(model, type)
+            }
+        }
+        fun getBattery(model: Int) {
+            Log.d(TAG, "getBattery")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.sendHeartbeat(model)
+            }
+        }
 
     }
 

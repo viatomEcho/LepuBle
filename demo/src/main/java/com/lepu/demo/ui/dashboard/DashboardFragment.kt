@@ -17,6 +17,7 @@ import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
 import com.lepu.demo.ble.LpBleUtil
@@ -36,6 +37,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     private val viewModel: DashboardViewModel by activityViewModels()
 
     private val binding: FragmentDashboardBinding by binding()
+
+    var dataString = ""
 
     // 心电产品
     private lateinit var ecgBkg: EcgBkg
@@ -94,7 +97,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     40
                 }
                 else -> {
-                    45
+                    100
                 }
             }
 
@@ -107,13 +110,14 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     }
 
     private fun startWave(model: Int) {
+        dataString = ""
         if (mainViewModel.runWave) {
             return
         }
         mainViewModel.runWave = true
         when(model) {
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2 -> waveHandler.post(EcgWaveTask())
-            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC_6N -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC_6N, Bluetooth.MODEL_AP20 -> waveHandler.post(OxyWaveTask())
         }
 
     }
@@ -286,7 +290,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BoRtWave)
             .observe(this, {
                 val rtWave = it.data as ByteArray
-//                binding.dataStr.text = bytesToHex(rtWave)
+                binding.dataStr.text = bytesToHex(rtWave)
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BoRtParam)
             .observe(this, {
@@ -321,6 +325,31 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.dataStr.text = rtData.toString()
                 }
             })
+        //------------------------------ap10------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBoWave)
+            .observe(this, {
+                val rtWave = it.data as Ap20BleResponse.RtBoWave
+                OxyDataController.receive(rtWave.waveIntData)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBoParam)
+            .observe(this, {
+                val rtData = it.data as Ap20BleResponse.RtBoParam
+                viewModel.oxyPr.value = rtData.pr
+                viewModel.spo2.value = rtData.spo2
+                viewModel.pi.value = rtData.pi.div(10f)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBreathWave)
+            .observe(this, {
+                val rtWave = it.data as Ap20BleResponse.RtBreathWave
+                dataString += "\n rtWave : $rtWave"
+                binding.dataStr.text = dataString
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBreathParam)
+            .observe(this, {
+                val rtData = it.data as Ap20BleResponse.RtBreathParam
+                dataString += "\n rtData : $rtData"
+                binding.dataStr.text = dataString
+            })
     }
 
     private fun initView() {
@@ -342,7 +371,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.ecgLayout.visibility = View.GONE
                     binding.oxyLayout.visibility = View.GONE
                 }
-                Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC_6N -> {
+                Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC_6N, Bluetooth.MODEL_AP20 -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE

@@ -130,6 +130,48 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             LpBleUtil.getBoState(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
         }
+        //-------------------------ap20-----------------------
+        binding.ap20Switch.setOnClickListener {
+            switchState = !switchState
+            var temp = "关"
+            if (switchState) {
+                LpBleUtil.setApConfig(Constant.BluetoothConfig.currentModel[0], 1, 1)
+                temp = "开"
+            } else {
+                LpBleUtil.setApConfig(Constant.BluetoothConfig.currentModel[0], 1, 0)
+            }
+            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.ap20Switch.text = "警报" + temp
+        }
+        binding.ap20GetConfig.setOnClickListener {
+            state++
+            if (state > 5)
+                state = 0
+            if (state == 5) {
+                LpBleUtil.getBattery(Constant.BluetoothConfig.currentModel[0])
+            } else {
+                LpBleUtil.getApConfig(Constant.BluetoothConfig.currentModel[0], state)
+            }
+            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.ap20GetConfig.text = "获取参数" + state
+        }
+        binding.ap20SetConfig.setOnClickListener {
+            state++
+            if (state > 4)
+                state = 0
+            if (state == 2 || state == 3) {
+                LpBleUtil.setApConfig(Constant.BluetoothConfig.currentModel[0], state, 90)
+            } else if (state == 4) {
+                LpBleUtil.setApConfig(Constant.BluetoothConfig.currentModel[0], state, 125)
+            } else if (state == 0) {
+                volume++
+                if (volume > 6)
+                    volume = 0
+                LpBleUtil.setApConfig(Constant.BluetoothConfig.currentModel[0], state, volume)
+            }
+            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.ap20SetConfig.text = "设置参数" + state
+        }
 
     }
 

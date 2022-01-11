@@ -59,7 +59,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         mainViewModel.pc100Info.observe(viewLifecycleOwner, {
             binding.info.text = it.toString()
         })
-        mainViewModel.pc6nInfo.observe(viewLifecycleOwner, {
+        mainViewModel.boInfo.observe(viewLifecycleOwner, {
             binding.info.text = it.toString()
         })
         // 公共方法测试

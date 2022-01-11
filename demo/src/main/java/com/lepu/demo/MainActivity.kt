@@ -204,12 +204,25 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 }
             })
 
-        //-------------------------pc6n---------------------------
+        //-------------------------pc60fw pc6n---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo)
             .observe(this, { event ->
-                (event.data as Pc6nDeviceInfo).let {
-                    Toast.makeText(this, "pc6n 获取设备信息成功", Toast.LENGTH_SHORT).show()
-                    viewModel._pc6nInfo.value = it
+                (event.data as BoDeviceInfo).let {
+                    Toast.makeText(this, "pc60fw pc6n获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._boInfo.value = it
+                }
+            })
+        //-------------------------ap20---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20SetTime)
+            .observe(this, {
+                Toast.makeText(this, "ap20 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20DeviceInfo)
+            .observe(this, { event ->
+                (event.data as BoDeviceInfo).let {
+                    Toast.makeText(this, "ap20 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._boInfo.value = it
                 }
             })
 

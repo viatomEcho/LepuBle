@@ -836,11 +836,11 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A ->{
                 return inter is Bp2BleInterface
             }
-            Bluetooth.MODEL_PC60FW -> {
-                return inter is PC60FwBleInterface
+            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC_6N -> {
+                return inter is Pc60FwBleInterface
             }
             Bluetooth.MODEL_PC80B -> {
-                return inter is PC80BleInterface
+                return inter is Pc80BleInterface
             }
             Bluetooth.MODEL_FHR -> {
                 return inter is FhrBleInterface
@@ -853,6 +853,9 @@ class BleServiceHelper private constructor() {
             }
             Bluetooth.MODEL_F5_SCALE -> {
                 return inter is F5ScaleBleInterface
+            }
+            Bluetooth.MODEL_AP20 -> {
+                return inter is Ap20BleInterface
             }
             else -> {
                 LepuBleLog.d(tag, "checkModel, 无效model：$model,${inter.javaClass}")
@@ -944,14 +947,26 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * PC80B心跳包 电量查询
+     * PC80B心跳包, AP10,AP20设备 电量查询
      */
     fun sendHeartbeat(model: Int) {
         if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as PC80BleInterface).let {
-                LepuBleLog.d(tag, "it as PC80BleInterface--sendHeartbeat")
-                it.sendHeartbeat()
+        when (model) {
+            Bluetooth.MODEL_PC80B -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Pc80BleInterface).let {
+                        LepuBleLog.d(tag, "it as PC80BleInterface--sendHeartbeat")
+                        it.sendHeartbeat()
+                    }
+                }
+            }
+            Bluetooth.MODEL_AP20 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Ap20BleInterface).let {
+                        LepuBleLog.d(tag, "it as Ap20BleInterface--sendHeartbeat")
+                        it.getBattery()
+                    }
+                }
             }
         }
     }
@@ -1065,6 +1080,25 @@ class BleServiceHelper private constructor() {
                         it.getBoState()
                     }
                 }
+            }
+        }
+    }
+
+    fun setAp20Config(model: Int, type: Int, config: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Ap20BleInterface).let {
+                LepuBleLog.d(tag, "it as Ap20BleInterface--setAp20Config")
+                it.setConfig(type, config)
+            }
+        }
+    }
+    fun getAp20Config(model: Int, type: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Ap20BleInterface).let {
+                LepuBleLog.d(tag, "it as Ap20BleInterface--getAp20Config")
+                it.getConfig(type)
             }
         }
     }

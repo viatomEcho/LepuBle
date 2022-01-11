@@ -16,7 +16,7 @@ import java.util.*
  * 蓝牙操作
  */
 
-class PC80BleInterface(model: Int): BleInterface(model) {
+class Pc80BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "PC80BleInterface"
 
     private lateinit var context: Context
@@ -25,7 +25,7 @@ class PC80BleInterface(model: Int): BleInterface(model) {
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
-        manager = PC80BleManager(context)
+        manager = Pc80BleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -56,18 +56,18 @@ class PC80BleInterface(model: Int): BleInterface(model) {
     private fun onResponseReceived(response: PC80BleResponse.PC80Response) {
         LepuBleLog.d(tag, "received: ${response.cmd}")
         when(response.cmd) {
-            PC80BleCmd.HEARTBEAT -> {
+            Pc80BleCmd.HEARTBEAT -> {
                 LepuBleLog.d(tag, "model:$model,HEARTBEAT => success")
                 val batLevel = (response.content[0].toUInt() and 0xFFu).toInt()
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bBatLevel).post(InterfaceEvent(model, batLevel))
             }
 
-            PC80BleCmd.TIME_SET -> {
+            Pc80BleCmd.TIME_SET -> {
                 LepuBleLog.d(tag, "model:$model,TIME_SET => success")
                 syncTime()
             }
 
-            PC80BleCmd.GET_INFO -> {
+            Pc80BleCmd.GET_INFO -> {
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 LepuBleLog.d(tag, "model:$model,GET_INFO response.len => " + response.len)
                 val info = PC80BleResponse.DeviceInfo(response.content, response.len)
@@ -75,20 +75,22 @@ class PC80BleInterface(model: Int): BleInterface(model) {
             }
 
             // 查询设备信息无应答
-            PC80BleCmd.GET_RATE -> {
+            Pc80BleCmd.GET_RATE -> {
                 LepuBleLog.d(tag, "model:$model,GET_RATE => success")
                 LepuBleLog.d(tag, "model:$model,GET_RATE response.len => " + response.len)
             }
 
             // 建立会话应答
-            PC80BleCmd.TRANS_SET -> {
+            Pc80BleCmd.TRANS_SET -> {
                 LepuBleLog.d(tag, "model:$model,TRANS_SET => success")
-                sendCmd(PC80BleCmd.responseTransSet(PC80BleCmd.ACK))
+                sendCmd(
+                    Pc80BleCmd.responseTransSet(
+                        Pc80BleCmd.ACK))
                 curFile = null
-                curFile = PC80BleResponse.RtRecordData(PC80BleCmd.SCP_ECG_LENGTH, 0)
+                curFile = PC80BleResponse.RtRecordData(Pc80BleCmd.SCP_ECG_LENGTH, 0)
             }
 
-            PC80BleCmd.DATA_MESS -> {
+            Pc80BleCmd.DATA_MESS -> {
                 LepuBleLog.d(tag, "model:$model,DATA_MESS => success")
                 LepuBleLog.d(tag, "model:$model,DATA_MESS response.len => " + response.len)
                 curFile?.apply {
@@ -104,11 +106,11 @@ class PC80BleInterface(model: Int): BleInterface(model) {
                     if (response.len == 1) {
                         if (this.index != this.fileSize){
                             LepuBleLog.d(tag, "model:$model,DATA_MESS EventPc80bReadFileError")
-                            sendCmd(PC80BleCmd.responseDataMess(this.seqNo, PC80BleCmd.NAK))
+                            sendCmd(Pc80BleCmd.responseDataMess(this.seqNo, Pc80BleCmd.NAK))
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadFileError).post(InterfaceEvent(model, true))
                         }else {
                             LepuBleLog.d(tag, "model:$model,DATA_MESS EventPC80BReadFileComplete")
-                            sendCmd(PC80BleCmd.responseDataMess(this.seqNo, PC80BleCmd.ACK))
+                            sendCmd(Pc80BleCmd.responseDataMess(this.seqNo, Pc80BleCmd.ACK))
                             val scpEcgFile = PC80BleResponse.ScpEcgFile(this.content)
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadFileComplete).post(InterfaceEvent(model, scpEcgFile))
                         }
@@ -116,7 +118,7 @@ class PC80BleInterface(model: Int): BleInterface(model) {
                 }
             }
 
-            PC80BleCmd.TRACK_DATA_MESS -> {
+            Pc80BleCmd.TRACK_DATA_MESS -> {
                 LepuBleLog.d(tag, "model:$model,TRACK_DATA_MESS => success")
                 val info = PC80BleResponse.RtTrackData(response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bTrackData).post(InterfaceEvent(model, info))
@@ -143,7 +145,7 @@ class PC80BleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i+4+len)
-            if (temp.last() == CrcUtil.calCRC8PC(temp)) {
+            if (temp.last() == CrcUtil.calCRC8Pc(temp)) {
                 val bleResponse = PC80BleResponse.PC80Response(temp)
                 onResponseReceived(bleResponse)
                 val tempBytes: ByteArray? = if (i+4+len == bytes.size) null else bytes.copyOfRange(i+4+len, bytes.size)
@@ -158,11 +160,11 @@ class PC80BleInterface(model: Int): BleInterface(model) {
      * get device info
      */
     override fun getInfo() {
-        sendCmd(PC80BleCmd.getInfo())
+        sendCmd(Pc80BleCmd.getInfo())
     }
 
     override fun syncTime() {
-        sendCmd(PC80BleCmd.setTime())
+        sendCmd(Pc80BleCmd.setTime())
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
@@ -180,7 +182,7 @@ class PC80BleInterface(model: Int): BleInterface(model) {
     }
 
     fun sendHeartbeat() {
-        sendCmd(PC80BleCmd.sendHeartbeat())
+        sendCmd(Pc80BleCmd.sendHeartbeat())
     }
 
 }

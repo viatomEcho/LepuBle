@@ -111,15 +111,15 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * PC60FwBleInterface发出的通知
-     * 包含model: model_pc60fw
+     * PC60FwBleInterface,Pc6nBleInterface发出的通知
+     * 包含model: model_pc60fw, model_pc_6n
      */
     interface PC60Fw{
         companion object{
             const val EventPC60FwRtDataParam = "com.lepu.ble.pc60fw.rt.data.param"     // 血氧参数 PC60FwBleResponse.RtDataParam
             const val EventPC60FwRtDataWave = "com.lepu.ble.pc60fw.rt.data.wave"       // 血氧波形 PC60FwBleResponse.RtDataWave
             const val EventPC60FwBattery = "com.lepu.ble.pc60fw.battery"               // 电池电量 PC60FwBleResponse.Battery
-            const val EventPC60FwDeviceInfo = "com.lepu.ble.pc60fw.device.info"        // 设备信息 Pc6nDeviceInfo
+            const val EventPC60FwDeviceInfo = "com.lepu.ble.pc60fw.device.info"        // 设备信息 BoDeviceInfo
             const val EventPC60FwWorkingStatus = "com.lepu.ble.pc60fw.working.status"  // 工作状态 PC60FwBleResponse.WorkingStatus
         }
     }
@@ -182,8 +182,33 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventPc100BpStop = "com.lepu.ble.pc100.bp.stop"                 // 血压停止测量 true
             const val EventPc100BpStatus = "com.lepu.ble.pc100.bp.status"             // 血压测量状态 Pc100BleResponse.BpStatus
             const val EventPc100BpRtData = "com.lepu.ble.pc100.bp.rtdata"             // 血压实时测量值 Pc100BleResponse.RtBpData
-            const val EventPc100BoRtWave = "com.lepu.ble.pc100.bo.rtwave"             //
+            const val EventPc100BoRtWave = "com.lepu.ble.pc100.bo.rtwave"             // 血氧实时波形包 byte数组
             const val EventPc100BoRtParam = "com.lepu.ble.pc100.bo.rtparam"           // 血氧实时测量值 Pc100BleResponse.RtBoParam
+        }
+    }
+
+    /**
+     * Ap10BleInterface
+     * 包含model: model_ap20
+     */
+    interface AP20{
+        companion object{
+            const val EventAp20SetTime = "com.lepu.ble.ap20.set.time"              // 设置时间 true
+            const val EventAp20DeviceInfo = "com.lepu.ble.ap20.device.info"        // 设备信息 BoDeviceInfo
+            const val EventAp20Battery = "com.lepu.ble.ap20.battery"               // 电池电量 int（0-3）
+            const val EventAp20RtBoWave = "com.lepu.ble.ap20.bo.rtwave"            // 血氧波形包数据 Ap10BleResponse.RtBoWave
+            const val EventAp20RtBoParam = "com.lepu.ble.ap20.bo.rtparam"          // 血氧参数包数据 Ap10BleResponse.RtBoParam
+            const val EventAp20RtBreathWave = "com.lepu.ble.ap20.breath.rtwave"    // 鼻息流波形包数据 Ap10BleResponse.RtBreathWave
+            const val EventAp20RtBreathParam = "com.lepu.ble.ap20.breath.rtparam"  // 鼻息流参数包数据 Ap10BleResponse.RtBreathParam
+
+            /**
+             * type : 0 背光等级（0-5）
+             *        1 警报功能开关（0 off，1 on）
+             *        2 血氧过低阈值（85-99）
+             *        3 脉率过低阈值（30-99）
+             *        4 脉率过高阈值（100-250）
+             */
+            const val EventAp20ConfigInfo = "com.lepu.ble.ap20.config.info"   // 配置信息 int
         }
     }
 

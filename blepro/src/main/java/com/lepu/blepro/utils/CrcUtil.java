@@ -36,7 +36,7 @@ public class CrcUtil {
      * @param buf Data buffer
      * @return CRC8 code, return 0 when the parameter is error
      */
-    public static byte calCRC8PC(byte[] buf) {
+    public static byte calCRC8Pc(byte[] buf) {
         if (buf == null || buf.length == 0) {
             return 0;
         }

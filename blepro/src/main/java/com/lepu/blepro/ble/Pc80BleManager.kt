@@ -11,7 +11,7 @@ import java.util.*
  * created on: 2021/1/27 10:22
  * description:
  */
-class PC80BleManager(context: Context): LpBleManager(context) {
+class Pc80BleManager(context: Context): LpBleManager(context) {
     override fun initUUID() {
         service_uuid = UUID.fromString("0000FFF0-0000-1000-8000-00805f9b34fb")
         write_uuid = UUID.fromString("0000FFF2-0000-1000-8000-00805f9b34fb")

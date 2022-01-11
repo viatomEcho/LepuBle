@@ -5,7 +5,7 @@ import kotlinx.android.parcel.Parcelize
 
 @ExperimentalUnsignedTypes
 @Parcelize
-class Pc6nDeviceInfo : Parcelable {
+class BoDeviceInfo : Parcelable {
     var deviceName: String? = null
     var sn: String? = null
     var softwareV: String? = null
