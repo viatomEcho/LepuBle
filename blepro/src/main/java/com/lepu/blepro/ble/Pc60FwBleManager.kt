@@ -15,7 +15,7 @@ import java.util.*
  * created on: 2021/719 10:22
  * description:
  */
-class PC60FwBleManager(context: Context): LpBleManager(context) {
+class Pc60FwBleManager(context: Context): LpBleManager(context) {
     override fun initUUID() {
         service_uuid = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e")
         write_uuid = UUID.fromString("6E400002-B5A3-F393-E0A9-E50E24DCCA9E")

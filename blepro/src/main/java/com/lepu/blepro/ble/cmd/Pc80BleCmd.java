@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * universal command for Viatom devices
  */
-public class PC80BleCmd {
+public class Pc80BleCmd {
 
     public final static int SCP_ECG_LENGTH = (2+4+76+32+30+28+9024+88+512);
 
@@ -33,7 +33,7 @@ public class PC80BleCmd {
         cmd[0] = (byte) 0xA5;
         cmd[1] = (byte) GET_INFO;
         cmd[2] = (byte) (6 & 0xFF);
-        cmd[cmdLength - 1] = CrcUtil.calCRC8PC(cmd);
+        cmd[cmdLength - 1] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
 
@@ -49,7 +49,7 @@ public class PC80BleCmd {
         for(int i = 0; i < data.length; i++) {
             cmd[i + 3] = data[i];
         }
-        cmd[cmdLength - 1] = CrcUtil.calCRC8PC(cmd);
+        cmd[cmdLength - 1] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
 
@@ -60,7 +60,7 @@ public class PC80BleCmd {
         cmd[1] = (byte) GET_RATE;
         cmd[2] = (byte) 0x01;
         cmd[3] = (byte) 0x01;
-        cmd[4] = CrcUtil.calCRC8PC(cmd);
+        cmd[4] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
 
@@ -74,7 +74,7 @@ public class PC80BleCmd {
         cmd[1] = (byte) TRANS_SET;
         cmd[2] = (byte) 0x01;
         cmd[3] = (byte) res;
-        cmd[4] = CrcUtil.calCRC8PC(cmd);
+        cmd[4] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
     //传输协议版本设置
@@ -98,7 +98,7 @@ public class PC80BleCmd {
         cmd[2] = (byte) 0x02;
         cmd[3] = (byte) seq;
         cmd[4] = (byte) res;
-        cmd[5] = CrcUtil.calCRC8PC(cmd);
+        cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
 
@@ -109,7 +109,7 @@ public class PC80BleCmd {
         cmd[1] = (byte) HEARTBEAT;
         cmd[2] = (byte) 0x01;
         cmd[3] = (byte) 0x00;
-        cmd[4] = CrcUtil.calCRC8PC(cmd);
+        cmd[4] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
 

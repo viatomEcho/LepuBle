@@ -59,9 +59,9 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                             pc100Device = Pc100DeviceInfo()
                         }
                         val str = toString(response.content).split(":")
-                        pc100Device?.deviceName = toString(response.content)
+                        pc100Device?.deviceName = device.name
                         pc100Device?.sn = str[1]
-                        LepuBleLog.d(tag, "model:$model,HAND_SHAKE deviceName => " + pc100Device?.deviceName)
+                        LepuBleLog.d(tag, "model:$model,HAND_SHAKE deviceName => " + toString(response.content))
                         LepuBleLog.d(tag, "model:$model,HAND_SHAKE sn => " + pc100Device?.sn)
                     }
                     Pc100BleCmd.GET_DEVICE_ID -> {
@@ -254,7 +254,7 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i+4+len)
-            if (temp.last() == CrcUtil.calCRC8PC(temp)) {
+            if (temp.last() == CrcUtil.calCRC8Pc(temp)) {
                 val bleResponse = Pc100BleResponse.Pc100Response(temp)
 //                LepuBleLog.d(TAG, "get response: ${temp.toHex()}" )
                 onResponseReceived(bleResponse)

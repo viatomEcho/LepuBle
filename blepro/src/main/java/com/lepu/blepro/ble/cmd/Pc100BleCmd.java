@@ -54,7 +54,7 @@ public class Pc100BleCmd {
         cmd[2] = (byte) TOKEN_0XFF;
         cmd[3] = (byte) 0x02;
         cmd[4] = (byte) HAND_SHAKE;
-        cmd[5] = CrcUtil.calCRC8PC(cmd);
+        cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
 
@@ -66,7 +66,7 @@ public class Pc100BleCmd {
         cmd[2] = (byte) GET_DEVICE_INFO;
         cmd[3] = (byte) 0x02;
         cmd[4] = (byte) 0x01;
-        cmd[5] = CrcUtil.calCRC8PC(cmd);
+        cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
 
@@ -78,7 +78,7 @@ public class Pc100BleCmd {
         cmd[2] = (byte) TOKEN_0XFF;
         cmd[3] = (byte) 0x02;
         cmd[4] = (byte) GET_DEVICE_ID;
-        cmd[5] = CrcUtil.calCRC8PC(cmd);
+        cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
 
@@ -90,7 +90,7 @@ public class Pc100BleCmd {
         cmd[2] = (byte) BP_MODULE_STATE;
         cmd[3] = (byte) 0x02;
         cmd[4] = (byte) state;
-        cmd[5] = CrcUtil.calCRC8PC(cmd);
+        cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
     // 血压测量结果查询
@@ -101,7 +101,7 @@ public class Pc100BleCmd {
         cmd[2] = (byte) BP_GET_RESULT;
         cmd[3] = (byte) 0x02;
         cmd[4] = (byte) 0x01;
-        cmd[5] = CrcUtil.calCRC8PC(cmd);
+        cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
     // 血压状态查询
@@ -112,7 +112,7 @@ public class Pc100BleCmd {
         cmd[2] = (byte) BP_GET_STATUS;
         cmd[3] = (byte) 0x02;
         cmd[4] = (byte) 0x01;
-        cmd[5] = CrcUtil.calCRC8PC(cmd);
+        cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
 
@@ -124,7 +124,7 @@ public class Pc100BleCmd {
         cmd[2] = (byte) BO_MODULE_STATE;
         cmd[3] = (byte) 0x02;
         cmd[4] = (byte) state;
-        cmd[5] = CrcUtil.calCRC8PC(cmd);
+        cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
     // 血氧状态查询
@@ -135,7 +135,7 @@ public class Pc100BleCmd {
         cmd[2] = (byte) BO_GET_STATUS;
         cmd[3] = (byte) 0x02;
         cmd[4] = (byte) 0x01;
-        cmd[5] = CrcUtil.calCRC8PC(cmd);
+        cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
 
@@ -147,7 +147,7 @@ public class Pc100BleCmd {
         cmd[2] = (byte) BS_MODULE_STATE;
         cmd[3] = (byte) 0x02;
         cmd[4] = (byte) state;
-        cmd[5] = CrcUtil.calCRC8PC(cmd);
+        cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
     // 血糖测量结果查询
@@ -158,7 +158,7 @@ public class Pc100BleCmd {
         cmd[2] = (byte) BS_GET_RESULT;
         cmd[3] = (byte) 0x02;
         cmd[4] = (byte) 0x01;
-        cmd[5] = CrcUtil.calCRC8PC(cmd);
+        cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
     // 血糖状态查询
@@ -169,7 +169,7 @@ public class Pc100BleCmd {
         cmd[2] = (byte) BS_GET_STATUS;
         cmd[3] = (byte) 0x02;
         cmd[4] = (byte) 0x01;
-        cmd[5] = CrcUtil.calCRC8PC(cmd);
+        cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
 
@@ -181,7 +181,7 @@ public class Pc100BleCmd {
         cmd[2] = (byte) BT_MODULE_STATE;
         cmd[3] = (byte) 0x02;
         cmd[4] = (byte) state;
-        cmd[5] = CrcUtil.calCRC8PC(cmd);
+        cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
     // 体温测量结果查询
@@ -192,7 +192,7 @@ public class Pc100BleCmd {
         cmd[2] = (byte) BT_GET_RESULT;
         cmd[3] = (byte) 0x02;
         cmd[4] = (byte) 0x01;
-        cmd[5] = CrcUtil.calCRC8PC(cmd);
+        cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
     // 体温状态查询
@@ -203,7 +203,7 @@ public class Pc100BleCmd {
         cmd[2] = (byte) BT_GET_STATUS;
         cmd[3] = (byte) 0x02;
         cmd[4] = (byte) 0x01;
-        cmd[5] = CrcUtil.calCRC8PC(cmd);
+        cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
 
