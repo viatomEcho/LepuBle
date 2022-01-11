@@ -11,6 +11,7 @@ import android.util.SparseArray
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.*
+import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.FscaleUserInfo
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
@@ -1069,14 +1070,14 @@ class BleServiceHelper private constructor() {
         }
     }
 
-    fun burnFactoryInfo(model: Int, data: ByteArray) {
+    fun burnFactoryInfo(model: Int, config: FactoryConfig) {
         if (!checkService()) return
         when(model) {
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er1BleInterface).let {
                         LepuBleLog.d(tag, "it as Er1BleInterface--burnFactoryInfo")
-                        it.burnFactoryInfo(data)
+                        it.burnFactoryInfo(config)
                     }
                 }
             }
@@ -1088,7 +1089,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er1BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er1BleInterface--lockFlash")
+                        LepuBleLog.d(tag, "it as Er1BleInterface--burnLockFlash")
                         it.burnLockFlash()
                     }
                 }

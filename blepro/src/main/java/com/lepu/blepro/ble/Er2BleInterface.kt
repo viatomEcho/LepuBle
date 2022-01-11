@@ -117,12 +117,21 @@ class Er2BleInterface(model: Int): BleInterface(model) {
             Er2BleCmd.CMD_SET_SWITCHER_STATE -> {
 
                 LepuBleLog.d(tag, "model:$model,CMD_SET_SWITCHER_STATE => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetSwitcherState).post(
-                    InterfaceEvent(
-                        model,
-                        true
+                if (respPkg.pkgType == 0x01.toByte()) {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetSwitcherState).post(
+                        InterfaceEvent(
+                            model,
+                            true
+                        )
                     )
-                )
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetSwitcherState).post(
+                        InterfaceEvent(
+                            model,
+                            false
+                        )
+                    )
+                }
             }
             Er2BleCmd.CMD_RETRIEVE_SWITCHER_STATE -> {
 
@@ -137,32 +146,59 @@ class Er2BleInterface(model: Int): BleInterface(model) {
             Er2BleCmd.CMD_RESET -> {
 
                 LepuBleLog.d(tag, "model:$model,CMD_RESET => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2Reset).post(
-                    InterfaceEvent(
-                        model,
-                        true
+                if (respPkg.pkgType == 0x01.toByte()) {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2Reset).post(
+                        InterfaceEvent(
+                            model,
+                            true
+                        )
                     )
-                )
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2Reset).post(
+                        InterfaceEvent(
+                            model,
+                            false
+                        )
+                    )
+                }
             }
             Er2BleCmd.CMD_FACTORY_RESET -> {
 
                 LepuBleLog.d(tag, "model:$model,CMD_FACTORY_RESET => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FactoryReset).post(
-                    InterfaceEvent(
-                        model,
-                        true
+                if (respPkg.pkgType == 0x01.toByte()) {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FactoryReset).post(
+                        InterfaceEvent(
+                            model,
+                            true
+                        )
                     )
-                )
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FactoryReset).post(
+                        InterfaceEvent(
+                            model,
+                            false
+                        )
+                    )
+                }
             }
             Er2BleCmd.CMD_FACTORY_RESET_ALL -> {
 
                 LepuBleLog.d(tag, "model:$model,CMD_FACTORY_RESET_ALL => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FactoryResetAll).post(
-                    InterfaceEvent(
-                        model,
-                        true
+                if (respPkg.pkgType == 0x01.toByte()) {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FactoryResetAll).post(
+                        InterfaceEvent(
+                            model,
+                            true
+                        )
                     )
-                )
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FactoryResetAll).post(
+                        InterfaceEvent(
+                            model,
+                            false
+                        )
+                    )
+                }
             }
             Er2BleCmd.CMD_GET_REAL_TIME_DATA -> {
 
@@ -244,14 +280,10 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                 }?: LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
                 curFile = null
             }
-
-            else -> {
-
-            }
         }
     }
     fun setSwitcherState(hrFlag: Boolean) {
-        sendCmd( Er2BleCmd.setSwitcherState(hrFlag))
+        sendCmd(Er2BleCmd.setSwitcherState(hrFlag))
     }
 
     fun getSwitcherState() {
