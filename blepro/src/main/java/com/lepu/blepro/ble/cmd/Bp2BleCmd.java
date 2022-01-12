@@ -1,22 +1,16 @@
 package com.lepu.blepro.ble.cmd;
 
-
-import com.lepu.blepro.ble.data.TimeData;
-import com.lepu.blepro.utils.ByteArrayKt;
 import com.lepu.blepro.utils.CrcUtil;
 import com.lepu.blepro.utils.LepuBleLog;
-
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
-
-import static com.lepu.blepro.ble.cmd.BpmBleCmd.BPMCmd.CMD_TYPE_START_BP;
 import static com.lepu.blepro.ble.cmd.BpmBleCmd.BPMCmd.CMD_WRITE;
 
-
+/**
+ * @author chenyongfeng
+ */
 public class Bp2BleCmd {
     public static final int MSG_TYPE_INVALID = -1;
-    public final static int SET_TIME = 0xEC;
+    public static final int SET_TIME = 0xEC;
     private static int seqNo = 0;
 
 
@@ -36,30 +30,30 @@ public class Bp2BleCmd {
 
 
     public static class SwitchState {
-        public final static int ENTER_BP = 0;
-        public final static int ENTER_ECG = 1;
-        public final static int ENTER_HISTORY = 2;
-        public final static int ENTER_ON = 3;
-        public final static int ENTER_OFF = 4;
-        public final static int ENTER_FISIOT = 5;
+        public static final int ENTER_BP = 0;
+        public static final int ENTER_ECG = 1;
+        public static final int ENTER_HISTORY = 2;
+        public static final int ENTER_ON = 3;
+        public static final int ENTER_OFF = 4;
+        public static final int ENTER_FISIOT = 5;
     }
 
 
     public static class BPMCmd {
-        public final static byte HEAD_0 = (byte) 0x02;
-        public final static byte HEAD_1 = (byte) 0x40;
-        public final static byte CMD_TYPE_START_BP = (byte) 0xA1;
-        public final static byte CMD_TYPE_STOP = (byte) 0xA2;
-        private final static byte HEAD = (byte) 0xA5;
-        public final static byte CMD_SET_TIME = (byte) 0xEC;
-        private final static byte TYPE_NORMAL_SEND = (byte) 0x00;
-        public final static byte CMD_FILE_LIST = (byte) 0xF1;
-        public final static byte CMD_RESET = (byte) 0xE2;
-        public final static byte CMD_FACTORY_RESET = (byte) 0xE3;
-        public final static byte CMD_FACTORY_RESET_ALL = (byte) 0xEE;
+        public static final byte HEAD_0 = (byte) 0x02;
+        public static final byte HEAD_1 = (byte) 0x40;
+        public static final byte CMD_TYPE_START_BP = (byte) 0xA1;
+        public static final byte CMD_TYPE_STOP = (byte) 0xA2;
+        private static final byte HEAD = (byte) 0xA5;
+        public static final byte CMD_SET_TIME = (byte) 0xEC;
+        private static final byte TYPE_NORMAL_SEND = (byte) 0x00;
+        public static final byte CMD_FILE_LIST = (byte) 0xF1;
+        public static final byte CMD_RESET = (byte) 0xE2;
+        public static final byte CMD_FACTORY_RESET = (byte) 0xE3;
+        public static final byte CMD_FACTORY_RESET_ALL = (byte) 0xEE;
         // data = state + wave
-        public final static byte CMD_BP2_RT_DATA = (byte) 0x08;
-        public final static byte CMD_BP2_RT_STATE = (byte) 0x06;
+        public static final byte CMD_BP2_RT_DATA = (byte) 0x08;
+        public static final byte CMD_BP2_RT_STATE = (byte) 0x06;
 
         /**
          * 0：进入血压测量
@@ -72,38 +66,38 @@ public class Bp2BleCmd {
         public static byte SWITCH_STATE = (byte)0x09;//
 
         // heartbeat sound
-        public final static byte CMD_BP2_SET_SWITCHER_STATE = (byte) 0x0B;
-        public final static byte CMD_INFO = (byte) 0xE1;
-        public final static byte CMD_BP2_CONFIG = (byte) 0x00;
+        public static final byte CMD_BP2_SET_SWITCHER_STATE = (byte) 0x0B;
+        public static final byte CMD_INFO = (byte) 0xE1;
+        public static final byte CMD_BP2_CONFIG = (byte) 0x00;
         private static int serial = 0;
 
 
-        public final static int MSG_TYPE_SET_SWITCHER_STATE = 0x0B;
-        public final static int MSG_TYPE_GET_CONFIG = 0x00;
-        public final static int MSG_TYPE_RESET = 0xE2;
-        public final static int MSG_TYPE_FACTORY_RESET = 0xE3;
-        public final static int MSG_TYPE_FACTORY_RESET_ALL = 0xEE;
-        public final static int MSG_TYPE_SWITCH_STATE = 0x09;
-        public final static int MSG_TYPE_GET_INFO = 0x03;
-        public final static int MSG_TYPE_SET_TIME = 0x04;
-        public final static int MSG_TYPE_START_BP = 0x15;
-        public final static int MSG_TYPE_STOP_BP = 0x16;
-        public final static int MSG_TYPE_BP2_RT_DATA = 0x08;
-        public final static int MSG_TYPE_BP2_RT_STATE = 0x06;
-        public final static int MSG_TYPE_READ_START = 0xF2;//开始
-        public final static int MSG_TYPE_READ_PKG =  0xF3;//读取中
-        public final static int MSG_TYPE_READ_END =  0xF4;//结束
+        public static final int MSG_TYPE_SET_SWITCHER_STATE = 0x0B;
+        public static final int MSG_TYPE_GET_CONFIG = 0x00;
+        public static final int MSG_TYPE_RESET = 0xE2;
+        public static final int MSG_TYPE_FACTORY_RESET = 0xE3;
+        public static final int MSG_TYPE_FACTORY_RESET_ALL = 0xEE;
+        public static final int MSG_TYPE_SWITCH_STATE = 0x09;
+        public static final int MSG_TYPE_GET_INFO = 0x03;
+        public static final int MSG_TYPE_SET_TIME = 0x04;
+        public static final int MSG_TYPE_START_BP = 0x15;
+        public static final int MSG_TYPE_STOP_BP = 0x16;
+        public static final int MSG_TYPE_BP2_RT_DATA = 0x08;
+        public static final int MSG_TYPE_BP2_RT_STATE = 0x06;
+        public static final int MSG_TYPE_READ_START = 0xF2;//开始
+        public static final int MSG_TYPE_READ_PKG =  0xF3;//读取中
+        public static final int MSG_TYPE_READ_END =  0xF4;//结束
 
 
-        public final static int MSG_TYPE_GET_BP_STATE = 0x18;//实施波形状态
-        public final static int MSG_TYPE_GET_BP_FILE_LIST = 0xF1;//获取文件列表
+        public static final int MSG_TYPE_GET_BP_STATE = 0x18;//实施波形状态
+        public static final int MSG_TYPE_GET_BP_FILE_LIST = 0xF1;//获取文件列表
 
 
 
 
-        public final static byte CMD_FILE_READ_START = (byte) 0xF2;//开始
-        public final static byte CMD_FILE_READ_PKG = (byte) 0xF3;//读取中
-        public final static byte CMD_FILE_READ_END = (byte) 0xF4;//结束
+        public static final byte CMD_FILE_READ_START = (byte) 0xF2;//开始
+        public static final byte CMD_FILE_READ_PKG = (byte) 0xF3;//读取中
+        public static final byte CMD_FILE_READ_END = (byte) 0xF4;//结束
 
 
         public static String getCmdStr(int cmd){

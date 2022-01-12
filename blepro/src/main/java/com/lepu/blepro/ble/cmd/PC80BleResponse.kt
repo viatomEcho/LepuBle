@@ -256,7 +256,6 @@ object PC80BleResponse {
             seqNo = 0
             fileSize = size
             content = ByteArray(size)
-            index = index
         }
 
         fun addContent(bytes: ByteArray) {

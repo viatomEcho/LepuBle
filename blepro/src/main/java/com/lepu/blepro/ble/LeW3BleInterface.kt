@@ -14,8 +14,8 @@ import java.util.*
 import kotlin.experimental.inv
 
 /**
- * author: wujuan
- * created on: 2021/2/26 13:57
+ * author: chenyongfeng
+ * created on: 2022/1/11 16:24
  * description:
  */
 class LeW3BleInterface(model: Int): BleInterface(model) {

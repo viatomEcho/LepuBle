@@ -1,17 +1,14 @@
 package com.lepu.blepro.ble
 
-import android.bluetooth.BluetoothDevice
 import android.content.Context
-import android.util.Log
-import com.lepu.blepro.base.BaseBleManager
 import com.lepu.blepro.base.LpBleManager
 import com.lepu.blepro.utils.LepuBleLog
 import no.nordicsemi.android.ble.RequestQueue
 import java.util.*
 
 /**
- * author: wujuan
- * created on: 2021/1/27 10:22
+ * author: chneyongfeng
+ * created on: 2021/12/23 12:23
  * description:
  */
 class Pc100BleManager(context: Context): LpBleManager(context) {

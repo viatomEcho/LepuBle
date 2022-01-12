@@ -5,7 +5,7 @@ import com.lepu.blepro.utils.CrcUtil;
 import java.util.Calendar;
 
 /**
- * universal command for Viatom devices
+ * @author chenyongfeng
  */
 public class Bpw1BleCmd {
 
@@ -13,30 +13,30 @@ public class Bpw1BleCmd {
 
     // request
     // cmd
-    public final static int MEASURE_REQUEST = 0x00;
-    public final static int GET_FILE_LIST = 0x01;
-    public final static int CLEAR_FILE_LIST = 0x02;
-    public final static int GET_MEASURE_TIME = 0x03;
-    public final static int GET_DEVICE_INFO = 0x04;
-    public final static int FACTORY_RESET = 0x13;
-    public final static int SET_TIME = 0x20;
-    public final static int SET_MEASURE_TIME = 0x21;
-    public final static int SET_TIMING_SWITCH = 0x22;
+    public static final int MEASURE_REQUEST = 0x00;
+    public static final int GET_FILE_LIST = 0x01;
+    public static final int CLEAR_FILE_LIST = 0x02;
+    public static final int GET_MEASURE_TIME = 0x03;
+    public static final int GET_DEVICE_INFO = 0x04;
+    public static final int FACTORY_RESET = 0x13;
+    public static final int SET_TIME = 0x20;
+    public static final int SET_MEASURE_TIME = 0x21;
+    public static final int SET_TIMING_SWITCH = 0x22;
 
 
     // response
     // len
-    public final static int UNIVERSAL_RESPONSE_LEN = 0x02;
-    public final static int BP_DATA_LEN = 0x0A;
-    public final static int MEASURE_TIME_OR_DEVICE_INFO_LEN = 0x06;
+    public static final int UNIVERSAL_RESPONSE_LEN = 0x02;
+    public static final int BP_DATA_LEN = 0x0A;
+    public static final int MEASURE_TIME_OR_DEVICE_INFO_LEN = 0x06;
 
     // cmd
-    public final static int RT_DATA = 0x00;
-    public final static int UNIVERSAL_RESPONSE = 0x40;
-    public final static int LOW_BATTERY = 0x50;
-    public final static int HISTORY_FILE_NUM = 0x60;
-    public final static int MEASURE_RESPONSE = 0x51;
-    public final static int ERROR_RESULT = 0x52;
+    public static final int RT_DATA = 0x00;
+    public static final int UNIVERSAL_RESPONSE = 0x40;
+    public static final int LOW_BATTERY = 0x50;
+    public static final int HISTORY_FILE_NUM = 0x60;
+    public static final int MEASURE_RESPONSE = 0x51;
+    public static final int ERROR_RESULT = 0x52;
 
 
     public static byte[] startBp() {
@@ -161,8 +161,9 @@ public class Bpw1BleCmd {
         cmd[2] = (byte) 0x07;
         cmd[3] = (byte) SET_TIMING_SWITCH;
         cmd[4] = (byte) 0x00;
-        if (timingSwitch)
+        if (timingSwitch) {
             cmd[4] = (byte) 0x01;
+        }
         cmd[5] = (byte) 0x00;
         cmd[6] = (byte) 0x00;
         cmd[7] = (byte) 0x00;

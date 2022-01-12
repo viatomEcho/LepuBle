@@ -3,6 +3,9 @@ package com.lepu.blepro.ble.data;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * @author chenyongfeng
+ */
 public class LeW3FileList {
     private int fileNum;
     private String[] fileNames;

@@ -1,8 +1,10 @@
 package com.lepu.blepro.ble.cmd;
 
-
 import java.util.Arrays;
 
+/**
+ * @author wujuan
+ */
 public class Er2BleResponse {
 
     private byte head;

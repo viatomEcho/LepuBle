@@ -7,21 +7,17 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
-
 import com.lepu.blepro.utils.ByteArrayKt;
 import com.lepu.blepro.utils.LepuBleLog;
-
 import java.util.UUID;
-
 import no.nordicsemi.android.ble.BleManager;
 import no.nordicsemi.android.ble.RequestQueue;
 import no.nordicsemi.android.ble.callback.BeforeCallback;
 import no.nordicsemi.android.ble.callback.FailCallback;
 
 /**
- * author: wujuan
+ * @author: wujuan
  * created on: 2021/1/26 17:32
  * description:
  */
@@ -106,7 +102,9 @@ public abstract class BaseBleManager extends BleManager {
             final BluetoothGattService service = gatt.getService(service_uuid);
             LepuBleLog.d(TAG, "service ==  " + service);
 
-            if (isUpdater && service == null ) return true;
+            if (isUpdater && service == null ) {
+                return true;
+            }
             if (service != null) {
                 write_char = service.getCharacteristic(write_uuid);
                 notify_char = service.getCharacteristic(notify_uuid);
@@ -189,7 +187,8 @@ public abstract class BaseBleManager extends BleManager {
 
     public RequestQueue buildRequest(){
        return beginAtomicRequestQueue()
-                .add(requestMtu(23) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
+               // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
+                .add(requestMtu(23)
                         .with((device, mtu) -> log(Log.INFO, "MTU set to " + mtu))
                         .fail((device, status) -> log(Log.WARN, "Requested MTU not supported: " + status)))
 //                    .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)

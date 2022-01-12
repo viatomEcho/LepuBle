@@ -1,19 +1,19 @@
 package com.lepu.blepro.ble.cmd;
 
-
-
 import com.lepu.blepro.utils.LepuBleLog;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import static com.lepu.blepro.utils.StringUtilsKt.makeTimeStr;
 
+/**
+ * @author wujuan
+ */
 public class OxyBleCmd {
 
     public static int OXY_CMD_INFO = 0x14;
     public static int OXY_CMD_PARA_SYNC = 0x16;
-    public static int OXY_CMD_RT_DATA = 0x1B;  //没有pi
+    //没有pi
+    public static int OXY_CMD_RT_DATA = 0x1B;
     public static int OXY_CMD_PI_RT_DATA = 0x17;
     public static int OXY_CMD_FACTORY_RESET = 0x18;
     public static int OXY_CMD_READ_START = 0x03;
@@ -106,8 +106,8 @@ public class OxyBleCmd {
         buf[2] = (byte) ~OXY_CMD_RT_DATA;
         buf[5] = (byte) len;
         buf[6] = (byte) (len >> 8);
-
-        buf[7] = (byte) 0;  // 0 -> 125hz;  1-> 62.5hz
+        // 0 -> 125hz;  1-> 62.5hz
+        buf[7] = (byte) 0;
 
         buf[8] = BleCRC.calCRC8(buf);
 
@@ -148,8 +148,8 @@ public class OxyBleCmd {
     public static byte[] readFileStart(String fileName) {
         char[] name = fileName.toCharArray();
         int len = name.length + 1;
-
-        byte[] buf = new byte[8 + len];  // filename最后一位补0
+        // filename最后一位补0
+        byte[] buf = new byte[8 + len];
         buf[0] = (byte) 0xAA;
         buf[1] = (byte) OXY_CMD_READ_START;
         buf[2] = (byte) ~OXY_CMD_READ_START;

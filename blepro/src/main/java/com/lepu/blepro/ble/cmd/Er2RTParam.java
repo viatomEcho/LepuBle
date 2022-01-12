@@ -1,5 +1,8 @@
 package com.lepu.blepro.ble.cmd;
 
+/**
+ * @author wujuan
+ */
 public class Er2RTParam {
 
     public static final int LENGTH = 20;

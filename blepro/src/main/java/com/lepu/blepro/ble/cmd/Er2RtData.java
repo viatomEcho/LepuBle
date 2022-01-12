@@ -1,9 +1,11 @@
 package com.lepu.blepro.ble.cmd;
 
 import org.apache.commons.lang3.ArrayUtils;
-
 import java.util.Arrays;
 
+/**
+ * @author wujuan
+ */
 public class Er2RtData {
     Er2RTParam parameters;
 
@@ -132,8 +134,9 @@ public class Er2RtData {
         }
 
         private float byteTomV(byte a, byte b) {
-            if (a == (byte) 0xff && b == (byte) 0x7f)
+            if (a == (byte) 0xff && b == (byte) 0x7f) {
                 return 0f;
+            }
 
             int n = ((a & 0xFF) | (short) (b << 8));
 

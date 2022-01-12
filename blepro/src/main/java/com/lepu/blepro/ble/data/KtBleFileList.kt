@@ -1,7 +1,7 @@
 package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.toString
-//
+
 class KtBleFileList {
     var fileNum: Int
     var fileNameList : Array<String?>

@@ -2,6 +2,9 @@ package com.lepu.blepro.ble.data;
 
 import com.lepu.blepro.utils.PCMCovWavUtil;
 
+/**
+ * @author chenyongfeng
+ */
 public class FhrBleFile {
 
     private static int[] indexTable={
@@ -48,27 +51,37 @@ public class FhrBleFile {
                 int tmp;
                 step = stepsizeTable[index];
                 vpdiff = 0;
-                if ((delta[j] & 0x04) != 0) vpdiff += step;
-                if ((delta[j] & 0x02) != 0) vpdiff += (step >> 1);
-                if ((delta[j] & 0x01) != 0) vpdiff += (step >> 2);
+                if ((delta[j] & 0x04) != 0) {
+                    vpdiff += step;
+                }
+                if ((delta[j] & 0x02) != 0) {
+                    vpdiff += (step >> 1);
+                }
+                if ((delta[j] & 0x01) != 0) {
+                    vpdiff += (step >> 2);
+                }
                 vpdiff += (step >> 3);
                 sign = delta[j] & 0x08;
-                if (sign != 0)
+                if (sign != 0) {
                     tmp = valpred - vpdiff;
-                else
+                } else {
                     tmp = valpred + vpdiff;
+                }
 
-                if (tmp > 32767)
+                if (tmp > 32767) {
                     tmp = 32767;
-                else if (tmp < -32768)
+                } else if (tmp < -32768) {
                     tmp = -32768;
+                }
 
                 valpred = tmp;
                 index += indexTable[delta[j]];
-                if (index < 0)
+                if (index < 0) {
                     index = 0;
-                if (index > 88)
+                }
+                if (index > 88) {
                     index = 88;
+                }
                 pcmFileBytes[i*4 + j*2] = Hex2ByteDTX(tmp)[0];
                 pcmFileBytes[i*4 + j*2+1] = Hex2ByteDTX(tmp)[1];
             }
@@ -162,13 +175,15 @@ public class FhrBleFile {
                 if (RspCont_obj8.in_cnt <= 0) {
                     return;
                 }
-                for (i = 0; i < 8 - 1; i++)
+                for (i = 0; i < 8 - 1; i++) {
                     RspCont_obj8.bufL[i] = RspCont_obj8.bufL[i + 1];
+                }
                 RspCont_obj8.bufL[8 - 1] = inData[len*RspCont_obj8.nch - RspCont_obj8.in_cnt];
                 RspCont_obj8.in_cnt--;
                 if (nch!=0) {
-                    for (i = 0; i < 8 - 1; i++)
+                    for (i = 0; i < 8 - 1; i++) {
                         RspCont_obj8.bufR[i] = RspCont_obj8.bufR[i + 1];
+                    }
                     RspCont_obj8.bufR[8 - 1] = inData[len*RspCont_obj8.nch - RspCont_obj8.in_cnt];
                     RspCont_obj8.in_cnt--;
                 }
@@ -202,12 +217,13 @@ public class FhrBleFile {
     }
 
     private static int clip_8(int a, int amin, int amax) {
-        if (a < amin)
+        if (a < amin) {
             return amin;
-        else if (a > amax)
+        } else if (a > amax) {
             return amax;
-        else
+        } else {
             return a;
+        }
     }
 
     static class RSP8_CONTEXT {

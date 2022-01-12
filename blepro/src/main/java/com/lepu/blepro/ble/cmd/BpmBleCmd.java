@@ -1,11 +1,12 @@
 package com.lepu.blepro.ble.cmd;
 
-
 import com.lepu.blepro.utils.ByteArrayKt;
-
 import java.util.Calendar;
 import java.util.Map;
 
+/**
+ * @author wujuan
+ */
 public class BpmBleCmd {
     public static final int MSG_TYPE_INVALID = -1;
 
@@ -22,29 +23,29 @@ public class BpmBleCmd {
     }
 
     public static class BPMCmd {
-        public final static byte HEAD_0 = (byte) 0x02;
-        public final static byte HEAD_1 = (byte) 0x40;
-        public final static byte CMD_WRITE = (byte) 0xDC;
-        public final static byte CMD_READ = (byte) 0xDD;
+        public static final byte HEAD_0 = (byte) 0x02;
+        public static final byte HEAD_1 = (byte) 0x40;
+        public static final byte CMD_WRITE = (byte) 0xDC;
+        public static final byte CMD_READ = (byte) 0xDD;
 
-        public final static int MSG_TYPE_GET_INFO = 0x03;
-        public final static int MSG_TYPE_SET_TIME = 0x04;
-        public final static int MSG_TYPE_START_BP = 0x15;
-        public final static int MSG_TYPE_STOP_BP = 0x16;
-        public final static int MSG_TYPE_GET_RECORDS = 0x17; // 获取历史记录列表
-        public final static int MSG_TYPE_GET_BP_STATE = 0x18;
-        public final static int MSG_TYPE_GET_BP_DATA = 0x19; // 实时广播血压的值
-        public final static int MSG_TYPE_GET_RESULT = 0x1A; // 测量结束返回测量的结果
+        public static final int MSG_TYPE_GET_INFO = 0x03;
+        public static final int MSG_TYPE_SET_TIME = 0x04;
+        public static final int MSG_TYPE_START_BP = 0x15;
+        public static final int MSG_TYPE_STOP_BP = 0x16;
+        public static final int MSG_TYPE_GET_RECORDS = 0x17; // 获取历史记录列表
+        public static final int MSG_TYPE_GET_BP_STATE = 0x18;
+        public static final int MSG_TYPE_GET_BP_DATA = 0x19; // 实时广播血压的值
+        public static final int MSG_TYPE_GET_RESULT = 0x1A; // 测量结束返回测量的结果
 
-        public final static byte CMD_TYPE_START_BP = (byte) 0xA1;
-        public final static byte CMD_TYPE_STOP = (byte) 0xA2;
-        public final static byte CMD_TYPE_GET_INFO = (byte) 0xAB;
-        public final static byte CMD_TYPE_SET_TIME = (byte) 0xB0;
-        public final static byte CMD_TYPE_GET_RECORDS = (byte) 0xB1;
-        public final static byte CMD_TYPE_GET_RECORDS_N = (byte) 0xB3;
-        public final static byte CMD_TYPE_GET_BP_STATE = (byte) 0xB2;
-        public final static byte CMD_TYPE_GET_BP_DATA = (byte) 0x00;
-        public final static byte CMD_TYPE_GET_RESULT = (byte) 0x1C;
+        public static final byte CMD_TYPE_START_BP = (byte) 0xA1;
+        public static final byte CMD_TYPE_STOP = (byte) 0xA2;
+        public static final byte CMD_TYPE_GET_INFO = (byte) 0xAB;
+        public static final byte CMD_TYPE_SET_TIME = (byte) 0xB0;
+        public static final byte CMD_TYPE_GET_RECORDS = (byte) 0xB1;
+        public static final byte CMD_TYPE_GET_RECORDS_N = (byte) 0xB3;
+        public static final byte CMD_TYPE_GET_BP_STATE = (byte) 0xB2;
+        public static final byte CMD_TYPE_GET_BP_DATA = (byte) 0x00;
+        public static final byte CMD_TYPE_GET_RESULT = (byte) 0x1C;
 
         public static byte[] getCmd(int msgType) {
             switch (msgType) {
@@ -66,16 +67,12 @@ public class BpmBleCmd {
         }
 
         public static byte[] getCmd(int msgType, Map<String, Object> map) {
-            switch (msgType) {
-                case BPMCmd.MSG_TYPE_GET_RECORDS:
-                {
-                    int storeIdA = (int) map.get("storeIdA");
-                    int storeIdB = (int) map.get("storeIdB");
-                    return getRecords(storeIdA, storeIdB);
-                }
-                default:
-                    return new byte[0];
+            if (msgType == BPMCmd.MSG_TYPE_GET_RECORDS) {
+                int storeIdA = (int) map.get("storeIdA");
+                int storeIdB = (int) map.get("storeIdB");
+                return getRecords(storeIdA, storeIdB);
             }
+            return new byte[0];
         }
 
         public static int getMsgType(byte[] response) {
@@ -93,8 +90,9 @@ public class BpmBleCmd {
                 case CMD_TYPE_GET_RECORDS:
                 case CMD_TYPE_GET_RECORDS_N:
                     return MSG_TYPE_GET_RECORDS;
+                default:
+                    return MSG_TYPE_INVALID;
             }
-            return MSG_TYPE_INVALID;
         }
 
         public static byte[] getInfo() {

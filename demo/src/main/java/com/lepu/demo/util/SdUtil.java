@@ -16,7 +16,8 @@ import java.util.Map;
  */
 public class SdUtil {
 
-	public static int STORGE_VALUE = 300;// 400MB
+	// 400MB
+	public static int STORGE_VALUE = 300;
 
 	@SuppressLint("NewApi")
 	public static boolean checkSdCanUse() {

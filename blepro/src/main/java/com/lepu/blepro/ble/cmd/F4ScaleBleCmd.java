@@ -3,24 +3,26 @@ package com.lepu.blepro.ble.cmd;
 import com.lepu.blepro.ble.data.FscaleUserInfo;
 import com.lepu.blepro.utils.CrcUtil;
 import com.lepu.blepro.utils.DateUtil;
-
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+/**
+ * @author chenyongfeng
+ */
 public class F4ScaleBleCmd {
 
     // response
-    public final static int A0 = 0xA0;
-    public final static int A1 = 0xA1;
-    public final static int A2 = 0xA2;
-    public final static int A3 = 0xA3;
-    public final static int A4 = 0xA4;
+    public static final int A0 = 0xA0;
+    public static final int A1 = 0xA1;
+    public static final int A2 = 0xA2;
+    public static final int A3 = 0xA3;
+    public static final int A4 = 0xA4;
 
     // request
-    public final static int B0 = 0xB0;
-    public final static int B1 = 0xB1;
-    public final static int B2 = 0xB2;
+    public static final int B0 = 0xB0;
+    public static final int B1 = 0xB1;
+    public static final int B2 = 0xB2;
 
     private static int seqNo = 0;
     private static void addNo() {

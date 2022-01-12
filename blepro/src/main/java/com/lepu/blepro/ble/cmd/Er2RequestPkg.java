@@ -1,10 +1,11 @@
 package com.lepu.blepro.ble.cmd;
 
-
 import com.lepu.blepro.utils.Convertible;
-
 import static com.lepu.blepro.ble.cmd.Er2BleCmd.COMMON_PKG_HEAD_LENGTH;
 
+/**
+ * @author wujuan
+ */
 public class Er2RequestPkg {
 
     protected final byte head = (byte) 0xA5;

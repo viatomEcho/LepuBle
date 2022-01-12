@@ -1,8 +1,10 @@
 package com.lepu.blepro.ble.data;
 
-
 import java.util.Arrays;
 
+/**
+ * @author wujuan
+ */
 public class Er2DeviceInfo {
     private String deviceName;
     private String deviceMacAddress;

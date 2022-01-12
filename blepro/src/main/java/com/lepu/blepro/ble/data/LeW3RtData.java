@@ -5,6 +5,9 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 
+/**
+ * @author chenyongfeng
+ */
 public class LeW3RtData {
     private RtParam parameters;
 

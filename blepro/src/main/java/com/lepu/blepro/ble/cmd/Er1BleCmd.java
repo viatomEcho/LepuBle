@@ -3,30 +3,28 @@ package com.lepu.blepro.ble.cmd;
 import com.lepu.blepro.ble.data.TimeData;
 import com.lepu.blepro.utils.ByteArrayKt;
 import com.lepu.blepro.utils.LepuBleLog;
-
 import java.util.Date;
-
-import static com.lepu.blepro.ble.cmd.Er2BleCmd.COMMON_PKG_HEAD_LENGTH;
 
 /**
  * universal command for Viatom devices
+ * @author wujuan
  */
 public class Er1BleCmd {
 
-    public final static int GET_INFO = 0xE1;
-    public final static int RESET = 0xE2;
-    public final static int FACTORY_RESET = 0xE3;
-    public final static int FACTORY_RESET_ALL = 0xEE;
-    public final static int BURN_FACTORY_INFO = 0xEA;
-    public final static int BURN_LOCK_FLASH = 0xEB;
-    public final static int RT_DATA = 0x03;
-    public final static int VIBRATE_CONFIG = 0x00;
-    public final static int READ_FILE_LIST = 0xF1;
-    public final static int READ_FILE_START = 0xF2;
-    public final static int READ_FILE_DATA = 0xF3;
-    public final static int READ_FILE_END = 0xF4;
-    public final static int SET_VIBRATE_STATE = 0x04;
-    public final static int SET_TIME = 0xEC;
+    public static final int GET_INFO = 0xE1;
+    public static final int RESET = 0xE2;
+    public static final int FACTORY_RESET = 0xE3;
+    public static final int FACTORY_RESET_ALL = 0xEE;
+    public static final int BURN_FACTORY_INFO = 0xEA;
+    public static final int BURN_LOCK_FLASH = 0xEB;
+    public static final int RT_DATA = 0x03;
+    public static final int VIBRATE_CONFIG = 0x00;
+    public static final int READ_FILE_LIST = 0xF1;
+    public static final int READ_FILE_START = 0xF2;
+    public static final int READ_FILE_DATA = 0xF3;
+    public static final int READ_FILE_END = 0xF4;
+    public static final int SET_VIBRATE_STATE = 0x04;
+    public static final int SET_TIME = 0xEC;
 
 
     private static int seqNo = 0;
@@ -73,7 +71,8 @@ public class Er1BleCmd {
         cmd[4] = (byte) seqNo;
         cmd[5] = (byte) 0x01;
         cmd[6] = (byte) 0x00;
-        cmd[7] = (byte) 0x7D;  // 0 -> 125hz;  1-> 62.5hz
+        // 0 -> 125hz;  1-> 62.5hz
+        cmd[7] = (byte) 0x7D;
         cmd[8] = BleCRC.calCRC8(cmd);
 
         addNo();

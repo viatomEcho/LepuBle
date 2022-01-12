@@ -198,8 +198,9 @@ public class FileUtil {
         file2 = new File(file2, "HolterECGData_data.txt");
 
         try {
-            if (!file2.exists())
+            if (!file2.exists()) {
                 file2.createNewFile();
+            }
 
             InputStream inputStream = new FileInputStream(file);
             FileOutputStream fos = new FileOutputStream(file2);
@@ -223,8 +224,9 @@ public class FileUtil {
                 }*/
 
                 index++;
-                if (index == total)
+                if (index == total) {
                     break;
+                }
             }
             Log.d("test12345", "th12BleFile.getFileCreateTime() == " + th12BleFile.getFileCreateTime());
             Log.d("test12345", "th12BleFile.getEcgTime() == " + th12BleFile.getEcgTime());

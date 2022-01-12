@@ -10,6 +10,7 @@ const val HEAD_0 = 0xAA.toByte()
 const val HEAD_1 = 0x55.toByte()
 const val TOKEN_EPI_F0 = 0xF0.toByte() // (EPI -> Equipment Public information)
 const val TOKEN_PO_0F = 0x0F.toByte() // (PO -> Pulse Oximeter)
+
 class PC60FwBleResponse{
     class PC60FwResponse(var bytes: ByteArray) {
 

@@ -3,7 +3,7 @@ package com.lepu.demo.ble;
 import com.lepu.blepro.observer.BleServiceObserver;
 
 /**
- * author: wujuan
+ * @author: wujuan
  * created on: 2020/12/10 17:40
  * description:
  */

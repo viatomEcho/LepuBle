@@ -1,31 +1,37 @@
 package com.lepu.blepro.ble.cmd;
 
-import com.lepu.blepro.ble.data.PC80TimeData;
+import com.lepu.blepro.ble.data.Pc80TimeData;
 import com.lepu.blepro.utils.CrcUtil;
 
 import java.util.Date;
 
 /**
- * universal command for Viatom devices
+ * @author chenyongfeng
  */
 public class Pc80BleCmd {
 
-    public final static int SCP_ECG_LENGTH = (2+4+76+32+30+28+9024+88+512);
+    public static final int SCP_ECG_LENGTH = (2+4+76+32+30+28+9024+88+512);
 
-    public final static int GET_INFO = 0x11;
-    public final static int TIME_SET = 0x33;
-    public final static int TRANS_SET = 0x55;
-    public final static int VERSION_SET = 0x66;
-    public final static int GET_RATE = 0x77;
-    public final static int DATA_MESS = 0xAA;
-    public final static int TRACK_DATA_MESS = 0xDD;
-    public final static int HEARTBEAT = 0xFF;
+    public static final int GET_INFO = 0x11;
+    public static final int TIME_SET = 0x33;
+    public static final int TRANS_SET = 0x55;
+    public static final int VERSION_SET = 0x66;
+    public static final int GET_RATE = 0x77;
+    public static final int DATA_MESS = 0xAA;
+    public static final int TRACK_DATA_MESS = 0xDD;
+    public static final int HEARTBEAT = 0xFF;
 
-    public final static int ACK = 0x00;
-    public final static int NAK = 0x01;
-    public final static int REJ = 0x02;
+    // 接收正确
+    public static final int ACK = 0x00;
+    // 接收有误
+    public static final int NAK = 0x01;
+    // 拒绝接收
+    public static final int REJ = 0x02;
 
-    // 用于查询下位机的版本信息
+    /**
+     * 用于查询下位机的版本信息
+     * @return byte数组
+     */
     public static byte[] getInfo() {
         int versionLen = 6;
         int cmdLength = 4 + versionLen;
@@ -37,9 +43,12 @@ public class Pc80BleCmd {
         return cmd;
     }
 
-    // 用于下位机同步时间请求，上位机发送时间
+    /**
+     * 用于下位机同步时间请求，上位机发送时间
+     * @return byte数组
+     */
     public static byte[] setTime() {
-        PC80TimeData timeData = new PC80TimeData(new Date());
+        Pc80TimeData timeData = new Pc80TimeData(new Date());
         byte[] data = timeData.convert2Data();
         int cmdLength = 4 + data.length;
         byte[] cmd = new byte[cmdLength];
@@ -53,7 +62,10 @@ public class Pc80BleCmd {
         return cmd;
     }
 
-    // 查询信息(用于查询采样率等参数)
+    /**
+     * 查询信息(用于查询采样率等参数)
+     * @return byte数组
+     */
     public static byte[] getRate() {
         byte[] cmd = new byte[5];
         cmd[0] = (byte) 0xA5;
@@ -64,10 +76,11 @@ public class Pc80BleCmd {
         return cmd;
     }
 
-    // 用于建立数据传输会话应答
-    // ACK 0x00 接收正确
-    // NAK 0x01 接收有误
-    // REJ 0x02 拒绝接收
+    /**
+     * 用于建立数据传输会话应答
+     * @param res int
+     * @return byte数组
+     */
     public static byte[] responseTransSet(int res) {
         byte[] cmd = new byte[5];
         cmd[0] = (byte) 0xA5;
@@ -77,7 +90,11 @@ public class Pc80BleCmd {
         cmd[4] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
-    //传输协议版本设置
+    /**
+     * 传输协议版本设置
+     * @param res int
+     * @return byte数组
+     */
     public static byte[] versionSet(int res) {
         byte[] cmd = new byte[5];
         cmd[0] = (byte) 0xA5;
@@ -87,10 +104,12 @@ public class Pc80BleCmd {
         cmd[4] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
-    // 用于数据传输应答
-    // ACK 0x00 接收正确
-    // NAK 0x01 接收有误
-    // REJ 0x02 拒绝接收
+    /**
+     * 用于数据传输应答
+     * @param seq int
+     * @param res int
+     * @return byte数组
+     */
     public static byte[] responseDataMess(int seq, int res) {
         byte[] cmd = new byte[6];
         cmd[0] = (byte) 0xA5;
@@ -102,7 +121,10 @@ public class Pc80BleCmd {
         return cmd;
     }
 
-    // 用于上位机判断下位机的连接状态，每秒1包
+    /**
+     * 用于上位机判断下位机的连接状态，每秒1包
+     * @return byte数组
+     */
     public static byte[] sendHeartbeat() {
         byte[] cmd = new byte[5];
         cmd[0] = (byte) 0xA5;

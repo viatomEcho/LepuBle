@@ -7,20 +7,20 @@ import java.util.Date;
 import java.util.TimeZone;
 
 /**
- * universal command for Viatom devices
+ * @author chenyongfeng
  */
 public class F5ScaleBleCmd {
 
     // response
-    public final static int WEIGHT_DATA = 0xD5;
-    public final static int IMPEDANCE_DATA = 0xD6;
-    public final static int UNSTABLE_DATA = 0xD0;
-    public final static int OTHER_DATA = 0xD7;
-    public final static int HISTORY_DATA = 0xD8;
+    public static final int WEIGHT_DATA = 0xD5;
+    public static final int IMPEDANCE_DATA = 0xD6;
+    public static final int UNSTABLE_DATA = 0xD0;
+    public static final int OTHER_DATA = 0xD7;
+    public static final int HISTORY_DATA = 0xD8;
 
     // request
-    public final static int SET_PARAM = 0xD0;
-    public final static int SET_USER_LIST = 0xD1;
+    public static final int SET_PARAM = 0xD0;
+    public static final int SET_USER_LIST = 0xD1;
 
     private static int seqNo = 0;
     private static void addNo() {

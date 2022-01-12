@@ -147,32 +147,6 @@
                     </LinearLayout>
                 </LinearLayout>
                 <LinearLayout
-                    android:id="@+id/pc60fw_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="pc60fw"/>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <Button
-                            android:id="@+id/pc60fw_get_config"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Get Config"/>
-
-                        <Button
-                            android:id="@+id/pc60fw_set_config"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Set Config"
-                            android:layout_marginStart="20dp"/>
-                    </LinearLayout>
-                </LinearLayout>
-                <LinearLayout
                     android:id="@+id/scale_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

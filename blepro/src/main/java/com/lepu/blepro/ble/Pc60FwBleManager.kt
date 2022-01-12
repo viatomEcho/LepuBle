@@ -12,7 +12,7 @@ import java.util.*
 
 /**
  * author: wujuan
- * created on: 2021/719 10:22
+ * created on: 2021/7/19 10:22
  * description:
  */
 class Pc60FwBleManager(context: Context): LpBleManager(context) {

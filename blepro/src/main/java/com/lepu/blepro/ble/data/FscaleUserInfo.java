@@ -1,11 +1,13 @@
 package com.lepu.blepro.ble.data;
 
 import androidx.annotation.Nullable;
-
 import com.icomon.icbodyfatalgorithms.ICBodyFatAlgorithmsPeopleType;
 import com.icomon.icbodyfatalgorithms.ICBodyFatAlgorithmsSex;
 import com.icomon.icbodyfatalgorithms.ICBodyFatAlgorithmsType;
 
+/**
+ * @author chenyongfeng
+ */
 public class FscaleUserInfo implements Cloneable {
     public Integer userIndex = 1;
     public Integer height = 172;
@@ -33,6 +35,7 @@ public class FscaleUserInfo implements Cloneable {
         this.weightDirection = 0;
     }
 
+    @Override
     public FscaleUserInfo clone() {
         try {
             return (FscaleUserInfo)super.clone();
@@ -146,16 +149,18 @@ public class FscaleUserInfo implements Cloneable {
         this.weightDirection = weightDirection;
     }
 
+    @Override
     public String toString() {
         return String.format("userIndex:%d,weight:%02f,height:%d,age:%d,sex:%s, weightUnit=%s, rulerUnit=%s,kitchenUnit=%s,bfa=%s, people=%s,rulermode=%s,imp_flag=%s,hr_flag=%s,balance=%s,gravity=%s", this.userIndex, this.weight, this.height, this.age, this.sex, this.bfaType, this.peopleType, this.enableMeasureImpendence, this.enableMeasureHr, this.enableMeasureBalance, this.enableMeasureGravity);
     }
 
+    @Override
     public boolean equals(@Nullable Object obj) {
         FscaleUserInfo user = (FscaleUserInfo)obj;
-        if (user.height != this.height) {
+        if (!user.height.equals(this.height)) {
             return false;
         } else if (user.weight - this.weight <= 0.001D && user.weight - this.weight >= -0.001D) {
-            if (user.age != this.age) {
+            if (!user.age.equals(this.age)) {
                 return false;
             } else if (user.sex != this.sex) {
                 return false;
@@ -163,7 +168,7 @@ public class FscaleUserInfo implements Cloneable {
                 return false;
             } else if (user.bfaType != this.bfaType) {
                 return false;
-            } else if (user.userIndex != this.userIndex) {
+            } else if (!user.userIndex.equals(this.userIndex)) {
                 return false;
             } else if (user.enableMeasureHr != this.enableMeasureHr) {
                 return false;

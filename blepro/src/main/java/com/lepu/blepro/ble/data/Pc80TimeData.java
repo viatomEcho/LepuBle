@@ -7,7 +7,10 @@ import com.lepu.blepro.utils.Convertible;
 import java.util.Calendar;
 import java.util.Date;
 
-public class PC80TimeData implements Convertible {
+/**
+ * @author chenyongfeng
+ */
+public class Pc80TimeData implements Convertible {
 
     private int year;
     private int month;
@@ -19,7 +22,7 @@ public class PC80TimeData implements Convertible {
 
     private int weekday;
 
-    public PC80TimeData(Date date) {
+    public Pc80TimeData(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         this.year = calendar.get(Calendar.YEAR);

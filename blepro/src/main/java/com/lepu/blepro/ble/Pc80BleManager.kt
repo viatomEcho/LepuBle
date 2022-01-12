@@ -7,8 +7,8 @@ import no.nordicsemi.android.ble.RequestQueue
 import java.util.*
 
 /**
- * author: wujuan
- * created on: 2021/1/27 10:22
+ * author: chenyongfeng
+ * created on: 2021/11/18 18:41
  * description:
  */
 class Pc80BleManager(context: Context): LpBleManager(context) {

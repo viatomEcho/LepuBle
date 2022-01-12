@@ -4,6 +4,9 @@ package com.lepu.demo.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+/**
+ * @author wujuan
+ */
 public class PrefUtils {
 
     public static final String APP_SHARE_PREF = "app_share_pref";
@@ -23,7 +26,8 @@ public class PrefUtils {
         }
         SharedPreferences preferences;
         SharedPreferences.Editor editor;
-        preferences = context.getSharedPreferences(APP_SHARE_PREF, Context.MODE_PRIVATE);//新版不支持MODE_WORLD_READABLE
+        //新版不支持MODE_WORLD_READABLE
+        preferences = context.getSharedPreferences(APP_SHARE_PREF, Context.MODE_PRIVATE);
         editor = preferences.edit();
         editor.putLong(key, value);
         editor.commit();
@@ -42,7 +46,8 @@ public class PrefUtils {
         }
         SharedPreferences preferences;
         SharedPreferences.Editor editor;
-        preferences = context.getSharedPreferences(APP_SHARE_PREF, Context.MODE_PRIVATE);//新版不支持MODE_WORLD_READABLE
+        //新版不支持MODE_WORLD_READABLE
+        preferences = context.getSharedPreferences(APP_SHARE_PREF, Context.MODE_PRIVATE);
         editor = preferences.edit();
         editor.putInt(key, value);
         editor.commit();
@@ -60,7 +65,8 @@ public class PrefUtils {
         }
         SharedPreferences preferences;
         SharedPreferences.Editor editor;
-        preferences = context.getSharedPreferences(APP_SHARE_PREF, Context.MODE_PRIVATE);//新版不支持MODE_WORLD_READABLE
+        //新版不支持MODE_WORLD_READABLE
+        preferences = context.getSharedPreferences(APP_SHARE_PREF, Context.MODE_PRIVATE);
         editor = preferences.edit();
         editor.putString(key, value);
         editor.commit();
@@ -78,7 +84,8 @@ public class PrefUtils {
         }
         SharedPreferences preferences;
         SharedPreferences.Editor editor;
-        preferences = context.getSharedPreferences(APP_SHARE_PREF, Context.MODE_PRIVATE);//新版不支持MODE_WORLD_READABLE
+        //新版不支持MODE_WORLD_READABLE
+        preferences = context.getSharedPreferences(APP_SHARE_PREF, Context.MODE_PRIVATE);
         editor = preferences.edit();
         editor.putBoolean(key, value);
         editor.commit();
@@ -95,8 +102,9 @@ public class PrefUtils {
             return 0;
         }
         SharedPreferences preferences;
+        //新版不支持MODE_WORLD_READABLE
         preferences = context.getSharedPreferences(APP_SHARE_PREF
-                , Context.MODE_PRIVATE);//新版不支持MODE_WORLD_READABLE
+                , Context.MODE_PRIVATE);
         long value = preferences.getLong(key, 0);
 
         return value;
@@ -113,8 +121,9 @@ public class PrefUtils {
             return defaultValue;
         }
         SharedPreferences preferences;
+        //新版不支持MODE_WORLD_READABLE
         preferences = context.getSharedPreferences(APP_SHARE_PREF
-                , Context.MODE_PRIVATE);//新版不支持MODE_WORLD_READABLE
+                , Context.MODE_PRIVATE);
         long value = preferences.getLong(key, defaultValue);
 
         return value;
@@ -131,8 +140,9 @@ public class PrefUtils {
             return 0;
         }
         SharedPreferences preferences;
+        //新版不支持MODE_WORLD_READABLE
         preferences = context.getSharedPreferences(APP_SHARE_PREF
-                , Context.MODE_PRIVATE);//新版不支持MODE_WORLD_READABLE
+                , Context.MODE_PRIVATE);
         int value = preferences.getInt(key, 0);
 
         return value;
@@ -149,8 +159,9 @@ public class PrefUtils {
             return false;
         }
         SharedPreferences preferences;
+        //新版不支持MODE_WORLD_READABLE
         preferences = context.getSharedPreferences(APP_SHARE_PREF
-                , Context.MODE_PRIVATE);//新版不支持MODE_WORLD_READABLE
+                , Context.MODE_PRIVATE);
         boolean value = preferences.getBoolean(key, false);
 
         return value;
@@ -167,8 +178,9 @@ public class PrefUtils {
             return defaultValue;
         }
         SharedPreferences preferences;
+        //新版不支持MODE_WORLD_READABLE
         preferences = context.getSharedPreferences(APP_SHARE_PREF
-                , Context.MODE_PRIVATE);//新版不支持MODE_WORLD_READABLE
+                , Context.MODE_PRIVATE);
         boolean value = preferences.getBoolean(key, defaultValue);
 
         return value;
@@ -185,8 +197,9 @@ public class PrefUtils {
             return null;
         }
         SharedPreferences preferences;
+        //新版不支持MODE_WORLD_READABLE
         preferences = context.getSharedPreferences(APP_SHARE_PREF
-                , Context.MODE_PRIVATE);//新版不支持MODE_WORLD_READABLE
+                , Context.MODE_PRIVATE);
         String value = preferences.getString(key, null);
 
         return value;
@@ -203,8 +216,9 @@ public class PrefUtils {
             return null;
         }
         SharedPreferences preferences;
+        //新版不支持MODE_WORLD_READABLE
         preferences = context.getSharedPreferences(APP_SHARE_PREF
-                , Context.MODE_PRIVATE);//新版不支持MODE_WORLD_READABLE
+                , Context.MODE_PRIVATE);
         String value = preferences.getString(key, defaultValue);
 
         return value;

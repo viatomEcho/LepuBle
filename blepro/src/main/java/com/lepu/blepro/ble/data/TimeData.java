@@ -1,12 +1,13 @@
 package com.lepu.blepro.ble.data;
 
 import androidx.annotation.NonNull;
-
 import com.lepu.blepro.utils.Convertible;
-
 import java.util.Calendar;
 import java.util.Date;
 
+/**
+ * @author wujuan
+ */
 public class TimeData implements Convertible {
 
     private int year;

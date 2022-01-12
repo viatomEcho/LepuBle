@@ -2,6 +2,9 @@ package com.lepu.blepro.ble.data;
 
 import com.icomon.icbodyfatalgorithms.ICBodyFatAlgorithmsType;
 
+/**
+ * @author chenyongfeng
+ */
 public class FscaleWeightData implements Cloneable {
     public boolean isStabilized;
     public int weight_g;
@@ -286,6 +289,7 @@ public class FscaleWeightData implements Cloneable {
         this.state = state;
     }
 
+    @Override
     public FscaleWeightData clone() {
         try {
             return (FscaleWeightData)super.clone();

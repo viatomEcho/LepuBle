@@ -5,48 +5,51 @@ import com.lepu.blepro.utils.CrcUtil;
 import java.util.Date;
 
 /**
- * universal command for Viatom devices
+ * @author chenyongfeng
  */
 public class Ap20BleCmd {
 
-    public final static int HEAD_0 = 0xAA;
-    public final static int HEAD_1 = 0x55;
+    public static final int HEAD_0 = 0xAA;
+    public static final int HEAD_1 = 0x55;
 
-    public final static int TOKEN_F0 = 0xF0;
-    public final static int CMD_GET_DEVICE_INFO = 0x81;
-    public final static int MSG_GET_DEVICE_INFO = 0x01;
-    public final static int CMD_GET_DEVICE_SN = 0x82;
-    public final static int MSG_GET_DEVICE_SN = 0x02;
-    public final static int CMD_GET_BATTERY = 0x83;
-    public final static int MSG_GET_BATTERY = 0x03;
-    public final static int CMD_GET_BACKLIGHT = 0x84;
-    public final static int MSG_GET_BACKLIGHT = 0x04;
-    public final static int CMD_SET_BACKLIGHT = 0x85;
-    public final static int MSG_SET_BACKLIGHT = 0x05;
+    public static final int TOKEN_F0 = 0xF0;
+    public static final int CMD_GET_DEVICE_INFO = 0x81;
+    public static final int MSG_GET_DEVICE_INFO = 0x01;
+    public static final int CMD_GET_DEVICE_SN = 0x82;
+    public static final int MSG_GET_DEVICE_SN = 0x02;
+    public static final int CMD_GET_BATTERY = 0x83;
+    public static final int MSG_GET_BATTERY = 0x03;
+    public static final int CMD_GET_BACKLIGHT = 0x84;
+    public static final int MSG_GET_BACKLIGHT = 0x04;
+    public static final int CMD_SET_BACKLIGHT = 0x85;
+    public static final int MSG_SET_BACKLIGHT = 0x05;
 
-    public final static int TOKEN_0F = 0x0F;
-    public final static int MSG_RT_BO_PARAM = 0x01;
-    public final static int MSG_RT_BO_WAVE = 0x02;
-    public final static int CMD_ENABLE_BO_PARAM = 0x84;
-    public final static int MSG_ENABLE_BO_PARAM = 0x04;
-    public final static int CMD_ENABLE_BO_WAVE = 0x85;
-    public final static int MSG_ENABLE_BO_WAVE = 0x05;
-    public final static int CMD_SET_TIME = 0x87;
-    public final static int MSG_SET_TIME = 0x07;
-    public final static int CMD_GET_CONFIG = 0x91;
-    public final static int MSG_GET_CONFIG = 0x11;
-    public final static int CMD_SET_CONFIG = 0x92;
-    public final static int MSG_SET_CONFIG = 0x12;
+    public static final int TOKEN_0F = 0x0F;
+    public static final int MSG_RT_BO_PARAM = 0x01;
+    public static final int MSG_RT_BO_WAVE = 0x02;
+    public static final int CMD_ENABLE_BO_PARAM = 0x84;
+    public static final int MSG_ENABLE_BO_PARAM = 0x04;
+    public static final int CMD_ENABLE_BO_WAVE = 0x85;
+    public static final int MSG_ENABLE_BO_WAVE = 0x05;
+    public static final int CMD_SET_TIME = 0x87;
+    public static final int MSG_SET_TIME = 0x07;
+    public static final int CMD_GET_CONFIG = 0x91;
+    public static final int MSG_GET_CONFIG = 0x11;
+    public static final int CMD_SET_CONFIG = 0x92;
+    public static final int MSG_SET_CONFIG = 0x12;
 
-    public final static int TOKEN_2D = 0x2D;
-    public final static int MSG_RT_BREATH_WAVE = 0x01;
-    public final static int MSG_RT_BREATH_PARAM = 0x02;
-    public final static int CMD_ENABLE_BREATH_WAVE = 0x83;
-    public final static int MSG_ENABLE_BREATH_WAVE = 0x03;
-    public final static int CMD_ENABLE_BREATH_PARAM = 0x84;
-    public final static int MSG_ENABLE_BREATH_PARAM = 0x04;
+    public static final int TOKEN_2D = 0x2D;
+    public static final int MSG_RT_BREATH_WAVE = 0x01;
+    public static final int MSG_RT_BREATH_PARAM = 0x02;
+    public static final int CMD_ENABLE_BREATH_WAVE = 0x83;
+    public static final int MSG_ENABLE_BREATH_WAVE = 0x03;
+    public static final int CMD_ENABLE_BREATH_PARAM = 0x84;
+    public static final int MSG_ENABLE_BREATH_PARAM = 0x04;
 
-    // 查询版本/名称
+    /**
+     * 查询版本/名称
+     * @return byte数组
+     */
     public static byte[] getInfo() {
         int len = 1;
         byte[] cmd = new byte[5+len];
@@ -58,7 +61,10 @@ public class Ap20BleCmd {
         cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
-    // 查询设备序列号
+    /**
+     * 查询设备序列号
+     * @return byte数组
+     */
     public static byte[] getSn() {
         int len = 1;
         byte[] cmd = new byte[5+len];
@@ -70,7 +76,10 @@ public class Ap20BleCmd {
         cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
-    // 查询电池电量
+    /**
+     * 查询电池电量
+     * @return byte数组
+     */
     public static byte[] getBattery() {
         int len = 1;
         byte[] cmd = new byte[5+len];
@@ -82,7 +91,10 @@ public class Ap20BleCmd {
         cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
-    // 查询设备背光等级
+    /**
+     * 查询设备背光等级
+     * @return byte数组
+     */
     public static byte[] getBacklight() {
         int len = 1;
         byte[] cmd = new byte[5+len];
@@ -94,7 +106,11 @@ public class Ap20BleCmd {
         cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
-    // 设置设备背光等级
+    /**
+     * 设置设备背光等级
+     * @param level int(0-5)
+     * @return byte数组
+     */
     public static byte[] setBacklight(int level) {
         int len = 2;
         byte[] cmd = new byte[5+len];
@@ -108,7 +124,11 @@ public class Ap20BleCmd {
         return cmd;
     }
 
-    // 血氧使能参数发送
+    /**
+     * 血氧使能参数发送
+     * @param enable boolean
+     * @return byte数组
+     */
     public static byte[] enableBoParam(boolean enable) {
         int len = 2;
         byte[] cmd = new byte[5+len];
@@ -121,7 +141,11 @@ public class Ap20BleCmd {
         cmd[6] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
-    // 血氧使能波形发送
+    /**
+     * 血氧使能波形发送
+     * @param enable boolean
+     * @return byte数组
+     */
     public static byte[] enableBoWave(boolean enable) {
         int len = 2;
         byte[] cmd = new byte[5+len];
@@ -134,7 +158,10 @@ public class Ap20BleCmd {
         cmd[6] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
-    // 设置设备时间
+    /**
+     * 设置设备时间
+     * @return byte数组
+     */
     public static byte[] setTime() {
         TimeData timeData = new TimeData(new Date());
         byte[] data = timeData.convert2Data();
@@ -151,7 +178,11 @@ public class Ap20BleCmd {
         cmd[cmd.length - 1] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
-    // 查询血氧警报参数设置信息
+    /**
+     * 查询血氧警报参数设置信息
+     * @param type int(1-4)
+     * @return byte数组
+     */
     public static byte[] getConfig(int type) {
         int len = 2;
         byte[] cmd = new byte[5+len];
@@ -164,7 +195,12 @@ public class Ap20BleCmd {
         cmd[6] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
-    // 设置血氧警报参数设置信息
+    /**
+     * 设置血氧警报参数设置信息
+     * @param type int(1-4)
+     * @param config int
+     * @return byte数组
+     */
     public static byte[] setConfig(int type, int config) {
         int len = 3;
         byte[] cmd = new byte[5+len];
@@ -179,7 +215,11 @@ public class Ap20BleCmd {
         return cmd;
     }
 
-    // 鼻息流使能参数发送
+    /**
+     * 鼻息流使能参数发送
+     * @param enable boolean
+     * @return byte数组
+     */
     public static byte[] enableBreathParam(boolean enable) {
         int len = 2;
         byte[] cmd = new byte[5+len];
@@ -192,7 +232,11 @@ public class Ap20BleCmd {
         cmd[6] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
-    // 鼻息流使能波形发送
+    /**
+     * 鼻息流使能波形发送
+     * @param enable boolean
+     * @return byte数组
+     */
     public static byte[] enableBreathWave(boolean enable) {
         int len = 2;
         byte[] cmd = new byte[5+len];

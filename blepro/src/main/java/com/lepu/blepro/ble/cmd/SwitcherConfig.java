@@ -1,8 +1,10 @@
 package com.lepu.blepro.ble.cmd;
 
-
 import com.lepu.blepro.utils.Convertible;
 
+/**
+ * @author wujuan
+ */
 public class SwitcherConfig implements Convertible {
     private int switcher;
     private int vector;

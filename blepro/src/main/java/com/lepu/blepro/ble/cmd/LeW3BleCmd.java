@@ -1,35 +1,37 @@
 package com.lepu.blepro.ble.cmd;
 
 import com.lepu.blepro.ble.data.TimeData;
-
 import java.util.Date;
 
+/**
+ * @author chenyongfeng
+ */
 public class LeW3BleCmd {
 
-    public final static int COMMON_PKG_HEAD_LENGTH = 7;
-    public final static int MIN_PKG_LENGTH = COMMON_PKG_HEAD_LENGTH + 1;
+    public static final int COMMON_PKG_HEAD_LENGTH = 7;
+    public static final int MIN_PKG_LENGTH = COMMON_PKG_HEAD_LENGTH + 1;
 
-    public final static byte CMD_GET_CONFIG = 0x00;
-    public final static byte CMD_SET_SYSTEM_SETTINGS = 0x01;
-    public final static byte CMD_SET_CONFIG = 0x02;
-    public final static byte CMD_SET_SWITCHER_STATE = 0x04;
-    public final static byte CMD_RETRIEVE_DEVICE_INFO = (byte) 0xE1;
-    public final static byte CMD_LOCK_FLASH = (byte) 0xEB;
-    public final static byte CMD_BURN_SN_CODE = (byte) 0xEA;
-    public final static byte CMD_RESET = (byte) 0xE2;
-    public final static byte CMD_FACTORY_RESET_ALL = (byte) 0xEE;
-    public final static byte CMD_FACTORY_RESET = (byte) 0xE3;
-    public final static byte CMD_GET_BATTERY = (byte) 0xE4;
-    public final static byte CMD_SET_TIME = (byte) 0xEC;
-    public final static byte CMD_LIST_FILE = (byte) 0xF1;
-    public final static byte CMD_GET_REAL_TIME_DATA = (byte) 0x11;
+    public static final byte CMD_GET_CONFIG = 0x00;
+    public static final byte CMD_SET_SYSTEM_SETTINGS = 0x01;
+    public static final byte CMD_SET_CONFIG = 0x02;
+    public static final byte CMD_SET_SWITCHER_STATE = 0x04;
+    public static final byte CMD_RETRIEVE_DEVICE_INFO = (byte) 0xE1;
+    public static final byte CMD_LOCK_FLASH = (byte) 0xEB;
+    public static final byte CMD_BURN_SN_CODE = (byte) 0xEA;
+    public static final byte CMD_RESET = (byte) 0xE2;
+    public static final byte CMD_FACTORY_RESET_ALL = (byte) 0xEE;
+    public static final byte CMD_FACTORY_RESET = (byte) 0xE3;
+    public static final byte CMD_GET_BATTERY = (byte) 0xE4;
+    public static final byte CMD_SET_TIME = (byte) 0xEC;
+    public static final byte CMD_LIST_FILE = (byte) 0xF1;
+    public static final byte CMD_GET_REAL_TIME_DATA = (byte) 0x11;
 
-    public final static byte CMD_START_READ_FILE = (byte) 0xF2;
-    public final static byte CMD_READ_FILE_CONTENT = (byte) 0xF3;
-    public final static byte CMD_END_READ_FILE = (byte) 0xF4;
-    public final static byte CMD_DELETE_FILE = (byte) 0xF8;
+    public static final byte CMD_START_READ_FILE = (byte) 0xF2;
+    public static final byte CMD_READ_FILE_CONTENT = (byte) 0xF3;
+    public static final byte CMD_END_READ_FILE = (byte) 0xF4;
+    public static final byte CMD_DELETE_FILE = (byte) 0xF8;
 
-    public final static byte CMD_BOUND_DEVICE = (byte) 0x03;
+    public static final byte CMD_BOUND_DEVICE = (byte) 0x03;
 
     public static int VECTOR = 1;
     public static int MOTION_COUNT= 1;

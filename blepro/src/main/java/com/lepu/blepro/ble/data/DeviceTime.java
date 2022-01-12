@@ -1,9 +1,11 @@
 package com.lepu.blepro.ble.data;
 
 import androidx.annotation.NonNull;
-
 import com.lepu.blepro.utils.Convertible;
 
+/**
+ * @author wujuan
+ */
 public class DeviceTime implements Convertible {
     private int year;
     private byte month;

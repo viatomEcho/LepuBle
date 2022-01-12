@@ -1,4 +1,5 @@
 package com.lepu.blepro.ble.cmd
+
 import android.os.Parcelable
 import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.utils.ByteUtils
@@ -6,7 +7,7 @@ import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
 import kotlinx.android.parcel.Parcelize
 import org.json.JSONObject
-//
+
 class OxyBleResponse{
 
     @ExperimentalUnsignedTypes
