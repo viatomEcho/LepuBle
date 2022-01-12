@@ -21,7 +21,7 @@ class LeW3Config(var data: ByteArray) {
 
     override fun toString(): String {
         val string = """
-            Watch4gServer
+            LeW3Config
             state: $state
             serverAddrType: $serverAddrType
             len: $len

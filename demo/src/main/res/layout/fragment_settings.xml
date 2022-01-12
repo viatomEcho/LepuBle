@@ -254,6 +254,37 @@
                             android:layout_marginStart="20dp"/>
                     </LinearLayout>
                 </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/lew3_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="lew3"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <Button
+                            android:id="@+id/lew3_bound"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="请求绑定"/>
+                        <Button
+                            android:id="@+id/lew3_get_config"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="获取参数"
+                            android:layout_marginStart="20dp"/>
+                        <Button
+                            android:id="@+id/lew3_set_config"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="设置参数"
+                            android:layout_marginStart="20dp"/>
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
 
             <TextView

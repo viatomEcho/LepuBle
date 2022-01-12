@@ -73,6 +73,13 @@ fun bytesToHex(bytes: ByteArray): String {
     }
     return String(hexChars)
 }
+fun byteToPointHex(bytes: Byte): String {
+    val hexChars = CharArray(2)
+    val v: Int = bytes.toInt() and 0xFF
+    hexChars[0] = HEX_ARRAY.get(v ushr 4)
+    hexChars[1] = HEX_ARRAY.get(v and 0x0F)
+    return hexChars[0]+"."+hexChars[1]
+}
 fun shortToByteArray(value: Int): ByteArray {
     return byteArrayOf(
         (value ushr 8).toByte(),

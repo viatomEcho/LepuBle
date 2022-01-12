@@ -2,7 +2,7 @@ package com.lepu.blepro.ble.cmd
 
 import android.os.Parcelable
 import com.lepu.blepro.utils.ByteUtils.toSignedShort
-import com.lepu.blepro.utils.bytesToHex
+import com.lepu.blepro.utils.byteToPointHex
 import kotlinx.android.parcel.Parcelize
 
 
@@ -58,11 +58,19 @@ class PC60FwBleResponse{
 
         init {
             var index = 0
-            softwareV = bytesToHex(bytes.copyOfRange(index, index + 2))
+            softwareV = byteToPointHex(bytes[index]) + "." + byteToPointHex(bytes[index+1])
             index += 2
-            hardwareV = bytesToHex(byteArrayOf(bytes[index]))
+            hardwareV = byteToPointHex(bytes[index])
             index++
             deviceName = com.lepu.blepro.utils.toString(bytes.copyOfRange(index, bytes.size))
+        }
+
+        override fun toString(): String {
+            return """
+                softwareV : $softwareV
+                hardwareV : $hardwareV
+                deviceName : $deviceName
+            """.trimIndent()
         }
     }
 
@@ -72,12 +80,21 @@ class PC60FwBleResponse{
         var spo2: Byte
         var pr: Short
         var pi: Short
+        var status: Int  // 血氧状态（0：正常 2：探头脱落，手指未插入）
         init {
             spo2 =  byteArray[0]
             pr = toSignedShort(byteArray[1], byteArray[2])
             pi = (byteArray[3].toInt() and 0xff).toShort()
+            status = (byteArray[4].toUInt() and 0xFFu).toInt()
         }
-
+        override fun toString(): String {
+            return """
+                spo2 : $spo2
+                pr : $pr
+                pi : $pi
+                status : $status
+            """.trimIndent()
+        }
 
     }
 
@@ -97,7 +114,7 @@ class PC60FwBleResponse{
     @ExperimentalUnsignedTypes
     @Parcelize
     class Battery constructor(var byteArray: ByteArray) : Parcelable {
-        var batteryLevel: Byte
+        var batteryLevel: Byte  // 电量等级（0-3）
         init {
             batteryLevel  = byteArray[0]
         }
@@ -106,12 +123,11 @@ class PC60FwBleResponse{
     @Parcelize
     @ExperimentalUnsignedTypes
     class WorkingStatus constructor(var bytes: ByteArray) : Parcelable {
-        var mode: Int
-        var step: Int
+        var mode: Int   // 模式（1：点测 2：连续 3：菜单）
+        var step: Int   // 状态（0：idle 1：准备阶段 2：正在测量 3：播报血氧结果 4：脉率分析 5：点测完成）
         var para1: Int
         var para2: Int
 
-        // 模式 : 0x01点测 0x02连续 0x03菜单
         init {
             var index = 0
             mode = (bytes[index].toUInt() and 0xFFu).toInt()

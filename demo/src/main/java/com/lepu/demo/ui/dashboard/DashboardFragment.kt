@@ -116,7 +116,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         }
         mainViewModel.runWave = true
         when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2 -> waveHandler.post(EcgWaveTask())
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2, Bluetooth.MODEL_LEW3 -> waveHandler.post(EcgWaveTask())
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC_6N, Bluetooth.MODEL_AP20 -> waveHandler.post(OxyWaveTask())
         }
 
@@ -177,6 +177,22 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FileList).observe(this, { event ->
             (event.data as Er2FileList).let {
+                binding.dataStr.text = it.toString()
+            }
+        })
+        //------------------------------lew3------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3RtData)
+            .observe(this, {
+                val rtData = it.data as LeW3RtData
+                rtData.let { data ->
+                    Log.d("lew3 data ", "len = ${data.waveData.size}")
+                    DataController.receive(data.waveData.datas)
+                    binding.dataStr.text = data.rtParam.toString()
+                    viewModel.ecgHr.value = data.rtParam.hr
+                }
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3FileList).observe(this, { event ->
+            (event.data as LeW3FileList).let {
                 binding.dataStr.text = it.toString()
             }
         })
@@ -284,6 +300,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.oxyPr.value = rtData.pr.toInt()
                 viewModel.spo2.value = rtData.spo2.toInt()
                 viewModel.pi.value = rtData.pi.toInt().div(10f)
+                binding.dataStr.text = rtData.toString()
             })
 
         //------------------------------pc100------------------------------
@@ -337,6 +354,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.oxyPr.value = rtData.pr
                 viewModel.spo2.value = rtData.spo2
                 viewModel.pi.value = rtData.pi.div(10f)
+                binding.dataStr.text = rtData.toString()
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBreathWave)
             .observe(this, {
@@ -356,7 +374,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
         mainViewModel.curBluetooth.observe(viewLifecycleOwner, {
             when (it!!.modelNo) {
-                Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2, Bluetooth.MODEL_PC80B -> {
+                Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2, Bluetooth.MODEL_PC80B, Bluetooth.MODEL_LEW3 -> {
                     binding.ecgLayout.visibility = View.VISIBLE
                     binding.bpLayout.visibility = View.GONE
                     binding.oxyLayout.visibility = View.GONE

@@ -30,14 +30,14 @@ object Pc100BleResponse {
         var batLevel: Int      // 电量等级
         var batStatus: Int     // 充电状态
 
-        // 电量等级 : 级数越高，电量越多
+        // 电量等级 : 级数越高，电量越多（0-3）
         // 充电状态 : 00：为没有充电，01：表示充电中，10：表示充电完成，11：保留
         init {
             var index = 0
-            softwareV = bytesToHex(byteArrayOf(bytes[index]))
+            softwareV = byteToPointHex(bytes[index])
             if (bytes.size == 3) {
                 index++
-                hardwareV = bytesToHex(byteArrayOf(bytes[index]))
+                hardwareV = byteToPointHex(bytes[index])
                 index++
                 batLevel = bytes[index].toInt() and 0x07
                 batStatus = (bytes[index].toInt() and 0x30) shr 4
@@ -63,7 +63,7 @@ object Pc100BleResponse {
     @ExperimentalUnsignedTypes
     class BpResult constructor(var bytes: ByteArray) : Parcelable {
         var sys: Int            // 收缩压
-        var result: Int         // 心率结果
+        var result: Int         // 心率结果（0：心率正常 1：心率不齐）
         var resultMess: String  // 心率结果
         var map: Int            // 平均压
         var dia: Int            // 舒张压
@@ -174,7 +174,7 @@ object Pc100BleResponse {
     @Parcelize
     @ExperimentalUnsignedTypes
     class RtBpData constructor(var bytes: ByteArray) : Parcelable {
-        var sign: Int     // 心跳标记
+        var sign: Int     // 心跳标记（0 无心跳 1 有心跳）
         var psValue: Int  // 当前压力值
         init {
             sign = (bytes[0].toInt() and 0x10) shr 4
@@ -207,9 +207,9 @@ object Pc100BleResponse {
             status = (bytes[index].toUInt() and 0xFFu).toInt()
             statusMess = getStateMess(status)
             index++
-            sw_ver = bytesToHex(byteArrayOf(bytes[index]))
+            sw_ver = byteToPointHex(bytes[index])
             index++
-            hw_ver = bytesToHex(byteArrayOf(bytes[index]))
+            hw_ver = byteToPointHex(bytes[index])
         }
 
         override fun toString(): String {
@@ -225,10 +225,10 @@ object Pc100BleResponse {
     @Parcelize
     @ExperimentalUnsignedTypes
     class RtBoParam constructor(var bytes: ByteArray) : Parcelable {
-        var spo2: Int
-        var pr: Int
-        var pi: Int
-        var status: Int
+        var spo2: Int    // （0-100）
+        var pr: Int      // （0-511）
+        var pi: Int      // （0-255）
+        var status: Int  // 状态（0：正常 2：探头脱落，手指未接入）
 
         init {
             var index = 0
@@ -290,9 +290,9 @@ object Pc100BleResponse {
             var index = 0
             status = (bytes[index].toUInt() and 0xFFu).toInt()
             index++
-            sw_ver = bytesToHex(byteArrayOf(bytes[index]))
+            sw_ver = byteToPointHex(bytes[index])
             index++
-            hw_ver = bytesToHex(byteArrayOf(bytes[index]))
+            hw_ver = byteToPointHex(bytes[index])
         }
     }
 
@@ -329,9 +329,9 @@ object Pc100BleResponse {
             var index = 0
             status = (bytes[index].toUInt() and 0xFFu).toInt()
             index++
-            sw_ver = bytesToHex(byteArrayOf(bytes[index]))
+            sw_ver = byteToPointHex(bytes[index])
             index++
-            hw_ver = bytesToHex(byteArrayOf(bytes[index]))
+            hw_ver = byteToPointHex(bytes[index])
         }
     }
 

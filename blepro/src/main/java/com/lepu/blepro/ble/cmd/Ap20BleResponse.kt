@@ -1,8 +1,7 @@
 package com.lepu.blepro.ble.cmd
 
 import android.os.Parcelable
-import com.lepu.blepro.utils.ByteUtils.toSignedShort
-import com.lepu.blepro.utils.bytesToHex
+import com.lepu.blepro.utils.byteToPointHex
 import com.lepu.blepro.utils.toUInt
 import kotlinx.android.parcel.Parcelize
 
@@ -34,9 +33,9 @@ class Ap20BleResponse{
 
         init {
             var index = 0
-            softwareV = bytesToHex(bytes.copyOfRange(index, index + 2))
+            softwareV = byteToPointHex(bytes[index]) + "." + byteToPointHex(bytes[index+1])
             index += 2
-            hardwareV = bytesToHex(byteArrayOf(bytes[index]))
+            hardwareV = byteToPointHex(bytes[index])
             index++
             deviceName = com.lepu.blepro.utils.toString(bytes.copyOfRange(index, bytes.size))
         }
@@ -56,8 +55,8 @@ class Ap20BleResponse{
         var spo2: Int
         var pr: Int
         var pi: Int
-        var status: Int
-        var battery: Int
+        var status: Int   // 血氧状态（0：正常 2：探头脱落，手指未接入）
+        var battery: Int  // 电量等级（0-3）
         init {
             var index = 0
             spo2 = (bytes[index].toUInt() and 0xFFu).toInt()
@@ -95,8 +94,8 @@ class Ap20BleResponse{
     @ExperimentalUnsignedTypes
     @Parcelize
     class RtBreathParam constructor(var bytes: ByteArray) : Parcelable {
-        var rr: Int
-        var singleFlag: Int
+        var rr: Int          // 呼吸率（6-60，单位bpm，0是无效值）
+        var singleFlag: Int  // 鼻息流脱落标记（0：呼吸信号正常 1：无呼吸信号）
         init {
             var index = 0
             rr = (bytes[index].toUInt() and 0xFFu).toInt()
@@ -114,19 +113,13 @@ class Ap20BleResponse{
     @ExperimentalUnsignedTypes
     @Parcelize
     class RtBreathWave(var byteArray: ByteArray) : Parcelable {
-        val flow: Int
-        val snore: Int
+        val flow: Int   // 呼吸波形数据（0-4095）
+        val snore: Int  // 鼾声波形数据（0-4095）
         init {
             var index = 0
             flow = toUInt(byteArray.copyOfRange(index, index+2))
             index += 2
             snore = toUInt(byteArray.copyOfRange(index, index+2))
-        }
-
-        fun intToArray(data: Int): IntArray {
-            var array = IntArray(1)
-            array[0] = data
-            return array
         }
 
         override fun toString(): String {
@@ -140,7 +133,7 @@ class Ap20BleResponse{
     @ExperimentalUnsignedTypes
     @Parcelize
     class ConfigInfo constructor(var bytes: ByteArray) : Parcelable {
-        var type: Int
+        var type: Int  // 0：背光等级（0-5） 1：警报开关（0：off 1：on） 2：血氧过低阈值（85-99） 3：脉率过低阈值（30-99） 4：脉率过高阈值（100-250）
         var data: Int
         init {
             type = (bytes[0].toUInt() and 0xFFu).toInt()

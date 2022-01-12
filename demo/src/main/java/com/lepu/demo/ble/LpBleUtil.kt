@@ -572,6 +572,37 @@ class LpBleUtil {
             }
         }
 
+        fun boundDevice(model: Int){
+            Log.d(TAG, "boundDevice")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.boundDevice(model)
+            }
+        }
+        fun setLeW3Config(model: Int, addr: String, port: Int){
+            Log.d(TAG, "setLeW3Config")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.setLeW3Config(model, addr, port)
+            }
+        }
+        fun getLeW3Config(model: Int){
+            Log.d(TAG, "getLeW3Config")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.getLeW3Config(model)
+            }
+        }
+
     }
 
 

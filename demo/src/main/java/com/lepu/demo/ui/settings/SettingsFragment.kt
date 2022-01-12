@@ -6,10 +6,12 @@ import androidx.fragment.app.Fragment
 import com.lepu.demo.R
 import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.ble.cmd.Ap20BleResponse
 import com.lepu.blepro.ble.cmd.Bpw1BleResponse
 import com.lepu.blepro.ble.cmd.Pc100BleResponse
 import com.lepu.blepro.ble.data.Bp2Config
 import com.lepu.blepro.ble.data.FscaleUserInfo
+import com.lepu.blepro.ble.data.LeW3Config
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.bytesToHex
@@ -76,6 +78,19 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             if (switchState)
                 temp = "开"
             binding.er2SetConfig.text = "声音" + temp
+        }
+        //-------------------------lew3------------------------
+        binding.lew3Bound.setOnClickListener {
+            LpBleUtil.boundDevice(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+        }
+        binding.lew3GetConfig.setOnClickListener {
+            LpBleUtil.getLeW3Config(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+        }
+        binding.lew3SetConfig.setOnClickListener {
+            LpBleUtil.setLeW3Config(Constant.BluetoothConfig.currentModel[0], "192.168.111.222", 5000)
+            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
         }
 
         //-------------------------bp2/bp2A--------------------
@@ -203,6 +218,26 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpStatus)
             .observe(this, {
                 var data = it.data as Pc100BleResponse.BpStatus
+                binding.content.text = data.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20Battery)
+            .observe(this, {
+                var data = it.data as Int
+                binding.content.text = data.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20ConfigInfo)
+            .observe(this, {
+                var data = it.data as Ap20BleResponse.ConfigInfo
+                binding.content.text = data.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3BoundDevice)
+            .observe(this, {
+                var data = it.data as Boolean
+                binding.content.text = "请求绑定 : " + data
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3GetConfig)
+            .observe(this, {
+                var data = it.data as LeW3Config
                 binding.content.text = data.toString()
             })
 

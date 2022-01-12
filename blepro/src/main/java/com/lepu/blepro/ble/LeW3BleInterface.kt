@@ -7,6 +7,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
 import java.util.*
@@ -37,6 +38,7 @@ class LeW3BleInterface(model: Int): BleInterface(model) {
     /**
      * download a file, name come from filelist
      */
+    var fileListName: String? = null
     var curFileName: String? = null
     private var userId: String? = null
     var curFile: LeW3File? = null
@@ -191,8 +193,9 @@ class LeW3BleInterface(model: Int): BleInterface(model) {
                 )
             }
             LeW3BleCmd.CMD_LIST_FILE -> {
+                fileListName = trimStr(com.lepu.blepro.utils.toString(respPkg.data.copyOfRange(1, respPkg.data.size)))
                 LepuBleLog.d(tag, "model:$model,CMD_LIST_FILE => success, $respPkg")
-                curFileName = com.lepu.blepro.utils.toString(respPkg.data.copyOfRange(1, respPkg.data.size))
+                curFileName = fileListName
                 LepuBleLog.d(tag, "model:$model, curFileName == $curFileName")
                 LepuBleLog.d(tag, "model:$model, fileName == " + respPkg.data[0].toInt())
                 sendCmd(LeW3BleCmd.readFileStart(curFileName?.toByteArray(), 0))
@@ -244,7 +247,7 @@ class LeW3BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "read file finished: ${curFile?.fileName} ==> ${curFile?.fileSize}")
                 LepuBleLog.d(tag, "read file finished: isCancel = $isCancelRF, isPause = $isPausedRF")
 
-                if (curFileName?.equals("ecgrecord.list") == true) {
+                if (curFileName?.equals(fileListName) == true) {
                     curFileName = null// 一定要放在发通知之前
                     curFile?.let {
                         if (it.index < it.fileSize ){

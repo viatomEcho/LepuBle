@@ -175,6 +175,31 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     readFile()
                 }
             })
+        //--------------------------------lew3-----------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3FileList)
+            .observe(this, { event ->
+                (event.data as LeW3FileList).let {
+                    binding.info.text = it.toString()
+                    for (fileName in it.fileNames) {
+                        fileNames.add(fileName)
+                    }
+                    Toast.makeText(context, "lew3 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                }
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3ReadingFileProgress)
+            .observe(this, { event ->
+                (event.data as Int).let {
+                    binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it/10).toString() + "%"
+                }
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3ReadFileComplete)
+            .observe(this, { event ->
+                (event.data as LeW3File).let {
+                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
+                    fileNames.removeAt(0)
+                    readFile()
+                }
+            })
         //--------------------------------bp2-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList)
             .observe(this, { event ->

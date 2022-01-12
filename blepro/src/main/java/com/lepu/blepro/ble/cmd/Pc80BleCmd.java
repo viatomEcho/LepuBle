@@ -84,7 +84,7 @@ public class Pc80BleCmd {
         cmd[1] = (byte) VERSION_SET;
         cmd[2] = (byte) 0x01;
         cmd[3] = (byte) res;
-        cmd[4] = CrcUtil.calCRC8PC(cmd);
+        cmd[4] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
     // 用于数据传输应答

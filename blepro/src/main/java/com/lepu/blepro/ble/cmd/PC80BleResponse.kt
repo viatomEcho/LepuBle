@@ -40,15 +40,15 @@ object PC80BleResponse {
                         "." + bytes[1].toInt() +
                         "." + bytes[2].toInt() +
                         "." + toString(byteArrayOf(bytes[3])) + bytes[4].toInt() + bytes[5].toInt()
-                hardwareV = bytesToHex(byteArrayOf(bytes[len-2]))
-                algorithmV = bytesToHex(byteArrayOf(bytes[len-1]))
+                hardwareV = byteToPointHex(bytes[len-2])
+                algorithmV = byteToPointHex(bytes[len-1])
             } else {
                 softwareV = "" + bytes[0].toInt() +
                         "." + bytes[1].toInt() +
                         "." + bytes[2].toInt() +
                         "." + bytes[3].toInt()
-                hardwareV = bytesToHex(byteArrayOf(bytes[len-2]))
-                algorithmV = bytesToHex(byteArrayOf(bytes[len-1]))
+                hardwareV = byteToPointHex(bytes[len-2])
+                algorithmV = byteToPointHex(bytes[len-1])
             }
             sn = "XBN00NK03553"
         }
@@ -69,12 +69,10 @@ object PC80BleResponse {
     class TransSet constructor(var bytes: ByteArray) : Parcelable {
         var deviceType: Int     // 设备型号
         var deviceName: String  // 设备型号字符串
-        var filterMode: Int     // 滤波模式
-        var transType: Int      // 传输类型
+        var filterMode: Int     // 滤波模式（0：普通 1：增强）
+        var transType: Int      // 传输类型（0：实时 1：非实时）
         var sn: String          // 产品序列号
 
-        // 滤波模式 : 0普通, 1增强
-        // 传输类型 : 0实时, 1非实时
         init {
             var index = 0
             deviceType = (bytes[index].toUInt() and 0xFFu).toInt()

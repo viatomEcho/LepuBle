@@ -1131,4 +1131,32 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    fun boundDevice(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LeW3BleInterface).let {
+                LepuBleLog.d(tag, "it as LeW3BleInterface--boundDevice")
+                it.getConfig()
+            }
+        }
+    }
+    fun getLeW3Config(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LeW3BleInterface).let {
+                LepuBleLog.d(tag, "it as LeW3BleInterface--getLeW3Config")
+                it.getConfig()
+            }
+        }
+    }
+    fun setLeW3Config(model: Int, addr: String, port: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LeW3BleInterface).let {
+                LepuBleLog.d(tag, "it as LeW3BleInterface--setLeW3Config")
+                it.setConfig(addr, port)
+            }
+        }
+    }
+
 }
