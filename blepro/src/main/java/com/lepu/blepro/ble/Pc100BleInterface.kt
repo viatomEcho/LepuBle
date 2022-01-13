@@ -7,10 +7,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.Pc100DeviceInfo
 import com.lepu.blepro.event.InterfaceEvent
-import com.lepu.blepro.utils.CrcUtil
-import com.lepu.blepro.utils.LepuBleLog
-import com.lepu.blepro.utils.toUInt
-import com.lepu.blepro.utils.toString
+import com.lepu.blepro.utils.*
 import java.util.*
 
 /**
@@ -78,20 +75,24 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             }
             Pc100BleCmd.GET_DEVICE_INFO -> {
                 LepuBleLog.d(tag, "model:$model,GET_DEVICE_INFO => success")
-                if (response.len != 5) return
-                val info = Pc100BleResponse.DeviceInfo(response.content)
-                if (pc100Device == null) {
-                    pc100Device = Pc100DeviceInfo()
+                if (response.len != 5) {
+                    LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BoFingerOut).post(InterfaceEvent(model, true))
+                } else {
+                    val info = Pc100BleResponse.DeviceInfo(response.content)
+                    if (pc100Device == null) {
+                        pc100Device = Pc100DeviceInfo()
+                    }
+                    pc100Device?.softwareV = info.softwareV
+                    pc100Device?.hardwareV = info.hardwareV
+                    pc100Device?.batLevel = info.batLevel
+                    pc100Device?.batStatus = info.batStatus
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100DeviceInfo).post(InterfaceEvent(model, pc100Device!!))
+                    LepuBleLog.d(tag, "model:$model,GET_DEVICE_INFO info.softwareV => " + info.softwareV)
+                    LepuBleLog.d(tag, "model:$model,GET_DEVICE_INFO info.hardwareV => " + info.hardwareV)
+                    LepuBleLog.d(tag, "model:$model,GET_DEVICE_INFO info.batLevel => " + info.batLevel)
+                    LepuBleLog.d(tag, "model:$model,GET_DEVICE_INFO info.batStatus => " + info.batStatus)
                 }
-                pc100Device?.softwareV = info.softwareV
-                pc100Device?.hardwareV = info.hardwareV
-                pc100Device?.batLevel = info.batLevel
-                pc100Device?.batStatus = info.batStatus
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100DeviceInfo).post(InterfaceEvent(model, pc100Device!!))
-                LepuBleLog.d(tag, "model:$model,GET_DEVICE_INFO info.softwareV => " + info.softwareV)
-                LepuBleLog.d(tag, "model:$model,GET_DEVICE_INFO info.hardwareV => " + info.hardwareV)
-                LepuBleLog.d(tag, "model:$model,GET_DEVICE_INFO info.batLevel => " + info.batLevel)
-                LepuBleLog.d(tag, "model:$model,GET_DEVICE_INFO info.batStatus => " + info.batStatus)
             }
 
             Pc100BleCmd.BP_MODULE_STATE -> {
@@ -198,7 +199,7 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             }
             Pc100BleCmd.BS_GET_STATUS -> {
                 LepuBleLog.d(tag, "model:$model,BS_GET_STATUS => success")
-                val info = Pc100BleResponse.BoStatus(response.content)
+                val info = Pc100BleResponse.BsStatus(response.content)
                 LepuBleLog.d(tag, "model:$model,BS_GET_STATUS info.status => " + info.status)
                 LepuBleLog.d(tag, "model:$model,BS_GET_STATUS info.sw_ver => " + info.sw_ver)
                 LepuBleLog.d(tag, "model:$model,BS_GET_STATUS info.hw_ver => " + info.hw_ver)
@@ -224,7 +225,7 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             }
             Pc100BleCmd.BT_GET_STATUS -> {
                 LepuBleLog.d(tag, "model:$model,BT_GET_STATUS => success")
-                val info = Pc100BleResponse.BoStatus(response.content)
+                val info = Pc100BleResponse.BtStatus(response.content)
                 LepuBleLog.d(tag, "model:$model,BT_GET_STATUS info.status => " + info.status)
                 LepuBleLog.d(tag, "model:$model,BT_GET_STATUS info.sw_ver => " + info.sw_ver)
                 LepuBleLog.d(tag, "model:$model,BT_GET_STATUS info.hw_ver => " + info.hw_ver)

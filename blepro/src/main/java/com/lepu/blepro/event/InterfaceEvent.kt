@@ -186,6 +186,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventPc100BpRtData = "com.lepu.ble.pc100.bp.rtdata"             // 血压实时测量值 Pc100BleResponse.RtBpData
             const val EventPc100BoRtWave = "com.lepu.ble.pc100.bo.rtwave"             // 血氧实时波形包 byte数组
             const val EventPc100BoRtParam = "com.lepu.ble.pc100.bo.rtparam"           // 血氧实时测量值 Pc100BleResponse.RtBoParam
+            const val EventPc100BoFingerOut = "com.lepu.ble.pc100.bo.finger.out"      // 血氧脱落未接入
         }
     }
 
