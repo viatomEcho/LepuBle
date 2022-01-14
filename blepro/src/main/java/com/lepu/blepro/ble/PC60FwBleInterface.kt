@@ -10,6 +10,7 @@ import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_D
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_DEVICE_SN
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_SPO2_PARAM
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_SPO2_WAVE
+import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_WORKING_STATUS
 import com.lepu.blepro.ble.data.BoDeviceInfo
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
@@ -119,6 +120,13 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             PC60FwBleResponse.RtDataWave(response.content).let {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataWave).post(InterfaceEvent(model, it))
             }
+        }
+        if (response.token == TOKEN_PO_0F && response.type == TYPE_WORKING_STATUS){
+            PC60FwBleResponse.WorkingStatus(response.content).let {
+                LepuBleLog.d(tag, "model:$model,WORK_STATUS_DATA => success")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwWorkingStatus).post(InterfaceEvent(model, it))
+            }
+
         }
     }
 
