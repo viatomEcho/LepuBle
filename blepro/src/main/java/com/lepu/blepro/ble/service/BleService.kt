@@ -302,6 +302,14 @@ open class BleService: LifecycleService() {
                     return this
                 }
             }
+            Bluetooth.MODEL_VETCORDER -> {
+                VetcorderBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
 
             else -> {
                 return throw Exception("BleService initInterfaces() 未配置此model:$m")

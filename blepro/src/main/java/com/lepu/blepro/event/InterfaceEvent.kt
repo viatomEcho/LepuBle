@@ -237,4 +237,14 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * VetcorderBleInterface发出的通知
+     * 包含model: model_vetcorder
+     */
+    interface Vetcorder{
+        companion object{
+            const val EventVetcorderInfo = "com.lepu.ble.vetcorder.info"
+        }
+    }
+
 }

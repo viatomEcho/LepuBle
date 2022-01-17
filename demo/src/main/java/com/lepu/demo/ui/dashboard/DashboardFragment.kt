@@ -118,6 +118,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         when(model) {
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2, Bluetooth.MODEL_LEW3 -> waveHandler.post(EcgWaveTask())
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC_6N, Bluetooth.MODEL_AP20 -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_VETCORDER -> {
+                waveHandler.post(EcgWaveTask())
+                waveHandler.post(OxyWaveTask())
+            }
         }
 
     }
@@ -368,6 +372,21 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 dataString += "\n rtData : $rtData"
                 binding.dataStr.text = dataString
             })
+        //------------------------------vetcorder------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Vetcorder.EventVetcorderInfo)
+            .observe(this, {
+                val rtData = it.data as VetcorderInfo
+                viewModel.oxyPr.value = rtData.pr
+                viewModel.spo2.value = rtData.spo2
+                viewModel.pi.value = rtData.pi.div(10f)
+                viewModel.ecgHr.value = rtData.hr
+
+                DataController.receive(rtData.ecgwFs)
+                OxyDataController.receive(rtData.spo2wIs)
+
+                binding.dataStr.text = rtData.toString()
+            })
+
     }
 
     private fun initView() {
@@ -398,6 +417,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.bpLayout.visibility = View.VISIBLE
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
+                }
+                Bluetooth.MODEL_VETCORDER -> {
+                    binding.ecgLayout.visibility = View.VISIBLE
+                    binding.oxyLayout.visibility = View.VISIBLE
+                    binding.bpLayout.visibility = View.GONE
                 }
             }
         })
