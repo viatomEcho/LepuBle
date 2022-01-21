@@ -5,11 +5,9 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.ble.data.Er2DeviceInfo
-import com.lepu.blepro.ble.data.Watch4gFile
-import com.lepu.blepro.ble.data.Watch4gFileList
-import com.lepu.blepro.ble.data.Watch4gRtData
+import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
 import java.util.*
@@ -96,15 +94,11 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
         when(respPkg.cmd) {
             Watch4gBleCmd.CMD_RETRIEVE_DEVICE_INFO -> {
                 if (respPkg.data==null) return
-                val info = Er2DeviceInfo(device.name, device.address, respPkg.data)
+                val info = Watch4gDeviceInfo(device.name, device.address, respPkg.data)
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2Info).post(InterfaceEvent(model, info))
-
-                if (runRtImmediately){
-                    runRtTask()
-                    runRtImmediately = false
-                }
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2Info)
+                    .post(InterfaceEvent(model, info))
             }
             Watch4gBleCmd.CMD_SET_TIME -> {
 
