@@ -81,12 +81,16 @@ class PC60FwBleResponse{
         var spo2: Byte
         var pr: Short
         var pi: Short
-        var status: Int  // 血氧状态（0：正常 2：探头脱落，手指未插入）
+        var status: Byte               // 血氧状态
+        var isProbeOff: Boolean        // 探头脱落，手指未接入
+        var isPulseSearching: Boolean  // 脉搏检测
         init {
             spo2 =  byteArray[0]
             pr = toSignedShort(byteArray[1], byteArray[2])
             pi = (byteArray[3].toInt() and 0xff).toShort()
-            status = (byteArray[4].toUInt() and 0xFFu).toInt()
+            status = byteArray[4]
+            isProbeOff = ((byteArray[4].toInt() and 0x02) shr 1) == 1
+            isPulseSearching = ((byteArray[4].toInt() and 0x04) shr 2) == 1
         }
         override fun toString(): String {
             return """
@@ -94,6 +98,8 @@ class PC60FwBleResponse{
                 pr : $pr
                 pi : $pi
                 status : $status
+                isProbeOff : $isProbeOff
+                isPulseSearching : $isPulseSearching
             """.trimIndent()
         }
 

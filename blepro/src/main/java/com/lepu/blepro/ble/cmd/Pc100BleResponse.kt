@@ -225,10 +225,12 @@ object Pc100BleResponse {
     @Parcelize
     @ExperimentalUnsignedTypes
     class RtBoParam constructor(var bytes: ByteArray) : Parcelable {
-        var spo2: Int    // （0-100）
-        var pr: Int      // （0-511）
-        var pi: Int      // （0-255）
-        var status: Int  // 状态（0：正常 2：探头检测 4：脉搏扫描中）
+        var spo2: Int             // （0-100）
+        var pr: Int               // （0-511）
+        var pi: Int               // （0-255）
+        var status: Byte          // 状态
+        var isDetecting: Boolean  // 探头检测中
+        var isScanning: Boolean   // 脉搏扫描中
 
         init {
             var index = 0
@@ -238,7 +240,11 @@ object Pc100BleResponse {
             index += 2
             pi = (bytes[index].toUInt() and 0xFFu).toInt()
             index++
-            status = (bytes[index].toUInt() and 0xFFu).toInt()
+            status = bytes[index]
+
+            isDetecting = ((bytes[index].toInt() and 0x02) shr 1) == 1
+            isScanning = ((bytes[index].toInt() and 0x04) shr 2) == 1
+
         }
 
         override fun toString(): String {
@@ -248,6 +254,8 @@ object Pc100BleResponse {
                 pr : $pr
                 pi : $pi
                 status : $status
+                isDetecting : $isDetecting
+                isScanning : $isScanning
             """.trimIndent()
         }
 
