@@ -172,6 +172,10 @@ open class BleService: LifecycleService() {
         leScanner = bluetoothAdapter?.bluetoothLeScanner
         LepuBleLog.d(tag, "initBle success")
 
+        if (leScanner == null) {
+            LepuBleLog.d(tag, "leScanner is null")
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             support2MPhy = bluetoothAdapter!!.isLe2MPhySupported
         }
@@ -485,12 +489,17 @@ open class BleService: LifecycleService() {
                     }
                     //                    List<ScanFilter> filters = new ArrayList<ScanFilter>();
                     //                    filters.add(new ScanFilter.Builder().build());
+                    if (leScanner == null) {
+                        leScanner = bluetoothAdapter?.bluetoothLeScanner
+                    }
                     leScanner?.startScan(null, settings, leScanCallback)
                     LepuBleLog.d(tag, "scanDevice started")
                 }
             } else {
                 if (bluetoothAdapter?.isEnabled!! && leScanCallback != null) {
-
+                    if (leScanner == null) {
+                        leScanner = bluetoothAdapter?.bluetoothLeScanner
+                    }
                     leScanner?.stopScan(leScanCallback)
                 }
             }
