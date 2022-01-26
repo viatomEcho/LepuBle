@@ -91,6 +91,11 @@ public class Watch4gBleCmd {
         return getReq(CMD_RESET, (byte)seqNo, new byte[0]);
     }
 
+    public static byte[] getBattery() {
+        addNo();
+        return getReq(CMD_GET_BATTERY, (byte)seqNo, new byte[0]);
+    }
+
     public static byte[] getRtData() {
         addNo();
         return getReq(CMD_GET_REAL_TIME_DATA, (byte)seqNo, new byte[0]);

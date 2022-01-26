@@ -1,6 +1,7 @@
 package com.lepu.blepro.ble.data
 
 import android.os.Parcelable
+import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.toUInt
 import kotlinx.android.parcel.Parcelize
 
@@ -41,7 +42,7 @@ class LepuDevice constructor(var bytes: ByteArray) : Parcelable {
         curTime = "$year/$month/$day $hour:$min:$second"
         protocolMaxLen = toUInt(bytes.copyOfRange(21, 23))
         snLen = (bytes[37].toUInt() and 0xFFu).toInt()
-        sn = String(bytes.copyOfRange(38, 38+snLen!!))
+        sn = trimStr(String(bytes.copyOfRange(38, 38+snLen!!)))
     }
 
     override fun toString(): String {

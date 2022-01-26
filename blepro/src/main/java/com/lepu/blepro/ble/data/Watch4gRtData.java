@@ -168,10 +168,6 @@ public class Watch4gRtData {
 //        float mv = (float) (n * 0.002467);
             n1 = n;
             mv1 = mv;
-            Log.d("test12345", "----------n------------" + n);
-            Log.d("test12345", "----------mv------------" + mv);
-
-
             return mv;
         }
 

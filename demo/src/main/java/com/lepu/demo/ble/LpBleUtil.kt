@@ -581,6 +581,9 @@ class LpBleUtil {
                 BleServiceHelper.boundDevice(model)
             }
         }
+        fun getBattery(model: Int) {
+            BleServiceHelper.sendHeartbeat(model)
+        }
 
     }
 

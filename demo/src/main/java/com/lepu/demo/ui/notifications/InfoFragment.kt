@@ -45,6 +45,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         mainViewModel.er2Info.observe(viewLifecycleOwner, {
             binding.info.text = it.toString()
         })
+        mainViewModel.watch4gInfo.observe(viewLifecycleOwner, {
+            binding.info.text = it.toString()
+        })
         mainViewModel.pc80bInfo.observe(viewLifecycleOwner, {
             binding.info.text = it.toString()
         })

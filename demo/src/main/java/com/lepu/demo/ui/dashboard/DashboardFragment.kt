@@ -17,6 +17,7 @@ import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
 import com.lepu.demo.ble.LpBleUtil
@@ -172,9 +173,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     DataController.receive(data.waveData.datas)
 
                     temp += "\n n == " + data.waveData.n1 + " mv == " + data.waveData.mv1
-                    binding.dataStr.text = data.rtParam.toString() + temp
+//                    binding.dataStr.text = data.rtParam.toString() + temp
                     viewModel.ecgHr.value = data.hr
                 }
+                LpBleUtil.getBattery(Constant.BluetoothConfig.currentModel[0])
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FileList).observe(this, { event ->
             (event.data as Watch4gFileList).let {
@@ -184,6 +186,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.dataStr.text = it.toString()
             }*/
         })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2BatteryInfo)
+            .observe(this, { event ->
+                (event.data as ByteArray).let {
+                    binding.dataStr.text = bytesToHex(it)
+                }
+            })
         //------------------------------pc80b------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bTrackData)
             .observe(this, {

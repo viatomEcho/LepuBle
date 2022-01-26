@@ -96,6 +96,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     interface ER2{
         companion object{
             const val EventEr2Info = "com.lepu.ble.er2.info"                                  // 设备信息 Er2DeviceInfo
+            const val EventEr2BatteryInfo = "com.lepu.ble.er2.battery.info"                   // 电量信息 BatteryInfo
             const val EventEr2SetTime = "com.lepu.ble.er2.set.time"                           // 同步时间 true
             const val EventEr2BoundDevice = "com.lepu.ble.er2.bound.device"                   // 绑定设置回调 boolean
             const val EventEr2SetSwitcherState = "com.lepu.ble.er2.set.switcher.state"        // 设置心跳音 true

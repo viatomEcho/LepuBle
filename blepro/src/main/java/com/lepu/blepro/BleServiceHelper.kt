@@ -972,10 +972,22 @@ class BleServiceHelper private constructor() {
      */
     fun sendHeartbeat(model: Int) {
         if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as PC80BleInterface).let {
-                LepuBleLog.d(tag, "it as PC80BleInterface--sendHeartbeat")
-                it.sendHeartbeat()
+        when(model) {
+            Bluetooth.MODEL_PC80B -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as PC80BleInterface).let {
+                        LepuBleLog.d(tag, "it as PC80BleInterface--sendHeartbeat")
+                        it.sendHeartbeat()
+                    }
+                }
+            }
+            Bluetooth.MODEL_WATCH_4G -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Watch4gBleInterface).let {
+                        LepuBleLog.d(tag, "it as Watch4gBleInterface--sendHeartbeat")
+                        it.getBattery()
+                    }
+                }
             }
         }
     }

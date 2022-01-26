@@ -22,6 +22,7 @@ import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.HexString
@@ -131,9 +132,16 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2Info)
             .observe(this, { event ->
-                (event.data as Er2DeviceInfo).let {
-                    Toast.makeText(this, "er2 获取设备信息成功", Toast.LENGTH_SHORT).show()
-                    viewModel._er2Info.value = it
+                if (event.model == Bluetooth.MODEL_WATCH_4G) {
+                    (event.data as Watch4gDeviceInfo).let {
+                        Toast.makeText(this, "watch4g 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                        viewModel._watch4gInfo.value = it
+                    }
+                } else {
+                    (event.data as Er2DeviceInfo).let {
+                        Toast.makeText(this, "er2 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                        viewModel._er2Info.value = it
+                    }
                 }
             })
         //-------------------------fhr---------------------------

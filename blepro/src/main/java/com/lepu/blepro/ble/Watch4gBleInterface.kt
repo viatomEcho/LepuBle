@@ -5,6 +5,7 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
+import com.lepu.blepro.ble.cmd.Watch4gBleCmd.CMD_GET_BATTERY
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
@@ -93,7 +94,7 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
     private fun onResponseReceived(respPkg: Er2BleResponse) {
         when(respPkg.cmd) {
             Watch4gBleCmd.CMD_RETRIEVE_DEVICE_INFO -> {
-                if (respPkg.data==null) return
+                if (respPkg.data==null || respPkg.data.isEmpty()) return
                 val info = Watch4gDeviceInfo(device.name, device.address, respPkg.data)
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
@@ -111,7 +112,7 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
                 )
             }
             Watch4gBleCmd.CMD_BOUND_DEVICE -> {
-                if (respPkg.data==null) return
+                if (respPkg.data==null || respPkg.data.isEmpty()) return
                 LepuBleLog.d(tag, "model:$model,CMD_BOUND_DEVICE => success")
                 if (respPkg.data[0].toInt() == 0) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2BoundDevice).post(
@@ -140,7 +141,7 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
                 )
             }
             Watch4gBleCmd.CMD_GET_CONFIG -> {
-                if (respPkg.data==null) return
+                if (respPkg.data==null || respPkg.data.isEmpty()) return
                 LepuBleLog.d(tag, "model:$model,CMD_GET_CONFIG => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2GetConfig).post(
                     InterfaceEvent(
@@ -190,7 +191,7 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
                 )
             }
             Watch4gBleCmd.CMD_GET_REAL_TIME_DATA -> {
-                if (respPkg.data==null) return
+                if (respPkg.data==null || respPkg.data.isEmpty()) return
                 val rtData = Watch4gRtData(respPkg.data)
 
                 LepuBleLog.d(tag, "model:$model,CMD_GET_REAL_TIME_DATA => success")
@@ -214,7 +215,7 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
                 )*/
             }
             Watch4gBleCmd.CMD_START_READ_FILE -> {
-                if (respPkg.data==null) return
+                if (respPkg.data==null || respPkg.data.isEmpty()) return
                 LepuBleLog.d(tag, "model:$model,CMD_START_READ_FILE => success, $respPkg")
                 if (respPkg.pkgType == 0x01.toByte()) {
                     if (curFileName?.equals("ecgrecord.list") == true) {
@@ -239,7 +240,7 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
 
             }
             Watch4gBleCmd.CMD_READ_FILE_CONTENT -> {
-                if (respPkg.data==null) return
+                if (respPkg.data==null || respPkg.data.isEmpty()) return
                 if (curFileName?.equals("ecgrecord.list") == true) {
                     curFile4g?.apply {
 
@@ -322,8 +323,9 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
                 }
             }
 
-            else -> {
-
+            CMD_GET_BATTERY -> {
+                LepuBleLog.d(tag, "model:$model,CMD_GET_BATTERY => success, $respPkg")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2BatteryInfo).post(InterfaceEvent(model,respPkg.data))
             }
         }
     }
@@ -382,6 +384,8 @@ class Watch4gBleInterface(model: Int): BleInterface(model) {
         readFile(userId, fileName)
     }
 
-
+    fun getBattery() {
+        sendCmd(Watch4gBleCmd.getBattery())
+    }
 
 }

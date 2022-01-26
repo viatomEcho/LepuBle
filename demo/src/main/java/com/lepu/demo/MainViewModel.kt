@@ -78,6 +78,9 @@ class MainViewModel: ViewModel() {
     val _er2Info = MutableLiveData<Er2DeviceInfo>()
     val er2Info: LiveData<Er2DeviceInfo> = _er2Info
 
+    val _watch4gInfo = MutableLiveData<Watch4gDeviceInfo>()
+    val watch4gInfo: LiveData<Watch4gDeviceInfo> = _watch4gInfo
+
     val _pc80bInfo = MutableLiveData<PC80BleResponse.DeviceInfo>()
     val pc80bInfo: LiveData<PC80BleResponse.DeviceInfo> = _pc80bInfo
 
