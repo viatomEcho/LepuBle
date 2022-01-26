@@ -40,4 +40,26 @@ object Ble {
 
         }
     }
+
+    /**
+     * 文件类型
+     */
+    interface File {
+        companion object {
+            /**
+             * 用户 0
+             */
+            const val USER_TYPE = 0
+
+            /**
+             * 血压
+             */
+            const val BP_TYPE = 1
+
+            /**
+             * 心电
+             */
+            const val ECG_TYPE = 2
+        }
+    }
 }

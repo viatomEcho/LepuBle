@@ -73,10 +73,25 @@ fun bytesToHex(bytes: ByteArray): String {
     }
     return String(hexChars)
 }
+// 大端模式
 fun shortToByteArray(value: Int): ByteArray {
     return byteArrayOf(
         (value ushr 8).toByte(),
         value.toByte())
+}
+// 小端模式
+fun int2ByteArray(value: Int): ByteArray {
+    val b1 = (value and 0xff).toByte()
+    val b2 = (value shr 8 and 0x7f).toByte()
+    return byteArrayOf(b1).plus(b2)
+}
+// 小端模式
+fun int4ByteArray(value: Int): ByteArray {
+    val b1 = (value and 0xff).toByte()
+    val b2 = (value shr 8 and 0xff).toByte()
+    val b3 = (value shr 16 and 0xff).toByte()
+    val b4 = (value shr 24 and 0x7f).toByte()
+    return byteArrayOf(b1).plus(b2).plus(b3).plus(b4)
 }
 
 /*

@@ -76,9 +76,10 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBp2RtData = "com.lepu.ble.bp2.rtData"                              // 实时数据 Bp2BleRtData
             const val EventBp2State = "com.lepu.ble.bp2.state"                                // 实时状态 Bp2BleRtState
             const val EventBp2FileList = "com.lepu.ble.bp2.fileList"                          // 文件列表 KtBleFileList
-            const val EventBp2ReadFileError = "com.lepu.ble.bp2.read.file.error"              // 传输文件出错
+            const val EventBp2ReadFileError = "com.lepu.ble.bp2.read.file.error"              // 读文件出错
             const val EventBp2ReadingFileProgress = "com.lepu.ble.bp2.reading.file.progress"  // 传输文件进度 Bp2FilePart
             const val EventBp2ReadFileComplete = "com.lepu.ble.bp2.read.file.complete"        // 传输文件完成 Bp2BleFile
+            const val EventBp2WriteFileError = "com.lepu.ble.bp2.write.file.error"            // 写文件出错
             const val EventBp2Reset = "com.lepu.ble.bp2.reset"                                // 复位 int(0 失败 1 成功)
             const val EventBp2FactoryReset = "com.lepu.ble.bp2.factory.reset"                 // 恢复出厂设置 int(0 失败 1 成功)
             const val EventBp2FactoryResetAll = "com.lepu.ble.bp2.factory.reset.all"          // 恢复生产出厂状态 int(0 失败 1 成功)
@@ -86,6 +87,12 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBpSetConfigResult = "com.lepu.ble.bp2.measure.config"              // 设置心跳音开关 int(0 失败 1 成功)
             const val EventBpGetConfigResult = "com.lepu.ble.bp2.measure.getConfig"           // 心跳音开关 int(0 关 1 开)
             const val EventBpSwitchState = "com.lepu.ble.bp2.switch.state"                    // 切换设备状态 true
+
+            const val EventBp2WifiDevice = "com.lepu.ble.bp2w.wifi.device"
+            const val EventBp2GetWifiConfig = "com.lepu.ble.bp2w.get.wifi.config"
+            const val EventBp2SetWifiConfig = "com.lepu.ble.bp2w.set.wifi.config"
+            const val EventBp2WifiScanning = "com.lepu.ble.bp2w.wifi.scanning"
+            const val EventBp2wGetFileListCrc = "com.lepu.ble.bp2w.get.fileList.crc"
         }
     }
 

@@ -12,6 +12,7 @@ import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
@@ -112,7 +113,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         }
         mainViewModel.runWave = true
         when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2 -> waveHandler.post(EcgWaveTask())
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2W -> waveHandler.post(EcgWaveTask())
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC_6N -> waveHandler.post(OxyWaveTask())
         }
 
@@ -185,7 +186,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.dataStr.text = data.toString()
                 }
             })
-        //------------------------------bp2 bp2a------------------------------
+        //------------------------------bp2 bp2a bp2w------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData)
             .observe(this, {
                 val bp2Rt = it.data as Bp2BleRtData
@@ -225,8 +226,30 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList).observe(this, { event ->
-            (event.data as KtBleFileList).let {
-                binding.dataStr.text = it.toString()
+            if (event.model == Bluetooth.MODEL_BP2W) {
+                (event.data as Bp2BleFile).let {
+                    when (it.type) {
+                        Ble.File.ECG_TYPE -> {
+                            val data = Bp2wEcgList(it.content)
+                            binding.dataStr.text = data.toString()
+                        }
+                        Ble.File.BP_TYPE -> {
+                            val data = Bp2wBpList(it.content)
+                            binding.dataStr.text = data.toString()
+                        }
+                        Ble.File.USER_TYPE -> {
+                            val data = Bp2wUserList(it.content)
+                            binding.dataStr.text = data.toString()
+                        }
+                        else -> {
+                            binding.dataStr.text = it.toString()
+                        }
+                    }
+                }
+            } else {
+                (event.data as KtBleFileList).let {
+                    binding.dataStr.text = it.toString()
+                }
             }
         })
         //------------------------------bpm------------------------------
@@ -332,7 +355,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.bpLayout.visibility = View.GONE
                     binding.oxyLayout.visibility = View.GONE
                 }
-                Bluetooth.MODEL_BP2 -> {
+                Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2W -> {
                     binding.bpLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.VISIBLE
                     binding.oxyLayout.visibility = View.GONE

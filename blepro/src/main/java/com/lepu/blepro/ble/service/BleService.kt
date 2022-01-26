@@ -3,7 +3,6 @@ package com.lepu.blepro.ble.service
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.*
 import android.content.Context
@@ -225,6 +224,13 @@ open class BleService: LifecycleService() {
                 Bp2BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_BP2W -> {
+                Bp2wBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
                     return this
                 }

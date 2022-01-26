@@ -3,16 +3,20 @@ package com.lepu.demo.ui.settings
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.lepu.demo.R
 import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.Bpw1BleResponse
 import com.lepu.blepro.ble.cmd.Pc100BleResponse
-import com.lepu.blepro.ble.data.FscaleUserInfo
+import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
+import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.demo.ble.LpBleUtil
+import com.lepu.demo.ble.WifiAdapter
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.databinding.FragmentSettingsBinding
 
@@ -29,6 +33,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private var switchState = false
     private var state = 0
+
+    private var fileType = Ble.File.ECG_TYPE
+
+    private lateinit var adapter: WifiAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -81,14 +89,96 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
         }
 
+        //-------------------------bp2w------------------------
+        binding.bp2wGetWifiRoute.setOnClickListener {
+            LpBleUtil.getWifiDevice(Constant.BluetoothConfig.currentModel[0])
+        }
+        binding.bp2wUserList.setOnClickListener {
+            val icon1 = Bp2wUserInfo.Icon()
+            icon1.width = 28
+            icon1.height = 19
+            icon1.icon = ByteArray(84)
+            val icon2 = Bp2wUserInfo.Icon()
+            icon2.width = 28
+            icon2.height = 19
+            icon2.icon = ByteArray(84)
+
+            val userInfo1 = Bp2wUserInfo()
+            userInfo1.aid = 12345
+            userInfo1.uid = 12345
+            userInfo1.fName = "王"
+            userInfo1.name = "五"
+            userInfo1.birthday = 19991020
+            userInfo1.height = 170
+            userInfo1.weight = 70
+            userInfo1.gender = 0
+            userInfo1.icon = icon1
+            val userInfo2 = Bp2wUserInfo()
+            userInfo2.aid = 12345
+            userInfo2.uid = 11111
+            userInfo2.fName = "黄"
+            userInfo2.name = "六"
+            userInfo2.birthday = 19901020
+            userInfo2.height = 175
+            userInfo2.weight = 50
+            userInfo2.gender = 1
+            userInfo2.icon = icon2
+
+            val userList = Bp2wUserList()
+            userList.userList.add(userInfo1)
+            userList.userList.add(userInfo2)
+
+            LepuBleLog.d("icon1 == " + bytesToHex(icon1.getDataBytes()))
+            LepuBleLog.d("icon1.getDataBytes().size == " + icon1.getDataBytes().size)
+            LepuBleLog.d("userInfo1 == " + bytesToHex(userInfo1.getDataBytes()))
+            LepuBleLog.d("userInfo1.getDataBytes().size == " + userInfo1.getDataBytes().size)
+            LepuBleLog.d("userList == " + bytesToHex(userList.getDataBytes()))
+            LepuBleLog.d("userList.getDataBytes().size == " + userList.getDataBytes().size)
+
+            LpBleUtil.writeUserList(Constant.BluetoothConfig.currentModel[0], userList)
+        }
+        binding.bp2wGetWifiConfig.setOnClickListener {
+            LpBleUtil.getWifiConfig(Constant.BluetoothConfig.currentModel[0])
+        }
+        binding.bp2wGetFileCrc.setOnClickListener {
+            fileType++
+            if (fileType > 2) {
+                fileType = 0
+            }
+            LpBleUtil.getFileListCrc(Constant.BluetoothConfig.currentModel[0], fileType)
+        }
+
+        LinearLayoutManager(context).apply {
+            this.orientation = LinearLayoutManager.VERTICAL
+            binding.rcv.layoutManager = this
+        }
+        adapter = WifiAdapter(R.layout.device_item, null).apply {
+            binding.rcv.adapter = this
+        }
+        adapter.setOnItemClickListener { adapter, view, position ->
+            (adapter.getItem(position) as Bp2Wifi).let {
+                val wifiConfig = Bp2WifiConfig()
+                wifiConfig.option = 3
+                it.ssid = "小米手机"
+                it.pwd = "chen12345"
+                wifiConfig.wifi = it
+                val server = Bp2wServer()
+                server.addr = "34.209.148.123"
+                server.port = 7100
+                wifiConfig.server = server
+                LpBleUtil.setWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
+                binding.content.text = wifiConfig.toString()
+            }
+        }
+
         //-------------------------F4,F5-----------------------
         binding.scaleUserInfo.setOnClickListener {
-            var userInfo = FscaleUserInfo()
+            val userInfo = FscaleUserInfo()
             LpBleUtil.setUserInfo(Bluetooth.MODEL_F5_SCALE, userInfo)
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
         }
         binding.scaleUserList.setOnClickListener {
-            var userList = arrayListOf<FscaleUserInfo>()
+            val userList = arrayListOf<FscaleUserInfo>()
             userList.add(FscaleUserInfo())
             userList.add(FscaleUserInfo())
             userList.add(FscaleUserInfo())
@@ -110,10 +200,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun initLiveEvent() {
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
-            .observe(this, {
-                binding.content.text = (it.data as Int).toString()
-            })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1VibrateConfig)
             .observe(this, {
                 binding.content.text = bytesToHex(it.data as ByteArray)
@@ -124,7 +210,40 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpStatus)
             .observe(this, {
-                var data = it.data as Pc100BleResponse.BpStatus
+                val data = it.data as Pc100BleResponse.BpStatus
+                binding.content.text = data.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
+            .observe(this, {
+                if (it.model == Bluetooth.MODEL_BP2W) {
+                    binding.content.text = (it.data as Bp2wConfig).toString()
+                } else {
+                    binding.content.text = (it.data as Int).toString()
+                }
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2WifiScanning)
+            .observe(this, {
+                binding.content.text = "设备正在扫描wifi"
+                LpBleUtil.getWifiDevice(Constant.BluetoothConfig.currentModel[0])
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2WifiDevice)
+            .observe(this, {
+                val data = it.data as Bp2WifiDevice
+                adapter.setNewInstance(data.wifiList)
+                adapter.notifyDataSetChanged()
+                binding.content.text = data.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2GetWifiConfig)
+            .observe(this, {
+                val data = it.data as Bp2WifiConfig
+                binding.content.text = data.toString()
+                if ((data.wifi.state != 2 || data.server.state != 2) && data.wifi.ssid.isNotEmpty()) {
+                    LpBleUtil.getWifiConfig(Constant.BluetoothConfig.currentModel[0])
+                }
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2wGetFileListCrc)
+            .observe(this, {
+                val data = it.data as FileListCrc
                 binding.content.text = data.toString()
             })
 
@@ -134,37 +253,37 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1MeasureState)
             .observe(this, {
-                var state = it.data as Int
+                val state = it.data as Int
                 binding.content.text = if(state == 1) "start bp" else "stop bp"
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1RtData)
             .observe(this, {
-                var data = it.data as Bpw1BleResponse.RtData
+                val data = it.data as Bpw1BleResponse.RtData
                 binding.content.text = "压力值 ：" + data.pressure.toString()
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1ErrorResult)
             .observe(this, {
-                var data = it.data as Bpw1BleResponse.ErrorResult
+                val data = it.data as Bpw1BleResponse.ErrorResult
                 binding.content.text = "测量出错 类型：" + data.type + " 结果：" + data.result
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1GetFileListComplete)
             .observe(this, {
-                var bpw1FileList = it.data as Bpw1BleResponse.Bpw1FileList
+                val bpw1FileList = it.data as Bpw1BleResponse.Bpw1FileList
                 binding.content.text = bpw1FileList.toString()
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1MeasureResult)
             .observe(this, {
-                var data = it.data as Bpw1BleResponse.BpData
+                val data = it.data as Bpw1BleResponse.BpData
                 binding.content.text = data.toString()
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1DeviceInfo)
             .observe(this, {
-                var data = it.data as Bpw1BleResponse.DeviceInfo
+                val data = it.data as Bpw1BleResponse.DeviceInfo
                 binding.content.text = data.toString()
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1GetMeasureTime)
             .observe(this, {
-                var data = it.data as Bpw1BleResponse.MeasureTime
+                val data = it.data as Bpw1BleResponse.MeasureTime
                 binding.content.text = data.toString()
             })
     }
