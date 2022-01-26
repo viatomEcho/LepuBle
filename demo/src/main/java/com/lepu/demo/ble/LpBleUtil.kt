@@ -8,6 +8,7 @@ import android.util.Log
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
+import com.lepu.blepro.ble.data.Bp2WifiConfig
 import com.lepu.blepro.ble.data.FscaleUserInfo
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.objs.Bluetooth
@@ -311,11 +312,11 @@ class LpBleUtil {
         }
 
         /**
-         *
-         * @param model Int
+         * @param fileType
          */
-        fun getFileList(model: Int){
-            BleServiceHelper.getFileList(model)
+        @JvmOverloads
+        fun getFileList(model: Int, fileType: Int = Ble.File.ECG_TYPE){
+            BleServiceHelper.getFileList(model, fileType)
 
         }
 
@@ -439,6 +440,21 @@ class LpBleUtil {
         }
         fun bp2SwitchState(model: Int, state: Int){
            BleServiceHelper.bp2SwitchState(model, state)
+        }
+        fun getWifiDevice(model: Int) {
+            BleServiceHelper.getWifiDevice(model)
+        }
+        fun setWifiConfig(model: Int, config: Bp2WifiConfig) {
+            BleServiceHelper.setWifiConfig(model, config)
+        }
+        fun getWifiConfig(model: Int) {
+            BleServiceHelper.getWifiConfig(model)
+        }
+        fun writeUserList(model: Int, userList: Any) {
+            BleServiceHelper.writeUserList(model, userList)
+        }
+        fun getFileListCrc(model: Int, fileType: Int) {
+            BleServiceHelper.getFileListCrc(model, fileType)
         }
 
         fun oxyGetPpgRt(model: Int){

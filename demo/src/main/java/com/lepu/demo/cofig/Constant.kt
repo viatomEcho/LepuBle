@@ -19,6 +19,7 @@ class Constant{
             const val PC80B_MODEL: Int = Bluetooth.MODEL_PC80B
             const val BP2_MODEL: Int = Bluetooth.MODEL_BP2
             const val BP2A_MODEL: Int = Bluetooth.MODEL_BP2A
+            const val BP2W_MODEL: Int = Bluetooth.MODEL_BP2W
             const val BPM_MODEL: Int = Bluetooth.MODEL_BPM
             const val O2RING_MODEL: Int = Bluetooth.MODEL_O2RING
             const val PC60FW_MODEL: Int = Bluetooth.MODEL_PC60FW
@@ -32,7 +33,7 @@ class Constant{
 
             val SUPPORT_MODELS = intArrayOf(ER1_MODEL, DUOEK_MODEL, ER2_MODEL, PC80B_MODEL, BP2_MODEL,
                 BP2A_MODEL, BPM_MODEL, O2RING_MODEL, PC60FW_MODEL, FHR_MODEL, PC100_MODEL, PC6N_MODEL,
-                AP20_MODEL, LEW3_MODEL, VETCORDER_MODEL)
+                AP20_MODEL, LEW3_MODEL, VETCORDER_MODEL, BP2W_MODEL)
 
             val SUPPORT_FACES = SparseArray<Int>().apply {
                for (m in SUPPORT_MODELS){

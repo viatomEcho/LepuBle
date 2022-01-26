@@ -12,7 +12,9 @@ import com.lepu.blepro.ble.cmd.Er2File
 import com.lepu.blepro.ble.cmd.Er2FileList
 import com.lepu.blepro.ble.cmd.Pc100BleResponse
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.objs.Bluetooth
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
 import com.lepu.demo.ble.LpBleUtil
@@ -31,6 +33,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
     private var curFileName = ""
     private var readFileProcess = ""
     private var fileCount = 0
+
+    private var fileType = Ble.File.ECG_TYPE
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -72,7 +76,13 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         binding.getFileList.setOnClickListener {
             fileCount = 0
             fileNames.clear()
-            LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0])
+
+            fileType++
+            if (fileType > 2) {
+                fileType = 0
+            }
+
+            LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0], fileType)
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
         }
         // 读文件
@@ -203,13 +213,39 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         //--------------------------------bp2-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList)
             .observe(this, { event ->
-                (event.data as KtBleFileList).let {
-                    binding.info.text = it.toString()
-                    for (fileName in it.fileNameList) {
-                        if (fileName != null)
-                            fileNames.add(fileName)
+                if (event.model == Bluetooth.MODEL_BP2W) {
+                    (event.data as Bp2BleFile).let {
+                        when (it.type) {
+                            Ble.File.ECG_TYPE -> {
+                                val data = Bp2wEcgList(it.content)
+                                binding.info.text = data.toString()
+                            }
+                            Ble.File.BP_TYPE -> {
+                                val data = Bp2wBpList(it.content)
+                                binding.info.text = data.toString()
+                            }
+                            Ble.File.USER_TYPE -> {
+                                val data = Bp2wUserList(it.content)
+                                binding.info.text = data.toString()
+                            }
+                            else -> {
+                                binding.info.text = it.toString()
+                            }
+                        }
                     }
-                    Toast.makeText(context, "bp2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                } else {
+                    (event.data as KtBleFileList).let {
+                        binding.info.text = it.toString()
+                        for (fileName in it.fileNameList) {
+                            if (fileName != null)
+                                fileNames.add(fileName)
+                        }
+                        Toast.makeText(
+                            context,
+                            "bp2 获取文件列表成功 共有${fileNames.size}个文件",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadingFileProgress)

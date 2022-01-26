@@ -12,6 +12,8 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.*
 import com.lepu.blepro.ble.data.FactoryConfig
+import com.lepu.blepro.ble.data.Bp2WifiConfig
+import com.lepu.blepro.ble.data.Bp2wUserList
 import com.lepu.blepro.ble.data.FscaleUserInfo
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
@@ -436,10 +438,21 @@ class BleServiceHelper private constructor() {
 
     /**
      * 获取设备文件列表
+     * @param fileType model_bp2w获取文件列表类型（Ble.File.ECG_TYPE, BP_TYPE, USER_TYPE）
      */
-    fun getFileList(model: Int){
+    @JvmOverloads
+    fun getFileList(model: Int, fileType: Int = Ble.File.ECG_TYPE){
         if (!checkService()) return
-        getInterface(model)?.getFileList()
+        if (model == Bluetooth.MODEL_BP2W) {
+            getInterface(model)?.let { it1 ->
+                (it1 as Bp2wBleInterface).let {
+                    LepuBleLog.d(tag, "it as Bp2wBleInterface--getFileList")
+                    it.getFileList(fileType)
+                }
+            }
+        } else {
+            getInterface(model)?.getFileList()
+        }
     }
 
     /**
@@ -597,6 +610,14 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
+            Bluetooth.MODEL_BP2W ->{
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2GetConfig")
+                        it.getConfig()
+                    }
+                }
+            }
             else -> LepuBleLog.e(tag, "bp2GetConfig model error")
 
         }
@@ -611,6 +632,14 @@ class BleServiceHelper private constructor() {
                     (it1 as Bp2BleInterface).let {
                         LepuBleLog.d(tag, "it as Bp2BleInterface--bp2SetConfig")
                         it.setConfig(switch, volume)
+                    }
+                }
+            }
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2SetConfig")
+                        it.setConfig(switch, 2)
                     }
                 }
             }
@@ -932,18 +961,70 @@ class BleServiceHelper private constructor() {
 
     fun bp2SwitchState(model: Int, state: Int){
         if (!checkService()) return
-        getInterface(model)?.let {
-            it as Bp2BleInterface
-            it.switchState(state)
+        when (model) {
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2BleInterface).let {
+                        it.switchState(state)
+                    }
+                }
+            }
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        it.switchState(state)
+                    }
+                }
+            }
         }
-
+    }
+    fun getWifiDevice(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Bp2wBleInterface).let {
+                it.getWifiDevice()
+            }
+        }
+    }
+    fun setWifiConfig(model: Int, config: Any) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Bp2wBleInterface).let {
+                it.setWifiConfig(config as Bp2WifiConfig)
+            }
+        }
+    }
+    fun getWifiConfig(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Bp2wBleInterface).let {
+                it.getWifiConfig()
+            }
+        }
+    }
+    fun getFileListCrc(model: Int, fileType: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Bp2wBleInterface).let {
+                it.getFileListCrc(fileType)
+            }
+        }
+    }
+    fun writeUserList(model: Int, userList: Any) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Bp2wBleInterface).let {
+                it.writeUserList(userList as Bp2wUserList)
+            }
+        }
     }
 
     fun oxyGetPpgRt(model: Int){
         if (!checkService()) return
-        getInterface(model)?.let {
-            it as OxyBleInterface
-            it.getPpgRT()
+        getInterface(model)?.let { it1 ->
+            (it1 as OxyBleInterface).let {
+                it.getPpgRT()
+            }
         }
     }
 

@@ -232,6 +232,13 @@ open class BleService: LifecycleService() {
                     return this
                 }
             }
+            Bluetooth.MODEL_BP2W -> {
+                Bp2wBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
 
             Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC_6N -> {
                 Pc60FwBleInterface(m).apply {
