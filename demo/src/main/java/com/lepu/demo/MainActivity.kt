@@ -205,6 +205,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo).observe(this, { event ->
             (event.data as OxyBleResponse.OxyInfo).let {
                 viewModel._oxyInfo.value = it
+                Toast.makeText(this, "o2 获取设备信息成功", Toast.LENGTH_SHORT).show()
             }
         })
 

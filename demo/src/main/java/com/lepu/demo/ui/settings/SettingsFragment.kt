@@ -7,10 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.lepu.demo.R
 import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.ble.cmd.Ap20BleResponse
-import com.lepu.blepro.ble.cmd.Bpw1BleResponse
-import com.lepu.blepro.ble.cmd.Pc100BleResponse
-import com.lepu.blepro.ble.data.Bp2Config
+import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.FscaleUserInfo
 import com.lepu.blepro.ble.data.LeW3Config
 import com.lepu.blepro.ble.data.*
@@ -38,6 +35,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private var switchState = false
     private var state = 0
     private var volume = 0
+    private var motor = intArrayOf(20, 40, 60, 80, 100)
+    private var sound = intArrayOf(5, 10, 17, 22, 35)
 
     private var fileType = Ble.File.ECG_TYPE
 
@@ -278,6 +277,32 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.ap20SetConfig.text = "设置参数" + state
         }
+        //-------------------------o2-----------------------
+        binding.o2OxiSwitch.setOnClickListener {
+            state++
+            if (state > 1)
+                state = 0
+            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_OXI_SWITCH, state)
+            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+        }
+        binding.o2HrSwitch.setOnClickListener {
+            state++
+            if (state > 1)
+                state = 0
+            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_HR_SWITCH, state)
+            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+        }
+        binding.o2Motor.setOnClickListener {
+            volume++
+            if (volume > 4)
+                volume = 0
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING) {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MOTOR, motor[volume])
+            } else {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MOTOR, sound[volume])
+            }
+            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+        }
 
     }
 
@@ -346,6 +371,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3GetConfig)
             .observe(this, {
                 var data = it.data as LeW3Config
+                binding.content.text = data.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo)
+            .observe(this, {
+                var data = it.data as OxyBleResponse.OxyInfo
+                binding.o2HrSwitch.text = "心率开关值" + data.hrSwitch
+                binding.o2OxiSwitch.text = "血氧开关值" + data.oxiSwitch
+                binding.o2Motor.text = "震动强度" + data.motor
                 binding.content.text = data.toString()
             })
 

@@ -12,28 +12,48 @@ public class OxyBleCmd {
 
     public static int OXY_CMD_INFO = 0x14;
     public static int OXY_CMD_PARA_SYNC = 0x16;
-    //没有pi
-    public static int OXY_CMD_RT_DATA = 0x1B;
-    public static int OXY_CMD_PI_RT_DATA = 0x17;
+    // 有pi
+    public static int OXY_CMD_RT_PARAM = 0x17;
     public static int OXY_CMD_FACTORY_RESET = 0x18;
+    public static int OXY_CMD_BURN_LOCK_FLASH = 0x19;
+    public static int OXY_CMD_BURN_FACTORY_INFO = 0x1A;
+    // 1.4.1固件版本前没有pi
+    public static int OXY_CMD_RT_WAVE = 0x1B;
     public static int OXY_CMD_READ_START = 0x03;
     public static int OXY_CMD_READ_CONTENT = 0x04;
     public static int OXY_CMD_READ_END = 0x05;
     public static int OXY_CMD_PPG_RT_DATA = 0x1C;
 
 
-    /*************************同步相关**************************************/
-    public final static String SYNC_TYPE_TIME = "SetTIME";
-    public final static String SYNC_TYPE_OXI_SWITCH = "SetOxiSwitch";
-    public final static String SYNC_TYPE_OXI_THR = "SetOxiThr";
-    public final static String SYNC_TYPE_HR_SWITCH = "SetHRSwitch";
-    public final static String SYNC_TYPE_HR_LOW_THR = "SetHRLowThr";
-    public final static String SYNC_TYPE_HR_HIGH_THR = "SetHRHighThr";
-    public final static String SYNC_TYPE_MOTOR = "SetMotor";
-    /*************************同步相关**************************************/
+    /*************************参数同步相关**************************************/
+    /**
+     * SetTIME : 设置时间
+     * SetOxiThr : 设置血氧阈值
+     * SetOxiSwitch : 设置血氧震动开关
+     * SetMotor : 设置强度（KidsO2、Oxylink：最低：5，低：10，中：17，高：22，最高：35；O2Ring：最低：20，低：40，中：60，高：80，最高：100，震动强度不随开关的改变而改变）
+     * SetPedtar : 设置计步器目标提醒步数
+     * SetLightingMode : 设置亮屏模式（0：Standard模式，1：Always Off模式，2：Always On模式）
+     * SetHRSwitch : 设置心率开关
+     * SetHRLowThr : 设置心率震动最低阀值（30-60）
+     * SetHRHighThr : 设置心率震动最高阀值（90-180）
+     * SetLightStr : 设置屏幕亮度（0：低，1：中，2：高）
+     */
+    public static final String SYNC_TYPE_TIME = "SetTIME";
+    public static final String SYNC_TYPE_OXI_THR = "SetOxiThr";
+    public static final String SYNC_TYPE_OXI_SWITCH = "SetOxiSwitch";
+    public static final String SYNC_TYPE_MOTOR = "SetMotor";
+    public static final String SYNC_TYPE_PEDTAR = "SetPedtar";
+    public static final String SYNC_TYPE_LIGHTING_MODE = "SetLightingMode";
+    public static final String SYNC_TYPE_HR_SWITCH = "SetHRSwitch";
+    public static final String SYNC_TYPE_HR_LOW_THR = "SetHRLowThr";
+    public static final String SYNC_TYPE_HR_HIGH_THR = "SetHRHighThr";
+    public static final String SYNC_TYPE_LIGHT_STR = "SetLightStr";
+    /*************************参数同步相关**************************************/
 
 
-    // O2 系列不使用SeqNo, 仅在下载数据时作为数据偏移
+    /**
+     * O2 系列不使用SeqNo, 仅在下载数据时作为数据偏移
+     */
     private static int seqNo = 0;
 
     private static void addNo() {
@@ -102,8 +122,8 @@ public class OxyBleCmd {
 
         byte[] buf = new byte[8 + len];
         buf[0] = (byte) 0xAA;
-        buf[1] = (byte) OXY_CMD_RT_DATA;
-        buf[2] = (byte) ~OXY_CMD_RT_DATA;
+        buf[1] = (byte) OXY_CMD_RT_WAVE;
+        buf[2] = (byte) ~OXY_CMD_RT_WAVE;
         buf[5] = (byte) len;
         buf[6] = (byte) (len >> 8);
         // 0 -> 125hz;  1-> 62.5hz
@@ -116,11 +136,11 @@ public class OxyBleCmd {
 
     }
 
-    public static byte[] getPiAndRTWave() {
+    public static byte[] getRtParam() {
         byte[] buf = new byte[8];
         buf[0] = (byte) 0xAA;
-        buf[1] = (byte) OXY_CMD_PI_RT_DATA;
-        buf[2] = (byte) ~OXY_CMD_PI_RT_DATA;
+        buf[1] = (byte) OXY_CMD_RT_PARAM;
+        buf[2] = (byte) ~OXY_CMD_RT_PARAM;
 
         buf[7] = BleCRC.calCRC8(buf);
 

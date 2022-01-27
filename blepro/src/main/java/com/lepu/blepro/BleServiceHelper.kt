@@ -1019,7 +1019,7 @@ class BleServiceHelper private constructor() {
         }
     }
 
-    fun oxyGetPpgRt(model: Int){
+    fun oxyGetPpgRt(model: Int) {
         if (!checkService()) return
         getInterface(model)?.let { it1 ->
             (it1 as OxyBleInterface).let {

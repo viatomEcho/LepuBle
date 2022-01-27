@@ -117,8 +117,15 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         }
         mainViewModel.runWave = true
         when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LEW3 -> waveHandler.post(EcgWaveTask())
-            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC_6N, Bluetooth.MODEL_AP20 -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK,
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2,
+            Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LEW3,
+            Bluetooth.MODEL_ER1_N,-> waveHandler.post(EcgWaveTask())
+
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
+            Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC_6N,
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_BABYO2 -> waveHandler.post(OxyWaveTask())
+
             Bluetooth.MODEL_VETCORDER -> {
                 waveHandler.post(EcgWaveTask())
                 waveHandler.post(OxyWaveTask())
@@ -288,21 +295,26 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
         //------------------------------o2ring------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtData).observeForever { event ->
-            (event.data as OxyBleResponse.RtWave).let { rtWave ->
+            (event.data as OxyBleResponse.RtWave).let { data ->
                 activity?.let {
                     //接收数据 开始添加采集数据
-                    mainViewModel.checkStartCollect(it, rtWave.waveByte)
+                    mainViewModel.checkStartCollect(it, data.waveByte)
 
-                    toPlayAlarm(rtWave.pr)
+                    toPlayAlarm(data.pr)
+                    OxyDataController.receive(data.wFs)
 
-                    viewModel.oxyPr.value = rtWave.pr
-                    viewModel.spo2.value = rtWave.spo2
-                    LepuBleLog.d("o2ring pr = ${rtWave.pr}, spo2 = ${rtWave.spo2}")
-
-                    OxyDataController.receive(rtWave.wFs)
+                    binding.dataStr.text = data.toString()
                 }
             }
         }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamData)
+            .observe(this, {
+                val data = it.data as OxyBleResponse.RtParam
+                viewModel.oxyPr.value = data.pr
+                viewModel.spo2.value = data.spo2
+                viewModel.pi.value = data.pi.div(10f)
+                viewModel.oxyPr.value = data.pr
+            })
         // o2ring ppg
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
             .observe(this, {
@@ -416,7 +428,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
         mainViewModel.curBluetooth.observe(viewLifecycleOwner, {
             when (it!!.modelNo) {
-                Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2, Bluetooth.MODEL_PC80B, Bluetooth.MODEL_LEW3 -> {
+                Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK,
+                Bluetooth.MODEL_ER2, Bluetooth.MODEL_PC80B,
+                Bluetooth.MODEL_LEW3, Bluetooth.MODEL_ER1_N -> {
                     binding.ecgLayout.visibility = View.VISIBLE
                     binding.bpLayout.visibility = View.GONE
                     binding.oxyLayout.visibility = View.GONE
@@ -431,7 +445,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.ecgLayout.visibility = View.GONE
                     binding.oxyLayout.visibility = View.GONE
                 }
-                Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC_6N, Bluetooth.MODEL_AP20 -> {
+                Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
+                Bluetooth.MODEL_PC_6N, Bluetooth.MODEL_AP20,
+                Bluetooth.MODEL_BABYO2 -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE
@@ -639,6 +655,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        LpBleUtil.stopRtTask()
+        super.onDestroy()
     }
 
 }

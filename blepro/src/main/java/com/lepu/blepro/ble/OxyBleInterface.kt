@@ -28,7 +28,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
     var isPpgRt: Boolean = false
 
-    var isPiRt: Boolean = false
+    var isPiRt: Boolean = true
 
 
     /**
@@ -122,8 +122,6 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
             OxyBleCmd.OXY_CMD_INFO -> {
 
-
-
                 clearTimeout()
                 val info = OxyBleResponse.OxyInfo(response.content)
 
@@ -131,13 +129,13 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                     runRtTask()
                     runRtImmediately = false
                 }
-                LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success")
+                LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success $info")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo).post(InterfaceEvent(model, info))
 
             }
 
-            // 1.4.1之前没有PI 有波形
-            OxyBleCmd.OXY_CMD_RT_DATA -> {
+            // 1.4.1固件版本之前没有PI 有波形
+            OxyBleCmd.OXY_CMD_RT_WAVE -> {
                 clearTimeout()
                 val rtWave = OxyBleResponse.RtWave(response.content)
 
@@ -147,7 +145,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             }
 
             // 有pi 没有波形
-            OxyBleCmd.OXY_CMD_PI_RT_DATA -> {
+            OxyBleCmd.OXY_CMD_RT_PARAM -> {
                 clearTimeout()
                 val rtParam = OxyBleResponse.RtParam(response.content)
                 //发送实时数据
@@ -234,7 +232,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     }
 
     /**
-     * 注意默认发没有PI的波形命令
+     * 注意默认获取实时参数
      */
     override fun getRtData() {
         LepuBleLog.d(tag, "getRtData...isPpgRt = $isPpgRt")
@@ -243,11 +241,11 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             return
         }
         if (isPiRt){
-            sendOxyCmd(OxyBleCmd.OXY_CMD_PI_RT_DATA, OxyBleCmd.getPiAndRTWave())
+            sendOxyCmd(OxyBleCmd.OXY_CMD_RT_PARAM, OxyBleCmd.getRtParam())
             return
         }
 
-        sendOxyCmd(OxyBleCmd.OXY_CMD_RT_DATA, OxyBleCmd.getRtWave())// 无法支持1.4.1之前获取pi
+        sendOxyCmd(OxyBleCmd.OXY_CMD_RT_WAVE, OxyBleCmd.getRtWave())// 无法支持1.4.1之前获取pi
     }
 
     fun getPpgRT(){

@@ -192,14 +192,14 @@ open class BleService: LifecycleService() {
 
         vailFace.get(m)?.let { return it }
         when(m) {
-            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M -> {
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M, Bluetooth.MODEL_BABYO2 -> {
                 OxyBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
                     return this
                 }
             }
-            Bluetooth.MODEL_ER1,Bluetooth.MODEL_DUOEK -> {
+            Bluetooth.MODEL_ER1,Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N -> {
                 Er1BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 

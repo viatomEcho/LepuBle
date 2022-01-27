@@ -7,10 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.ble.cmd.Er1BleResponse
-import com.lepu.blepro.ble.cmd.Er2File
-import com.lepu.blepro.ble.cmd.Er2FileList
-import com.lepu.blepro.ble.cmd.Pc100BleResponse
+import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.InterfaceEvent
@@ -81,8 +78,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             if (fileType > 2) {
                 fileType = 0
             }
-
-            LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0], fileType)
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2) {
+                LpBleUtil.getInfo(Constant.BluetoothConfig.currentModel[0])
+            } else {
+                LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0], fileType)
+            }
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
         }
         // 读文件
@@ -282,6 +282,31 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this, { event ->
                 (event.data as Pc100BleResponse.BpResultError).let {
                     binding.info.text = it.toString()
+                }
+            })
+        //------------------------------o2--------------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo)
+            .observe(this, { event ->
+                (event.data as OxyBleResponse.OxyInfo).let {
+                    for (fileName in it.fileList.split(",")) {
+                        fileNames.add(fileName)
+                    }
+                    Toast.makeText(context, "o2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                    binding.info.text = it.toString()
+                }
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadingFileProgress)
+            .observe(this, { event ->
+                (event.data as Int).let {
+                    binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it/10).toString() + "%"
+                }
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileComplete)
+            .observe(this, { event ->
+                (event.data as OxyBleResponse.OxyFile).let {
+                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
+                    fileNames.removeAt(0)
+                    readFile()
                 }
             })
     }

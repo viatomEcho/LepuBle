@@ -178,16 +178,22 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
                         <Button
-                            android:id="@+id/o2_get_config"
+                            android:id="@+id/o2_oxi_switch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Get Config"/>
+                            android:text="血氧开关值"/>
 
                         <Button
-                            android:id="@+id/o2_set_config"
+                            android:id="@+id/o2_hr_switch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Set Config"
+                            android:text="心率开关值"
+                            android:layout_marginStart="20dp"/>
+                        <Button
+                            android:id="@+id/o2_motor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="震动强度"
                             android:layout_marginStart="20dp"/>
                     </LinearLayout>
                 </LinearLayout>
