@@ -27,6 +27,9 @@ fun add(ori: ByteArray?, add: ByteArray): ByteArray {
     return new
 }
 
+/**
+ * byte数组转无符号整数（小端模式）
+ */
 @ExperimentalUnsignedTypes fun toUInt(bytes: ByteArray): Int {
     var result : UInt = 0u
     for (i in bytes.indices) {
@@ -35,7 +38,6 @@ fun add(ori: ByteArray?, add: ByteArray): ByteArray {
 
     return result.toInt()
 }
-
 fun toInt(bytes: ByteArray): Int {
     var result : Int = 0
     for (i in bytes.indices) {
@@ -43,6 +45,40 @@ fun toInt(bytes: ByteArray): Int {
     }
 
     return result
+}
+
+/**
+ * 两个字节转有符号数（小端模式）
+ */
+fun bytesToSignedShort(byte1: Byte, byte2: Byte):Short {
+    return ((byte2.toInt() shl 8) or (byte1.toInt() and 0xFF)).toShort()
+}
+
+/**
+ * 转两个字节byte数组（大端模式）
+ */
+fun shortToByteArray(value: Int): ByteArray {
+    return byteArrayOf(
+        (value ushr 8).toByte(),
+        value.toByte())
+}
+/**
+ * 转两个字节byte数组（小端模式）
+ */
+fun int2ByteArray(value: Int): ByteArray {
+    val b1 = (value and 0xff).toByte()
+    val b2 = (value shr 8 and 0xff).toByte()
+    return byteArrayOf(b1).plus(b2)
+}
+/**
+ * 转四个字节byte数组（小端模式）
+ */
+fun int4ByteArray(value: Int): ByteArray {
+    val b1 = (value and 0xff).toByte()
+    val b2 = (value shr 8 and 0xff).toByte()
+    val b3 = (value shr 16 and 0xff).toByte()
+    val b4 = (value shr 24 and 0xff).toByte()
+    return byteArrayOf(b1).plus(b2).plus(b3).plus(b4)
 }
 
 fun toString(bytes: ByteArray): String {
@@ -79,31 +115,4 @@ fun byteToPointHex(bytes: Byte): String {
     hexChars[0] = HEX_ARRAY.get(v ushr 4)
     hexChars[1] = HEX_ARRAY.get(v and 0x0F)
     return hexChars[0]+"."+hexChars[1]
-}
-// 大端模式
-fun shortToByteArray(value: Int): ByteArray {
-    return byteArrayOf(
-        (value ushr 8).toByte(),
-        value.toByte())
-}
-// 小端模式
-fun int2ByteArray(value: Int): ByteArray {
-    val b1 = (value and 0xff).toByte()
-    val b2 = (value shr 8 and 0x7f).toByte()
-    return byteArrayOf(b1).plus(b2)
-}
-// 小端模式
-fun int4ByteArray(value: Int): ByteArray {
-    val b1 = (value and 0xff).toByte()
-    val b2 = (value shr 8 and 0xff).toByte()
-    val b3 = (value shr 16 and 0xff).toByte()
-    val b4 = (value shr 24 and 0x7f).toByte()
-    return byteArrayOf(b1).plus(b2).plus(b3).plus(b4)
-}
-
-/*
- * 两个字节转有符号数 小端模式
- */
-fun bytesToSignedShort(byte1: Byte, byte2: Byte):Short {
-    return ((byte2.toInt() shl 8) or (byte1.toInt() and 0xFF)).toShort()
 }

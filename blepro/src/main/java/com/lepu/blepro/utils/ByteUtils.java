@@ -2,10 +2,21 @@ package com.lepu.blepro.utils;
 
 public class ByteUtils {
 
+    /**
+     * 转无符号整数
+     * @param b
+     * @return int
+     */
     public static int byte2UInt(byte b) {
         return b & 0xff;
     }
 
+    /**
+     * 转有符号整数（小端模式）
+     * @param b1
+     * @param b2
+     * @return short
+     */
     public static short toSignedShort(byte b1, byte b2) {
         return (short) ((b1 & 0xff) + ((b2 & 0xff) << 8));
     }
