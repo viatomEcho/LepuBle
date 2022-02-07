@@ -438,7 +438,7 @@ class BleServiceHelper private constructor() {
 
     /**
      * 获取设备文件列表
-     * @param fileType model_bp2w获取文件列表类型（Ble.File.ECG_TYPE, BP_TYPE, USER_TYPE）
+     * @param fileType bp2w获取文件列表类型（Ble.File.ECG_TYPE, BP_TYPE, USER_TYPE）
      */
     @JvmOverloads
     fun getFileList(model: Int, fileType: Int = Ble.File.ECG_TYPE){
