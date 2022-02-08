@@ -217,7 +217,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.dataStr.text = data.toString()
                 }
             })
-        //------------------------------bp2 bp2a bp2w------------------------------
+        //------------------------------bp2 bp2a------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData)
             .observe(this, {
                 val bp2Rt = it.data as Bp2BleRtData
@@ -253,33 +253,69 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val mvs = ByteUtils.bytes2mvs(bp2Rt.rtWave.waveform)
                 DataController.receive(mvs)
 
-                binding.dataStr.text = "state: " + bp2Rt.rtWave.waveDataType + " " + data.toString()
-
+                binding.dataStr.text = "dataType: " + bp2Rt.rtWave.waveDataType + " " + data.toString() + "----rtState--" + bp2Rt.rtState.toString()
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList).observe(this, { event ->
-            if (event.model == Bluetooth.MODEL_BP2W) {
-                (event.data as Bp2BleFile).let {
-                    when (it.type) {
-                        Ble.File.ECG_TYPE -> {
-                            val data = Bp2wEcgList(it.content)
-                            binding.dataStr.text = data.toString()
-                        }
-                        Ble.File.BP_TYPE -> {
-                            val data = Bp2wBpList(it.content)
-                            binding.dataStr.text = data.toString()
-                        }
-                        Ble.File.USER_TYPE -> {
-                            val data = Bp2wUserList(it.content)
-                            binding.dataStr.text = data.toString()
-                        }
-                        else -> {
-                            binding.dataStr.text = it.toString()
-                        }
+            (event.data as KtBleFileList).let {
+                binding.dataStr.text = it.toString()
+            }
+        })
+        //------------------------------bp2w------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wRtData)
+            .observe(this, {
+                val bp2Rt = it.data as Bp2BleRtData
+
+                var data1: Any
+                when(bp2Rt.rtWave.waveDataType) {
+                    0 -> {
+                        data1 = Bp2DataBpIng(bp2Rt.rtWave.waveData)
+                        viewModel.ps.value = data1.pressure
                     }
+                    1 -> {
+                        data1 = Bp2DataBpResult(bp2Rt.rtWave.waveData)
+                        viewModel.ps.value = data1.pressure
+                        viewModel.sys.value = data1.sys
+                        viewModel.dia.value = data1.dia
+                        viewModel.mean.value = data1.mean
+                        viewModel.bpPr.value = data1.pr
+                    }
+                    2 -> {
+                        data1 = Bp2DataEcgIng(bp2Rt.rtWave.waveData)
+                        LepuBleLog.d("bp2 ecg hr = ${data1.hr}")
+                        viewModel.ecgHr.value = data1.hr
+                    }
+                    3 -> {
+                        data1 = Bp2DataEcgResult(bp2Rt.rtWave.waveData)
+                        viewModel.ecgHr.value = data1.hr
+                    }
+                    else -> data1 = ""
                 }
-            } else {
-                (event.data as KtBleFileList).let {
-                    binding.dataStr.text = it.toString()
+
+                LepuBleLog.d("bp2 ecg waveformSize = ${bp2Rt.rtWave.waveformSize}")
+
+                val mvs = ByteUtils.bytes2mvs(bp2Rt.rtWave.waveform)
+                DataController.receive(mvs)
+
+                binding.dataStr.text = "dataType: " + bp2Rt.rtWave.waveDataType + " " + data1.toString() + "----rtState--" + bp2Rt.rtState.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wFileList).observe(this, { event ->
+            (event.data as Bp2BleFile).let {
+                when (it.type) {
+                    Bp2wBleCmd.FileType.ECG_TYPE -> {
+                        val data = Bp2wEcgList(it.content)
+                        binding.dataStr.text = data.toString()
+                    }
+                    Bp2wBleCmd.FileType.BP_TYPE -> {
+                        val data = Bp2wBpList(it.content)
+                        binding.dataStr.text = data.toString()
+                    }
+                    Bp2wBleCmd.FileType.USER_TYPE -> {
+                        val data = Bp2wUserList(it.content)
+                        binding.dataStr.text = data.toString()
+                    }
+                    else -> {
+                        binding.dataStr.text = it.toString()
+                    }
                 }
             }
         })

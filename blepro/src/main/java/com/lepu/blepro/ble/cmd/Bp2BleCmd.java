@@ -28,7 +28,14 @@ public class Bp2BleCmd {
         return BPMCmd.getCmd(msgType);
     }
 
-
+    /**
+     * 0：进入血压测量
+     * 1：进入心电测量
+     * 2：进入历史回顾
+     * 3：进入开机预备状态
+     * 4：关机
+     * 5：进入理疗模式
+     */
     public static class SwitchState {
         public static final int ENTER_BP = 0;
         public static final int ENTER_ECG = 1;
@@ -55,14 +62,6 @@ public class Bp2BleCmd {
         public static final byte CMD_BP2_RT_DATA = (byte) 0x08;
         public static final byte CMD_BP2_RT_STATE = (byte) 0x06;
 
-        /**
-         * 0：进入血压测量
-         * 1：进入心电测量
-         * 2：进入历史回顾
-         * 3：进入开机预备状态
-         * 4：关机
-         * 5：进入理疗模式
-         */
         public static byte SWITCH_STATE = (byte)0x09;//
 
         // heartbeat sound

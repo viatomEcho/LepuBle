@@ -44,14 +44,6 @@ public class Bp2wBleCmd {
     public static final int RT_DATA = 0x08;
     public static final int RT_STATE = 0x06;
 
-    /**
-     * 0：进入血压测量
-     * 1：进入心电测量
-     * 2：进入历史回顾
-     * 3：进入开机预备状态
-     * 4：关机
-     * 5：进入理疗模式
-     */
     public static final int SWITCH_STATE = 0x09;
 
     public static final int GET_PHY_STATUS = 0x0E;
@@ -72,6 +64,14 @@ public class Bp2wBleCmd {
         }
     }
 
+    /**
+     * 0：进入血压测量
+     * 1：进入心电测量
+     * 2：进入历史回顾
+     * 3：进入开机预备状态
+     * 4：关机
+     * 5：进入理疗模式
+     */
     public static class SwitchState {
         public static final int ENTER_BP = 0;
         public static final int ENTER_ECG = 1;
@@ -79,6 +79,12 @@ public class Bp2wBleCmd {
         public static final int ENTER_ON = 3;
         public static final int ENTER_OFF = 4;
         public static final int ENTER_PHYSIOTHERAPY = 5;
+    }
+
+    public static class FileType {
+        public static final int ECG_TYPE = 0;
+        public static final int BP_TYPE = 1;
+        public static final int USER_TYPE = 2;
     }
 
     public static byte[] switchState(int state) {
@@ -105,13 +111,7 @@ public class Bp2wBleCmd {
         return getReq(FACTORY_RESET_ALL, new byte[0]);
     }
 
-    public static byte[] setConfig(boolean switchState, int volume) {
-        int len = 40;
-        byte[] data = new byte[len];
-        if(switchState) {
-            data[24] = 1;
-        }
-        data[26] = (byte) volume;
+    public static byte[] setConfig(byte[] data) {
         return getReq(SET_CONFIG, data);
     }
 
@@ -168,8 +168,17 @@ public class Bp2wBleCmd {
     public static byte[] getFileList() {
         return getReq(GET_FILE_LIST, new byte[0]);
     }
-    public static byte[] getFileListCrc(int cmd) {
-        return getReq(cmd, new byte[0]);
+    public static byte[] getFileListCrc(int fileType) {
+        switch (fileType) {
+            case FileType.ECG_TYPE:
+                return getReq(GET_ECG_LIST_CRC, new byte[0]);
+            case FileType.BP_TYPE:
+                return getReq(GET_BP_LIST_CRC, new byte[0]);
+            case FileType.USER_TYPE:
+                return getReq(GET_USER_LIST_CRC, new byte[0]);
+            default:
+                return new byte[0];
+        }
     }
 
     public static byte[] getRtBpState() {

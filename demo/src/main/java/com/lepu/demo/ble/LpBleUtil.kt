@@ -8,7 +8,10 @@ import android.util.Log
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
+import com.lepu.blepro.ble.cmd.Bp2wBleCmd
 import com.lepu.blepro.ble.data.Bp2WifiConfig
+import com.lepu.blepro.ble.data.Bp2wConfig
+import com.lepu.blepro.ble.data.Bp2wUserList
 import com.lepu.blepro.ble.data.FscaleUserInfo
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.objs.Bluetooth
@@ -315,7 +318,7 @@ class LpBleUtil {
          * @param fileType
          */
         @JvmOverloads
-        fun getFileList(model: Int, fileType: Int = Ble.File.ECG_TYPE){
+        fun getFileList(model: Int, fileType: Int = Bp2wBleCmd.FileType.ECG_TYPE){
             BleServiceHelper.getFileList(model, fileType)
 
         }
@@ -441,20 +444,30 @@ class LpBleUtil {
         fun bp2SwitchState(model: Int, state: Int){
            BleServiceHelper.bp2SwitchState(model, state)
         }
-        fun getWifiDevice(model: Int) {
-            BleServiceHelper.getWifiDevice(model)
+
+        fun bp2wSetConfig(model: Int, config: Bp2wConfig) {
+            BleServiceHelper.bp2wSetConfig(model, config)
         }
-        fun setWifiConfig(model: Int, config: Bp2WifiConfig) {
-            BleServiceHelper.setWifiConfig(model, config)
+        fun bp2wGetConfig(model: Int){
+            BleServiceHelper.bp2wGetConfig(model)
         }
-        fun getWifiConfig(model: Int) {
-            BleServiceHelper.getWifiConfig(model)
+        fun bp2wSwitchState(model: Int, state: Int){
+            BleServiceHelper.bp2wSwitchState(model, state)
         }
-        fun writeUserList(model: Int, userList: Any) {
-            BleServiceHelper.writeUserList(model, userList)
+        fun bp2wGetWifiDevice(model: Int) {
+            BleServiceHelper.bp2wGetWifiDevice(model)
         }
-        fun getFileListCrc(model: Int, fileType: Int) {
-            BleServiceHelper.getFileListCrc(model, fileType)
+        fun bp2wSetWifiConfig(model: Int, config: Bp2WifiConfig) {
+            BleServiceHelper.bp2wSetWifiConfig(model, config)
+        }
+        fun bp2wGetWifiConfig(model: Int) {
+            BleServiceHelper.bp2wGetWifiConfig(model)
+        }
+        fun bp2WriteUserList(model: Int, userList: Bp2wUserList) {
+            BleServiceHelper.bp2WriteUserList(model, userList)
+        }
+        fun bp2wGetFileListCrc(model: Int, fileType: Int) {
+            BleServiceHelper.bp2wGetFileListCrc(model, fileType)
         }
 
         fun oxyGetPpgRt(model: Int){
@@ -483,34 +496,34 @@ class LpBleUtil {
             }
 
         }
-        fun setMeasureTime(model: Int, measureTime: Array<String?>) {
+        fun bpw1SetMeasureTime(model: Int, measureTime: Array<String?>) {
             Log.d(TAG, "setMeasureTime")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.setMeasureTime(model, measureTime)
+                BleServiceHelper.bpw1SetMeasureTime(model, measureTime)
             }
         }
-        fun getMeasureTime(model: Int) {
+        fun bpw1GetMeasureTime(model: Int) {
             Log.d(TAG, "getMeasureTime")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.getMeasureTime(model)
+                BleServiceHelper.bpw1GetMeasureTime(model)
             }
         }
-        fun setTimingSwitch(model: Int, timingSwitch: Boolean) {
+        fun bpw1SetTimingSwitch(model: Int, timingSwitch: Boolean) {
             Log.d(TAG, "setTimingSwitch")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.setTimingSwitch(model, timingSwitch)
+                BleServiceHelper.bpw1SetTimingSwitch(model, timingSwitch)
             }
         }
 
@@ -536,45 +549,24 @@ class LpBleUtil {
             }
         }
 
-        fun getBpState(model: Int) {
-            Log.d(TAG, "getBpState")
-            BleServiceHelper.getInterface(model)?.let {
-                if(getBleState(model) != State.CONNECTED){
-                    Log.d(TAG, "设备未连接")
-                    return
-                }
-                BleServiceHelper.getBpState(model)
-            }
-        }
-        fun getBoState(model: Int) {
-            Log.d(TAG, "getBoState")
-            BleServiceHelper.getInterface(model)?.let {
-                if(getBleState(model) != State.CONNECTED){
-                    Log.d(TAG, "设备未连接")
-                    return
-                }
-                BleServiceHelper.getBoState(model)
-            }
-        }
-
-        fun setApConfig(model: Int, type: Int, config: Int) {
+        fun ap20SetConfig(model: Int, type: Int, config: Int) {
             Log.d(TAG, "setApConfig")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.setAp20Config(model, type, config)
+                BleServiceHelper.ap20SetConfig(model, type, config)
             }
         }
-        fun getApConfig(model: Int, type: Int) {
+        fun ap20GetConfig(model: Int, type: Int) {
             Log.d(TAG, "getApConfig")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.getAp20Config(model, type)
+                BleServiceHelper.ap20GetConfig(model, type)
             }
         }
         fun getBattery(model: Int) {
@@ -588,34 +580,34 @@ class LpBleUtil {
             }
         }
 
-        fun boundDevice(model: Int){
-            Log.d(TAG, "boundDevice")
+        fun lew3BoundDevice(model: Int){
+            Log.d(TAG, "lew3BoundDevice")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.boundDevice(model)
+                BleServiceHelper.lew3BoundDevice(model)
             }
         }
-        fun setLeW3Config(model: Int, addr: String, port: Int){
-            Log.d(TAG, "setLeW3Config")
+        fun lew3SetConfig(model: Int, addr: String, port: Int){
+            Log.d(TAG, "lew3SetConfig")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.setLeW3Config(model, addr, port)
+                BleServiceHelper.lew3SetConfig(model, addr, port)
             }
         }
-        fun getLeW3Config(model: Int){
-            Log.d(TAG, "getLeW3Config")
+        fun lew3GetConfig(model: Int){
+            Log.d(TAG, "lew3GetConfig")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.getLeW3Config(model)
+                BleServiceHelper.lew3GetConfig(model)
             }
         }
 

@@ -82,21 +82,21 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
             }
         } else if (response.token == Ap20BleCmd.TOKEN_0F) {
             when (response.type) {
-                Ap20BleCmd.MSG_ENABLE_BO_PARAM -> {
+                Ap20BleCmd.MSG_ENABLE_OXY_PARAM -> {
                     LepuBleLog.d(tag, "model:$model,MSG_ENABLE_BO_PARAM => success")
                     LepuBleLog.d(tag, "model:$model, toUInt(response.content)) == " + toUInt(response.content))
                 }
-                Ap20BleCmd.MSG_ENABLE_BO_WAVE -> {
+                Ap20BleCmd.MSG_ENABLE_OXY_WAVE -> {
                     LepuBleLog.d(tag, "model:$model,MSG_ENABLE_BO_WAVE => success")
                     LepuBleLog.d(tag, "model:$model, toUInt(response.content)) == " + toUInt(response.content))
                 }
-                Ap20BleCmd.MSG_RT_BO_PARAM -> {
+                Ap20BleCmd.MSG_RT_OXY_PARAM -> {
                     LepuBleLog.d(tag, "model:$model,MSG_RT_BO_PARAM => success")
                     val data = Ap20BleResponse.RtBoParam(response.content)
                     LepuBleLog.d(tag, "model:$model, data.toString() == $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBoParam).post(InterfaceEvent(model, data))
                 }
-                Ap20BleCmd.MSG_RT_BO_WAVE -> {
+                Ap20BleCmd.MSG_RT_OXY_WAVE -> {
                     LepuBleLog.d(tag, "model:$model,MSG_RT_BO_WAVE => success")
                     val data = Ap20BleResponse.RtBoWave(response.content)
                     LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
@@ -214,13 +214,6 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
         // 设备没有记录
     }
 
-    /**
-     * type : 0 设置背光等级（0-5）
-     *        1 警报功能开关（0 off，1 on）
-     *        2 血氧过低阈值（85-99）
-     *        3 脉率过低阈值（30-99）
-     *        4 脉率过高阈值（100-250）
-     */
     fun setConfig(type: Int, config: Int) {
         if (type == 0) {
             setBacklight(config)
@@ -228,13 +221,6 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
             sendCmd(Ap20BleCmd.setConfig(type, config))
         }
     }
-    /**
-     * type : 0 背光等级（0-5）
-     *        1 警报功能开关（0 off，1 on）
-     *        2 血氧过低阈值（85-99）
-     *        3 脉率过低阈值（30-99）
-     *        4 脉率过高阈值（100-250）
-     */
     fun getConfig(type: Int) {
         when (type) {
             0 -> {
@@ -245,11 +231,8 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
             }
         }
     }
-    fun enableRtData(enable: Boolean) {
-        sendCmd(Ap20BleCmd.enableBoParam(enable))
-        sendCmd(Ap20BleCmd.enableBoWave(enable))
-        sendCmd(Ap20BleCmd.enableBreathParam(!enable))
-        sendCmd(Ap20BleCmd.enableBreathWave(!enable))
+    fun enableRtData(type: Int, enable: Boolean) {
+        sendCmd(Ap20BleCmd.enableSwitch(type, enable))
     }
     private fun setBacklight(level: Int) {
         sendCmd(Ap20BleCmd.setBacklight(level))

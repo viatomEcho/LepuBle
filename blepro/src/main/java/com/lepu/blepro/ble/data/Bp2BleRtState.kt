@@ -1,5 +1,6 @@
 package com.lepu.blepro.ble.data
 
+import com.lepu.blepro.utils.ByteUtils.byte2UInt
 
 
 const val STATUS_SLEEP = 0
@@ -11,51 +12,34 @@ const val STATUS_BP_END = 5
 const val STATUS_ECG_ING = 6
 const val STATUS_ECG_END = 7
 
+const val STATUS_BP_AVG_ING = 15
+const val STATUS_BP_AVG_WAIT = 16
+const val STATUS_BP_AVG_END = 17
+
 
 class Bp2BleRtState {
 
-
     var status : Int
     var battery : KtBleBattery
-    // reserve 4
+    var avgCnt: Int
+    var avgWaitTick: Int
+    // reserve 2
 
 
     constructor(bytes : ByteArray) {
         status = bytes[0].toInt()
         battery = KtBleBattery(bytes.copyOfRange(1, 5))
+        avgCnt = byte2UInt(bytes[5])
+        avgWaitTick = byte2UInt(bytes[6])
     }
 
     override fun toString(): String {
-        var str : String = "status: "
-        when(status) {
-            STATUS_SLEEP -> {
-                str += "STATUS_SLEEP"
-            }
-            STATUS_HISTORY -> {
-                str += "STATUS_HISTORY"
-            }
-            STATUS_CHARGING -> {
-                str += "STATUS_CHARGING"
-            }
-            STATUS_READY -> {
-                str += "STATUS_READY"
-            }
-            STATUS_BP_ING -> {
-                str += "STATUS_BP_ING"
-            }
-            STATUS_BP_END -> {
-                str += "STATUS_BP_END"
-            }
-            STATUS_ECG_ING -> {
-                str += "STATUS_ECG_ING"
-            }
-            STATUS_ECG_END -> {
-                str += "STATUS_ECG_END"
-            }
-        }
-
-        str += battery.toString()
-        return str
+        return """
+            status : $status
+            battery : $battery
+            avgCnt : $avgCnt
+            avgWaitTick : $avgWaitTick
+        """.trimIndent()
     }
 }
 
