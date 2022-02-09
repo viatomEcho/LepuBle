@@ -143,6 +143,12 @@
                             android:layout_height="wrap_content"
                             android:text="获取配置"
                             android:layout_marginStart="20dp"/>
+                        <Button
+                            android:id="@+id/bp2w_delete_file"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="删除文件"
+                            android:layout_marginStart="20dp"/>
                     </LinearLayout>
                     <LinearLayout
                         android:layout_width="match_parent"

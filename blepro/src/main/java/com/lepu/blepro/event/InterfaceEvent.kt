@@ -116,6 +116,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBp2wGetWifiConfig = "com.lepu.ble.bp2w.get.wifi.config"              // 获取WiFi配置 Bp2WifiConfig
             const val EventBp2wSetWifiConfig = "com.lepu.ble.bp2w.set.wifi.config"              // 设置WiFi boolean
             const val EventBp2wGetFileListCrc = "com.lepu.ble.bp2w.get.fileList.crc"            // 获取列表校验值 FileListCrc
+            const val EventBp2wDeleteFile = "com.lepu.ble.bp2w.delete.file"                     // 删除文件 boolean
         }
     }
 

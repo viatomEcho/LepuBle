@@ -930,6 +930,19 @@ class BleServiceHelper private constructor() {
     }
 
     /**
+     * 删除文件
+     */
+    fun bp2wDeleteFile(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Bp2wBleInterface).let {
+                LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2wDeleteFile")
+                it.deleteFile()
+            }
+        }
+    }
+
+    /**
      * 获取参数（bp2w）
      */
     fun bp2wGetConfig(model: Int) {

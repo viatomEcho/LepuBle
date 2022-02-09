@@ -342,6 +342,17 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                     .post(InterfaceEvent(model, crc))
                 LepuBleLog.d(tag, "model:$model,GET_USER_LIST_CRC => success")
             }
+            DELETE_FILE -> {
+                if (bleResponse.pkgType != 0x01.toByte()) {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wDeleteFile)
+                        .post(InterfaceEvent(model, false))
+                    LepuBleLog.d(tag, "model:$model,DELETE_FILE => error")
+                    return
+                }
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wDeleteFile)
+                    .post(InterfaceEvent(model, true))
+                LepuBleLog.d(tag, "model:$model,DELETE_FILE => success")
+            }
 
         }
     }
@@ -354,6 +365,10 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
     override fun syncTime() {
         LepuBleLog.d(tag, "syncTime...")
         sendCmd(setTime())
+    }
+
+    fun deleteFile() {
+        sendCmd(Bp2wBleCmd.deleteFile())
     }
 
     override fun updateSetting(type: String, value: Any) {

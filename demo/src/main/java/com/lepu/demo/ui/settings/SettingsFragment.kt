@@ -175,6 +175,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.bp2wGetWifiRoute.setOnClickListener {
             LpBleUtil.bp2wGetWifiDevice(Constant.BluetoothConfig.currentModel[0])
         }
+        binding.bp2wDeleteFile.setOnClickListener {
+            LpBleUtil.bp2wDeleteFile(Constant.BluetoothConfig.currentModel[0])
+        }
         binding.bp2wUserList.setOnClickListener {
             val icon1 = Bp2wUserInfo.Icon()
             icon1.width = 28
@@ -366,6 +369,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.content.text = (it.data as Int).toString()
             })
         //------------------------------bp2w-------------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wDeleteFile)
+            .observe(this, {
+                Toast.makeText(
+                    context,
+                    "bp2w 删除文件成功",
+                    Toast.LENGTH_SHORT
+                ).show()
+            })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSetConfig)
             .observe(this, {
                 LpBleUtil.bp2wGetConfig(Constant.BluetoothConfig.currentModel[0])

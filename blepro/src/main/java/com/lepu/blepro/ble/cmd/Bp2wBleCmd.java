@@ -224,6 +224,9 @@ public class Bp2wBleCmd {
     public static byte[] getWifiConfig() {
         return getReq(GET_WIFI_CONFIG, new byte[]{0});
     }
+    public static byte[] deleteFile() {
+        return getReq(DELETE_FILE, new byte[]{0});
+    }
 
     /**
      * 写文件开始

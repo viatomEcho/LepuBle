@@ -469,6 +469,9 @@ class LpBleUtil {
         fun bp2wGetFileListCrc(model: Int, fileType: Int) {
             BleServiceHelper.bp2wGetFileListCrc(model, fileType)
         }
+        fun bp2wDeleteFile(model: Int) {
+            BleServiceHelper.bp2wDeleteFile(model)
+        }
 
         fun oxyGetPpgRt(model: Int){
             BleServiceHelper.oxyGetPpgRt(model)
