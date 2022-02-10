@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.lepu.demo.R
 import com.hi.dhl.jdatabinding.binding
@@ -17,6 +18,7 @@ import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
+import com.lepu.demo.MainViewModel
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.ble.WifiAdapter
 import com.lepu.demo.cofig.Constant
@@ -31,6 +33,7 @@ import com.lepu.demo.databinding.FragmentSettingsBinding
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private val binding: FragmentSettingsBinding by binding()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private lateinit var measureTime: Array<String?>
 
     private var switchState = false
@@ -47,46 +50,166 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         super.onViewCreated(view, savedInstanceState)
         initView()
         initLiveEvent()
-        LpBleUtil.bp2GetConfig(Constant.BluetoothConfig.currentModel[0])
     }
 
     private fun initView() {
-        //-------------------------er1/duoek--------------------
+        mainViewModel.bleState.observe(viewLifecycleOwner, {
+            if (it) {
+                binding.settingLayout.visibility = View.VISIBLE
+            } else {
+                binding.settingLayout.visibility = View.GONE
+            }
+        })
+        mainViewModel.curBluetooth.observe(viewLifecycleOwner, {
+            when (it!!.modelNo) {
+                Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N -> {
+                    binding.er1Layout.visibility = View.VISIBLE
+                    binding.er2Layout.visibility = View.GONE
+                    binding.bp2Bp2aLayout.visibility = View.GONE
+                    binding.bp2wLayout.visibility = View.GONE
+                    binding.o2Layout.visibility = View.GONE
+                    binding.scaleLayout.visibility = View.GONE
+                    binding.pc100Layout.visibility = View.GONE
+                    binding.ap20Layout.visibility = View.GONE
+                    binding.lew3Layout.visibility = View.GONE
+                    LpBleUtil.getEr1VibrateConfig(it.modelNo)
+                }
+                Bluetooth.MODEL_ER2, Bluetooth.MODEL_DUOEK -> {
+                    binding.er2Layout.visibility = View.VISIBLE
+                    binding.er1Layout.visibility = View.GONE
+                    binding.bp2Bp2aLayout.visibility = View.GONE
+                    binding.bp2wLayout.visibility = View.GONE
+                    binding.o2Layout.visibility = View.GONE
+                    binding.scaleLayout.visibility = View.GONE
+                    binding.pc100Layout.visibility = View.GONE
+                    binding.ap20Layout.visibility = View.GONE
+                    binding.lew3Layout.visibility = View.GONE
+                    LpBleUtil.getEr2SwitcherState(it.modelNo)
+                }
+                Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
+                    binding.bp2Bp2aLayout.visibility = View.VISIBLE
+                    binding.er1Layout.visibility = View.GONE
+                    binding.er2Layout.visibility = View.GONE
+                    binding.bp2wLayout.visibility = View.GONE
+                    binding.o2Layout.visibility = View.GONE
+                    binding.scaleLayout.visibility = View.GONE
+                    binding.pc100Layout.visibility = View.GONE
+                    binding.ap20Layout.visibility = View.GONE
+                    binding.lew3Layout.visibility = View.GONE
+                    LpBleUtil.bp2GetConfig(it.modelNo)
+                }
+                Bluetooth.MODEL_BP2W -> {
+                    binding.bp2wLayout.visibility = View.VISIBLE
+                    binding.er1Layout.visibility = View.GONE
+                    binding.er2Layout.visibility = View.GONE
+                    binding.bp2Bp2aLayout.visibility = View.GONE
+                    binding.o2Layout.visibility = View.GONE
+                    binding.scaleLayout.visibility = View.GONE
+                    binding.pc100Layout.visibility = View.GONE
+                    binding.ap20Layout.visibility = View.GONE
+                    binding.lew3Layout.visibility = View.GONE
+                    LpBleUtil.bp2wGetConfig(it.modelNo)
+                }
+                Bluetooth.MODEL_O2RING, Bluetooth.MODEL_BABYO2 -> {
+                    binding.o2Layout.visibility = View.VISIBLE
+                    binding.er1Layout.visibility = View.GONE
+                    binding.er2Layout.visibility = View.GONE
+                    binding.bp2Bp2aLayout.visibility = View.GONE
+                    binding.bp2wLayout.visibility = View.GONE
+                    binding.scaleLayout.visibility = View.GONE
+                    binding.pc100Layout.visibility = View.GONE
+                    binding.ap20Layout.visibility = View.GONE
+                    binding.lew3Layout.visibility = View.GONE
+                    LpBleUtil.getInfo(it.modelNo)
+                }
+                Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F5_SCALE -> {
+                    binding.scaleLayout.visibility = View.VISIBLE
+                    binding.er1Layout.visibility = View.GONE
+                    binding.er2Layout.visibility = View.GONE
+                    binding.bp2Bp2aLayout.visibility = View.GONE
+                    binding.bp2wLayout.visibility = View.GONE
+                    binding.o2Layout.visibility = View.GONE
+                    binding.pc100Layout.visibility = View.GONE
+                    binding.ap20Layout.visibility = View.GONE
+                    binding.lew3Layout.visibility = View.GONE
+                }
+                Bluetooth.MODEL_PC100 -> {
+                    binding.pc100Layout.visibility = View.VISIBLE
+                    binding.er1Layout.visibility = View.GONE
+                    binding.er2Layout.visibility = View.GONE
+                    binding.bp2Bp2aLayout.visibility = View.GONE
+                    binding.bp2wLayout.visibility = View.GONE
+                    binding.o2Layout.visibility = View.GONE
+                    binding.scaleLayout.visibility = View.GONE
+                    binding.ap20Layout.visibility = View.GONE
+                    binding.lew3Layout.visibility = View.GONE
+                }
+                Bluetooth.MODEL_AP20 -> {
+                    binding.ap20Layout.visibility = View.VISIBLE
+                    binding.er1Layout.visibility = View.GONE
+                    binding.er2Layout.visibility = View.GONE
+                    binding.bp2Bp2aLayout.visibility = View.GONE
+                    binding.bp2wLayout.visibility = View.GONE
+                    binding.o2Layout.visibility = View.GONE
+                    binding.scaleLayout.visibility = View.GONE
+                    binding.pc100Layout.visibility = View.GONE
+                    binding.lew3Layout.visibility = View.GONE
+                    LpBleUtil.ap20GetConfig(it.modelNo, state)
+                }
+                Bluetooth.MODEL_LEW3 -> {
+                    binding.lew3Layout.visibility = View.VISIBLE
+                    binding.er1Layout.visibility = View.GONE
+                    binding.er2Layout.visibility = View.GONE
+                    binding.bp2Bp2aLayout.visibility = View.GONE
+                    binding.bp2wLayout.visibility = View.GONE
+                    binding.o2Layout.visibility = View.GONE
+                    binding.scaleLayout.visibility = View.GONE
+                    binding.pc100Layout.visibility = View.GONE
+                    binding.ap20Layout.visibility = View.GONE
+                    LpBleUtil.lew3GetConfig(it.modelNo)
+                }
+                else -> {
+                    binding.lew3Layout.visibility = View.GONE
+                    binding.er1Layout.visibility = View.GONE
+                    binding.er2Layout.visibility = View.GONE
+                    binding.bp2Bp2aLayout.visibility = View.GONE
+                    binding.bp2wLayout.visibility = View.GONE
+                    binding.o2Layout.visibility = View.GONE
+                    binding.scaleLayout.visibility = View.GONE
+                    binding.pc100Layout.visibility = View.GONE
+                    binding.ap20Layout.visibility = View.GONE
+                }
+            }
+        })
+
+
+        //-------------------------er1--------------------
         binding.er1SetConfig.setOnClickListener {
             switchState = !switchState
             LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, 0, 0)
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            var temp = "关"
-            if (switchState)
-                temp = "开"
-            binding.er1SetConfig.text = "声音" + temp
-        }
-        binding.duoekSetConfig.setOnClickListener {
-            switchState = !switchState
-            LpBleUtil.setDuoekVibrate(Constant.BluetoothConfig.currentModel[0], switchState, 0, 0, 0)
-            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            var temp = "关"
-            if (switchState)
-                temp = "开"
-            binding.duoekSetConfig.text = "声音" + temp
         }
         binding.er1GetConfig.setOnClickListener {
             LpBleUtil.getEr1VibrateConfig(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
         }
-        //-------------------------er2------------------------
+        //-------------------------er2/duoek------------------------
         binding.er2GetConfig.setOnClickListener {
-            LpBleUtil.getEr2SwitcherState(Constant.BluetoothConfig.currentModel[0])
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER2) {
+                LpBleUtil.getEr2SwitcherState(Constant.BluetoothConfig.currentModel[0])
+            } else {
+                LpBleUtil.getEr1VibrateConfig(Constant.BluetoothConfig.currentModel[0])
+            }
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
         }
         binding.er2SetConfig.setOnClickListener {
             switchState = !switchState
-            LpBleUtil.setEr2SwitcherState(Constant.BluetoothConfig.currentModel[0], switchState)
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER2) {
+                LpBleUtil.setEr2SwitcherState(Constant.BluetoothConfig.currentModel[0], switchState)
+            } else {
+                LpBleUtil.setDuoekVibrate(Constant.BluetoothConfig.currentModel[0], switchState, 0, 0, 0)
+            }
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            var temp = "关"
-            if (switchState)
-                temp = "开"
-            binding.er2SetConfig.text = "声音" + temp
         }
         //-------------------------lew3------------------------
         binding.lew3Bound.setOnClickListener {
@@ -105,7 +228,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         //-------------------------bp2/bp2A--------------------
         binding.bp2SetState.setOnClickListener {
             state++
-            if (state > 5)
+            if (state > 4)
                 state = 0
             LpBleUtil.bp2SwitchState(Constant.BluetoothConfig.currentModel[0], state)
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
@@ -119,11 +242,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             switchState = !switchState
             LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], switchState, volume)
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            var on = "关"
-            if (switchState) {
-                on = "开"
-            }
-            binding.bp2SetConfig.text = "声音" + on
         }
         binding.bp2SetVolume.setOnClickListener {
             volume++
@@ -137,11 +255,15 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         //-------------------------bp2w------------------------
         binding.bp2wSetState.setOnClickListener {
             state++
-            if (state > 5)
+            if (state > 4)
                 state = 0
-            LpBleUtil.bp2SwitchState(Constant.BluetoothConfig.currentModel[0], state)
+            LpBleUtil.bp2wSwitchState(Constant.BluetoothConfig.currentModel[0], state)
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.bp2wSetState.text = "设备状态" + state
+        }
+        binding.bp2wGetState.setOnClickListener {
+            LpBleUtil.bp2wGetRtState(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
         }
         binding.bp2wGetConfig.setOnClickListener {
             LpBleUtil.bp2wGetConfig(Constant.BluetoothConfig.currentModel[0])
@@ -351,23 +473,95 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun initLiveEvent() {
+        //----------------------------er1/duoek-----------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetSwitcherState)
+            .observe(this, {
+                LpBleUtil.getEr1VibrateConfig(it.model)
+                Toast.makeText(
+                    context,
+                    "er1/duoek 设置参数成功",
+                    Toast.LENGTH_SHORT
+                ).show()
+            })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1VibrateConfig)
             .observe(this, {
-                binding.content.text = bytesToHex(it.data as ByteArray)
+                val data = it.data as ByteArray
+                if (it.model == Bluetooth.MODEL_ER1) {
+                    val config = VbVibrationSwitcherConfig.parse(data)
+                    var temp = "关"
+                    if (config.switcher)
+                        temp = "开"
+                    binding.er1SetConfig.text = "er1声音" + temp
+                    binding.content.text = "switcher : " + config.switcher + " hr1 : " + config.hr1 + " hr2 : " + config.hr2
+                    Toast.makeText(
+                        context,
+                        "er1 获取参数成功",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    val data = it.data as ByteArray
+                    val config = SwitcherConfig.parse(data)
+                    var temp = "关"
+                    if (config.switcher)
+                        temp = "开"
+                    binding.er2SetConfig.text = "声音" + temp
+                    binding.content.text = "switcher : " + config.switcher + " vector : " + config.vector + " motionCount : " + config.motionCount + " motionWindows : " + config.motionWindows
+                    Toast.makeText(
+                        context,
+                        "duoek 获取参数成功",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
+        //-----------------------------er2------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetSwitcherState)
+            .observe(this, {
+                LpBleUtil.getEr2SwitcherState(it.model)
+                Toast.makeText(
+                    context,
+                    "er2 设置参数成功",
+                    Toast.LENGTH_SHORT
+                ).show()
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SwitcherState)
             .observe(this, {
-                binding.content.text = bytesToHex(it.data as ByteArray)
+                val data = it.data as ByteArray
+                val config = SwitcherConfig.parse(data)
+                var temp = "关"
+                if (config.switcher)
+                    temp = "开"
+                binding.er1SetConfig.text = "声音" + temp
+                binding.content.text = "switcher : " + config.switcher + " vector : " + config.vector + " motionCount : " + config.motionCount + " motionWindows : " + config.motionWindows
+                Toast.makeText(
+                    context,
+                    "er2 获取参数成功",
+                    Toast.LENGTH_SHORT
+                ).show()
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpStatus)
-            .observe(this, {
-                val data = it.data as Pc100BleResponse.BpStatus
-                binding.content.text = data.toString()
-            })
+        //----------------------------bp2/bp2a-----------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
             .observe(this, {
-                binding.content.text = (it.data as Int).toString()
+                val data = it.data as Int
+                var temp = "关"
+                if (data == 1)
+                    temp = "开"
+                binding.bp2SetConfig.text = "声音" + temp
+                Toast.makeText(
+                    context,
+                    "bp2 获取参数成功",
+                    Toast.LENGTH_SHORT
+                ).show()
             })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSetConfigResult)
+            .observe(this, {
+                LpBleUtil.bp2GetConfig(it.model)
+                Toast.makeText(
+                    context,
+                    "bp2 设置参数成功",
+                    Toast.LENGTH_SHORT
+                ).show()
+            })
+
         //------------------------------bp2w-------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wDeleteFile)
             .observe(this, {
@@ -379,10 +573,30 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSetConfig)
             .observe(this, {
-                LpBleUtil.bp2wGetConfig(Constant.BluetoothConfig.currentModel[0])
+                LpBleUtil.bp2wGetConfig(it.model)
                 Toast.makeText(
                     context,
                     "bp2w 设置参数成功",
+                    Toast.LENGTH_SHORT
+                ).show()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSwitchState)
+            .observe(this, {
+                LpBleUtil.bp2wGetRtState(it.model)
+                Toast.makeText(
+                    context,
+                    "bp2w 设置主机状态成功",
+                    Toast.LENGTH_SHORT
+                ).show()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wRtState)
+            .observe(this, {
+                val data = it.data as Bp2BleRtState
+                binding.bp2wGetState.text = "实时状态" + data.status
+                binding.content.text = data.toString()
+                Toast.makeText(
+                    context,
+                    "bp2w 获取主机状态成功",
                     Toast.LENGTH_SHORT
                 ).show()
             })
@@ -406,7 +620,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiScanning)
             .observe(this, {
                 binding.content.text = "设备正在扫描wifi"
-                LpBleUtil.bp2wGetWifiDevice(Constant.BluetoothConfig.currentModel[0])
+                LpBleUtil.bp2wGetWifiDevice(it.model)
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiDevice)
             .observe(this, {
@@ -414,25 +628,71 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 adapter.setNewInstance(data.wifiList)
                 adapter.notifyDataSetChanged()
                 binding.content.text = data.toString()
+                Toast.makeText(
+                    context,
+                    "bp2w 获取路由成功",
+                    Toast.LENGTH_SHORT
+                ).show()
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetWifiConfig)
             .observe(this, {
                 val data = it.data as Bp2WifiConfig
                 binding.content.text = data.toString()
-                if ((data.wifi.state != 2 || data.server.state != 2) && data.wifi.ssid.isNotEmpty()) {
-                    LpBleUtil.bp2wGetWifiConfig(Constant.BluetoothConfig.currentModel[0])
+                if ((data.wifi.state != 2 || data.server.state != 2)) {
+                    if (data.wifi.ssid.isNotEmpty()) {
+                        LpBleUtil.bp2wGetWifiConfig(it.model)
+                        Toast.makeText(
+                            context,
+                            "bp2w 正在配置WiFi",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "bp2w 尚未配置WiFi",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetFileListCrc)
             .observe(this, {
                 val data = it.data as FileListCrc
                 binding.content.text = data.toString()
+                Toast.makeText(
+                    context,
+                    "bp2w 获取文件列表校验成功",
+                    Toast.LENGTH_SHORT
+                ).show()
+            })
+        //------------------------------o2/babyO2-----------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxySyncDeviceInfo)
+            .observe(this, {
+                LpBleUtil.getInfo(it.model)
+                Toast.makeText(
+                    context,
+                    "o2/babyO2 设置参数成功",
+                    Toast.LENGTH_SHORT
+                ).show()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo)
+            .observe(this, {
+                var data = it.data as OxyBleResponse.OxyInfo
+                binding.o2HrSwitch.text = "心率开关值" + data.hrSwitch
+                binding.o2OxiSwitch.text = "血氧开关值" + data.oxiSwitch
+                binding.o2Motor.text = "震动强度" + data.motor
+                binding.content.text = data.toString()
+                Toast.makeText(
+                    context,
+                    "o2/babyO2 获取参数成功",
+                    Toast.LENGTH_SHORT
+                ).show()
             })
         //------------------------------ap20-------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20Battery)
             .observe(this, {
                 var data = it.data as Int
-                binding.content.text = data.toString()
+                binding.content.text = "电量" + data.toString()
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20ConfigInfo)
             .observe(this, {
@@ -448,14 +708,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3GetConfig)
             .observe(this, {
                 var data = it.data as LeW3Config
-                binding.content.text = data.toString()
-            })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo)
-            .observe(this, {
-                var data = it.data as OxyBleResponse.OxyInfo
-                binding.o2HrSwitch.text = "心率开关值" + data.hrSwitch
-                binding.o2OxiSwitch.text = "血氧开关值" + data.oxiSwitch
-                binding.o2Motor.text = "震动强度" + data.motor
                 binding.content.text = data.toString()
             })
 

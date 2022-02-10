@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <LinearLayout
+            android:id="@+id/setting_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorGrayBg"
@@ -21,14 +22,30 @@
                 android:text="私有方法测试"/>
 
             <LinearLayout
-                android:id="@+id/er1_duoek_layout"
+                android:id="@+id/er1_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="er1/duoek"/>
+                    android:text="er1"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/er1_hr1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="阈值1"/>
+
+                    <EditText
+                        android:id="@+id/er1_hr2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="阈值2"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -36,321 +53,320 @@
                         android:id="@+id/er1_set_config"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="设置参数er1"/>
+                        android:text="声音"/>
 
                     <Button
-                        android:id="@+id/duoek_set_config"
+                        android:id="@+id/er1_get_config"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="设置参数duoek"
+                        android:text="获取配置"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/er2_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="er2/duoek"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/er2_set_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="声音" />
+                    <Button
+                        android:id="@+id/er2_get_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取配置"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/bp2_bp2a_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="bp2/bp2A"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/bp2_set_state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设备状态"/>
+                    <Button
+                        android:id="@+id/bp2_get_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取配置"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <Button
-                        android:id="@+id/er1_get_config"
+                        android:id="@+id/bp2_set_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="声音" />
+                    <Button
+                        android:id="@+id/bp2_set_volume"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="音量"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/bp2w_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="bp2w"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/bp2w_set_state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置设备状态"/>
+                    <Button
+                        android:id="@+id/bp2w_get_state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取设备状态"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/bp2w_get_config"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="获取配置"/>
+                    <Button
+                        android:id="@+id/bp2w_delete_file"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="删除文件"
+                        android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <LinearLayout
-                    android:id="@+id/er2_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/bp2w_set_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="声音" />
+                    <Button
+                        android:id="@+id/bp2w_set_volume"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="音量"
+                        android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/bp2w_mode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="测量模式"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/bp2w_user_list"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="写用户信息"/>
+                    <Button
+                        android:id="@+id/bp2w_get_file_crc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取文件列表crc"
+                        android:layout_marginStart="10dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/bp2w_get_wifi_route"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取路由"/>
+                    <Button
+                        android:id="@+id/bp2w_get_wifi_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取wifi"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="match_parent"
+                    android:layout_marginTop="20dp" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/o2_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="o2/babyO2"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/o2_oxi_switch"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="er2"/>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <Button
-                            android:id="@+id/er2_get_config"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="获取配置"/>
+                        android:text="血氧开关值"/>
 
-                        <Button
-                            android:id="@+id/er2_set_config"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="声音"
-                            android:layout_marginStart="20dp"/>
-                    </LinearLayout>
+                    <Button
+                        android:id="@+id/o2_hr_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="心率开关值"
+                        android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/o2_motor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="震动强度"
+                        android:layout_marginStart="20dp"/>
                 </LinearLayout>
-                <LinearLayout
-                    android:id="@+id/bp2_bp2a_layout"
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/scale_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="bp2/bp2A"/>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <Button
-                            android:id="@+id/bp2_set_state"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="设备状态"/>
-                        <Button
-                            android:id="@+id/bp2_get_config"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="获取配置"
-                            android:layout_marginStart="20dp"/>
-                    </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <Button
-                            android:id="@+id/bp2_set_config"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="声音" />
-                        <Button
-                            android:id="@+id/bp2_set_volume"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="音量"
-                            android:layout_marginStart="20dp"/>
-                    </LinearLayout>
-                </LinearLayout>
+                    android:text="scale"/>
                 <LinearLayout
-                    android:id="@+id/bp2w_bp2a_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/scale_user_info"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="bp2w"/>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <Button
-                            android:id="@+id/bp2w_set_state"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="设备状态"/>
-                        <Button
-                            android:id="@+id/bp2w_get_config"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="获取配置"
-                            android:layout_marginStart="20dp"/>
-                        <Button
-                            android:id="@+id/bp2w_delete_file"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="删除文件"
-                            android:layout_marginStart="20dp"/>
-                    </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <Button
-                            android:id="@+id/bp2w_set_config"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="声音" />
-                        <Button
-                            android:id="@+id/bp2w_set_volume"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="音量"
-                            android:layout_marginStart="20dp"/>
-                        <Button
-                            android:id="@+id/bp2w_mode"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="测量模式"
-                            android:layout_marginStart="20dp"/>
-                    </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <Button
-                            android:id="@+id/bp2w_user_list"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="写用户信息"/>
-                        <Button
-                            android:id="@+id/bp2w_get_file_crc"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="获取文件列表crc"
-                            android:layout_marginStart="10dp"/>
-                    </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <Button
-                            android:id="@+id/bp2w_get_wifi_route"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="获取路由"/>
-                        <Button
-                            android:id="@+id/bp2w_get_wifi_config"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="获取wifi"
-                            android:layout_marginStart="20dp"/>
-                    </LinearLayout>
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rcv"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp" />
-                </LinearLayout>
-                <LinearLayout
-                    android:id="@+id/o2_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="o2"/>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <Button
-                            android:id="@+id/o2_oxi_switch"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="血氧开关值"/>
+                        android:text="当前用户"/>
 
-                        <Button
-                            android:id="@+id/o2_hr_switch"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="心率开关值"
-                            android:layout_marginStart="20dp"/>
-                        <Button
-                            android:id="@+id/o2_motor"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="震动强度"
-                            android:layout_marginStart="20dp"/>
-                    </LinearLayout>
+                    <Button
+                        android:id="@+id/scale_user_list"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="用户列表"
+                        android:layout_marginStart="20dp"/>
                 </LinearLayout>
-                <LinearLayout
-                    android:id="@+id/scale_layout"
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/pc100_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="scale"/>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <Button
-                            android:id="@+id/scale_user_info"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="当前用户"/>
-
-                        <Button
-                            android:id="@+id/scale_user_list"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="用户列表"
-                            android:layout_marginStart="20dp"/>
-                    </LinearLayout>
-                </LinearLayout>
+                    android:text="pc100"/>
                 <LinearLayout
-                    android:id="@+id/pc100_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/pc100_bp_state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="血压状态"/>
+                    <Button
+                        android:id="@+id/pc100_bo_state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="血氧状态"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ap20_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="pc100"/>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <Button
-                            android:id="@+id/pc100_bp_state"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="血压状态"/>
-                        <Button
-                            android:id="@+id/pc100_bo_state"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="血氧状态"
-                            android:layout_marginStart="20dp"/>
-                    </LinearLayout>
-                </LinearLayout>
+                    android:text="ap20"/>
                 <LinearLayout
-                    android:id="@+id/ap20_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/ap20_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="警报开关"/>
+                    <Button
+                        android:id="@+id/ap20_get_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取参数"
+                        android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/ap20_set_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置参数"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/lew3_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="ap20"/>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <Button
-                            android:id="@+id/ap20_switch"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="警报开关"/>
-                        <Button
-                            android:id="@+id/ap20_get_config"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="获取参数"
-                            android:layout_marginStart="20dp"/>
-                        <Button
-                            android:id="@+id/ap20_set_config"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="设置参数"
-                            android:layout_marginStart="20dp"/>
-                    </LinearLayout>
-                </LinearLayout>
+                    android:text="lew3"/>
                 <LinearLayout
-                    android:id="@+id/lew3_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew3_bound"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="lew3"/>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <Button
-                            android:id="@+id/lew3_bound"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="请求绑定"/>
-                        <Button
-                            android:id="@+id/lew3_get_config"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="获取参数"
-                            android:layout_marginStart="20dp"/>
-                        <Button
-                            android:id="@+id/lew3_set_config"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="设置参数"
-                            android:layout_marginStart="20dp"/>
-                    </LinearLayout>
+                        android:text="请求绑定"/>
+                    <Button
+                        android:id="@+id/lew3_get_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取参数"
+                        android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/lew3_set_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置参数"
+                        android:layout_marginStart="20dp"/>
                 </LinearLayout>
             </LinearLayout>
 

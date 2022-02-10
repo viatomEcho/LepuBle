@@ -266,7 +266,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
         sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.syncTime())
     }
 
-    override fun updateSetting(type: String, value: Any) {
+    fun updateSetting(type: String, value: Any) {
         sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.updateSetting(type, value as Int))
 
     }

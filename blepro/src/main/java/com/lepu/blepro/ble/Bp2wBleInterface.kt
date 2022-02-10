@@ -95,6 +95,14 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                     .post(InterfaceEvent(model, true))
             }
 
+            RT_STATE -> {
+                // 主机状态
+                LepuBleLog.d(tag, "model:$model,RT_STATE => success")
+                val data = Bp2BleRtState(bleResponse.content)
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wRtState)
+                    .post(InterfaceEvent(model, data))
+            }
+
             //----------------------------读文件--------------------------
             READ_FILE_START -> {
                 LepuBleLog.d(tag, "model:$model,READ_FILE_START => success")
@@ -371,9 +379,6 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
         sendCmd(Bp2wBleCmd.deleteFile())
     }
 
-    override fun updateSetting(type: String, value: Any) {
-    }
-
     //实时波形命令
     override fun getRtData() {
         LepuBleLog.d(tag, "getRtData...")
@@ -481,6 +486,9 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
         sendCmd(Bp2wBleCmd.getWifiConfig())
     }
 
+    fun getRtState() {
+        sendCmd(Bp2wBleCmd.getRtState())
+    }
 
 
 }

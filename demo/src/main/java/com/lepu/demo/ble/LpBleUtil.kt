@@ -454,6 +454,9 @@ class LpBleUtil {
         fun bp2wSwitchState(model: Int, state: Int){
             BleServiceHelper.bp2wSwitchState(model, state)
         }
+        fun bp2wGetRtState(model: Int) {
+            BleServiceHelper.bp2wGetRtState(model)
+        }
         fun bp2wGetWifiDevice(model: Int) {
             BleServiceHelper.bp2wGetWifiDevice(model)
         }

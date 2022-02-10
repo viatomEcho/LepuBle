@@ -39,6 +39,15 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         initEvent()
     }
     private fun initView(){
+
+        mainViewModel.bleState.observe(viewLifecycleOwner, {
+            if (it) {
+                binding.infoLayout.visibility = View.VISIBLE
+            } else {
+                binding.infoLayout.visibility = View.GONE
+            }
+        })
+
         mainViewModel.er1Info.observe(viewLifecycleOwner, {
             binding.info.text = it.toString()
         })
@@ -98,10 +107,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         binding.continueRf.setOnClickListener {
 
         }
-        // 更新配置
-        binding.updateSet.setOnClickListener {
 
-        }
         // 复位
         binding.reset.setOnClickListener {
             LpBleUtil.reset(Constant.BluetoothConfig.currentModel[0])

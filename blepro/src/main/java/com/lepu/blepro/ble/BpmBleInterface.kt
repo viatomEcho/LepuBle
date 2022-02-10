@@ -155,10 +155,6 @@ class BpmBleInterface(model: Int): BleInterface(model) {
         sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_SET_TIME))
     }
 
-    override fun updateSetting(type: String, value: Any) {
-    }
-
-
     override fun getRtData() {
         LepuBleLog.d(tag, "getRtData...")
         sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_BP_STATE))

@@ -441,11 +441,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     abstract fun syncTime()
 
     /**
-     * 更新设置
-     */
-    open fun updateSetting(type: String, value: Any){}
-
-    /**
      * 获取实时
      */
     abstract fun getRtData()

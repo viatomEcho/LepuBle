@@ -52,9 +52,9 @@ public class Bp2wBleCmd {
     public static final int GET_WIFI_ROUTE = 0x11;
     public static final int SET_WIFI_CONFIG = 0x12;
     public static final int GET_WIFI_CONFIG = 0x13;
-    public static final int GET_USER_LIST_CRC = 0x20;
-    public static final int GET_ECG_LIST_CRC = 0x21;
-    public static final int GET_BP_LIST_CRC = 0x22;
+    public static final int GET_USER_LIST_CRC = 0x30;
+    public static final int GET_ECG_LIST_CRC = 0x31;
+    public static final int GET_BP_LIST_CRC = 0x32;
 
     private static int seqNo = 0;
     private static void addNo() {
@@ -181,7 +181,7 @@ public class Bp2wBleCmd {
         }
     }
 
-    public static byte[] getRtBpState() {
+    public static byte[] getRtState() {
         return getReq(RT_STATE, new byte[0]);
     }
     public static byte[] getRtData() {

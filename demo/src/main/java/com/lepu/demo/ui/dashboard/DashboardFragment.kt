@@ -417,7 +417,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.dataStr.text = rtData.toString()
                 }
             })
-        //------------------------------ap10------------------------------
+        //------------------------------ap20------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBoWave)
             .observe(this, {
                 val rtWave = it.data as Ap20BleResponse.RtBoWave

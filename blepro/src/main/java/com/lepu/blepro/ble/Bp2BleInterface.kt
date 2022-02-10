@@ -392,9 +392,6 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
         sendCmd(MSG_TYPE_SET_TIME, Bp2BleCmd.getCmd(MSG_TYPE_SET_TIME))
     }
 
-    override fun updateSetting(type: String, value: Any) {
-    }
-
     //实时波形命令
     override fun getRtData() {
         LepuBleLog.d(tag, "getRtData...")

@@ -385,6 +385,92 @@ class BleServiceHelper private constructor() {
 
     }
 
+    /**
+     * 获取扫描状态
+     */
+    fun isScanning(): Boolean{
+        if (!checkService()) return false
+        return bleService.isDiscovery
+    }
+
+    /**
+     * 获取实时任务停止状态
+     */
+    fun isRtStop(model: Int): Boolean{
+        if (!checkService()) return false
+        return getInterface(model)?.isRtStop ?: true
+    }
+
+    /**
+     * 设置mtu
+     */
+    fun setBleMtu(model: Int, mtu: Int){
+        if (!checkService()) return
+        getInterface(model)?.setBleMtu(mtu)
+    }
+
+    /**
+     * 获取mtu
+     */
+    fun getBleMtu(model: Int): Int{
+        var mtu = 0
+        if (!checkService()) return mtu
+        mtu = getInterface(model)?.getBleMtu()!!
+        return mtu
+    }
+
+    /**
+     * 设置匹配状态
+     */
+    fun setNeedPair(needPair : Boolean){
+        BleServiceHelper.bleService.needPair = needPair
+    }
+
+    fun removeReconnectName(name: String) {
+        val iterator = bleService.reconnectDeviceName.iterator()
+        while (iterator.hasNext()) {
+            val i = iterator.next()
+            if (i == name) {
+                iterator.remove()
+                LepuBleLog.d(
+                    tag,
+                    "从重连名单中移除 $name,  list = ${bleService.reconnectDeviceName.joinToString()}"
+                )
+            }
+        }
+    }
+
+    fun removeReconnectAddress(address: String) {
+        val iterator = bleService.reconnectDeviceAddress.iterator()
+        while (iterator.hasNext()) {
+            val i = iterator.next()
+            if (i == address) {
+                iterator.remove()
+                LepuBleLog.d(
+                    tag,
+                    "从重连名单中移除 $address,  list = ${bleService.reconnectDeviceAddress.joinToString()}"
+                )
+            }
+        }
+    }
+
+    fun getReconnectDeviceName(): ArrayList<String>{
+        return bleService.reconnectDeviceName
+    }
+
+    /**
+     * 设置严格模式
+     */
+    fun setStrict(isStrict : Boolean){
+        bleService.isStrict =  isStrict
+    }
+
+    /**
+     * 严格模式判断
+     */
+    fun isStrict(): Boolean{
+        return bleService.isStrict
+    }
 
     /**
      * 是否存在未连接状态的interface
@@ -424,6 +510,63 @@ class BleServiceHelper private constructor() {
         return false
     }
 
+    /**
+     * BleService初始化判断
+     */
+    fun checkService(): Boolean{
+        if (!this::bleService.isInitialized){
+            LepuBleLog.d("Error: bleService unInitialized")
+            return false
+        }
+        return true
+    }
+
+    fun checkInterfaceType(model: Int, inter: BleInterface): Boolean {
+        if (!checkService()) return false
+
+        when (model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
+                return inter is Er1BleInterface
+            }
+            Bluetooth.MODEL_ER2 -> {
+                return inter is Er2BleInterface
+            }
+            Bluetooth.MODEL_BPM -> {
+                return inter is BpmBleInterface
+            }
+            Bluetooth.MODEL_O2RING -> {
+                return inter is OxyBleInterface
+            }
+            Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A ->{
+                return inter is Bp2BleInterface
+            }
+            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC_6N -> {
+                return inter is Pc60FwBleInterface
+            }
+            Bluetooth.MODEL_PC80B -> {
+                return inter is Pc80BleInterface
+            }
+            Bluetooth.MODEL_FHR -> {
+                return inter is FhrBleInterface
+            }
+            Bluetooth.MODEL_BPW1 -> {
+                return inter is Bpw1BleInterface
+            }
+            Bluetooth.MODEL_F4_SCALE -> {
+                return inter is F4ScaleBleInterface
+            }
+            Bluetooth.MODEL_F5_SCALE -> {
+                return inter is F5ScaleBleInterface
+            }
+            Bluetooth.MODEL_AP20 -> {
+                return inter is Ap20BleInterface
+            }
+            else -> {
+                LepuBleLog.d(tag, "checkModel, 无效model：$model,${inter.javaClass}")
+                return false
+            }
+        }
+    }
 
     /**
      * 获取主机信息
@@ -507,15 +650,6 @@ class BleServiceHelper private constructor() {
         }
     }
 
-
-    /**
-     * 更新设备设置
-     */
-    fun updateSetting(model: Int, type: String, value: Any) {
-        if (!checkService()) return
-        getInterface(model)?.updateSetting(type, value)
-    }
-
     /**
      * 同步时间
      */
@@ -559,7 +693,6 @@ class BleServiceHelper private constructor() {
     /**
      * 开启实时任务
      */
-    @JvmOverloads
     fun startRtTask(model: Int){
         if (!checkService()) return
         getInterface(model)?.let {
@@ -649,14 +782,39 @@ class BleServiceHelper private constructor() {
         }
     }
 
-    fun checkService(): Boolean{
-        if (!this::bleService.isInitialized){
-            LepuBleLog.d("Error: bleService unInitialized")
-            return false
+    /**
+     * 烧录出厂信息
+     */
+    fun burnFactoryInfo(model: Int, config: FactoryConfig) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Er1BleInterface).let {
+                        LepuBleLog.d(tag, "it as Er1BleInterface--burnFactoryInfo")
+                        it.burnFactoryInfo(config)
+                    }
+                }
+            }
         }
-        return true
     }
 
+    /**
+     * 加密Flash
+     */
+    fun burnLockFlash(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Er1BleInterface).let {
+                        LepuBleLog.d(tag, "it as Er1BleInterface--burnLockFlash")
+                        it.burnLockFlash()
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * 获取Bpm设备文件列表
@@ -674,27 +832,6 @@ class BleServiceHelper private constructor() {
             }
         }
 
-    }
-
-    fun isScanning(): Boolean{
-        if (!checkService()) return false
-        return bleService.isDiscovery
-    }
-
-    fun isRtStop(model: Int): Boolean{
-        if (!checkService()) return false
-        return getInterface(model)?.isRtStop ?: true
-    }
-
-    fun setBleMtu(model: Int, mtu: Int){
-        if (!checkService()) return
-        getInterface(model)?.setBleMtu(mtu)
-    }
-    fun getBleMtu(model: Int): Int{
-        var mtu = 0
-        if (!checkService()) return mtu
-        mtu = getInterface(model)?.getBleMtu()!!
-        return mtu
     }
 
     /**
@@ -735,8 +872,9 @@ class BleServiceHelper private constructor() {
     }
 
 
-    //er1  duoek----------------
-
+    /**
+     * er1/duoek获取参数
+     */
     fun getEr1VibrateConfig(model: Int){
         if (!checkService()) return
         when(model){
@@ -750,6 +888,9 @@ class BleServiceHelper private constructor() {
 
     }
 
+    /**
+     * er1设置参数
+     */
     fun setEr1Vibrate(model: Int, switcher: Boolean, threshold1: Int, threshold2: Int){
         if (!checkService()) return
         when(model) {
@@ -764,6 +905,9 @@ class BleServiceHelper private constructor() {
 
     }
 
+    /**
+     * duoek/er2设置参数
+     */
     fun setEr1Vibrate(model: Int,switcher: Boolean, vector: Int, motionCount: Int,motionWindows: Int ){
         if (!checkService()) return
         when(model) {
@@ -775,101 +919,6 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.e(tag, "model error")
 
         }
-    }
-
-    //------er1 duoek   end-----------------
-
-    fun checkInterfaceType(model: Int, inter: BleInterface): Boolean {
-        if (!checkService()) return false
-
-        when (model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
-                return inter is Er1BleInterface
-            }
-            Bluetooth.MODEL_ER2 -> {
-                return inter is Er2BleInterface
-            }
-            Bluetooth.MODEL_BPM -> {
-                return inter is BpmBleInterface
-            }
-            Bluetooth.MODEL_O2RING -> {
-                return inter is OxyBleInterface
-            }
-            Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A ->{
-                return inter is Bp2BleInterface
-            }
-            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC_6N -> {
-                return inter is Pc60FwBleInterface
-            }
-            Bluetooth.MODEL_PC80B -> {
-                return inter is Pc80BleInterface
-            }
-            Bluetooth.MODEL_FHR -> {
-                return inter is FhrBleInterface
-            }
-            Bluetooth.MODEL_BPW1 -> {
-                return inter is Bpw1BleInterface
-            }
-            Bluetooth.MODEL_F4_SCALE -> {
-                return inter is F4ScaleBleInterface
-            }
-            Bluetooth.MODEL_F5_SCALE -> {
-                return inter is F5ScaleBleInterface
-            }
-            Bluetooth.MODEL_AP20 -> {
-                return inter is Ap20BleInterface
-            }
-            else -> {
-                LepuBleLog.d(tag, "checkModel, 无效model：$model,${inter.javaClass}")
-                return false
-            }
-        }
-
-
-    }
-
-    fun setNeedPair(needPair : Boolean){
-        BleServiceHelper.bleService.needPair = needPair
-    }
-
-    fun removeReconnectName(name: String) {
-        val iterator = bleService.reconnectDeviceName.iterator()
-        while (iterator.hasNext()) {
-            val i = iterator.next()
-            if (i == name) {
-                iterator.remove()
-                LepuBleLog.d(
-                    tag,
-                    "从重连名单中移除 $name,  list = ${bleService.reconnectDeviceName.joinToString()}"
-                )
-            }
-        }
-    }
-
-    fun removeReconnectAddress(address: String) {
-        val iterator = bleService.reconnectDeviceAddress.iterator()
-        while (iterator.hasNext()) {
-            val i = iterator.next()
-            if (i == address) {
-                iterator.remove()
-                LepuBleLog.d(
-                    tag,
-                    "从重连名单中移除 $address,  list = ${bleService.reconnectDeviceAddress.joinToString()}"
-                )
-            }
-        }
-    }
-
-
-    fun getReconnectDeviceName(): ArrayList<String>{
-       return bleService.reconnectDeviceName
-    }
-    fun setStrict(isStrict : Boolean){
-        bleService.isStrict =  isStrict
-    }
-
-    fun isStrict(): Boolean{
-       return bleService.isStrict
     }
 
     /**
@@ -986,6 +1035,22 @@ class BleServiceHelper private constructor() {
     }
 
     /**
+     * 获取设备状态（bp2w）
+     */
+    fun bp2wGetRtState(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        it.getRtState()
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * 获取路由（bp2w）
      */
     fun bp2wGetWifiDevice(model: Int) {
@@ -1054,6 +1119,17 @@ class BleServiceHelper private constructor() {
         getInterface(model)?.let { it1 ->
             (it1 as OxyBleInterface).let {
                 it.getPpgRT()
+            }
+        }
+    }
+    /**
+     * 更新设备设置（O2Ring，BabyO2）
+     */
+    fun updateSetting(model: Int, type: String, value: Any) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as OxyBleInterface).let {
+                it.updateSetting(type, value)
             }
         }
     }
@@ -1166,33 +1242,6 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.e(tag, "model error")
-        }
-    }
-
-    fun burnFactoryInfo(model: Int, config: FactoryConfig) {
-        if (!checkService()) return
-        when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Er1BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er1BleInterface--burnFactoryInfo")
-                        it.burnFactoryInfo(config)
-                    }
-                }
-            }
-        }
-    }
-    fun burnLockFlash(model: Int) {
-        if (!checkService()) return
-        when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Er1BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er1BleInterface--burnLockFlash")
-                        it.burnLockFlash()
-                    }
-                }
-            }
         }
     }
 

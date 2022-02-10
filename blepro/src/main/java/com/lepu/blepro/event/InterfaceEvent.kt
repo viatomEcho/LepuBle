@@ -98,6 +98,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     interface BP2W {
         companion object {
             const val EventBp2wInfo = "com.lepu.ble.bp2w.info"                                  // 设备信息 LepuDevice
+            const val EventBp2wRtState = "com.lepu.ble.bp2w.rtState"                            // 主机状态 Bp2BleRtState
             const val EventBp2wRtData = "com.lepu.ble.bp2w.rtData"                              // 实时数据 Bp2BleRtData
             const val EventBp2wFileList = "com.lepu.ble.bp2w.fileList"                          // 文件列表 Bp2BleFile(0：Bp2wUserList 1：Bp2wBpList 2：Bp2wEcgList)
             const val EventBp2wReadFileError = "com.lepu.ble.bp2w.read.file.error"              // 读文件出错 String(fileName)
