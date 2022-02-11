@@ -1,6 +1,9 @@
 package com.lepu.blepro.ble.data
 
+import com.lepu.blepro.utils.DateUtil
+import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.blepro.utils.toUInt
+import java.util.*
 
 const val ECG_RECORD_LENGTH = 46
 
@@ -41,8 +44,8 @@ class Bp2wEcgList(bytes: ByteArray) {
         init {
             var index = 0
             time = toUInt(bytes.copyOfRange(index, index+4))
+            fileName = stringFromDate(Date(time.toLong()), "yyyyMMddHHmmss")
             index += 4
-            fileName = ""
             uid = toUInt(bytes.copyOfRange(index, index+4))
             index += 4
             mode = (bytes[index].toUInt() and 0xFFu).toInt()

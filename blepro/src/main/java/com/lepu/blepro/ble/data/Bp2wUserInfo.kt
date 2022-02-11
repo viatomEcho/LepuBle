@@ -13,14 +13,14 @@ import java.nio.charset.Charset
 class Bp2wUserInfo() {
 
     var len: Int = 0
-    var aid: Int = 0            // 主账户id
-    var uid: Int = 0            // 用户id
-    lateinit var fName: String  // 姓
-    lateinit var name: String   // 名
-    var birthday: Int = 0       // 生日
-    var height: Int = 0         // 身高 cm
-    var weight: Int = 0         // 体重 kg
-    var gender: Int = 0         // 性别 0：男 1：女
+    var aid: Int = 0               // 主账户id
+    var uid: Int = 0               // 用户id
+    lateinit var fName: String     // 姓
+    lateinit var name: String      // 名
+    lateinit var birthday: String  // 生日 19970101
+    var height: Int = 0            // 身高 cm
+    var weight: Int = 0            // 体重 kg
+    var gender: Int = 0            // 性别 0：男 1：女
     lateinit var icon: Icon
 
     constructor(bytes: ByteArray) : this() {
@@ -35,7 +35,7 @@ class Bp2wUserInfo() {
         index += 32
         name = trimStr(String(bytes.copyOfRange(index, index+32), Charset.defaultCharset()))
         index += 32
-        birthday = toUInt(bytes.copyOfRange(index, index+4))
+        birthday = "" + toUInt(bytes.copyOfRange(index, index+2)) + "-" + bytes[index+2].toInt() + "-" + bytes[index+3].toInt()
         index += 4
         height = toUInt(bytes.copyOfRange(index, index+2))
         index += 2
@@ -89,7 +89,9 @@ class Bp2wUserInfo() {
             .plus(int4ByteArray(uid))
             .plus(fNameByteArray)
             .plus(nameByteArray)
-            .plus(int4ByteArray(birthday))
+            .plus(int2ByteArray(birthday.split("-")[0].toInt()))
+            .plus(birthday.split("-")[1].toInt().toByte())
+            .plus(birthday.split("-")[2].toInt().toByte())
             .plus(int2ByteArray(height))
             .plus(int2ByteArray(weight))
             .plus(gender.toByte())

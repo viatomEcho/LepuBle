@@ -105,6 +105,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBp2wReadingFileProgress = "com.lepu.ble.bp2w.reading.file.progress"  // 传输文件进度 Bp2FilePart
             const val EventBp2wReadFileComplete = "com.lepu.ble.bp2w.read.file.complete"        // 传输文件完成 Bp2BleFile
             const val EventBp2WriteFileError = "com.lepu.ble.bp2w.write.file.error"             // 写文件出错 String(fileName)
+            const val EventBp2WriteFileComplete = "com.lepu.ble.bp2w.write.file.complete"       // 写文件完成 FileListCrc
             const val EventBp2wReset = "com.lepu.ble.bp2w.reset"                                // 复位 boolean
             const val EventBp2wFactoryReset = "com.lepu.ble.bp2w.factory.reset"                 // 恢复出厂设置 boolean
             const val EventBp2wFactoryResetAll = "com.lepu.ble.bp2w.factory.reset.all"          // 恢复生产出厂状态 boolean

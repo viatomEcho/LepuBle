@@ -315,7 +315,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             userInfo1.uid = 12345
             userInfo1.fName = "王"
             userInfo1.name = "五"
-            userInfo1.birthday = 19991020
+            userInfo1.birthday = "1999-10-20"
             userInfo1.height = 170
             userInfo1.weight = 70
             userInfo1.gender = 0
@@ -325,7 +325,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             userInfo2.uid = 11111
             userInfo2.fName = "黄"
             userInfo2.name = "六"
-            userInfo2.birthday = 19901020
+            userInfo2.birthday = "1990-10-20"
             userInfo2.height = 175
             userInfo2.weight = 50
             userInfo2.gender = 1
@@ -638,22 +638,15 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this, {
                 val data = it.data as Bp2WifiConfig
                 binding.content.text = data.toString()
-                if ((data.wifi.state != 2 || data.server.state != 2)) {
-                    if (data.wifi.ssid.isNotEmpty()) {
+                if (data.wifi.ssid.isNotEmpty()) {
+                    if ((data.wifi.state != 2 || data.server.state != 2)) {
                         LpBleUtil.bp2wGetWifiConfig(it.model)
-                        Toast.makeText(
-                            context,
-                            "bp2w 正在配置WiFi",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "bp2w 尚未配置WiFi",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(context, "bp2w WiFi未连接成功", Toast.LENGTH_SHORT).show()
                     }
+                } else {
+                    Toast.makeText(context, "bp2w 尚未配置WiFi", Toast.LENGTH_SHORT).show()
                 }
+
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetFileListCrc)
             .observe(this, {

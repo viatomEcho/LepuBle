@@ -35,7 +35,7 @@ class Bp2Wifi(i: Int, bytes: ByteArray) {
         index += ssidLen
         type = (bytes[index].toUInt() and 0xFFu).toInt()
         index++
-        rssi = (bytes[index].toUInt() and 0xFFu).toInt()
+        rssi = bytes[index].toInt()
         index++
         pwdLen = (bytes[index].toUInt() and 0xFFu).toInt()
         index++

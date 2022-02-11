@@ -210,6 +210,9 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
             }
             WRITE_FILE_END -> {
                 LepuBleLog.d(tag, "model:$model,WRITE_FILE_END => success")
+                val crc = FileListCrc(FileType.USER_TYPE, bleResponse.content)
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WriteFileComplete)
+                    .post(InterfaceEvent(model, crc))
                 curSize = 0
                 userIndex = 0
             }
