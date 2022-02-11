@@ -1,0 +1,39 @@
+package com.lepu.blepro.ble.data
+
+import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.toUInt
+
+class Bp2wEcgWaveFile {
+    var fileName: String
+    var fileVersion: Int
+    var fileType: Int
+    var timestamp: Int
+    var waveData: ByteArray
+    var deviceName: String
+    constructor(fileName: String, content: ByteArray, deviceName: String) {
+        this.deviceName = deviceName
+        this.fileName = fileName
+        var index = 0
+        fileVersion = byte2UInt(content[index])
+        index++
+        fileType = byte2UInt(content[index])
+        index++
+        timestamp = toUInt(content.copyOfRange(index, index+4))
+        index += 4
+        // reserved 4
+        index += 4
+        waveData = content.copyOfRange(index, content.size)
+    }
+
+    override fun toString(): String {
+        val string = """
+            download file:
+            file name: $fileName
+            file version: $fileVersion
+            file type: $fileType
+            timestamp: $timestamp
+            device name: $deviceName
+        """.trimIndent()
+        return string
+    }
+}

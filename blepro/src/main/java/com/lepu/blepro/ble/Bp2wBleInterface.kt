@@ -168,12 +168,13 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
 
                 fileContent?.let {
                     if (it.isNotEmpty()) {
-                        val data = Bp2BleFile(fileName, it, device.name)
                         if (fileName.endsWith(".list")) {
+                            val data = Bp2BleFile(fileName, it, device.name)
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wFileList).post(
                                 InterfaceEvent(model, data)
                             )
                         } else {
+                            val data = Bp2wEcgWaveFile(fileName, it, device.name)
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileComplete)
                                 .post(InterfaceEvent(model, data))
                         }

@@ -277,7 +277,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileComplete)
             .observe(this, { event ->
-                (event.data as Bp2BleFile).let {
+                (event.data as Bp2wEcgWaveFile).let {
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
                     fileNames.removeAt(0)
                     readFile()

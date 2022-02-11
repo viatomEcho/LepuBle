@@ -100,10 +100,10 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBp2wInfo = "com.lepu.ble.bp2w.info"                                  // 设备信息 LepuDevice
             const val EventBp2wRtState = "com.lepu.ble.bp2w.rtState"                            // 主机状态 Bp2BleRtState
             const val EventBp2wRtData = "com.lepu.ble.bp2w.rtData"                              // 实时数据 Bp2BleRtData
-            const val EventBp2wFileList = "com.lepu.ble.bp2w.fileList"                          // 文件列表 Bp2BleFile(0：Bp2wUserList 1：Bp2wBpList 2：Bp2wEcgList)
+            const val EventBp2wFileList = "com.lepu.ble.bp2w.fileList"                          // 文件列表 Bp2BleFile(type 0：Bp2wUserList 1：Bp2wBpList 2：Bp2wEcgList)
             const val EventBp2wReadFileError = "com.lepu.ble.bp2w.read.file.error"              // 读文件出错 String(fileName)
             const val EventBp2wReadingFileProgress = "com.lepu.ble.bp2w.reading.file.progress"  // 传输文件进度 Bp2FilePart
-            const val EventBp2wReadFileComplete = "com.lepu.ble.bp2w.read.file.complete"        // 传输文件完成 Bp2BleFile
+            const val EventBp2wReadFileComplete = "com.lepu.ble.bp2w.read.file.complete"        // 传输文件完成 Bp2wEcgWaveFile
             const val EventBp2WriteFileError = "com.lepu.ble.bp2w.write.file.error"             // 写文件出错 String(fileName)
             const val EventBp2WriteFileComplete = "com.lepu.ble.bp2w.write.file.complete"       // 写文件完成 FileListCrc
             const val EventBp2wReset = "com.lepu.ble.bp2w.reset"                                // 复位 boolean
