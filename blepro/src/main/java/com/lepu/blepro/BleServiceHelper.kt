@@ -196,20 +196,21 @@ class BleServiceHelper private constructor() {
      * @param needPair Boolean
      */
     @JvmOverloads
-    fun startScan(scanModel: Int, needPair: Boolean = false, isStrict: Boolean = false, isScanUnRegister: Boolean = false) {
+    fun startScan(scanModel: Int? = null, needPair: Boolean = false) {
         if (!checkService()) return
-        bleService.isStrict = isStrict
-        bleService.isScanUnRegister = isScanUnRegister
-        bleService.startDiscover(intArrayOf(scanModel), needPair)
+        if (scanModel != null) {
+            bleService.startDiscover(intArrayOf(scanModel), needPair)
+        } else {
+            bleService.startDiscover(null, needPair)
+        }
     }
 
     /**
      * 开始扫描 多设备
      */
     @JvmOverloads
-    fun startScan(scanModel: IntArray, needPair: Boolean = false, isStrict: Boolean = false) {
+    fun startScan(scanModel: IntArray, needPair: Boolean = false) {
         if (!checkService()) return
-        bleService.isStrict = isStrict
         bleService.startDiscover(scanModel, needPair)
     }
 
@@ -456,20 +457,6 @@ class BleServiceHelper private constructor() {
 
     fun getReconnectDeviceName(): ArrayList<String>{
         return bleService.reconnectDeviceName
-    }
-
-    /**
-     * 设置严格模式
-     */
-    fun setStrict(isStrict : Boolean){
-        bleService.isStrict =  isStrict
-    }
-
-    /**
-     * 严格模式判断
-     */
-    fun isStrict(): Boolean{
-        return bleService.isStrict
     }
 
     /**

@@ -130,15 +130,13 @@ class LpBleUtil {
         }
 
         @JvmOverloads
-        fun startScan(scanModel: Int, needPair: Boolean = false, isStrict: Boolean = false) {
-
-            BleServiceHelper.startScan(scanModel, needPair, isStrict)
+        fun startScan(scanModel: Int? = null, needPair: Boolean = false) {
+            BleServiceHelper.startScan(scanModel, needPair)
         }
 
         @JvmOverloads
-        fun startScan(scanModel: IntArray, needPair: Boolean = false, isStrict: Boolean = false) {
-
-            BleServiceHelper.startScan(scanModel, needPair, isStrict)
+        fun startScan(scanModel: IntArray, needPair: Boolean = false) {
+            BleServiceHelper.startScan(scanModel, needPair)
         }
 
 

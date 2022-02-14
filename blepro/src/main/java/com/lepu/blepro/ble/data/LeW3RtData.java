@@ -175,7 +175,8 @@ public class LeW3RtData {
 //        float mv = (float) (n*12.7*1800*1.03)/(10*227*4096);
 //            float mv = (float) (n * (1.0035 * 1800) / (4096 * 178.74));
 
-            float mv = (float) (n*0.00275);
+//            float mv = (float) (n*0.00275);
+            float mv = (float) (n*0.0028985507246377);
 
 //        float mv = (float) (n * 0.002467);
             n1 = n;

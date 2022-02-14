@@ -98,16 +98,6 @@ open class BleService: LifecycleService() {
      */
     var toConnectUpdater: Boolean = false
 
-    /**
-     * 扫描通知严格模式(非严格模式 可以不添加)
-     */
-    var isStrict: Boolean = false
-
-    /**
-     * 是否返回没有注册的蓝牙名的设备
-     */
-    var isScanUnRegister: Boolean = false
-
     var support2MPhy: Boolean = false
 
 
@@ -341,7 +331,7 @@ open class BleService: LifecycleService() {
      * @param needPair Boolean 本次扫描是否需要发送配对Event通知
      * @param isReconnecting Boolean 本次扫描是否自来重连
      */
-    fun startDiscover(scanModel: IntArray, needPair: Boolean = false, isReconnecting :Boolean = false) {
+    fun startDiscover(scanModel: IntArray? = null, needPair: Boolean = false, isReconnecting :Boolean = false) {
         LepuBleLog.d(tag, "start discover.....${vailFace.size()}, needPair = $needPair, isReconnecting = $isReconnecting")
         stopDiscover()
 
@@ -359,7 +349,7 @@ open class BleService: LifecycleService() {
             scanDevice(true)
         }
 
-        LepuBleLog.d(tag, "startScan...., scanModel:${scanModel.joinToString()}, needPair:$needPair")
+        LepuBleLog.d(tag, "startScan...., scanModel:${scanModel?.joinToString()}, needPair:$needPair")
     }
 
     /**
@@ -534,8 +524,8 @@ open class BleService: LifecycleService() {
                 deviceName = BluetoothController.getDeviceName(deviceAddress)
             }
 
-            if (isScanUnRegister){
-
+            @Bluetooth.MODEL val model: Int = Bluetooth.getDeviceModel(deviceName)
+            if (model == Bluetooth.MODEL_UNRECOGNIZED) {
                 if (needPair)
                     result.scanRecord?.let {
                         HashMap<String, Any>().apply {
@@ -552,11 +542,6 @@ open class BleService: LifecycleService() {
                 LiveEventBus.get<ScanResult>(EventMsgConst.Discovery.EventDeviceFoundForUnRegister).post(result)
                 return
             }
-
-            @Bluetooth.MODEL val model: Int = Bluetooth.getDeviceModel(deviceName)
-            if (model == Bluetooth.MODEL_UNRECOGNIZED) {
-                return
-            }
             val b = Bluetooth(
                     model,  /*ecgResult.getScanRecord().getDeviceName()*/
                     deviceName,
@@ -570,7 +555,7 @@ open class BleService: LifecycleService() {
 //                return
 //            }
 
-            if(isStrict)
+            if(scanModel != null)
                 if (!filterResult(b)) return
 
             if (needPair)
