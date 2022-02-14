@@ -193,14 +193,24 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         })
         //------------------------------lew3------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3BatteryInfo)
+            .observe(this, {
+                val data = it.data as LepuBatteryInfo
+                dataString += "\n" + data.toString()
+                binding.dataStr.text = dataString
+            })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3RtData)
             .observe(this, {
                 val rtData = it.data as LeW3RtData
                 rtData.let { data ->
                     Log.d("lew3 data ", "len = ${data.waveData.size}")
                     DataController.receive(data.waveData.datas)
-                    binding.dataStr.text = data.rtParam.toString()
+                    dataString = data.rtParam.toString()
+                    binding.dataStr.text = dataString
                     viewModel.ecgHr.value = data.rtParam.hr
+
+                    LpBleUtil.lew3GetBattery(it.model)
+
                 }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3FileList).observe(this, { event ->

@@ -616,6 +616,16 @@ class LpBleUtil {
                 BleServiceHelper.lew3GetConfig(model)
             }
         }
+        fun lew3GetBattery(model: Int){
+            Log.d(TAG, "lew3GetBattery")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.lew3GetBattery(model)
+            }
+        }
 
     }
 

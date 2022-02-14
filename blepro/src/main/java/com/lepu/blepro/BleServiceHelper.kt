@@ -1334,4 +1334,17 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    /**
+     * 获取电量（lew3）
+     */
+    fun lew3GetBattery(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LeW3BleInterface).let {
+                LepuBleLog.d(tag, "it as LeW3BleInterface--lew3GetBattery")
+                it.getBattery()
+            }
+        }
+    }
+
 }

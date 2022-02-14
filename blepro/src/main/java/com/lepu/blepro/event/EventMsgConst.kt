@@ -62,6 +62,7 @@ object EventMsgConst {
     interface Cmd{
         companion object{
             const val EventCmdResponseTimeOut = "com.lepu.ble.cmd.response.timeout"  // 指令响应超时会发送
+            const val EventCmdResponseContent = "com.lepu.ble.cmd.response.content"  // 指令响应
         }
     }
 

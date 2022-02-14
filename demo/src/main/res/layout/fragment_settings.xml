@@ -356,11 +356,20 @@
                         android:layout_height="wrap_content"
                         android:text="请求绑定"/>
                     <Button
+                        android:id="@+id/lew3_get_battery"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取电量"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
                         android:id="@+id/lew3_get_config"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="获取参数"
-                        android:layout_marginStart="20dp"/>
+                        android:text="获取参数"/>
                     <Button
                         android:id="@+id/lew3_set_config"
                         android:layout_width="wrap_content"

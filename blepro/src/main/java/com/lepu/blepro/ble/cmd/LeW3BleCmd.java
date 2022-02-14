@@ -57,6 +57,11 @@ public class LeW3BleCmd {
         return getReq(CMD_GET_CONFIG, (byte)seqNo, new byte[0]);
     }
 
+    public static byte[] getBattery() {
+        addNo();
+        return getReq(CMD_GET_BATTERY, (byte)seqNo, new byte[0]);
+    }
+
     public static byte[] getDeviceInfo() {
         addNo();
         return getReq(CMD_RETRIEVE_DEVICE_INFO, (byte)seqNo, new byte[0]);

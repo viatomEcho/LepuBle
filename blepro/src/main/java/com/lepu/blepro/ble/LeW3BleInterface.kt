@@ -6,9 +6,11 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 import java.util.*
 import kotlin.experimental.inv
@@ -87,6 +89,7 @@ class LeW3BleInterface(model: Int): BleInterface(model) {
 
 
     private fun onResponseReceived(respPkg: Er2BleResponse) {
+        LiveEventBus.get<String>(EventMsgConst.Cmd.EventCmdResponseContent).post(bytesToHex(respPkg.buf))
         when(respPkg.cmd) {
             LeW3BleCmd.CMD_RETRIEVE_DEVICE_INFO -> {
                 if (respPkg.data==null) return
@@ -277,6 +280,13 @@ class LeW3BleInterface(model: Int): BleInterface(model) {
                 }
                 curFile = null
             }
+
+            LeW3BleCmd.CMD_GET_BATTERY -> {
+                LepuBleLog.d(tag, "model:$model,CMD_GET_BATTERY => success, $respPkg")
+                val data = LepuBatteryInfo(respPkg.data)
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3BatteryInfo)
+                    .post(InterfaceEvent(model, data))
+            }
         }
     }
 
@@ -285,6 +295,10 @@ class LeW3BleInterface(model: Int): BleInterface(model) {
     }
     fun getConfig() {
         sendCmd(LeW3BleCmd.getConfig())
+    }
+
+    fun getBattery() {
+        sendCmd(LeW3BleCmd.getBattery())
     }
 
     fun boundDevice() {

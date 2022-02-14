@@ -253,6 +253,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     interface LeW3 {
         companion object {
             const val EventLeW3Info = "com.lepu.ble.lew3.info"                                  // 设备信息 LepuDevice
+            const val EventLeW3BatteryInfo = "com.lepu.ble.lew3.battery.info"                   // 电量信息 LepuBatteryInfo
             const val EventLeW3SetTime = "com.lepu.ble.lew3.set.time"                           // 同步时间 true
             const val EventLeW3BoundDevice = "com.lepu.ble.lew3.bound.device"                   // 请求绑定设备
             const val EventLeW3GetConfig = "com.lepu.ble.lew3.get.config"                       // 获取配置信息
