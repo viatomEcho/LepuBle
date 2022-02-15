@@ -251,8 +251,8 @@ public class Bluetooth implements Parcelable {
                 return MODEL_BPW1;
 //            case BT_NAME_F4_SCALE:
 //                return MODEL_F4_SCALE;
-//            case BT_NAME_F5_SCALE:
-//                return MODEL_F5_SCALE;
+            case BT_NAME_F5_SCALE:
+                return MODEL_F5_SCALE;
             case BT_NAME_LEW3:
                 return MODEL_LEW3;
             case BT_NAME_VETCORDER:
@@ -266,7 +266,7 @@ public class Bluetooth implements Parcelable {
             BT_NAME_BP2, BT_NAME_BP2A, BT_NAME_BP2T, BT_NAME_BP2W, BT_NAME_RINGO2, BT_NAME_O2M, BT_NAME_LEM, BT_NAME_BPM,
             BT_NAME_FHR, BT_NAME_BABYO2N, BT_NAME_STATION, BT_NAME_BPW1, BT_NAME_LEW3, BT_NAME_VETCORDER, BT_NAME_PC60FW, FETAL_DEVICE_NAME,
             BT_NAME_TV221U, BT_NAME_PC100, BT_NAME_AOJ20A, BT_NAME_VCOMIN, BT_NAME_CHECK_POD, BT_NAME_BODY_FAT, BT_NAME_POD2B, BT_NAME_PC_60NW,
-            BT_NAME_POD_1W, BT_NAME_PC_60B, BT_NAME_KCA, BT_NAME_PC80B, BT_NAME_PC66B, BT_NAME_AP20})
+            BT_NAME_POD_1W, BT_NAME_PC_60B, BT_NAME_KCA, BT_NAME_PC80B, BT_NAME_PC66B, BT_NAME_AP20, BT_NAME_F5_SCALE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface DEVICE_NAME {
 
@@ -367,6 +367,8 @@ public class Bluetooth implements Parcelable {
                 return BT_NAME_AP20;
             case MODEL_PC66B:
                 return BT_NAME_PC66B;
+            case MODEL_F5_SCALE:
+                return BT_NAME_F5_SCALE;
             default:
                 return "";
         }
