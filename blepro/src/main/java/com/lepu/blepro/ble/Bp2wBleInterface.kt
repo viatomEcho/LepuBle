@@ -471,7 +471,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
      */
     fun getWifiDevice() {
         LepuBleLog.d(tag, "getWifiDevice...")
-        sendCmd(getWifiRoute(10))
+        sendCmd(getWifiRoute(0))
     }
 
     /**

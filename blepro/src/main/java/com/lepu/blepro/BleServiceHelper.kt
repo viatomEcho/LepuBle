@@ -527,7 +527,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A ->{
                 return inter is Bp2BleInterface
             }
-            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC_6N -> {
+            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B -> {
                 return inter is Pc60FwBleInterface
             }
             Bluetooth.MODEL_PC80B -> {
@@ -1288,7 +1288,7 @@ class BleServiceHelper private constructor() {
         getInterface(model)?.let { it1 ->
             (it1 as LeW3BleInterface).let {
                 LepuBleLog.d(tag, "it as LeW3BleInterface--boundDevice")
-                it.getConfig()
+                it.boundDevice()
             }
         }
     }

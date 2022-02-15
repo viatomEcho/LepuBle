@@ -27,7 +27,7 @@ class Constant{
             const val PC60FW_MODEL: Int = Bluetooth.MODEL_PC60FW
             const val FHR_MODEL: Int = Bluetooth.MODEL_FHR
             const val PC100_MODEL: Int = Bluetooth.MODEL_PC100
-            const val PC6N_MODEL: Int = Bluetooth.MODEL_PC_6N
+            const val PC6N_MODEL: Int = Bluetooth.MODEL_PC66B
             const val AP20_MODEL: Int = Bluetooth.MODEL_AP20
             const val LEW3_MODEL: Int = Bluetooth.MODEL_LEW3
             const val VETCORDER_MODEL: Int = Bluetooth.MODEL_VETCORDER

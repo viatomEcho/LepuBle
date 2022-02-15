@@ -399,8 +399,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             (adapter.getItem(position) as Bp2Wifi).let {
                 val wifiConfig = Bp2WifiConfig()
                 wifiConfig.option = 3
-                it.ssid = "小米手机"
-                it.pwd = "chen12345"
+                it.ssid = "VIATOM_WIFI"
+                it.pwd = "ViatomCtrl"
                 wifiConfig.wifi = it
                 val server = Bp2wServer()
                 server.addr = "34.209.148.123"
@@ -680,8 +680,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.content.text = data.toString()
                 if (data.wifi.ssid.isNotEmpty()) {
                     if ((data.wifi.state != 2 || data.server.state != 2)) {
-                        LpBleUtil.bp2wGetWifiConfig(it.model)
+//                        LpBleUtil.bp2wGetWifiConfig(it.model)
                         Toast.makeText(context, "bp2w WiFi未连接成功", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "bp2w WiFi连接成功", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     Toast.makeText(context, "bp2w 尚未配置WiFi", Toast.LENGTH_SHORT).show()

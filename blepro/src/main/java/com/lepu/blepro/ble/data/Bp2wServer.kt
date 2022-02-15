@@ -12,7 +12,7 @@ class Bp2wServer() {
     var state: Int = 0         // 0:断开 1:连接中 2:已连接 0xff:服务器无法连接
     var addrType: Int = 0      // 服务器地址类型  0:ipv4  1:域名形式
     var addrLen: Int = 0
-    lateinit var addr: String  // 服务器地址 e.g. “192.168.1.33”
+    var addr: String = ""      // 服务器地址 e.g. “192.168.1.33”
     var port: Int = 0          // 服务器端口号
 
     constructor(i: Int, bytes: ByteArray) : this() {

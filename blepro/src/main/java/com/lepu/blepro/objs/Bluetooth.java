@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.IntDef;
+import androidx.annotation.StringDef;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -27,7 +28,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_BABY_O2 = "BabyO2";
     public static final String BT_NAME_OXY_SMART = "OxySmart";
     public static final String BT_NAME_TV221U = "VTM 20F";//4 OEM
-    public static final String BT_NAME_PC100 = "PC-100:";//5 OEM   小企鹅后面 5位sn
+    public static final String BT_NAME_PC100 = "PC-100";//5 OEM   小企鹅后面 5位sn
     public static final String BT_NAME_PC60FW = "PC-60F_SN";//6 OEM
     public static final String BT_NAME_AOJ20A = "AOJ-20A";//2 OEM
     public static final String BT_NAME_BP2 = "BP2";
@@ -71,10 +72,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_F4_SCALE = "MY_SCALE"; // F4体脂秤
     public static final String BT_NAME_F5_SCALE = "MY_SCALE"; // F5体脂秤
 
-    public static final String BT_NAME_PC66A = "PC-66A";
     public static final String BT_NAME_PC66B = "PC-66B";
-    public static final String BT_NAME_PC68A = "PC-68A";
-    public static final String BT_NAME_PC68B = "PC-68B";
 
     public static final String BT_NAME_LEW3 = "Le-W3";
     public static final String BT_NAME_AP20 = "AP-20";
@@ -131,7 +129,7 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_F4_SCALE = 45;
     public static final int MODEL_F5_SCALE = 46;
 
-    public static final int MODEL_PC_6N = 47;
+    public static final int MODEL_PC66B = 47;
     public static final int MODEL_AP20 = 48;
     public static final int MODEL_LEW3 = 49;
     public static final int MODEL_VETCORDER = 50;
@@ -142,7 +140,7 @@ public class Bluetooth implements Parcelable {
             MODEL_TV221U, MODEL_PC100, MODEL_AOJ20A, MODEL_OXYFIT, MODEL_VCOMIN, MODEL_CHECK_POD, MODEL_BODY_FAT, MODEL_LEM,
             MODEL_BABYO2N, MODEL_BP2T, MODEL_BP2W, MODEL_STATION, MODEL_POD2B, MODEL_PC_60NW, MODEL_POD_1W, MODEL_PC_60B,
             MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2M, MODEL_BPM,MODEL_BP2A, MODEL_PC60FW, MODEL_PC80B, MODEL_FHR, MODEL_BPW1,
-            MODEL_F4_SCALE, MODEL_F5_SCALE, MODEL_PC_6N, MODEL_AP20, MODEL_LEW3, MODEL_VETCORDER})
+            MODEL_F4_SCALE, MODEL_F5_SCALE, MODEL_PC66B, MODEL_AP20, MODEL_LEW3, MODEL_VETCORDER})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 
@@ -183,9 +181,8 @@ public class Bluetooth implements Parcelable {
             return MODEL_KCA;
         } else if (deviceName.contains(BT_NAME_PC80B)) {
             return MODEL_PC80B;
-        } else if (deviceName.contains(BT_NAME_PC66A) || deviceName.contains(BT_NAME_PC66B)
-                || deviceName.contains(BT_NAME_PC68A) || deviceName.contains(BT_NAME_PC68B)) {
-            return MODEL_PC_6N;
+        } else if (deviceName.contains(BT_NAME_PC66B)) {
+            return MODEL_PC66B;
         } else if (deviceName.contains(BT_NAME_AP20)) {
             return MODEL_AP20;
         }
@@ -262,6 +259,116 @@ public class Bluetooth implements Parcelable {
                 return MODEL_VETCORDER;
             default:
                 return MODEL_UNRECOGNIZED;
+        }
+    }
+    @StringDef({"", BT_NAME_O2, BT_NAME_SNO2, BT_NAME_SPO2, BT_NAME_O2RING, BT_NAME_WEARO2, BT_NAME_SLEEPU, BT_NAME_ER1, BT_NAME_ER1_N,
+            BT_NAME_DUOEK, BT_NAME_DEVICES_ER2, BT_NAME_PULSEBIT_EX, BT_NAME_OXY_LINK, BT_NAME_KIDS_O2, BT_NAME_BABY_O2, BT_NAME_OXY_SMART, BT_NAME_OXYFIT,
+            BT_NAME_BP2, BT_NAME_BP2A, BT_NAME_BP2T, BT_NAME_BP2W, BT_NAME_RINGO2, BT_NAME_O2M, BT_NAME_LEM, BT_NAME_BPM,
+            BT_NAME_FHR, BT_NAME_BABYO2N, BT_NAME_STATION, BT_NAME_BPW1, BT_NAME_LEW3, BT_NAME_VETCORDER, BT_NAME_PC60FW, FETAL_DEVICE_NAME,
+            BT_NAME_TV221U, BT_NAME_PC100, BT_NAME_AOJ20A, BT_NAME_VCOMIN, BT_NAME_CHECK_POD, BT_NAME_BODY_FAT, BT_NAME_POD2B, BT_NAME_PC_60NW,
+            BT_NAME_POD_1W, BT_NAME_PC_60B, BT_NAME_KCA, BT_NAME_PC80B, BT_NAME_PC66B, BT_NAME_AP20})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface DEVICE_NAME {
+
+    }
+
+    public @DEVICE_NAME
+    static String getDeviceName(int model) {
+        switch (model) {
+            case MODEL_CHECKO2:
+                return BT_NAME_O2;
+            case MODEL_SNOREO2:
+                return BT_NAME_SNO2;
+            case MODEL_SLEEPO2:
+                return BT_NAME_SPO2;
+            case MODEL_O2RING:
+                return BT_NAME_O2RING;
+            case MODEL_WEARO2:
+                return BT_NAME_WEARO2;
+            case MODEL_SLEEPU:
+                return BT_NAME_SLEEPU;
+            case MODEL_ER1:
+                return BT_NAME_ER1;
+            case MODEL_ER1_N:
+                return BT_NAME_ER1_N;
+            case MODEL_DUOEK:
+                return BT_NAME_DUOEK;
+            case MODEL_ER2:
+                return BT_NAME_DEVICES_ER2; // vihealth MODEL_DEVICE_ER2
+            case MODEL_PULSEBITEX:
+                return BT_NAME_PULSEBIT_EX;
+            case MODEL_OXYLINK:
+                return BT_NAME_OXY_LINK;
+            case MODEL_KIDSO2:
+                return BT_NAME_KIDS_O2;
+            case MODEL_BABYO2:
+                return BT_NAME_BABY_O2;
+            case MODEL_OXYSMART:
+                return BT_NAME_OXY_SMART;
+            case MODEL_OXYFIT:
+                return BT_NAME_OXYFIT;
+            case MODEL_BP2:
+                return BT_NAME_BP2;
+            case MODEL_BP2A:
+                return BT_NAME_BP2A;
+            case MODEL_BP2T:
+                return BT_NAME_BP2T;
+            case MODEL_BP2W:
+                return BT_NAME_BP2W;
+            case MODEL_RINGO2:
+                return BT_NAME_RINGO2;
+            case MODEL_O2M:
+                return BT_NAME_O2M;
+            case MODEL_LEM:
+                return BT_NAME_LEM;
+            case MODEL_BPM:
+                return BT_NAME_BPM;
+            case MODEL_FHR:
+                return BT_NAME_FHR; // vihealth MODEL_P600L
+            case MODEL_BABYO2N:
+                return BT_NAME_BABYO2N;
+            case MODEL_STATION:
+                return BT_NAME_STATION;
+            case MODEL_BPW1:
+                return BT_NAME_BPW1;
+            case MODEL_LEW3:
+                return BT_NAME_LEW3;
+            case MODEL_VETCORDER:
+                return BT_NAME_VETCORDER;
+            case MODEL_PC60FW:
+                return BT_NAME_PC60FW;
+            case MODEL_FETAL:
+                return FETAL_DEVICE_NAME;
+            case MODEL_TV221U:
+                return BT_NAME_TV221U;
+            case MODEL_PC100:
+                return BT_NAME_PC100;
+            case MODEL_AOJ20A:
+                return BT_NAME_AOJ20A;
+            case MODEL_VCOMIN:
+                return BT_NAME_VCOMIN;
+            case MODEL_CHECK_POD:
+                return BT_NAME_CHECK_POD;
+            case MODEL_BODY_FAT:
+                return BT_NAME_BODY_FAT;
+            case MODEL_POD2B:
+                return BT_NAME_POD2B;
+            case MODEL_PC_60NW:
+                return BT_NAME_PC_60NW;
+            case MODEL_POD_1W:
+                return BT_NAME_POD_1W;
+            case MODEL_PC_60B:
+                return BT_NAME_PC_60B;
+            case MODEL_KCA:
+                return BT_NAME_KCA;
+            case MODEL_PC80B:
+                return BT_NAME_PC80B;
+            case MODEL_AP20:
+                return BT_NAME_AP20;
+            case MODEL_PC66B:
+                return BT_NAME_PC66B;
+            default:
+                return "";
         }
     }
 
