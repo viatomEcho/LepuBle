@@ -73,6 +73,16 @@
 - 2.0.0.16
 
   >集成bp2w设备
+  
+- 2.0.0.18
+
+  >开启扫描scanModel参数非必传
+  >
+  >添加Bluetooth.getDeviceName接口
+  >
+  >开启扫描3秒未返回结果重新扫描
+  >
+  >er1，er2添加设置参数异常消息
 
 
 
@@ -111,9 +121,11 @@
 
 - `reInitBle()` ：重新初始化蓝牙
 
-- `startScan(scanModel: Int, needPair: Boolean = false, isStrict: Boolean = false， isScanUnRegister: Boolean = false)` 
+- `startScan(scanModel: Int? = null, needPair: Boolean = false)` 
 
-  > 开始扫描，单个model设备
+  > 开始扫描
+  >
+  > scanModel：非空，对应model发送通知；为空，sdk添加的model都发送通知
   >
   > needPair：本次扫描是否需要发送配对信息，默认是false
   >
@@ -121,7 +133,7 @@
   >
   > isScanUnRegister：本次扫描是否返回SDK没有的model蓝牙名的设备
 
-- `startScan(scanModel: IntArray, needPair: Boolean = false, isStrict: Boolean = false)` ：开始扫描，多个model设备
+- `startScan(scanModel: IntArray, needPair: Boolean = false)` ：开始扫描，多个model设备
 
 - `stopScan()` ：停止扫描
 
@@ -377,7 +389,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventEr1Reset = "com.lepu.ble.er1.reset"                                // 复位 boolean
             const val EventEr1ResetFactory = "com.lepu.ble.er1.reset.factory"                 // 恢复出厂设置 boolean
             const val EventEr1ResetFactoryAll = "com.lepu.ble.er1.reset.factory.all"          // 恢复生产出厂状态 boolean
-            const val EventEr1VibrateConfig = "com.lepu.ble.er1.vibrate.config"               // 配置参数 byte数组
+            const val EventEr1VibrateConfig = "com.lepu.ble.er1.vibrate.config"               // 获取配置参数 byte数组
+            const val EventEr1GetConfigError = "com.lepu.ble.er1.get.config.error"            // 获取配置参数失败 boolean
             const val EventEr1SetSwitcherState = "com.lepu.ble.er1.set.switcher.state"        // 设置心跳音开关 boolean
             const val EventEr1SetTime = "com.lepu.ble.er1.set.time"                           // 同步时间 boolean
             const val EventEr1BurnFactoryInfo = "com.lepu.ble.er1.burn.factory.info"          // 烧录出厂信息 boolean
@@ -464,7 +477,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventEr2Info = "com.lepu.ble.er2.info"                                  // 设备信息 Er2DeviceInfo
             const val EventEr2SetTime = "com.lepu.ble.er2.set.time"                           // 同步时间 true
             const val EventEr2SetSwitcherState = "com.lepu.ble.er2.set.switcher.state"        // 设置心跳音 boolean
-            const val EventEr2SwitcherState = "com.lepu.ble.er2.switcher.state"               // 配置参数 byte数组
+            const val EventEr2SwitcherState = "com.lepu.ble.er2.switcher.state"               // 获取配置参数 byte数组
+            const val EventEr2GetConfigError = "com.lepu.ble.er2.get.config.error"            // 获取配置参数失败 boolean
             const val EventEr2Reset = "com.lepu.ble.er2.reset"                                // 复位 boolean
             const val EventEr2FactoryReset = "com.lepu.ble.er2.factory.reset"                 // 恢复出厂设置 boolean
             const val EventEr2FactoryResetAll = "com.lepu.ble.er2.factory.reset.all"          // 恢复生产出厂状态 boolean
@@ -583,21 +597,23 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      * LeW3BleInterface发出的通知
      * 包含model: MODEL_LEW3
      */
-    interface LeW3 {
+    interface Lew3 {
         companion object {
-            const val EventLeW3Info = "com.lepu.ble.lew3.info"                                  // 设备信息 LepuDevice
-            const val EventLeW3SetTime = "com.lepu.ble.lew3.set.time"                           // 同步时间 true
-            const val EventLeW3BoundDevice = "com.lepu.ble.lew3.bound.device"                   // 请求绑定设备
-            const val EventLeW3GetConfig = "com.lepu.ble.lew3.get.config"                       // 获取配置信息
-            const val EventLeW3SetConfig = "com.lepu.ble.lew3.set.config"                       // 设置配置信息
-            const val EventLeW3Reset = "com.lepu.ble.lew3.reset"                                // 复位 true
-            const val EventLeW3FactoryReset = "com.lepu.ble.lew3.factory.reset"                 // 恢复出厂设置 true
-            const val EventLeW3FactoryResetAll = "com.lepu.ble.lew3.factory.reset.all"          // 恢复生产出厂状态 true
-            const val EventLeW3RtData = "com.lepu.ble.lew3.realtime.data"                       // 实时数据 LeW3RtData
-            const val EventLeW3FileList = "com.lepu.ble.lew3.file.list"                         // 文件列表 LeW3FileList
-            const val EventLeW3ReadFileError = "com.lepu.ble.lew3.file.read.error"              // 传输文件出错 true
-            const val EventLeW3ReadingFileProgress = "com.lepu.ble.lew3.file.reading.progress"  // 传输文件进度 int(0-100)
-            const val EventLeW3ReadFileComplete = "com.lepu.ble.lew3.file.read.complete"        // 传输文件完成 LeW3File
+            const val EventLew3Info = "com.lepu.ble.lew3.info"                                  // 设备信息 LepuDevice
+            const val EventLew3BatteryInfo = "com.lepu.ble.lew3.battery.info"                   // 电量信息 LepuBatteryInfo
+            const val EventLew3SetTime = "com.lepu.ble.lew3.set.time"                           // 同步时间 true
+            const val EventLew3BoundDevice = "com.lepu.ble.lew3.bound.device"                   // 请求绑定设备
+            const val EventLew3GetConfig = "com.lepu.ble.lew3.get.config"                       // 获取配置信息
+            const val EventLew3SetServer = "com.lepu.ble.lew3.set.server"                       // 配置服务器信息
+            const val EventLew3SystemSettings = "com.lepu.ble.lew3.system.settings"             // 配置系统设置
+            const val EventLew3Reset = "com.lepu.ble.lew3.reset"                                // 复位 true
+            const val EventLew3FactoryReset = "com.lepu.ble.lew3.factory.reset"                 // 恢复出厂设置 true
+            const val EventLew3FactoryResetAll = "com.lepu.ble.lew3.factory.reset.all"          // 恢复生产出厂状态 true
+            const val EventLew3RtData = "com.lepu.ble.lew3.realtime.data"                       // 实时数据 Lew3RtData
+            const val EventLew3FileList = "com.lepu.ble.lew3.file.list"                         // 文件列表 Lew3FileList
+            const val EventLew3ReadFileError = "com.lepu.ble.lew3.file.read.error"              // 传输文件出错 true
+            const val EventLew3ReadingFileProgress = "com.lepu.ble.lew3.file.reading.progress"  // 传输文件进度 int(0-100)
+            const val EventLew3ReadFileComplete = "com.lepu.ble.lew3.file.read.complete"        // 传输文件完成 LeW3File
         }
     }
 
@@ -634,12 +650,12 @@ object EventMsgConst {
      */
     interface Discovery{
         companion object{
-            const val EventDeviceFound = "com.lepu.ble.device.found"  // 扫描到设备会发送 Bluetooth
+            const val EventDeviceFound = "com.lepu.ble.device.found"  // 扫描到sdk已有model设备会发送 Bluetooth
             const val EventDeviceFound_Device = "com.lepu.ble.device.found.device"  // 开始扫描设置需要配对的信息 BluetoothDevice
             const val EventDeviceFound_ScanRecord = "com.lepu.ble.device.found.scanResult"  // 开始扫描设置需要配对的信息 ScanRecord
-            const val EventDeviceFound_ER1_UPDATE = "com.lepu.ble.device.found.er1Update"  // 扫描到er1 updater设备会发送
-            const val EventDeviceFoundForUnRegister = "com.lepu.ble.device.found.unregister"  // 不需要添加model BluetoothDevice
+            const val EventDeviceFoundForUnRegister = "com.lepu.ble.device.found.unregister"  // 扫描到sdk没有model设备会发送 ScanResult
             const val EventDeviceFound_ScanRecordUnRegister = "com.lepu.ble.device.found.scanResult.unregister"
+            const val EventDeviceFound_ER1_UPDATE = "com.lepu.ble.device.found.er1Update"  // 扫描到er1 updater设备会发送
         }
 
     }
@@ -678,8 +694,12 @@ object EventMsgConst {
     interface Cmd{
         companion object{
             const val EventCmdResponseTimeOut = "com.lepu.ble.cmd.response.timeout"  // 指令响应超时会发送
+            const val EventCmdResponseContent = "com.lepu.ble.cmd.response.content"  // 指令响应
         }
     }
+
+
+
 }
 ```
 
