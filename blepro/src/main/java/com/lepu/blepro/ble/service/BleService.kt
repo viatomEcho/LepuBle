@@ -297,7 +297,7 @@ open class BleService: LifecycleService() {
                 }
             }
             Bluetooth.MODEL_LEW3 -> {
-                LeW3BleInterface(m).apply {
+                Lew3BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
                     vailFace.put(m, this)

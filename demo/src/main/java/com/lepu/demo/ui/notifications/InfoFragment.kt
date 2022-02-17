@@ -9,7 +9,6 @@ import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
-import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.demo.MainViewModel
@@ -192,9 +191,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 }
             })
         //--------------------------------lew3-----------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3FileList)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3FileList)
             .observe(this, { event ->
-                (event.data as LeW3FileList).let {
+                (event.data as Lew3FileList).let {
                     binding.info.text = it.toString()
                     for (fileName in it.fileNames) {
                         fileNames.add(fileName)
@@ -202,15 +201,15 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     Toast.makeText(context, "lew3 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 }
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3ReadingFileProgress)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3ReadingFileProgress)
             .observe(this, { event ->
                 (event.data as Int).let {
                     binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it/10).toString() + "%"
                 }
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3ReadFileComplete)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3ReadFileComplete)
             .observe(this, { event ->
-                (event.data as LeW3File).let {
+                (event.data as Lew3File).let {
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
                     fileNames.removeAt(0)
                     readFile()

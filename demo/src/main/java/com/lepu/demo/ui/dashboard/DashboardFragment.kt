@@ -12,7 +12,6 @@ import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
-import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
@@ -193,15 +192,15 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         })
         //------------------------------lew3------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3BatteryInfo)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3BatteryInfo)
             .observe(this, {
                 val data = it.data as LepuBatteryInfo
                 dataString += "\n" + data.toString()
                 binding.dataStr.text = dataString
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3RtData)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3RtData)
             .observe(this, {
-                val rtData = it.data as LeW3RtData
+                val rtData = it.data as Lew3RtData
                 rtData.let { data ->
                     Log.d("lew3 data ", "len = ${data.waveData.size}")
                     DataController.receive(data.waveData.datas)
@@ -209,12 +208,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.dataStr.text = dataString
                     viewModel.ecgHr.value = data.rtParam.hr
 
-//                    LpBleUtil.lew3GetBattery(it.model)
+                    LpBleUtil.lew3GetBattery(it.model)
 
                 }
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3FileList).observe(this, { event ->
-            (event.data as LeW3FileList).let {
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3FileList).observe(this, { event ->
+            (event.data as Lew3FileList).let {
                 binding.dataStr.text = it.toString()
             }
         })

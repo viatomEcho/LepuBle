@@ -9,10 +9,7 @@ import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.Bp2wBleCmd
-import com.lepu.blepro.ble.data.Bp2WifiConfig
-import com.lepu.blepro.ble.data.Bp2wConfig
-import com.lepu.blepro.ble.data.Bp2wUserList
-import com.lepu.blepro.ble.data.FscaleUserInfo
+import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.demo.BuildConfig
@@ -594,14 +591,14 @@ class LpBleUtil {
                 BleServiceHelper.lew3BoundDevice(model)
             }
         }
-        fun lew3SetConfig(model: Int, addr: String, port: Int){
-            Log.d(TAG, "lew3SetConfig")
+        fun lew3SetServer(model: Int, server: Lew3Config){
+            Log.d(TAG, "lew3SetServer")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.lew3SetConfig(model, addr, port)
+                BleServiceHelper.lew3SetServer(model, server)
             }
         }
         fun lew3GetConfig(model: Int){

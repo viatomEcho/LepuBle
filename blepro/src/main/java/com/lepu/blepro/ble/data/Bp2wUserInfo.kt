@@ -17,7 +17,7 @@ class Bp2wUserInfo() {
     var uid: Int = 0               // 用户id
     lateinit var fName: String     // 姓
     lateinit var name: String      // 名
-    lateinit var birthday: String  // 生日 19970101
+    lateinit var birthday: String  // 生日 "1997-01-01"
     var height: Int = 0            // 身高 cm
     var weight: Int = 0            // 体重 kg
     var gender: Int = 0            // 性别 0：男 1：女

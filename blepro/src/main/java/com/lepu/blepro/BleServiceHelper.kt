@@ -1286,8 +1286,8 @@ class BleServiceHelper private constructor() {
     fun lew3BoundDevice(model: Int) {
         if (!checkService()) return
         getInterface(model)?.let { it1 ->
-            (it1 as LeW3BleInterface).let {
-                LepuBleLog.d(tag, "it as LeW3BleInterface--boundDevice")
+            (it1 as Lew3BleInterface).let {
+                LepuBleLog.d(tag, "it as Lew3BleInterface--boundDevice")
                 it.boundDevice()
             }
         }
@@ -1299,8 +1299,8 @@ class BleServiceHelper private constructor() {
     fun lew3GetConfig(model: Int) {
         if (!checkService()) return
         getInterface(model)?.let { it1 ->
-            (it1 as LeW3BleInterface).let {
-                LepuBleLog.d(tag, "it as LeW3BleInterface--lew3GetConfig")
+            (it1 as Lew3BleInterface).let {
+                LepuBleLog.d(tag, "it as Lew3BleInterface--lew3GetConfig")
                 it.getConfig()
             }
         }
@@ -1308,15 +1308,14 @@ class BleServiceHelper private constructor() {
 
     /**
      * 配置服务器信息（lew3）
-     * @param addr 服务器地址
-     * @param port 端口号
+     * @param server 服务器信息
      */
-    fun lew3SetConfig(model: Int, addr: String, port: Int) {
+    fun lew3SetServer(model: Int, server: Lew3Config) {
         if (!checkService()) return
         getInterface(model)?.let { it1 ->
-            (it1 as LeW3BleInterface).let {
-                LepuBleLog.d(tag, "it as LeW3BleInterface--lew3SetConfig")
-                it.setConfig(addr, port)
+            (it1 as Lew3BleInterface).let {
+                LepuBleLog.d(tag, "it as Lew3BleInterface--lew3SetServer")
+                it.setServer(server)
             }
         }
     }
@@ -1327,8 +1326,8 @@ class BleServiceHelper private constructor() {
     fun lew3GetBattery(model: Int) {
         if (!checkService()) return
         getInterface(model)?.let { it1 ->
-            (it1 as LeW3BleInterface).let {
-                LepuBleLog.d(tag, "it as LeW3BleInterface--lew3GetBattery")
+            (it1 as Lew3BleInterface).let {
+                LepuBleLog.d(tag, "it as Lew3BleInterface--lew3GetBattery")
                 it.getBattery()
             }
         }

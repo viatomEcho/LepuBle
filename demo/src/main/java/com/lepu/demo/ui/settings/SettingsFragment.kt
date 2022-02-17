@@ -11,7 +11,7 @@ import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.FscaleUserInfo
-import com.lepu.blepro.ble.data.LeW3Config
+import com.lepu.blepro.ble.data.Lew3Config
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
@@ -228,7 +228,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         binding.lew3SetConfig.setOnClickListener {
-            LpBleUtil.lew3SetConfig(Constant.BluetoothConfig.currentModel[0], "192.168.111.222", 5000)
+            val server = Lew3Config()
+            server.addr = "192.168.111.222"
+            server.port = 5000
+            LpBleUtil.lew3SetServer(Constant.BluetoothConfig.currentModel[0], server)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -735,23 +738,23 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.content.text = data.toString()
             })
         //------------------------------lew3-------------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3BoundDevice)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3BoundDevice)
             .observe(this, {
                 var data = it.data as Boolean
                 binding.content.text = "请求绑定 : " + data
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3SetConfig)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3SetServer)
             .observe(this, {
                 LpBleUtil.lew3GetConfig(it.model)
                 Toast.makeText(
                     context,
-                    "lew3手表 设置参数成功",
+                    "lew3手表 配置服务器成功",
                     Toast.LENGTH_SHORT
                 ).show()
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3GetConfig)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3GetConfig)
             .observe(this, {
-                var data = it.data as LeW3Config
+                var data = it.data as Lew3Config
                 binding.content.text = data.toString()
                 Toast.makeText(
                     context,
@@ -759,7 +762,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     Toast.LENGTH_SHORT
                 ).show()
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeW3.EventLeW3BatteryInfo)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3BatteryInfo)
             .observe(this, {
                 val data = it.data as LepuBatteryInfo
                 binding.content.text = data.toString()
