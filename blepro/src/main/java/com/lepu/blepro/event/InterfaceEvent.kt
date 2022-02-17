@@ -44,7 +44,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventEr1Reset = "com.lepu.ble.er1.reset"                                // 复位 boolean
             const val EventEr1ResetFactory = "com.lepu.ble.er1.reset.factory"                 // 恢复出厂设置 boolean
             const val EventEr1ResetFactoryAll = "com.lepu.ble.er1.reset.factory.all"          // 恢复生产出厂状态 boolean
-            const val EventEr1VibrateConfig = "com.lepu.ble.er1.vibrate.config"               // 配置参数 byte数组
+            const val EventEr1VibrateConfig = "com.lepu.ble.er1.vibrate.config"               // 获取配置参数 byte数组
+            const val EventEr1GetConfigError = "com.lepu.ble.er1.get.config.error"            // 获取配置参数失败 boolean
             const val EventEr1SetSwitcherState = "com.lepu.ble.er1.set.switcher.state"        // 设置心跳音开关 boolean
             const val EventEr1SetTime = "com.lepu.ble.er1.set.time"                           // 同步时间 boolean
             const val EventEr1BurnFactoryInfo = "com.lepu.ble.er1.burn.factory.info"          // 烧录出厂信息 boolean
@@ -131,7 +132,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventEr2Info = "com.lepu.ble.er2.info"                                  // 设备信息 Er2DeviceInfo
             const val EventEr2SetTime = "com.lepu.ble.er2.set.time"                           // 同步时间 true
             const val EventEr2SetSwitcherState = "com.lepu.ble.er2.set.switcher.state"        // 设置心跳音 boolean
-            const val EventEr2SwitcherState = "com.lepu.ble.er2.switcher.state"               // 配置参数 byte数组
+            const val EventEr2SwitcherState = "com.lepu.ble.er2.switcher.state"               // 获取配置参数 byte数组
+            const val EventEr2GetConfigError = "com.lepu.ble.er2.get.config.error"            // 获取配置参数失败 boolean
             const val EventEr2Reset = "com.lepu.ble.er2.reset"                                // 复位 boolean
             const val EventEr2FactoryReset = "com.lepu.ble.er2.factory.reset"                 // 恢复出厂设置 boolean
             const val EventEr2FactoryResetAll = "com.lepu.ble.er2.factory.reset.all"          // 恢复生产出厂状态 boolean

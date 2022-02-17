@@ -82,6 +82,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
 
         when (bleResponse.cmd) {
             GET_INFO -> {
+                if (bleResponse.len == 0) return
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 val info = LepuDevice(bleResponse.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wInfo)
@@ -96,6 +97,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             RT_STATE -> {
+                if (bleResponse.len == 0) return
                 // 主机状态
                 LepuBleLog.d(tag, "model:$model,RT_STATE => success")
                 val data = Bp2BleRtState(bleResponse.content)
@@ -220,15 +222,12 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
 
             //实时波形
             RT_DATA -> {
+                if (bleResponse.len == 0) return
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success")
 
-                if (bleResponse.content.size > 31) {
-                    val rtData = Bp2BleRtData(bleResponse.content)
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wRtData)
-                        .post(InterfaceEvent(model, rtData))
-                } else {
-                    Log.d(tag, "bytes.content.size < 31")
-                }
+                val rtData = Bp2BleRtData(bleResponse.content)
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wRtData)
+                    .post(InterfaceEvent(model, rtData))
             }
 
             SET_CONFIG -> {
@@ -246,6 +245,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             GET_CONFIG -> {
+                if (bleResponse.len == 0) return
                 LepuBleLog.d(tag, "model:$model,GET_CONFIG => success")
                 val data = Bp2wConfig(bleResponse.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetConfig)
@@ -317,6 +317,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             GET_WIFI_CONFIG -> {
+                if (bleResponse.len == 0) return
                 LepuBleLog.d(tag, "model:$model,GET_WIFI_CONFIG => success")
                 LepuBleLog.d(tag, "model:$model,bytesToHex == " + bytesToHex(bleResponse.content))
                 var data = Bp2WifiConfig(bleResponse.content)
@@ -337,18 +338,21 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             GET_ECG_LIST_CRC -> {
+                if (bleResponse.len == 0) return
                 val crc = FileListCrc(FileType.ECG_TYPE, bleResponse.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetFileListCrc)
                     .post(InterfaceEvent(model, crc))
                 LepuBleLog.d(tag, "model:$model,GET_ECG_LIST_CRC => success")
             }
             GET_BP_LIST_CRC -> {
+                if (bleResponse.len == 0) return
                 val crc = FileListCrc(FileType.BP_TYPE, bleResponse.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetFileListCrc)
                     .post(InterfaceEvent(model, crc))
                 LepuBleLog.d(tag, "model:$model,GET_BP_LIST_CRC => success")
             }
             GET_USER_LIST_CRC -> {
+                if (bleResponse.len == 0) return
                 val crc = FileListCrc(FileType.USER_TYPE, bleResponse.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetFileListCrc)
                     .post(InterfaceEvent(model, crc))

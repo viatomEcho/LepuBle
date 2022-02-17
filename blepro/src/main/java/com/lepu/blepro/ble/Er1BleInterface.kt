@@ -149,6 +149,11 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                 curFile = null
             }
             Er1BleCmd.VIBRATE_CONFIG -> {
+                if (response.pkgType != 0x01.toByte()) {
+                    LepuBleLog.d(tag, "model:$model,VIBRATE_CONFIG => error")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1GetConfigError).post(InterfaceEvent(model, true))
+                    return
+                }
                 LepuBleLog.d(tag, "model:$model,VIBRATE_CONFIG => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1VibrateConfig).post(InterfaceEvent(model, response.content))
 

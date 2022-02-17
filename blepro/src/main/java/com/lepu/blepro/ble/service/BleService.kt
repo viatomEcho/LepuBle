@@ -24,10 +24,7 @@ import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -100,7 +97,13 @@ open class BleService: LifecycleService() {
 
     var support2MPhy: Boolean = false
 
+    /**
+     * 等待扫描结果（当status=6重新开启扫描）
+     */
+    var isWaitingScanResult = false
+    var scanTimeout: Job? = null
 
+    var startScan: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -344,7 +347,9 @@ open class BleService: LifecycleService() {
 
         isDiscovery = true
 
-        GlobalScope.launch {
+        startScan?.cancel()
+
+        startScan = GlobalScope.launch {
             delay(3000)
             scanDevice(true)
         }
@@ -469,7 +474,8 @@ open class BleService: LifecycleService() {
     private fun scanDevice(enable: Boolean) {
         LepuBleLog.d(tag, "scanDevice => $enable")
 
-
+        scanTimeout?.cancel()
+        LepuBleLog.d(tag, "scanDevice scanTimeout.cancel()")
 
         GlobalScope.launch {
 
@@ -490,7 +496,17 @@ open class BleService: LifecycleService() {
                     if (leScanner == null) {
                         leScanner = bluetoothAdapter?.bluetoothLeScanner
                     }
+                    isWaitingScanResult = true
+                    LepuBleLog.d(tag, "scanDevice isWaitingScanResult = true")
                     leScanner?.startScan(null, settings, leScanCallback)
+                    scanTimeout = GlobalScope.launch {
+                        delay(3000)
+                        if (bluetoothAdapter?.isEnabled!!) {
+                            scanDevice(true)
+                            LepuBleLog.d(tag, "-------scanTimeout-------")
+                        }
+                    }
+                    LepuBleLog.d(tag, "scanDevice scanTimeout.start()")
                     LepuBleLog.d(tag, "scanDevice started")
                 }
             } else {
@@ -499,6 +515,8 @@ open class BleService: LifecycleService() {
                         leScanner = bluetoothAdapter?.bluetoothLeScanner
                     }
                     leScanner?.stopScan(leScanCallback)
+                    isWaitingScanResult = false
+                    LepuBleLog.d(tag, "scanDevice isWaitingScanResult = false")
                 }
             }
         }
@@ -516,6 +534,13 @@ open class BleService: LifecycleService() {
                 result: ScanResult
         ) {
             super.onScanResult(callbackType, result)
+
+            if (isWaitingScanResult) {
+                isWaitingScanResult = false
+                LepuBleLog.d(tag, "onScanResult isWaitingScanResult = false")
+                scanTimeout?.cancel()
+                LepuBleLog.d(tag, "onScanResult scanTimeout.cancel()")
+            }
 
             val device = result.device
             var deviceName = result.device.name

@@ -135,6 +135,12 @@ class Er2BleInterface(model: Int): BleInterface(model) {
             }
             Er2BleCmd.CMD_RETRIEVE_SWITCHER_STATE -> {
 
+                if (respPkg.pkgType != 0x01.toByte()) {
+                    LepuBleLog.d(tag, "model:$model,CMD_RETRIEVE_SWITCHER_STATE => error")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2GetConfigError).post(InterfaceEvent(model, true))
+                    return
+                }
+
                 LepuBleLog.d(tag, "model:$model,CMD_RETRIEVE_SWITCHER_STATE => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SwitcherState).post(
                     InterfaceEvent(

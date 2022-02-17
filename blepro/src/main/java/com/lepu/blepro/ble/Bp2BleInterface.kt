@@ -277,10 +277,6 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
                         .post(InterfaceEvent(model, 0))
                 } else {
-
-//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
-//                        .post(InterfaceEvent(model, Bp2Config(bleResponse.content)))
-
                     if (bleResponse.content.size > 24 && bleResponse.content[24].toInt() == 1) {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
                             .post(InterfaceEvent(model, 1))
@@ -329,10 +325,15 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 }
             }
 
-            SWITCH_STATE ->{
+            SWITCH_STATE -> {
                 LepuBleLog.d(tag, "model:$model,SWITCH_STATE => success")
                 //切换状态
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSwitchState).post(InterfaceEvent(model, true))
+                if (bleResponse.type != 0x01.toByte()) {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSwitchState)
+                        .post(InterfaceEvent(model, false))
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSwitchState).post(InterfaceEvent(model, true))
+                }
             }
 
 
