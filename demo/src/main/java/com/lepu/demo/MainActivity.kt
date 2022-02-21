@@ -3,8 +3,11 @@ package com.lepu.demo
 import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
+import android.content.ComponentName
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -27,6 +30,7 @@ import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.HexString
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.ble.LpBleUtil
+import com.lepu.demo.ble.NotificationService
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.CHECK_BLE_REQUEST_CODE
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.SUPPORT_MODELS
@@ -39,6 +43,19 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
     private val TAG: String = "MainActivity"
 
     private val viewModel: MainViewModel by viewModels()
+
+    private var service: NotificationService? = null
+    private val connection = object: ServiceConnection {
+        override fun onServiceDisconnected(name: ComponentName?) {
+            Log.d("NotificationService", "onServiceDisconnected")
+        }
+
+        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
+            val bleStateBinder = binder as NotificationService.BleStateBinder
+            service = bleStateBinder.service
+            Log.d("NotificationService", "onServiceConnected")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +78,8 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 it.initCurrentCollectDuration()
             }
         }
+        val intent = Intent(this, NotificationService::class.java)
+        bindService(intent, connection, BIND_AUTO_CREATE)
 
         subscribeUi()
         needPermission()
@@ -100,6 +119,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             } else LpBleUtil.stopScan()
 
         })
+
+        viewModel.bleState.observeForever {
+            service?.bleStateChange(it)
+        }
 
     }
 
@@ -188,7 +211,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wInfo)
             .observe(this, { event ->
                 (event.data as LepuDevice).let {
-                    Toast.makeText(this, "bp2 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "bp2w 获取设备信息成功", Toast.LENGTH_SHORT).show()
                     viewModel._er1Info.value = it
                 }
             })
@@ -358,6 +381,11 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             LpBleUtil.reInitBle()
             viewModel._bleEnable.value = true
         }
+    }
+
+    override fun onDestroy() {
+        unbindService(connection)
+        super.onDestroy()
     }
 
 }
