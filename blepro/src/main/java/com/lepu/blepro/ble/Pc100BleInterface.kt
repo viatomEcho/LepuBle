@@ -175,7 +175,6 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,BO_RT_PARAM info.spo2 => " + info.spo2)
                 LepuBleLog.d(tag, "model:$model,BO_RT_PARAM info.pr => " + info.pr)
                 LepuBleLog.d(tag, "model:$model,BO_RT_PARAM info.pi => " + info.pi)
-                LepuBleLog.d(tag, "model:$model,BO_RT_PARAM info.status => " + info.status)
             }
 
             Pc100BleCmd.BS_MODULE_STATE -> {
