@@ -1099,6 +1099,26 @@ class BleServiceHelper private constructor() {
     }
 
     /**
+     * 获取实时波形（O2Ring，BabyO2）
+     */
+    fun oxyGetWave(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as OxyBleInterface).getRtWave()
+        }
+    }
+
+    /**
+     * 获取实时参数值（O2Ring，BabyO2）
+     */
+    fun oxyGetRtParam(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as OxyBleInterface).getRtParam()
+        }
+    }
+
+    /**
      * 实时PPG数据（O2Ring，BabyO2）
      */
     fun oxyGetPpgRt(model: Int) {

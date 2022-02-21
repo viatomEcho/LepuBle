@@ -364,7 +364,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
             .observe(this, {
 
-                LpBleUtil.oxyGetPpgRt(it.model)
+//                LpBleUtil.oxyGetPpgRt(it.model)
 
                 val ppgData = it.data as OxyBleResponse.PPGData
                 ppgData.let { data ->

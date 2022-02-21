@@ -19,10 +19,10 @@ const val STATUS_BP_AVG_END = 17
 
 class Bp2BleRtState {
 
-    var status : Int
+    var status : Int             // STATUS_SLEEP, STATUS_HISTORY ...
     var battery : KtBleBattery
-    var avgCnt: Int
-    var avgWaitTick: Int
+    var avgCnt: Int              // x3当前测量下标 0,1,2
+    var avgWaitTick: Int         // x3等待计时
     // reserve 2
 
 

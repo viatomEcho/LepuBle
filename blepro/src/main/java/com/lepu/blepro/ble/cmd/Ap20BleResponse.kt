@@ -55,7 +55,6 @@ class Ap20BleResponse{
         var spo2: Int
         var pr: Int
         var pi: Int
-        var status: Byte               // 血氧状态
         var isProbeOff: Boolean        // 探头脱落，手指未接入
         var isPulseSearching: Boolean  // 脉搏检测
         var battery: Int               // 电量等级（0-3）
@@ -67,7 +66,6 @@ class Ap20BleResponse{
             index += 2
             pi = (bytes[index].toUInt() and 0xFFu).toInt()
             index++
-            status = bytes[index]
             isProbeOff = ((bytes[index].toInt() and 0x02) shr 1) == 1
             isPulseSearching = ((bytes[index].toInt() and 0x04) shr 2) == 1
             index++
@@ -78,7 +76,6 @@ class Ap20BleResponse{
                 spo2 : $spo2
                 pr : $pr
                 pi : $pi
-                status : $status
                 isProbeOff : $isProbeOff
                 isPulseSearching : $isPulseSearching
                 battery : $battery

@@ -248,6 +248,14 @@ class OxyBleInterface(model: Int): BleInterface(model) {
         sendOxyCmd(OxyBleCmd.OXY_CMD_RT_WAVE, OxyBleCmd.getRtWave())// 无法支持1.4.1之前获取pi
     }
 
+    fun getRtParam() {
+        sendOxyCmd(OxyBleCmd.OXY_CMD_RT_PARAM, OxyBleCmd.getRtParam())
+    }
+
+    fun getRtWave() {
+        sendOxyCmd(OxyBleCmd.OXY_CMD_RT_WAVE, OxyBleCmd.getRtWave())
+    }
+
     fun getPpgRT(){
         sendOxyCmd(OxyBleCmd.OXY_CMD_PPG_RT_DATA, OxyBleCmd.getPpgRt())
     }
