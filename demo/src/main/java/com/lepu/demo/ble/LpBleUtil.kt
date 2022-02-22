@@ -471,6 +471,9 @@ class LpBleUtil {
             BleServiceHelper.bp2wDeleteFile(model)
         }
 
+        fun oxyGetRtParam(model: Int) {
+            BleServiceHelper.oxyGetRtParam(model)
+        }
         fun oxyGetPpgRt(model: Int){
             BleServiceHelper.oxyGetPpgRt(model)
         }

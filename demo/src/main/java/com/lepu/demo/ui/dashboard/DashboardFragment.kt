@@ -202,11 +202,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             .observe(this, {
                 val rtData = it.data as Lew3RtData
                 rtData.let { data ->
-                    Log.d("lew3 data ", "len = ${data.waveData.size}")
-                    DataController.receive(data.waveData.datas)
-                    dataString = data.rtParam.toString()
+                    Log.d("lew3 data ", "len = ${data.wave.samplingNum}")
+                    DataController.receive(data.wave.wFs)
+                    dataString = data.param.toString()
                     binding.dataStr.text = dataString
-                    viewModel.ecgHr.value = data.rtParam.hr
+                    viewModel.ecgHr.value = data.param.hr
 
                     LpBleUtil.lew3GetBattery(it.model)
 
@@ -359,16 +359,19 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.spo2.value = data.spo2
                 viewModel.pi.value = data.pi.div(10f)
                 viewModel.oxyPr.value = data.pr
+                LpBleUtil.oxyGetPpgRt(it.model)
             })
         // o2ring ppg
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
             .observe(this, {
 
 //                LpBleUtil.oxyGetPpgRt(it.model)
-
+                LpBleUtil.oxyGetRtParam(it.model)
                 val ppgData = it.data as OxyBleResponse.PPGData
                 ppgData.let { data ->
+                    oxyPpgSize += data.rawDataBytes.size
                     Log.d("ppg", "len  = ${data.rawDataBytes.size}")
+                    Log.d("test12345", "oxyPpgSize == $oxyPpgSize")
                 }
 
             })
@@ -381,9 +384,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataParam)
             .observe(this, {
                 val rtData = it.data as PC60FwBleResponse.RtDataParam
-                viewModel.oxyPr.value = rtData.pr.toInt()
-                viewModel.spo2.value = rtData.spo2.toInt()
-                viewModel.pi.value = rtData.pi.toInt().div(10f)
+                viewModel.oxyPr.value = rtData.pr
+                viewModel.spo2.value = rtData.spo2
+                viewModel.pi.value = rtData.pi.div(10f)
                 binding.dataStr.text = rtData.toString()
             })
 
@@ -468,6 +471,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             })
 
     }
+
+    var oxyPpgSize = 0
 
     private fun initView() {
 
@@ -625,7 +630,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         })
         binding.startRtOxy.setOnClickListener {
-            LpBleUtil.startRtTask()
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING) {
+                LpBleUtil.oxyGetPpgRt(Constant.BluetoothConfig.currentModel[0])
+            } else {
+                LpBleUtil.startRtTask()
+            }
         }
         binding.stopRtOxy.setOnClickListener {
             LpBleUtil.stopRtTask()

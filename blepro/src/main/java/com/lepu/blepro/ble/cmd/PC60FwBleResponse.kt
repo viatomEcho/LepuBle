@@ -1,8 +1,9 @@
 package com.lepu.blepro.ble.cmd
 
 import android.os.Parcelable
-import com.lepu.blepro.utils.ByteUtils.toSignedShort
+import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.byteToPointHex
+import com.lepu.blepro.utils.toUInt
 import kotlinx.android.parcel.Parcelize
 
 
@@ -78,15 +79,15 @@ class PC60FwBleResponse{
     @ExperimentalUnsignedTypes
     @Parcelize
     class RtDataParam constructor(var byteArray: ByteArray) : Parcelable {
-        var spo2: Byte
-        var pr: Short
-        var pi: Short
+        var spo2: Int
+        var pr: Int
+        var pi: Int
         var isProbeOff: Boolean        // 探头脱落，手指未接入
         var isPulseSearching: Boolean  // 脉搏检测
         init {
-            spo2 =  byteArray[0]
-            pr = toSignedShort(byteArray[1], byteArray[2])
-            pi = (byteArray[3].toInt() and 0xff).toShort()
+            spo2 = byte2UInt(byteArray[0])
+            pr = toUInt(byteArray.copyOfRange(1, 3))
+            pi = byte2UInt(byteArray[3])
             isProbeOff = ((byteArray[4].toInt() and 0x02) shr 1) == 1
             isPulseSearching = ((byteArray[4].toInt() and 0x04) shr 2) == 1
         }

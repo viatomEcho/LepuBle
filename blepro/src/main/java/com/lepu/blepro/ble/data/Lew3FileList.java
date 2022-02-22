@@ -35,18 +35,12 @@ public class Lew3FileList {
             }
             if (hour<10) {
                 h = "0"+hour;
-            } else if (hour == 0) {
-                min = "00";
             }
             if (minute<10) {
                 min = "0"+minute;
-            } else if (minute == 0) {
-                min = "00";
             }
             if (second<10) {
                 s = "0"+second;
-            } else if (second == 0) {
-                s = "00";
             }
 
             String name = "R"+year+mon+d+h+min+s;

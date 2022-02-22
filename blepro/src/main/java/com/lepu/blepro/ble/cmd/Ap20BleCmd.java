@@ -184,7 +184,7 @@ public class Ap20BleCmd {
         cmd[0] = (byte) HEAD_0;
         cmd[1] = (byte) HEAD_1;
         cmd[2] = (byte) token;
-        cmd[3] = (byte) (len+1);
+        cmd[3] = (byte) (len+2);
         cmd[4] = (byte) sendCmd;
 
         System.arraycopy(data, 0, cmd, 5, data.length);

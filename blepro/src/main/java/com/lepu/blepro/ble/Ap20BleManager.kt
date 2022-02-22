@@ -18,7 +18,7 @@ class Ap20BleManager(context: Context): LpBleManager(context) {
     }
 
     override fun initialize() {
-        LepuBleLog.d("Ap10BleManager inited")
+        LepuBleLog.d("Ap20BleManager inited")
     }
 
 }

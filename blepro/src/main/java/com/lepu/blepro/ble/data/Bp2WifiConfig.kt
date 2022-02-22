@@ -20,9 +20,8 @@ class Bp2WifiConfig() {
     }
 
     fun getDataBytes(): ByteArray {
-        var data = ByteArray(length)
-        return data.plus(option.toByte())
-            .plus(wifi.getDataBytes())
+        val data = byteArrayOf(option.toByte())
+        return data.plus(wifi.getDataBytes())
             .plus(server.getDataBytes())
     }
 
