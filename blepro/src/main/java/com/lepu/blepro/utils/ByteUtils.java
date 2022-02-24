@@ -21,6 +21,20 @@ public class ByteUtils {
         return (short) ((b1 & 0xff) + ((b2 & 0xff) << 8));
     }
 
+    /**
+     * 转无符号整数（大端模式）
+     * @param b1
+     * @param b2
+     * @return
+     */
+    public static int bytes2UIntBig(byte b1, byte b2) {
+        return (((b1 & 0xff) << 8) + (b2 & 0xff));
+    }
+
+    public static int bytes2UIntBig(byte b1, byte b2, byte b3, byte b4) {
+        return (((b1 & 0xff) << 24) + ((b2 & 0xff) << 16) + ((b3 & 0xff) << 8) + (b4 & 0xff));
+    }
+
     public static float[] bytes2mvs(byte[] bytes) {
         if (bytes == null || bytes.length <2) {
             return null;

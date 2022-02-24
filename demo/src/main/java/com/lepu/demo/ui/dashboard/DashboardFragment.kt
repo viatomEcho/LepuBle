@@ -123,7 +123,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
             Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC66B,
-            Bluetooth.MODEL_AP20, Bluetooth.MODEL_BABYO2 -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_BABYO2,
+            Bluetooth.MODEL_SP20 -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER -> {
                 waveHandler.post(EcgWaveTask())
@@ -372,6 +373,14 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     oxyPpgSize += data.rawDataBytes.size
                     Log.d("ppg", "len  = ${data.rawDataBytes.size}")
                     Log.d("test12345", "oxyPpgSize == $oxyPpgSize")
+
+                    var bytes = ByteArray(0)
+                    for (i in 0 until data.len) {
+                        bytes = bytes.plus(data.redByteArray[i]!!)
+                    }
+
+                    Log.d("test12345", "------------------------" + bytesToHex(bytes))
+
                 }
 
             })
@@ -470,6 +479,36 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.dataStr.text = rtData.toString()
             })
 
+        //------------------------------sp20------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20RtWave)
+            .observe(this, {
+                val rtWave = it.data as Sp20BleResponse.RtWave
+                OxyDataController.receive(rtWave.waveIntData)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20RtParam)
+            .observe(this, {
+                val rtData = it.data as Sp20BleResponse.RtParam
+                viewModel.oxyPr.value = rtData.pr
+                viewModel.spo2.value = rtData.spo2
+                viewModel.pi.value = rtData.pi.div(10f)
+                binding.dataStr.text = rtData.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20TempData)
+            .observe(this, {
+                val data = it.data as Sp20BleResponse.TempData
+                if (data.result == 1) {
+                    binding.tempStr.text = "体温过低"
+                } else if (data.result == 2) {
+                    binding.tempStr.text = "体温过高"
+                } else {
+                    if (data.unit == 1) {
+                        binding.tempStr.text = "体温 ：" + data.value + "℉"
+                    } else {
+                        binding.tempStr.text = "体温 ：" + data.value + "℃"
+                    }
+                }
+            })
+
     }
 
     var oxyPpgSize = 0
@@ -497,7 +536,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 }
                 Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
                 Bluetooth.MODEL_PC66B, Bluetooth.MODEL_AP20,
-                Bluetooth.MODEL_BABYO2 -> {
+                Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_SP20 -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE

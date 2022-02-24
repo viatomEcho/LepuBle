@@ -253,6 +253,20 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 }
             })
 
+        //-------------------------sp20---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20SetTime)
+            .observe(this, {
+                Toast.makeText(this, "sp20 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20DeviceInfo)
+            .observe(this, { event ->
+                (event.data as BoDeviceInfo).let {
+                    Toast.makeText(this, "sp20 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._boInfo.value = it
+                }
+            })
+
     }
     private fun needPermission(){
         PermissionX.init(this)

@@ -1155,14 +1155,6 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
-            Bluetooth.MODEL_AP20 -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Ap20BleInterface).let {
-                        LepuBleLog.d(tag, "it as Ap20BleInterface--sendHeartbeat")
-                        it.getBattery()
-                    }
-                }
-            }
         }
     }
 
@@ -1301,6 +1293,19 @@ class BleServiceHelper private constructor() {
     }
 
     /**
+     * 获取电量（ap20）
+     */
+    fun ap20GetBattery(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Ap20BleInterface).let {
+                LepuBleLog.d(tag, "it as Ap20BleInterface--ap20GetBattery")
+                it.getBattery()
+            }
+        }
+    }
+
+    /**
      * 请求绑定设备（lew3）
      */
     fun lew3BoundDevice(model: Int) {
@@ -1348,6 +1353,61 @@ class BleServiceHelper private constructor() {
         getInterface(model)?.let { it1 ->
             (it1 as Lew3BleInterface).let {
                 LepuBleLog.d(tag, "it as Lew3BleInterface--lew3GetBattery")
+                it.getBattery()
+            }
+        }
+    }
+
+    /**
+     * 配置参数（sp20）
+     * @param config Sp20Config
+     */
+    fun sp20SetConfig(model: Int, config: Sp20Config) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Sp20BleInterface).let {
+                LepuBleLog.d(tag, "it as Sp20BleInterface--sp20SetConfig")
+                it.setConfig(config)
+            }
+        }
+    }
+
+    /**
+     * 获取参数（sp20）
+     * @param type Ap20BleCmd.ConfigType
+     */
+    fun sp20GetConfig(model: Int, type: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Sp20BleInterface).let {
+                LepuBleLog.d(tag, "it as Sp20BleInterface--sp20GetConfig")
+                it.getConfig(type)
+            }
+        }
+    }
+
+    /**
+     * 使能实时数据发送（sp20）
+     * @param type Sp20BleCmd.EnableType
+     */
+    fun sp20EnableRtData(model: Int, type: Int, enable: Boolean) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Sp20BleInterface).let {
+                LepuBleLog.d(tag, "it as Sp20BleInterface--sp20EnableRtData")
+                it.enableRtData(type,enable)
+            }
+        }
+    }
+
+    /**
+     * 获取电量（ap20）
+     */
+    fun sp20GetBattery(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Sp20BleInterface).let {
+                LepuBleLog.d(tag, "it as Sp20BleInterface--sp20GetBattery")
                 it.getBattery()
             }
         }

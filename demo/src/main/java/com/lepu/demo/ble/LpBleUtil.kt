@@ -573,14 +573,14 @@ class LpBleUtil {
                 BleServiceHelper.ap20GetConfig(model, type)
             }
         }
-        fun getBattery(model: Int) {
-            Log.d(TAG, "getBattery")
+        fun ap20GetBattery(model: Int) {
+            Log.d(TAG, "ap20GetBattery")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.sendHeartbeat(model)
+                BleServiceHelper.ap20GetBattery(model)
             }
         }
 
@@ -622,6 +622,37 @@ class LpBleUtil {
                     return
                 }
                 BleServiceHelper.lew3GetBattery(model)
+            }
+        }
+
+        fun sp20GetBattery(model: Int) {
+            Log.d(TAG, "sp20GetBattery")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.sp20GetBattery(model)
+            }
+        }
+        fun sp20GetConfig(model: Int, type: Int) {
+            Log.d(TAG, "sp20GetConfig")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.sp20GetConfig(model, type)
+            }
+        }
+        fun sp20SetConfig(model: Int, config: Sp20Config) {
+            Log.d(TAG, "sp20SetConfig")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.sp20SetConfig(model, config)
             }
         }
 

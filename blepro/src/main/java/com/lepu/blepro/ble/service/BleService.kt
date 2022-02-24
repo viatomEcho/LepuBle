@@ -299,6 +299,14 @@ open class BleService: LifecycleService() {
                     return this
                 }
             }
+            Bluetooth.MODEL_SP20 -> {
+                Sp20BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
             Bluetooth.MODEL_LEW3 -> {
                 Lew3BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately

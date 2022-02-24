@@ -16,6 +16,7 @@ import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
+import com.lepu.blepro.utils.HexString.hexToBytes
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.demo.MainViewModel
@@ -23,6 +24,7 @@ import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.ble.WifiAdapter
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.databinding.FragmentSettingsBinding
+import com.lepu.demo.util.FileUtil
 
 /**
  * @ClassName SettingsFragment
@@ -53,6 +55,21 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         initLiveEvent()
     }
 
+    private fun setViewVisible(v: View?) {
+        binding.er1Layout.visibility = View.GONE
+        binding.er2Layout.visibility = View.GONE
+        binding.bp2Bp2aLayout.visibility = View.GONE
+        binding.bp2wLayout.visibility = View.GONE
+        binding.o2Layout.visibility = View.GONE
+        binding.scaleLayout.visibility = View.GONE
+        binding.pc100Layout.visibility = View.GONE
+        binding.ap20Layout.visibility = View.GONE
+        binding.lew3Layout.visibility = View.GONE
+        binding.sp20Layout.visibility = View.GONE
+        if (v == null) return
+        v.visibility = View.VISIBLE
+    }
+
     private fun initView() {
         mainViewModel.bleState.observe(viewLifecycleOwner, {
             if (it) {
@@ -64,121 +81,45 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         mainViewModel.curBluetooth.observe(viewLifecycleOwner, {
             when (it!!.modelNo) {
                 Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N -> {
-                    binding.er1Layout.visibility = View.VISIBLE
-                    binding.er2Layout.visibility = View.GONE
-                    binding.bp2Bp2aLayout.visibility = View.GONE
-                    binding.bp2wLayout.visibility = View.GONE
-                    binding.o2Layout.visibility = View.GONE
-                    binding.scaleLayout.visibility = View.GONE
-                    binding.pc100Layout.visibility = View.GONE
-                    binding.ap20Layout.visibility = View.GONE
-                    binding.lew3Layout.visibility = View.GONE
+                    setViewVisible(binding.er1Layout)
                     LpBleUtil.getEr1VibrateConfig(it.modelNo)
                 }
                 Bluetooth.MODEL_ER2, Bluetooth.MODEL_DUOEK -> {
-                    binding.er2Layout.visibility = View.VISIBLE
-                    binding.er1Layout.visibility = View.GONE
-                    binding.bp2Bp2aLayout.visibility = View.GONE
-                    binding.bp2wLayout.visibility = View.GONE
-                    binding.o2Layout.visibility = View.GONE
-                    binding.scaleLayout.visibility = View.GONE
-                    binding.pc100Layout.visibility = View.GONE
-                    binding.ap20Layout.visibility = View.GONE
-                    binding.lew3Layout.visibility = View.GONE
+                    setViewVisible(binding.er2Layout)
                     LpBleUtil.getEr2SwitcherState(it.modelNo)
                 }
                 Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
-                    binding.bp2Bp2aLayout.visibility = View.VISIBLE
-                    binding.er1Layout.visibility = View.GONE
-                    binding.er2Layout.visibility = View.GONE
-                    binding.bp2wLayout.visibility = View.GONE
-                    binding.o2Layout.visibility = View.GONE
-                    binding.scaleLayout.visibility = View.GONE
-                    binding.pc100Layout.visibility = View.GONE
-                    binding.ap20Layout.visibility = View.GONE
-                    binding.lew3Layout.visibility = View.GONE
+                    setViewVisible(binding.bp2Bp2aLayout)
                     LpBleUtil.bp2GetConfig(it.modelNo)
                 }
                 Bluetooth.MODEL_BP2W -> {
-                    binding.bp2wLayout.visibility = View.VISIBLE
-                    binding.er1Layout.visibility = View.GONE
-                    binding.er2Layout.visibility = View.GONE
-                    binding.bp2Bp2aLayout.visibility = View.GONE
-                    binding.o2Layout.visibility = View.GONE
-                    binding.scaleLayout.visibility = View.GONE
-                    binding.pc100Layout.visibility = View.GONE
-                    binding.ap20Layout.visibility = View.GONE
-                    binding.lew3Layout.visibility = View.GONE
+                    setViewVisible(binding.bp2wLayout)
                     LpBleUtil.bp2wGetConfig(it.modelNo)
                 }
                 Bluetooth.MODEL_O2RING, Bluetooth.MODEL_BABYO2 -> {
-                    binding.o2Layout.visibility = View.VISIBLE
-                    binding.er1Layout.visibility = View.GONE
-                    binding.er2Layout.visibility = View.GONE
-                    binding.bp2Bp2aLayout.visibility = View.GONE
-                    binding.bp2wLayout.visibility = View.GONE
-                    binding.scaleLayout.visibility = View.GONE
-                    binding.pc100Layout.visibility = View.GONE
-                    binding.ap20Layout.visibility = View.GONE
-                    binding.lew3Layout.visibility = View.GONE
+                    setViewVisible(binding.o2Layout)
                     LpBleUtil.getInfo(it.modelNo)
                 }
                 Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F5_SCALE -> {
-                    binding.scaleLayout.visibility = View.VISIBLE
-                    binding.er1Layout.visibility = View.GONE
-                    binding.er2Layout.visibility = View.GONE
-                    binding.bp2Bp2aLayout.visibility = View.GONE
-                    binding.bp2wLayout.visibility = View.GONE
-                    binding.o2Layout.visibility = View.GONE
-                    binding.pc100Layout.visibility = View.GONE
-                    binding.ap20Layout.visibility = View.GONE
-                    binding.lew3Layout.visibility = View.GONE
+                    setViewVisible(binding.scaleLayout)
                 }
                 Bluetooth.MODEL_PC100 -> {
-                    binding.pc100Layout.visibility = View.VISIBLE
-                    binding.er1Layout.visibility = View.GONE
-                    binding.er2Layout.visibility = View.GONE
-                    binding.bp2Bp2aLayout.visibility = View.GONE
-                    binding.bp2wLayout.visibility = View.GONE
-                    binding.o2Layout.visibility = View.GONE
-                    binding.scaleLayout.visibility = View.GONE
-                    binding.ap20Layout.visibility = View.GONE
-                    binding.lew3Layout.visibility = View.GONE
+                    setViewVisible(binding.pc100Layout)
                 }
                 Bluetooth.MODEL_AP20 -> {
-                    binding.ap20Layout.visibility = View.VISIBLE
-                    binding.er1Layout.visibility = View.GONE
-                    binding.er2Layout.visibility = View.GONE
-                    binding.bp2Bp2aLayout.visibility = View.GONE
-                    binding.bp2wLayout.visibility = View.GONE
-                    binding.o2Layout.visibility = View.GONE
-                    binding.scaleLayout.visibility = View.GONE
-                    binding.pc100Layout.visibility = View.GONE
-                    binding.lew3Layout.visibility = View.GONE
+                    setViewVisible(binding.ap20Layout)
                     LpBleUtil.ap20GetConfig(it.modelNo, state)
                 }
                 Bluetooth.MODEL_LEW3 -> {
-                    binding.lew3Layout.visibility = View.VISIBLE
-                    binding.er1Layout.visibility = View.GONE
-                    binding.er2Layout.visibility = View.GONE
-                    binding.bp2Bp2aLayout.visibility = View.GONE
-                    binding.bp2wLayout.visibility = View.GONE
-                    binding.o2Layout.visibility = View.GONE
-                    binding.scaleLayout.visibility = View.GONE
-                    binding.pc100Layout.visibility = View.GONE
-                    binding.ap20Layout.visibility = View.GONE
+                    setViewVisible(binding.lew3Layout)
                     LpBleUtil.lew3GetConfig(it.modelNo)
                 }
+                Bluetooth.MODEL_SP20 -> {
+                    setViewVisible(binding.sp20Layout)
+                    LpBleUtil.sp20GetConfig(it.modelNo, state)
+                }
                 else -> {
-                    binding.lew3Layout.visibility = View.GONE
-                    binding.er1Layout.visibility = View.GONE
-                    binding.er2Layout.visibility = View.GONE
-                    binding.bp2Bp2aLayout.visibility = View.GONE
-                    binding.bp2wLayout.visibility = View.GONE
-                    binding.o2Layout.visibility = View.GONE
-                    binding.scaleLayout.visibility = View.GONE
-                    binding.pc100Layout.visibility = View.GONE
-                    binding.ap20Layout.visibility = View.GONE
+                    setViewVisible(null)
                 }
             }
         })
@@ -331,10 +272,21 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         binding.bp2wUserList.setOnClickListener {
+
+            FileUtil.getBmp(context)
+
+            val string = "0007040F0C0700040504060D070405000007040C0F0404070002020F0202020000070C0F040407000F090F090F090F000007040F0404070009090F090F09090000000102030700000000020404040603030000020404040607030000F891FE9FF70503DF56DA76D2D0DF0300F993BCF79395F3434C70FF7048444300F893FC9793F503FF203CA46521FF0100F893FE9793F701FF0CF01CF119FF0100000000FFFF0000000003070C1830F0C000000120202060D19F0E00408000C0404040C040404040C0408040800000C0404040404040404040408040800000C0404040404040404040C08040800000C04040404040404040404080000000008080000000008080808080808000000080808080800000"
+            val bytes = hexToBytes(string)
+            val bytesString = bytesToHex(bytes)
+
+            LepuBleLog.d("test bytesToHex(bytes) == $bytesString")
+            LepuBleLog.d("test bytesString.equals(string) == " + bytesString.equals(string))
+            LepuBleLog.d("test bytes.size == " + bytes.size)
+
             val icon1 = Bp2wUserInfo.Icon()
-            icon1.width = 28
-            icon1.height = 19
-            icon1.icon = ByteArray(84)
+            icon1.width = 91
+            icon1.height = 21
+            icon1.icon = bytes
             val icon2 = Bp2wUserInfo.Icon()
             icon2.width = 28
             icon2.height = 19
@@ -342,9 +294,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
             val userInfo1 = Bp2wUserInfo()
             userInfo1.aid = 12345
-            userInfo1.uid = 12345
-            userInfo1.fName = "王"
-            userInfo1.name = "五"
+            userInfo1.uid = -1
+            userInfo1.fName = "魑魅"
+            userInfo1.name = "魍魉123"
             userInfo1.birthday = "1999-10-20"
             userInfo1.height = 170
             userInfo1.weight = 70
@@ -363,7 +315,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
             val userList = Bp2wUserList()
             userList.userList.add(userInfo1)
-            userList.userList.add(userInfo2)
+//            userList.userList.add(userInfo2)
+
+            FileUtil.saveFile(context, userList.getDataBytes())
+
+
 
             LepuBleLog.d("icon1 == " + bytesToHex(icon1.getDataBytes()))
             LepuBleLog.d("icon1.getDataBytes().size == " + icon1.getDataBytes().size)
@@ -452,7 +408,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             if (state > 5)
                 state = 0
             if (state == 5) {
-                LpBleUtil.getBattery(Constant.BluetoothConfig.currentModel[0])
+                LpBleUtil.ap20GetBattery(Constant.BluetoothConfig.currentModel[0])
             } else {
                 LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], state)
             }
@@ -506,6 +462,74 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
+        }
+
+        //-------------------------sp20-----------------------
+        binding.sp20AlarmSwitch.setOnClickListener {
+            switchState = !switchState
+            var temp = "关"
+            val config = Sp20Config()
+            config.type = Sp20BleCmd.ConfigType.ALARM_SWITCH
+            if (switchState) {
+                config.value = 1
+                temp = "开"
+            } else {
+                config.value = 0
+            }
+            LpBleUtil.sp20SetConfig(Constant.BluetoothConfig.currentModel[0], config)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+            binding.sp20AlarmSwitch.text = "警报" + temp
+        }
+        binding.sp20PulseSwitch.setOnClickListener {
+            switchState = !switchState
+            var temp = "关"
+            val config = Sp20Config()
+            config.type = Sp20BleCmd.ConfigType.PULSE_BEEP
+            if (switchState) {
+                config.value = 1
+                temp = "开"
+            } else {
+                config.value = 0
+            }
+            LpBleUtil.sp20SetConfig(Constant.BluetoothConfig.currentModel[0], config)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+            binding.sp20PulseSwitch.text = "搏动音" + temp
+        }
+        binding.sp20GetConfig.setOnClickListener {
+            state++
+            if (state > 5)
+                state = 0
+            if (state == 0) {
+                LpBleUtil.sp20GetBattery(Constant.BluetoothConfig.currentModel[0])
+            } else {
+                LpBleUtil.sp20GetConfig(Constant.BluetoothConfig.currentModel[0], state)
+            }
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+            binding.sp20GetConfig.text = "获取参数" + state
+        }
+        binding.sp20SetConfig.setOnClickListener {
+            state++
+            if (state > 4)
+                state = 0
+            val config = Sp20Config()
+            config.type = state
+            if (state == 2 || state == 3) {
+                config.value = 90
+            } else if (state == 4) {
+                config.value = 110
+            } else if (state == 0) {
+                volume++
+                if (volume > 6)
+                    volume = 0
+                config.value = volume
+            }
+            LpBleUtil.sp20SetConfig(Constant.BluetoothConfig.currentModel[0], config)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+            binding.sp20SetConfig.text = "设置参数" + state
         }
 
     }
@@ -771,6 +795,18 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     "lew3手表 获取电量成功",
                     Toast.LENGTH_SHORT
                 ).show()
+            })
+
+        //------------------------------sp20-------------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20Battery)
+            .observe(this, {
+                var data = it.data as Int
+                binding.content.text = "电量" + data.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20GetConfig)
+            .observe(this, {
+                var data = it.data as Sp20Config
+                binding.content.text = data.toString()
             })
 
 

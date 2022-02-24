@@ -194,6 +194,27 @@ public class FileUtil {
 
     }*/
 
+    public static void saveFile(Context context, byte[] data) {
+        File file = new File(context.getExternalFilesDir(null).getAbsolutePath());
+        file = new File(file, "userlist.dat");
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            FileOutputStream fos = new FileOutputStream(file);
+
+            fos.write(data);
+
+            fos.close();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public static void readFile(Context context) {
         Th12BleFile th12BleFile = new Th12BleFile();
 
@@ -251,7 +272,7 @@ public class FileUtil {
 
     // 生成bmp
     public static void getBmp(Context context){
-        Bitmap inputBitmap = generateBitmap(context, "魑魅魍魉");
+        Bitmap inputBitmap = generateBitmap(context, "魑魅魍魉123");
         //旋转图片 动作
         Matrix matrix = new Matrix();
         //旋转角度

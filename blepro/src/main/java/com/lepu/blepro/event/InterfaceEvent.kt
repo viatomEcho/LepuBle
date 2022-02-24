@@ -232,10 +232,10 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventAp20SetTime = "com.lepu.ble.ap20.set.time"              // 设置时间 true
             const val EventAp20DeviceInfo = "com.lepu.ble.ap20.device.info"        // 设备信息 BoDeviceInfo
             const val EventAp20Battery = "com.lepu.ble.ap20.battery"               // 电池电量 int（0-3）
-            const val EventAp20RtBoWave = "com.lepu.ble.ap20.bo.rtwave"            // 血氧波形包数据 Ap10BleResponse.RtBoWave
-            const val EventAp20RtBoParam = "com.lepu.ble.ap20.bo.rtparam"          // 血氧参数包数据 Ap10BleResponse.RtBoParam
-            const val EventAp20RtBreathWave = "com.lepu.ble.ap20.breath.rtwave"    // 鼻息流波形包数据 Ap10BleResponse.RtBreathWave
-            const val EventAp20RtBreathParam = "com.lepu.ble.ap20.breath.rtparam"  // 鼻息流参数包数据 Ap10BleResponse.RtBreathParam
+            const val EventAp20RtBoWave = "com.lepu.ble.ap20.bo.rtwave"            // 血氧波形包数据 Ap20BleResponse.RtBoWave
+            const val EventAp20RtBoParam = "com.lepu.ble.ap20.bo.rtparam"          // 血氧参数包数据 Ap20BleResponse.RtBoParam
+            const val EventAp20RtBreathWave = "com.lepu.ble.ap20.breath.rtwave"    // 鼻息流波形包数据 Ap20BleResponse.RtBreathWave
+            const val EventAp20RtBreathParam = "com.lepu.ble.ap20.breath.rtparam"  // 鼻息流参数包数据 Ap20BleResponse.RtBreathParam
 
             /**
              * type : 0 背光等级（0-5）
@@ -244,7 +244,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
              *        3 脉率过低阈值（30-99）
              *        4 脉率过高阈值（100-250）
              */
-            const val EventAp20ConfigInfo = "com.lepu.ble.ap20.config.info"   // 配置信息 int
+            const val EventAp20ConfigInfo = "com.lepu.ble.ap20.config.info"   // 获取配置信息 Ap20BleResponse.ConfigInfo
         }
     }
 
@@ -279,6 +279,35 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     interface Vetcorder {
         companion object {
             const val EventVetcorderInfo = "com.lepu.ble.vetcorder.info"
+        }
+    }
+
+    /**
+     * Sp20BleInterface
+     * 包含model: MODEL_SP20
+     */
+    interface SP20 {
+        companion object {
+            const val EventSp20SetTime = "com.lepu.ble.sp20.set.time"        // 设置时间 true
+            const val EventSp20DeviceInfo = "com.lepu.ble.sp20.device.info"  // 设备信息 BoDeviceInfo
+            const val EventSp20Battery = "com.lepu.ble.sp20.battery"         // 电池电量 int（0-3）
+            const val EventSp20RtWave = "com.lepu.ble.sp20.rtwave"           // 血氧波形包数据 Sp20BleResponse.RtWave
+            const val EventSp20RtParam = "com.lepu.ble.sp20.rtparam"         // 血氧参数包数据 Sp20BleResponse.RtParam
+            const val EventSp20TempData = "com.lepu.ble.sp20.temp.data"      // 鼻息流参数包数据 Sp20BleResponse.TempData
+
+            /**
+             * type :
+             *        2 血氧过低阈值（value：85-99）
+             *        3 脉率过低阈值（value：30-99）
+             *        4 脉率过高阈值（value：100-250）
+             *        5 搏动音开关（value：0 off，1 on）
+             */
+            const val EventSp20GetConfig = "com.lepu.ble.sp20.get.config"          // 获取配置信息 Sp20Config
+            /**
+             * value : 0 失败
+             *         1 成功
+             */
+            const val EventSp20SetConfig = "com.lepu.ble.sp20.set.config.success"  // 配置信息 Sp20Config
         }
     }
 
