@@ -136,18 +136,23 @@ public class Bp2wBleCmd {
     //文件下载开始
     public static byte[] readFileStart(byte[] fileName,byte offset){
         // filename = 16, offset = 4
-        int len = 20;
+        int len = fileName.length + 4;
+        int l = 0;
+        if (fileName.length < 16) {
+            l = 16-fileName.length;
+            len += l;
+        }
 
         byte[] data = new byte[len];
-        // file name > 16 : cut
-        int l = fileName.length > 20 ? 20 : fileName.length;
 
         System.arraycopy(fileName, 0, data, 0, l);
 
-        data[len-4] = (byte) (offset >> 24);
-        data[len-3] = (byte) (offset >> 16);
-        data[len-2] = (byte) (offset >> 8);
-        data[len-1] = (byte) offset;
+        System.arraycopy(new byte[l], 0, data, fileName.length, l);
+
+        data[len-4] = (byte) offset;
+        data[len-3] = (byte) (offset >> 8);
+        data[len-2] = (byte) (offset >> 16);
+        data[len-1] = (byte) (offset >> 24);
         return getReq(READ_FILE_START, data);
     }
     //文件下载结束
@@ -235,18 +240,26 @@ public class Bp2wBleCmd {
         // filename = fileName.length, offset = 4, fileSize = 4
         int len = fileName.length + 8;
 
+        int l = 0;
+        if (fileName.length < 16) {
+            l = 16-fileName.length;
+            len += l;
+        }
+
         byte[] data = new byte[len];
         System.arraycopy(fileName, 0, data, 0, fileName.length);
 
-        data[len-8] = (byte) (offset >> 24);
-        data[len-7] = (byte) (offset >> 16);
-        data[len-6] = (byte) (offset >> 8);
-        data[len-5] = (byte) offset;
+        System.arraycopy(new byte[l], 0, data, fileName.length, l);
 
-        data[len-4] = (byte) (fileSize >> 24);
-        data[len-3] = (byte) (fileSize >> 16);
-        data[len-2] = (byte) (fileSize >> 8);
-        data[len-1] = (byte) fileSize;
+        data[len-8] = (byte) offset;
+        data[len-7] = (byte) (offset >> 8);
+        data[len-6] = (byte) (offset >> 16);
+        data[len-5] = (byte) (offset >> 24);
+
+        data[len-4] = (byte) fileSize;
+        data[len-3] = (byte) (fileSize >> 8);
+        data[len-2] = (byte) (fileSize >> 16);
+        data[len-1] = (byte) (fileSize >> 24);
 
         return getReq(WRITE_FILE_START, data);
     }

@@ -43,7 +43,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
     var curSize: Int = 0
     var fileContent : ByteArray? = null
     var userList: Bp2wUserList? = null
-    var userIndex: Int = 0
+    var chunkSize: Int = 200  // 每次写文件大小
 
     override fun hasResponse(bytes: ByteArray?): ByteArray? {
         val bytesLeft: ByteArray? = bytes
@@ -144,6 +144,14 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                     return
                 }
 
+                //检查返回是否异常
+                if (bleResponse.pkgType != 0x01.toByte()) {
+                    LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, READ_FILE_CONTENT => error")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileError)
+                        .post(InterfaceEvent(model, fileName))
+                    return
+                }
+
                 curSize += bleResponse.len
                 val part = Bp2FilePart(fileName, fileSize, curSize)
                 fileContent = add(fileContent, bleResponse.content)
@@ -158,6 +166,13 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 }
             }
             READ_FILE_END -> {
+                //检查返回是否异常
+                if (bleResponse.pkgType != 0x01.toByte()) {
+                    LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, READ_FILE_END => error")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileError)
+                        .post(InterfaceEvent(model, fileName))
+                    return
+                }
                 LepuBleLog.d(tag, "model:$model,READ_FILE_END => success")
 
                 curSize = 0
@@ -197,27 +212,46 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 if (fileSize == 0) {
                     sendCmd(writeFileEnd())
                 } else {
-                    sendCmd(writeFileData(userList?.getDataBytes()?.copyOfRange(0, 10)))
-                    curSize = 10
+                    sendCmd(writeFileData(userList?.getDataBytes()?.copyOfRange(0, chunkSize)))
+                    curSize = chunkSize
                 }
             }
             WRITE_FILE_DATA -> {
+                //检查返回是否异常
+                if (bleResponse.pkgType != 0x01.toByte()) {
+                    LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, WRITE_FILE_DATA => error")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WriteFileError)
+                        .post(InterfaceEvent(model, fileName))
+                    return
+                }
                 LepuBleLog.d(tag, "model:$model,WRITE_FILE_DATA => success")
                 if (curSize < fileSize) {
-                    sendCmd(writeFileData(userList?.getDataBytes()?.copyOfRange(curSize, curSize + userList?.userList?.get(userIndex)?.getDataBytes()?.size!!)))
-                    curSize += userList?.userList?.get(userIndex)?.getDataBytes()?.size!!
-                    userIndex++
+
+                    if (fileSize - curSize < chunkSize) {
+                        sendCmd(writeFileData(userList?.getDataBytes()?.copyOfRange(curSize, fileSize)))
+                        curSize = fileSize
+                    } else {
+                        sendCmd(writeFileData(userList?.getDataBytes()?.copyOfRange(curSize, curSize + chunkSize)))
+                        curSize += chunkSize
+                    }
+
                 } else {
                     sendCmd(writeFileEnd())
                 }
             }
             WRITE_FILE_END -> {
+                //检查返回是否异常
+                if (bleResponse.pkgType != 0x01.toByte()) {
+                    LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, WRITE_FILE_END => error")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WriteFileError)
+                        .post(InterfaceEvent(model, fileName))
+                    return
+                }
                 LepuBleLog.d(tag, "model:$model,WRITE_FILE_END => success")
                 val crc = FileListCrc(FileType.USER_TYPE, bleResponse.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WriteFileComplete)
                     .post(InterfaceEvent(model, crc))
                 curSize = 0
-                userIndex = 0
             }
 
             //实时波形

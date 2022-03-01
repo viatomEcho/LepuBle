@@ -126,9 +126,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
 
         //-------------------------er1--------------------
-        binding.er1SetConfig.setOnClickListener {
+        binding.er1SetSound.setOnClickListener {
             switchState = !switchState
-            LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, 0, 0)
+            LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, binding.er1Hr1.text.toString().toInt(), binding.er1Hr2.text.toString().toInt())
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -136,6 +136,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             LpBleUtil.getEr1VibrateConfig(Constant.BluetoothConfig.currentModel[0])
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
+        }
+        binding.er1SetHr.setOnClickListener {
+            LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, binding.er1Hr1.text.toString().toInt(), binding.er1Hr2.text.toString().toInt())
         }
         //-------------------------er2/duoek------------------------
         binding.er2GetConfig.setOnClickListener {
@@ -299,7 +302,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             userInfo1.name = "魍魉123"
             userInfo1.birthday = "1999-10-20"
             userInfo1.height = 170
-            userInfo1.weight = 70
+            userInfo1.weight = 70f
             userInfo1.gender = 0
             userInfo1.icon = icon1
             val userInfo2 = Bp2wUserInfo()
@@ -309,13 +312,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             userInfo2.name = "六"
             userInfo2.birthday = "1990-10-20"
             userInfo2.height = 175
-            userInfo2.weight = 50
+            userInfo2.weight = 50f
             userInfo2.gender = 1
             userInfo2.icon = icon2
 
             val userList = Bp2wUserList()
             userList.userList.add(userInfo1)
-//            userList.userList.add(userInfo2)
+            userList.userList.add(userInfo2)
 
             FileUtil.saveFile(context, userList.getDataBytes())
 
@@ -435,6 +438,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.ap20SetConfig.text = "设置参数" + state
         }
         //-------------------------o2-----------------------
+        binding.o2OxiThr.setOnClickListener {
+            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_OXI_THR, 96)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
         binding.o2OxiSwitch.setOnClickListener {
             state++
             if (state > 1)
@@ -558,7 +566,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     var temp = "关"
                     if (config.switcher)
                         temp = "开"
-                    binding.er1SetConfig.text = "er1声音" + temp
+                    binding.er1SetSound.text = "声音" + temp
+                    binding.er1Hr1.setText(""+config.hr1)
+                    binding.er1Hr2.setText(""+config.hr2)
                     binding.content.text = "switcher : " + config.switcher + " hr1 : " + config.hr1 + " hr2 : " + config.hr2
                     Toast.makeText(
                         context,
@@ -597,7 +607,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 var temp = "关"
                 if (config.switcher)
                     temp = "开"
-                binding.er1SetConfig.text = "声音" + temp
+                binding.er1SetSound.text = "声音" + temp
                 binding.content.text = "switcher : " + config.switcher + " vector : " + config.vector + " motionCount : " + config.motionCount + " motionWindows : " + config.motionWindows
                 Toast.makeText(
                     context,
@@ -739,9 +749,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo)
             .observe(this, {
-                var data = it.data as OxyBleResponse.OxyInfo
+                val data = it.data as OxyBleResponse.OxyInfo
                 binding.o2HrSwitch.text = "心率开关值" + data.hrSwitch
                 binding.o2OxiSwitch.text = "血氧开关值" + data.oxiSwitch
+                binding.o2OxiThr.text = "血氧阈值" + data.oxiThr
                 binding.o2Motor.text = "震动强度" + data.motor
                 binding.content.text = data.toString()
                 Toast.makeText(

@@ -43,6 +43,9 @@ public class Er2DeviceInfo {
         protocolVersion = "".concat(String.valueOf(data[23]))
                 .concat(".").concat(String.valueOf(data[22]));
 
+        currentTime = new DeviceTime();
+        currentTime.setData(Arrays.copyOfRange(data, 24, 31));
+
         protocolDataMaxLen = data[32] + ((data[31] >> 8) & 0xFF);
         snLength = data[37];
         byte[] tmpSerialNumData = Arrays.copyOfRange(data, 38, 56);

@@ -193,9 +193,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         //--------------------------------lew3-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3FileList)
             .observe(this, { event ->
-                (event.data as Lew3FileList).let {
+                (event.data as Lew3BleResponse.FileList).let {
                     binding.info.text = it.toString()
-                    for (fileName in it.fileNames) {
+                    for (fileName in it.list) {
                         fileNames.add(fileName)
                     }
                     Toast.makeText(context, "lew3 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
@@ -209,7 +209,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3ReadFileComplete)
             .observe(this, { event ->
-                (event.data as Lew3File).let {
+                (event.data as Lew3BleResponse.EcgFile).let {
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
                     fileNames.removeAt(0)
                     readFile()
@@ -253,14 +253,56 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         Bp2wBleCmd.FileType.ECG_TYPE -> {
                             val data = Bp2wEcgList(it.content)
                             binding.info.text = data.toString()
+                            if (data.ecgFileList.size != 0) {
+                                for (file in data.ecgFileList) {
+                                    fileNames.add(file.fileName)
+                                }
+                                Toast.makeText(
+                                    context,
+                                    "bp2w 获取心电文件列表成功 共有${fileNames.size}个文件",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "bp2w 获取心电文件列表为空",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
                         Bp2wBleCmd.FileType.BP_TYPE -> {
                             val data = Bp2wBpList(it.content)
                             binding.info.text = data.toString()
+                            if (data.bpFileList.size != 0) {
+                                Toast.makeText(
+                                    context,
+                                    "bp2w 获取血压文件列表成功 共有${data.bpFileList.size}个记录",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "bp2w 获取血压文件列表为空",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
                         Bp2wBleCmd.FileType.USER_TYPE -> {
                             val data = Bp2wUserList(it.content)
                             binding.info.text = data.toString()
+                            if (data.userList.size != 0) {
+                                Toast.makeText(
+                                    context,
+                                    "bp2w 获取用户文件列表成功 共有${data.userList.size}个用户",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "bp2w 获取用户文件列表为空",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
                         else -> {
                             binding.info.text = it.toString()

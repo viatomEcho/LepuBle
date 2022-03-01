@@ -201,7 +201,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3RtData)
             .observe(this, {
-                val rtData = it.data as Lew3RtData
+                val rtData = it.data as Lew3BleResponse.RtData
                 rtData.let { data ->
                     Log.d("lew3 data ", "len = ${data.wave.samplingNum}")
                     DataController.receive(data.wave.wFs)
@@ -214,7 +214,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3FileList).observe(this, { event ->
-            (event.data as Lew3FileList).let {
+            (event.data as Lew3BleResponse.FileList).let {
                 binding.dataStr.text = it.toString()
             }
         })
@@ -360,7 +360,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.spo2.value = data.spo2
                 viewModel.pi.value = data.pi.div(10f)
                 viewModel.oxyPr.value = data.pr
-                LpBleUtil.oxyGetPpgRt(it.model)
+//                LpBleUtil.oxyGetPpgRt(it.model)
             })
         // o2ring ppg
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
@@ -669,11 +669,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         })
         binding.startRtOxy.setOnClickListener {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING) {
-                LpBleUtil.oxyGetPpgRt(Constant.BluetoothConfig.currentModel[0])
-            } else {
+//            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING) {
+//                LpBleUtil.oxyGetPpgRt(Constant.BluetoothConfig.currentModel[0])
+//            } else {
                 LpBleUtil.startRtTask()
-            }
+//            }
         }
         binding.stopRtOxy.setOnClickListener {
             LpBleUtil.stopRtTask()

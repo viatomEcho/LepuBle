@@ -37,20 +37,26 @@
                         android:id="@+id/er1_hr1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="阈值1"/>
+                        android:hint="阈值1"/>
 
                     <EditText
                         android:id="@+id/er1_hr2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="阈值2"
+                        android:hint="阈值2"
+                        android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/er1_set_hr"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置阈值"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <Button
-                        android:id="@+id/er1_set_config"
+                        android:id="@+id/er1_set_sound"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="声音"/>
@@ -254,6 +260,15 @@
                         android:layout_height="wrap_content"
                         android:text="震动强度"
                         android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/o2_oxi_thr"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="血氧阈值"/>
                 </LinearLayout>
             </LinearLayout>
             <LinearLayout
