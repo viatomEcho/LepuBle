@@ -113,15 +113,11 @@ public class Bp2wBleCmd {
     //文件下载开始
     public static byte[] readFileStart(byte[] fileName,byte offset){
         // filename = 16, offset = 4
-        int len = fileName.length + 4;
-        if (fileName.length < 16) {
-            int l = 16-fileName.length;
-            len += l;
-        }
+        int len = 20;
 
         byte[] data = new byte[len];
-
-        System.arraycopy(fileName, 0, data, 0, fileName.length);
+        int l = Math.min(fileName.length, 16);
+        System.arraycopy(fileName, 0, data, 0, l);
 
         data[len-4] = (byte) offset;
         data[len-3] = (byte) (offset >> 8);
@@ -199,16 +195,12 @@ public class Bp2wBleCmd {
      * 写文件开始
      */
     public static byte[] writeFileStart(byte[] fileName, int offset, int fileSize) {
-        // filename = fileName.length, offset = 4, fileSize = 4
-        int len = fileName.length + 8;
-
-        if (fileName.length < 16) {
-            int l = 16-fileName.length;
-            len += l;
-        }
+        // filename = 16, offset = 4, fileSize = 4
+        int len = 24;
 
         byte[] data = new byte[len];
-        System.arraycopy(fileName, 0, data, 0, fileName.length);
+        int l = Math.min(fileName.length, 16);
+        System.arraycopy(fileName, 0, data, 0, l);
 
         data[len-8] = (byte) offset;
         data[len-7] = (byte) (offset >> 8);

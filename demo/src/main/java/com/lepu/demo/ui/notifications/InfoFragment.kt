@@ -248,9 +248,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         //--------------------------------bp2w-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wFileList)
             .observe(this, { event ->
-                (event.data as LepuFileList).let {
-                    for (fileName in it.list) {
-                        fileNames.add(fileName)
+                (event.data as KtBleFileList).let {
+                    for (fileName in it.fileNameList) {
+                        if (fileName != null) {
+                            fileNames.add(fileName)
+                        }
                     }
                     Toast.makeText(context, "bp2w 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                     binding.info.text = it.toString()

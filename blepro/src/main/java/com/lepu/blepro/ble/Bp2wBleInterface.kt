@@ -107,7 +107,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,GET_FILE_LIST => success")
                 if (bleResponse.len == 0) return
 
-                val list = LepuFileList(bleResponse.content)
+                val list = KtBleFileList(bleResponse.content, device.name)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wFileList)
                     .post(InterfaceEvent(model, list))
             }

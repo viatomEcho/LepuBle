@@ -195,7 +195,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         //------------------------------lew3------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3BatteryInfo)
             .observe(this, {
-                val data = it.data as LepuBatteryInfo
+                val data = it.data as KtBleBattery
                 dataString += "\n" + data.toString()
                 binding.dataStr.text = dataString
             })
@@ -309,7 +309,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.dataStr.text = "dataType: " + bp2Rt.rtWave.waveDataType + " " + data1.toString() + "----rtState--" + bp2Rt.rtState.toString()
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wFileList).observe(this, { event ->
-            (event.data as LepuFileList).let {
+            (event.data as KtBleFileList).let {
                 binding.dataStr.text = it.toString()
             }
         })

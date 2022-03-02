@@ -370,7 +370,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
             FileUtil.getBmp(context)
 
-            val string = "0007040F0C0700040504060D070405000007040C0F0404070002020F0202020000070C0F040407000F090F090F090F000007040F0404070009090F090F09090000000102030700000000020404040603030000020404040607030000F891FE9FF70503DF56DA76D2D0DF0300F993BCF79395F3434C70FF7048444300F893FC9793F503FF203CA46521FF0100F893FE9793F701FF0CF01CF119FF0100000000FFFF0000000003070C1830F0C000000120202060D19F0E00408000C0404040C040404040C0408040800000C0404040404040404040408040800000C0404040404040404040C08040800000C04040404040404040404080000000008080000000008080808080808000000080808080800000"
+//            val string = "0007040F0C0700040504060D070405000007040C0F0404070002020F0202020000070C0F040407000F090F090F090F000007040F0404070009090F090F09090000000102030700000000020404040603030000020404040607030000F891FE9FF70503DF56DA76D2D0DF0300F993BCF79395F3434C70FF7048444300F893FC9793F503FF203CA46521FF0100F893FE9793F701FF0CF01CF119FF0100000000FFFF0000000003070C1830F0C000000120202060D19F0E00408000C0404040C040404040C0408040800000C0404040404040404040408040800000C0404040404040404040C08040800000C04040404040404040404080000000008080000000008080808080808000000080808080800000"
+            val string = "00000000000000000000001F00000000000000000000001F00000000000000000000001F00000000000000000000001F1810181030FE10FE0000001F7DFE7F107EAA7E28041E0F9F5428497E52AA52281C2391DF549A491052FE52FE2C0180DF7CAE7F107E927EAA0C0180DF54FE49FF528A52AA0C01819F5410593852FE52AA0C030F1F7CFE7F387EA27EBE0C0700DF58A2505450A250D60C0C007F1ED21A521ABA1AD20C18007F1DFB2D912D823E820C30007F2F836F912F8F2F8F0C3010DF28854801480348010C3F8F9F4FFE8FFE8FFE8FFE0000001F00000000000000000000001F00000000000000000000001F00000000000000000000001F"
             val bytes = hexToBytes(string)
             val bytesString = bytesToHex(bytes)
 
@@ -383,16 +384,20 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             icon1.height = 21
             icon1.icon = bytes
             val icon2 = LeBp2wUserInfo.Icon()
-            icon2.width = 28
-            icon2.height = 19
-            icon2.icon = ByteArray(84)
+            icon2.width = 91
+            icon2.height = 21
+            icon2.icon = bytes
+            val icon3 = LeBp2wUserInfo.Icon()
+            icon3.width = 91
+            icon3.height = 21
+            icon3.icon = bytes
 
             val userInfo1 = LeBp2wUserInfo()
             userInfo1.aid = 12345
             userInfo1.uid = -1
-            userInfo1.fName = "魑魅"
-            userInfo1.name = "魍魉123"
-            userInfo1.birthday = "1999-10-20"
+            userInfo1.fName = "魑"
+            userInfo1.name = "魅魍魉123"
+            userInfo1.birthday = "1990-10-20"
             userInfo1.height = 170
             userInfo1.weight = 70f
             userInfo1.gender = 0
@@ -400,28 +405,39 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             val userInfo2 = LeBp2wUserInfo()
             userInfo2.aid = 12345
             userInfo2.uid = 11111
-            userInfo2.fName = "黄"
-            userInfo2.name = "六"
-            userInfo2.birthday = "1990-10-20"
+            userInfo2.fName = "魑魅"
+            userInfo2.name = "魍魉123"
+            userInfo2.birthday = "1991-10-20"
             userInfo2.height = 175
             userInfo2.weight = 50f
             userInfo2.gender = 1
             userInfo2.icon = icon2
+            val userInfo3 = LeBp2wUserInfo()
+            userInfo3.aid = 12345
+            userInfo3.uid = 22222
+            userInfo3.fName = "魑魅魍"
+            userInfo3.name = "魉123"
+            userInfo3.birthday = "1992-10-20"
+            userInfo3.height = 175
+            userInfo3.weight = 50f
+            userInfo3.gender = 1
+            userInfo3.icon = icon3
 
             val userList = LeBp2wUserList()
             userList.userList.add(userInfo1)
             userList.userList.add(userInfo2)
+            userList.userList.add(userInfo3)
 
             FileUtil.saveFile(context, userList.getDataBytes())
 
 
 
-            LepuBleLog.d("icon1 == " + bytesToHex(icon1.getDataBytes()))
-            LepuBleLog.d("icon1.getDataBytes().size == " + icon1.getDataBytes().size)
-            LepuBleLog.d("userInfo1 == " + bytesToHex(userInfo1.getDataBytes()))
-            LepuBleLog.d("userInfo1.getDataBytes().size == " + userInfo1.getDataBytes().size)
-            LepuBleLog.d("userList == " + bytesToHex(userList.getDataBytes()))
-            LepuBleLog.d("userList.getDataBytes().size == " + userList.getDataBytes().size)
+            LepuBleLog.d("test icon1 == " + bytesToHex(icon1.getDataBytes()))
+            LepuBleLog.d("test icon1.getDataBytes().size == " + icon1.getDataBytes().size)
+            LepuBleLog.d("test userInfo1 == " + bytesToHex(userInfo1.getDataBytes()))
+            LepuBleLog.d("test userInfo1.getDataBytes().size == " + userInfo1.getDataBytes().size)
+            LepuBleLog.d("test userList == " + bytesToHex(userList.getDataBytes()))
+            LepuBleLog.d("test userList.getDataBytes().size == " + userList.getDataBytes().size)
 
             LpBleUtil.bp2WriteUserList(Constant.BluetoothConfig.currentModel[0], userList)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
@@ -979,7 +995,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3BatteryInfo)
             .observe(this, {
-                val data = it.data as LepuBatteryInfo
+                val data = it.data as KtBleBattery
                 binding.content.text = data.toString()
                 Toast.makeText(
                     context,

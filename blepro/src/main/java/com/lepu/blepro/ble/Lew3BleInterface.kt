@@ -308,7 +308,7 @@ class Lew3BleInterface(model: Int): BleInterface(model) {
             Lew3BleCmd.GET_BATTERY -> {
                 if (response.len == 0) return
                 LepuBleLog.d(tag, "model:$model,GET_BATTERY => success")
-                val data = LepuBatteryInfo(response.content)
+                val data = KtBleBattery(response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3BatteryInfo)
                     .post(InterfaceEvent(model, data))
             }

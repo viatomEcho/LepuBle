@@ -1237,7 +1237,7 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * 电量查询（pc80b，ap20）
+     * 电量查询（pc80b）
      */
     fun sendHeartbeat(model: Int) {
         if (!checkService()) return

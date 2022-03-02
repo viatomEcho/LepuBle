@@ -101,7 +101,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBp2wInfo = "com.lepu.ble.bp2w.info"                                  // 设备信息 LepuDevice
             const val EventBp2wRtState = "com.lepu.ble.bp2w.rtState"                            // 主机状态 Bp2BleRtState
             const val EventBp2wRtData = "com.lepu.ble.bp2w.rtData"                              // 实时数据 Bp2BleRtData
-            const val EventBp2wFileList = "com.lepu.ble.bp2w.fileList"                          // 文件列表 LepuFileList
+            const val EventBp2wFileList = "com.lepu.ble.bp2w.fileList"                          // 文件列表 KtBleFileList
             const val EventBp2wReadFileError = "com.lepu.ble.bp2w.read.file.error"              // 读文件出错 String(fileName)
             const val EventBp2wReadingFileProgress = "com.lepu.ble.bp2w.reading.file.progress"  // 传输文件进度 Bp2FilePart
             const val EventBp2wReadFileComplete = "com.lepu.ble.bp2w.read.file.complete"        // 传输文件完成
@@ -283,7 +283,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     interface Lew3 {
         companion object {
             const val EventLew3Info = "com.lepu.ble.lew3.info"                                  // 设备信息 LepuDevice
-            const val EventLew3BatteryInfo = "com.lepu.ble.lew3.battery.info"                   // 电量信息 LepuBatteryInfo
+            const val EventLew3BatteryInfo = "com.lepu.ble.lew3.battery.info"                   // 电量信息 KtBleBattery
             const val EventLew3SetTime = "com.lepu.ble.lew3.set.time"                           // 同步时间 true
             const val EventLew3BoundDevice = "com.lepu.ble.lew3.bound.device"                   // 请求绑定设备
             const val EventLew3GetConfig = "com.lepu.ble.lew3.get.config"                       // 获取配置信息
@@ -306,7 +306,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface Vetcorder {
         companion object {
-            const val EventVetcorderInfo = "com.lepu.ble.vetcorder.info"
+            const val EventVetcorderInfo = "com.lepu.ble.vetcorder.info"  // VetcorderInfo
         }
     }
 
