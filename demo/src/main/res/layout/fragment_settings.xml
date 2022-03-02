@@ -198,21 +198,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <Button
-                        android:id="@+id/bp2w_user_list"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="写用户信息"/>
-                    <Button
-                        android:id="@+id/bp2w_get_file_crc"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="获取文件列表crc"
-                        android:layout_marginStart="10dp"/>
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <Button
                         android:id="@+id/bp2w_get_wifi_route"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -225,7 +210,103 @@
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rcv"
+                    android:id="@+id/bp2w_rcv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/le_bp2w_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="le bp2w"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/le_bp2w_set_state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置设备状态"/>
+                    <Button
+                        android:id="@+id/le_bp2w_get_state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取设备状态"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/le_bp2w_get_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取配置"/>
+                    <Button
+                        android:id="@+id/le_bp2w_delete_file"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="删除文件"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/le_bp2w_set_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="声音" />
+                    <Button
+                        android:id="@+id/le_bp2w_set_volume"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="音量"
+                        android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/le_bp2w_mode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="测量模式"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/le_bp2w_user_list"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="写用户信息"/>
+                    <Button
+                        android:id="@+id/le_bp2w_get_file_crc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取文件列表crc"
+                        android:layout_marginStart="10dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/le_bp2w_get_wifi_route"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取路由"/>
+                    <Button
+                        android:id="@+id/le_bp2w_get_wifi_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取wifi"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/le_bp2w_rcv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp" />

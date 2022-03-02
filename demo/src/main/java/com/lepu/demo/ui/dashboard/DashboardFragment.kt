@@ -119,7 +119,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK,
             Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2,
             Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LEW3,
-            Bluetooth.MODEL_ER1_N,-> waveHandler.post(EcgWaveTask())
+            Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_LE_BP2W -> waveHandler.post(EcgWaveTask())
 
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
             Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC66B,
@@ -309,18 +309,61 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.dataStr.text = "dataType: " + bp2Rt.rtWave.waveDataType + " " + data1.toString() + "----rtState--" + bp2Rt.rtState.toString()
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wFileList).observe(this, { event ->
+            (event.data as LepuFileList).let {
+                binding.dataStr.text = it.toString()
+            }
+        })
+        //------------------------------le bp2w------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wRtData)
+            .observe(this, {
+                val bp2Rt = it.data as Bp2BleRtData
+
+                var data2: Any
+                when(bp2Rt.rtWave.waveDataType) {
+                    0 -> {
+                        data2 = Bp2DataBpIng(bp2Rt.rtWave.waveData)
+                        viewModel.ps.value = data2.pressure
+                    }
+                    1 -> {
+                        data2 = Bp2DataBpResult(bp2Rt.rtWave.waveData)
+                        viewModel.ps.value = data2.pressure
+                        viewModel.sys.value = data2.sys
+                        viewModel.dia.value = data2.dia
+                        viewModel.mean.value = data2.mean
+                        viewModel.bpPr.value = data2.pr
+                    }
+                    2 -> {
+                        data2 = Bp2DataEcgIng(bp2Rt.rtWave.waveData)
+                        LepuBleLog.d("bp2 ecg hr = ${data2.hr}")
+                        viewModel.ecgHr.value = data2.hr
+                    }
+                    3 -> {
+                        data2 = Bp2DataEcgResult(bp2Rt.rtWave.waveData)
+                        viewModel.ecgHr.value = data2.hr
+                    }
+                    else -> data2 = ""
+                }
+
+                LepuBleLog.d("bp2 ecg waveformSize = ${bp2Rt.rtWave.waveformSize}")
+
+                val mvs = ByteUtils.bytes2mvs(bp2Rt.rtWave.waveform)
+                DataController.receive(mvs)
+
+                binding.dataStr.text = "dataType: " + bp2Rt.rtWave.waveDataType + " " + data2.toString() + "----rtState--" + bp2Rt.rtState.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFileList).observe(this, { event ->
             (event.data as Bp2BleFile).let {
                 when (it.type) {
-                    Bp2wBleCmd.FileType.ECG_TYPE -> {
-                        val data = Bp2wEcgList(it.content)
+                    LeBp2wBleCmd.FileType.ECG_TYPE -> {
+                        val data = LeBp2wEcgList(it.content)
                         binding.dataStr.text = data.toString()
                     }
-                    Bp2wBleCmd.FileType.BP_TYPE -> {
-                        val data = Bp2wBpList(it.content)
+                    LeBp2wBleCmd.FileType.BP_TYPE -> {
+                        val data = LeBp2wBpList(it.content)
                         binding.dataStr.text = data.toString()
                     }
-                    Bp2wBleCmd.FileType.USER_TYPE -> {
-                        val data = Bp2wUserList(it.content)
+                    LeBp2wBleCmd.FileType.USER_TYPE -> {
+                        val data = LeBp2wUserList(it.content)
                         binding.dataStr.text = data.toString()
                     }
                     else -> {
@@ -524,7 +567,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.bpLayout.visibility = View.GONE
                     binding.oxyLayout.visibility = View.GONE
                 }
-                Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2W -> {
+                Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LE_BP2W -> {
                     binding.bpLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.VISIBLE
                     binding.oxyLayout.visibility = View.GONE

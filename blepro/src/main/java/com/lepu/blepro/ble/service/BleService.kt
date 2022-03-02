@@ -233,7 +233,13 @@ open class BleService: LifecycleService() {
                     return this
                 }
             }
-
+            Bluetooth.MODEL_LE_BP2W -> {
+                LeBp2wBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
             Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B -> {
                 Pc60FwBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
@@ -479,6 +485,10 @@ open class BleService: LifecycleService() {
     private var bluetoothAdapter : BluetoothAdapter? = null
     private var leScanner : BluetoothLeScanner? = null
 
+    /**
+     * @param enable true(startScan) false(stopScan)
+     * startScan前必须先stopScan
+     */
     private fun scanDevice(enable: Boolean) {
         LepuBleLog.d(tag, "scanDevice => $enable")
 
@@ -650,14 +660,29 @@ open class BleService: LifecycleService() {
         override fun onScanFailed(errorCode: Int) {
             LepuBleLog.e(tag, "scan error: $errorCode")
             if (errorCode == SCAN_FAILED_ALREADY_STARTED) {
-                LepuBleLog.e(tag, "already start")
+                LepuBleLog.e(tag, "Fails to start scan as BLE scan with the same settings is already started by the app.")
 
+                // 执行BluetoothLeScanner.startScan前必须先stopScan，否则出现此错误
+            }
+            if (errorCode == SCAN_FAILED_APPLICATION_REGISTRATION_FAILED) {
+                LepuBleLog.e(tag, "Fails to start scan as app cannot be registered.")
+
+                // 手机蓝牙未开启
+            }
+            if (errorCode == SCAN_FAILED_INTERNAL_ERROR) {
+                LepuBleLog.e(tag, "Fails to start scan due an internal error")
             }
             if (errorCode == SCAN_FAILED_FEATURE_UNSUPPORTED) {
-                LepuBleLog.e(tag, "scan settings not supported")
+                LepuBleLog.e(tag, "Fails to start power optimized scan as this feature is not supported.")
+            }
+
+            if (errorCode == 5) {
+                // @hide
+                LepuBleLog.e(tag, "Fails to start scan as it is out of hardware resources.")
             }
             if (errorCode == 6) {
-                LepuBleLog.e(tag, "too frequently")
+                // @hide
+                LepuBleLog.e(tag, "Fails to start scan as application tries to scan too frequently.")
 
             }
             if (errorCode == 2){ // 连接超时，去重连扫描时候可能碰到，解决办法重启蓝牙 待验证
@@ -678,7 +703,7 @@ open class BleService: LifecycleService() {
                 if(it.state == BluetoothAdapter.STATE_OFF){
                     it.enable()
                     delay(1000L)
-                    scanDevice(true)
+                    startDiscover(scanModel, needPair, isReconnectScan)
                 }
             }
             runBlocking { delay(1000L) }

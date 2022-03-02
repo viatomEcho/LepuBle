@@ -4,7 +4,7 @@ import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.int2ByteArray
 import com.lepu.blepro.utils.toUInt
 
-class Bp2wConfig() {
+class Bp2Config() {
 
     var prevCalibZero: Int = 0
     var lastCalibZero: Int = 0

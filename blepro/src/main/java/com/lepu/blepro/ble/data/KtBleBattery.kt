@@ -1,12 +1,6 @@
 package com.lepu.blepro.ble.data
 import com.lepu.blepro.utils.toUInt
 
-
-const val NORMAL = 0
-const val CHARGING = 1
-const val CHARGED = 2
-const val LOW_BATTERY = 3
-
 @ExperimentalUnsignedTypes
 public class KtBleBattery constructor(bytes: ByteArray) {
     var state: Int

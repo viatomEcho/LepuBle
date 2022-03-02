@@ -188,7 +188,20 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wInfo)
             .observe(this, { event ->
                 (event.data as LepuDevice).let {
-                    Toast.makeText(this, "bp2 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "bp2w 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._er1Info.value = it
+                }
+            })
+        //-------------------------LeBp2w---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSyncTime)
+            .observe(this, {
+                Toast.makeText(this, "le bp2w 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wInfo)
+            .observe(this, { event ->
+                (event.data as LepuDevice).let {
+                    Toast.makeText(this, "le bp2w 获取设备信息成功", Toast.LENGTH_SHORT).show()
                     viewModel._er1Info.value = it
                 }
             })

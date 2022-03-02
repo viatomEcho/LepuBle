@@ -3,11 +3,11 @@ package com.lepu.blepro.ble.data
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.toUInt
 
-class Bp2wEcgWaveFile {
+class LeBp2wEcgFile {
     var fileName: String
     var fileVersion: Int
     var fileType: Int
-    var timestamp: Int
+    var timestamp: Long
     var waveData: ByteArray
     var deviceName: String
     constructor(fileName: String, content: ByteArray, deviceName: String) {
@@ -18,7 +18,7 @@ class Bp2wEcgWaveFile {
         index++
         fileType = byte2UInt(content[index])
         index++
-        timestamp = toUInt(content.copyOfRange(index, index+4))
+        timestamp = toUInt(content.copyOfRange(index, index+4)).toLong()
         index += 4
         // reserved 4
         index += 4

@@ -1,13 +1,12 @@
 package com.lepu.blepro.ble.data
 
-import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.blepro.utils.toUInt
 import java.util.*
 
 const val ECG_RECORD_LENGTH = 46
 
-class Bp2wEcgList(bytes: ByteArray) {
+class LeBp2wEcgList(bytes: ByteArray) {
 
     var fileVersion: Int
     var fileType: Int
@@ -30,7 +29,7 @@ class Bp2wEcgList(bytes: ByteArray) {
     }
 
     data class EcgRecord(val bytes: ByteArray) {
-        var time: Int           // 测量时间
+        var time: Long          // 测量时间戳
         var fileName: String    // 文件名
         var uid: Int            // 用户id
         var mode: Int           // 测量模式
@@ -43,8 +42,8 @@ class Bp2wEcgList(bytes: ByteArray) {
 
         init {
             var index = 0
-            time = toUInt(bytes.copyOfRange(index, index+4))
-            fileName = stringFromDate(Date(time.toLong()), "yyyyMMddHHmmss")
+            time = toUInt(bytes.copyOfRange(index, index+4)).toLong()
+            fileName = stringFromDate(Date(time), "yyyyMMddHHmmss")
             index += 4
             uid = toUInt(bytes.copyOfRange(index, index+4))
             index += 4

@@ -10,7 +10,7 @@ import java.nio.charset.Charset
  * bp2wifi用户信息
  * 必传参数：aid, uid, fName, name, birthday, height, weight, gender, icon(width, height, data)
  */
-class Bp2wUserInfo() {
+class LeBp2wUserInfo() {
 
     var len: Int = 0
     var aid: Int = 0               // 主账户id

@@ -6,7 +6,7 @@ class Bp2WifiConfig() {
     var option: Int = 0
 
     lateinit var wifi: Bp2Wifi
-    lateinit var server: Bp2wServer
+    lateinit var server: Bp2Server
 
     constructor(bytes: ByteArray) : this() {
         var index = 0
@@ -14,7 +14,7 @@ class Bp2WifiConfig() {
         index++
         wifi = Bp2Wifi(index, bytes)
         index += wifi.length
-        server = Bp2wServer(index, bytes)
+        server = Bp2Server(index, bytes)
         index += server.length
         length = index
     }

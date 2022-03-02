@@ -2,12 +2,12 @@ package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.toUInt
 
-class Bp2wUserList() {
+class LeBp2wUserList() {
 
     var fileVersion: Int = 0
     var fileType: Int = 0
     lateinit var listContent: ByteArray
-    var userList = mutableListOf<Bp2wUserInfo>()
+    var userList = mutableListOf<LeBp2wUserInfo>()
 
     constructor(bytes: ByteArray) : this() {
         var index = 0
@@ -20,7 +20,7 @@ class Bp2wUserList() {
         index = 0
         while (index != listContent.size) {
             val len = toUInt(listContent.copyOfRange(index, index+2))
-            userList.add(Bp2wUserInfo(listContent.copyOfRange(index, index+len)))
+            userList.add(LeBp2wUserInfo(listContent.copyOfRange(index, index+len)))
             index += len
         }
     }

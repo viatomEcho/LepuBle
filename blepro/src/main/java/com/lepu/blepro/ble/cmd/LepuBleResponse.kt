@@ -4,7 +4,7 @@ import android.os.Parcelable
 import com.lepu.blepro.utils.toUInt
 import kotlinx.android.parcel.Parcelize
 
-class Bp2wBleResponse {
+class LepuBleResponse {
 
     @ExperimentalUnsignedTypes
     @Parcelize

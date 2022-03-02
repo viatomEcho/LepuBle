@@ -5,7 +5,7 @@ import com.lepu.blepro.utils.int2ByteArray
 import com.lepu.blepro.utils.toUInt
 import java.nio.charset.Charset
 
-class Bp2wServer() {
+class Bp2Server() {
 
     var length = 0
 

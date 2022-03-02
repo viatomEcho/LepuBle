@@ -11,7 +11,7 @@ import android.util.SparseArray
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.*
-import com.lepu.blepro.ble.cmd.Bp2wBleCmd
+import com.lepu.blepro.ble.cmd.LeBp2wBleCmd
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
@@ -566,20 +566,23 @@ class BleServiceHelper private constructor() {
 
     /**
      * 获取设备文件列表
-     * @param fileType bp2w获取文件列表类型（Bp2wBleCmd.FileType.ECG_TYPE, BP_TYPE, USER_TYPE）
+     * @param fileType LeBp2w获取文件列表类型（LeBp2wBleCmd.FileType.ECG_TYPE, BP_TYPE, USER_TYPE）
      */
     @JvmOverloads
-    fun getFileList(model: Int, fileType: Int = Bp2wBleCmd.FileType.ECG_TYPE){
+    fun getFileList(model: Int, fileType: Int = LeBp2wBleCmd.FileType.ECG_TYPE){
         if (!checkService()) return
-        if (model == Bluetooth.MODEL_BP2W) {
-            getInterface(model)?.let { it1 ->
-                (it1 as Bp2wBleInterface).let {
-                    LepuBleLog.d(tag, "it as Bp2wBleInterface--getFileList")
-                    it.getFileList(fileType)
+        when (model) {
+            Bluetooth.MODEL_LE_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LeBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LeBp2wBleInterface--getFileList")
+                        it.getFileList(fileType)
+                    }
                 }
             }
-        } else {
-            getInterface(model)?.getFileList()
+            else -> {
+                getInterface(model)?.getFileList()
+            }
         }
     }
 
@@ -909,7 +912,7 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * 获取提示音开关（bp2，bp2a）
+     * 获取配置信息（bp2，bp2a，bp2w，le bp2w）
      */
     fun bp2GetConfig(model: Int){
         if (!checkService()) return
@@ -918,6 +921,22 @@ class BleServiceHelper private constructor() {
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2BleInterface).let {
                         LepuBleLog.d(tag, "it as Bp2BleInterface--bp2GetConfig")
+                        it.getConfig()
+                    }
+                }
+            }
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2GetConfig")
+                        it.getConfig()
+                    }
+                }
+            }
+            Bluetooth.MODEL_LE_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LeBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LeBp2wBleInterface--bp2GetConfig")
                         it.getConfig()
                     }
                 }
@@ -945,11 +964,35 @@ class BleServiceHelper private constructor() {
             }
             else -> LepuBleLog.e(tag, "bp2SetConfig model error")
         }
-
+    }
+    /**
+     * 配置参数（bp2w，le bp2w）
+     */
+    fun bp2SetConfig(model: Int, config: Bp2Config) {
+        if (!checkService()) return
+        when(model){
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2SetConfig")
+                        it.setConfig(config)
+                    }
+                }
+            }
+            Bluetooth.MODEL_LE_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LeBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LeBp2wBleInterface--bp2SetConfig")
+                        it.setConfig(config)
+                    }
+                }
+            }
+            else -> LepuBleLog.e(tag, "bp2SetConfig model error")
+        }
     }
 
     /**
-     * 切换设备状态（bp2，bp2a）
+     * 切换设备状态（bp2，bp2a，bp2w，le bp2w）
      * @param state Bp2BleCmd.SwitchState
      */
     fun bp2SwitchState(model: Int, state: Int) {
@@ -958,143 +1001,195 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2SwitchState")
                         it.switchState(state)
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * 删除文件
-     */
-    fun bp2wDeleteFile(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as Bp2wBleInterface).let {
-                LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2wDeleteFile")
-                it.deleteFile()
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2SwitchState")
+                        it.switchState(state)
+                    }
+                }
             }
-        }
-    }
-
-    /**
-     * 获取参数（bp2w）
-     */
-    fun bp2wGetConfig(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as Bp2wBleInterface).let {
-                LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2wGetConfig")
-                it.getConfig()
+            Bluetooth.MODEL_LE_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LeBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LeBp2wBleInterface--bp2SwitchState")
+                        it.switchState(state)
+                    }
+                }
             }
+            else -> LepuBleLog.e(tag, "bp2SwitchState model error")
         }
     }
 
     /**
-     * 配置参数（bp2w）
+     * 删除文件（bp2w，le bp2w）
      */
-    fun bp2wSetConfig(model: Int, config: Bp2wConfig) {
-        if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as Bp2wBleInterface).let {
-                LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2wSetConfig")
-                it.setConfig(config)
-            }
-        }
-    }
-
-    /**
-     * 切换设备状态（bp2w）
-     * @param state Bp2wBleCmd.SwitchState
-     */
-    fun bp2wSwitchState(model: Int, state: Int) {
+    fun bp2DeleteFile(model: Int) {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_BP2W -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2wBleInterface).let {
-                        it.switchState(state)
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2DeleteFile")
+                        it.deleteFile()
                     }
                 }
             }
+            Bluetooth.MODEL_LE_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LeBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LeBp2wBleInterface--bp2DeleteFile")
+                        it.deleteFile()
+                    }
+                }
+            }
+            else -> LepuBleLog.e(tag, "bp2DeleteFile model error")
         }
     }
 
     /**
-     * 获取设备状态（bp2w）
+     * 获取设备状态（bp2w，le bp2w）
      */
-    fun bp2wGetRtState(model: Int) {
+    fun bp2GetRtState(model: Int) {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_BP2W -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2GetRtState")
                         it.getRtState()
                     }
                 }
             }
+            Bluetooth.MODEL_LE_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LeBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LeBp2wBleInterface--bp2GetRtState")
+                        it.getRtState()
+                    }
+                }
+            }
+            else -> LepuBleLog.e(tag, "bp2GetRtState model error")
         }
     }
 
     /**
-     * 获取路由（bp2w）
+     * 获取路由（bp2w，le bp2w）
      */
-    fun bp2wGetWifiDevice(model: Int) {
+    fun bp2GetWifiDevice(model: Int) {
         if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as Bp2wBleInterface).let {
-                it.getWifiDevice()
+        when (model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2GetWifiDevice")
+                        it.getWifiDevice()
+                    }
+                }
             }
+            Bluetooth.MODEL_LE_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LeBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LeBp2wBleInterface--bp2GetWifiDevice")
+                        it.getWifiDevice()
+                    }
+                }
+            }
+            else -> LepuBleLog.e(tag, "bp2GetWifiDevice model error")
         }
     }
 
     /**
-     * 配置WiFi信息（bp2w）
+     * 配置WiFi信息（bp2w，le bp2w）
      */
-    fun bp2wSetWifiConfig(model: Int, config: Bp2WifiConfig) {
+    fun bp2SetWifiConfig(model: Int, config: Bp2WifiConfig) {
         if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as Bp2wBleInterface).let {
-                it.setWifiConfig(config)
+        when (model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2SetWifiConfig")
+                        it.setWifiConfig(config)
+                    }
+                }
             }
+            Bluetooth.MODEL_LE_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LeBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LeBp2wBleInterface--bp2SetWifiConfig")
+                        it.setWifiConfig(config)
+                    }
+                }
+            }
+            else -> LepuBleLog.e(tag, "bp2SetWifiConfig model error")
         }
     }
 
     /**
-     * 获取WiFi配置信息（bp2w）
+     * 获取WiFi配置信息（bp2w，le bp2w）
      */
-    fun bp2wGetWifiConfig(model: Int) {
+    fun bp2GetWifiConfig(model: Int) {
         if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as Bp2wBleInterface).let {
-                it.getWifiConfig()
+        when (model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2GetWifiConfig")
+                        it.getWifiConfig()
+                    }
+                }
             }
+            Bluetooth.MODEL_LE_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LeBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LeBp2wBleInterface--bp2GetWifiConfig")
+                        it.getWifiConfig()
+                    }
+                }
+            }
+            else -> LepuBleLog.e(tag, "bp2GetWifiConfig model error")
         }
     }
 
     /**
-     * 获取文件列表校验码（bp2w）
-     * @param fileType Bp2wBleCmd.FileType
+     * 获取文件列表校验码（le bp2w）
+     * @param fileType LeBp2wBleCmd.FileType
      */
-    fun bp2wGetFileListCrc(model: Int, fileType: Int) {
+    fun bp2GetFileListCrc(model: Int, fileType: Int) {
         if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as Bp2wBleInterface).let {
-                it.getFileListCrc(fileType)
+        when (model) {
+            Bluetooth.MODEL_LE_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LeBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LeBp2wBleInterface--bp2GetFileListCrc")
+                        it.getFileListCrc(fileType)
+                    }
+                }
             }
+            else -> LepuBleLog.e(tag, "bp2GetFileListCrc model error")
         }
     }
 
     /**
-     * 写用户信息（bp2w）
+     * 写用户信息（le bp2w）
      */
-    fun bp2WriteUserList(model: Int, userList: Bp2wUserList) {
+    fun bp2WriteUserList(model: Int, userList: LeBp2wUserList) {
         if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as Bp2wBleInterface).let {
-                it.writeUserList(userList)
+        when (model) {
+            Bluetooth.MODEL_LE_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LeBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LeBp2wBleInterface--bp2WriteUserList")
+                        it.writeUserList(userList)
+                    }
+                }
             }
+            else -> LepuBleLog.e(tag, "bp2WriteUserList model error")
         }
     }
 
