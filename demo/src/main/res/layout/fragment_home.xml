@@ -46,13 +46,31 @@
             android:layout_marginStart="20dp"
             android:text="地址重连"/>
 
+        <Button
+            android:id="@+id/scanByName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/reconnectByName"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="名称扫描"/>
+
+        <Button
+            android:id="@+id/scanByAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/scanByName"
+            app:layout_constraintBottom_toBottomOf="@id/scanByName"
+            app:layout_constraintStart_toEndOf="@id/scanByName"
+            android:layout_marginStart="20dp"
+            android:text="地址扫描"/>
+
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/ble_split"
             android:hint="筛选设备"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/reconnectByName"
+            app:layout_constraintTop_toBottomOf="@id/scanByName"
             android:layout_marginTop="20dp"
             android:layout_marginRight="200dp"
             android:textSize="20sp"/>

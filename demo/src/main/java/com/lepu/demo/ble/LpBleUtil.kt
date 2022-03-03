@@ -136,6 +136,12 @@ class LpBleUtil {
             BleServiceHelper.startScan(scanModel, needPair)
         }
 
+        fun startScanByName(deviceName: String, scanModel: Int? = null) {
+            BleServiceHelper.startScanByName(deviceName, scanModel)
+        }
+        fun startScanByAddress(address: String, scanModel: Int? = null) {
+            BleServiceHelper.startScanByAddress(address, scanModel)
+        }
 
         fun stopScan() {
             Log.d(TAG, "stopScan...")

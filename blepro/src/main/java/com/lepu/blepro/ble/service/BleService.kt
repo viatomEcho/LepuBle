@@ -65,6 +65,14 @@ open class BleService: LifecycleService() {
     var scanModel: IntArray? = null
 
     /**
+     * 扫描指定设备
+     */
+    var isScanDefineDevice = false
+    var isScanByName = false
+    var scanByName = ""
+    var scanByAddress = ""
+
+    /**
      * 本次扫描是否需要发送配对信息
      * 默认： false
      * 开启扫描被重新赋值
@@ -342,6 +350,22 @@ open class BleService: LifecycleService() {
 
     private val binder = BleBinder()
 
+    fun setScanDefineDevice(isScanDefineDevice: Boolean, isScanByName: Boolean, defineDevice: String) {
+        this.isScanDefineDevice = isScanDefineDevice
+        this.isScanByName = isScanByName
+        if (isScanDefineDevice) {
+            if (isScanByName) {
+                scanByName = defineDevice
+            } else {
+                scanByAddress = defineDevice
+            }
+        } else {
+            scanByName = ""
+            scanByAddress = ""
+        }
+
+    }
+
     /**
      *
      * @param scanModel IntArray 本次扫描过滤的model
@@ -598,6 +622,18 @@ open class BleService: LifecycleService() {
 
             if(scanModel != null)
                 if (!filterResult(b)) return
+
+            if (isScanDefineDevice) {
+                if (isScanByName) {
+                    if (!b.name.equals(scanByName)) return
+                    LepuBleLog.d(tag, "b.name == " + b.name)
+                    LepuBleLog.d(tag, "scanByName == " + scanByName)
+                } else {
+                    if (!b.macAddr.equals(scanByAddress)) return
+                    LepuBleLog.d(tag, "b.macAddr == " + b.macAddr)
+                    LepuBleLog.d(tag, "scanByAddress == " + scanByAddress)
+                }
+            }
 
             if (needPair)
             result.scanRecord?.let {

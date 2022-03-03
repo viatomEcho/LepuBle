@@ -72,8 +72,8 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         binding.disconnect.setOnClickListener{
             LpBleUtil.disconnect(false)
         }
-        binding.reconnectByName.setOnClickListener {
 
+        binding.reconnectByName.setOnClickListener {
             mainViewModel.curBluetooth.value?.let { it1 ->
                 LpBleUtil.reconnect(currentModel[0], it1.deviceName)
             }
@@ -82,6 +82,15 @@ class HomeFragment : Fragment(R.layout.fragment_home){
             mainViewModel.curBluetooth.value?.let { it1 ->
                 LpBleUtil.reconnectByMac(currentModel[0], it1.deviceMacAddress)
             }
+        }
+
+        binding.scanByName.setOnClickListener {
+//            LpBleUtil.startScanByName("BP2 6077", Bluetooth.MODEL_BP2)
+            LpBleUtil.startScanByName("BP2 6077")
+        }
+        binding.scanByAddress.setOnClickListener {
+//            LpBleUtil.startScanByAddress("CF:8A:57:84:D1:4E", Bluetooth.MODEL_BP2)
+            LpBleUtil.startScanByAddress("CF:8A:57:84:D1:4E")
         }
 
         LinearLayoutManager(context).apply {
