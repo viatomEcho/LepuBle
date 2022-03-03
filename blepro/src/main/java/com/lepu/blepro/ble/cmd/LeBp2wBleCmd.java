@@ -65,9 +65,9 @@ public class LeBp2wBleCmd {
     }
 
     public static class FileType {
-        public static final int ECG_TYPE = 0;
+        public static final int ECG_TYPE = 2;
         public static final int BP_TYPE = 1;
-        public static final int USER_TYPE = 2;
+        public static final int USER_TYPE = 0;
     }
 
     public static byte[] switchState(int state) {

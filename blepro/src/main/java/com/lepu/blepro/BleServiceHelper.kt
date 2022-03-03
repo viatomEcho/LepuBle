@@ -191,13 +191,14 @@ class BleServiceHelper private constructor() {
 
 
     /**
-     * 开始扫描 单设备
+     * 开始扫描 单model设备
      * @param scanModel Int
      * @param needPair Boolean
      */
     @JvmOverloads
     fun startScan(scanModel: Int? = null, needPair: Boolean = false) {
         if (!checkService()) return
+        bleService.setScanDefineDevice(false, false, "")
         if (scanModel != null) {
             bleService.startDiscover(intArrayOf(scanModel), needPair)
         } else {
@@ -206,15 +207,42 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * 开始扫描 多设备
+     * 开始扫描 多model设备
      */
     @JvmOverloads
     fun startScan(scanModel: IntArray, needPair: Boolean = false) {
         if (!checkService()) return
+        bleService.setScanDefineDevice(false, false, "")
         bleService.startDiscover(scanModel, needPair)
     }
 
+    /**
+     * 具体蓝牙名扫描
+     */
+    @JvmOverloads
+    fun startScanByName(deviceName: String, scanModel: Int? = null, needPair: Boolean = false) {
+        if (!checkService()) return
+        bleService.setScanDefineDevice(true, true, deviceName)
+        if (scanModel != null) {
+            bleService.startDiscover(intArrayOf(scanModel), needPair)
+        } else {
+            bleService.startDiscover(null, needPair)
+        }
+    }
 
+    /**
+     * 具体蓝牙地址扫描
+     */
+    @JvmOverloads
+    fun startScanByAddress(address: String, scanModel: Int? = null, needPair: Boolean = false) {
+        if (!checkService()) return
+        bleService.setScanDefineDevice(true, false, address)
+        if (scanModel != null) {
+            bleService.startDiscover(intArrayOf(scanModel), needPair)
+        } else {
+            bleService.startDiscover(null, needPair)
+        }
+    }
 
     /**
      * 停止扫描

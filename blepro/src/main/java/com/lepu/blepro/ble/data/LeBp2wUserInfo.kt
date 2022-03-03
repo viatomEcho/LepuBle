@@ -1,6 +1,7 @@
 package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.HexString.trimStr
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.int2ByteArray
 import com.lepu.blepro.utils.int4ByteArray
 import com.lepu.blepro.utils.toUInt
@@ -73,6 +74,16 @@ class LeBp2wUserInfo() {
                 .plus(int2ByteArray(icon.size))
                 .plus(icon)
         }
+
+        override fun toString(): String {
+            return """
+                type : $type
+                width : $width
+                height : $height
+                iconLen : $iconLen
+                icon : ${bytesToHex(icon)}
+            """.trimIndent()
+        }
     }
 
     fun getDataBytes(): ByteArray {
@@ -97,6 +108,21 @@ class LeBp2wUserInfo() {
             .plus(gender.toByte())
             .plus(ByteArray(11))
             .plus(icon.getDataBytes())
+    }
+
+    override fun toString(): String {
+        return """
+            len : $len
+            aid : $aid
+            uid : $uid
+            fName : $fName
+            name : $name
+            birthday : $birthday
+            height : $height
+            weight : $weight
+            gender : $gender
+            icon : $icon
+        """.trimIndent()
     }
 
 }

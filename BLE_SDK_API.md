@@ -76,13 +76,19 @@
   
 - 2.0.0.18
 
-  >开启扫描scanModel参数非必传
+  >startScan开启扫描scanModel参数非必传
   >
   >添加Bluetooth.getDeviceName接口
   >
-  >开启扫描3秒未返回结果重新扫描
+  >开启扫描3秒未返回结果，sdk自动重新扫描
   >
   >er1，er2添加设置参数异常消息
+  
+- 2.0.0.22
+
+  >集成sp20，LeBp2w设备
+  >
+  >添加具体蓝牙名或蓝牙地址扫描接口
 
 
 
@@ -93,7 +99,7 @@
 - `BIOL` ：订阅蓝牙状态监听
 - `BleChangeObserver` ：监听蓝牙状态，必须订阅蓝牙状态监听，否则无法接收蓝牙状态
 - `BleServiceObserver` ：监听蓝牙服务状态
-- 每个model对应一个interface，由app管理interface
+- 每个model对应一个interface，由app管理interface（**使用sdk连接设备前必须确保已经设置对应model的interface**）
 
 
 
@@ -129,17 +135,18 @@
   >
   > needPair：本次扫描是否需要发送配对信息，默认是false
   >
-  > isStrict：本次扫描是否是严格模式（严格模式下只会发送scanModel的扫描结果信息），默认是false
-  >
-  > isScanUnRegister：本次扫描是否返回SDK没有的model蓝牙名的设备
-
+  
 - `startScan(scanModel: IntArray, needPair: Boolean = false)` ：开始扫描，多个model设备
 
 - `stopScan()` ：停止扫描
 
+- `startScanByName(deviceName: String, scanModel: Int? = null, needPair: Boolean = false)` ：具体蓝牙名扫描
+
+- `startScanByAddress(address: String, scanModel: Int? = null, needPair: Boolean = false)`：具体蓝牙地址扫描
+
 - `setInterfaces(model: Int, runRtImmediately: Boolean = false)` 
 
-  > 在initService()之后调用，**连接设备前需要设置** 
+  > 在initService()之后调用，**连接设备前必须已有对应interface设置** 
   >
   > 设置model的interface
   >
@@ -153,7 +160,7 @@
 
   > 连接成功后自动同步时间，但Pc80b，Pc60fw，胎心仪Fhr，Pc100，Pc66b设备没有同步时间设置，连接成功后直接发送EventMsgConst.Ble.EventBleDeviceReady
   >
-  > 每次发起**连接前必须关闭扫描** 
+  > 每次发起**连接前必须关闭扫描** ，**连接设备前必须已有对应interface设置** 
   >
   > isAutoReconnect：是否自动重连，默认是true
   >
@@ -179,11 +186,11 @@
 
 - `getInfo(model: Int)` ：获取主机信息
 
-- `getFileList(model: Int, fileType: Int = Bp2wBleCmd.FileType.ECG_TYPE)` 
+- `getFileList(model: Int, fileType: Int = LeBp2wBleCmd.FileType.ECG_TYPE)` 
 
   > 获取设备文件列表
   >
-  > fileType：bp2w获取文件列表类型
+  > fileType：LeBp2w获取文件列表类型
 
 - `readFile(userId: String, fileName: String, model: Int, offset: Int = 0)` ：读取主机文件，进入读文件流程前APP要手动停止实时任务状态
 
@@ -198,8 +205,6 @@
 - `factoryReset(model: Int)` ：恢复出厂设置
 
 - `reset(model: Int)` ：设备复位
-
-- `updateSetting(model: Int, type: String, value: Any)` ：更新设备设置
 
 - `setRTDelayTime(model: Int, delayMillis: Long)` ：设置实时监测任务的间隔时间
 
@@ -216,24 +221,6 @@
 - `startBp(model: Int)` ：开始测量血压，支持设备有Bpm，Bpw1，Pc100
 
 - `stopBp(model: Int)` ：停止测量血压
-
-- `bp2SetConfig(model: Int, switch: Boolean, volume: Int = 2)` 
-
-  > 设置配置信息，支持设备Bp2，Bp2A
-  >
-  > switch：声音开关
-  >
-  > volume：声音大小（0-3）
-
-- `bp2GetConfig(model: Int)` ：获取配置信息，支持设备Bp2，Bp2A
-
-- `bp2SwitchState(model: Int, state: Int)` 
-
-  > 切换设备状态，支持设备Bp2，Bp2A
-  >
-  > state：Bp2BleCmd.SwitchState
-  >
-  > 0 进入血压测量，1 进入心电测量，2 进入历史回顾，3 进入开机预备状态，4 关机，5 进入理疗模式
 
 - `getBpmFileList(model: Int, map: HashMap<String, Any>)` ：获取Bpm设备文件列表
 
@@ -265,9 +252,7 @@
   >
   > motionWindows：加速度检测窗口
 
-- `oxyGetPpgRt(model: Int)` ：获取原始数据，支持设备O2Ring，BabyO2
-
-- `sendHeartbeat(model: Int)` ：发送心跳包查询电量，支持设备有Pc80b，ap20
+- `sendHeartbeat(model: Int)` ：发送心跳包查询电量，支持设备有Pc80b
 
 - `bpw1SetMeasureTime(model: Int, measureTime: Array<String?>)` 
   
@@ -282,6 +267,15 @@
 - `burnFactoryInfo(model: Int, config: FactoryConfig)` ：烧录出厂信息，支持设备有Er1，Duoek
 
 - `burnLockFlash(model: Int)` ：加密Flash，支持设备有Er1，Duoek
+
+------------------------------------------------------------------------O2Ring，BabyO2-------------------------------------------------------------------
+
+- `oxyGetPpgRt(model: Int)` ：获取实时原始数据，支持设备O2Ring，BabyO2
+- `oxyGetWave(model: Int)` ：获取实时波形数据，支持设备O2Ring，BabyO2
+- `oxyGetRtParam(model: Int)` ：获取实时参数值，支持设备O2Ring，BabyO2
+- `updateSetting(model: Int, type: String, value: Any)` ：更新设备设置，支持设备O2Ring，BabyO2
+
+--------------------------------------------------------------------------------ap20---------------------------------------------------------------------------
 
 - `ap20SetConfig(model: Int, type: Int, config: Int)` 
 
@@ -307,45 +301,68 @@
   >
   >type：Ap20BleCmd.EnableType
 
+- `ap20GetBattery(model: Int)` ：获取电量
+
+--------------------------------------------------------------------------------lew3---------------------------------------------------------------------------
+
 - `lew3BoundDevice(model: Int)` ：请求绑定设备，支持设备有LeW3手表
-
 - `lew3GetConfig(model: Int)` ：LeW3手表获取服务器配置信息
+- `lew3SetServer(model: Int, server: Lew3Config)` ：LeW3手表设置服务器配置信息
+- `lew3GetBattery(model: Int)` ：获取电量
 
-- `lew3SetConfig(model: Int, addr: String, port: Int)` 
+--------------------------------------------------------------------------------bp2---------------------------------------------------------------------------
 
-  >LeW3手表设置服务器配置信息
+- `bp2SetConfig(model: Int, switch: Boolean, volume: Int = 2)` 
+
+  > 设置配置信息，支持设备Bp2，Bp2A
   >
-  >addr：服务器地址
+  > switch：声音开关
   >
-  >port：端口号
-  
-- `bp2wDeleteFile(model: Int)` ：删除文件
+  > volume：声音大小（0-3）
 
-- `bp2wGetConfig(model: Int)` ：获取参数
+- `bp2SetConfig(model: Int, config: Bp2Config)` ：配置参数，支持设备Bp2W，LeBp2W
 
-- `bp2wSetConfig(model: Int, config: Bp2wConfig)` ：配置参数
+- `bp2GetConfig(model: Int)` ：获取配置信息，支持设备Bp2，Bp2A，Bp2W，LeBp2W
 
-- `bp2wSwitchState(model: Int, state: Int)` 
+- `bp2SwitchState(model: Int, state: Int)` 
 
-  >切换设备状态
+  > 切换设备状态，支持设备Bp2，Bp2A，Bp2W，LeBp2W
   >
-  >state：Bp2wBleCmd.SwitchState
-
-- `bp2wGetRtState(model: Int)` ：获取主机实时状态
-
-- `bp2wGetWifiDevice(model: Int)` ：获取路由
-
-- `bp2wSetWifiConfig(model: Int, config: Bp2WifiConfig)` ：配置WiFi信息
-
-- `bp2wGetWifiConfig(model: Int)` ：获取WiFi配置信息
-
-- `bp2wGetFileListCrc(model: Int, fileType: Int)` 
-
-  > 获取文件列表校验码
+  > state：Bp2BleCmd.SwitchState
   >
-  > fileType：Bp2wBleCmd.FileType
+  > 0 进入血压测量，1 进入心电测量，2 进入历史回顾，3 进入开机预备状态，4 关机，5 进入理疗模式
 
-- `bp2WriteUserList(model: Int, userList: Bp2wUserList)` ：写用户信息
+- `bp2DeleteFile(model: Int)` ：删除文件，支持设备Bp2W，LeBp2W
+
+- `bp2GetRtState(model: Int)` ：获取主机实时状态，支持设备Bp2W，LeBp2W
+
+- `bp2GetWifiDevice(model: Int)` ：获取路由，支持设备Bp2W，LeBp2W
+
+- `bp2SetWifiConfig(model: Int, config: Bp2WifiConfig)` ：配置WiFi信息，支持设备Bp2W，LeBp2W
+
+- `bp2GetWifiConfig(model: Int)` ：获取WiFi配置信息，支持设备Bp2W，LeBp2W
+
+- `bp2GetFileListCrc(model: Int, fileType: Int)` 
+
+  > 获取文件列表校验码，支持设备LeBp2W
+  >
+  > fileType：LeBp2wBleCmd.FileType
+
+- `bp2WriteUserList(model: Int, userList: Bp2wUserList)` ：写用户信息，支持设备LeBp2W
+
+--------------------------------------------------------------------------------sp20---------------------------------------------------------------------------
+
+- `sp20SetConfig(model: Int, config: Sp20Config)` ：配置参数
+
+- `sp20GetConfig(model: Int, type: Int)` ：获取参数
+
+- `sp20EnableRtData(model: Int, type: Int, enable: Boolean)` 
+
+  >使能实时数据发送
+  >
+  >type：Sp20BleCmd.EnableType
+
+- `sp20GetBattery(model: Int)` ：获取电量
 
 
 
@@ -446,25 +463,53 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBp2wInfo = "com.lepu.ble.bp2w.info"                                  // 设备信息 LepuDevice
             const val EventBp2wRtState = "com.lepu.ble.bp2w.rtState"                            // 主机状态 Bp2BleRtState
             const val EventBp2wRtData = "com.lepu.ble.bp2w.rtData"                              // 实时数据 Bp2BleRtData
-            const val EventBp2wFileList = "com.lepu.ble.bp2w.fileList"                          // 文件列表 Bp2BleFile(type 0：Bp2wUserList 1：Bp2wBpList 2：Bp2wEcgList)
+            const val EventBp2wFileList = "com.lepu.ble.bp2w.fileList"                          // 文件列表 KtBleFileList
             const val EventBp2wReadFileError = "com.lepu.ble.bp2w.read.file.error"              // 读文件出错 String(fileName)
             const val EventBp2wReadingFileProgress = "com.lepu.ble.bp2w.reading.file.progress"  // 传输文件进度 Bp2FilePart
-            const val EventBp2wReadFileComplete = "com.lepu.ble.bp2w.read.file.complete"        // 传输文件完成 Bp2wEcgWaveFile
-            const val EventBp2WriteFileError = "com.lepu.ble.bp2w.write.file.error"             // 写文件出错 String(fileName)
-            const val EventBp2WriteFileComplete = "com.lepu.ble.bp2w.write.file.complete"       // 写文件完成 FileListCrc
+            const val EventBp2wReadFileComplete = "com.lepu.ble.bp2w.read.file.complete"        // 传输文件完成
             const val EventBp2wReset = "com.lepu.ble.bp2w.reset"                                // 复位 boolean
             const val EventBp2wFactoryReset = "com.lepu.ble.bp2w.factory.reset"                 // 恢复出厂设置 boolean
             const val EventBp2wFactoryResetAll = "com.lepu.ble.bp2w.factory.reset.all"          // 恢复生产出厂状态 boolean
             const val EventBp2wSetConfig = "com.lepu.ble.bp2w.set.config"                       // 设置心跳音开关 boolean
-            const val EventBp2wGetConfig = "com.lepu.ble.bp2w.get.config"                       // 获取参数 Bp2wConfig
+            const val EventBp2wGetConfig = "com.lepu.ble.bp2w.get.config"                       // 获取参数 Bp2Config
             const val EventBp2wSyncTime = "com.lepu.ble.bp2w.sync.time"                         // 同步时间 boolean
             const val EventBp2wSwitchState = "com.lepu.ble.bp2w.switch.state"                   // 切换设备状态 boolean
             const val EventBp2WifiDevice = "com.lepu.ble.bp2w.wifi.device"                      // 获取路由 Bp2WifiDevice
             const val EventBp2WifiScanning = "com.lepu.ble.bp2w.wifi.scanning"                  // 正在扫描路由 boolean
             const val EventBp2wGetWifiConfig = "com.lepu.ble.bp2w.get.wifi.config"              // 获取WiFi配置 Bp2WifiConfig
             const val EventBp2wSetWifiConfig = "com.lepu.ble.bp2w.set.wifi.config"              // 设置WiFi boolean
-            const val EventBp2wGetFileListCrc = "com.lepu.ble.bp2w.get.fileList.crc"            // 获取列表校验值 FileListCrc
             const val EventBp2wDeleteFile = "com.lepu.ble.bp2w.delete.file"                     // 删除文件 boolean
+        }
+    }
+
+    /**
+     * LeBp2wBleInterface发出的通知
+     * 包含model: MODEL_LE_BP2W
+     */
+    interface LeBP2W {
+        companion object {
+            const val EventLeBp2wInfo = "com.lepu.ble.le.bp2w.info"                                  // 设备信息 LepuDevice
+            const val EventLeBp2wRtState = "com.lepu.ble.le.bp2w.rtState"                            // 主机状态 Bp2BleRtState
+            const val EventLeBp2wRtData = "com.lepu.ble.le.bp2w.rtData"                              // 实时数据 Bp2BleRtData
+            const val EventLeBp2wFileList = "com.lepu.ble.le.bp2w.fileList"                          // 文件列表 Bp2BleFile(type 0：LeBp2wUserList 1：LeBp2wBpList 2：LeBp2wEcgList)
+            const val EventLeBp2wReadFileError = "com.lepu.ble.le.bp2w.read.file.error"              // 读文件出错 String(fileName)
+            const val EventLeBp2wReadingFileProgress = "com.lepu.ble.le.bp2w.reading.file.progress"  // 传输文件进度 Bp2FilePart
+            const val EventLeBp2wReadFileComplete = "com.lepu.ble.le.bp2w.read.file.complete"        // 传输文件完成 LeBp2wEcgFile
+            const val EventLeBp2WriteFileError = "com.lepu.ble.le.bp2w.write.file.error"            // 写文件出错 String(fileName)
+            const val EventLeBp2WriteFileComplete = "com.lepu.ble.le.bp2w.write.file.complete"      // 写文件完成 FileListCrc
+            const val EventLeBp2wReset = "com.lepu.ble.le.bp2w.reset"                                // 复位 boolean
+            const val EventLeBp2wFactoryReset = "com.lepu.ble.le.bp2w.factory.reset"                 // 恢复出厂设置 boolean
+            const val EventLeBp2wFactoryResetAll = "com.lepu.ble.le.bp2w.factory.reset.all"          // 恢复生产出厂状态 boolean
+            const val EventLeBp2wSetConfig = "com.lepu.ble.le.bp2w.set.config"                       // 设置心跳音开关 boolean
+            const val EventLeBp2wGetConfig = "com.lepu.ble.le.bp2w.get.config"                       // 获取参数 Bp2Config
+            const val EventLeBp2wSyncTime = "com.lepu.ble.le.bp2w.sync.time"                         // 同步时间 boolean
+            const val EventLeBp2wSwitchState = "com.lepu.ble.le.bp2w.switch.state"                   // 切换设备状态 boolean
+            const val EventLeBp2WifiDevice = "com.lepu.ble.le.bp2w.wifi.device"                     // 获取路由 Bp2WifiDevice
+            const val EventLeBp2WifiScanning = "com.lepu.ble.le.bp2w.wifi.scanning"                 // 正在扫描路由 boolean
+            const val EventLeBp2wGetWifiConfig = "com.lepu.ble.le.bp2w.get.wifi.config"              // 获取WiFi配置 Bp2WifiConfig
+            const val EventLeBp2wSetWifiConfig = "com.lepu.ble.le.bp2w.set.wifi.config"              // 设置WiFi boolean
+            const val EventLeBp2wGetFileListCrc = "com.lepu.ble.le.bp2w.get.fileList.crc"            // 获取列表校验值 FileListCrc
+            const val EventLeBp2wDeleteFile = "com.lepu.ble.le.bp2w.delete.file"                     // 删除文件 boolean
         }
     }
 
@@ -577,10 +622,10 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventAp20SetTime = "com.lepu.ble.ap20.set.time"              // 设置时间 true
             const val EventAp20DeviceInfo = "com.lepu.ble.ap20.device.info"        // 设备信息 BoDeviceInfo
             const val EventAp20Battery = "com.lepu.ble.ap20.battery"               // 电池电量 int（0-3）
-            const val EventAp20RtBoWave = "com.lepu.ble.ap20.bo.rtwave"            // 血氧波形包数据 Ap10BleResponse.RtBoWave
-            const val EventAp20RtBoParam = "com.lepu.ble.ap20.bo.rtparam"          // 血氧参数包数据 Ap10BleResponse.RtBoParam
-            const val EventAp20RtBreathWave = "com.lepu.ble.ap20.breath.rtwave"    // 鼻息流波形包数据 Ap10BleResponse.RtBreathWave
-            const val EventAp20RtBreathParam = "com.lepu.ble.ap20.breath.rtparam"  // 鼻息流参数包数据 Ap10BleResponse.RtBreathParam
+            const val EventAp20RtBoWave = "com.lepu.ble.ap20.bo.rtwave"            // 血氧波形包数据 Ap20BleResponse.RtBoWave
+            const val EventAp20RtBoParam = "com.lepu.ble.ap20.bo.rtparam"          // 血氧参数包数据 Ap20BleResponse.RtBoParam
+            const val EventAp20RtBreathWave = "com.lepu.ble.ap20.breath.rtwave"    // 鼻息流波形包数据 Ap20BleResponse.RtBreathWave
+            const val EventAp20RtBreathParam = "com.lepu.ble.ap20.breath.rtparam"  // 鼻息流参数包数据 Ap20BleResponse.RtBreathParam
 
             /**
              * type : 0 背光等级（0-5）
@@ -589,7 +634,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
              *        3 脉率过低阈值（30-99）
              *        4 脉率过高阈值（100-250）
              */
-            const val EventAp20ConfigInfo = "com.lepu.ble.ap20.config.info"   // 配置信息 int
+            const val EventAp20ConfigInfo = "com.lepu.ble.ap20.config.info"   // 获取配置信息 Ap20BleResponse.ConfigInfo
         }
     }
 
@@ -600,7 +645,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     interface Lew3 {
         companion object {
             const val EventLew3Info = "com.lepu.ble.lew3.info"                                  // 设备信息 LepuDevice
-            const val EventLew3BatteryInfo = "com.lepu.ble.lew3.battery.info"                   // 电量信息 LepuBatteryInfo
+            const val EventLew3BatteryInfo = "com.lepu.ble.lew3.battery.info"                   // 电量信息 KtBleBattery
             const val EventLew3SetTime = "com.lepu.ble.lew3.set.time"                           // 同步时间 true
             const val EventLew3BoundDevice = "com.lepu.ble.lew3.bound.device"                   // 请求绑定设备
             const val EventLew3GetConfig = "com.lepu.ble.lew3.get.config"                       // 获取配置信息
@@ -609,11 +654,11 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventLew3Reset = "com.lepu.ble.lew3.reset"                                // 复位 true
             const val EventLew3FactoryReset = "com.lepu.ble.lew3.factory.reset"                 // 恢复出厂设置 true
             const val EventLew3FactoryResetAll = "com.lepu.ble.lew3.factory.reset.all"          // 恢复生产出厂状态 true
-            const val EventLew3RtData = "com.lepu.ble.lew3.realtime.data"                       // 实时数据 Lew3RtData
-            const val EventLew3FileList = "com.lepu.ble.lew3.file.list"                         // 文件列表 Lew3FileList
+            const val EventLew3RtData = "com.lepu.ble.lew3.realtime.data"                       // 实时数据 Lew3BleResponse.RtData
+            const val EventLew3FileList = "com.lepu.ble.lew3.file.list"                         // 文件列表 Lew3BleResponse.FileList
             const val EventLew3ReadFileError = "com.lepu.ble.lew3.file.read.error"              // 传输文件出错 true
             const val EventLew3ReadingFileProgress = "com.lepu.ble.lew3.file.reading.progress"  // 传输文件进度 int(0-100)
-            const val EventLew3ReadFileComplete = "com.lepu.ble.lew3.file.read.complete"        // 传输文件完成 LeW3File
+            const val EventLew3ReadFileComplete = "com.lepu.ble.lew3.file.read.complete"        // 传输文件完成 Lew3BleResponse.EcgFile
         }
     }
 
@@ -623,7 +668,36 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface Vetcorder {
         companion object {
-            const val EventVetcorderInfo = "com.lepu.ble.vetcorder.info"
+            const val EventVetcorderInfo = "com.lepu.ble.vetcorder.info"  // VetcorderInfo
+        }
+    }
+
+    /**
+     * Sp20BleInterface
+     * 包含model: MODEL_SP20
+     */
+    interface SP20 {
+        companion object {
+            const val EventSp20SetTime = "com.lepu.ble.sp20.set.time"        // 设置时间 true
+            const val EventSp20DeviceInfo = "com.lepu.ble.sp20.device.info"  // 设备信息 BoDeviceInfo
+            const val EventSp20Battery = "com.lepu.ble.sp20.battery"         // 电池电量 int（0-3）
+            const val EventSp20RtWave = "com.lepu.ble.sp20.rtwave"           // 血氧波形包数据 Sp20BleResponse.RtWave
+            const val EventSp20RtParam = "com.lepu.ble.sp20.rtparam"         // 血氧参数包数据 Sp20BleResponse.RtParam
+            const val EventSp20TempData = "com.lepu.ble.sp20.temp.data"      // 鼻息流参数包数据 Sp20BleResponse.TempData
+
+            /**
+             * type :
+             *        2 血氧过低阈值（value：85-99）
+             *        3 脉率过低阈值（value：30-99）
+             *        4 脉率过高阈值（value：100-250）
+             *        5 搏动音开关（value：0 off，1 on）
+             */
+            const val EventSp20GetConfig = "com.lepu.ble.sp20.get.config"          // 获取配置信息 Sp20Config
+            /**
+             * value : 0 失败
+             *         1 成功
+             */
+            const val EventSp20SetConfig = "com.lepu.ble.sp20.set.config.success"  // 配置信息 Sp20Config
         }
     }
 
@@ -651,7 +725,7 @@ object EventMsgConst {
     interface Discovery{
         companion object{
             const val EventDeviceFound = "com.lepu.ble.device.found"  // 扫描到sdk已有model设备会发送 Bluetooth
-            const val EventDeviceFound_Device = "com.lepu.ble.device.found.device"  // 开始扫描设置需要配对的信息 BluetoothDevice
+            const val EventDeviceFound_Device = "com.lepu.ble.device.found.device"  // 开始扫描设置需要配对的信息 Bluetooth/BluetoothDevice
             const val EventDeviceFound_ScanRecord = "com.lepu.ble.device.found.scanResult"  // 开始扫描设置需要配对的信息 ScanRecord
             const val EventDeviceFoundForUnRegister = "com.lepu.ble.device.found.unregister"  // 扫描到sdk没有model设备会发送 ScanResult
             const val EventDeviceFound_ScanRecordUnRegister = "com.lepu.ble.device.found.scanResult.unregister"

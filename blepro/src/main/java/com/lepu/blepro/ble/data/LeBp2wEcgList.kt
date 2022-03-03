@@ -61,5 +61,28 @@ class LeBp2wEcgList(bytes: ByteArray) {
             index += 2
             qtc = toUInt(bytes.copyOfRange(index, index+2))
         }
+
+        override fun toString(): String {
+            return """
+                time : $time
+                fileName : $fileName
+                uid : $uid
+                mode : $mode
+                recordingTime : $recordingTime
+                result : $result
+                hr : $hr
+                qrs : $qrs
+                pvcs : $pvcs
+                qtc : $qtc
+            """.trimIndent()
+        }
+    }
+
+    override fun toString(): String {
+        return """
+            fileVersion : $fileVersion
+            fileType : $fileType
+            ecgFileList : $ecgFileList
+        """.trimIndent()
     }
 }

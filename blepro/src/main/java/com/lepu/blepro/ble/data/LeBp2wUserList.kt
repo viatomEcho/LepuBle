@@ -34,4 +34,12 @@ class LeBp2wUserList() {
         }
         return data
     }
+
+    override fun toString(): String {
+        return """
+            fileVersion : $fileVersion
+            fileType : $fileType
+            userList : $userList
+        """.trimIndent()
+    }
 }

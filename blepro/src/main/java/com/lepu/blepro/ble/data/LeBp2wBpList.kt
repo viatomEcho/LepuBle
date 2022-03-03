@@ -1,6 +1,8 @@
 package com.lepu.blepro.ble.data
 
+import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.toUInt
+import java.util.*
 
 const val BP_RECORD_LENGTH = 37
 
@@ -27,6 +29,7 @@ class LeBp2wBpList(bytes: ByteArray) {
 
     data class BpRecord(val bytes: ByteArray) {
         var time: Long        // 测量时间戳
+        var fileName: String
         var uid: Int          // 用户id
         var mode: Int         // 测量模式 0：单次 1：3次
         var interval: Int     // 测量间隔 单位s 非单次测量模式有效
@@ -41,6 +44,7 @@ class LeBp2wBpList(bytes: ByteArray) {
         init {
             var index = 0
             time = toUInt(bytes.copyOfRange(index, index+4)).toLong()
+            fileName = DateUtil.stringFromDate(Date(time), "yyyyMMddHHmmss")
             index += 4
             uid = toUInt(bytes.copyOfRange(index, index+4))
             index += 4
@@ -62,6 +66,31 @@ class LeBp2wBpList(bytes: ByteArray) {
             index++
             level = (bytes[index].toUInt() and 0xFFu).toInt()
         }
+
+        override fun toString(): String {
+            return """
+                time : $time
+                fileName : $fileName
+                uid : $uid
+                mode : $mode
+                interval : $interval
+                status : $status
+                sys : $sys
+                dia : $dia
+                mean : $mean
+                pr : $pr
+                result : $result
+                level : $level
+            """.trimIndent()
+        }
+    }
+
+    override fun toString(): String {
+        return """
+            fileVersion : $fileVersion
+            fileType : $fileType
+            bpFileList : $bpFileList
+        """.trimIndent()
     }
 
 }
