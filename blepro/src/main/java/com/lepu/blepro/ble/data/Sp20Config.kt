@@ -10,10 +10,12 @@ class Sp20Config() {
      * 4 脉率过高阈值（100-250）
      */
 
+    var bytes = byteArrayOf(0)
     var type: Int = 0   // Sp20BleCmd.ConfigType
     var value: Int = 0
 
     constructor(bytes: ByteArray) : this() {
+        this.bytes = bytes
         type = byte2UInt(bytes[0])
         value = byte2UInt(bytes[1])
     }

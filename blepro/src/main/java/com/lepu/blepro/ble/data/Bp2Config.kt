@@ -6,6 +6,7 @@ import com.lepu.blepro.utils.toUInt
 
 class Bp2Config() {
 
+    var bytes = byteArrayOf(0)
     var prevCalibZero: Int = 0
     var lastCalibZero: Int = 0
     var calibSlope: Int = 0
@@ -18,6 +19,7 @@ class Bp2Config() {
     var volume: Int = 0                 // 音量大小
 
     constructor(bytes: ByteArray) : this() {
+        this.bytes = bytes
         var index = 0
         prevCalibZero = toUInt(bytes.copyOfRange(index, index+4))
         index += 4

@@ -236,6 +236,13 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                 } else {
                     sendCmd(writeFileEnd())
                 }
+
+                val part = Bp2FilePart(fileName, fileSize, curSize)
+                LepuBleLog.d(tag, "write file $fileName WRITE_FILE_DATA curSize == $curSize | fileSize == $fileSize")
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2WritingFileProgress)
+                    .post(InterfaceEvent(model, part))
+
             }
             WRITE_FILE_END -> {
                 //检查返回是否异常

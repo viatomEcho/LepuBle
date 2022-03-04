@@ -4,10 +4,12 @@ import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.toString
 
 class KtBleFileList {
+    var bytes: ByteArray
     var fileNum: Int
     var fileNameList : Array<String?>
     var deviceName: String
     constructor(bytes: ByteArray, deviceName: String) {
+        this.bytes = bytes
         this.deviceName = deviceName
             this.fileNum = bytes[0].toInt()
 

@@ -2,6 +2,7 @@ package com.lepu.blepro.ble.data
 
 class Bp2WifiConfig() {
 
+    var bytes = byteArrayOf(0)
     var length: Int = 0
     var option: Int = 0
 
@@ -9,6 +10,7 @@ class Bp2WifiConfig() {
     lateinit var server: Bp2Server
 
     constructor(bytes: ByteArray) : this() {
+        this.bytes = bytes
         var index = 0
         option = (bytes[index].toUInt() and 0xFFu).toInt()
         index++

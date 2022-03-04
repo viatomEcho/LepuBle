@@ -4,6 +4,7 @@ import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.toUInt
 
 class LeBp2wEcgFile {
+    var content: ByteArray
     var fileName: String
     var fileVersion: Int
     var fileType: Int
@@ -11,6 +12,7 @@ class LeBp2wEcgFile {
     var waveData: ByteArray
     var deviceName: String
     constructor(fileName: String, content: ByteArray, deviceName: String) {
+        this.content = content
         this.deviceName = deviceName
         this.fileName = fileName
         var index = 0

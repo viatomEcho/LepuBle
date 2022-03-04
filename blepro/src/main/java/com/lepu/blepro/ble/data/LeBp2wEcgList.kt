@@ -6,7 +6,7 @@ import java.util.*
 
 const val ECG_RECORD_LENGTH = 46
 
-class LeBp2wEcgList(bytes: ByteArray) {
+class LeBp2wEcgList(var bytes: ByteArray) {
 
     var fileVersion: Int
     var fileType: Int
@@ -29,7 +29,7 @@ class LeBp2wEcgList(bytes: ByteArray) {
     }
 
     data class EcgRecord(val bytes: ByteArray) {
-        var time: Long          // 测量时间戳
+        var time: Long          // 测量时间戳s
         var fileName: String    // 文件名
         var uid: Int            // 用户id
         var mode: Int           // 测量模式
@@ -43,7 +43,7 @@ class LeBp2wEcgList(bytes: ByteArray) {
         init {
             var index = 0
             time = toUInt(bytes.copyOfRange(index, index+4)).toLong()
-            fileName = stringFromDate(Date(time), "yyyyMMddHHmmss")
+            fileName = stringFromDate(Date(time*1000), "yyyyMMddHHmmss")
             index += 4
             uid = toUInt(bytes.copyOfRange(index, index+4))
             index += 4

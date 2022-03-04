@@ -17,62 +17,15 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:text="扫描"/>
-
-        <Button
-            android:id="@+id/disconnect"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/scan"
-            app:layout_constraintBottom_toBottomOf="@id/scan"
-            app:layout_constraintStart_toEndOf="@id/scan"
-            android:layout_marginStart="20dp"
-            android:text="断开"/>
-
-        <Button
-            android:id="@+id/reconnectByName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/scan"
-            app:layout_constraintStart_toStartOf="parent"
-            android:text="名称重连"/>
-
-        <Button
-            android:id="@+id/reconnectByAddress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/reconnectByName"
-            app:layout_constraintBottom_toBottomOf="@id/reconnectByName"
-            app:layout_constraintStart_toEndOf="@id/reconnectByName"
-            android:layout_marginStart="20dp"
-            android:text="地址重连"/>
-
-        <Button
-            android:id="@+id/scanByName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/reconnectByName"
-            app:layout_constraintStart_toStartOf="parent"
-            android:text="名称扫描"/>
-
-        <Button
-            android:id="@+id/scanByAddress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/scanByName"
-            app:layout_constraintBottom_toBottomOf="@id/scanByName"
-            app:layout_constraintStart_toEndOf="@id/scanByName"
-            android:layout_marginStart="20dp"
-            android:text="地址扫描"/>
-
         <EditText
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/ble_split"
             android:hint="筛选设备"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/scanByName"
-            android:layout_marginTop="20dp"
-            android:layout_marginRight="200dp"
+            app:layout_constraintStart_toEndOf="@id/scan"
+            app:layout_constraintTop_toTopOf="@id/scan"
+            app:layout_constraintBottom_toBottomOf="@id/scan"
+            android:layout_marginStart="20dp"
             android:textSize="20sp"/>
         <Button
             android:id="@+id/ble_split_btn"
@@ -84,13 +37,81 @@
             android:layout_marginStart="20dp"
             android:text="确定"/>
 
+        <Button
+            android:id="@+id/disconnect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/scan"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="断开"/>
+
+        <Button
+            android:id="@+id/reconnect_by_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/disconnect"
+            app:layout_constraintBottom_toBottomOf="@id/disconnect"
+            app:layout_constraintStart_toEndOf="@id/disconnect"
+            android:layout_marginStart="20dp"
+            android:text="名称重连"/>
+
+        <Button
+            android:id="@+id/reconnect_by_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/reconnect_by_name"
+            app:layout_constraintBottom_toBottomOf="@id/reconnect_by_name"
+            app:layout_constraintStart_toEndOf="@id/reconnect_by_name"
+            android:layout_marginStart="20dp"
+            android:text="地址重连"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/scan_name"
+            android:hint="蓝牙名"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/reconnect_by_name"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="200dp"
+            android:textSize="20sp"/>
+        <Button
+            android:id="@+id/scan_by_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/scan_name"
+            app:layout_constraintBottom_toBottomOf="@id/scan_name"
+            app:layout_constraintStart_toEndOf="@id/scan_name"
+            android:layout_marginStart="20dp"
+            android:text="扫描"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/scan_address"
+            android:hint="蓝牙地址"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/scan_name"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="200dp"
+            android:textSize="20sp"/>
+        <Button
+            android:id="@+id/scan_by_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/scan_address"
+            app:layout_constraintBottom_toBottomOf="@id/scan_address"
+            app:layout_constraintStart_toEndOf="@id/scan_address"
+            android:layout_marginStart="20dp"
+            android:text="扫描"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/ble_device"
             android:text="蓝牙设备"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ble_split"
+            app:layout_constraintTop_toBottomOf="@id/scan_address"
             android:layout_marginTop="20dp"
             android:textSize="20sp"/>
 
