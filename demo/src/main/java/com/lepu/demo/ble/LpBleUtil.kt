@@ -659,6 +659,17 @@ class LpBleUtil {
             }
         }
 
+        fun aoj20aDeleteData(model: Int) {
+            Log.d(TAG, "aoj20aDeleteData")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.aoj20aDeleteData(model)
+            }
+        }
+
     }
 
 

@@ -124,7 +124,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
             Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC66B,
             Bluetooth.MODEL_AP20, Bluetooth.MODEL_BABYO2,
-            Bluetooth.MODEL_SP20 -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_TV221U -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER -> {
                 waveHandler.post(EcgWaveTask())
@@ -551,7 +551,31 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     }
                 }
             })
-
+        //--------------------------vtm20f----------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM20f.EventVTM20fRtWave)
+            .observe(this, {
+                val rtWave = it.data as Vtm20fBleResponse.RtWave
+                OxyDataController.receive(intArrayOf(rtWave.wave))
+                binding.dataStr.text = rtWave.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM20f.EventVTM20fRtParam)
+            .observe(this, {
+                val rtData = it.data as Vtm20fBleResponse.RtParam
+                viewModel.oxyPr.value = rtData.pr
+                viewModel.spo2.value = rtData.spo2
+                viewModel.pi.value = rtData.pi
+            })
+        //--------------------------aoj20a----------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempRtData)
+            .observe(this, {
+                val data = it.data as Aoj20aBleResponse.TempRtData
+                binding.tempStr.text = data.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempErrorMsg)
+            .observe(this, {
+                val data = it.data as Aoj20aBleResponse.ErrorMsg
+                binding.tempStr.text = data.toString()
+            })
     }
 
     var oxyPpgSize = 0
@@ -579,7 +603,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 }
                 Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
                 Bluetooth.MODEL_PC66B, Bluetooth.MODEL_AP20,
-                Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_SP20 -> {
+                Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_SP20,
+                Bluetooth.MODEL_TV221U -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE

@@ -280,6 +280,20 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 }
             })
 
+        //-------------------------aoj20a---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aSetTime)
+            .observe(this, {
+                Toast.makeText(this, "aoj20a 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aDeviceData)
+            .observe(this, { event ->
+                (event.data as Aoj20aBleResponse.DeviceData).let {
+                    Toast.makeText(this, "aoj20a 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._aoj20aInfo.value = it
+                }
+            })
+
     }
     private fun needPermission(){
         PermissionX.init(this)

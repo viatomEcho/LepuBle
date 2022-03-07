@@ -35,6 +35,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
     private var isReceive = false
 
+    private var tempList = mutableListOf<Aoj20aBleResponse.TempRecord>()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
@@ -88,6 +90,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         mainViewModel.boInfo.observe(viewLifecycleOwner, {
             binding.info.text = it.toString()
         })
+        mainViewModel.aoj20aInfo.observe(viewLifecycleOwner, {
+            binding.info.text = it.toString()
+        })
         // 公共方法测试
         // 获取设备信息
         binding.getInfo.setOnClickListener {
@@ -98,6 +103,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         binding.getFileList.setOnClickListener {
             fileCount = 0
             fileNames.clear()
+            tempList.clear()
 
             fileType++
             if (fileType > 2) {
@@ -429,6 +435,13 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     fileNames.removeAt(0)
                     readFile()
                 }
+            })
+        //---------------------------aoj20a-----------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempRecord)
+            .observe(this, {
+                val data = it.data as Aoj20aBleResponse.TempRecord
+                tempList.add(data)
+                binding.info.text = tempList.toString()
             })
     }
 

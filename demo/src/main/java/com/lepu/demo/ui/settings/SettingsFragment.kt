@@ -71,6 +71,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.ap20Layout.visibility = View.GONE
         binding.lew3Layout.visibility = View.GONE
         binding.sp20Layout.visibility = View.GONE
+        binding.aoj20aLayout.visibility = View.GONE
         if (v == null) return
         v.visibility = View.VISIBLE
     }
@@ -126,6 +127,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_SP20 -> {
                     setViewVisible(binding.sp20Layout)
                     LpBleUtil.sp20GetConfig(it.modelNo, state)
+                }
+                Bluetooth.MODEL_AOJ20A -> {
+                    setViewVisible(binding.aoj20aLayout)
                 }
                 else -> {
                     setViewVisible(null)
@@ -657,6 +661,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sp20SetConfig.text = "设置参数" + state
         }
 
+        //----------------------aoj20a--------------------
+        binding.aoj20aDeleteFile.setOnClickListener {
+            LpBleUtil.aoj20aDeleteData(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
     }
 
     private fun setReceiveCmd(bytes: ByteArray) {
@@ -1082,6 +1092,31 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.content.text = data.toString()
             })
 
+        //---------------------------aoj20a-------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempRtData)
+            .observe(this, {
+                Toast.makeText(
+                    context,
+                    "aoj20a 测量完成",
+                    Toast.LENGTH_SHORT
+                ).show()
+                val data = it.data as Aoj20aBleResponse.TempRtData
+                setReceiveCmd(data.bytes)
+                binding.content.text = data.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aDeleteData)
+            .observe(this, {
+                Toast.makeText(
+                    context,
+                    "aoj20a 删除成功",
+                    Toast.LENGTH_SHORT
+                ).show()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempErrorMsg)
+            .observe(this, {
+                val data = it.data as Aoj20aBleResponse.ErrorMsg
+                binding.content.text = data.toString()
+            })
 
         //-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1SetTime)

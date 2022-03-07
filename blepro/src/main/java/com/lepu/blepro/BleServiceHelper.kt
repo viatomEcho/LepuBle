@@ -1536,4 +1536,17 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    /**
+     * 删除历史数据（aoj20a）
+     */
+    fun aoj20aDeleteData(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Aoj20aBleInterface).let {
+                LepuBleLog.d(tag, "it as Aoj20aBleInterface--aoj20aDeleteData")
+                it.deleteData()
+            }
+        }
+    }
+
 }
