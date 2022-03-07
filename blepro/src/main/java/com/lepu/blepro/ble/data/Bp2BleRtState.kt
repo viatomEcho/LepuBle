@@ -17,7 +17,7 @@ const val STATUS_BP_AVG_WAIT = 16
 const val STATUS_BP_AVG_END = 17
 
 
-class Bp2BleRtState {
+class Bp2BleRtState(val bytes: ByteArray) {
 
     var status : Int             // STATUS_SLEEP, STATUS_HISTORY ...
     var statusMsg: String
@@ -27,7 +27,7 @@ class Bp2BleRtState {
     // reserve 2
 
 
-    constructor(bytes : ByteArray) {
+    init {
         status = bytes[0].toInt()
         statusMsg = getStatusMsg(status)
         battery = KtBleBattery(bytes.copyOfRange(1, 5))

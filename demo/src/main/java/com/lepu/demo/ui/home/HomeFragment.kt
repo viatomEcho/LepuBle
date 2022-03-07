@@ -85,12 +85,10 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         }
 
         binding.scanByName.setOnClickListener {
-//            LpBleUtil.startScanByName("BP2 6077", Bluetooth.MODEL_BP2)
-            LpBleUtil.startScanByName("BP2 6077")
+            LpBleUtil.startScanByName(binding.scanName.text.toString())
         }
         binding.scanByAddress.setOnClickListener {
-//            LpBleUtil.startScanByAddress("CF:8A:57:84:D1:4E", Bluetooth.MODEL_BP2)
-            LpBleUtil.startScanByAddress("CF:8A:57:84:D1:4E")
+            LpBleUtil.startScanByAddress(binding.scanAddress.text.toString())
         }
 
         LinearLayoutManager(context).apply {

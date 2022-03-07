@@ -1,6 +1,6 @@
 package com.lepu.blepro.ble.data
 
-class Bp2WifiDevice(bytes: ByteArray) {
+class Bp2WifiDevice(val bytes: ByteArray) {
 
     var num: Int
 

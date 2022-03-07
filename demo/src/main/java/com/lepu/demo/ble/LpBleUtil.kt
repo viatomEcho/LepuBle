@@ -471,6 +471,9 @@ class LpBleUtil {
             BleServiceHelper.bp2DeleteFile(model)
         }
 
+        fun oxyGetRtWave(model: Int) {
+            BleServiceHelper.oxyGetRtWave(model)
+        }
         fun oxyGetRtParam(model: Int) {
             BleServiceHelper.oxyGetRtParam(model)
         }

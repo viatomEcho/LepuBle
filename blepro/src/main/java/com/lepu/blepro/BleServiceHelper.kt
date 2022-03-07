@@ -1224,7 +1224,7 @@ class BleServiceHelper private constructor() {
     /**
      * 获取实时波形（O2Ring，BabyO2）
      */
-    fun oxyGetWave(model: Int) {
+    fun oxyGetRtWave(model: Int) {
         if (!checkService()) return
         getInterface(model)?.let { it1 ->
             (it1 as OxyBleInterface).getRtWave()
