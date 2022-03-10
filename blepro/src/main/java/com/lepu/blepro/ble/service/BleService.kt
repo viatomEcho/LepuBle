@@ -606,7 +606,7 @@ open class BleService: LifecycleService() {
             }
 
             @Bluetooth.MODEL val model: Int = Bluetooth.getDeviceModel(deviceName)
-            if (model == Bluetooth.MODEL_UNRECOGNIZED) {
+            if (model == Bluetooth.MODEL_UNRECOGNIZED && scanModel == null) {
                 if (needPair)
                     result.scanRecord?.let {
                         HashMap<String, Any>().apply {
