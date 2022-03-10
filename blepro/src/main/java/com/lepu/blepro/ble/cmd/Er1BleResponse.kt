@@ -84,6 +84,11 @@ object Er1BleResponse {
         init {
             len = toUInt(bytes.copyOfRange(0, 2))
             wave = bytes.copyOfRange(2, bytes.size)
+
+            if (len != wave.size.div(2)) {
+                len = wave.size.div(2)
+            }
+
             wFs = FloatArray(len)
             for (i in 0 until len) {
                 wFs!![i] = Er1DataController.byteTomV(wave[2 * i], wave[2 * i + 1])
