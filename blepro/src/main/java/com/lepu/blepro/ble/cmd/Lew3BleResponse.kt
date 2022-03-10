@@ -99,6 +99,11 @@ object Lew3BleResponse {
             samplingNum = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
             waveData = bytes.copyOfRange(index, bytes.size)
+
+            if (samplingNum != waveData.size.div(2)) {
+                samplingNum = waveData.size.div(2)
+            }
+
             wFs = FloatArray(samplingNum)
             for (i in 0 until samplingNum) {
                 wFs[i] = byteTomV(waveData[2 * i], waveData[2 * i + 1])

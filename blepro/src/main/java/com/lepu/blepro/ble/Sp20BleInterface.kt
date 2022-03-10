@@ -72,7 +72,7 @@ class Sp20BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_BATTERY => success")
                         LepuBleLog.d(
                             tag,
-                            "model:$model, toUInt(response.content)) == " + toUInt(response.content)
+                            "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content)
                         )
                         val data = toUInt(response.content)
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20Battery)
@@ -86,14 +86,14 @@ class Sp20BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,MSG_ENABLE_OXY_PARAM => success")
                         LepuBleLog.d(
                             tag,
-                            "model:$model, toUInt(response.content)) == " + toUInt(response.content)
+                            "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content)
                         )
                     }
                     Sp20BleCmd.MSG_ENABLE_OXY_WAVE -> {
                         LepuBleLog.d(tag, "model:$model,MSG_ENABLE_OXY_WAVE => success")
                         LepuBleLog.d(
                             tag,
-                            "model:$model, toUInt(response.content)) == " + toUInt(response.content)
+                            "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content)
                         )
                     }
                     Sp20BleCmd.MSG_RT_OXY_PARAM -> {
@@ -117,7 +117,7 @@ class Sp20BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,MSG_SET_TIME => success")
                         LepuBleLog.d(
                             tag,
-                            "model:$model, toUInt(response.content)) == " + toUInt(response.content)
+                            "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content)
                         )
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20SetTime)
                             .post(InterfaceEvent(model, true))

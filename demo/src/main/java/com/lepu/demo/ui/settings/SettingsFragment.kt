@@ -695,7 +695,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this, {
                 val data = it.data as ByteArray
                 setReceiveCmd(data)
-                if (it.model == Bluetooth.MODEL_ER1) {
+                if (it.model == Bluetooth.MODEL_ER1 || it.model == Bluetooth.MODEL_ER1_N) {
                     val config = VbVibrationSwitcherConfig.parse(data)
                     this.config = config
                     var temp = "关"
