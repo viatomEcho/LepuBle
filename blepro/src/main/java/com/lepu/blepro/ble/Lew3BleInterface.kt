@@ -43,7 +43,7 @@ class Lew3BleInterface(model: Int): BleInterface(model) {
     var fileListName: String? = null
     var curFileName: String? = null
     private var userId: String? = null
-    var curFile: Lew3File? = null
+    var curFile: Lew3BleResponse.EcgFile? = null
 
     override fun dealReadFile(userId: String, fileName: String) {
         this.userId = userId
@@ -52,6 +52,7 @@ class Lew3BleInterface(model: Int): BleInterface(model) {
         sendCmd(Lew3BleCmd.readFileStart(fileName.toByteArray(), 0))
     }
 
+    @OptIn(ExperimentalUnsignedTypes::class)
     override fun hasResponse(bytes: ByteArray?): ByteArray? {
         val bytesLeft: ByteArray? = bytes
 
@@ -87,7 +88,7 @@ class Lew3BleInterface(model: Int): BleInterface(model) {
         return bytesLeft
     }
 
-
+    @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: Lew3BleResponse.BleResponse) {
         LiveEventBus.get<String>(EventMsgConst.Cmd.EventCmdResponseContent).post(bytesToHex(response.bytes))
         when(response.cmd) {
@@ -201,7 +202,7 @@ class Lew3BleInterface(model: Int): BleInterface(model) {
 
             Lew3BleCmd.RT_DATA -> {
                 if (response.len == 0) return
-                val rtData = Lew3RtData(response.content)
+                val rtData = Lew3BleResponse.RtData(response.content)
 
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3RtData).post(
@@ -223,11 +224,10 @@ class Lew3BleInterface(model: Int): BleInterface(model) {
             }
 
             Lew3BleCmd.READ_FILE_START -> {
-                if (response.len == 0) return
                 LepuBleLog.d(tag, "model:$model,READ_FILE_START => success")
                 if (response.pkgType == 0x01.toByte()) {
                     curFile =  curFileName?.let {
-                        Lew3File(model, it, toUInt(response.content))
+                        Lew3BleResponse.EcgFile(model, it, toUInt(response.content))
                     }
                     sendCmd(Lew3BleCmd.readFileData(0))
                 } else {
@@ -242,14 +242,18 @@ class Lew3BleInterface(model: Int): BleInterface(model) {
 
             }
             Lew3BleCmd.READ_FILE_DATA -> {
-                if (response.len == 0) return
                 curFile?.apply {
 
                     LepuBleLog.d(tag, "READ_FILE_DATA: paused = $isPausedRF, cancel = $isCancelRF, offset =  ${offset}, index = ${this.index}")
 
                     //检查当前的下载状态
                     if (isCancelRF || isPausedRF) {
-                        sendCmd(Er1BleCmd.readFileEnd())
+                        sendCmd(Lew3BleCmd.readFileEnd())
+                        return
+                    }
+                    // 心电文件数据不知为何有空数据的文件
+                    if (response.len == 0) {
+                        sendCmd(Lew3BleCmd.readFileEnd())
                         return
                     }
 
@@ -276,13 +280,13 @@ class Lew3BleInterface(model: Int): BleInterface(model) {
                         if (it.index < it.fileSize ) {
                             if ((isCancelRF || isPausedRF) ) return
                         } else {
-                            val fileArray =
-                                Lew3FileList(it.content)
+                            val list =
+                                Lew3BleResponse.FileList(it.content)
 
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3FileList).post(
                                 InterfaceEvent(
                                     model,
-                                    fileArray
+                                    list
                                 )
                             )
                         }
@@ -304,7 +308,7 @@ class Lew3BleInterface(model: Int): BleInterface(model) {
             Lew3BleCmd.GET_BATTERY -> {
                 if (response.len == 0) return
                 LepuBleLog.d(tag, "model:$model,GET_BATTERY => success")
-                val data = LepuBatteryInfo(response.content)
+                val data = KtBleBattery(response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3BatteryInfo)
                     .post(InterfaceEvent(model, data))
             }

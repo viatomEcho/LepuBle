@@ -17,25 +17,44 @@ const val STATUS_BP_AVG_WAIT = 16
 const val STATUS_BP_AVG_END = 17
 
 
-class Bp2BleRtState {
+class Bp2BleRtState(val bytes: ByteArray) {
 
-    var status : Int
+    var status : Int             // STATUS_SLEEP, STATUS_HISTORY ...
+    var statusMsg: String
     var battery : KtBleBattery
-    var avgCnt: Int
-    var avgWaitTick: Int
+    var avgCnt: Int              // x3当前测量下标 0,1,2
+    var avgWaitTick: Int         // x3等待计时
     // reserve 2
 
 
-    constructor(bytes : ByteArray) {
+    init {
         status = bytes[0].toInt()
+        statusMsg = getStatusMsg(status)
         battery = KtBleBattery(bytes.copyOfRange(1, 5))
         avgCnt = byte2UInt(bytes[5])
         avgWaitTick = byte2UInt(bytes[6])
     }
 
+    private fun getStatusMsg(status: Int): String {
+        return when(status) {
+            STATUS_SLEEP -> "STATUS_SLEEP"
+            STATUS_HISTORY -> "STATUS_HISTORY"
+            STATUS_CHARGING -> "STATUS_CHARGING"
+            STATUS_READY -> "STATUS_READY"
+            STATUS_BP_ING -> "STATUS_BP_ING"
+            STATUS_BP_END -> "STATUS_BP_END"
+            STATUS_ECG_ING -> "STATUS_ECG_ING"
+            STATUS_BP_AVG_ING -> "STATUS_BP_AVG_ING"
+            STATUS_BP_AVG_WAIT -> "STATUS_BP_AVG_WAIT"
+            STATUS_BP_AVG_END -> "STATUS_BP_AVG_END"
+            else -> ""
+        }
+    }
+
     override fun toString(): String {
         return """
             status : $status
+            statusMsg : $statusMsg
             battery : $battery
             avgCnt : $avgCnt
             avgWaitTick : $avgWaitTick

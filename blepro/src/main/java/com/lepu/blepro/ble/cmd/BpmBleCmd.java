@@ -166,9 +166,9 @@ public class BpmBleCmd {
             cmd[3] = (byte) 0x05; // length
             cmd[4] = CMD_TYPE_GET_RECORDS; // cmd value
             cmd[5] = 0x00; // cmd value
-            cmd[6] = 0x01; // cmd value
+            cmd[6] = 0x00; // cmd value
             cmd[7] = 0x00; // cmd value
-            cmd[8] = 0x02; // cmd value
+            cmd[8] = 0x00; // cmd value
             cmd[9] = calcNum(cmd);
             return cmd;
         }

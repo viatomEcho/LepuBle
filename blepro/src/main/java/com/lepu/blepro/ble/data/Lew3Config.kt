@@ -7,14 +7,16 @@ import com.lepu.blepro.utils.toUInt
 import java.nio.charset.Charset
 
 class Lew3Config() {
-    var notchMask = 0
-    var state: Int = 0
-    var serverAddrType: Int = 0
-    var len: Int = 0
-    var addr: String = ""
-    var port: Int = 0
+    var bytes = byteArrayOf(0)
+    var notchMask = 0            // 工频陷波屏蔽  0:开启 1:屏蔽
+    var state: Int = 0           // 服务器当前连接状态 0:断开 1:连接中 2:已连接
+    var serverAddrType: Int = 0  // 服务器地址类型  0:ipv4  1:域名形式
+    var len: Int = 0             // 服务器地址长度
+    var addr: String = ""        // 服务器地址 e.g. “192.168.1.33”
+    var port: Int = 0            // 服务器端口号 6000
 
     constructor(bytes: ByteArray) : this() {
+        this.bytes = bytes
         var index = 0
         notchMask = byte2UInt(bytes[index])
         index++

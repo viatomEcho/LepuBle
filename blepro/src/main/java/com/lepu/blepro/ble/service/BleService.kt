@@ -65,6 +65,14 @@ open class BleService: LifecycleService() {
     var scanModel: IntArray? = null
 
     /**
+     * 扫描指定设备
+     */
+    var isScanDefineDevice = false
+    var isScanByName = false
+    var scanByName = ""
+    var scanByAddress = ""
+
+    /**
      * 本次扫描是否需要发送配对信息
      * 默认： false
      * 开启扫描被重新赋值
@@ -233,7 +241,13 @@ open class BleService: LifecycleService() {
                     return this
                 }
             }
-
+            Bluetooth.MODEL_LE_BP2W -> {
+                LeBp2wBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
             Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B -> {
                 Pc60FwBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
@@ -299,6 +313,14 @@ open class BleService: LifecycleService() {
                     return this
                 }
             }
+            Bluetooth.MODEL_SP20 -> {
+                Sp20BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
             Bluetooth.MODEL_LEW3 -> {
                 Lew3BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
@@ -309,6 +331,22 @@ open class BleService: LifecycleService() {
             }
             Bluetooth.MODEL_VETCORDER -> {
                 VetcorderBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_TV221U -> {
+                Vtm20fBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_AOJ20A -> {
+                Aoj20aBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
                     vailFace.put(m, this)
@@ -327,6 +365,22 @@ open class BleService: LifecycleService() {
 
 
     private val binder = BleBinder()
+
+    fun setScanDefineDevice(isScanDefineDevice: Boolean, isScanByName: Boolean, defineDevice: String) {
+        this.isScanDefineDevice = isScanDefineDevice
+        this.isScanByName = isScanByName
+        if (isScanDefineDevice) {
+            if (isScanByName) {
+                scanByName = defineDevice
+            } else {
+                scanByAddress = defineDevice
+            }
+        } else {
+            scanByName = ""
+            scanByAddress = ""
+        }
+
+    }
 
     /**
      *
@@ -471,6 +525,10 @@ open class BleService: LifecycleService() {
     private var bluetoothAdapter : BluetoothAdapter? = null
     private var leScanner : BluetoothLeScanner? = null
 
+    /**
+     * @param enable true(startScan) false(stopScan)
+     * startScan前必须先stopScan
+     */
     private fun scanDevice(enable: Boolean) {
         LepuBleLog.d(tag, "scanDevice => $enable")
 
@@ -502,6 +560,7 @@ open class BleService: LifecycleService() {
                     scanTimeout = GlobalScope.launch {
                         delay(10000)
                         startDiscover(scanModel, needPair, isReconnectScan)
+                        LepuBleLog.d(tag, "-------scanTimeout-------")
                     }
                     LepuBleLog.d(tag, "scanDevice scanTimeout.start()")
                     LepuBleLog.d(tag, "scanDevice started")
@@ -547,7 +606,7 @@ open class BleService: LifecycleService() {
             }
 
             @Bluetooth.MODEL val model: Int = Bluetooth.getDeviceModel(deviceName)
-            if (model == Bluetooth.MODEL_UNRECOGNIZED) {
+            if (model == Bluetooth.MODEL_UNRECOGNIZED && scanModel == null) {
                 if (needPair)
                     result.scanRecord?.let {
                         HashMap<String, Any>().apply {
@@ -579,6 +638,18 @@ open class BleService: LifecycleService() {
 
             if(scanModel != null)
                 if (!filterResult(b)) return
+
+            if (isScanDefineDevice) {
+                if (isScanByName) {
+                    if (!b.name.equals(scanByName)) return
+                    LepuBleLog.d(tag, "b.name == " + b.name)
+                    LepuBleLog.d(tag, "scanByName == " + scanByName)
+                } else {
+                    if (!b.macAddr.equals(scanByAddress)) return
+                    LepuBleLog.d(tag, "b.macAddr == " + b.macAddr)
+                    LepuBleLog.d(tag, "scanByAddress == " + scanByAddress)
+                }
+            }
 
             if (needPair)
             result.scanRecord?.let {
@@ -641,14 +712,29 @@ open class BleService: LifecycleService() {
         override fun onScanFailed(errorCode: Int) {
             LepuBleLog.e(tag, "scan error: $errorCode")
             if (errorCode == SCAN_FAILED_ALREADY_STARTED) {
-                LepuBleLog.e(tag, "already start")
+                LepuBleLog.e(tag, "Fails to start scan as BLE scan with the same settings is already started by the app.")
 
+                // 执行BluetoothLeScanner.startScan前必须先stopScan，否则出现此错误
+            }
+            if (errorCode == SCAN_FAILED_APPLICATION_REGISTRATION_FAILED) {
+                LepuBleLog.e(tag, "Fails to start scan as app cannot be registered.")
+
+                // 手机蓝牙未开启
+            }
+            if (errorCode == SCAN_FAILED_INTERNAL_ERROR) {
+                LepuBleLog.e(tag, "Fails to start scan due an internal error")
             }
             if (errorCode == SCAN_FAILED_FEATURE_UNSUPPORTED) {
-                LepuBleLog.e(tag, "scan settings not supported")
+                LepuBleLog.e(tag, "Fails to start power optimized scan as this feature is not supported.")
+            }
+
+            if (errorCode == 5) {
+                // @hide
+                LepuBleLog.e(tag, "Fails to start scan as it is out of hardware resources.")
             }
             if (errorCode == 6) {
-                LepuBleLog.e(tag, "too frequently")
+                // @hide
+                LepuBleLog.e(tag, "Fails to start scan as application tries to scan too frequently.")
 
             }
             if (errorCode == 2){ // 连接超时，去重连扫描时候可能碰到，解决办法重启蓝牙 待验证
@@ -670,7 +756,7 @@ open class BleService: LifecycleService() {
                 if(it.state == BluetoothAdapter.STATE_OFF){
                     it.enable()
                     delay(1000L)
-                    scanDevice(true)
+                    startDiscover(scanModel, needPair, isReconnectScan)
                 }
             }
             runBlocking { delay(1000L) }

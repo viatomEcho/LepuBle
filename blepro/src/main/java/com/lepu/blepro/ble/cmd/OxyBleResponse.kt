@@ -258,7 +258,9 @@ class OxyBleResponse{
 
         var rawDataArray: Array<PpgRawData?>
         var irArray: Array<Int?>
+        var irByteArray: Array<ByteArray?>
         var redArray: Array<Int?>
+        var redByteArray: Array<ByteArray?>
         var motionArray: Array<Int?>
 
         init {
@@ -266,7 +268,9 @@ class OxyBleResponse{
             rawDataBytes =  bytes.copyOfRange(2, bytes.size)
             rawDataArray = arrayOfNulls(len)
             irArray = arrayOfNulls(len)
+            irByteArray = arrayOfNulls(len)
             redArray = arrayOfNulls(len)
+            redByteArray = arrayOfNulls(len)
             motionArray = arrayOfNulls(len)
             for (i in 0  until len ){
                 if (bytes.size < (i * 9) + 11) break
@@ -275,7 +279,9 @@ class OxyBleResponse{
                     rawDataArray[i] = it
 
                     irArray[i] = it.ir
+                    irByteArray[i] = it.irBytes
                     redArray[i] = it.red
+                    redByteArray[i] = it.redBytes
                     motionArray[i] = it.motion
                 }
             }
@@ -285,13 +291,17 @@ class OxyBleResponse{
 
     @ExperimentalUnsignedTypes
     @Parcelize
-    class PpgRawData(var bytes: ByteArray): Parcelable  {
+    class PpgRawData(var bytes: ByteArray): Parcelable {
         var ir : Int
+        var irBytes: ByteArray
         var red : Int
+        var redBytes : ByteArray
         var motion : Int
         init {
             ir = toUInt(bytes.copyOfRange(0, 4))
+            irBytes = bytes.copyOfRange(0, 4)
             red = toUInt(bytes.copyOfRange(4, 8))
+            redBytes = bytes.copyOfRange(4, 8)
             motion = bytes[8].toUInt().toInt()
         }
 

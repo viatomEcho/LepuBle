@@ -8,7 +8,7 @@ import android.util.Log
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.cmd.Bp2wBleCmd
+import com.lepu.blepro.ble.cmd.LeBp2wBleCmd
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.objs.Bluetooth
@@ -136,6 +136,12 @@ class LpBleUtil {
             BleServiceHelper.startScan(scanModel, needPair)
         }
 
+        fun startScanByName(deviceName: String, scanModel: Int? = null) {
+            BleServiceHelper.startScanByName(deviceName, scanModel)
+        }
+        fun startScanByAddress(address: String, scanModel: Int? = null) {
+            BleServiceHelper.startScanByAddress(address, scanModel)
+        }
 
         fun stopScan() {
             Log.d(TAG, "stopScan...")
@@ -313,7 +319,7 @@ class LpBleUtil {
          * @param fileType
          */
         @JvmOverloads
-        fun getFileList(model: Int, fileType: Int = Bp2wBleCmd.FileType.ECG_TYPE){
+        fun getFileList(model: Int, fileType: Int = LeBp2wBleCmd.FileType.ECG_TYPE){
             BleServiceHelper.getFileList(model, fileType)
 
         }
@@ -440,37 +446,37 @@ class LpBleUtil {
            BleServiceHelper.bp2SwitchState(model, state)
         }
 
-        fun bp2wSetConfig(model: Int, config: Bp2wConfig) {
-            BleServiceHelper.bp2wSetConfig(model, config)
+        fun bp2SetConfig(model: Int, config: Bp2Config) {
+            BleServiceHelper.bp2SetConfig(model, config)
         }
-        fun bp2wGetConfig(model: Int){
-            BleServiceHelper.bp2wGetConfig(model)
+        fun bp2GetRtState(model: Int) {
+            BleServiceHelper.bp2GetRtState(model)
         }
-        fun bp2wSwitchState(model: Int, state: Int){
-            BleServiceHelper.bp2wSwitchState(model, state)
+        fun bp2GetWifiDevice(model: Int) {
+            BleServiceHelper.bp2GetWifiDevice(model)
         }
-        fun bp2wGetRtState(model: Int) {
-            BleServiceHelper.bp2wGetRtState(model)
+        fun bp2SetWifiConfig(model: Int, config: Bp2WifiConfig) {
+            BleServiceHelper.bp2SetWifiConfig(model, config)
         }
-        fun bp2wGetWifiDevice(model: Int) {
-            BleServiceHelper.bp2wGetWifiDevice(model)
+        fun bp2GetWifiConfig(model: Int) {
+            BleServiceHelper.bp2GetWifiConfig(model)
         }
-        fun bp2wSetWifiConfig(model: Int, config: Bp2WifiConfig) {
-            BleServiceHelper.bp2wSetWifiConfig(model, config)
-        }
-        fun bp2wGetWifiConfig(model: Int) {
-            BleServiceHelper.bp2wGetWifiConfig(model)
-        }
-        fun bp2WriteUserList(model: Int, userList: Bp2wUserList) {
+        fun bp2WriteUserList(model: Int, userList: LeBp2wUserList) {
             BleServiceHelper.bp2WriteUserList(model, userList)
         }
-        fun bp2wGetFileListCrc(model: Int, fileType: Int) {
-            BleServiceHelper.bp2wGetFileListCrc(model, fileType)
+        fun bp2GetFileListCrc(model: Int, fileType: Int) {
+            BleServiceHelper.bp2GetFileListCrc(model, fileType)
         }
-        fun bp2wDeleteFile(model: Int) {
-            BleServiceHelper.bp2wDeleteFile(model)
+        fun bp2DeleteFile(model: Int) {
+            BleServiceHelper.bp2DeleteFile(model)
         }
 
+        fun oxyGetRtWave(model: Int) {
+            BleServiceHelper.oxyGetRtWave(model)
+        }
+        fun oxyGetRtParam(model: Int) {
+            BleServiceHelper.oxyGetRtParam(model)
+        }
         fun oxyGetPpgRt(model: Int){
             BleServiceHelper.oxyGetPpgRt(model)
         }
@@ -570,14 +576,14 @@ class LpBleUtil {
                 BleServiceHelper.ap20GetConfig(model, type)
             }
         }
-        fun getBattery(model: Int) {
-            Log.d(TAG, "getBattery")
+        fun ap20GetBattery(model: Int) {
+            Log.d(TAG, "ap20GetBattery")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.sendHeartbeat(model)
+                BleServiceHelper.ap20GetBattery(model)
             }
         }
 
@@ -619,6 +625,48 @@ class LpBleUtil {
                     return
                 }
                 BleServiceHelper.lew3GetBattery(model)
+            }
+        }
+
+        fun sp20GetBattery(model: Int) {
+            Log.d(TAG, "sp20GetBattery")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.sp20GetBattery(model)
+            }
+        }
+        fun sp20GetConfig(model: Int, type: Int) {
+            Log.d(TAG, "sp20GetConfig")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.sp20GetConfig(model, type)
+            }
+        }
+        fun sp20SetConfig(model: Int, config: Sp20Config) {
+            Log.d(TAG, "sp20SetConfig")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.sp20SetConfig(model, config)
+            }
+        }
+
+        fun aoj20aDeleteData(model: Int) {
+            Log.d(TAG, "aoj20aDeleteData")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.aoj20aDeleteData(model)
             }
         }
 

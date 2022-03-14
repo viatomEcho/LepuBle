@@ -20,7 +20,7 @@ import java.util.*
 
 class Ap20BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Ap20BleInterface"
-    private var ap10Device = BoDeviceInfo()
+    private var ap20Device = BoDeviceInfo()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = Ap20BleManager(context)
@@ -42,53 +42,53 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
     }
 
     @ExperimentalUnsignedTypes
-    private fun onResponseReceived(response: Ap20BleResponse.Ap10Response) {
+    private fun onResponseReceived(response: Ap20BleResponse.Ap20Response) {
         if (response.token == Ap20BleCmd.TOKEN_F0) {
             when (response.type) {
                 Ap20BleCmd.MSG_GET_DEVICE_SN -> {
                     LepuBleLog.d(tag, "model:$model,MSG_GET_DEVICE_SN => success")
-                    ap10Device.sn = com.lepu.blepro.utils.toString(response.content)
-                    LepuBleLog.d(tag, "model:$model, ap10Device.sn == " + ap10Device.sn)
+                    ap20Device.sn = com.lepu.blepro.utils.toString(response.content)
+                    LepuBleLog.d(tag, "model:$model, ap20Device.sn == " + ap20Device.sn)
                 }
                 Ap20BleCmd.MSG_GET_DEVICE_INFO -> {
                     LepuBleLog.d(tag, "model:$model,MSG_GET_DEVICE_INFO => success")
                     val data = Ap20BleResponse.DeviceInfo(response.content)
-                    ap10Device.deviceName = device.name
-                    ap10Device.softwareV = data.softwareV
-                    ap10Device.hardwareV = data.hardwareV
+                    ap20Device.deviceName = device.name
+                    ap20Device.softwareV = data.softwareV
+                    ap20Device.hardwareV = data.hardwareV
                     LepuBleLog.d(tag, "model:$model, data.toString() == $data")
-                    LepuBleLog.d(tag, "model:$model, DeviceInfo.deviceName:ap10Device.sn == " + data.deviceName + ":" + ap10Device.sn)
+                    LepuBleLog.d(tag, "model:$model, DeviceInfo.deviceName:ap20Device.sn == " + data.deviceName + ":" + ap20Device.sn)
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20DeviceInfo).post(
-                        InterfaceEvent(model, ap10Device)
+                        InterfaceEvent(model, ap20Device)
                     )
                 }
                 Ap20BleCmd.MSG_GET_BATTERY -> {
                     LepuBleLog.d(tag, "model:$model,MSG_GET_BATTERY => success")
-                    LepuBleLog.d(tag, "model:$model, toUInt(response.content)) == " + toUInt(response.content))
+                    LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
                     val data = toUInt(response.content)
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20Battery).post(InterfaceEvent(model, data))
                 }
                 Ap20BleCmd.MSG_GET_BACKLIGHT -> {
                     LepuBleLog.d(tag, "model:$model,MSG_GET_BACKLIGHT => success")
-                    LepuBleLog.d(tag, "model:$model, toUInt(response.content)) == " + toUInt(response.content))
+                    LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
                     val data = Ap20BleResponse.ConfigInfo(byteArrayOf(0, response.content[0]))
                     LepuBleLog.d(tag, "model:$model, data.toString() == $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20ConfigInfo).post(InterfaceEvent(model, data))
                 }
                 Ap20BleCmd.MSG_SET_BACKLIGHT -> {
                     LepuBleLog.d(tag, "model:$model,MSG_SET_BACKLIGHT => success")
-                    LepuBleLog.d(tag, "model:$model, toUInt(response.content)) == " + toUInt(response.content))
+                    LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
                 }
             }
         } else if (response.token == Ap20BleCmd.TOKEN_0F) {
             when (response.type) {
                 Ap20BleCmd.MSG_ENABLE_OXY_PARAM -> {
                     LepuBleLog.d(tag, "model:$model,MSG_ENABLE_BO_PARAM => success")
-                    LepuBleLog.d(tag, "model:$model, toUInt(response.content)) == " + toUInt(response.content))
+                    LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
                 }
                 Ap20BleCmd.MSG_ENABLE_OXY_WAVE -> {
                     LepuBleLog.d(tag, "model:$model,MSG_ENABLE_BO_WAVE => success")
-                    LepuBleLog.d(tag, "model:$model, toUInt(response.content)) == " + toUInt(response.content))
+                    LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
                 }
                 Ap20BleCmd.MSG_RT_OXY_PARAM -> {
                     LepuBleLog.d(tag, "model:$model,MSG_RT_BO_PARAM => success")
@@ -104,7 +104,7 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
                 }
                 Ap20BleCmd.MSG_SET_TIME -> {
                     LepuBleLog.d(tag, "model:$model,MSG_SET_TIME => success")
-                    LepuBleLog.d(tag, "model:$model, toUInt(response.content)) == " + toUInt(response.content))
+                    LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20SetTime).post(InterfaceEvent(model, true))
                 }
                 Ap20BleCmd.MSG_GET_CONFIG -> {
@@ -122,11 +122,11 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
             when (response.type) {
                 Ap20BleCmd.MSG_ENABLE_BREATH_PARAM -> {
                     LepuBleLog.d(tag, "model:$model,MSG_ENABLE_BREATH_PARAM => success")
-                    LepuBleLog.d(tag, "model:$model, toUInt(response.content)) == " + toUInt(response.content))
+                    LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
                 }
                 Ap20BleCmd.MSG_ENABLE_BREATH_WAVE -> {
                     LepuBleLog.d(tag, "model:$model,MSG_ENABLE_BREATH_WAVE => success")
-                    LepuBleLog.d(tag, "model:$model, toUInt(response.content)) == " + toUInt(response.content))
+                    LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
                 }
                 Ap20BleCmd.MSG_RT_BREATH_PARAM -> {
                     LepuBleLog.d(tag, "model:$model,MSG_RT_BREATH_PARAM => success")
@@ -170,7 +170,7 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
 
             val temp: ByteArray = bytes.copyOfRange(i, i+4+len)
             if (temp.last() == CrcUtil.calCRC8Pc(temp)) {
-                val bleResponse = Ap20BleResponse.Ap10Response(temp)
+                val bleResponse = Ap20BleResponse.Ap20Response(temp)
                 onResponseReceived(bleResponse)
                 val tempBytes: ByteArray? = if (i+4+len == bytes.size) null else bytes.copyOfRange(i+4+len, bytes.size)
 
@@ -183,6 +183,8 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
     override fun getInfo() {
         sendCmd(Ap20BleCmd.getSn())
         sendCmd(Ap20BleCmd.getInfo())
+        enableRtData(Ap20BleCmd.EnableType.OXY_PARAM, true)
+        enableRtData(Ap20BleCmd.EnableType.OXY_WAVE, true)
     }
 
     override fun syncTime() {
@@ -215,7 +217,7 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
     }
 
     fun setConfig(type: Int, config: Int) {
-        if (type == 0) {
+        if (type == Ap20BleCmd.ConfigType.BACK_LIGHT) {
             setBacklight(config)
         } else {
             sendCmd(Ap20BleCmd.setConfig(type, config))
@@ -223,7 +225,7 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
     }
     fun getConfig(type: Int) {
         when (type) {
-            0 -> {
+            Ap20BleCmd.ConfigType.BACK_LIGHT -> {
                 getBacklight()
             }
             else -> {

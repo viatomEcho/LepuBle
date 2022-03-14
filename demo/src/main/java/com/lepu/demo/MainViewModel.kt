@@ -11,6 +11,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lepu.blepro.ble.cmd.Aoj20aBleResponse
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.cmd.PC80BleResponse
 import com.lepu.blepro.ble.data.*
@@ -99,7 +100,8 @@ class MainViewModel: ViewModel() {
     val _oxyPrAlarmFlag = MutableLiveData<Boolean>().apply { value = false }
     val oxyPrAlarmFlag: LiveData<Boolean> = _oxyPrAlarmFlag
 
-
+    val _aoj20aInfo = MutableLiveData<Aoj20aBleResponse.DeviceData>()
+    val aoj20aInfo: LiveData<Aoj20aBleResponse.DeviceData> = _aoj20aInfo
 
 
     /**

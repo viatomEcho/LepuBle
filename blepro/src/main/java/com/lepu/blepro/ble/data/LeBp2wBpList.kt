@@ -6,7 +6,7 @@ import java.util.*
 
 const val BP_RECORD_LENGTH = 37
 
-class Bp2wBpList(bytes: ByteArray) {
+class LeBp2wBpList(var bytes: ByteArray) {
 
     var fileVersion: Int
     var fileType: Int
@@ -28,7 +28,8 @@ class Bp2wBpList(bytes: ByteArray) {
     }
 
     data class BpRecord(val bytes: ByteArray) {
-        var time: Int         // 测量时间
+        var time: Long        // 测量时间戳s
+        var fileName: String  // 文件名
         var uid: Int          // 用户id
         var mode: Int         // 测量模式 0：单次 1：3次
         var interval: Int     // 测量间隔 单位s 非单次测量模式有效
@@ -42,7 +43,8 @@ class Bp2wBpList(bytes: ByteArray) {
 
         init {
             var index = 0
-            time = toUInt(bytes.copyOfRange(index, index+4))
+            time = toUInt(bytes.copyOfRange(index, index+4)).toLong()
+            fileName = stringFromDate(Date(time * 1000), "yyyyMMddHHmmss")
             index += 4
             uid = toUInt(bytes.copyOfRange(index, index+4))
             index += 4
@@ -64,6 +66,31 @@ class Bp2wBpList(bytes: ByteArray) {
             index++
             level = (bytes[index].toUInt() and 0xFFu).toInt()
         }
+
+        override fun toString(): String {
+            return """
+                time : $time
+                fileName : $fileName
+                uid : $uid
+                mode : $mode
+                interval : $interval
+                status : $status
+                sys : $sys
+                dia : $dia
+                mean : $mean
+                pr : $pr
+                result : $result
+                level : $level
+            """.trimIndent()
+        }
+    }
+
+    override fun toString(): String {
+        return """
+            fileVersion : $fileVersion
+            fileType : $fileType
+            bpFileList : $bpFileList
+        """.trimIndent()
     }
 
 }

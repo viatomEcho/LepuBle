@@ -7,7 +7,7 @@ import java.util.Calendar;
 /**
  * @author chenyongfeng
  */
-public class Bp2wBleCmd {
+public class LeBp2wBleCmd {
 
     private static final int HEAD = 0xA5;
     private static final int TYPE_NORMAL_SEND = 0x00;
@@ -64,6 +64,12 @@ public class Bp2wBleCmd {
         }
     }
 
+    public static class FileType {
+        public static final int ECG_TYPE = 2;
+        public static final int BP_TYPE = 1;
+        public static final int USER_TYPE = 0;
+    }
+
     public static byte[] switchState(int state) {
         return getReq(SWITCH_STATE, new byte[]{(byte)state});
     }
@@ -116,6 +122,7 @@ public class Bp2wBleCmd {
         int len = 20;
 
         byte[] data = new byte[len];
+
         int l = Math.min(fileName.length, 16);
         System.arraycopy(fileName, 0, data, 0, l);
 
@@ -142,6 +149,18 @@ public class Bp2wBleCmd {
 
     public static byte[] getFileList() {
         return getReq(GET_FILE_LIST, new byte[0]);
+    }
+    public static byte[] getFileListCrc(int fileType) {
+        switch (fileType) {
+            case FileType.ECG_TYPE:
+                return getReq(GET_ECG_LIST_CRC, new byte[0]);
+            case FileType.BP_TYPE:
+                return getReq(GET_BP_LIST_CRC, new byte[0]);
+            case FileType.USER_TYPE:
+                return getReq(GET_USER_LIST_CRC, new byte[0]);
+            default:
+                return new byte[0];
+        }
     }
 
     public static byte[] getRtState() {

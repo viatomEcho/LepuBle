@@ -1,24 +1,26 @@
 package com.lepu.blepro.ble.cmd
 
 import android.os.Parcelable
+import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.ByteUtils.bytes2UIntBig
 import com.lepu.blepro.utils.byteToPointHex
 import com.lepu.blepro.utils.toUInt
 import kotlinx.android.parcel.Parcelize
 
-class Ap20BleResponse{
+class Sp20BleResponse{
 
     @ExperimentalUnsignedTypes
     @Parcelize
-    class Ap20Response constructor(var bytes: ByteArray) : Parcelable {
+    class Sp20Response constructor(var bytes: ByteArray) : Parcelable {
         var token: Int
         var len: Int
         var type: Int
         var content: ByteArray  // 内容
 
         init {
-            token = (bytes[2].toUInt() and 0xFFu).toInt()
-            len = toUInt(bytes.copyOfRange(3, 4))
-            type = (bytes[4].toUInt() and 0xFFu).toInt()
+            token = byte2UInt(bytes[2])
+            len = byte2UInt(bytes[3])
+            type = byte2UInt(bytes[4])
             content = bytes.copyOfRange(5, bytes.size-1)
         }
 
@@ -51,7 +53,7 @@ class Ap20BleResponse{
 
     @ExperimentalUnsignedTypes
     @Parcelize
-    class RtBoParam constructor(var bytes: ByteArray) : Parcelable {
+    class RtParam constructor(var bytes: ByteArray) : Parcelable {
         var spo2: Int
         var pr: Int
         var pi: Int
@@ -60,11 +62,11 @@ class Ap20BleResponse{
         var battery: Int               // 电量等级（0-3）
         init {
             var index = 0
-            spo2 = (bytes[index].toUInt() and 0xFFu).toInt()
+            spo2 = byte2UInt(bytes[index])
             index++
             pr = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
-            pi = (bytes[index].toUInt() and 0xFFu).toInt()
+            pi = byte2UInt(bytes[index])
             index++
             isProbeOff = ((bytes[index].toInt() and 0x02) shr 1) == 1
             isPulseSearching = ((bytes[index].toInt() and 0x04) shr 2) == 1
@@ -85,7 +87,7 @@ class Ap20BleResponse{
 
     @ExperimentalUnsignedTypes
     @Parcelize
-    class RtBoWave(var byteArray: ByteArray) : Parcelable {
+    class RtWave(var byteArray: ByteArray) : Parcelable {
         val waveData: ByteArray
         val waveIntData: IntArray
         init {
@@ -96,59 +98,23 @@ class Ap20BleResponse{
 
     @ExperimentalUnsignedTypes
     @Parcelize
-    class RtBreathParam constructor(var bytes: ByteArray) : Parcelable {
-        var rr: Int          // 呼吸率（6-60，单位bpm，0是无效值）
-        var singleFlag: Int  // 鼻息流脱落标记（0：呼吸信号正常 1：无呼吸信号）
+    class TempData constructor(val bytes: ByteArray) : Parcelable {
+        var result: Int   // 体温结果 0：正常 1：过低 2：过高
+        var unit: Int     // 单位 0：摄氏度℃ 1：华氏度℉
+        var value: Float  // 体温值
         init {
-            var index = 0
-            rr = (bytes[index].toUInt() and 0xFFu).toInt()
-            index++
-            singleFlag = bytes[index].toInt() and 0x01
-        }
-        override fun toString(): String {
-            return """
-                rr : $rr
-                singleFlag : $singleFlag
-            """.trimIndent()
-        }
-    }
-
-    @ExperimentalUnsignedTypes
-    @Parcelize
-    class RtBreathWave(var byteArray: ByteArray) : Parcelable {
-        val flow: Int   // 呼吸波形数据（0-4095）
-        val snore: Int  // 鼾声波形数据（0-4095）
-        init {
-            var index = 0
-            flow = toUInt(byteArray.copyOfRange(index, index+2))
-            index += 2
-            snore = toUInt(byteArray.copyOfRange(index, index+2))
+            result = (bytes[0].toInt() and 0x06) shr 1
+            unit = bytes[0].toInt() and 0x01
+            value = bytes2UIntBig(bytes[1], bytes[2]).div(100f)
         }
 
         override fun toString(): String {
             return """
-                flow : $flow
-                snore : $snore
+                result : $result
+                unit : $unit
+                value : $value
             """.trimIndent()
         }
-    }
-
-    @ExperimentalUnsignedTypes
-    @Parcelize
-    class ConfigInfo constructor(var bytes: ByteArray) : Parcelable {
-        var type: Int  // 0：背光等级（0-5） 1：警报开关（0：off 1：on） 2：血氧过低阈值（85-99） 3：脉率过低阈值（30-99） 4：脉率过高阈值（100-250）
-        var data: Int
-        init {
-            type = (bytes[0].toUInt() and 0xFFu).toInt()
-            data = (bytes[1].toUInt() and 0xFFu).toInt()
-        }
-        override fun toString(): String {
-            return """
-                type : $type
-                data : $data
-            """.trimIndent()
-        }
-
     }
 
 }

@@ -215,6 +215,19 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._er1Info.value = it
                 }
             })
+        //-------------------------LeBp2w---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSyncTime)
+            .observe(this, {
+                Toast.makeText(this, "le bp2w 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wInfo)
+            .observe(this, { event ->
+                (event.data as LepuDevice).let {
+                    Toast.makeText(this, "le bp2w 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._er1Info.value = it
+                }
+            })
         //-------------------------bpm---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmSyncTime)
             .observe(this, {
@@ -273,6 +286,34 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 (event.data as BoDeviceInfo).let {
                     Toast.makeText(this, "ap20 获取设备信息成功", Toast.LENGTH_SHORT).show()
                     viewModel._boInfo.value = it
+                }
+            })
+
+        //-------------------------sp20---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20SetTime)
+            .observe(this, {
+                Toast.makeText(this, "sp20 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20DeviceInfo)
+            .observe(this, { event ->
+                (event.data as BoDeviceInfo).let {
+                    Toast.makeText(this, "sp20 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._boInfo.value = it
+                }
+            })
+
+        //-------------------------aoj20a---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aSetTime)
+            .observe(this, {
+                Toast.makeText(this, "aoj20a 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aDeviceData)
+            .observe(this, { event ->
+                (event.data as Aoj20aBleResponse.DeviceData).let {
+                    Toast.makeText(this, "aoj20a 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._aoj20aInfo.value = it
                 }
             })
 

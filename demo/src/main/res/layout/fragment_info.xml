@@ -21,6 +21,11 @@
                 android:gravity="center"
                 android:layout_margin="@dimen/dp_10"
                 android:text="公共方法测试"/>
+            <Button
+                android:id="@+id/bytes_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="原始数据显示开关" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -119,6 +124,13 @@
 
             <TextView
                 android:id="@+id/send_cmd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/receive_cmd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp_10"

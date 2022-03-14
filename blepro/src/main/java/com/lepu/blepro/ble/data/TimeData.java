@@ -90,6 +90,18 @@ public class TimeData implements Convertible {
         return data;
     }
 
+    public byte[] convert2DataBig() {
+        byte[] data = new byte[7];
+        data[0] = (byte) ((year >> 8) & 0xFF);
+        data[1] = (byte) (year & 0xFF);
+        data[2] = (byte) (month & 0xFF);
+        data[3] = (byte) (date & 0xFF);
+        data[4] = (byte) (hour & 0xFF);
+        data[5] = (byte) (minute & 0xFF);
+        data[6] = (byte) (second & 0xFF);
+        return data;
+    }
+
     @NonNull
     @Override
     public String toString() {
