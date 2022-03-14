@@ -10,6 +10,8 @@ import android.os.IBinder
 import android.util.Log
 import androidx.lifecycle.LifecycleService
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.ble.cmd.Er1BleResponse
+import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.Bp2BleRtData
 import com.lepu.blepro.ble.data.Bp2DataBpIng
 import com.lepu.blepro.event.InterfaceEvent
@@ -36,6 +38,20 @@ class NotificationService: LifecycleService() {
     }
 
     private fun initLiveEvent() {
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1RtData)
+            .observe(this, {
+                val data = it.data as Er1BleResponse.RtData
+                if (data.param.hr in 1..59) {
+                    ecgPsChange(data.param.hr)
+                }
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamData)
+            .observe(this, {
+                val data = it.data as OxyBleResponse.RtParam
+                if (data.spo2 in 1..98) {
+                    ecgPsChange(data.spo2)
+                }
+            })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wRtData)
             .observe(this, {
                 val data = it.data as Bp2BleRtData
@@ -91,7 +107,7 @@ class NotificationService: LifecycleService() {
             val notification = Notification.Builder(this)
                 .setChannelId("ID")
                 .setSmallIcon(android.R.drawable.sym_def_app_icon)
-                .setContentTitle("压力值")
+                .setContentTitle("阈值警报")
                 .setContentText(""+ps)
                 .build()
             notificationManager.notify(1, notification)
