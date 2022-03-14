@@ -500,11 +500,8 @@ open class BleService: LifecycleService() {
                     LepuBleLog.d(tag, "scanDevice isWaitingScanResult = true")
                     leScanner?.startScan(null, settings, leScanCallback)
                     scanTimeout = GlobalScope.launch {
-                        delay(3000)
-                        if (bluetoothAdapter?.isEnabled!!) {
-                            scanDevice(true)
-                            LepuBleLog.d(tag, "-------scanTimeout-------")
-                        }
+                        delay(10000)
+                        startDiscover(scanModel, needPair, isReconnectScan)
                     }
                     LepuBleLog.d(tag, "scanDevice scanTimeout.start()")
                     LepuBleLog.d(tag, "scanDevice started")
@@ -663,6 +660,7 @@ open class BleService: LifecycleService() {
     }
 
     fun whenScanFail(){
+        scanDevice(false)
         bluetoothAdapter?.let {
             it.disable()
             LepuBleLog.d(tag, "关闭蓝牙中...")
