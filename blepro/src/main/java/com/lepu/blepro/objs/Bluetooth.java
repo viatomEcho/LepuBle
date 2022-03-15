@@ -81,7 +81,7 @@ public class Bluetooth implements Parcelable {
 
     public static final String BT_NAME_VETCORDER = "Vetcorder";
     public static final String BT_NAME_VTM_AD5 = "VTM AD5";
-    public static final String BT_NAME_LE_BP2W = "Le-BP2W";
+    public static final String BT_NAME_LE_BP2W = "LP-BP2W";
 
 
     public static final int MODEL_UNRECOGNIZED = 0;

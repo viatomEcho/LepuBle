@@ -37,7 +37,8 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
     }
 
     var fileSize: Int = 0
-    var fileName:String=""
+    var fileName:String = ""
+    var fileType:Int = 0
     var curSize: Int = 0
     var fileContent : ByteArray? = null
     var userList: LeBp2wUserList? = null
@@ -193,6 +194,10 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileComplete)
                                 .post(InterfaceEvent(model, data))
                         }
+                    } else {
+                        val data = Bp2BleFile(fileName, byteArrayOf(0,fileType.toByte(),0,0,0,0,0,0,0,0), device.name)
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFileList)
+                            .post(InterfaceEvent(model, data))
                     }
                 }
             }
@@ -210,8 +215,13 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                 if (fileSize == 0) {
                     sendCmd(writeFileEnd())
                 } else {
-                    sendCmd(writeFileData(userList?.getDataBytes()?.copyOfRange(0, chunkSize)))
-                    curSize = chunkSize
+                    curSize = if (fileSize < chunkSize) {
+                        sendCmd(writeFileData(userList?.getDataBytes()?.copyOfRange(0, fileSize)))
+                        fileSize
+                    } else {
+                        sendCmd(writeFileData(userList?.getDataBytes()?.copyOfRange(0, chunkSize)))
+                        chunkSize
+                    }
                 }
             }
             WRITE_FILE_DATA -> {
@@ -450,6 +460,7 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
     }
 
     fun getFileList(fileType: Int) {
+        this.fileType = fileType
         when (fileType) {
             FileType.ECG_TYPE -> {
                 fileName = "bp2ecg.list"
