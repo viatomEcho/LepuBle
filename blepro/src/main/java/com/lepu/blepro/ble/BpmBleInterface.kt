@@ -135,6 +135,10 @@ class BpmBleInterface(model: Int): BleInterface(model) {
                 // 返回测量数据
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmMeasureResult).post(InterfaceEvent(model, BpmCmd(bytes)))
             }
+            BpmBleCmd.BPMCmd.MSG_TYPE_ERROR_RESULT -> {
+                // 返回测量数据错误
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmMeasureErrorResult).post(InterfaceEvent(model, BpmCmd(bytes)))
+            }
             else -> {
                 //实时指标
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRtData).post(InterfaceEvent(model, BpmCmd(bytes)))

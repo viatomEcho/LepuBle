@@ -66,6 +66,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBpmRecordData = "com.lepu.ble.bpm.record.data"        // 记录数据 BpmCmd
             const val EventBpmRecordEnd = "com.lepu.ble.bpm.record.end"          // 传输完成 true
             const val EventBpmMeasureResult = "com.lepu.ble.bpm.measure.result"  // 测量结果 BpmCmd
+            const val EventBpmMeasureErrorResult = "com.lepu.ble.bpm.measure.error.result"  // 测量错误结果 BpmCmd
         }
     }
 
