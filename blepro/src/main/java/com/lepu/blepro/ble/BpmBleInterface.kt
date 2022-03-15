@@ -161,6 +161,9 @@ class BpmBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getFileList() {
+        isUserAEnd = false
+        isUserBEnd = false
+        LepuBleLog.d(tag, "getFileList...")
         sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_RECORDS))
     }
 
