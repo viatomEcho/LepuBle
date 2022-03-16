@@ -36,6 +36,7 @@ public class BpmBleCmd {
         public static final int MSG_TYPE_GET_BP_STATE = 0x18;
         public static final int MSG_TYPE_GET_BP_DATA = 0x19; // 实时广播血压的值
         public static final int MSG_TYPE_GET_RESULT = 0x1A; // 测量结束返回测量的结果
+        public static final int MSG_TYPE_ERROR_RESULT = 0x1B; // 测量结束返回的错误结果
 
         public static final byte CMD_TYPE_START_BP = (byte) 0xA1;
         public static final byte CMD_TYPE_STOP = (byte) 0xA2;
@@ -46,6 +47,7 @@ public class BpmBleCmd {
         public static final byte CMD_TYPE_GET_BP_STATE = (byte) 0xB2;
         public static final byte CMD_TYPE_GET_BP_DATA = (byte) 0x00;
         public static final byte CMD_TYPE_GET_RESULT = (byte) 0x1C;
+        public static final byte CMD_TYPE_ERROR_RESULT = (byte) 0x3C;
 
         public static byte[] getCmd(int msgType) {
             switch (msgType) {
@@ -87,6 +89,8 @@ public class BpmBleCmd {
                     return MSG_TYPE_GET_BP_DATA;
                 case CMD_TYPE_GET_RESULT:
                     return MSG_TYPE_GET_RESULT;
+                case CMD_TYPE_ERROR_RESULT:
+                    return MSG_TYPE_ERROR_RESULT;
                 case CMD_TYPE_GET_RECORDS:
                 case CMD_TYPE_GET_RECORDS_N:
                     return MSG_TYPE_GET_RECORDS;
