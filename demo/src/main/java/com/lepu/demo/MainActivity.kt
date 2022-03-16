@@ -232,6 +232,13 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             (event.data as OxyBleResponse.OxyInfo).let {
                 viewModel._oxyInfo.value = it
                 Toast.makeText(this, "o2 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                LpBleUtil.oxyGetBoxInfo(event.model)
+            }
+        })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBoxInfo).observe(this, { event ->
+            (event.data as LepuDevice).let {
+                Toast.makeText(this, "o2 获取盒子信息成功 $it", Toast.LENGTH_SHORT).show()
+                LpBleUtil.oxyGetBoxInfo(event.model)
             }
         })
 

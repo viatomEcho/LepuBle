@@ -109,7 +109,17 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             if (fileType > 2) {
                 fileType = 0
             }
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2) {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SNOREO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_WEARO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPU
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYLINK
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2) {
                 LpBleUtil.getInfo(Constant.BluetoothConfig.currentModel[0])
             } else {
                 LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0], fileType)

@@ -124,7 +124,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
             Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC66B,
             Bluetooth.MODEL_AP20, Bluetooth.MODEL_BABYO2,
-            Bluetooth.MODEL_SP20, Bluetooth.MODEL_TV221U -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_TV221U,
+            Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_CHECKO2,
+            Bluetooth.MODEL_O2M, Bluetooth.MODEL_SLEEPO2,
+            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
+            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
+            Bluetooth.MODEL_KIDSO2 -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER -> {
                 waveHandler.post(EcgWaveTask())
@@ -604,7 +609,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
                 Bluetooth.MODEL_PC66B, Bluetooth.MODEL_AP20,
                 Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_SP20,
-                Bluetooth.MODEL_TV221U -> {
+                Bluetooth.MODEL_TV221U, Bluetooth.MODEL_BABYO2N,
+                Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_O2M,
+                Bluetooth.MODEL_SLEEPO2, Bluetooth.MODEL_SNOREO2,
+                Bluetooth.MODEL_WEARO2, Bluetooth.MODEL_SLEEPU,
+                Bluetooth.MODEL_OXYLINK, Bluetooth.MODEL_KIDSO2 -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE

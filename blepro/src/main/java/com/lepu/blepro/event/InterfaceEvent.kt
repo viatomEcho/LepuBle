@@ -12,7 +12,10 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     /**
      * Oxy LiveDataBus Event
      * OxyBleInterface发出的通知
-     * 包含model: MODEL_O2RING, MODEL_BABYO2
+     * 包含model: MODEL_O2RING, MODEL_BABYO2, MODEL_BABYO2N,
+     *           MODEL_CHECKO2, MODEL_O2M, MODEL_SLEEPO2,
+     *           MODEL_SNOREO2, MODEL_WEARO2, MODEL_SLEEPU,
+     *           MODEL_OXYLINK, MODEL_KIDSO2
      */
     interface Oxy {
         companion object {
@@ -22,6 +25,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventOxyFactoryReset = "com.lepu.ble.oxy.factory.reset"                 // 恢复出厂设置 true
             const val EventOxySyncDeviceInfo = "com.lepu.ble.oxy.sync"                        // 同步参数 true
             const val EventOxyInfo = "com.lepu.ble.oxy.info"                                  // 设备信息 OxyBleResponse.OxyInfo
+            const val EventOxyBoxInfo = "com.lepu.ble.oxy.box.info"                           // 盒子信息 LepuDevice
             const val EventOxyRtData = "com.lepu.ble.oxy.rtData"                              // 实时波形 OxyBleResponse.RtWave
             const val EventOxyRtParamData = "com.lepu.ble.oxy.rt.param.Data"                  // 实时参数 OxyBleResponse.RtParam
             const val EventOxyPpgData = "com.lepu.ble.oxy.ppg.data"                           // PPG数据成功 OxyBleResponse.PPGData

@@ -7,6 +7,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BleCRC
 import com.lepu.blepro.ble.cmd.OxyBleCmd
 import com.lepu.blepro.ble.cmd.OxyBleResponse
+import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toHex
@@ -118,6 +119,13 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_PARA_SYNC => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxySyncDeviceInfo).post(InterfaceEvent(model, true))
 
+            }
+
+            OxyBleCmd.OXY_CMD_BOX_INFO -> {
+                clearTimeout()
+                val boxInfo = LepuDevice(response.content)
+                LepuBleLog.d(tag, "model:$model, OXY_CMD_BOX_INFO => success $boxInfo")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBoxInfo).post(InterfaceEvent(model, boxInfo))
             }
 
             OxyBleCmd.OXY_CMD_INFO -> {
@@ -269,6 +277,9 @@ class OxyBleInterface(model: Int): BleInterface(model) {
         sendOxyCmd(OxyBleCmd.OXY_CMD_READ_START, OxyBleCmd.readFileStart(fileName))
     }
 
+    fun getBoxInfo() {
+        sendOxyCmd(OxyBleCmd.OXY_CMD_BOX_INFO, OxyBleCmd.getBoxInfo())
+    }
 
     override fun syncTime() {
         sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.syncTime())

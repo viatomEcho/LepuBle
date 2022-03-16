@@ -107,7 +107,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     setViewVisible(binding.leBp2wLayout)
                     LpBleUtil.bp2GetConfig(it.modelNo)
                 }
-                Bluetooth.MODEL_O2RING, Bluetooth.MODEL_BABYO2 -> {
+                Bluetooth.MODEL_O2RING, Bluetooth.MODEL_BABYO2,
+                Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_CHECKO2,
+                Bluetooth.MODEL_O2M, Bluetooth.MODEL_SLEEPO2,
+                Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
+                Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
+                Bluetooth.MODEL_KIDSO2 -> {
                     setViewVisible(binding.o2Layout)
                     LpBleUtil.getInfo(it.modelNo)
                 }
@@ -566,14 +571,24 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.ap20SetConfig.text = "设置参数" + state
         }
         //-------------------------o2-----------------------
-        binding.o2OxiThr.setOnClickListener {
-            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_OXI_THR, 96)
+        binding.o2SetOxiThr.setOnClickListener {
+            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_OXI_THR, binding.o2OxiThr.text.toString())
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.o2SetHrThr1.setOnClickListener {
+            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_HR_LOW_THR, binding.o2HrThr1.text.toString())
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.o2SetHrThr2.setOnClickListener {
+            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_HR_HIGH_THR, binding.o2HrThr2.text.toString())
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
         binding.o2OxiSwitch.setOnClickListener {
             state++
-            if (state > 1)
+            if (state > 3)
                 state = 0
             LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_OXI_SWITCH, state)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
@@ -581,9 +596,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
         binding.o2HrSwitch.setOnClickListener {
             state++
-            if (state > 1)
+            if (state > 3)
                 state = 0
             LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_HR_SWITCH, state)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.o2Spo2Switch.setOnClickListener {
+            state++
+            if (state > 1)
+                state = 0
+            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_SPO2SW, state)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -596,6 +619,56 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             } else {
                 LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MOTOR, sound[volume])
             }
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.o2Buzzer.setOnClickListener {
+            volume++
+            if (volume > 4)
+                volume = 0
+            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_BUZZER, motor[volume])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.o2LightMode.setOnClickListener {
+            volume++
+            if (volume > 2)
+                volume = 0
+            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_LIGHTING_MODE, volume)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.o2LightStr.setOnClickListener {
+            volume++
+            if (volume > 2)
+                volume = 0
+            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_LIGHT_STR, volume)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.o2SetMtThr.setOnClickListener {
+            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MT_THR, binding.o2MtThr.text.toString())
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.o2MtSwitch.setOnClickListener {
+            state++
+            if (state > 1)
+                state = 0
+            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MT_SW, state)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.o2SetIvThr.setOnClickListener {
+            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_IV_THR, binding.o2IvThr.text.toString())
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.o2MtSwitch.setOnClickListener {
+            state++
+            if (state > 1)
+                state = 0
+            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_IV_SW, state)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -1023,10 +1096,42 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this, {
                 val data = it.data as OxyBleResponse.OxyInfo
                 setReceiveCmd(data.bytes)
-                binding.o2HrSwitch.text = "心率开关值" + data.hrSwitch
-                binding.o2OxiSwitch.text = "血氧开关值" + data.oxiSwitch
-                binding.o2OxiThr.text = "血氧阈值" + data.oxiThr
+                binding.o2OxiThr.setText("血氧阈值" + data.oxiThr)
+                binding.o2HrThr1.setText("心率低阈值" + data.hrLowThr)
+                binding.o2HrThr2.setText("心率高阈值" + data.hrHighThr)
+                binding.o2OxiSwitch.text = when (data.oxiSwitch) {
+                    1 -> "血氧震动开声音关"
+                    2 -> "血氧震动关声音开"
+                    3 -> "血氧震动开声音开"
+                    else -> "血氧震动关声音关"
+                }
+                binding.o2HrSwitch.text = when (data.hrSwitch) {
+                    1 -> "心率震动开声音关"
+                    2 -> "心率震动关声音开"
+                    3 -> "心率震动开声音开"
+                    else -> "心率震动关声音关"
+                }
+                binding.o2Spo2Switch.text = if (data.spo2Switch == 1) {
+                    "血氧功能开"
+                } else {
+                    "血氧功能关"
+                }
                 binding.o2Motor.text = "震动强度" + data.motor
+                binding.o2Buzzer.text = "声音强度" + data.buzzer
+                binding.o2LightMode.text = "亮屏模式"
+                binding.o2LightStr.text = "屏幕亮度"
+                binding.o2MtThr.setText("体动阈值" + data.mtThr)
+                binding.o2MtSwitch.text = if (data.mtSwitch == 1) {
+                    "体动开"
+                } else {
+                    "体动关"
+                }
+                binding.o2IvThr.setText("无效值阈值" + data.ivThr)
+                binding.o2IvSwitch.text = if (data.ivSwitch == 1) {
+                    "无效值开"
+                } else {
+                    "无效值关"
+                }
                 binding.content.text = data.toString()
                 Toast.makeText(
                     context,
