@@ -25,6 +25,7 @@ import com.lepu.demo.ble.WifiAdapter
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.databinding.FragmentSettingsBinding
 import com.lepu.demo.util.FileUtil
+import com.lepu.demo.util.icon.BitmapConvertor
 
 /**
  * @ClassName SettingsFragment
@@ -396,14 +397,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             icon1.width = 91
             icon1.height = 21
             icon1.icon = bytes
-            val icon2 = LeBp2wUserInfo.Icon()
-            icon2.width = 91
-            icon2.height = 21
-            icon2.icon = bytes
-            val icon3 = LeBp2wUserInfo.Icon()
-            icon3.width = 91
-            icon3.height = 21
-            icon3.icon = bytes
+            val icon2 = BitmapConvertor(context).createIcon("一二")
+            val icon3 = BitmapConvertor(context).createIcon("一二三")
+            val icon4 = BitmapConvertor(context).createIcon("一二三四")
 
             val userInfo1 = LeBp2wUserInfo()
             userInfo1.aid = 12345
@@ -418,8 +414,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             val userInfo2 = LeBp2wUserInfo()
             userInfo2.aid = 12345
             userInfo2.uid = 11111
-            userInfo2.fName = "魑魅"
-            userInfo2.name = "魍魉123"
+            userInfo2.fName = "一"
+            userInfo2.name = "二"
             userInfo2.birthday = "1991-10-20"
             userInfo2.height = 175
             userInfo2.weight = 50f
@@ -428,18 +424,29 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             val userInfo3 = LeBp2wUserInfo()
             userInfo3.aid = 12345
             userInfo3.uid = 22222
-            userInfo3.fName = "魑魅魍"
-            userInfo3.name = "魉123"
+            userInfo3.fName = "一"
+            userInfo3.name = "二三"
             userInfo3.birthday = "1992-10-20"
             userInfo3.height = 175
             userInfo3.weight = 50f
             userInfo3.gender = 1
             userInfo3.icon = icon3
+            val userInfo4 = LeBp2wUserInfo()
+            userInfo4.aid = 12345
+            userInfo4.uid = 33333
+            userInfo4.fName = "一"
+            userInfo4.name = "二三四"
+            userInfo4.birthday = "1993-10-20"
+            userInfo4.height = 175
+            userInfo4.weight = 50f
+            userInfo4.gender = 1
+            userInfo4.icon = icon4
 
             val userList = LeBp2wUserList()
-            userList.userList.add(userInfo1)
             userList.userList.add(userInfo2)
             userList.userList.add(userInfo3)
+            userList.userList.add(userInfo4)
+            userList.userList.add(userInfo1)
 
             FileUtil.saveFile(context, userList.getDataBytes())
 

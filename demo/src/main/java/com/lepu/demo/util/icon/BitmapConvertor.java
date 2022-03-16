@@ -3,11 +3,18 @@ package com.lepu.demo.util.icon;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.text.TextPaint;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.lepu.blepro.ble.data.LeBp2wUserInfo;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -51,7 +58,41 @@ public class BitmapConvertor {
 
     }
 
+    /**
+     * 同步方法
+     * Converts the input image to 1bpp-monochrome bitmap
+     * @param inputBitmap : Bitmpa to be converted
+     * @return :  Returns a String. Success when the file is saved on memory card or error.
+     */
+    public byte[] convertBitmapSync(Bitmap inputBitmap){
 
+        mWidth = inputBitmap.getWidth();
+        mHeight = inputBitmap.getHeight();
+        mDataWidth=((mWidth+31)/32)*4*8;
+        mDataArray = new byte[(mDataWidth * mHeight)];
+        mRawBitmapData = new byte[(mDataWidth * mHeight) / 8];
+
+        convertArgbToGrayscale(inputBitmap, mWidth, mHeight);
+        createRawMonochromeData();
+        return mRawBitmapData;
+
+    }
+
+    public static byte[] hexToBytes(String hexRepresentation) {
+        if (hexRepresentation.length() % 2 == 1) {
+            throw new IllegalArgumentException("hexToBytes requires an even-length String parameter");
+        }
+
+        int len = hexRepresentation.length();
+        byte[] data = new byte[len / 2];
+
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(hexRepresentation.charAt(i), 16) << 4)
+                    + Character.digit(hexRepresentation.charAt(i + 1), 16));
+        }
+
+        return data;
+    }
 
     private void convertArgbToGrayscale(Bitmap bmpOriginal, int width, int height){
         int pixel;
@@ -101,10 +142,10 @@ public class BitmapConvertor {
         }
     }
 
-    private String saveImage(String fileName, int width, int height) {
+    public String saveImage(String fileName, int width, int height) {
         FileOutputStream fileOutputStream;
         BmpFile bmpFile = new BmpFile();
-        File file = new File(mContext.getExternalFilesDir(null).getAbsolutePath(), fileName + ".bmp");
+        File file = new File(Environment.getExternalStorageDirectory(), fileName + ".bmp");
         try {
             file.createNewFile();
             fileOutputStream = new FileOutputStream(file);
@@ -145,4 +186,36 @@ public class BitmapConvertor {
 
 
     }
+
+
+    public Bitmap generateBitmap(String text){
+        Typeface typeface = Typeface.createFromAsset(mContext.getAssets(),"msyh.ttf");
+        TextPaint textPaint = new TextPaint();
+        textPaint.setTextSize(16);
+        textPaint.setTypeface(typeface);
+        textPaint.setColor(Color.WHITE);
+        int width = (int) Math.ceil(textPaint.measureText(text));
+        Paint.FontMetrics fontMetrics = textPaint.getFontMetrics();
+        int height = (int) Math.ceil(Math.abs(fontMetrics.bottom) + Math.abs(fontMetrics.top));
+        Matrix m = new Matrix();
+
+        Bitmap bitmap = Bitmap.createBitmap(width,height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawText(text,0,Math.abs(fontMetrics.ascent),textPaint);
+        return bitmap;
+    }
+
+    public LeBp2wUserInfo.Icon createIcon(String name) {
+        LeBp2wUserInfo.Icon icon = new LeBp2wUserInfo.Icon();
+        Bitmap inputBitmap = generateBitmap(name);
+        icon.setWidth(inputBitmap.getWidth());
+        icon.setHeight(inputBitmap.getHeight());
+        Bitmap resizedBitmap = Bitmap.createBitmap(inputBitmap, 0, 0, icon.getWidth(), icon.getHeight());
+        icon.setIcon(convertBitmapSync(resizedBitmap));
+
+        saveImage(name, inputBitmap.getWidth(), inputBitmap.getHeight());
+
+        return icon;
+    }
+
 }
