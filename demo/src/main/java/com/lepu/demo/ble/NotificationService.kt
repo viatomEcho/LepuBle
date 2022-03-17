@@ -90,7 +90,7 @@ class NotificationService: LifecycleService() {
                 .setContentTitle("蓝牙状态")
                 .setContentText(""+state)
                 .build()
-            notificationManager.notify(1, notification)
+            notificationManager.notify(2, notification)
         }
     }
 

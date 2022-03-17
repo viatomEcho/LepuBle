@@ -79,7 +79,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             }
         }
         val intent = Intent(this, NotificationService::class.java)
-        bindService(intent, connection, BIND_AUTO_CREATE)
+//        bindService(intent, connection, BIND_AUTO_CREATE)
 
         subscribeUi()
         needPermission()
@@ -425,7 +425,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
     }
 
     override fun onDestroy() {
-        unbindService(connection)
+//        unbindService(connection)
         super.onDestroy()
     }
 
