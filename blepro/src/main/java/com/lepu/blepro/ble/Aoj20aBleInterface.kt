@@ -55,6 +55,7 @@ class Aoj20aBleInterface(model: Int): BleInterface(model) {
             Aoj20aBleCmd.MSG_GET_HISTORY_DATA -> {
                 if (response.len == 0) {
                     LepuBleLog.d(tag, "model:$model,MSG_GET_HISTORY_DATA => null " + bytesToHex(response.bytes))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aNoTempRecord).post(InterfaceEvent(model, true))
                     return
                 }
                 LepuBleLog.d(tag, "model:$model,MSG_GET_HISTORY_DATA => success " + bytesToHex(response.bytes))
