@@ -181,7 +181,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * PC60FwBleInterface发出的通知
-     * 包含model: MODEL_PC60FW, MODEL_PC_6N
+     * 包含model: MODEL_PC60FW, MODEL_PC66B, MODEL_OXYSMART
      */
     interface PC60Fw {
         companion object {
@@ -190,6 +190,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventPC60FwBattery = "com.lepu.ble.pc60fw.battery"               // 电池电量 PC60FwBleResponse.Battery
             const val EventPC60FwDeviceInfo = "com.lepu.ble.pc60fw.device.info"        // 设备信息 BoDeviceInfo
             const val EventPC60FwWorkingStatus = "com.lepu.ble.pc60fw.working.status"  // 工作状态 PC60FwBleResponse.WorkingStatus
+            const val EventPC60FwOriginalData = "com.lepu.ble.pc60fw.original.data"    // 红外数据 PC60FwBleResponse.OriginalData
         }
     }
 
