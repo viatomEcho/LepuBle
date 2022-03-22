@@ -6,13 +6,13 @@ import kotlinx.android.parcel.Parcelize
 @ExperimentalUnsignedTypes
 @Parcelize
 class Pc100DeviceInfo : Parcelable {
-    var sn: String? = null
-    var deviceId: Int? = null
-    var deviceName: String? = null
-    var softwareV: String? = null
-    var hardwareV: String? = null
-    var batLevel: Int? = null
-    var batStatus: Int? = null
+    var sn = ""
+    var deviceId = 0
+    var deviceName = ""
+    var softwareV = ""
+    var hardwareV = ""
+    var batLevel = 0
+    var batStatus = 0
 
     override fun toString(): String {
         return """

@@ -22,6 +22,7 @@ import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.HexString
@@ -232,7 +233,9 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             (event.data as OxyBleResponse.OxyInfo).let {
                 viewModel._oxyInfo.value = it
                 Toast.makeText(this, "o2 获取设备信息成功", Toast.LENGTH_SHORT).show()
-                LpBleUtil.oxyGetBoxInfo(event.model)
+                if (event.model == Bluetooth.MODEL_BABYO2N) {
+                    LpBleUtil.oxyGetBoxInfo(event.model)
+                }
             }
         })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBoxInfo).observe(this, { event ->

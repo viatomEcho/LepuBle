@@ -425,7 +425,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (event.data as OxyBleResponse.OxyInfo).let {
                     setReceiveCmd(it.bytes)
                     for (fileName in it.fileList.split(",")) {
-                        fileNames.add(fileName)
+                        if (fileName.isNotEmpty()) {
+                            fileNames.add(fileName)
+                        }
                     }
                     Toast.makeText(context, "o2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                     binding.info.text = it.toString()

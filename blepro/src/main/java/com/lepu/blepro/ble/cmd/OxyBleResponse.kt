@@ -75,12 +75,20 @@ class OxyBleResponse{
             curTime = infoStr.getString("CurTIME")
             batteryState = infoStr.getInt("CurBatState")
             batteryValue = infoStr.getString("CurBAT")
-            oxiSwitch = infoStr.getInt("OxiSwitch")
+            oxiSwitch = if (infoStr.has("OxiSwitch")) {
+                infoStr.getInt("OxiSwitch")
+            } else {
+                0
+            }
             oxiThr = infoStr.getInt("CurOxiThr")
             motor = infoStr.getInt("CurMotor")
             mode = infoStr.getInt("CurMode")
             fileList = infoStr.getString("FileList")
-            hrSwitch = infoStr.getInt("HRSwitch")
+            hrSwitch = if (infoStr.has("HRSwitch")) {
+                infoStr.getInt("HRSwitch")
+            } else {
+                0
+            }
             hrLowThr = infoStr.getInt("HRLowThr")
             hrHighThr = infoStr.getInt("HRHighThr")
             fileVer = infoStr.getString("FileVer")
