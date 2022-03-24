@@ -145,6 +145,13 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             // 1.4.1固件版本之前没有PI 有波形
             OxyBleCmd.OXY_CMD_RT_WAVE -> {
                 clearTimeout()
+
+                if (response.content.size < 13) {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtWaveRes)
+                        .post(InterfaceEvent(model, true))
+                    return
+                }
+
                 val rtWave = OxyBleResponse.RtWave(response.content)
 
                 //发送实时数据

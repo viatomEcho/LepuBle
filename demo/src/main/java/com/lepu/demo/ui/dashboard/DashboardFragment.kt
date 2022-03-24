@@ -396,8 +396,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
                     toPlayAlarm(data.pr)
                     OxyDataController.receive(data.wFs)
-
-                    binding.dataStr.text = data.toString()
+                    LpBleUtil.oxyGetRtParam(event.model)
+                    viewModel.oxyPr.value = data.pr
+                    viewModel.spo2.value = data.spo2
+                    viewModel.pi.value = data.pi.div(10f)
+                    viewModel.oxyPr.value = data.pr
                 }
             }
         }
@@ -408,14 +411,15 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.spo2.value = data.spo2
                 viewModel.pi.value = data.pi.div(10f)
                 viewModel.oxyPr.value = data.pr
-//                LpBleUtil.oxyGetPpgRt(it.model)
+                LpBleUtil.oxyGetPpgRt(it.model)
+                binding.dataStr.text = data.toString()
             })
         // o2ring ppg
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
             .observe(this, {
 
 //                LpBleUtil.oxyGetPpgRt(it.model)
-                LpBleUtil.oxyGetRtParam(it.model)
+                LpBleUtil.oxyGetRtWave(it.model)
                 val ppgData = it.data as OxyBleResponse.PPGData
                 ppgData.let { data ->
                     oxyPpgSize += data.rawDataBytes.size
@@ -431,6 +435,16 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
                 }
 
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgRes)
+            .observe(this, {
+                Log.d("test12345", "------------EventOxyPpgRes------------")
+                LpBleUtil.oxyGetRtWave(it.model)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtWaveRes)
+            .observe(this, {
+                Log.d("test12345", "------------EventOxyRtWaveRes------------")
+                LpBleUtil.oxyGetRtParam(it.model)
             })
         //------------------------------pc60fw------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataWave)
@@ -747,11 +761,18 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         })
         binding.startRtOxy.setOnClickListener {
-//            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING) {
-//                LpBleUtil.oxyGetPpgRt(Constant.BluetoothConfig.currentModel[0])
-//            } else {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
+                ||Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
+                ||Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N
+                ||Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M
+                ||Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_WEARO2
+                ||Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPU
+                ||Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SNOREO2) {
+                LpBleUtil.oxyGetPpgRt(Constant.BluetoothConfig.currentModel[0])
+                startWave(Constant.BluetoothConfig.currentModel[0])
+            } else {
                 LpBleUtil.startRtTask()
-//            }
+            }
         }
         binding.stopRtOxy.setOnClickListener {
             LpBleUtil.stopRtTask()

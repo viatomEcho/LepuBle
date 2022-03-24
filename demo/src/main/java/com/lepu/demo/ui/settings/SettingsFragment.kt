@@ -666,7 +666,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.o2MtSwitch.setOnClickListener {
+        binding.o2IvSwitch.setOnClickListener {
             state++
             if (state > 1)
                 state = 0

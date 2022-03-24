@@ -27,6 +27,7 @@ class OxyBleResponse{
 
     @Parcelize
     class OxyInfo (val bytes: ByteArray) : Parcelable {
+        var infoStr: JSONObject
         var region: String       // 地区版本
         var model: String        // 系列版本
         var hwVersion: String    // 硬件版本
@@ -59,83 +60,59 @@ class OxyBleResponse{
         var ivThr: Int           // 无效值报警告警时间阈值
 
         init {
-            var infoStr = JSONObject(String(bytes))
+            infoStr = JSONObject(String(bytes))
 //            try {
 //                var infoStr = JSONObject(String(bytes))
 //            } catch (e: JSONException) {
 //                LogUtils.d(String(bytes))
 //            }
-            region = infoStr.getString("Region")
-            model = infoStr.getString("Model")
-            hwVersion = infoStr.getString("HardwareVer")
-            swVersion = infoStr.getString("SoftwareVer")
-            btlVersion = infoStr.getString("BootloaderVer")
-            pedTar = infoStr.getInt("CurPedtar")
-            sn = infoStr.getString("SN")
-            curTime = infoStr.getString("CurTIME")
-            batteryState = infoStr.getInt("CurBatState")
-            batteryValue = infoStr.getString("CurBAT")
-            oxiSwitch = if (infoStr.has("OxiSwitch")) {
-                infoStr.getInt("OxiSwitch")
-            } else {
-                0
-            }
-            oxiThr = infoStr.getInt("CurOxiThr")
-            motor = infoStr.getInt("CurMotor")
-            mode = infoStr.getInt("CurMode")
-            fileList = infoStr.getString("FileList")
-            hrSwitch = if (infoStr.has("HRSwitch")) {
-                infoStr.getInt("HRSwitch")
-            } else {
-                0
-            }
-            hrLowThr = infoStr.getInt("HRLowThr")
-            hrHighThr = infoStr.getInt("HRHighThr")
-            fileVer = infoStr.getString("FileVer")
-            spcpVer = infoStr.getString("SPCPVer")
-            curState = infoStr.getInt("CurState")
-            lightingMode = if (infoStr.has("LightingMode")) {
-                infoStr.getInt("LightingMode")
-            } else {
-                0
-            }
-            lightStr = if (infoStr.has("LightStr")) {
-                infoStr.getInt("LightStr")
-            } else {
-                0
-            }
-            branchCode = infoStr.getString("BranchCode")
-            spo2Switch = if (infoStr.has("SpO2SW")) {
-                infoStr.getInt("SpO2SW")
-            } else {
-                0
-            }
-            buzzer = if (infoStr.has("CurBuzzer")) {
-                infoStr.getInt("CurBuzzer")
-            } else {
-                0
-            }
-            mtSwitch = if (infoStr.has("MtSW")) {
-                infoStr.getInt("MtSW")
-            } else {
-                0
-            }
-            mtThr = if (infoStr.has("MtThr")) {
-                infoStr.getInt("MtThr")
-            } else {
-                0
-            }
-            ivSwitch = if (infoStr.has("IvSW")) {
-                infoStr.getInt("IvSW")
-            } else {
-                0
-            }
-            ivThr = if (infoStr.has("IvThr")) {
-                infoStr.getInt("IvThr")
-            } else {
-                0
-            }
+            region = infoStrGetString("Region")
+            model = infoStrGetString("Model")
+            hwVersion = infoStrGetString("HardwareVer")
+            swVersion = infoStrGetString("SoftwareVer")
+            btlVersion = infoStrGetString("BootloaderVer")
+            pedTar = infoStrGetInt("CurPedtar")
+            sn = infoStrGetString("SN")
+            curTime = infoStrGetString("CurTIME")
+            batteryState = infoStrGetInt("CurBatState")
+            batteryValue = infoStrGetString("CurBAT")
+            oxiSwitch = infoStrGetInt("OxiSwitch")
+            oxiThr = infoStrGetInt("CurOxiThr")
+            motor = infoStrGetInt("CurMotor")
+            mode = infoStrGetInt("CurMode")
+            fileList = infoStrGetString("FileList")
+            hrSwitch = infoStrGetInt("HRSwitch")
+            hrLowThr = infoStrGetInt("HRLowThr")
+            hrHighThr = infoStrGetInt("HRHighThr")
+            fileVer = infoStrGetString("FileVer")
+            spcpVer = infoStrGetString("SPCPVer")
+            curState = infoStrGetInt("CurState")
+            lightingMode = infoStrGetInt("LightingMode")
+            lightStr = infoStrGetInt("LightStr")
+            branchCode = infoStrGetString("BranchCode")
+            spo2Switch = infoStrGetInt("SpO2SW")
+            buzzer = infoStrGetInt("CurBuzzer")
+            mtSwitch = infoStrGetInt("MtSW")
+            mtThr = infoStrGetInt("MtThr")
+            ivSwitch = infoStrGetInt("IvSW")
+            ivThr = infoStrGetInt("IvThr")
 
+        }
+
+        private fun infoStrGetInt(key: String): Int {
+            return if (infoStr.has(key)) {
+                infoStr.getInt(key)
+            } else {
+                0
+            }
+        }
+
+        private fun infoStrGetString(key: String): String {
+            return if (infoStr.has(key)) {
+                infoStr.getString(key)
+            } else {
+                ""
+            }
         }
 
         override fun toString(): String {
@@ -178,7 +155,6 @@ class OxyBleResponse{
     @ExperimentalUnsignedTypes
     @Parcelize
     class RtParam constructor(var bytes: ByteArray) : Parcelable {
-        var content: ByteArray = bytes
         var spo2: Int             // 血氧值
         var pr: Int               // 脉率值
         var steps: Int            // 步数
@@ -249,7 +225,6 @@ class OxyBleResponse{
     @ExperimentalUnsignedTypes
     @Parcelize
     class RtWave constructor(var bytes: ByteArray) : Parcelable {
-        var content: ByteArray = bytes
         var spo2: Int
         var pr: Int
         var battery: Int
