@@ -197,7 +197,9 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         companion object {
             const val EventPc80bBatLevel = "com.lepu.ble.pc80b.bat.level"                         // 电池电量 int(0-3)
             const val EventPc80bDeviceInfo = "com.lepu.ble.pc80b.device.info"                     // 设备信息 PC80BleResponse.DeviceInfo
-            const val EventPc80bTrackData = "com.lepu.ble.pc80b.track.data"                       // 实时数据 PC80BleResponse.RtTrackData
+            const val EventPc80bTrackData = "com.lepu.ble.pc80b.track.data"                       // 快速实时数据 PC80BleResponse.RtTrackData
+            const val EventPc80bContinuousData = "com.lepu.ble.pc80b.continuous.data"             // 连续实时数据 PC80BleResponse.RtContinuousData
+            const val EventPc80bContinuousDataEnd = "com.lepu.ble.pc80b.continuous.data.end"       // 连续实时结束 true
             const val EventPc80bReadFileError = "com.lepu.ble.pc80b.file.read.error"              // 传输文件出错 true
             const val EventPc80bReadingFileProgress = "com.lepu.ble.pc80b.file.reading.progress"  // 传输文件进度 int(0-100)
             const val EventPc80bReadFileComplete = "com.lepu.ble.pc80b.file.read.complete"        // 传输文件完成 PC80BleResponse.ScpEcgFile

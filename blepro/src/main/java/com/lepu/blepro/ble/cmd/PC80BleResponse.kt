@@ -3,6 +3,7 @@ package com.lepu.blepro.ble.cmd
 import android.os.Parcelable
 import com.lepu.blepro.ble.data.PC80DataController
 import com.lepu.blepro.utils.*
+import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.HexString.trimStr
 import kotlinx.android.parcel.Parcelize
 
@@ -90,6 +91,16 @@ object PC80BleResponse {
             sn3 = trimStr(toString(bytes.copyOfRange(index, index+12)))
             sn4 = bytesToHex(bytes.copyOfRange(index, index+12))*/
         }
+
+        override fun toString(): String {
+            return """
+                deviceType : $deviceType
+                deviceName : $deviceName
+                filterMode : $filterMode
+                transType : $transType
+                sn : $sn
+            """.trimIndent()
+        }
     }
     fun getDeviceName(int: Int) : String {
         return when(int) {
@@ -97,6 +108,40 @@ object PC80BleResponse {
             0x0B -> "PC-80B"
             0x80 -> "PC-80B(UW)"
             else -> ""
+        }
+    }
+
+    @ExperimentalUnsignedTypes
+    class RtContinuousData(val bytes: ByteArray) {
+        var seqNo: Int
+        var ecgData: RtEcgData
+        var hr: Int
+        var leadOff: Boolean
+        var gain: Float
+        var vol: Float
+
+        init {
+            var index = 0
+            seqNo = byte2UInt(bytes[index])
+            index++
+            ecgData = RtEcgData(bytes.copyOfRange(index, index+50))
+            index += 50
+            hr = byte2UInt(bytes[index])
+            index++
+            leadOff = ((byte2UInt(bytes[index+1]) and 0x80) shr 7) == 1
+            gain = getGain((byte2UInt(bytes[index+1]) and 0x70) shr 4)
+            vol = (((byte2UInt(bytes[index+1]) and 0x0F) shl 8) + byte2UInt(bytes[index])).div(1000f)
+        }
+
+        override fun toString(): String {
+            return """
+                seqNo : $seqNo
+                ecgData : $ecgData
+                hr : $hr
+                leadOff : $leadOff
+                gain : $gain
+                vol : $vol
+            """.trimIndent()
         }
     }
 
@@ -108,6 +153,7 @@ object PC80BleResponse {
         var channel: Int   // 当前使用的通道
         var measure: Int   // 当前测量模式
         var stage: Int     // 当前测量阶段
+        var hr: Int        // 实时心率
         var leadOff: Int   // 电极脱落标记
         var dataType: Int  // ECG数据结构类型
         var data: RtData   // ECG数据
@@ -134,6 +180,7 @@ object PC80BleResponse {
             channel = (bytes[3].toInt() and 0xC0) shr 6
             measure = (bytes[3].toInt() and 0x30) shr 4
             stage = bytes[3].toInt() and 0x0F
+            hr = byte2UInt(bytes[4])
             leadOff = (bytes[5].toInt() and 0x80) shr 7
             dataType = bytes[5].toInt() and 0x07
             data = RtData(bytes.copyOfRange(6, bytes.size), dataType)
@@ -147,6 +194,7 @@ object PC80BleResponse {
                 channel: $channel
                 measure: $measure
                 stage: $stage
+                hr: $hr
                 leadOff: $leadOff
                 dataType: $dataType
             """.trimIndent()
@@ -178,7 +226,7 @@ object PC80BleResponse {
             ecg = bytes
             wFs = FloatArray(len/2)
             for (i in 0 until (len/2)) {
-                wFs!![i] = PC80DataController.byteTomV(bytes[2 * i], bytes[2 * i + 1])
+                wFs[i] = PC80DataController.byteTomV(bytes[2 * i], bytes[2 * i + 1])
             }
         }
     }

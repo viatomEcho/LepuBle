@@ -119,7 +119,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK,
             Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2,
             Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LEW3,
-            Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_LE_BP2W -> waveHandler.post(EcgWaveTask())
+            Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_LE_BP2W,
+            Bluetooth.MODEL_PC80B -> waveHandler.post(EcgWaveTask())
 
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
             Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC66B,
@@ -220,12 +221,30 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         })
         //------------------------------pc80b------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bTrackData)
-            .observe(this, {
-                val rtData = it.data as PC80BleResponse.RtTrackData
+            .observe(this, { event ->
+                val rtData = event.data as PC80BleResponse.RtTrackData
                 rtData.let { data ->
-                    DataController.receive(data.data.ecgData!!.wFs)
+                    viewModel.ecgHr.value = data.hr
+                    data.data.ecgData?.wFs.let {
+                        DataController.receive(it)
+                    }
                     binding.dataStr.text = data.toString()
                 }
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bContinuousData)
+            .observe(this, { event ->
+                val rtData = event.data as PC80BleResponse.RtContinuousData
+                rtData.let { data ->
+                    viewModel.ecgHr.value = data.hr
+                    data.ecgData?.wFs.let {
+                        DataController.receive(it)
+                    }
+                    binding.dataStr.text = data.toString()
+                }
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bContinuousDataEnd)
+            .observe(this, {
+                stopWave()
             })
         //------------------------------bp2 bp2a------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData)
