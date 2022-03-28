@@ -261,9 +261,16 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.bp2wSetConfig.setOnClickListener {
+        binding.bp2wBeepSw.setOnClickListener {
             switchState = !switchState
             (config as Bp2Config).beepSwitch = switchState
+            LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.bp2wVolumeSw.setOnClickListener {
+            switchState = !switchState
+            (config as Bp2Config).volumeSwitch = switchState
             LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
@@ -344,9 +351,16 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.leBp2wSetConfig.setOnClickListener {
+        binding.leBp2wBeepSw.setOnClickListener {
             switchState = !switchState
             (config as Bp2Config).beepSwitch = switchState
+            LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.leBp2wVolumeSw.setOnClickListener {
+            switchState = !switchState
+            (config as Bp2Config).volumeSwitch = switchState
             LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
@@ -825,7 +839,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 if (config.beepSwitch) {
                     on = "开"
                 }
-                binding.bp2wSetConfig.text = "声音" + on
+                binding.bp2wBeepSw.text = "心跳音" + on
+                on = if (config.volumeSwitch) {
+                    "开"
+                } else {
+                    "关"
+                }
+                binding.bp2wVolumeSw.text = "播报音" + on
                 binding.bp2wSetVolume.text = "音量" + config.volume
                 binding.bp2wMode.text = "测量模式" + config.avgMeasureMode
                 Toast.makeText(
@@ -918,7 +938,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 if (config.beepSwitch) {
                     on = "开"
                 }
-                binding.leBp2wSetConfig.text = "声音" + on
+                binding.leBp2wBeepSw.text = "心跳音" + on
+                on = if (config.volumeSwitch) {
+                    "开"
+                } else {
+                    "关"
+                }
+                binding.leBp2wVolumeSw.text = "播报音" + on
                 binding.leBp2wSetVolume.text = "音量" + config.volume
                 binding.leBp2wMode.text = "测量模式" + config.avgMeasureMode
                 Toast.makeText(
