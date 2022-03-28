@@ -15,7 +15,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      * 包含model: MODEL_O2RING, MODEL_BABYO2, MODEL_BABYO2N,
      *           MODEL_CHECKO2, MODEL_O2M, MODEL_SLEEPO2,
      *           MODEL_SNOREO2, MODEL_WEARO2, MODEL_SLEEPU,
-     *           MODEL_OXYLINK, MODEL_KIDSO2
+     *           MODEL_OXYLINK, MODEL_KIDSO2, MODEL_OXYFIT
      */
     interface Oxy {
         companion object {

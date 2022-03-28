@@ -119,7 +119,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_WEARO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPU
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYLINK
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2) {
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYFIT) {
                 LpBleUtil.getInfo(Constant.BluetoothConfig.currentModel[0])
             } else {
                 LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0], fileType)

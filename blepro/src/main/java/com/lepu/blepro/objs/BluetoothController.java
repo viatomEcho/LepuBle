@@ -59,7 +59,8 @@ public class BluetoothController {
                 || model == Bluetooth.MODEL_SNOREO2
                 || model == Bluetooth.MODEL_WEARO2
                 || model == Bluetooth.MODEL_SLEEPU
-                || model == Bluetooth.MODEL_KIDSO2) {
+                || model == Bluetooth.MODEL_KIDSO2
+                || model == Bluetooth.MODEL_OXYFIT) {
             isO2 = true;
         }
         return isO2;

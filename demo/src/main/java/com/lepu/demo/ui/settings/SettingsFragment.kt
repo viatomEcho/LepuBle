@@ -112,7 +112,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_O2M, Bluetooth.MODEL_SLEEPO2,
                 Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
                 Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
-                Bluetooth.MODEL_KIDSO2 -> {
+                Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT -> {
                     setViewVisible(binding.o2Layout)
                     LpBleUtil.getInfo(it.modelNo)
                 }
@@ -616,7 +616,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 volume = 0
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYLINK
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2) {
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N) {
                 LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MOTOR, motor2[volume])
             } else {
                 LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MOTOR, motor1[volume])

@@ -554,7 +554,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_O2M, Bluetooth.MODEL_SLEEPO2,
             Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
-            Bluetooth.MODEL_KIDSO2 -> {
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT -> {
                 return inter is OxyBleInterface
             }
             Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A ->{

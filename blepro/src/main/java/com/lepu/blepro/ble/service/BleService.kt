@@ -199,7 +199,7 @@ open class BleService: LifecycleService() {
             Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
             Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
-            Bluetooth.MODEL_KIDSO2 -> {
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT -> {
                 OxyBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
