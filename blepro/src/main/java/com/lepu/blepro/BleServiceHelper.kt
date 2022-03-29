@@ -549,13 +549,19 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BPM -> {
                 return inter is BpmBleInterface
             }
-            Bluetooth.MODEL_O2RING -> {
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_BABYO2,
+            Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_CHECKO2,
+            Bluetooth.MODEL_O2M, Bluetooth.MODEL_SLEEPO2,
+            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
+            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT -> {
                 return inter is OxyBleInterface
             }
             Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A ->{
                 return inter is Bp2BleInterface
             }
-            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B -> {
+            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
+            Bluetooth.MODEL_OXYSMART -> {
                 return inter is Pc60FwBleInterface
             }
             Bluetooth.MODEL_PC80B -> {
@@ -1265,6 +1271,18 @@ class BleServiceHelper private constructor() {
     }
 
     /**
+     * 获取盒子信息（BabyO2N）
+     */
+    fun oxyGetBoxInfo(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as OxyBleInterface).let {
+                it.getBoxInfo()
+            }
+        }
+    }
+
+    /**
      * 电量查询（pc80b）
      */
     fun sendHeartbeat(model: Int) {
@@ -1545,6 +1563,20 @@ class BleServiceHelper private constructor() {
             (it1 as Aoj20aBleInterface).let {
                 LepuBleLog.d(tag, "it as Aoj20aBleInterface--aoj20aDeleteData")
                 it.deleteData()
+            }
+        }
+    }
+
+    /**
+     * 使能实时数据发送（pc60fw，pc66b，oxysmart）
+     * @param type Pc60FwBleCmd.EnableType
+     */
+    fun pc60fwEnableRtData(model: Int, type: Int, enable: Boolean) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc60FwBleInterface).let {
+                LepuBleLog.d(tag, "it as Pc60FwBleInterface--pc60fwEnableRtData")
+                it.enableRtData(type,enable)
             }
         }
     }

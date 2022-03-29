@@ -49,7 +49,18 @@ public class BluetoothController {
 
     synchronized public static boolean checkO2Device(int model) {
         boolean isO2 = false;
-        if (model == Bluetooth.MODEL_O2RING || model == Bluetooth.MODEL_O2M || model == Bluetooth.MODEL_OXYLINK) {
+        if (model == Bluetooth.MODEL_O2RING
+                || model == Bluetooth.MODEL_O2M
+                || model == Bluetooth.MODEL_OXYLINK
+                || model == Bluetooth.MODEL_BABYO2
+                || model == Bluetooth.MODEL_BABYO2N
+                || model == Bluetooth.MODEL_CHECKO2
+                || model == Bluetooth.MODEL_SLEEPO2
+                || model == Bluetooth.MODEL_SNOREO2
+                || model == Bluetooth.MODEL_WEARO2
+                || model == Bluetooth.MODEL_SLEEPU
+                || model == Bluetooth.MODEL_KIDSO2
+                || model == Bluetooth.MODEL_OXYFIT) {
             isO2 = true;
         }
         return isO2;

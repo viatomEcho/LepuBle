@@ -2,7 +2,7 @@ package com.lepu.blepro.ble.cmd
 
 import android.os.Parcelable
 import com.lepu.blepro.download.DownloadHelper
-import com.lepu.blepro.utils.ByteUtils
+import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
 import kotlinx.android.parcel.Parcelize
@@ -27,6 +27,7 @@ class OxyBleResponse{
 
     @Parcelize
     class OxyInfo (val bytes: ByteArray) : Parcelable {
+        var infoStr: JSONObject
         var region: String       // 地区版本
         var model: String        // 系列版本
         var hwVersion: String    // 硬件版本
@@ -41,8 +42,8 @@ class OxyBleResponse{
         var motor: Int           // 强度（KidsO2、Oxylink：最低：5，低：10，中：17，高：22，最高：35；O2Ring：最低：20，低：40，中：60，高：80，最高：100，震动强度不随开关的改变而改变）
         var mode: Int            // 工作模式（0：sleep模式  1：monitor模式）
         var fileList: String     // 文件列表
-        var oxiSwitch:Int        // 血氧开关
-        var hrSwitch:Int         // 心率开关
+        var oxiSwitch:Int        // 血氧开关（bit0:震动  bit1:声音）(int 0：震动关声音关 1：震动开声音关 2：震动关声音开 3：震动开声音开)
+        var hrSwitch:Int         // 心率开关（bit0:震动  bit1:声音）(int 0：震动关声音关 1：震动开声音关 2：震动关声音开 3：震动开声音开)
         var hrLowThr:Int         // 心率震动最低阈值
         var hrHighThr:Int        // 心率震动最高阈值
         var fileVer:String       // 文件解析协议版本
@@ -51,46 +52,67 @@ class OxyBleResponse{
         var lightingMode:Int     // 亮屏模式（0：Standard模式，1：Always Off模式，2：Always On模式）
         var lightStr:Int         // 屏幕亮度
         var branchCode:String    // code码
+        var spo2Switch : Int     // 血氧功能开关（0：关 1：开）
+        var buzzer: Int          // 声音强度（checkO2Plus：最低：20，低：40，中：60，高：80，最高：100）
+        var mtSwitch: Int        // 体动开关（0：关 1：开）
+        var mtThr: Int           // 体动阈值
+        var ivSwitch: Int        // 无效值报警开关（0：关 1：开）
+        var ivThr: Int           // 无效值报警告警时间阈值
+
         init {
-            var infoStr = JSONObject(String(bytes))
+            infoStr = JSONObject(String(bytes))
 //            try {
 //                var infoStr = JSONObject(String(bytes))
 //            } catch (e: JSONException) {
 //                LogUtils.d(String(bytes))
 //            }
-            region = infoStr.getString("Region")
-            model = infoStr.getString("Model")
-            hwVersion = infoStr.getString("HardwareVer")
-            swVersion = infoStr.getString("SoftwareVer")
-            btlVersion = infoStr.getString("BootloaderVer")
-            pedTar = infoStr.getInt("CurPedtar")
-            sn = infoStr.getString("SN")
-            curTime = infoStr.getString("CurTIME")
-            batteryState = infoStr.getInt("CurBatState")
-            batteryValue = infoStr.getString("CurBAT")
-            oxiSwitch = infoStr.getInt("OxiSwitch")
-            oxiThr = infoStr.getInt("CurOxiThr")
-            motor = infoStr.getInt("CurMotor")
-            mode = infoStr.getInt("CurMode")
-            fileList = infoStr.getString("FileList")
-            hrSwitch = infoStr.getInt("HRSwitch")
-            hrLowThr = infoStr.getInt("HRLowThr")
-            hrHighThr = infoStr.getInt("HRHighThr")
-            fileVer = infoStr.getString("FileVer")
-            spcpVer = infoStr.getString("SPCPVer")
-            curState = infoStr.getInt("CurState")
-            lightingMode = if (infoStr.has("LightingMode")) {
-                infoStr.getInt("LightingMode")
-            } else {
-                0
-            }
-            lightStr = if (infoStr.has("LightStr")) {
-                infoStr.getInt("LightStr")
-            } else {
-                0
-            }
-            branchCode = infoStr.getString("BranchCode")
+            region = infoStrGetString("Region")
+            model = infoStrGetString("Model")
+            hwVersion = infoStrGetString("HardwareVer")
+            swVersion = infoStrGetString("SoftwareVer")
+            btlVersion = infoStrGetString("BootloaderVer")
+            pedTar = infoStrGetInt("CurPedtar")
+            sn = infoStrGetString("SN")
+            curTime = infoStrGetString("CurTIME")
+            batteryState = infoStrGetInt("CurBatState")
+            batteryValue = infoStrGetString("CurBAT")
+            oxiSwitch = infoStrGetInt("OxiSwitch")
+            oxiThr = infoStrGetInt("CurOxiThr")
+            motor = infoStrGetInt("CurMotor")
+            mode = infoStrGetInt("CurMode")
+            fileList = infoStrGetString("FileList")
+            hrSwitch = infoStrGetInt("HRSwitch")
+            hrLowThr = infoStrGetInt("HRLowThr")
+            hrHighThr = infoStrGetInt("HRHighThr")
+            fileVer = infoStrGetString("FileVer")
+            spcpVer = infoStrGetString("SPCPVer")
+            curState = infoStrGetInt("CurState")
+            lightingMode = infoStrGetInt("LightingMode")
+            lightStr = infoStrGetInt("LightStr")
+            branchCode = infoStrGetString("BranchCode")
+            spo2Switch = infoStrGetInt("SpO2SW")
+            buzzer = infoStrGetInt("CurBuzzer")
+            mtSwitch = infoStrGetInt("MtSW")
+            mtThr = infoStrGetInt("MtThr")
+            ivSwitch = infoStrGetInt("IvSW")
+            ivThr = infoStrGetInt("IvThr")
 
+        }
+
+        private fun infoStrGetInt(key: String): Int {
+            return if (infoStr.has(key)) {
+                infoStr.getInt(key)
+            } else {
+                0
+            }
+        }
+
+        private fun infoStrGetString(key: String): String {
+            return if (infoStr.has(key)) {
+                infoStr.getString(key)
+            } else {
+                ""
+            }
         }
 
         override fun toString(): String {
@@ -120,6 +142,12 @@ class OxyBleResponse{
                 lightingMode = $lightingMode
                 lightStr = $lightStr
                 branchCode = $branchCode
+                spo2Switch = $spo2Switch
+                buzzer = $buzzer
+                mtSwitch = $mtSwitch
+                mtThr = $mtThr
+                ivSwitch = $ivSwitch
+                ivThr = $ivThr
             """.trimIndent()
         }
     }
@@ -127,7 +155,6 @@ class OxyBleResponse{
     @ExperimentalUnsignedTypes
     @Parcelize
     class RtParam constructor(var bytes: ByteArray) : Parcelable {
-        var content: ByteArray = bytes
         var spo2: Int             // 血氧值
         var pr: Int               // 脉率值
         var steps: Int            // 步数
@@ -136,16 +163,43 @@ class OxyBleResponse{
         var vector: Int           // 三轴矢量
         var pi: Int               // pi值
         var state: Int            // 工作状态（0：导联脱落 1：导联连上 其他：异常）
+        var countDown: Int        // 导联脱落倒计时（10s-0）
+        var invalidIvState: Int   // 无效值报警（0：未达到报警条件 1：达到报警条件 2：达到报警条件，但是盒子不报警）
+        var spo2IvState: Int      // 血氧报警（0：未达到报警条件 1：达到报警条件 2：达到报警条件，但是盒子不报警）
+        var hrIvState: Int        // 心率报警（0：未达到报警条件 1：达到报警条件 2：达到报警条件，但是盒子不报警）
+        var vectorIvState: Int    // 体动报警（0：未达到报警条件 1：达到报警条件 2：达到报警条件，但是盒子不报警）
 
         init {
-            spo2 = bytes[0].toUInt().toInt()
-            pr =  (bytes[1].toUInt().toInt() and 0xFF) or (bytes[2].toUInt().toInt() and 0xFF shl 8)
-            steps = bytes[3].toUInt().toInt() and 0xFF or (bytes[4].toUInt().toInt() and 0xFF shl 8) or (bytes[5].toUInt().toInt() and 0xFF shl 16) or (bytes[6].toUInt().toInt() and 0xFF shl 24)
-            battery = bytes[7].toUInt().toInt()
-            batteryState = bytes[8].toUInt().toInt()
-            vector = bytes[9].toUInt().toInt()
-            pi = bytes[10].toUInt().toInt() and 0xFF
-            state = bytes[11].toUInt().toInt()
+            var index = 0
+            spo2 = byte2UInt(bytes[index])
+            index++
+            pr =  toUInt(bytes.copyOfRange(index, index+2))
+            index += 2
+            steps = toUInt(bytes.copyOfRange(index, index+4))
+            index += 4
+            battery = byte2UInt(bytes[index])
+            index++
+            batteryState = byte2UInt(bytes[index])
+            index++
+            vector = byte2UInt(bytes[index])
+            index++
+            pi = byte2UInt(bytes[index])
+            index++
+            state = byte2UInt(bytes[index]) and 0x01
+            countDown = (byte2UInt(bytes[index]) and 0xF0) shr 4
+            index++
+            if (bytes.size > index) {
+                invalidIvState = byte2UInt(bytes[index]) and 0x03
+                spo2IvState = (byte2UInt(bytes[index]) and 0x0C) shr 2
+                hrIvState = (byte2UInt(bytes[index]) and 0x30) shr 4
+                vectorIvState = (byte2UInt(bytes[index]) and 0xC0) shr 6
+            } else {
+                invalidIvState = 0
+                spo2IvState = 0
+                hrIvState = 0
+                vectorIvState = 0
+            }
+
         }
 
         override fun toString(): String {
@@ -159,6 +213,11 @@ class OxyBleResponse{
                 vector = $vector
                 pi = $pi
                 state = $state
+                countDown = $countDown
+                invalidIvState = $invalidIvState
+                spo2IvState = $spo2IvState
+                hrIvState = $hrIvState
+                vectorIvState = $vectorIvState
             """.trimIndent()
         }
     }
@@ -166,7 +225,6 @@ class OxyBleResponse{
     @ExperimentalUnsignedTypes
     @Parcelize
     class RtWave constructor(var bytes: ByteArray) : Parcelable {
-        var content: ByteArray = bytes
         var spo2: Int
         var pr: Int
         var battery: Int
@@ -183,23 +241,24 @@ class OxyBleResponse{
             pr = toUInt(bytes.copyOfRange(1, 3))
             battery = bytes[3].toUInt().toInt()
             batteryState = bytes[4].toUInt().toInt()
-            pi = ByteUtils.byte2UInt(bytes[5])
+            pi = byte2UInt(bytes[5])
             state = bytes[6].toUInt().toInt()
             len = toUInt(bytes.copyOfRange(10, 12))
             waveByte = bytes.copyOfRange(12, 12 + len)
             wFs = IntArray(len)
             wByte = ByteArray(len)
             for (i in 0 until len) {
-                var temp = ByteUtils.byte2UInt(waveByte[i])
-                if (temp == 156) {
+                var temp = byte2UInt(waveByte[i])
+                // 处理毛刺
+                if (temp == 156 || temp == 246) {
                     if (i==0) {
                         if ((i+1) < len)
-                          temp = ByteUtils.byte2UInt(waveByte[i+1])
+                          temp = byte2UInt(waveByte[i+1])
                     } else if (i == len-1) {
-                        temp = ByteUtils.byte2UInt(waveByte[i-1])
+                        temp = byte2UInt(waveByte[i-1])
                     } else {
                         if ((i+1) < len)
-                            temp = (ByteUtils.byte2UInt(waveByte[i-1]) + ByteUtils.byte2UInt(waveByte[i+1]))/2
+                            temp = (byte2UInt(waveByte[i-1]) + byte2UInt(waveByte[i+1]))/2
                     }
                 }
 
@@ -209,7 +268,7 @@ class OxyBleResponse{
         }
         override fun toString(): String {
             return """
-                RtParam : 
+                RtWave : 
                 spo2 = $spo2
                 pr = $pr
                 battery = $battery

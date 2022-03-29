@@ -7,6 +7,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BleCRC
 import com.lepu.blepro.ble.cmd.OxyBleCmd
 import com.lepu.blepro.ble.cmd.OxyBleResponse
+import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toHex
@@ -120,6 +121,13 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
             }
 
+            OxyBleCmd.OXY_CMD_BOX_INFO -> {
+                clearTimeout()
+                val boxInfo = LepuDevice(response.content)
+                LepuBleLog.d(tag, "model:$model, OXY_CMD_BOX_INFO => success $boxInfo")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBoxInfo).post(InterfaceEvent(model, boxInfo))
+            }
+
             OxyBleCmd.OXY_CMD_INFO -> {
 
                 clearTimeout()
@@ -137,6 +145,13 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             // 1.4.1固件版本之前没有PI 有波形
             OxyBleCmd.OXY_CMD_RT_WAVE -> {
                 clearTimeout()
+
+                if (response.content.size < 13) {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtWaveRes)
+                        .post(InterfaceEvent(model, true))
+                    return
+                }
+
                 val rtWave = OxyBleResponse.RtWave(response.content)
 
                 //发送实时数据
@@ -147,6 +162,11 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             // 有pi 没有波形
             OxyBleCmd.OXY_CMD_RT_PARAM -> {
                 clearTimeout()
+                if (response.len < 12) {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamRes)
+                        .post(InterfaceEvent(model, true))
+                    return
+                }
                 val rtParam = OxyBleResponse.RtParam(response.content)
                 //发送实时数据
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamData).post(InterfaceEvent(model, rtParam))
@@ -269,6 +289,9 @@ class OxyBleInterface(model: Int): BleInterface(model) {
         sendOxyCmd(OxyBleCmd.OXY_CMD_READ_START, OxyBleCmd.readFileStart(fileName))
     }
 
+    fun getBoxInfo() {
+        sendOxyCmd(OxyBleCmd.OXY_CMD_BOX_INFO, OxyBleCmd.getBoxInfo())
+    }
 
     override fun syncTime() {
         sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.syncTime())

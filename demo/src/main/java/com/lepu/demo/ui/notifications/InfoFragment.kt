@@ -109,7 +109,18 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             if (fileType > 2) {
                 fileType = 0
             }
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2) {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SNOREO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_WEARO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPU
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYLINK
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYFIT) {
                 LpBleUtil.getInfo(Constant.BluetoothConfig.currentModel[0])
             } else {
                 LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0], fileType)
@@ -415,7 +426,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (event.data as OxyBleResponse.OxyInfo).let {
                     setReceiveCmd(it.bytes)
                     for (fileName in it.fileList.split(",")) {
-                        fileNames.add(fileName)
+                        if (fileName.isNotEmpty()) {
+                            fileNames.add(fileName)
+                        }
                     }
                     Toast.makeText(context, "o2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                     binding.info.text = it.toString()

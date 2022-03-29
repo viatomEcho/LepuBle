@@ -145,5 +145,24 @@ class PC60FwBleResponse{
         }
     }
 
+    @ExperimentalUnsignedTypes
+    class OriginalData(val bytes: ByteArray) {
+        var redFrq: Int  // 0-600Khz
+        var irFrq: Int
+        init {
+            var index = 0
+            redFrq = toUInt(bytes.copyOfRange(index, index+2))
+            index += 2
+            irFrq = toUInt(bytes.copyOfRange(index, index+2))
+        }
+
+        override fun toString(): String {
+            return """
+                redFrq : $redFrq
+                irFrq : $irFrq
+            """.trimIndent()
+        }
+    }
+
 }
 

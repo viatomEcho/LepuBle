@@ -274,6 +274,17 @@ class LpBleUtil {
             }
 
         }
+        fun oxyGetBoxInfo(model: Int) {
+            Log.d(TAG, "getBoxInfo")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.oxyGetBoxInfo(model)
+            }
+
+        }
         fun updateSetting(model: Int, type: String, value: Any) {
             Log.d(TAG, "updateSetting")
             BleServiceHelper.getInterface(model)?.let {

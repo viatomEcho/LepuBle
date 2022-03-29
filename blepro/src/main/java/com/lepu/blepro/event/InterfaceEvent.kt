@@ -12,7 +12,10 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     /**
      * Oxy LiveDataBus Event
      * OxyBleInterface发出的通知
-     * 包含model: MODEL_O2RING, MODEL_BABYO2
+     * 包含model: MODEL_O2RING, MODEL_BABYO2, MODEL_BABYO2N,
+     *           MODEL_CHECKO2, MODEL_O2M, MODEL_SLEEPO2,
+     *           MODEL_SNOREO2, MODEL_WEARO2, MODEL_SLEEPU,
+     *           MODEL_OXYLINK, MODEL_KIDSO2, MODEL_OXYFIT
      */
     interface Oxy {
         companion object {
@@ -22,8 +25,11 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventOxyFactoryReset = "com.lepu.ble.oxy.factory.reset"                 // 恢复出厂设置 true
             const val EventOxySyncDeviceInfo = "com.lepu.ble.oxy.sync"                        // 同步参数 true
             const val EventOxyInfo = "com.lepu.ble.oxy.info"                                  // 设备信息 OxyBleResponse.OxyInfo
+            const val EventOxyBoxInfo = "com.lepu.ble.oxy.box.info"                           // 盒子信息 LepuDevice
             const val EventOxyRtData = "com.lepu.ble.oxy.rtData"                              // 实时波形 OxyBleResponse.RtWave
+            const val EventOxyRtWaveRes = "com.lepu.ble.oxy.rt.wave.res"                      // 实时波形失败 true
             const val EventOxyRtParamData = "com.lepu.ble.oxy.rt.param.Data"                  // 实时参数 OxyBleResponse.RtParam
+            const val EventOxyRtParamRes = "com.lepu.ble.oxy.rt.param.res"                    // 实时参数失败 true
             const val EventOxyPpgData = "com.lepu.ble.oxy.ppg.data"                           // PPG数据成功 OxyBleResponse.PPGData
             const val EventOxyPpgRes = "com.lepu.ble.oxy.ppg.res"                             // PPG数据失败 true
         }
@@ -31,7 +37,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * Er1BleInterface发出的通知
-     * 包含model: MODEL_ER1, MODEL_DUOEK
+     * 包含model: MODEL_ER1, MODEL_ER1_N, MODEL_DUOEK
      */
     interface ER1 {
         companion object {
@@ -66,6 +72,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBpmRecordData = "com.lepu.ble.bpm.record.data"        // 记录数据 BpmCmd
             const val EventBpmRecordEnd = "com.lepu.ble.bpm.record.end"          // 传输完成 true
             const val EventBpmMeasureResult = "com.lepu.ble.bpm.measure.result"  // 测量结果 BpmCmd
+            const val EventBpmMeasureErrorResult = "com.lepu.ble.bpm.measure.error.result"  // 测量错误结果 BpmCmd
         }
     }
 
@@ -176,7 +183,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * PC60FwBleInterface发出的通知
-     * 包含model: MODEL_PC60FW, MODEL_PC_6N
+     * 包含model: MODEL_PC60FW, MODEL_PC66B, MODEL_OXYSMART
      */
     interface PC60Fw {
         companion object {
@@ -185,6 +192,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventPC60FwBattery = "com.lepu.ble.pc60fw.battery"               // 电池电量 PC60FwBleResponse.Battery
             const val EventPC60FwDeviceInfo = "com.lepu.ble.pc60fw.device.info"        // 设备信息 BoDeviceInfo
             const val EventPC60FwWorkingStatus = "com.lepu.ble.pc60fw.working.status"  // 工作状态 PC60FwBleResponse.WorkingStatus
+            const val EventPC60FwOriginalData = "com.lepu.ble.pc60fw.original.data"    // 红外数据 PC60FwBleResponse.OriginalData
         }
     }
 
@@ -360,6 +368,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventAOJ20aTempRtData = "com.lepu.ble.aoj20a.temp.rtdata"         // 实时测温数据 Aoj20aBleResponse.TempRtData
             const val EventAOJ20aSetTime = "com.lepu.ble.aoj20a.set.time"               // 同步时间 boolean
             const val EventAOJ20aTempRecord = "com.lepu.ble.aoj20a.temp.record"         // 历史测量数据 Aoj20aBleResponse.TempRecord
+            const val EventAOJ20aNoTempRecord = "com.lepu.ble.aoj20a.no.temp.record"    // 无历史数据 boolean
             const val EventAOJ20aDeviceData = "com.lepu.ble.aoj20a.device.data"         // 设备数据 Aoj20aBleResponse.DeviceData
             const val EventAOJ20aTempErrorMsg = "com.lepu.ble.aoj20a.temp.error.msg"    // 错误码数据 Aoj20aBleResponse.ErrorMsg
             const val EventAOJ20aDeleteData = "com.lepu.ble.aoj20a.delete.data"         // 删除历史数据 boolean

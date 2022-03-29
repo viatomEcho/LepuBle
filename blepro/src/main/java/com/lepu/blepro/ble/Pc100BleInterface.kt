@@ -19,7 +19,7 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "PC100BleInterface"
 
     private lateinit var context: Context
-    private var pc100Device: Pc100DeviceInfo? = null
+    private var pc100Device = Pc100DeviceInfo()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
@@ -52,21 +52,15 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                 when (response.type) {
                     Pc100BleCmd.HAND_SHAKE -> {
                         LepuBleLog.d(tag, "model:$model,HAND_SHAKE => success")
-                        if (pc100Device == null) {
-                            pc100Device = Pc100DeviceInfo()
-                        }
                         val str = toString(response.content).split(":")
-                        pc100Device?.deviceName = device.name
-                        pc100Device?.sn = str[1]
+                        pc100Device.deviceName = device.name
+                        pc100Device.sn = str[1]
                         LepuBleLog.d(tag, "model:$model,HAND_SHAKE deviceName => " + toString(response.content))
-                        LepuBleLog.d(tag, "model:$model,HAND_SHAKE sn => " + pc100Device?.sn)
+                        LepuBleLog.d(tag, "model:$model,HAND_SHAKE sn => " + pc100Device.sn)
                     }
                     Pc100BleCmd.GET_DEVICE_ID -> {
                         LepuBleLog.d(tag, "model:$model,GET_DEVICE_ID => success")
-                        if (pc100Device == null) {
-                            pc100Device = Pc100DeviceInfo()
-                        }
-                        pc100Device?.deviceId = toUInt(response.content)
+                        pc100Device.deviceId = toUInt(response.content)
                         LepuBleLog.d(tag, "model:$model,GET_DEVICE_ID deviceId => " + toUInt(response.content))
                         LepuBleLog.d(tag, "model:$model,GET_DEVICE_ID response.content[0] => " + (response.content[0].toUInt() and 0xFFu).toInt())
                         LepuBleLog.d(tag, "model:$model,GET_DEVICE_ID response.content[1] => " + (response.content[1].toUInt() and 0xFFu).toInt())
@@ -80,14 +74,11 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BoFingerOut).post(InterfaceEvent(model, true))
                 } else {
                     val info = Pc100BleResponse.DeviceInfo(response.content)
-                    if (pc100Device == null) {
-                        pc100Device = Pc100DeviceInfo()
-                    }
-                    pc100Device?.softwareV = info.softwareV
-                    pc100Device?.hardwareV = info.hardwareV
-                    pc100Device?.batLevel = info.batLevel
-                    pc100Device?.batStatus = info.batStatus
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100DeviceInfo).post(InterfaceEvent(model, pc100Device!!))
+                    pc100Device.softwareV = info.softwareV
+                    pc100Device.hardwareV = info.hardwareV
+                    pc100Device.batLevel = info.batLevel
+                    pc100Device.batStatus = info.batStatus
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100DeviceInfo).post(InterfaceEvent(model, pc100Device))
                     LepuBleLog.d(tag, "model:$model,GET_DEVICE_INFO info.softwareV => " + info.softwareV)
                     LepuBleLog.d(tag, "model:$model,GET_DEVICE_INFO info.hardwareV => " + info.hardwareV)
                     LepuBleLog.d(tag, "model:$model,GET_DEVICE_INFO info.batLevel => " + info.batLevel)
