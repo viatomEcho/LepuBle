@@ -1,6 +1,7 @@
 package com.lepu.demo.ui.settings
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -46,13 +47,15 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private var state = 0
     private var volume = 0
     private var motor1 = intArrayOf(20, 40, 60, 80, 100)  // O2Ring
-    private var motor2 = intArrayOf(5, 10, 17, 22, 35)    // KidsO2、Oxylink、BabyO2
+    private var motor2 = intArrayOf(5, 10, 17, 22, 35)    // KidsO2、Oxylink、BabyO2、BabyO2N
     private var cmdStr = ""
 
     private var fileType = LeBp2wBleCmd.FileType.ECG_TYPE
 
     private lateinit var bp2wAdapter: WifiAdapter
     private lateinit var leBp2wAdapter: WifiAdapter
+
+    private var handler = Handler()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -329,6 +332,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
                 binding.content.text = wifiConfig.toString()
             }
+            adapter.setList(null)
+            adapter.notifyDataSetChanged()
         }
         //-------------------------le bp2w------------------------
         binding.leBp2wSetState.setOnClickListener {
@@ -504,6 +509,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
                 binding.content.text = wifiConfig.toString()
             }
+            adapter.setList(null)
+            adapter.notifyDataSetChanged()
         }
 
         //-------------------------F4,F5-----------------------
@@ -920,7 +927,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiScanning)
             .observe(this, {
                 binding.content.text = "设备正在扫描wifi"
-                LpBleUtil.bp2GetWifiDevice(it.model)
+                handler.postDelayed({
+                    LpBleUtil.bp2GetWifiDevice(it.model)
+                }, 1000)
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiDevice)
             .observe(this, {
@@ -935,6 +944,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     Toast.LENGTH_SHORT
                 ).show()
             })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSetWifiConfig)
+            .observe(this, {
+                val data = it.data as Boolean
+                if (data) {
+                    LpBleUtil.bp2GetWifiConfig(it.model)
+                }
+            })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetWifiConfig)
             .observe(this, {
                 val data = it.data as Bp2WifiConfig
@@ -942,8 +958,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.content.text = data.toString()
                 if (data.wifi.ssid.isNotEmpty()) {
                     if ((data.wifi.state != 2 || data.server.state != 2)) {
-//                        LpBleUtil.bp2wGetWifiConfig(it.model)
-                        Toast.makeText(context, "bp2w WiFi未连接成功", Toast.LENGTH_SHORT).show()
+                        LpBleUtil.bp2GetWifiConfig(it.model)
                     } else {
                         Toast.makeText(context, "bp2w WiFi连接成功", Toast.LENGTH_SHORT).show()
                     }
@@ -952,7 +967,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
 
             })
-        //------------------------------le bp2w-------------------------------------
+        //------------------------------lp bp2w-------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wDeleteFile)
             .observe(this, {
                 Toast.makeText(
@@ -1028,6 +1043,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     Toast.LENGTH_SHORT
                 ).show()
             })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSetWifiConfig)
+            .observe(this, {
+                val data = it.data as Boolean
+                if (data) {
+                    LpBleUtil.bp2GetWifiConfig(it.model)
+                }
+            })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetWifiConfig)
             .observe(this, {
                 val data = it.data as Bp2WifiConfig
@@ -1035,7 +1057,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.content.text = data.toString()
                 if (data.wifi.ssid.isNotEmpty()) {
                     if ((data.wifi.state != 2 || data.server.state != 2)) {
-//                        LpBleUtil.bp2wGetWifiConfig(it.model)
+                        LpBleUtil.bp2GetWifiConfig(it.model)
                         Toast.makeText(context, "le bp2w WiFi未连接成功", Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(context, "le bp2w WiFi连接成功", Toast.LENGTH_SHORT).show()

@@ -419,33 +419,37 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
             .observe(this, {
 
-//                LpBleUtil.oxyGetPpgRt(it.model)
                 LpBleUtil.oxyGetRtWave(it.model)
                 val ppgData = it.data as OxyBleResponse.PPGData
                 ppgData.let { data ->
                     oxyPpgSize += data.rawDataBytes.size
                     Log.d("ppg", "len  = ${data.rawDataBytes.size}")
-                    Log.d("test12345", "oxyPpgSize == $oxyPpgSize")
+                    Log.d(TAG, "oxyPpgSize == $oxyPpgSize")
 
                     var bytes = ByteArray(0)
                     for (i in 0 until data.len) {
                         bytes = bytes.plus(data.redByteArray[i]!!)
                     }
 
-                    Log.d("test12345", "------------------------" + bytesToHex(bytes))
+                    Log.d(TAG, "------------------------" + bytesToHex(bytes))
 
                 }
 
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgRes)
             .observe(this, {
-                Log.d("test12345", "------------EventOxyPpgRes------------")
+                Log.d(TAG, "------------EventOxyPpgRes------------")
                 LpBleUtil.oxyGetRtWave(it.model)
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtWaveRes)
             .observe(this, {
-                Log.d("test12345", "------------EventOxyRtWaveRes------------")
+                Log.d(TAG, "------------EventOxyRtWaveRes------------")
                 LpBleUtil.oxyGetRtParam(it.model)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamRes)
+            .observe(this, {
+                Log.d(TAG, "------------EventOxyRtParamRes------------")
+                LpBleUtil.oxyGetPpgRt(it.model)
             })
         //------------------------------pc60fw------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataWave)
@@ -763,13 +767,18 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         })
         binding.startRtOxy.setOnClickListener {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
-                ||Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
-                ||Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N
-                ||Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M
-                ||Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_WEARO2
-                ||Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPU
-                ||Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SNOREO2) {
-                LpBleUtil.oxyGetPpgRt(Constant.BluetoothConfig.currentModel[0])
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_WEARO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPU
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SNOREO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYFIT
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYLINK) {
+                LpBleUtil.oxyGetRtParam(Constant.BluetoothConfig.currentModel[0])
                 startWave(Constant.BluetoothConfig.currentModel[0])
             } else {
                 LpBleUtil.startRtTask()

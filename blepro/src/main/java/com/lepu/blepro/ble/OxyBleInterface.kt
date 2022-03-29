@@ -162,6 +162,11 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             // 有pi 没有波形
             OxyBleCmd.OXY_CMD_RT_PARAM -> {
                 clearTimeout()
+                if (response.len < 12) {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamRes)
+                        .post(InterfaceEvent(model, true))
+                    return
+                }
                 val rtParam = OxyBleResponse.RtParam(response.content)
                 //发送实时数据
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamData).post(InterfaceEvent(model, rtParam))

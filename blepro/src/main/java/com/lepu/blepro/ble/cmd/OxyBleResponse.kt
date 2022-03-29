@@ -249,7 +249,8 @@ class OxyBleResponse{
             wByte = ByteArray(len)
             for (i in 0 until len) {
                 var temp = byte2UInt(waveByte[i])
-                if (temp == 156) {
+                // 处理毛刺
+                if (temp == 156 || temp == 246) {
                     if (i==0) {
                         if ((i+1) < len)
                           temp = byte2UInt(waveByte[i+1])
