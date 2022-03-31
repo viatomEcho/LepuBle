@@ -183,7 +183,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * PC60FwBleInterface发出的通知
-     * 包含model: MODEL_PC60FW, MODEL_PC66B, MODEL_OXYSMART
+     * 包含model: MODEL_PC60FW, MODEL_PC66B, MODEL_OXYSMART, MODEL_POD_1W
      */
     interface PC60Fw {
         companion object {

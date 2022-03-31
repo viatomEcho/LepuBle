@@ -36,6 +36,7 @@ class Constant{
             const val CHECKO2_MODEL: Int = Bluetooth.MODEL_CHECKO2
             const val BABYO2N_MODEL: Int = Bluetooth.MODEL_BABYO2N
             const val PC60FW_MODEL: Int = Bluetooth.MODEL_PC60FW
+            const val POD_1W_MODEL: Int = Bluetooth.MODEL_POD_1W
             const val OXYSMART_MODEL: Int = Bluetooth.MODEL_OXYSMART
             const val TV221U_MODEL: Int = Bluetooth.MODEL_TV221U
             const val AOJ20A_MODEL: Int = Bluetooth.MODEL_AOJ20A
@@ -53,7 +54,7 @@ class Constant{
                 AP20_MODEL, LEW3_MODEL, VETCORDER_MODEL, BP2W_MODEL, BABYO2_MODEL, ER1_N_MODEL, SP20_MODEL,
                 LE_BP2W_MODEL, TV221U_MODEL, AOJ20A_MODEL, BABYO2N_MODEL, CHECKO2_MODEL, O2M_MODEL,
                 SLEEPO2_MODEL, SNOREO2_MODEL, WEARO2_MODEL, SLEEPU_MODEL, OXYLINK_MODEL, KIDSO2_MODEL,
-                OXYSMART_MODEL, OXYFIT_MODEL
+                OXYSMART_MODEL, OXYFIT_MODEL, POD_1W_MODEL
             )
 
             val SUPPORT_FACES = SparseArray<Int>().apply {

@@ -344,6 +344,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
         if (model == Bluetooth.MODEL_PC80B
             || model == Bluetooth.MODEL_PC60FW
+            || model == Bluetooth.MODEL_POD_1W
             || model == Bluetooth.MODEL_OXYSMART
             || model == Bluetooth.MODEL_BABYO2N
             || model == Bluetooth.MODEL_TV221U

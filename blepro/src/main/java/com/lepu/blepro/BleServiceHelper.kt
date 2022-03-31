@@ -561,7 +561,7 @@ class BleServiceHelper private constructor() {
                 return inter is Bp2BleInterface
             }
             Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
-            Bluetooth.MODEL_OXYSMART -> {
+            Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W -> {
                 return inter is Pc60FwBleInterface
             }
             Bluetooth.MODEL_PC80B -> {

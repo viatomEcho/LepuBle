@@ -130,7 +130,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYSMART,
-            Bluetooth.MODEL_OXYFIT -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_POD_1W -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER -> {
                 waveHandler.post(EcgWaveTask())
@@ -633,7 +633,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_SLEEPO2, Bluetooth.MODEL_SNOREO2,
                 Bluetooth.MODEL_WEARO2, Bluetooth.MODEL_SLEEPU,
                 Bluetooth.MODEL_OXYLINK, Bluetooth.MODEL_KIDSO2,
-                Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_OXYFIT -> {
+                Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_OXYFIT,
+                Bluetooth.MODEL_POD_1W -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE
