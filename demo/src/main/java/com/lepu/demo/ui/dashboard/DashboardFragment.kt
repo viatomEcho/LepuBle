@@ -40,6 +40,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
     var dataString = ""
 
+    private var state = false
+    private var type = 0
+
     // 心电产品
     private lateinit var ecgBkg: EcgBkg
     private lateinit var ecgView: EcgView
@@ -522,14 +525,14 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBreathWave)
             .observe(this, {
                 val rtWave = it.data as Ap20BleResponse.RtBreathWave
-                dataString += "\n rtWave : $rtWave"
-                binding.dataStr.text = dataString
+//                dataString += "\n rtWave : $rtWave"
+//                binding.dataStr.text = dataString
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBreathParam)
             .observe(this, {
                 val rtData = it.data as Ap20BleResponse.RtBreathParam
-                dataString += "\n rtData : $rtData"
-                binding.dataStr.text = dataString
+//                dataString += "\n rtData : $rtData"
+//                binding.dataStr.text = dataString
             })
         //------------------------------vetcorder------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Vetcorder.EventVetcorderInfo)
@@ -796,6 +799,36 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         })
 
+        binding.enableRtOxy.setOnClickListener {
+            Constant.BluetoothConfig.currentModel[0].let {
+                when (it) {
+                    Bluetooth.MODEL_AP20 -> {
+                        LpBleUtil.ap20EnableRtData(it, type, state)
+                        type++
+                        if (type > Ap20BleCmd.EnableType.BREATH_WAVE) {
+                            type = Ap20BleCmd.EnableType.OXY_PARAM
+                            state = !state
+                        }
+                    }
+                    Bluetooth.MODEL_SP20 -> {
+                        LpBleUtil.sp20EnableRtData(it, type, state)
+                        type++
+                        if (type > Sp20BleCmd.EnableType.OXY_WAVE) {
+                            type = Sp20BleCmd.EnableType.OXY_PARAM
+                            state = !state
+                        }
+                    }
+                    Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B, Bluetooth.MODEL_POD_1W -> {
+                        LpBleUtil.pc60fwEnableRtData(it, type, state)
+                        type++
+                        if (type > Pc60FwBleCmd.EnableType.OXY_WAVE) {
+                            type = Pc60FwBleCmd.EnableType.OXY_PARAM
+                            state = !state
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun initEcgView() {

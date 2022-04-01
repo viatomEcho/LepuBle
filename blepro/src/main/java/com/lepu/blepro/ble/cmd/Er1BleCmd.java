@@ -252,10 +252,10 @@ public class Er1BleCmd {
         cmd[4] = (byte) seqNo;
         cmd[5] = (byte) 0x14;
         cmd[6] = (byte) 0x00;
-        int k=0;
-        for(k=0;k<16;k++){
-            cmd[7+k]=name[k];
-        }
+
+        int l = Math.min(name.length, 16);
+        System.arraycopy(name, 0, cmd, 7, l);
+
         cmd[23] = (byte) (offset);
         cmd[24] = (byte) (offset >> 8);
         cmd[25] = (byte) (offset >> 16);

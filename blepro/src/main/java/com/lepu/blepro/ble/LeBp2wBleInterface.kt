@@ -365,6 +365,14 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                 }
             }
 
+            GET_FILE_LIST -> {
+                val data = LeBp2wBleList(bleResponse.content)
+                LepuBleLog.d(tag, "model:$model, GET_FILE_LIST $data")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wList).post(
+                    InterfaceEvent(model, data)
+                )
+            }
+
             GET_WIFI_CONFIG -> {
                 if (bleResponse.len == 0) return
                 LepuBleLog.d(tag, "model:$model,GET_WIFI_CONFIG => success")
@@ -452,7 +460,8 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getFileList() {
-        // 暂时不用
+        LepuBleLog.d(tag, "getFileList...")
+        sendCmd(LeBp2wBleCmd.getFileList())
     }
 
     fun getFileListCrc(fileType: Int) {

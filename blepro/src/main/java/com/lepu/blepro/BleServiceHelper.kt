@@ -603,14 +603,18 @@ class BleServiceHelper private constructor() {
      * @param fileType LeBp2w获取文件列表类型（LeBp2wBleCmd.FileType.ECG_TYPE, BP_TYPE, USER_TYPE）
      */
     @JvmOverloads
-    fun getFileList(model: Int, fileType: Int = LeBp2wBleCmd.FileType.ECG_TYPE){
+    fun getFileList(model: Int, fileType: Int? = /*LeBp2wBleCmd.FileType.ECG_TYPE*/ null){
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_LE_BP2W -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as LeBp2wBleInterface).let {
                         LepuBleLog.d(tag, "it as LeBp2wBleInterface--getFileList")
-                        it.getFileList(fileType)
+                        if (fileType == null) {
+                            it.getFileList()
+                        } else {
+                            it.getFileList(fileType)
+                        }
                     }
                 }
             }

@@ -189,8 +189,8 @@ class Sp20BleInterface(model: Int): BleInterface(model) {
     override fun getInfo() {
         sendCmd(Sp20BleCmd.getSn())
         sendCmd(Sp20BleCmd.getInfo())
-        enableRtData(Sp20BleCmd.EnableType.OXY_PARAM, true)
-        enableRtData(Sp20BleCmd.EnableType.OXY_WAVE, true)
+//        enableRtData(Sp20BleCmd.EnableType.OXY_PARAM, true)
+//        enableRtData(Sp20BleCmd.EnableType.OXY_WAVE, true)
     }
 
     override fun syncTime() {

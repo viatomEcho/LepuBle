@@ -136,7 +136,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventLeBp2wInfo = "com.lepu.ble.le.bp2w.info"                                  // 设备信息 LepuDevice
             const val EventLeBp2wRtState = "com.lepu.ble.le.bp2w.rtState"                            // 主机状态 Bp2BleRtState
             const val EventLeBp2wRtData = "com.lepu.ble.le.bp2w.rtData"                              // 实时数据 Bp2BleRtData
-            const val EventLeBp2wFileList = "com.lepu.ble.le.bp2w.fileList"                          // 文件列表 Bp2BleFile(type 0：LeBp2wUserList 1：LeBp2wBpList 2：LeBp2wEcgList)
+            const val EventLeBp2wList = "com.lepu.ble.le.bp2w.List"                                  // 列表名 LeBp2wBleList
+            const val EventLeBp2wFileList = "com.lepu.ble.le.bp2w.fileList"                          // 文件列表内容 Bp2BleFile(type 0：LeBp2wUserList 1：LeBp2wBpList 2：LeBp2wEcgList)
             const val EventLeBp2wReadFileError = "com.lepu.ble.le.bp2w.read.file.error"              // 读文件出错 String(fileName)
             const val EventLeBp2wReadingFileProgress = "com.lepu.ble.le.bp2w.reading.file.progress"  // 传输文件进度 Bp2FilePart
             const val EventLeBp2wReadFileComplete = "com.lepu.ble.le.bp2w.read.file.complete"        // 传输文件完成 LeBp2wEcgFile

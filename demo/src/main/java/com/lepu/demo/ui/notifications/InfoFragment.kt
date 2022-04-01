@@ -127,6 +127,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
         }
+        binding.getList.setOnClickListener {
+            LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+        }
         // 读文件
         binding.readFile.setOnClickListener {
             readFileProcess = ""
@@ -315,6 +319,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 }
             })
         //--------------------------------le bp2w-----------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wList)
+            .observe(this, {
+                val data = it.data as LeBp2wBleList
+                binding.info.text = data.toString()
+                setReceiveCmd(data.bytes)
+            })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFileList)
             .observe(this, { event ->
                 (event.data as Bp2BleFile).let {

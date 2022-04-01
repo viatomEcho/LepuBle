@@ -330,7 +330,7 @@ class LpBleUtil {
          * @param fileType
          */
         @JvmOverloads
-        fun getFileList(model: Int, fileType: Int = LeBp2wBleCmd.FileType.ECG_TYPE){
+        fun getFileList(model: Int, fileType: Int? = null){
             BleServiceHelper.getFileList(model, fileType)
 
         }
@@ -678,6 +678,37 @@ class LpBleUtil {
                     return
                 }
                 BleServiceHelper.aoj20aDeleteData(model)
+            }
+        }
+
+        fun ap20EnableRtData(model: Int, type: Int, enable: Boolean) {
+            Log.d(TAG, "ap20EnableRtData")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.ap20EnableRtData(model, type, enable)
+            }
+        }
+        fun sp20EnableRtData(model: Int, type: Int, enable: Boolean) {
+            Log.d(TAG, "sp20EnableRtData")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.sp20EnableRtData(model, type, enable)
+            }
+        }
+        fun pc60fwEnableRtData(model: Int, type: Int, enable: Boolean) {
+            Log.d(TAG, "pc60fwEnableRtData")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.pc60fwEnableRtData(model, type, enable)
             }
         }
 
