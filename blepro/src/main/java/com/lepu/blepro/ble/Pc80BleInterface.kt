@@ -22,6 +22,7 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
     private lateinit var context: Context
 
     private var curFile: PC80BleResponse.RtRecordData? = null
+    private var transType = 0
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
@@ -89,39 +90,63 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
             // 建立会话应答
             Pc80BleCmd.TRANS_SET -> {
                 LepuBleLog.d(tag, "model:$model,TRANS_SET => success")
+                val data = PC80BleResponse.TransSet(response.content)
+                // 1---传输文件 0---连续测量模式实时
+                transType = data.transType
                 sendCmd(
                     Pc80BleCmd.responseTransSet(
                         Pc80BleCmd.ACK))
-                curFile = null
-                curFile = PC80BleResponse.RtRecordData(Pc80BleCmd.SCP_ECG_LENGTH, 0)
+                if (transType == 1) {
+                    curFile = null
+                    curFile = PC80BleResponse.RtRecordData(Pc80BleCmd.SCP_ECG_LENGTH, 0)
+                }
             }
 
             Pc80BleCmd.DATA_MESS -> {
                 LepuBleLog.d(tag, "model:$model,DATA_MESS => success")
                 LepuBleLog.d(tag, "model:$model,DATA_MESS response.len => " + response.len)
-                curFile?.apply {
-                    this.addContent(response.content)
-                    LepuBleLog.d(tag, "model:$model,DATA_MESS info seqNo => " + this.seqNo)
+                if (transType == 1) {
+                    curFile?.apply {
+                        this.addContent(response.content)
+                        LepuBleLog.d(tag, "model:$model,DATA_MESS info seqNo => " + this.seqNo)
 
-                    val nowSize: Long = (this.index).toLong()
-                    val size :Long= nowSize * 100
-                    val poSize :Int= (size).div(this.fileSize).toInt()
-                    LepuBleLog.d(tag, "model:$model,DATA_MESS info poSize => $poSize")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadingFileProgress).post(InterfaceEvent(model, poSize))
-                    LepuBleLog.d(tag, "model======:${response.len}:${this.index}:${this.fileSize}")
-                    sendCmd(Pc80BleCmd.responseDataMess(this.seqNo, Pc80BleCmd.ACK))
-                    if (response.len == 1) {
-                        if (this.index != this.fileSize){
-                            LepuBleLog.d(tag, "model:$model,DATA_MESS EventPc80bReadFileError")
-                            sendCmd(Pc80BleCmd.responseDataMess(this.seqNo, Pc80BleCmd.NAK))
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadFileError).post(InterfaceEvent(model, true))
-                        }else {
-                            LepuBleLog.d(tag, "model:$model,DATA_MESS EventPC80BReadFileComplete")
-                            sendCmd(Pc80BleCmd.responseDataMess(this.seqNo, Pc80BleCmd.ACK))
-                            val scpEcgFile = PC80BleResponse.ScpEcgFile(this.content)
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadFileComplete).post(InterfaceEvent(model, scpEcgFile))
+                        val nowSize: Long = (this.index).toLong()
+                        val size: Long = nowSize * 100
+                        val poSize: Int = (size).div(this.fileSize).toInt()
+                        LepuBleLog.d(tag, "model:$model,DATA_MESS info poSize => $poSize")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadingFileProgress)
+                            .post(InterfaceEvent(model, poSize))
+                        LepuBleLog.d(
+                            tag,
+                            "model======:${response.len}:${this.index}:${this.fileSize}"
+                        )
+                        sendCmd(Pc80BleCmd.responseDataMess(this.seqNo, Pc80BleCmd.ACK))
+                        if (response.len == 1) {
+                            if (this.index != this.fileSize) {
+                                LepuBleLog.d(tag, "model:$model,DATA_MESS EventPc80bReadFileError")
+                                sendCmd(Pc80BleCmd.responseDataMess(this.seqNo, Pc80BleCmd.NAK))
+                                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadFileError)
+                                    .post(InterfaceEvent(model, true))
+                            } else {
+                                LepuBleLog.d(
+                                    tag,
+                                    "model:$model,DATA_MESS EventPC80BReadFileComplete"
+                                )
+                                sendCmd(Pc80BleCmd.responseDataMess(this.seqNo, Pc80BleCmd.ACK))
+                                val scpEcgFile = PC80BleResponse.ScpEcgFile(this.content)
+                                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadFileComplete)
+                                    .post(InterfaceEvent(model, scpEcgFile))
+                            }
                         }
                     }
+                } else if (transType == 0) {
+                    if (response.len == 1) {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bContinuousDataEnd).post(InterfaceEvent(model, true))
+                        return
+                    }
+                    val data = PC80BleResponse.RtContinuousData(response.content)
+                    LepuBleLog.d(tag, "model:$model,DATA_MESS => RtContinuousData $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bContinuousData).post(InterfaceEvent(model, data))
                 }
             }
 
