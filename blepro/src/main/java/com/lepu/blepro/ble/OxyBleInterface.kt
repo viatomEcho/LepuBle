@@ -123,7 +123,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
             OxyBleCmd.OXY_CMD_BOX_INFO -> {
                 clearTimeout()
-                val boxInfo = LepuDevice(response.content)
+                val boxInfo = LepuDevice(response.content.copyOfRange(1, response.len))
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_BOX_INFO => success $boxInfo")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBoxInfo).post(InterfaceEvent(model, boxInfo))
             }
