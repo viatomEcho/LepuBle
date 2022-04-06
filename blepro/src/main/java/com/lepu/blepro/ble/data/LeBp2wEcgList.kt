@@ -42,7 +42,9 @@ class LeBp2wEcgList(var bytes: ByteArray) {
 
         init {
             var index = 0
-            time = toUInt(bytes.copyOfRange(index, index+4)).toLong()
+            val rawOffset = TimeZone.getDefault().rawOffset.div(1000)
+            val defaultTime = toUInt(bytes.copyOfRange(index, index+4)).toLong()
+            time = defaultTime - rawOffset
             fileName = stringFromDate(Date(time*1000), "yyyyMMddHHmmss")
             index += 4
             uid = toUInt(bytes.copyOfRange(index, index+4))
