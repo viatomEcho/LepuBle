@@ -195,9 +195,18 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                                 .post(InterfaceEvent(model, data))
                         }
                     } else {
-                        val data = Bp2BleFile(fileName, byteArrayOf(0,fileType.toByte(),0,0,0,0,0,0,0,0), device.name)
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFileList)
-                            .post(InterfaceEvent(model, data))
+                        if (fileName.endsWith(".list")) {
+                            val data = Bp2BleFile(
+                                fileName,
+                                byteArrayOf(0, fileType.toByte(), 0, 0, 0, 0, 0, 0, 0, 0),
+                                device.name
+                            )
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFileList)
+                                .post(InterfaceEvent(model, data))
+                        } else {
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileError)
+                                .post(InterfaceEvent(model, fileName))
+                        }
                     }
                 }
             }
