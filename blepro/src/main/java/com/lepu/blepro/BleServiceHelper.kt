@@ -81,8 +81,9 @@ class BleServiceHelper private constructor() {
      * 停止服务
      */
     fun stopService(application: Application) {
+        disconnect(false)
         application.unbindService(bleConn)
-        BleService.stopService(application)
+//        BleService.stopService(application)
         LepuBleLog.d("BleServiceHelper stopService")
     }
 
@@ -94,7 +95,7 @@ class BleServiceHelper private constructor() {
 
         LepuBleLog.d("BleServiceHelper initService  start")
         BleService.observer = observer
-        BleService.startService(application)
+//        BleService.startService(application)
 
         Intent(application, BleService::class.java).also { intent ->
             application.bindService(intent, bleConn, Context.BIND_AUTO_CREATE)

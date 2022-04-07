@@ -125,6 +125,7 @@ open class BleService: LifecycleService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         startForeground()
+        LepuBleLog.d("BleService", "----onStartCommand----")
         return START_NOT_STICKY
     }
 
@@ -782,6 +783,7 @@ open class BleService: LifecycleService() {
 
     override fun onBind(p0: Intent): IBinder {
         super.onBind(p0)
+        LepuBleLog.d("BleService", "----onBind----")
         return binder
     }
 
@@ -823,5 +825,9 @@ open class BleService: LifecycleService() {
     }
 
 
+    override fun onDestroy() {
+        super.onDestroy()
+        LepuBleLog.d("BleService", "----onDestroy----")
+    }
 
 }

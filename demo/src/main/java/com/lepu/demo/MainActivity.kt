@@ -36,6 +36,7 @@ import com.lepu.demo.cofig.Constant
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.CHECK_BLE_REQUEST_CODE
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.SUPPORT_MODELS
 import com.lepu.demo.util.CollectUtil
+import com.lepu.demo.util.LogcatHelper
 import com.permissionx.guolindev.PermissionX
 import java.util.*
 
@@ -62,6 +63,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        LogcatHelper.getInstance(this).start()
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
 
         val navController = findNavController(R.id.nav_host_fragment)
@@ -435,6 +437,9 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
     override fun onDestroy() {
 //        unbindService(connection)
+//        LpBleUtil.stopService(application)
+//        System.exit(0)
+        android.os.Process.killProcess(android.os.Process.myPid())
         super.onDestroy()
     }
 

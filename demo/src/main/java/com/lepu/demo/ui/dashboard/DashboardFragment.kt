@@ -2,10 +2,9 @@ package com.lepu.demo.ui.dashboard
 
 import android.app.Notification
 import android.app.NotificationManager
+import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
-import android.os.Build
-import android.os.Bundle
-import android.os.Handler
+import android.os.*
 import android.util.Log
 import android.view.View
 import androidx.annotation.RequiresApi
@@ -159,15 +158,21 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         initLiveEvent()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun noti(state: Int) {
         val notificationManager = context?.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val notification = Notification.Builder(context)
             .setChannelId("foreground_service")
             .setSmallIcon(android.R.drawable.sym_def_app_icon)
-            .setContentTitle("状态")
-            .setContentText(""+state)
+            .setContentTitle("警报血氧阈值低于${mainViewModel.oxyInfo.value?.oxiThr}%")
+            .setContentText("$state%")
             .build()
         notificationManager.notify(2, notification)
+        var vibrator = context?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
+//        vibrator.vibrate(VibrationEffect.createWaveform(longArrayOf(500, 1000, 1000, 500, 500, 500), -1))
+        vibrator.vibrate(1000)
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -189,9 +194,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     DataController.receive(data.wave.wFs)
                     binding.dataStr.text = data.param.toString()
                     viewModel.ecgHr.value = data.param.hr
-                    if (data.param.runStatus.toInt() == 17) {
-                        noti(data.param.runStatus.toInt())
-                    }
                 }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1FileList).observe(this, { event ->
@@ -431,6 +433,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.oxyPr.value = data.pr
                 LpBleUtil.oxyGetPpgRt(it.model)
                 binding.dataStr.text = data.toString()
+
+                if (data.spo2 > 0 && data.spo2 < mainViewModel.oxyInfo.value?.oxiThr!!) {
+                    noti(data.spo2)
+                }
+
             })
         // o2ring ppg
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
