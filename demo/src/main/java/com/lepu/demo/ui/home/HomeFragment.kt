@@ -65,7 +65,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         }
 
         binding.scan.setOnClickListener {
-            mainViewModel._scanning.value = true
+            mainViewModel._scanning.value = !mainViewModel._scanning.value!!
             binding.rcv.visibility = View.VISIBLE
         }
 
