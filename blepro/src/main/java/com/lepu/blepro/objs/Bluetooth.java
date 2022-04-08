@@ -69,7 +69,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_KCA = "KCA"; // 康康血压计
     public static final String BT_NAME_PC80B = "PC80B";
     public static final String BT_NAME_BPW1 = "BPW1"; // 金亿帝血压手表
-    public static final String BT_NAME_F4_SCALE = "MY_SCALE"; // F4体脂秤
+    public static final String BT_NAME_F4_SCALE = "F4"; // F4体脂秤
     public static final String BT_NAME_F5_SCALE = "MY_SCALE"; // F5体脂秤
     public static final String BT_NAME_F8_SCALE = "F8"; // F8体脂秤
 
@@ -262,8 +262,8 @@ public class Bluetooth implements Parcelable {
                 return MODEL_STATION;
             case BT_NAME_BPW1:
                 return MODEL_BPW1;
-//            case BT_NAME_F4_SCALE:
-//                return MODEL_F4_SCALE;
+            case BT_NAME_F4_SCALE:
+                return MODEL_F4_SCALE;
             case BT_NAME_F5_SCALE:
                 return MODEL_F5_SCALE;
             case BT_NAME_F8_SCALE:
@@ -284,7 +284,7 @@ public class Bluetooth implements Parcelable {
             BT_NAME_FHR, BT_NAME_BABYO2N, BT_NAME_STATION, BT_NAME_BPW1, BT_NAME_LEW3, BT_NAME_VETCORDER, BT_NAME_PC60FW, FETAL_DEVICE_NAME,
             BT_NAME_TV221U, BT_NAME_PC100, BT_NAME_AOJ20A, BT_NAME_VCOMIN, BT_NAME_CHECK_POD, BT_NAME_BODY_FAT, BT_NAME_POD2B, BT_NAME_PC_60NW,
             BT_NAME_POD_1W, BT_NAME_PC_60B, BT_NAME_KCA, BT_NAME_PC80B, BT_NAME_PC66B, BT_NAME_AP20, BT_NAME_F5_SCALE, BT_NAME_VTM_AD5, BT_NAME_SP20,
-            BT_NAME_LE_BP2W, BT_NAME_F8_SCALE})
+            BT_NAME_LE_BP2W, BT_NAME_F8_SCALE, BT_NAME_F4_SCALE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface DEVICE_NAME {
 
@@ -387,6 +387,8 @@ public class Bluetooth implements Parcelable {
                 return BT_NAME_SP20;
             case MODEL_PC66B:
                 return BT_NAME_PC66B;
+            case MODEL_F4_SCALE:
+                return BT_NAME_F4_SCALE;
             case MODEL_F5_SCALE:
                 return BT_NAME_F5_SCALE;
             case MODEL_F8_SCALE:

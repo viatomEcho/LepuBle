@@ -422,6 +422,7 @@ open class BleService: LifecycleService() {
      */
     fun stopDiscover() {
         LepuBleLog.d(tag, "stopDiscover...")
+        startScan?.cancel()
         isDiscovery = false
         scanDevice(false)
     }
