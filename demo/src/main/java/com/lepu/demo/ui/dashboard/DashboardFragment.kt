@@ -134,7 +134,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYSMART,
-            Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_POD_1W -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_POD_1W,
+            Bluetooth.MODEL_CHECK_POD -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER -> {
                 waveHandler.post(EcgWaveTask())
@@ -622,6 +623,19 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val data = it.data as Aoj20aBleResponse.ErrorMsg
                 binding.tempStr.text = data.toString()
             })
+        //-------------------------checkme pod------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodRtDataError)
+            .observe(this, {
+                binding.dataStr.text = "EventCheckmePodRtDataError"
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodRtData)
+            .observe(this, {
+                val rtData = it.data as CheckmePodBleResponse.RtData
+                viewModel.oxyPr.value = rtData.param.pr
+                viewModel.spo2.value = rtData.param.spo2
+                viewModel.pi.value = rtData.param.pi
+                OxyDataController.receive(rtData.wave.wFs)
+            })
     }
 
     var oxyPpgSize = 0
@@ -656,7 +670,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_WEARO2, Bluetooth.MODEL_SLEEPU,
                 Bluetooth.MODEL_OXYLINK, Bluetooth.MODEL_KIDSO2,
                 Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_OXYFIT,
-                Bluetooth.MODEL_POD_1W -> {
+                Bluetooth.MODEL_POD_1W, Bluetooth.MODEL_CHECK_POD -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE

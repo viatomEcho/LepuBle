@@ -93,6 +93,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         mainViewModel.aoj20aInfo.observe(viewLifecycleOwner, {
             binding.info.text = it.toString()
         })
+        mainViewModel.checkmePodInfo.observe(viewLifecycleOwner, {
+            binding.info.text = it.toString()
+        })
         // 公共方法测试
         // 获取设备信息
         binding.getInfo.setOnClickListener {
@@ -465,6 +468,23 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 val data = it.data as Aoj20aBleResponse.TempRecord
                 tempList.add(data)
                 binding.info.text = tempList.toString()
+            })
+        //---------------------------checkme pod--------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListError)
+            .observe(this, {
+                val data = it.data as Int
+                binding.process.text = "EventCheckmePodGetFileListError"
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListProgress)
+            .observe(this, {
+                val data = it.data as Int
+                binding.process.text = "读取进度:$data%"
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodFileList)
+            .observe(this, {
+                val data = it.data as CheckmePodBleResponse.FileList
+                Toast.makeText(context, "checkme pod 获取文件列表成功 共有${data.size}个文件", Toast.LENGTH_SHORT).show()
+                binding.info.text = data.toString()
             })
     }
 
