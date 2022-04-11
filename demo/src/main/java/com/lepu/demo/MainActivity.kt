@@ -303,6 +303,20 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 }
             })
 
+        //-------------------------checkme pod-------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodSetTime)
+            .observe(this, {
+                Toast.makeText(this, "checkme pod 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodDeviceInfo)
+            .observe(this, { event ->
+                (event.data as CheckmePodBleResponse.DeviceInfo).let {
+                    Toast.makeText(this, "checkme pod 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._checkmePodInfo.value = it
+                }
+            })
+
     }
     private fun needPermission(){
         PermissionX.init(this)
