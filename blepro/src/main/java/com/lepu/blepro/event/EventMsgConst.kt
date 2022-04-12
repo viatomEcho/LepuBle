@@ -8,7 +8,7 @@ object EventMsgConst {
     interface Ble{
         companion object{
             const val EventServiceConnectedAndInterfaceInit = "com.lepu.ble.service.interface.init"  // 服务连接后初始化interface成功会发送 true
-            const val EventBleDeviceReady = "com.lepu.ble.device.ready"  // 没有同步时间的设备连接成功后会发送 true
+            const val EventBleDeviceReady = "com.lepu.ble.device.ready"  // 没有同步时间的设备连接成功后会发送 model
         }
     }
 

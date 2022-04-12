@@ -353,7 +353,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             || model == Bluetooth.MODEL_PC_68B
             || model == Bluetooth.MODEL_VETCORDER
             || model == Bluetooth.MODEL_FHR) { // 部分设备没有同步时间命令，发送此消息通知获取设备信息，进行绑定操作
-            LiveEventBus.get<Boolean>(EventMsgConst.Ble.EventBleDeviceReady).post(true)
+            LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceReady).post(model)
         } else {
             if (!manager.isUpdater) syncTime()
         }
