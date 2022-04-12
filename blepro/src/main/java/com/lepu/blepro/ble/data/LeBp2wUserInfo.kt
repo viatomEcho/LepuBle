@@ -14,14 +14,14 @@ import java.nio.charset.Charset
 class LeBp2wUserInfo() {
 
     var len: Int = 0
-    var aid: Int = 0               // 主账户id
-    var uid: Int = 0               // 用户id
-    lateinit var fName: String     // 姓
-    lateinit var name: String      // 名
-    lateinit var birthday: String  // 生日 "1997-01-01"
-    var height: Int = 0            // 身高 cm (init 170cm -> cmdSend 1700)
-    var weight: Float = 0f         // 体重 kg (init 75.5kg -> cmdSend 755)
-    var gender: Int = 0            // 性别 0：男 1：女
+    var aid: Int = 0                // 主账户id
+    var uid: Int = 0                // 用户id
+    var fName: String = ""          // 姓
+    var name: String = ""           // 名
+    var birthday: String = "0-0-0"  // 生日 "1997-01-01"
+    var height: Int = 0             // 身高 cm (init 170cm -> cmdSend 1700)
+    var weight: Float = 0f          // 体重 kg (init 75.5kg -> cmdSend 755)
+    var gender: Int = 0             // 性别 0：男 1：女
     lateinit var icon: Icon
 
     constructor(bytes: ByteArray) : this() {

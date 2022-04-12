@@ -333,7 +333,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventSp20Battery = "com.lepu.ble.sp20.battery"         // 电池电量 int（0-3）
             const val EventSp20RtWave = "com.lepu.ble.sp20.rtwave"           // 血氧波形包数据 Sp20BleResponse.RtWave
             const val EventSp20RtParam = "com.lepu.ble.sp20.rtparam"         // 血氧参数包数据 Sp20BleResponse.RtParam
-            const val EventSp20TempData = "com.lepu.ble.sp20.temp.data"      // 鼻息流参数包数据 Sp20BleResponse.TempData
+            const val EventSp20TempData = "com.lepu.ble.sp20.temp.data"      // 体温数据 Sp20BleResponse.TempData
 
             /**
              * type :
@@ -387,6 +387,25 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventCheckmePodFileList = "com.lepu.ble.checkme.pod.file.list"                          // 文件列表 CheckmePodBleResponse.FileList
             const val EventCheckmePodGetFileListError = "com.lepu.ble.checkme.pod.get.file.list.error"        // 获取文件列表出错 boolean
             const val EventCheckmePodGetFileListProgress = "com.lepu.ble.checkme.pod.get.file.list.progress"  // 获取文件列表进度 int
+        }
+    }
+
+    /**
+     * Pc68bBleInterface
+     * 包含model: MODEL_PC_68B
+     */
+    interface PC68B {
+        companion object {
+            const val EventPc68bSetTime = "com.lepu.ble.pc68b.set.time"                     // 设置时间 true
+            const val EventPc68bGetTime = "com.lepu.ble.pc68b.get.time"                     // 获取时间 Pc68bBleResponse.DeviceTime
+            const val EventPc68bDeleteFile = "com.lepu.ble.pc68b.delete.file"               // 删除文件 true
+            const val EventPc68bDeviceInfo = "com.lepu.ble.pc68b.device.info"               // 设备信息 BoDeviceInfo
+            const val EventPc68bRtWave = "com.lepu.ble.pc68b.rtwave"                        // 血氧波形包数据 Pc68bBleResponse.RtWave
+            const val EventPc68bRtParam = "com.lepu.ble.pc68b.rtparam"                      // 血氧参数包数据 Pc68bBleResponse.RtParam
+            const val EventPc68bStatusInfo = "com.lepu.ble.pc68b.status.info"               // 状态信息 Pc68bBleResponse.StatusInfo
+            const val EventPc68bConfigInfo = "com.lepu.ble.pc68b.config.info"               // 获取配置信息 Pc68bConfig
+            const val EventPc68bFileList = "com.lepu.ble.pc68b.file.list"                   // 文件列表 MutableList<String>
+            const val EventPc68bReadFileComplete = "com.lepu.ble.pc68b.read.file.complete"  // 文件内容 Pc68bBleResponse.Record
         }
     }
 

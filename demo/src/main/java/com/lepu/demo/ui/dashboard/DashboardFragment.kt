@@ -135,7 +135,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYSMART,
             Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_POD_1W,
-            Bluetooth.MODEL_CHECK_POD -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_PC_68B -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER -> {
                 waveHandler.post(EcgWaveTask())
@@ -598,6 +598,20 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     }
                 }
             })
+        //------------------------------PC68B------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bRtWave)
+            .observe(this, {
+                val rtWave = it.data as Pc68bBleResponse.RtWave
+                OxyDataController.receive(rtWave.waveIntData)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bRtParam)
+            .observe(this, {
+                val rtData = it.data as Pc68bBleResponse.RtParam
+                viewModel.oxyPr.value = rtData.pr
+                viewModel.spo2.value = rtData.spo2
+                viewModel.pi.value = rtData.pi.div(10f)
+                binding.dataStr.text = rtData.toString()
+            })
         //--------------------------vtm20f----------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM20f.EventVTM20fRtWave)
             .observe(this, {
@@ -670,7 +684,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_WEARO2, Bluetooth.MODEL_SLEEPU,
                 Bluetooth.MODEL_OXYLINK, Bluetooth.MODEL_KIDSO2,
                 Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_OXYFIT,
-                Bluetooth.MODEL_POD_1W, Bluetooth.MODEL_CHECK_POD -> {
+                Bluetooth.MODEL_POD_1W, Bluetooth.MODEL_CHECK_POD,
+                Bluetooth.MODEL_PC_68B -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE
@@ -836,26 +851,20 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Constant.BluetoothConfig.currentModel[0].let {
                 when (it) {
                     Bluetooth.MODEL_AP20 -> {
-                        LpBleUtil.ap20EnableRtData(it, type, state)
+                        LpBleUtil.enableRtData(it, type, state)
                         type++
                         if (type > Ap20BleCmd.EnableType.BREATH_WAVE) {
                             type = Ap20BleCmd.EnableType.OXY_PARAM
                             state = !state
                         }
                     }
-                    Bluetooth.MODEL_SP20 -> {
-                        LpBleUtil.sp20EnableRtData(it, type, state)
+                    Bluetooth.MODEL_SP20, Bluetooth.MODEL_PC60FW,
+                    Bluetooth.MODEL_PC66B, Bluetooth.MODEL_POD_1W,
+                    Bluetooth.MODEL_PC_68B -> {
+                        LpBleUtil.enableRtData(it, type, state)
                         type++
                         if (type > Sp20BleCmd.EnableType.OXY_WAVE) {
                             type = Sp20BleCmd.EnableType.OXY_PARAM
-                            state = !state
-                        }
-                    }
-                    Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B, Bluetooth.MODEL_POD_1W -> {
-                        LpBleUtil.pc60fwEnableRtData(it, type, state)
-                        type++
-                        if (type > Pc60FwBleCmd.EnableType.OXY_WAVE) {
-                            type = Pc60FwBleCmd.EnableType.OXY_PARAM
                             state = !state
                         }
                     }

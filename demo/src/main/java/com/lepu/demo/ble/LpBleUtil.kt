@@ -681,34 +681,79 @@ class LpBleUtil {
             }
         }
 
-        fun ap20EnableRtData(model: Int, type: Int, enable: Boolean) {
-            Log.d(TAG, "ap20EnableRtData")
+        fun enableRtData(model: Int, type: Int, enable: Boolean) {
+            Log.d(TAG, "enableRtData")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.ap20EnableRtData(model, type, enable)
+                when (model) {
+                    Bluetooth.MODEL_AP20 -> {
+                        BleServiceHelper.ap20EnableRtData(model, type, enable)
+                    }
+                    Bluetooth.MODEL_SP20 -> {
+                        BleServiceHelper.sp20EnableRtData(model, type, enable)
+                    }
+                    Bluetooth.MODEL_PC60FW -> {
+                        BleServiceHelper.pc60fwEnableRtData(model, type, enable)
+                    }
+                    Bluetooth.MODEL_PC_68B -> {
+                        BleServiceHelper.pc68bEnableRtData(model, type, enable)
+                    }
+                }
+
             }
         }
-        fun sp20EnableRtData(model: Int, type: Int, enable: Boolean) {
-            Log.d(TAG, "sp20EnableRtData")
+
+        fun pc68bDeleteFile(model: Int) {
+            Log.d(TAG, "pc68bDeleteFile")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.sp20EnableRtData(model, type, enable)
+                BleServiceHelper.pc68bDeleteFile(model)
             }
         }
-        fun pc60fwEnableRtData(model: Int, type: Int, enable: Boolean) {
-            Log.d(TAG, "pc60fwEnableRtData")
+        fun pc68bGetStateInfo(model: Int, interval: Int) {
+            Log.d(TAG, "pc68bStateInfo")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.pc60fwEnableRtData(model, type, enable)
+                BleServiceHelper.pc68bGetStateInfo(model, interval)
+            }
+        }
+        fun pc68bSetConfig(model: Int, config: Pc68bConfig) {
+            Log.d(TAG, "pc68bSetConfig")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.pc68bSetConfig(model, config)
+            }
+        }
+        fun pc68bGetConfig(model: Int) {
+            Log.d(TAG, "pc68bGetConfig")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.pc68bGetConfig(model)
+            }
+        }
+        fun pc68bGetTime(model: Int) {
+            Log.d(TAG, "pc68bGetTime")
+            BleServiceHelper.getInterface(model)?.let {
+                if(getBleState(model) != State.CONNECTED){
+                    Log.d(TAG, "设备未连接")
+                    return
+                }
+                BleServiceHelper.pc68bGetTime(model)
             }
         }
 

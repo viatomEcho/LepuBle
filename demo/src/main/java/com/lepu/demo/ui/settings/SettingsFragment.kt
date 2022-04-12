@@ -76,6 +76,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.lew3Layout.visibility = View.GONE
         binding.sp20Layout.visibility = View.GONE
         binding.aoj20aLayout.visibility = View.GONE
+        binding.pc68bLayout.visibility = View.GONE
         if (v == null) return
         v.visibility = View.VISIBLE
     }
@@ -139,6 +140,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
                 Bluetooth.MODEL_AOJ20A -> {
                     setViewVisible(binding.aoj20aLayout)
+                }
+                Bluetooth.MODEL_PC_68B -> {
+                    setViewVisible(binding.pc68bLayout)
+                    LpBleUtil.pc68bGetConfig(it.modelNo)
                 }
                 else -> {
                     setViewVisible(null)
@@ -701,15 +706,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.sp20AlarmSwitch.setOnClickListener {
             switchState = !switchState
             var temp = "关"
-            val config = Sp20Config()
-            config.type = Sp20BleCmd.ConfigType.ALARM_SWITCH
+            (config as Sp20Config).type = Sp20BleCmd.ConfigType.ALARM_SWITCH
             if (switchState) {
-                config.value = 1
+                (config as Sp20Config).value = 1
                 temp = "开"
             } else {
-                config.value = 0
+                (config as Sp20Config).value = 0
             }
-            LpBleUtil.sp20SetConfig(Constant.BluetoothConfig.currentModel[0], config)
+            LpBleUtil.sp20SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Sp20Config))
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
             binding.sp20AlarmSwitch.text = "警报" + temp
@@ -717,15 +721,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.sp20PulseSwitch.setOnClickListener {
             switchState = !switchState
             var temp = "关"
-            val config = Sp20Config()
-            config.type = Sp20BleCmd.ConfigType.PULSE_BEEP
+            (config as Sp20Config).type = Sp20BleCmd.ConfigType.PULSE_BEEP
             if (switchState) {
-                config.value = 1
+                (config as Sp20Config).value = 1
                 temp = "开"
             } else {
-                config.value = 0
+                (config as Sp20Config).value = 0
             }
-            LpBleUtil.sp20SetConfig(Constant.BluetoothConfig.currentModel[0], config)
+            LpBleUtil.sp20SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Sp20Config))
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
             binding.sp20PulseSwitch.text = "搏动音" + temp
@@ -747,19 +750,18 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             state++
             if (state > 4)
                 state = 0
-            val config = Sp20Config()
-            config.type = state
+            (config as Sp20Config).type = state
             if (state == 2 || state == 3) {
-                config.value = 90
+                (config as Sp20Config).value = 90
             } else if (state == 4) {
-                config.value = 110
+                (config as Sp20Config).value = 110
             } else if (state == 0) {
                 volume++
                 if (volume > 6)
                     volume = 0
-                config.value = volume
+                (config as Sp20Config).value = volume
             }
-            LpBleUtil.sp20SetConfig(Constant.BluetoothConfig.currentModel[0], config)
+            LpBleUtil.sp20SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Sp20Config))
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
             binding.sp20SetConfig.text = "设置参数" + state
@@ -768,6 +770,35 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         //----------------------aoj20a--------------------
         binding.aoj20aDeleteFile.setOnClickListener {
             LpBleUtil.aoj20aDeleteData(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+
+        //----------------------pc68b----------------------
+        binding.pc68bDeleteFile.setOnClickListener {
+            LpBleUtil.pc68bDeleteFile(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.pc68bStateInfo.setOnClickListener {
+            LpBleUtil.pc68bGetStateInfo(Constant.BluetoothConfig.currentModel[0], 5)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.pc68bGetConfig.setOnClickListener {
+            LpBleUtil.pc68bGetConfig(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.pc68bSetConfig.setOnClickListener {
+            switchState = !switchState
+            (config as Pc68bConfig).alert = switchState
+            (config as Pc68bConfig).pulseBeep = switchState
+            (config as Pc68bConfig).sensorAlert = switchState
+            (config as Pc68bConfig).spo2Lo = 90
+            (config as Pc68bConfig).prLo = 90
+            (config as Pc68bConfig).prHi = 90
+            LpBleUtil.pc68bSetConfig(Constant.BluetoothConfig.currentModel[0], (config as Pc68bConfig))
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -1218,10 +1249,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3GetConfig)
             .observe(this, {
-                var data = it.data as Lew3Config
+                var config = it.data as Lew3Config
                 this.config = config
-                setReceiveCmd(data.bytes)
-                binding.content.text = data.toString()
+                setReceiveCmd(config.bytes)
+                binding.content.text = config.toString()
                 Toast.makeText(
                     context,
                     "lew3手表 获取参数成功",
@@ -1248,10 +1279,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20GetConfig)
             .observe(this, {
-                var data = it.data as Sp20Config
+                var config = it.data as Sp20Config
                 this.config = config
-                setReceiveCmd(data.bytes)
-                binding.content.text = data.toString()
+                setReceiveCmd(config.bytes)
+                binding.content.text = config.toString()
             })
 
         //---------------------------aoj20a-------------------------------
@@ -1279,6 +1310,25 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 val data = it.data as Aoj20aBleResponse.ErrorMsg
                 binding.content.text = data.toString()
             })
+
+        //---------------------pc68b-------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bStatusInfo)
+            .observe(this, {
+                val data = it.data as Pc68bBleResponse.StatusInfo
+                binding.content.text = data.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bDeleteFile)
+            .observe(this, {
+                val data = it.data as Boolean
+                binding.content.text = data.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bConfigInfo)
+            .observe(this, {
+                val config = it.data as Pc68bConfig
+                this.config = config
+                binding.content.text = config.toString()
+            })
+
 
         //-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1SetTime)

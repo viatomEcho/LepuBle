@@ -316,6 +316,20 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._checkmePodInfo.value = it
                 }
             })
+        //-------------------------pc68b---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bSetTime)
+            .observe(this, {
+                Toast.makeText(this, "pc68b 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bDeviceInfo)
+            .observe(this, { event ->
+                (event.data as BoDeviceInfo).let {
+                    Toast.makeText(this, "pc68b 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._boInfo.value = it
+                    LpBleUtil.pc68bGetTime(event.model)
+                }
+            })
 
     }
     private fun needPermission(){

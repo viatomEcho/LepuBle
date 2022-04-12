@@ -582,6 +582,9 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_AP20 -> {
                 return inter is Ap20BleInterface
             }
+            Bluetooth.MODEL_PC_68B -> {
+                return inter is Pc68bBleInterface
+            }
             else -> {
                 LepuBleLog.d(tag, "checkModel, 无效model：$model,${inter.javaClass}")
                 return false
@@ -1585,4 +1588,84 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    /**
+     * 使能实时数据发送（pc68b）
+     * @param type Pc68bBleCmd.EnableType
+     */
+    fun pc68bEnableRtData(model: Int, type: Int, enable: Boolean) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc68bBleInterface).let {
+                LepuBleLog.d(tag, "it as Pc68bBleInterface--pc68bEnableRtData")
+                it.enableRtData(type,enable)
+            }
+        }
+    }
+
+    /**
+     * 删除文件（pc68b）
+     */
+    fun pc68bDeleteFile(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc68bBleInterface).let {
+                LepuBleLog.d(tag, "it as Pc68bBleInterface--pc68bDeleteFile")
+                it.deleteFile()
+            }
+        }
+    }
+
+    /**
+     * 定时获取状态（pc68b）
+     * @param interval 时间间隔
+     */
+    fun pc68bGetStateInfo(model: Int, interval: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc68bBleInterface).let {
+                LepuBleLog.d(tag, "it as Pc68bBleInterface--pc68bGetStateInfo")
+                it.getStateInfo(interval)
+            }
+        }
+    }
+
+    /**
+     * 获取配置（pc68b）
+     */
+    fun pc68bGetConfig(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc68bBleInterface).let {
+                LepuBleLog.d(tag, "it as Pc68bBleInterface--pc68bGetConfig")
+                it.getConfig()
+            }
+        }
+    }
+
+    /**
+     * 配置参数（pc68b）
+     * @param config Pc68bConfig
+     */
+    fun pc68bSetConfig(model: Int, config: Pc68bConfig) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc68bBleInterface).let {
+                LepuBleLog.d(tag, "it as Pc68bBleInterface--pc68bSetConfig")
+                it.setConfig(config)
+            }
+        }
+    }
+
+    /**
+     * 获取时间（pc68b）
+     */
+    fun pc68bGetTime(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc68bBleInterface).let {
+                LepuBleLog.d(tag, "it as Pc68bBleInterface--pc68bGetTime")
+                it.getTime()
+            }
+        }
+    }
 }

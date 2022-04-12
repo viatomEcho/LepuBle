@@ -70,8 +70,6 @@ class FhrBleInterface(model: Int): BleInterface(model) {
 
     }
 
-    var tempBytes = ByteArray(23)
-
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun hasResponse(bytes: ByteArray?): ByteArray? {
         val bytesLeft: ByteArray? = bytes

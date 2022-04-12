@@ -36,6 +36,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
     private var isReceive = false
 
     private var tempList = mutableListOf<Aoj20aBleResponse.TempRecord>()
+    private var pc68bList = mutableListOf<Pc68bBleResponse.Record>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -107,6 +108,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             fileCount = 0
             fileNames.clear()
             tempList.clear()
+            pc68bList.clear()
 
             fileType++
             if (fileType > 2) {
@@ -472,8 +474,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         //---------------------------checkme pod--------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListError)
             .observe(this, {
-                val data = it.data as Int
-                binding.process.text = "EventCheckmePodGetFileListError"
+                val data = it.data as Boolean
+                binding.process.text = "EventCheckmePodGetFileListError $data"
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListProgress)
             .observe(this, {
@@ -485,6 +487,25 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 val data = it.data as CheckmePodBleResponse.FileList
                 Toast.makeText(context, "checkme pod 获取文件列表成功 共有${data.size}个文件", Toast.LENGTH_SHORT).show()
                 binding.info.text = data.toString()
+            })
+        //---------------------------pc68b---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bFileList)
+            .observe(this, {
+                val data = it.data as MutableList<String>
+                for (i in data) {
+                    fileNames.add(i)
+                }
+                Toast.makeText(context, "pc68b 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                binding.info.text = fileNames.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bReadFileComplete)
+            .observe(this, {
+                val data = it.data as Pc68bBleResponse.Record
+                pc68bList.add(data)
+                binding.info.text = pc68bList.toString()
+                fileNames.removeAt(0)
+                Toast.makeText(context, "pc68b 接收文件成功 已接收${pc68bList.size}个文件, 还剩${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                readFile()
             })
     }
 
