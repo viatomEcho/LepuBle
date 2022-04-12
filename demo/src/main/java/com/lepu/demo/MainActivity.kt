@@ -153,7 +153,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         //-------------------------fhr---------------------------
         //-------------------------pc60fw---------------------------
         //-------------------------pc80b---------------------------
-        LiveEventBus.get<Boolean>(EventMsgConst.Ble.EventBleDeviceReady)
+        LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceReady)
             .observe(this, {
                 Toast.makeText(this, "EventBleDeviceReady 连接成功", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(viewModel.curBluetooth.value!!.modelNo)
