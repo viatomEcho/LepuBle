@@ -284,7 +284,8 @@ class BleServiceHelper private constructor() {
      */
     fun canReconnectByName(model: Int): Boolean {
         return when(model) {
-            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_FHR, Bluetooth.MODEL_BPW1, Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F5_SCALE -> false
+            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_FHR, Bluetooth.MODEL_BPW1,
+            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F5_SCALE -> false
             else -> true
         }
     }
@@ -561,7 +562,9 @@ class BleServiceHelper private constructor() {
                 return inter is Bp2BleInterface
             }
             Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
-            Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W -> {
+            Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
+            Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_PC_60B -> {
                 return inter is Pc60FwBleInterface
             }
             Bluetooth.MODEL_PC80B -> {

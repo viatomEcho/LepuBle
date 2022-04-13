@@ -254,7 +254,9 @@ open class BleService: LifecycleService() {
                 }
             }
             Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
-            Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W -> {
+            Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
+            Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_PC_60B -> {
                 Pc60FwBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 

@@ -28,7 +28,10 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = if (model == Bluetooth.MODEL_PC60FW
             || model == Bluetooth.MODEL_OXYSMART
-            || model == Bluetooth.MODEL_POD_1W) {
+            || model == Bluetooth.MODEL_POD_1W
+            || model == Bluetooth.MODEL_PC_60NW
+            || model == Bluetooth.MODEL_PC_60B
+            || model == Bluetooth.MODEL_POD2B) {
             Pc60FwBleManager(context)
         } else {
             Pc6nBleManager(context)
