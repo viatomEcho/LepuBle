@@ -557,7 +557,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT -> {
                 return inter is OxyBleInterface
             }
-            Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A ->{
+            Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T ->{
                 return inter is Bp2BleInterface
             }
             Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
@@ -953,12 +953,12 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * 获取配置信息（bp2，bp2a，bp2w，le bp2w）
+     * 获取配置信息（bp2，bp2a，bp2t，bp2w，le bp2w）
      */
     fun bp2GetConfig(model: Int){
         if (!checkService()) return
         when(model){
-            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A ->{
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T ->{
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2BleInterface).let {
                         LepuBleLog.d(tag, "it as Bp2BleInterface--bp2GetConfig")
@@ -995,7 +995,7 @@ class BleServiceHelper private constructor() {
     fun bp2SetConfig(model: Int, switch: Boolean, volume: Int = 2){
         if (!checkService()) return
         when(model){
-            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2BleInterface).let {
                         LepuBleLog.d(tag, "it as Bp2BleInterface--bp2SetConfig")
@@ -1033,13 +1033,48 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * 切换设备状态（bp2，bp2a，bp2w，le bp2w）
+     * 设置提示音开关（bp2，bp2a，bp2t）
+     */
+    fun bp2SetPhyState(model: Int, state: Bp2BlePhyState){
+        if (!checkService()) return
+        when(model){
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2SetPhyState")
+                        it.setPhyState(state)
+                    }
+                }
+            }
+            else -> LepuBleLog.e(tag, "bp2SetPhyState model error")
+        }
+    }
+    /**
+     * 设置提示音开关（bp2，bp2a，bp2t）
+     */
+    fun bp2GetPhyState(model: Int){
+        if (!checkService()) return
+        when(model){
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2GetPhyState")
+                        it.getPhyState()
+                    }
+                }
+            }
+            else -> LepuBleLog.e(tag, "bp2GetPhyState model error")
+        }
+    }
+
+    /**
+     * 切换设备状态（bp2，bp2a，bp2t，bp2w，le bp2w）
      * @param state Bp2BleCmd.SwitchState
      */
     fun bp2SwitchState(model: Int, state: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2BleInterface).let {
                         LepuBleLog.d(tag, "it as Bp2BleInterface--bp2SwitchState")
@@ -1094,11 +1129,19 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * 获取设备状态（bp2w，le bp2w）
+     * 获取设备状态（bp2，bp2a，bp2t，bp2w，le bp2w）
      */
     fun bp2GetRtState(model: Int) {
         if (!checkService()) return
         when (model) {
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2GetRtState")
+                        it.getRtState()
+                    }
+                }
+            }
             Bluetooth.MODEL_BP2W -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2wBleInterface).let {

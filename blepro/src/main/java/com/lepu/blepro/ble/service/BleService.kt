@@ -231,7 +231,7 @@ open class BleService: LifecycleService() {
                     return this
                 }
             }
-            Bluetooth.MODEL_BP2 ,Bluetooth.MODEL_BP2A-> {
+            Bluetooth.MODEL_BP2 ,Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
                 Bp2BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 

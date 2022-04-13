@@ -15,9 +15,8 @@ class Bp2Config() {
     var sleepTicks: Int = 0
     var bpTestTargetPressure: Int = 0   // 目标压力值
     var beepSwitch: Boolean = false     // 心电音开关
-    var volumeSwitch: Boolean = false   // 提示音开关
     var avgMeasureMode: Int = 0         // 0：x3模式关闭 1：x3模式开启（时间间隔30s） 2：时间间隔60s 3：时间间隔90s 4：时间间隔120s
-    var volume: Int = 0                 // 音量大小
+    var volume: Int = 0                 // 音量大小（0关，1，2，3）
 
     constructor(bytes: ByteArray) : this() {
         this.bytes = bytes
@@ -37,7 +36,6 @@ class Bp2Config() {
         bpTestTargetPressure = toUInt(bytes.copyOfRange(index, index+2))
         index += 2
         beepSwitch = (byte2UInt(bytes[index]) and 0x01) == 1
-        volumeSwitch = ((byte2UInt(bytes[index]) and 0x02) shr 1) == 1
         index++
         avgMeasureMode = byte2UInt(bytes[index])
         index++
@@ -45,19 +43,10 @@ class Bp2Config() {
     }
 
     fun getDataBytes(): ByteArray {
-        var on = 0
-        on = if (beepSwitch) {
-            if (volumeSwitch) {
-                3
-            } else {
-                1
-            }
+        val on = if (beepSwitch) {
+            1
         } else {
-            if (volumeSwitch) {
-                2
-            } else {
-                0
-            }
+            0
         }
         val data = ByteArray(22)
         return data.plus(int2ByteArray(bpTestTargetPressure))
@@ -78,7 +67,6 @@ class Bp2Config() {
             sleepTicks : $sleepTicks
             bpTestTargetPressure : $bpTestTargetPressure
             beepSwitch : $beepSwitch
-            volumeSwitch : $volumeSwitch
             avgMeasureMode : $avgMeasureMode
             volume : $volume
         """.trimIndent()

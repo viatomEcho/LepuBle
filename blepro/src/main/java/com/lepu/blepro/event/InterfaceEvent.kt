@@ -78,7 +78,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * Bp2BleInterface发出的通知
-     * 包含model: MODEL_BP2, MODEL_BP2A
+     * 包含model: MODEL_BP2, MODEL_BP2A, MODEL_BP2T
      */
     interface BP2 {
         companion object {
@@ -96,6 +96,9 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBpGetConfigResult = "com.lepu.ble.bp2.get.config"                  // 心跳音开关 int(0：关 1：开)
             const val EventBp2SyncTime = "com.lepu.ble.bp2.sync.time"                         // 同步时间 boolean
             const val EventBpSwitchState = "com.lepu.ble.bp2.switch.state"                    // 切换设备状态 boolean
+            const val EventBp2SetPhyState = "com.lepu.ble.bp2.set.phy.state"                  // 设置理疗状态 Bp2BlePhyState
+            const val EventBp2GetPhyState = "com.lepu.ble.bp2.get.phy.state"                  // 获取理疗状态 Bp2BlePhyState
+            const val EventBp2GetPhyStateError = "com.lepu.ble.bp2.get.phy.state.error"       // 获取理疗状态出错 boolean
         }
     }
 

@@ -670,7 +670,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.ecgLayout.visibility = View.VISIBLE
                     binding.oxyLayout.visibility = View.GONE
                 }
-                Bluetooth.MODEL_BPM -> {
+                Bluetooth.MODEL_BPM, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
                     binding.bpLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.oxyLayout.visibility = View.GONE
@@ -751,7 +751,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
         //------------------------------bp------------------------------
         binding.startBp.setOnClickListener {
-            LpBleUtil.startBp(mainViewModel.curBluetooth.value!!.modelNo)
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2A
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2T) {
+                LpBleUtil.startRtTask()
+            } else {
+                LpBleUtil.startBp(mainViewModel.curBluetooth.value!!.modelNo)
+            }
         }
         binding.stopBp.setOnClickListener {
             LpBleUtil.stopBp(mainViewModel.curBluetooth.value!!.modelNo)

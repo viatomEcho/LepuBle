@@ -37,11 +37,6 @@ object EventMsgConst {
             //实时波形
             const val EventRealTimeStart = "com.lepu.ble.realtime.start"  // 开启实时监测任务后会发送 model
             const val EventRealTimeStop = "com.lepu.ble.realtime.stop"  // 停止实时监测任务后会发送 model
-
-
-            //bp2 获取实时状态
-            const val EventRealTimeStateStart = "com.lepu.ble.realtime.state.start"
-            const val EventRealTimeStateStop = "com.lepu.ble.realtime.state.stop"
         }
     }
 

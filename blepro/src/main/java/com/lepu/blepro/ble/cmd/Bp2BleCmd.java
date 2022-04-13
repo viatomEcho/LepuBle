@@ -1,31 +1,41 @@
 package com.lepu.blepro.ble.cmd;
 
-import com.lepu.blepro.utils.CrcUtil;
-import com.lepu.blepro.utils.LepuBleLog;
 import java.util.Calendar;
-import static com.lepu.blepro.ble.cmd.BpmBleCmd.BPMCmd.CMD_WRITE;
 
 /**
  * @author chenyongfeng
  */
 public class Bp2BleCmd {
     public static final int MSG_TYPE_INVALID = -1;
-    public static final int SET_TIME = 0xEC;
     private static int seqNo = 0;
 
+    private static final int TYPE_NORMAL_SEND = 0x00;
+    private static final int HEAD = 0xA5;
+    public static final int SET_TIME = 0xEC;
+    public static final int GET_INFO = 0xE1;
+    public static final int GET_FILE_LIST = 0xF1;
+    public static final int RESET = 0xE2;
+    public static final int FACTORY_RESET = 0xE3;
+    public static final int FACTORY_RESET_ALL = 0xEE;
 
+    public static final int RT_DATA = 0x08;
+    public static final int RT_STATE = 0x06;
+    public static final int SWITCH_STATE = 0x09;
+    public static final int GET_PHY_STATE = 0x0E;
+    public static final int SET_PHY_STATE = 0x0F;
+
+    public static final int SET_CONFIG = 0x0B;
+    public static final int GET_CONFIG = 0x00;
+
+    public static final int FILE_READ_START = 0xF2;
+    public static final int FILE_READ_PKG = 0xF3;
+    public static final int FILE_READ_END = 0xF4;
 
     private static void addNo() {
         seqNo++;
         if (seqNo >= 255) {
             seqNo = 0;
         }
-
-
-    }
-
-    public static byte[] getCmd(int msgType) {
-        return BPMCmd.getCmd(msgType);
     }
 
     /**
@@ -42,465 +52,110 @@ public class Bp2BleCmd {
         public static final int ENTER_HISTORY = 2;
         public static final int ENTER_ON = 3;
         public static final int ENTER_OFF = 4;
-        public static final int ENTER_FISIOT = 5;
+        public static final int ENTER_PHY = 5;
+    }
+
+    private static byte[] getReq(int sendCmd, byte[] data) {
+        int len = data.length;
+        byte[] cmd = new byte[8+len];
+        cmd[0] = (byte) HEAD;
+        cmd[1] = (byte) sendCmd;
+        cmd[2] = (byte) ~sendCmd;
+        cmd[3] = (byte) TYPE_NORMAL_SEND;
+        cmd[4] = (byte) seqNo;
+        cmd[5] = (byte) len;
+        cmd[6] = (byte) (len << 8);
+
+        System.arraycopy(data, 0, cmd, 7, len);
+
+        cmd[cmd.length-1] = BleCRC.calCRC8(cmd);
+
+        addNo();
+        return cmd;
     }
 
 
-    public static class BPMCmd {
-        public static final byte HEAD_0 = (byte) 0x02;
-        public static final byte HEAD_1 = (byte) 0x40;
-        public static final byte CMD_TYPE_START_BP = (byte) 0xA1;
-        public static final byte CMD_TYPE_STOP = (byte) 0xA2;
-        private static final byte HEAD = (byte) 0xA5;
-        public static final byte CMD_SET_TIME = (byte) 0xEC;
-        private static final byte TYPE_NORMAL_SEND = (byte) 0x00;
-        public static final byte CMD_FILE_LIST = (byte) 0xF1;
-        public static final byte CMD_RESET = (byte) 0xE2;
-        public static final byte CMD_FACTORY_RESET = (byte) 0xE3;
-        public static final byte CMD_FACTORY_RESET_ALL = (byte) 0xEE;
-        // data = state + wave
-        public static final byte CMD_BP2_RT_DATA = (byte) 0x08;
-        public static final byte CMD_BP2_RT_STATE = (byte) 0x06;
-
-        public static byte SWITCH_STATE = (byte)0x09;//
-
-        // heartbeat sound
-        public static final byte CMD_BP2_SET_SWITCHER_STATE = (byte) 0x0B;
-        public static final byte CMD_INFO = (byte) 0xE1;
-        public static final byte CMD_BP2_CONFIG = (byte) 0x00;
-        private static int serial = 0;
-
-
-        public static final int MSG_TYPE_SET_SWITCHER_STATE = 0x0B;
-        public static final int MSG_TYPE_GET_CONFIG = 0x00;
-        public static final int MSG_TYPE_RESET = 0xE2;
-        public static final int MSG_TYPE_FACTORY_RESET = 0xE3;
-        public static final int MSG_TYPE_FACTORY_RESET_ALL = 0xEE;
-        public static final int MSG_TYPE_SWITCH_STATE = 0x09;
-        public static final int MSG_TYPE_GET_INFO = 0x03;
-        public static final int MSG_TYPE_SET_TIME = 0x04;
-        public static final int MSG_TYPE_START_BP = 0x15;
-        public static final int MSG_TYPE_STOP_BP = 0x16;
-        public static final int MSG_TYPE_BP2_RT_DATA = 0x08;
-        public static final int MSG_TYPE_BP2_RT_STATE = 0x06;
-        public static final int MSG_TYPE_READ_START = 0xF2;//开始
-        public static final int MSG_TYPE_READ_PKG =  0xF3;//读取中
-        public static final int MSG_TYPE_READ_END =  0xF4;//结束
-
-
-        public static final int MSG_TYPE_GET_BP_STATE = 0x18;//实施波形状态
-        public static final int MSG_TYPE_GET_BP_FILE_LIST = 0xF1;//获取文件列表
-
-
-
-
-        public static final byte CMD_FILE_READ_START = (byte) 0xF2;//开始
-        public static final byte CMD_FILE_READ_PKG = (byte) 0xF3;//读取中
-        public static final byte CMD_FILE_READ_END = (byte) 0xF4;//结束
-
-
-        public static String getCmdStr(int cmd){
-            if (cmd == MSG_TYPE_GET_BP_FILE_LIST){
-                return "获取文件列表";
-            }else if (cmd == MSG_TYPE_READ_START){
-                return "开始读文件";
-            }else if (cmd == MSG_TYPE_GET_CONFIG){
-                return "获取配置";
-            }else if (cmd == MSG_TYPE_SET_TIME){
-                return "同步时间";
-            }else if (cmd == MSG_TYPE_GET_INFO){
-                return "设备信息";
-            }
-            else {
-                return String.valueOf(cmd);
-            }
-        }
-
-        public static byte[] getCmd(int msgType) {
-            switch (msgType) {
-                case BPMCmd.MSG_TYPE_GET_INFO:
-                    return getInfo();//信息
-                case BPMCmd.MSG_TYPE_SET_TIME:
-                    return setTime();//设置时间
-                case BPMCmd.MSG_TYPE_GET_BP_FILE_LIST:
-                    return getFileList();//获取文件列表
-                case BPMCmd.MSG_TYPE_START_BP:
-                    return startBp();//开始血压测量
-                case BPMCmd.MSG_TYPE_STOP_BP:
-                    return stopBp();//停止血压测量
-                default:
-                    return new byte[0];
-            }
-        }
-
-
-
-        public static byte[] switchState(int state) {
-            int len = 1;
-
-            byte[] cmd = new byte[8+len];
-            cmd[0] = (byte) 0xA5;
-            cmd[1] = (byte) SWITCH_STATE;
-            cmd[2] = (byte) ~SWITCH_STATE;
-            cmd[3] = (byte) 0x00;
-            cmd[4] = (byte) seqNo;
-            cmd[5] = (byte) 0x01;
-            cmd[6] = (byte) 0x00;
-            cmd[7] = (byte) state;
-            cmd[8] = BleCRC.calCRC8(cmd);
-
-            addNo();
-            return cmd;
-        }
-
-        public static byte[] getInfo() {
-            int len = 0;
-
-            byte[] cmd = new byte[8 + len];
-
-            cmd[0] = HEAD;
-            cmd[1] = CMD_INFO;
-            cmd[2] = ~CMD_INFO;
-            cmd[3] = TYPE_NORMAL_SEND;
-            cmd[4] = (byte) serial;
-            // length
-            cmd[5] = (byte) len;
-            cmd[6] = (byte) (len >> 8);
-            cmd[7 + len] = CrcUtil.calCRC8(cmd);
-
-            serial++;
-
-            return cmd;
-        }
-
-        public static byte[] getConfig() {
-            int len = 0;
-
-            byte[] cmd = new byte[8 + len];
-
-            cmd[0] = HEAD;
-            cmd[1] = CMD_BP2_CONFIG;
-            cmd[2] = ~CMD_BP2_CONFIG;
-            cmd[3] = TYPE_NORMAL_SEND;
-            cmd[4] = (byte) serial;
-            // length
-            cmd[5] = (byte) len;
-            cmd[6] = (byte) (len >> 8);
-            cmd[7 + len] = CrcUtil.calCRC8(cmd);
-
-            serial++;
-
-            return cmd;
-
-
-        }
-        public static byte[] startBp() {
-            byte[] cmd = new byte[6];
-            cmd[0] = HEAD_0;
-            cmd[1] = HEAD_1;
-            cmd[2] = CMD_WRITE;
-            cmd[3] = (byte) 0x01; // length
-            cmd[4] = CMD_TYPE_START_BP; // cmd value
-            cmd[5] = calcNum(cmd);
-            return cmd;
-        }
-
-
-        public static byte[] reset() {
-            int len = 0;
-            byte[] cmd = new byte[8+len];
-
-            cmd[0] = HEAD;
-            cmd[1] = CMD_RESET;
-            cmd[2] = ~CMD_RESET;
-            cmd[3] = TYPE_NORMAL_SEND;
-            cmd[4] = (byte) serial;
-            // length
-            cmd[5] = (byte) len;
-            cmd[6] = (byte) (len>>8);
-            cmd[7+len] = CrcUtil.calCRC8(cmd);
-
-            serial++;
-
-            return cmd;
-
-        }
-
-        public static byte[] factoryReset() {
-            int len = 0;
-            byte[] cmd = new byte[8+len];
-
-            cmd[0] = HEAD;
-            cmd[1] = CMD_FACTORY_RESET;
-            cmd[2] = ~CMD_FACTORY_RESET;
-            cmd[3] = TYPE_NORMAL_SEND;
-            cmd[4] = (byte) serial;
-            // length
-            cmd[5] = (byte) len;
-            cmd[6] = (byte) (len>>8);
-            cmd[7+len] = CrcUtil.calCRC8(cmd);
-
-            serial++;
-
-            return cmd;
-
-        }
-
-        public static byte[] factoryResetAll() {
-            int len = 0;
-            byte[] cmd = new byte[8+len];
-
-            cmd[0] = HEAD;
-            cmd[1] = CMD_FACTORY_RESET_ALL;
-            cmd[2] = ~CMD_FACTORY_RESET_ALL;
-            cmd[3] = TYPE_NORMAL_SEND;
-            cmd[4] = (byte) serial;
-            // length
-            cmd[5] = (byte) len;
-            cmd[6] = (byte) (len>>8);
-            cmd[7+len] = CrcUtil.calCRC8(cmd);
-
-            serial++;
-
-            return cmd;
-
-        }
-
-
-        public static byte[] setConfig(boolean switchState, int volume) {
-                int len = 40;
-
-                byte[] cmd = new byte[8+len];
-
-                cmd[0] = HEAD;
-                cmd[1] = CMD_BP2_SET_SWITCHER_STATE;
-                cmd[2] = ~CMD_BP2_SET_SWITCHER_STATE;
-                cmd[3] = TYPE_NORMAL_SEND;
-                cmd[4] = (byte) serial;
-
-                // length
-                cmd[5] = (byte) len;
-                cmd[6] = (byte) (len>>8);
-
-                if(switchState) {
-                    cmd[31] = 1;
-                }
-                cmd[33] = (byte) volume;
-                cmd[7+len] = CrcUtil.calCRC8(cmd);
-
-                serial++;
-
-                return cmd;
-
-
-        }
-
-
-
-        public static byte[] stopBp() {
-            byte[] cmd = new byte[6];
-            cmd[0] = HEAD_0;
-            cmd[1] = HEAD_1;
-            cmd[2] = CMD_WRITE;
-            cmd[3] = (byte) 0x01; // length
-            cmd[4] = CMD_TYPE_STOP; // cmd value
-            cmd[5] = calcNum(cmd);
-            return cmd;
-        }
-
-        public static byte[] setTime() {
-            Calendar c = Calendar.getInstance();
-            c.setTimeInMillis(System.currentTimeMillis());
-
-            int len = 7;
-
-            byte[] cmd = new byte[8 + len];
-
-            cmd[0] = HEAD;
-            cmd[1] = CMD_SET_TIME;
-            cmd[2] = ~CMD_SET_TIME;
-            cmd[3] = TYPE_NORMAL_SEND;
-            cmd[4] = (byte) serial;
-            // length
-            cmd[5] = (byte) len;
-            cmd[6] = (byte) (len >> 8);
-
-            cmd[7] = (byte) (c.get(Calendar.YEAR));
-            cmd[8] = (byte) (c.get(Calendar.YEAR) >> 8);
-            cmd[9] = (byte) (c.get(Calendar.MONTH) + 1);
-            cmd[10] = (byte) (c.get(Calendar.DATE));
-            cmd[11] = (byte) (c.get(Calendar.HOUR_OF_DAY));
-            cmd[12] = (byte) (c.get(Calendar.MINUTE));
-            cmd[13] = (byte) (c.get(Calendar.SECOND));
-
-            cmd[7 + len] = CrcUtil.calCRC8(cmd);
-
-            serial++;
-            LepuBleLog.d("setTime===");
-
-            return cmd;
-        }
-
-        public static byte[] getRecords() {
-            byte[] cmd = new byte[10];
-
-            return cmd;
-        }
-
-        public static byte[] getRecords(int storeIdA, int storeIdB) {
-            byte[] cmd = new byte[10];
-
-            return cmd;
-        }
-
-        public static byte[] getBpState() {
-            byte[] cmd = new byte[10];
-            return cmd;
-        }
-        //文件下载开始
-        public static byte[] getFileStart(byte[] fileName,byte offset){
-            // filename = 16, offset = 4
-            int len = 20;
-
-            byte[] cmd = new byte[8+len];
-
-            cmd[0] = HEAD;
-            cmd[1] = CMD_FILE_READ_START;
-            cmd[2] = ~CMD_FILE_READ_START;
-            cmd[3] = TYPE_NORMAL_SEND;
-            cmd[4] = (byte) serial;
-            // length
-            cmd[5] = (byte) len;
-            cmd[6] = (byte) (len>>8);
-
-            // file name > 16 : cut
-            int l = fileName.length > 20 ? 20 : fileName.length;
-
-            System.arraycopy(fileName, 0, cmd, 7, l);
-
-            cmd[7+len-4] = (byte) (offset >> 24);
-            cmd[7+len-3] = (byte) (offset >> 16);
-            cmd[7+len-2] = (byte) (offset >> 8);
-            cmd[7+len-1] = (byte) offset;
-
-            cmd[7+len] = CrcUtil.calCRC8(cmd);
-
-            serial++;
-
-            return cmd;
-        }
-        //文件下载结束
-        public static byte[] fileReadEnd() {
-                int len = 0;
-
-                byte[] cmd = new byte[8+len];
-
-                cmd[0] = HEAD;
-                cmd[1] = CMD_FILE_READ_END;
-                cmd[2] = ~CMD_FILE_READ_END;
-                cmd[3] = TYPE_NORMAL_SEND;
-                cmd[4] = (byte) serial;
-                // length
-                cmd[5] = (byte) len;
-                cmd[6] = (byte) (len>>8);
-                cmd[7+len] = CrcUtil.calCRC8(cmd);
-
-                serial++;
-
-                return cmd;
-
-        }
-        //文件下载中途
-        public static byte[] fileReadPkg(int addrOffset) {
-                int len = 4;
-                byte[] cmd = new byte[8+len];
-
-                cmd[0] = HEAD;
-                cmd[1] = CMD_FILE_READ_PKG;
-                cmd[2] = ~CMD_FILE_READ_PKG;
-                cmd[3] = TYPE_NORMAL_SEND;
-                cmd[4] = (byte) serial;
-                // length
-                cmd[5] = (byte) len;
-                cmd[6] = (byte) (len>>8);
-
-                cmd[7] = (byte) addrOffset;
-                cmd[8] = (byte) (addrOffset >> 8);
-                cmd[9] = (byte) (addrOffset >> 16);
-                cmd[10] = (byte) (addrOffset >> 24);
-
-                cmd[11] = CrcUtil.calCRC8(cmd);
-
-                serial++;
-
-                return cmd;
-
-        }
-        public static byte[] getFileList() {
-            int len = 0;
-
-            byte[] cmd = new byte[8 + len];
-
-            cmd[0] = HEAD;
-            cmd[1] = CMD_FILE_LIST;
-            cmd[2] = ~CMD_FILE_LIST;
-            cmd[3] = TYPE_NORMAL_SEND;
-            cmd[4] = (byte) serial;
-            // length
-            cmd[5] = (byte) len;
-            cmd[6] = (byte) (len >> 8);
-            cmd[7 + len] = CrcUtil.calCRC8(cmd);
-
-            serial++;
-
-            return cmd;
-
-        }
-        public static byte[] getRtBpState() {
-                int len = 0;
-
-                byte[] cmd = new byte[8+len];
-
-                cmd[0] = HEAD;
-                cmd[1] = CMD_BP2_RT_STATE;
-                cmd[2] = ~CMD_BP2_RT_STATE;
-                cmd[3] = TYPE_NORMAL_SEND;
-                cmd[4] = (byte) serial;
-                // length
-                cmd[5] = (byte) len;
-                cmd[6] = (byte) (len>>8);
-                cmd[7+len] = CrcUtil.calCRC8(cmd);
-
-                serial++;
-
-                return cmd;
-
-
-        }
-        public static byte[] getRtData() {
-                int len = 0;
-
-                byte[] cmd = new byte[8+len];
-
-                cmd[0] = HEAD;
-                cmd[1] = CMD_BP2_RT_DATA;
-                cmd[2] = ~CMD_BP2_RT_DATA;
-                cmd[3] = TYPE_NORMAL_SEND;
-                cmd[4] = (byte) serial;
-                // length
-                cmd[5] = (byte) len;
-                cmd[6] = (byte) (len>>8);
-                cmd[7+len] = CrcUtil.calCRC8(cmd);
-
-                serial++;
-
-                return cmd;
-        }
+    public static byte[] switchState(int state) {
+        return getReq(SWITCH_STATE, new byte[]{(byte)state});
     }
 
-    public static byte calcNum(byte[] cmd) {
-        int result = BPMCmd.HEAD;
+    public static byte[] getInfo() {
+        return getReq(GET_INFO, new byte[0]);
+    }
 
-        return (byte) (result);
+    public static byte[] getConfig() {
+        return getReq(GET_CONFIG, new byte[0]);
+    }
+
+    public static byte[] reset() {
+        return getReq(RESET, new byte[0]);
+    }
+    public static byte[] factoryReset() {
+        return getReq(FACTORY_RESET, new byte[0]);
+    }
+
+    public static byte[] factoryResetAll() {
+        return getReq(FACTORY_RESET_ALL, new byte[0]);
+    }
+
+    public static byte[] setConfig(boolean switchState, int volume) {
+        byte[] cmd = new byte[40];
+        if(switchState) {
+            cmd[24] = (byte) 0x01;
+        }
+        cmd[26] = (byte) volume;
+        return getReq(SET_CONFIG, cmd);
+    }
+
+    public static byte[] setTime() {
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(System.currentTimeMillis());
+        byte[] cmd = new byte[7];
+        cmd[0] = (byte) (c.get(Calendar.YEAR));
+        cmd[1] = (byte) (c.get(Calendar.YEAR) >> 8);
+        cmd[2] = (byte) (c.get(Calendar.MONTH) + 1);
+        cmd[3] = (byte) (c.get(Calendar.DATE));
+        cmd[4] = (byte) (c.get(Calendar.HOUR_OF_DAY));
+        cmd[5] = (byte) (c.get(Calendar.MINUTE));
+        cmd[6] = (byte) (c.get(Calendar.SECOND));
+        return getReq(SET_TIME, cmd);
+    }
+    //文件下载开始
+    public static byte[] getFileStart(byte[] fileName,byte offset){
+        byte[] cmd = new byte[20];
+        System.arraycopy(fileName, 0, cmd, 0, fileName.length);
+        cmd[16] = (byte) offset;
+        cmd[17] = (byte) (offset >> 8);
+        cmd[18] = (byte) (offset >> 16);
+        cmd[19] = (byte) (offset >> 24);
+        return getReq(FILE_READ_START, cmd);
+    }
+    //文件下载结束
+    public static byte[] fileReadEnd() {
+        return getReq(FILE_READ_END, new byte[0]);
+    }
+    //文件下载中途
+    public static byte[] fileReadPkg(int addrOffset) {
+        byte[] cmd = new byte[4];
+        cmd[0] = (byte) addrOffset;
+        cmd[1] = (byte) (addrOffset >> 8);
+        cmd[2] = (byte) (addrOffset >> 16);
+        cmd[3] = (byte) (addrOffset >> 24);
+        return getReq(FILE_READ_PKG, cmd);
+    }
+    public static byte[] getFileList() {
+        return getReq(GET_FILE_LIST, new byte[0]);
+    }
+    public static byte[] getRtState() {
+        return getReq(RT_STATE, new byte[0]);
+    }
+    public static byte[] getPhyState() {
+        return getReq(GET_PHY_STATE, new byte[0]);
+    }
+    public static byte[] setPhyState(byte[] data) {
+        return getReq(SET_PHY_STATE, data);
+    }
+    public static byte[] getRtData() {
+        return getReq(RT_DATA, new byte[0]);
     }
 }

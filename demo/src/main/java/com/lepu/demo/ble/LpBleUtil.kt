@@ -456,6 +456,12 @@ class LpBleUtil {
         fun bp2SwitchState(model: Int, state: Int){
            BleServiceHelper.bp2SwitchState(model, state)
         }
+        fun bp2GetPhyState(model: Int) {
+            BleServiceHelper.bp2GetPhyState(model)
+        }
+        fun bp2SetPhyState(model: Int, state: Bp2BlePhyState) {
+            BleServiceHelper.bp2SetPhyState(model, state)
+        }
 
         fun bp2SetConfig(model: Int, config: Bp2Config) {
             BleServiceHelper.bp2SetConfig(model, config)

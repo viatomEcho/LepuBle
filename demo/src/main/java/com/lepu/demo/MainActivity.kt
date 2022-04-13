@@ -97,8 +97,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         // 开启/关闭扫描
         viewModel.scanning.observe(this, {
             if (it){
-               LpBleUtil.startScan(SUPPORT_MODELS)
-            } else LpBleUtil.stopScan()
+                LpBleUtil.startScan(SUPPORT_MODELS)
+            } else {
+                LpBleUtil.stopScan()
+            }
 
         })
 
