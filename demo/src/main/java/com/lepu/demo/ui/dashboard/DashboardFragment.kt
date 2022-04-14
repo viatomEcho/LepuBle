@@ -611,7 +611,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val rtData = it.data as Pc68bBleResponse.RtParam
                 viewModel.oxyPr.value = rtData.pr
                 viewModel.spo2.value = rtData.spo2
-                viewModel.pi.value = rtData.pi.div(10f)
+                viewModel.pi.value = rtData.pi
                 binding.dataStr.text = rtData.toString()
             })
         //--------------------------vtm20f----------------------------

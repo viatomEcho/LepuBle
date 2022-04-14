@@ -1621,7 +1621,7 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * 使能实时数据发送（pc60fw，pc66b，oxysmart）
+     * 使能实时数据发送（pc60fw，pc66b，oxysmart，pod1w）
      * @param type Pc60FwBleCmd.EnableType
      */
     fun pc60fwEnableRtData(model: Int, type: Int, enable: Boolean) {

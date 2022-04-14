@@ -63,6 +63,14 @@ fun shortToByteArray(value: Int): ByteArray {
         value.toByte())
 }
 /**
+ * 转两个字节byte数组（大端模式）
+ */
+fun int2ByteArrayBig(value: Int): ByteArray {
+    val b1 = (value shr 8 and 0xff).toByte()
+    val b2 = (value and 0xff).toByte()
+    return byteArrayOf(b1).plus(b2)
+}
+/**
  * 转两个字节byte数组（小端模式）
  */
 fun int2ByteArray(value: Int): ByteArray {

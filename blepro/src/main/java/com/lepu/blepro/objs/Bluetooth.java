@@ -84,6 +84,8 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_LE_BP2W = "LP-BP2W";
     public static final String BT_NAME_PC_68B = "PC-68B";
 
+    public static final String BT_NAME_PC_300SNT = "PC_300SNT";
+
 
     public static final int MODEL_UNRECOGNIZED = 0;
     public static final int MODEL_CHECKO2 = 1;
@@ -144,6 +146,8 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_F8_SCALE = 53;
     public static final int MODEL_PC_68B = 54;
 
+    public static final int MODEL_PC_300SNT = 55;
+
 
     @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER1_N,
             MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL, MODEL_BABYO2, MODEL_OXYSMART,
@@ -151,7 +155,7 @@ public class Bluetooth implements Parcelable {
             MODEL_BABYO2N, MODEL_BP2T, MODEL_BP2W, MODEL_STATION, MODEL_POD2B, MODEL_PC_60NW, MODEL_POD_1W, MODEL_PC_60B,
             MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2M, MODEL_BPM,MODEL_BP2A, MODEL_PC60FW, MODEL_PC80B, MODEL_FHR, MODEL_BPW1,
             MODEL_F4_SCALE, MODEL_F5_SCALE, MODEL_PC66B, MODEL_AP20, MODEL_LEW3, MODEL_VETCORDER, MODEL_VTM_AD5, MODEL_SP20,
-            MODEL_LE_BP2W, MODEL_F8_SCALE, MODEL_PC_68B})
+            MODEL_LE_BP2W, MODEL_F8_SCALE, MODEL_PC_68B, MODEL_PC_300SNT})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 
@@ -202,6 +206,8 @@ public class Bluetooth implements Parcelable {
             return MODEL_SP20;
         } else if (deviceName.contains(BT_NAME_PC_68B)) {
             return MODEL_PC_68B;
+        } else if (deviceName.contains(BT_NAME_PC_300SNT)) {
+            return MODEL_PC_300SNT;
         }
 
         if (deviceName.split(" ").length == 0) {
@@ -288,7 +294,7 @@ public class Bluetooth implements Parcelable {
             BT_NAME_FHR, BT_NAME_BABYO2N, BT_NAME_STATION, BT_NAME_BPW1, BT_NAME_LEW3, BT_NAME_VETCORDER, BT_NAME_PC60FW, FETAL_DEVICE_NAME,
             BT_NAME_TV221U, BT_NAME_PC100, BT_NAME_AOJ20A, BT_NAME_VCOMIN, BT_NAME_CHECK_POD, BT_NAME_BODY_FAT, BT_NAME_POD2B, BT_NAME_PC_60NW,
             BT_NAME_POD_1W, BT_NAME_PC_60B, BT_NAME_KCA, BT_NAME_PC80B, BT_NAME_PC66B, BT_NAME_AP20, BT_NAME_F5_SCALE, BT_NAME_VTM_AD5, BT_NAME_SP20,
-            BT_NAME_LE_BP2W, BT_NAME_F8_SCALE, BT_NAME_PC_68B, BT_NAME_F4_SCALE})
+            BT_NAME_LE_BP2W, BT_NAME_F8_SCALE, BT_NAME_PC_68B, BT_NAME_F4_SCALE, BT_NAME_PC_300SNT})
     @Retention(RetentionPolicy.SOURCE)
     public @interface DEVICE_NAME {
 
@@ -403,6 +409,8 @@ public class Bluetooth implements Parcelable {
                 return BT_NAME_LE_BP2W;
             case MODEL_PC_68B:
                 return BT_NAME_PC_68B;
+            case MODEL_PC_300SNT:
+                return BT_NAME_PC_300SNT;
             default:
                 return "";
         }

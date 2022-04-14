@@ -701,7 +701,7 @@ class LpBleUtil {
                     Bluetooth.MODEL_SP20 -> {
                         BleServiceHelper.sp20EnableRtData(model, type, enable)
                     }
-                    Bluetooth.MODEL_PC60FW -> {
+                    Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_POD_1W -> {
                         BleServiceHelper.pc60fwEnableRtData(model, type, enable)
                     }
                     Bluetooth.MODEL_PC_68B -> {

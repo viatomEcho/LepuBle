@@ -51,7 +51,7 @@ class Pc68bBleResponse{
     class RtParam(var bytes: ByteArray) {
         var spo2: Int
         var pr: Int
-        var pi: Int
+        var pi: Float
         var isProbeOff: Boolean        // 探头脱落，手指未接入
         var isPulseSearching: Boolean  // 脉搏检测
         var isCheckProbe: Boolean      // 探头故障或使用不当
@@ -64,7 +64,7 @@ class Pc68bBleResponse{
             index++
             pr = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
-            pi = byte2UInt(bytes[index])
+            pi = byte2UInt(bytes[index]).div(10f)
             index++
             isProbeOff = ((bytes[index].toInt() and 0x02) shr 1) == 1
             isPulseSearching = ((bytes[index].toInt() and 0x04) shr 2) == 1

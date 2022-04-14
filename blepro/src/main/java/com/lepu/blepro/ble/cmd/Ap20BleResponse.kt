@@ -101,17 +101,17 @@ class Ap20BleResponse{
     @Parcelize
     class RtBreathParam constructor(var bytes: ByteArray) : Parcelable {
         var rr: Int          // 呼吸率（6-60，单位bpm，0是无效值）
-        var singleFlag: Int  // 鼻息流脱落标记（0：呼吸信号正常 1：无呼吸信号）
+        var sign: Int      // 鼻息流脱落标记（0：呼吸信号正常 1：无呼吸信号）
         init {
             var index = 0
             rr = (bytes[index].toUInt() and 0xFFu).toInt()
             index++
-            singleFlag = bytes[index].toInt() and 0x01
+            sign = bytes[index].toInt() and 0x01
         }
         override fun toString(): String {
             return """
                 rr : $rr
-                singleFlag : $singleFlag
+                sign : $sign
             """.trimIndent()
         }
     }
