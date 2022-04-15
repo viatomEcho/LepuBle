@@ -202,7 +202,9 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             stopRtTask()
         }
 
-        LepuBleLog.d(tag, "try connect: ${device.name}，isAutoReconnect = $isAutoReconnect, toConnectUpdater = $toConnectUpdater")
+        device.name?.let {
+            LepuBleLog.d(tag, "try connect: $it，isAutoReconnect = $isAutoReconnect, toConnectUpdater = $toConnectUpdater")
+        }
         this.device = device
 
 
@@ -245,7 +247,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     abstract fun hasResponse(bytes: ByteArray?): ByteArray?
 
     override fun onDeviceConnected(device: BluetoothDevice) {
-        LepuBleLog.d(tag, "onDeviceConnected ${device.name} connected, ready: $ready")
 
 
         if (BleServiceHelper.isScanning()) BleServiceHelper.stopScan()
@@ -256,24 +257,32 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         if (toConnectUpdater)
             LiveEventBus.get<BluetoothDevice>(EventMsgConst.Updater.EventBleConnected).post(device)
 
-        BleServiceHelper.removeReconnectName(device.name)
-        BleServiceHelper.removeReconnectAddress(device.address)
+        // 广播名有可能为null
+        device.name?.let {
+            BleServiceHelper.removeReconnectName(it)
+            LepuBleLog.d(tag, "onDeviceConnected $it connected, ready: $ready")
+        }
 
-
+        device.address?.let {
+            BleServiceHelper.removeReconnectAddress(it)
+        }
 
     }
 
 
     override fun onDeviceConnecting(device: BluetoothDevice) {
-        LepuBleLog.d(tag, "${device.name} Connecting")
         state = false
         connecting = true
         publish()
 
+        device.name?.let {
+            LepuBleLog.d(tag, "$it Connecting")
+        }
+
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
-        LepuBleLog.d(tag, "${device.name} onDeviceDisconnected")
+
         state = false
         connecting = false
         ready = false
@@ -291,7 +300,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
                 }else{
                     BleServiceHelper.removeReconnectName(it)
                 }
-
+                LepuBleLog.d(tag, "$it onDeviceDisconnected")
             }
         } else {
             device.address?.let {
@@ -310,16 +319,20 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {
-        LepuBleLog.d(tag, "${device.name} onDeviceDisconnecting")
+
         state = false
         connecting = false
 
         publish()
 
+        device.name?.let {
+            LepuBleLog.d(tag, "$it onDeviceDisconnecting")
+        }
+
     }
 
     override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
-        LepuBleLog.d(tag, "${device.name} onDeviceFailedToConnect")
+
         state = false
 
         connecting = false
@@ -328,15 +341,24 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
         if (isAutoReconnect){
             //重开扫描, 扫描该interface的设备
-            LepuBleLog.d(tag, "onDeviceFailedToConnect....to do")
-            BleServiceHelper.reconnect(model, device.name)
+            device.name?.let {
+                BleServiceHelper.reconnect(model, it)
+                LepuBleLog.d(tag, "onDeviceFailedToConnect....reconnect $it")
+            }
         }
+
+        device.name?.let {
+            LepuBleLog.d(tag, "$it onDeviceFailedToConnect")
+        }
+
     }
 
 
 
     override fun onDeviceReady(device: BluetoothDevice) {
-        LepuBleLog.d(tag, "${device.name} onDeviceReady, state: $state")
+        device.name?.let {
+            LepuBleLog.d(tag, "$it onDeviceReady, state: $state")
+        }
         connecting = false
         ready = true
         publish()
