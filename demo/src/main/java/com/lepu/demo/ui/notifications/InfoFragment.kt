@@ -97,6 +97,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         mainViewModel.checkmePodInfo.observe(viewLifecycleOwner, {
             binding.info.text = it.toString()
         })
+        mainViewModel.pulsebitInfo.observe(viewLifecycleOwner, {
+            binding.info.text = it.toString()
+        })
         // 公共方法测试
         // 获取设备信息
         binding.getInfo.setOnClickListener {
@@ -506,6 +509,44 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 fileNames.removeAt(0)
                 Toast.makeText(context, "pc68b 接收文件成功 已接收${pc68bList.size}个文件, 还剩${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 readFile()
+            })
+        //---------------------------Pulsebit--------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitFileList)
+            .observe(this, {
+                val data = it.data as PulsebitBleResponse.FileList
+                for (file in data.list) {
+                    fileNames.add(file.getTimeString())
+                }
+                Toast.makeText(context, "pc68b 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                binding.info.text = data.toString()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileListError)
+            .observe(this, {
+                val data = it.data as Boolean
+                binding.process.text = "EventPulsebitGetFileListError $data"
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileListProgress)
+            .observe(this, {
+                val data = it.data as Int
+                binding.process.text = "读取进度:$data%"
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadFileComplete)
+            .observe(this, {
+                val data = it.data as PulsebitBleResponse.EcgFile
+                setReceiveCmd(data.bytes)
+                readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n "
+                fileNames.removeAt(0)
+                readFile()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadFileError)
+            .observe(this, {
+                val data = it.data as Boolean
+                binding.process.text = "EventPulsebitReadFileError $data"
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadingFileProgress)
+            .observe(this, {
+                val data = it.data as Int
+                binding.process.text = readFileProcess + curFileName + " 读取进度:" + data.toString() + "%"
             })
     }
 

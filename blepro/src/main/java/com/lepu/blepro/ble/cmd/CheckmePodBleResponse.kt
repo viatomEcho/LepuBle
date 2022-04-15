@@ -35,10 +35,13 @@ class CheckmePodBleResponse{
         var model: String        // 系列版本
         var hwVersion: String    // 硬件版本
         var swVersion: String    // 软件版本
+        var lgVersion: String    // 语言版本
+        var curLanguage: String    // 语言版本
         var sn: String           // 序列号
         var fileVer:String       // 文件解析协议版本
         var spcpVer:String       // 蓝牙通讯协议版本
         var branchCode:String    // code码
+        var application:String    // code码
 
         init {
             infoStr = JSONObject(String(bytes))
@@ -51,10 +54,13 @@ class CheckmePodBleResponse{
             model = infoStrGetString("Model")
             hwVersion = infoStrGetString("HardwareVer")
             swVersion = infoStrGetString("SoftwareVer")
+            lgVersion = infoStrGetString("LanguageVer")
+            curLanguage = infoStrGetString("CurLanguage")
             sn = infoStrGetString("SN")
             fileVer = infoStrGetString("FileVer")
             spcpVer = infoStrGetString("SPCPVer")
             branchCode = infoStrGetString("BranchCode")
+            application = infoStrGetString("Application")
         }
 
         private fun infoStrGetString(key: String): String {
@@ -73,10 +79,13 @@ class CheckmePodBleResponse{
                 model = $model
                 hwVersion = $hwVersion
                 swVersion = $swVersion
+                lgVersion = $lgVersion
+                curLanguage = $curLanguage
                 sn = $sn
                 fileVer = $fileVer
                 spcpVer = $spcpVer
                 branchCode = $branchCode
+                application = $application
             """.trimIndent()
         }
     }

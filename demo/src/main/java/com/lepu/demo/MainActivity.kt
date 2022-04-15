@@ -332,7 +332,19 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     LpBleUtil.pc68bGetTime(event.model)
                 }
             })
-
+        //-------------------------pulsebit-------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitSetTime)
+            .observe(this, {
+                Toast.makeText(this, "Pulsebit 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitDeviceInfo)
+            .observe(this, { event ->
+                (event.data as PulsebitBleResponse.DeviceInfo).let {
+                    Toast.makeText(this, "Pulsebit 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._pulsebitInfo.value = it
+                }
+            })
     }
     private fun needPermission(){
         PermissionX.init(this)

@@ -30,6 +30,18 @@ fun add(ori: ByteArray?, add: ByteArray): ByteArray {
 /**
  * byte数组转无符号整数（小端模式）
  */
+@ExperimentalUnsignedTypes fun toUIntTest(bytes: ByteArray): UInt {
+    var result : UInt = 0u
+    for (i in bytes.indices) {
+        result = result or ((bytes[i].toUInt() and 0xFFu) shl 8*i)
+    }
+
+    return result
+}
+
+/**
+ * byte数组转无符号整数（小端模式）
+ */
 @ExperimentalUnsignedTypes fun toUInt(bytes: ByteArray): Int {
     var result : UInt = 0u
     for (i in bytes.indices) {

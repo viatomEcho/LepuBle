@@ -395,6 +395,20 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    interface Pulsebit {
+        companion object {
+            const val EventPulsebitSetTime = "com.lepu.ble.pulsebit.set.time"                            // 同步时间 boolean
+            const val EventPulsebitDeviceInfo = "com.lepu.ble.pulsebit.device.info"                      // 设备信息 CheckmePodBleResponse.DeviceInfo
+            const val EventPulsebitGetFileListProgress = "com.lepu.ble.pulsebit.get.file.list.progress"  // 获取文件列表进度 int
+            const val EventPulsebitFileList = "com.lepu.ble.pulsebit.file.list"                          // 文件列表 CheckmePodBleResponse.FileList
+            const val EventPulsebitGetFileListError = "com.lepu.ble.pulsebit.get.file.list.error"        // 获取文件列表出错 boolean
+            const val EventPulsebitReadingFileProgress = "com.lepu.ble.pulsebit.reading.file.progress"   // 获取文件进度 int
+            const val EventPulsebitReadFileComplete = "com.lepu.ble.pulsebit.read.file.complete"         // 获取文件完成 PulsebitBleResponse.EcgFile
+            const val EventPulsebitReadFileError = "com.lepu.ble.pulsebit.read.file.error"               // 获取文件出错 boolean
+        }
+    }
+
+
     /**
      * Pc68bBleInterface
      * 包含model: MODEL_PC_68B

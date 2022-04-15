@@ -11,10 +11,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lepu.blepro.ble.cmd.Aoj20aBleResponse
-import com.lepu.blepro.ble.cmd.CheckmePodBleResponse
-import com.lepu.blepro.ble.cmd.OxyBleResponse
-import com.lepu.blepro.ble.cmd.PC80BleResponse
+import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.ble.LpBleUtil
@@ -106,6 +103,9 @@ class MainViewModel: ViewModel() {
 
     val _checkmePodInfo = MutableLiveData<CheckmePodBleResponse.DeviceInfo>()
     val checkmePodInfo: LiveData<CheckmePodBleResponse.DeviceInfo> = _checkmePodInfo
+
+    val _pulsebitInfo = MutableLiveData<PulsebitBleResponse.DeviceInfo>()
+    val pulsebitInfo: LiveData<PulsebitBleResponse.DeviceInfo> = _pulsebitInfo
 
 
     /**
