@@ -393,6 +393,22 @@ open class BleService: LifecycleService() {
                     return this
                 }
             }
+            Bluetooth.MODEL_VTM_AD5, Bluetooth.MODEL_FETAL -> {
+                Ad5FhrBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_VCOMIN -> {
+                VcominFhrBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
 
             else -> {
                 return throw Exception("BleService initInterfaces() 未配置此model:$m")

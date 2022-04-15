@@ -11,7 +11,6 @@ import android.util.SparseArray
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.*
-import com.lepu.blepro.ble.cmd.LeBp2wBleCmd
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
@@ -1711,6 +1710,16 @@ class BleServiceHelper private constructor() {
             (it1 as Pc68bBleInterface).let {
                 LepuBleLog.d(tag, "it as Pc68bBleInterface--pc68bGetTime")
                 it.getTime()
+            }
+        }
+    }
+
+    fun ad5EnableRtData(model: Int, enable: Boolean) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Ad5FhrBleInterface).let {
+                LepuBleLog.d(tag, "it as VtmFhrBleInterface--ad5EnableRtData")
+                it.enableRtData(enable)
             }
         }
     }

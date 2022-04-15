@@ -428,4 +428,16 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    interface VCOMIN {
+        companion object {
+            const val EventVcominRtHr = "com.lepu.ble.vcomin.rt.hr"  // 实时心率
+        }
+    }
+
+    interface AD5 {
+        companion object {
+            const val EventAd5RtHr = "com.lepu.ble.ad5.rt.hr"  // 实时心率
+        }
+    }
+
 }

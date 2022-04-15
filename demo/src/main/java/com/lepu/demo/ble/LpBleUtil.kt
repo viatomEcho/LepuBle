@@ -707,6 +707,9 @@ class LpBleUtil {
                     Bluetooth.MODEL_PC_68B -> {
                         BleServiceHelper.pc68bEnableRtData(model, type, enable)
                     }
+                    Bluetooth.MODEL_FETAL, Bluetooth.MODEL_VTM_AD5 -> {
+                        BleServiceHelper.ad5EnableRtData(model, enable)
+                    }
                 }
 
             }

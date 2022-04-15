@@ -815,6 +815,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
+
+        //----------------------ad5---------------------
+        binding.ad5EnableRtData.setOnClickListener {
+            switchState = !switchState
+            LpBleUtil.enableRtData(Constant.BluetoothConfig.currentModel[0], 0, switchState)
+            binding.ad5EnableRtData.text = if (switchState) {
+                "使能开"
+            } else {
+                "使能关"
+            }
+        }
     }
 
     private fun setReceiveCmd(bytes: ByteArray) {
