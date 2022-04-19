@@ -517,7 +517,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 for (file in data.list) {
                     fileNames.add(file.getTimeString())
                 }
-                Toast.makeText(context, "pc68b 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Pulsebit 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 binding.info.text = data.toString()
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileListError)

@@ -139,7 +139,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW,
             Bluetooth.MODEL_PC_60B -> waveHandler.post(OxyWaveTask())
 
-            Bluetooth.MODEL_VETCORDER -> {
+            Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300 -> {
                 waveHandler.post(EcgWaveTask())
                 waveHandler.post(OxyWaveTask())
             }
@@ -652,6 +652,24 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.pi.value = rtData.param.pi
                 OxyDataController.receive(rtData.wave.wFs)
             })
+        //-------------------------pc300-------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtOxyWave)
+            .observe(this, {
+                val data = it.data as Pc300BleResponse.RtOxyWave
+                OxyDataController.receive(data.waveIntData)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtOxyParam)
+            .observe(this, {
+                val data = it.data as Pc300BleResponse.RtOxyParam
+                viewModel.oxyPr.value = data.pr
+                viewModel.spo2.value = data.spo2
+                viewModel.pi.value = data.pi
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtEcgWave)
+            .observe(this, {
+                val data = it.data as Pc300BleResponse.RtEcgWave
+                DataController.receive(data.wFs)
+            })
     }
 
     var oxyPpgSize = 0
@@ -702,6 +720,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.ecgLayout.visibility = View.VISIBLE
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.bpLayout.visibility = View.GONE
+                }
+                Bluetooth.MODEL_PC300 -> {
+                    binding.ecgLayout.visibility = View.VISIBLE
+                    binding.oxyLayout.visibility = View.VISIBLE
+                    binding.bpLayout.visibility = View.VISIBLE
                 }
             }
         })

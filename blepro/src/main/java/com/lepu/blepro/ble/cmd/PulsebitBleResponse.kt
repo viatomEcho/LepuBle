@@ -1,11 +1,12 @@
 package com.lepu.blepro.ble.cmd
 
+import com.lepu.blepro.ble.data.ExEcgDiagnosis
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
-import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.ByteUtils.toSignedShort
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
-import com.lepu.blepro.utils.toUIntTest
 import org.json.JSONObject
+import java.util.*
 
 class PulsebitBleResponse{
 
@@ -32,12 +33,12 @@ class PulsebitBleResponse{
         var hwVersion: String    // 硬件版本
         var swVersion: String    // 软件版本
         var lgVersion: String    // 语言版本
-        var curLanguage: String    // 语言版本
+        var curLanguage: String  // 语言版本
         var sn: String           // 序列号
         var fileVer:String       // 文件解析协议版本
         var spcpVer:String       // 蓝牙通讯协议版本
         var branchCode:String    // code码
-        var application:String    // code码
+        var application:String   //
 
         init {
             infoStr = JSONObject(String(bytes))
@@ -88,26 +89,31 @@ class PulsebitBleResponse{
 
     @ExperimentalUnsignedTypes
     class EcgFile(val fileName: String, val fileSize: Int, val bytes: ByteArray) {
-        var hrsDataSize: Int     // 波形心率大小（byte）
-        var waveDataSize: UInt   // 波形数据大小（byte）
-        var hr: Int              // 诊断结果：HR，单位为bpm
-        var st: Int              // 诊断结果：ST（以ST/100存储），单位为mV(内部导联写0)
-        var qrs: Int             // 诊断结果：QRS，单位为ms
-        var pvcs: Int            // 诊断结果：PVCs(内部导联写0)
-        var qtc: Int             // 诊断结果：QTc单位为ms
-        var result: UInt
-        var resultMess: String   // 心电异常诊断结果
-        var measureMode: Int     // 测量模式
-        var filterMode: Int      // 滤波模式（1：wide   0：normal）
-        var qt: Int              // 诊断结果：QT单位为ms
-        var hrsData: ByteArray   // ECG心率值，从数据采样开始，采样率为1Hz，每个心率值为2byte（实际20s数据，每秒出一个心率），若出现无效心率，则心率为0
-        var waveData: ByteArray  // 按照压缩算法之后的ECG数据内容，每个采样点2byte
+        var hrsDataSize: Int           // 波形心率大小（byte）
+        var recordingTime: Int         // 记录时长 s
+        var waveDataSize: Int          // 波形数据大小（byte）
+        var hr: Int                    // 诊断结果：HR，单位为bpm
+        var st: Int                    // 诊断结果：ST（以ST/100存储），单位为mV(内部导联写0)
+        var qrs: Int                   // 诊断结果：QRS，单位为ms
+        var pvcs: Int                  // 诊断结果：PVCs(内部导联写0)
+        var qtc: Int                   // 诊断结果：QTc单位为ms
+        var result: ExEcgDiagnosis     // 心电异常诊断结果
+        var measureMode: Int           // 测量模式
+        var measureModeMess: String
+        var filterMode: Int            // 滤波模式（1：wide   0：normal）
+        var qt: Int                    // 诊断结果：QT单位为ms
+        var hrsData: ByteArray         // ECG心率值，从数据采样开始，采样率为1Hz，每个心率值为2byte（实际20s数据，每秒出一个心率），若出现无效心率，则心率为0
+        var hrsIntData: IntArray       // ECG心率值
+        var waveData: ByteArray        // 每个采样点2byte，原始数据
+        var waveShortData: ShortArray  // 每个采样点2byte
+        var wFs: FloatArray            // 转毫伏值(n*4033)/(32767*12*8)
 
         init {
             var index = 0
             hrsDataSize = toUInt(bytes.copyOfRange(index, index+2))
+            recordingTime = hrsDataSize/2
             index += 2
-            waveDataSize = toUIntTest(bytes.copyOfRange(index, index+4))
+            waveDataSize = toUInt(bytes.copyOfRange(index, index+4))
             index += 4
             hr = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
@@ -119,41 +125,49 @@ class PulsebitBleResponse{
             index += 2
             qtc = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
-            result = toUIntTest(bytes.copyOfRange(index, index+4))
-            resultMess = getMess(result)
+            result = ExEcgDiagnosis(bytes.copyOfRange(index, index+4))
             index += 4
             measureMode = byte2UInt(bytes[index])
+            measureModeMess = getMeasureMode(measureMode)
             index++
             filterMode = byte2UInt(bytes[index])
             index++
             qt = toUInt(bytes.copyOfRange(index, index+2))
             hrsData = bytes.copyOfRange(44, 44+hrsDataSize)
-//            waveData = bytes.copyOfRange(44+hrsDataSize, 44+hrsDataSize+waveDataSize)
-            waveData = bytes.copyOfRange(44+hrsDataSize, bytes.size)
+            hrsIntData = IntArray(hrsData.size/2)
+            for (i in hrsIntData.indices) {
+                hrsIntData[i] = toUInt(hrsData.copyOfRange(i*2, i*2+2))
+            }
+            val tempSize = 44+hrsDataSize+waveDataSize
+            waveData = if (tempSize > bytes.size) {
+                bytes.copyOfRange(44+hrsDataSize, bytes.size)
+            } else {
+                bytes.copyOfRange(44 + hrsDataSize, tempSize)
+            }
+            val len = waveData.size/2
+            waveShortData = ShortArray(len)
+            wFs = FloatArray(len)
+            for (i in 0 until len) {
+                waveShortData[i] = toSignedShort(waveData[i*2], waveData[i*2+1])
+                wFs[i] = (waveShortData[i] * 4033) / (32767 * 12 * 8f)
+            }
         }
 
-        fun getMess(result: UInt): String {
-            return when(result) {
-                0x00000000u -> "Regular ECG Rhythm(除异常情况之外)"
-                0xFFFFFFFFu -> "Unable to analyze(波形质量差，或者导联一直脱落等算法无法分析的情况)"
-                0x00000001u -> "Fast Heart Rate(HR>100bpm)"
-                0x00000002u -> "Slow Heart Rate(HR<50bpm)"
-                0x00000004u -> "Irregular ECG Rhythm(RR间期不规则)"
-                0x00000008u -> "Possible ventricular premature beats(PVC)"
-                0x00000010u -> "Possible heart pause(停搏)"
-                0x00000020u -> "Possible Atrial fibrillation"
-                0x00000040u -> "Wide QRS duration(QRS>120ms)"
-                0x00000080u -> "QTc is prolonged(QTc>450ms)"
-                0x00000100u -> "QTc is short(QTc<300ms)"
-                0x00000200u -> "ST segment elevation(ST>+0.2mV)"
-                0x00000400u -> "ST segment depression(ST<-0.2mV)"
+        fun getMeasureMode(mode: Int): String {
+            return when (mode) {
+                1, 3 -> "Lead I"
+                2, 4, 5 -> "Lead II"
+                6 -> "Chest Lead"
                 else -> ""
             }
         }
 
         override fun toString(): String {
             return """
+                fileSize : $fileSize
+                bytes.size : ${bytes.size}
                 hrsDataSize : $hrsDataSize
+                recordingTime : $recordingTime
                 waveDataSize : $waveDataSize
                 hr : $hr
                 st : $st
@@ -161,15 +175,15 @@ class PulsebitBleResponse{
                 pvcs : $pvcs
                 qtc : $qtc
                 result : $result
-                resultMess : $resultMess
                 measureMode : $measureMode
+                measureModeMess : $measureModeMess
                 filterMode : $filterMode
                 qt : $qt
                 hrsData : ${bytesToHex(hrsData)}
+                hrsIntData : ${Arrays.toString(hrsIntData)}
                 waveData : ${bytesToHex(waveData)}
             """.trimIndent()
         }
-
     }
 
     @ExperimentalUnsignedTypes

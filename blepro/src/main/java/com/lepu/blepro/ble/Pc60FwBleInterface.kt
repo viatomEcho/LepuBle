@@ -131,7 +131,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                 }
                 TYPE_WORKING_STATUS -> {
                     PC60FwBleResponse.WorkingStatus(response.content).let {
-                        LepuBleLog.d(tag, "model:$model,WORK_STATUS_DATA => success")
+                        LepuBleLog.d(tag, "model:$model,WORK_STATUS_DATA => success $it")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwWorkingStatus).post(InterfaceEvent(model, it))
                     }
                 }

@@ -428,15 +428,43 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * VcominFhrBleInterface
+     * 包含model: MODEL_VCOMIN
+     */
     interface VCOMIN {
         companion object {
             const val EventVcominRtHr = "com.lepu.ble.vcomin.rt.hr"  // 实时心率
         }
     }
 
+    /**
+     * Ad5FhrBleInterface
+     * 包含model: MODEL_VTM_AD5, MODEL_FETAL
+     */
     interface AD5 {
         companion object {
             const val EventAd5RtHr = "com.lepu.ble.ad5.rt.hr"  // 实时心率
+        }
+    }
+
+    /**
+     * PC300BleInterface发出的通知
+     * 包含model: MODEL_PC300
+     */
+    interface PC300 {
+        companion object {
+            const val EventPc300BpStart = "com.lepu.ble.pc300.bp.start"               // 血压开始测量 true
+            const val EventPc300BpStop = "com.lepu.ble.pc300.bp.stop"                 // 血压停止测量 true
+            const val EventPc300BpResult = "com.lepu.ble.pc300.bp.result"             // 血压测量结果 Pc300BleResponse.BpResult
+            const val EventPc300BpErrorResult = "com.lepu.ble.pc300.bp.error.result"  // 血压测量错误结果 Pc300BleResponse.BpResultError
+            const val EventPc300RtBpData = "com.lepu.ble.pc300.bp.rtdata"             // 血压实时测量值 Pc300BleResponse.RtBpData
+            const val EventPc300RtOxyWave = "com.lepu.ble.pc300.oxy.rtwave"           // 血氧实时波形包 Pc300BleResponse.RtOxyWave
+            const val EventPc300RtOxyParam = "com.lepu.ble.pc300.oxy.rtparam"         // 血氧实时参数包 Pc300BleResponse.RtOxyParam
+            const val EventPc300EcgStart = "com.lepu.ble.pc300.ecg.start"             // 心电开始测量 true
+            const val EventPc300EcgStop = "com.lepu.ble.pc300.ecg.stop"               // 心电停止测量 true
+            const val EventPc300RtEcgWave = "com.lepu.ble.pc300.ecg.rtwave"           // 心电实时波形包 Pc300BleResponse.RtEcgWave
+            const val EventPc300RtEcgResult = "com.lepu.ble.pc300.ecg.rtresult"       // 心电实时结果 Pc300BleResponse.RtEcgResult
         }
     }
 

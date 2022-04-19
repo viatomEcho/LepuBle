@@ -53,7 +53,7 @@ class Constant{
             const val VETCORDER_MODEL: Int = Bluetooth.MODEL_VETCORDER
             const val CHECK_POD_MODEL: Int = Bluetooth.MODEL_CHECK_POD
             const val PC_68B_MODEL: Int = Bluetooth.MODEL_PC_68B
-            const val PC_300SNT_MODEL: Int = Bluetooth.MODEL_PC_300SNT
+            const val PC300_MODEL: Int = Bluetooth.MODEL_PC300
             const val PULSEBITEX_MODEL: Int = Bluetooth.MODEL_PULSEBITEX
             const val FETAL_MODEL: Int = Bluetooth.MODEL_FETAL
             const val VTM_AD5_MODEL: Int = Bluetooth.MODEL_VTM_AD5
@@ -66,7 +66,7 @@ class Constant{
                 LE_BP2W_MODEL, TV221U_MODEL, AOJ20A_MODEL, BABYO2N_MODEL, CHECKO2_MODEL, O2M_MODEL,
                 SLEEPO2_MODEL, SNOREO2_MODEL, WEARO2_MODEL, SLEEPU_MODEL, OXYLINK_MODEL, KIDSO2_MODEL,
                 OXYSMART_MODEL, OXYFIT_MODEL, POD_1W_MODEL, CHECK_POD_MODEL, PC_68B_MODEL, BP2T_MODEL,
-                POD2B_MODEL, PC_60NW_MODEL, PC_60B_MODEL, PC_300SNT_MODEL, PULSEBITEX_MODEL, FETAL_MODEL,
+                POD2B_MODEL, PC_60NW_MODEL, PC_60B_MODEL, PC300_MODEL, PULSEBITEX_MODEL, FETAL_MODEL,
                 VTM_AD5_MODEL, VCOMIN_MODEL
             )
 

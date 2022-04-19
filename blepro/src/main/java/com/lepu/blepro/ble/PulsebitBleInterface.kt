@@ -116,6 +116,7 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
                 if (response.state) {
                     fileSize = toUInt(response.content)
                     curSize = 0
+                    fileContent = null
                     LepuBleLog.d(tag, "model:$model, 文件大小：${fileSize}  文件名：$curFileName")
                     sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_CONTENT, PulsebitBleCmd.readFileContent())
 

@@ -377,7 +377,7 @@ open class BleService: LifecycleService() {
                     return this
                 }
             }
-            Bluetooth.MODEL_PC_300SNT -> {
+            Bluetooth.MODEL_PC300 -> {
                 Pc300BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 

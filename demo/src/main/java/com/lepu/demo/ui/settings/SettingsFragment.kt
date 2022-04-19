@@ -77,6 +77,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.sp20Layout.visibility = View.GONE
         binding.aoj20aLayout.visibility = View.GONE
         binding.pc68bLayout.visibility = View.GONE
+        binding.ad5Layout.visibility = View.GONE
         if (v == null) return
         v.visibility = View.VISIBLE
     }
@@ -358,8 +359,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 it.pwd = "ViatomCtrl"
                 wifiConfig.wifi = it
                 val server = Bp2Server()
-                server.addr = "34.209.148.123"
+//                server.addr = "34.209.148.123"
+                server.addr = "bptest.viatomtech.com"
+//                server.addr = "bp.viatomtech.com"
+//                server.addr = "ai.viatomtech.com.cn"
                 server.port = 7100
+                server.addrType = 1
                 wifiConfig.server = server
                 LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
                 binding.content.text = wifiConfig.toString()
@@ -535,8 +540,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 it.pwd = "ViatomCtrl"
                 wifiConfig.wifi = it
                 val server = Bp2Server()
-                server.addr = "34.209.148.123"
+//                server.addr = "34.209.148.123"
+                server.addr = "bptest.viatomtech.com"
+//                server.addr = "bp.viatomtech.com"
+//                server.addr = "ai.viatomtech.com.cn"
                 server.port = 7100
+                server.addrType = 1
                 wifiConfig.server = server
                 LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
                 binding.content.text = wifiConfig.toString()
@@ -1082,11 +1091,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 setReceiveCmd(data.bytes)
                 binding.content.text = data.toString()
                 if (data.wifi.ssid.isNotEmpty()) {
-                    if ((data.wifi.state != 2 || data.server.state != 2)) {
+                    /*if ((data.wifi.state != 2 || data.server.state != 2) && (data.wifi.state != 255 || data.server.state != 255)) {
                         LpBleUtil.bp2GetWifiConfig(it.model)
                     } else {
                         Toast.makeText(context, "bp2w WiFi连接成功", Toast.LENGTH_SHORT).show()
-                    }
+                    }*/
                 } else {
                     Toast.makeText(context, "bp2w 尚未配置WiFi", Toast.LENGTH_SHORT).show()
                 }

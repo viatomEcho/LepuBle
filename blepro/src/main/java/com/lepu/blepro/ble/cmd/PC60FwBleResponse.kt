@@ -143,6 +143,16 @@ class PC60FwBleResponse{
             index++
             para2 = (bytes[index].toUInt() and 0xFFu).toInt()
         }
+
+        override fun toString(): String {
+            return """
+                WorkingStatus
+                mode : $mode
+                step : $step
+                para1 : $para1
+                para2 : $para2
+            """.trimIndent()
+        }
     }
 
     @ExperimentalUnsignedTypes

@@ -2,9 +2,11 @@ package com.lepu.blepro.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.Pc300BleCmd.*
 import com.lepu.blepro.ble.cmd.*
+import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.ByteUtils.bytes2UIntBig
@@ -45,61 +47,66 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 when (response.type) {
                     SET_DEVICE_ID -> {
                         val data = toUInt(response.content)
-                        LepuBleLog.d(tag, "model:$model,SET_DEVICE_ID => success $data")
+                        LepuBleLog.d(tag, "model:$model,SET_DEVICE_ID 设置产品 ID => success $data")
                     }
                     GET_DEVICE_ID -> {
                         val data = toUInt(response.content)
-                        LepuBleLog.d(tag, "model:$model,GET_DEVICE_ID => success $data")
+                        LepuBleLog.d(tag, "model:$model,GET_DEVICE_ID 查询产品 ID => success $data")
                     }
                     GET_DEVICE_NAME -> {
                         val data = trimStr(toString(response.content))
-                        LepuBleLog.d(tag, "model:$model,GET_DEVICE_NAME => success $data")
+                        LepuBleLog.d(tag, "model:$model,GET_DEVICE_NAME 查询产品名称 => success $data")
                     }
                     DEVICE_INFO_2 -> {
                         val data = Pc300BleResponse.DeviceInfo(response.content)
-                        LepuBleLog.d(tag, "model:$model,DEVICE_INFO_2 => success $data")
+                        LepuBleLog.d(tag, "model:$model,DEVICE_INFO_2 查询版本及电量等级 => success $data")
                     }
                     DEVICE_INFO_4 -> {
                         val data = Pc300BleResponse.DeviceInfo(response.content)
-                        LepuBleLog.d(tag, "model:$model,DEVICE_INFO_4 => success $data")
+                        LepuBleLog.d(tag, "model:$model,DEVICE_INFO_4 查询版本及电量等级 => success $data")
                     }
                     SET_TIME -> {
-                        LepuBleLog.d(tag, "model:$model,SET_TIME => success ${bytesToHex(response.content)}")
+                        LepuBleLog.d(tag, "model:$model,SET_TIME 设置时间 => success ${bytesToHex(response.content)}")
                     }
                 }
             }
             TOKEN_0XD0 -> {
-                LepuBleLog.d(tag, "model:$model,TOKEN_0XD0 => success ${bytesToHex(response.content)}")
+                LepuBleLog.d(tag, "model:$model,TOKEN_0XD0 上传PC_300SNT 关机命令信息 => success ${bytesToHex(response.content)}")
             }
             TOKEN_0X40 -> {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X40 => success ${bytesToHex(response.content)}")
                 when (response.type) {
                     BP_START -> {
-                        LepuBleLog.d(tag, "model:$model,BP_START => success ${bytesToHex(response.content)}")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300BpStart).post(InterfaceEvent(model, true))
+                        LepuBleLog.d(tag, "model:$model,BP_START 血压开始测量命令 => success ${bytesToHex(response.content)}")
                     }
                     BP_STOP -> {
-                        LepuBleLog.d(tag, "model:$model,BP_STOP => success ${bytesToHex(response.content)}")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300BpStop).post(InterfaceEvent(model, true))
+                        LepuBleLog.d(tag, "model:$model,BP_STOP 血压停止测量命令 => success ${bytesToHex(response.content)}")
                     }
                     BP_MODE -> {
                         val data = toUInt(response.content)
-                        LepuBleLog.d(tag, "model:$model,BP_MODE => success $data")
+                        LepuBleLog.d(tag, "model:$model,BP_MODE 血压模式命令 => success $data")
                     }
                 }
             }
             TOKEN_0X42 -> {
                 val data = Pc300BleResponse.RtBpData(response.content)
-                LepuBleLog.d(tag, "model:$model,TOKEN_0X42 => success $data")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtBpData).post(InterfaceEvent(model, data))
+                LepuBleLog.d(tag, "model:$model,TOKEN_0X42 血压当前值和心跳信息 => success $data")
             }
             TOKEN_0X43 -> {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X43 => success ${bytesToHex(response.content)}")
                 when (response.type) {
                     BP_RESULT -> {
                         val data = Pc300BleResponse.BpResult(response.content)
-                        LepuBleLog.d(tag, "model:$model,BP_RESULT => success $data")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300BpResult).post(InterfaceEvent(model, data))
+                        LepuBleLog.d(tag, "model:$model,BP_RESULT 血压测量结果 => success $data")
                     }
                     BP_ERROR_RESULT -> {
                         val data = Pc300BleResponse.BpResultError(response.content)
-                        LepuBleLog.d(tag, "model:$model,BP_ERROR_RESULT => success $data")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300BpErrorResult).post(InterfaceEvent(model, data))
+                        LepuBleLog.d(tag, "model:$model,BP_ERROR_RESULT 血压测量出现的错误结果 => success $data")
                     }
                 }
             }
@@ -108,58 +115,62 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 when (response.type) {
                     OXY_RT_STATE -> {
                         val data = Pc300BleResponse.RtOxyState(response.content)
-                        LepuBleLog.d(tag, "model:$model,OXY_RT_STATE => success $data")
+                        LepuBleLog.d(tag, "model:$model,OXY_RT_STATE 血氧上传状态数据包 => success $data")
                     }
                     DEVICE_INFO -> {
                         val data = Pc300BleResponse.DeviceInfo(response.content)
-                        LepuBleLog.d(tag, "model:$model,DEVICE_INFO => success $data")
+                        LepuBleLog.d(tag, "model:$model,DEVICE_INFO 查询产品版本及电量等级 => success $data")
                     }
                 }
             }
             TOKEN_0X52 -> {
-                LepuBleLog.d(tag, "model:$model,TOKEN_0X52 => success ${bytesToHex(response.content)}")
+                LepuBleLog.d(tag, "model:$model,TOKEN_0X52 血氧上传波形数据包 => success ${bytesToHex(response.content)}")
                 when (response.type) {
                     DISABLE_WAVE -> {
-                        LepuBleLog.d(tag, "model:$model,DISABLE_WAVE => success ${bytesToHex(response.content)}")
+                        LepuBleLog.d(tag, "model:$model,DISABLE_WAVE 禁止主动发送数据 => success ${bytesToHex(response.content)}")
                     }
                     ENABLE_WAVE -> {
-                        val data = response.content.copyOfRange(0, response.content.size).toList().asSequence().map { (it.toInt() and 0x7f).toByte() }.toList().toByteArray()
-                        LepuBleLog.d(tag, "model:$model,ENABLE_WAVE => success ${bytesToHex(data)}")
+                        val data = Pc300BleResponse.RtOxyWave(response.content)
+                        LepuBleLog.d(tag, "model:$model,ENABLE_WAVE 允许主动发送数据 => success ${bytesToHex(data.bytes)}")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtOxyWave).post(InterfaceEvent(model, data))
                     }
                 }
             }
             TOKEN_0X53 -> {
                 val data = Pc300BleResponse.RtOxyParam(response.content)
-                LepuBleLog.d(tag, "model:$model,TOKEN_0X53 => success $data")
+                LepuBleLog.d(tag, "model:$model,TOKEN_0X53 血氧上传参数数据包 => success $data")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtOxyParam).post(
+                    InterfaceEvent(model, data)
+                )
             }
             TOKEN_0X70 -> {
                 val data = (byte2UInt(response.content[0]) and 0x40) shr 5
-                LepuBleLog.d(tag, "model:$model,TOKEN_0X70 => success $data")
+                LepuBleLog.d(tag, "model:$model,TOKEN_0X70 体温开始测量命令 => success $data")
             }
             TOKEN_0X72 -> {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X72 => success ${bytesToHex(response.content)}")
                 when (response.type) {
                     TEMP_RESULT -> {
                         val data = Pc300BleResponse.TempResult(response.content)
-                        LepuBleLog.d(tag, "model:$model,TEMP_RESULT => success $data")
+                        LepuBleLog.d(tag, "model:$model,TEMP_RESULT 体温测量结果 => success $data")
                     }
                     SET_TEMP_CONFIG -> {
-                        LepuBleLog.d(tag, "model:$model,SET_TEMP_CONFIG => success ${bytesToHex(response.content)}")
+                        LepuBleLog.d(tag, "model:$model,SET_TEMP_CONFIG 配置体温计参数 => success ${bytesToHex(response.content)}")
                     }
                     GET_TEMP_CONFIG -> {
-                        LepuBleLog.d(tag, "model:$model,GET_TEMP_CONFIG => success ${bytesToHex(response.content)}")
+                        LepuBleLog.d(tag, "model:$model,GET_TEMP_CONFIG 查询体温计参数 => success ${bytesToHex(response.content)}")
                     }
                 }
             }
             TOKEN_0X73 -> {
                 val data = Pc300BleResponse.BsResult(response.content)
-                LepuBleLog.d(tag, "model:$model,TOKEN_0X73 => success $data")
+                LepuBleLog.d(tag, "model:$model,TOKEN_0X73 血糖结果 => success $data")
             }
             TOKEN_0XE0 -> {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0XE0 => success ${bytesToHex(response.content)}")
                 when (response.type) {
                     BS_UNIT -> {
-                        LepuBleLog.d(tag, "model:$model,BS_UNIT => success ${bytesToHex(response.content)}")
+                        LepuBleLog.d(tag, "model:$model,BS_UNIT 控制血糖显示单位(仅适用百捷) => success ${bytesToHex(response.content)}")
                     }
                 }
             }
@@ -168,37 +179,39 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0XE2 => success ${bytesToHex(response.content)}")
                 when (response.type) {
                     GLU_RESULT -> {
-                        LepuBleLog.d(tag, "model:$model,GLU_RESULT => success $data")
+                        LepuBleLog.d(tag, "model:$model,GLU_RESULT 血糖 => success $data")
                     }
                     UA_RESULT -> {
-                        LepuBleLog.d(tag, "model:$model,UA_RESULT => success $data")
+                        LepuBleLog.d(tag, "model:$model,UA_RESULT 尿酸 => success $data")
                     }
                     CHOL_RESULT -> {
-                        LepuBleLog.d(tag, "model:$model,CHOL_RESULT => success $data")
+                        LepuBleLog.d(tag, "model:$model,CHOL_RESULT 总胆固醇 => success $data")
                     }
                 }
             }
             TOKEN_0XE3 -> {
                 val data = toUInt(response.content)
-                LepuBleLog.d(tag, "model:$model,TOKEN_0XE3 => success $data")
+                LepuBleLog.d(tag, "model:$model,TOKEN_0XE3 设置下位机血糖仪类型 => success $data")
             }
             TOKEN_0XE4 -> {
-                LepuBleLog.d(tag, "model:$model,TOKEN_0XE4 => success ${bytesToHex(response.content)}")
+                LepuBleLog.d(tag, "model:$model,TOKEN_0XE4 查询下位机当前配置的血糖仪类型 => success ${bytesToHex(response.content)}")
             }
             TOKEN_0XE5 -> {
-                LepuBleLog.d(tag, "model:$model,TOKEN_0XE5 => success ${bytesToHex(response.content)}")
+                LepuBleLog.d(tag, "model:$model,TOKEN_0XE5 清除血糖历史数据 => success ${bytesToHex(response.content)}")
             }
             TOKEN_0X30 -> {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X30 => success ${bytesToHex(response.content)}")
                 when (response.type) {
                     ECG_START -> {
-                        LepuBleLog.d(tag, "model:$model,ECG_START => success ${bytesToHex(response.content)}")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300EcgStart).post(InterfaceEvent(model, true))
+                        LepuBleLog.d(tag, "model:$model,ECG_START 心电开始测量命令 => success ${bytesToHex(response.content)}")
                     }
                     ECG_STOP -> {
-                        LepuBleLog.d(tag, "model:$model,ECG_STOP => success ${bytesToHex(response.content)}")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300EcgStop).post(InterfaceEvent(model, true))
+                        LepuBleLog.d(tag, "model:$model,ECG_STOP 心电停止测量命令 => success ${bytesToHex(response.content)}")
                     }
                     ECG_DATA_DIGIT -> {
-                        LepuBleLog.d(tag, "model:$model,ECG_DATA_DIGIT => success ${bytesToHex(response.content)}")
+                        LepuBleLog.d(tag, "model:$model,ECG_DATA_DIGIT 设置心电数据位数 => success ${bytesToHex(response.content)}")
                     }
                 }
             }
@@ -207,22 +220,28 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 when (response.type) {
                     GET_VERSION -> {
                         val data = Pc300BleResponse.DeviceInfo(response.content)
-                        LepuBleLog.d(tag, "model:$model,GET_VERSION => success $data")
+                        LepuBleLog.d(tag, "model:$model,GET_VERSION 心电查询版本 => success $data")
                     }
                     ECG_RT_STATE -> {
                         val data = Pc300BleResponse.RtEcgState(response.content)
-                        LepuBleLog.d(tag, "model:$model,ECG_RT_STATE => success $data")
+                        LepuBleLog.d(tag, "model:$model,ECG_RT_STATE 心电查询工作状态 => success $data")
                     }
                 }
             }
             TOKEN_0X32 -> {
-                LepuBleLog.d(tag, "model:$model,TOKEN_0X32 => success ${bytesToHex(response.content)}")
+                val data = Pc300BleResponse.RtEcgWave(response.content)
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtEcgWave).post(
+                    InterfaceEvent(model, data)
+                )
+                LepuBleLog.d(tag, "model:$model,TOKEN_0X32 心电波形上传数据 => success $data")
             }
             TOKEN_0X33 -> {
-                LepuBleLog.d(tag, "model:$model,TOKEN_0X33 => success ${bytesToHex(response.content)}")
+                val data = Pc300BleResponse.RtEcgResult(response.content)
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtEcgResult).post(InterfaceEvent(model, data))
+                LepuBleLog.d(tag, "model:$model,TOKEN_0X33 心电结果上传参数 => success $data")
             }
             TOKEN_0X34 -> {
-                LepuBleLog.d(tag, "model:$model,TOKEN_0X34 => success ${bytesToHex(response.content)}")
+                LepuBleLog.d(tag, "model:$model,TOKEN_0X34 设备硬件增益 => success ${bytesToHex(response.content)}")
             }
         }
 
@@ -294,7 +313,8 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getRtData() {
-        sendCmd(ecgRtState())
+//        sendCmd(ecgRtState())
+//        sendCmd(Pc300BleCmd.ecgDataDigit(1))
     }
 
     override fun getFileList() {
