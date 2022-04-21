@@ -345,6 +345,19 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._pulsebitInfo.value = it
                 }
             })
+        //-------------------------CheckmeLE-------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeSetTime)
+            .observe(this, {
+                Toast.makeText(this, "CheckmeLE 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeDeviceInfo)
+            .observe(this, { event ->
+                (event.data as CheckmeLeBleResponse.DeviceInfo).let {
+                    Toast.makeText(this, "CheckmeLE 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._checkmeLeInfo.value = it
+                }
+            })
     }
     private fun needPermission(){
         PermissionX.init(this)

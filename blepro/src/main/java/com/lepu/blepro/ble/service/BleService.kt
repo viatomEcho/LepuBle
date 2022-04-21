@@ -393,6 +393,14 @@ open class BleService: LifecycleService() {
                     return this
                 }
             }
+            Bluetooth.MODEL_CHECKME_LE -> {
+                CheckmeLeBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
             Bluetooth.MODEL_VTM_AD5, Bluetooth.MODEL_FETAL -> {
                 Ad5FhrBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately

@@ -10,9 +10,9 @@ import com.lepu.blepro.utils.*
 import kotlin.experimental.inv
 
 
-class PulsebitBleInterface(model: Int): BleInterface(model) {
+class CheckmeLeBleInterface(model: Int): BleInterface(model) {
     
-    private val tag: String = "PulsebitBleInterface"
+    private val tag: String = "CheckmeLeBleInterface"
 
     var fileSize: Int = 0
     var curFileName:String = ""
@@ -67,7 +67,7 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
 
             val temp: ByteArray = bytes.copyOfRange(i, i + 8 + len)
             if (temp.last() == BleCRC.calCRC8(temp)) {
-                val bleResponse = PulsebitBleResponse.BleResponse(temp)
+                val bleResponse = CheckmeLeBleResponse.BleResponse(temp)
 //                Log.d(TAG, "get response: " + temp.toHex())
                 onResponseReceived(bleResponse)
 
@@ -83,34 +83,32 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
     }
 
     @ExperimentalUnsignedTypes
-    private fun onResponseReceived(response: PulsebitBleResponse.BleResponse) {
+    private fun onResponseReceived(response: CheckmeLeBleResponse.BleResponse) {
         LepuBleLog.d(tag, "Response: $curCmd, ${response.content.toHex()}")
         if (curCmd == -1) {
             return
         }
 
         when (curCmd) {
-            PulsebitBleCmd.OXY_CMD_PARA_SYNC -> {
+            CheckmeLeBleCmd.OXY_CMD_PARA_SYNC -> {
                 clearTimeout()
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_PARA_SYNC => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitSetTime).post(
-                    InterfaceEvent(model, true)
-                )
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeSetTime).post(InterfaceEvent(model, true))
             }
-            PulsebitBleCmd.OXY_CMD_INFO -> {
+            CheckmeLeBleCmd.OXY_CMD_INFO -> {
 
                 clearTimeout()
-                val info = PulsebitBleResponse.DeviceInfo(response.content)
+                val info = CheckmeLeBleResponse.DeviceInfo(response.content)
 
                 if (runRtImmediately) {
                     runRtTask()
                     runRtImmediately = false
                 }
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success $info")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitDeviceInfo).post(InterfaceEvent(model, info))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeDeviceInfo).post(InterfaceEvent(model, info))
             }
 
-            PulsebitBleCmd.OXY_CMD_READ_START -> {
+            CheckmeLeBleCmd.OXY_CMD_READ_START -> {
                 clearTimeout()
 
                 if (response.state) {
@@ -118,54 +116,70 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
                     curSize = 0
                     fileContent = null
                     LepuBleLog.d(tag, "model:$model, 文件大小：${fileSize}  文件名：$curFileName")
-                    sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_CONTENT, PulsebitBleCmd.readFileContent())
+                    sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_READ_CONTENT, CheckmeLeBleCmd.readFileContent())
 
                 } else {
                     if (curFileName.contains(".dat")) {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileListError).post(InterfaceEvent(model, true))
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileListError).post(InterfaceEvent(model, true))
                     } else {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadFileError).post(InterfaceEvent(model, true))
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadFileError).post(InterfaceEvent(model, true))
                     }
                     LepuBleLog.d(tag, "model:$model, 读文件失败：${response.content.toHex()}")
                 }
             }
 
-            PulsebitBleCmd.OXY_CMD_READ_CONTENT -> {
+            CheckmeLeBleCmd.OXY_CMD_READ_CONTENT -> {
                 clearTimeout()
                 fileContent = add(fileContent, response.content)
                 curSize += response.len
                 if (curFileName.contains(".dat")) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileListProgress).post(InterfaceEvent(model, curSize*100/fileSize))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileListProgress).post(InterfaceEvent(model, curSize*100/fileSize))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadingFileProgress).post(InterfaceEvent(model, curSize*100/fileSize))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadingFileProgress).post(InterfaceEvent(model, curSize*100/fileSize))
                 }
                 LepuBleLog.d(tag, "model:$model, 读文件中：$curFileName   => $curSize / $fileSize ${curSize*100/fileSize}")
 
                 if (curSize < fileSize) {
-                    sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_CONTENT, PulsebitBleCmd.readFileContent())
+                    sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_READ_CONTENT, CheckmeLeBleCmd.readFileContent())
                 } else {
-                    sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_END, PulsebitBleCmd.readFileEnd())
+                    sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_READ_END, CheckmeLeBleCmd.readFileEnd())
                 }
             }
-            PulsebitBleCmd.OXY_CMD_READ_END -> {
+            CheckmeLeBleCmd.OXY_CMD_READ_END -> {
                 clearTimeout()
                 LepuBleLog.d(tag, "model:$model, 读文件完成: $curFileName ==> $fileSize")
 
                 fileContent?.let {
                     if (curFileName.contains(".dat")) {
-                        val data = PulsebitBleResponse.FileList(it)
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileList).post(InterfaceEvent(model, data))
-                        LepuBleLog.d(tag, "model:$model,  FileList $data")
+                        LepuBleLog.d(tag, "model:$model, 读文件完成: $curFileName  bytesToHex ==> ${bytesToHex(it)})")
+                        var type = 0
+                        when (curFileName) {
+                            "temp.dat" -> {
+                                type = CheckmeLeBleCmd.ListType.TEMP_TYPE
+                            }
+                            "oxi.dat" -> {
+                                type = CheckmeLeBleCmd.ListType.OXY_TYPE
+                            }
+                            "ecg.dat" -> {
+                                type = CheckmeLeBleCmd.ListType.ECG_TYPE
+                            }
+                            "2dlc.dat" -> {
+                                type = CheckmeLeBleCmd.ListType.DLC_TYPE
+                            }
+                        }
+                        val data = CheckmeLeBleResponse.ListContent(type, it)
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileList).post(InterfaceEvent(model, data))
+                        LepuBleLog.d(tag, "model:$model, 读文件完成: $curFileName  data ==> $data")
                     } else {
-                        val data = PulsebitBleResponse.EcgFile(curFileName, fileSize, it)
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadFileComplete).post(InterfaceEvent(model, data))
+                        val data = CheckmeLeBleResponse.EcgFile(curFileName, fileSize, it)
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadFileComplete).post(InterfaceEvent(model, data))
                         LepuBleLog.d(tag, "model:$model,  EcgFile $data")
                     }
                 } ?: run {
                     if (curFileName.contains(".dat")) {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileListError).post(InterfaceEvent(model, true))
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileListError).post(InterfaceEvent(model, true))
                     } else {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadFileError).post(InterfaceEvent(model, true))
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadFileError).post(InterfaceEvent(model, true))
                     }
                     LepuBleLog.d(tag, "model:$model,  curFile error!!")
                 }
@@ -177,32 +191,37 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
         curCmd = -1
     }
 
-    /**
-     * 注意默认获取实时参数
-     */
-    override fun getRtData() {
-    }
-
     override fun dealReadFile(userId: String, fileName: String) {
         this.curFileName = fileName
         LepuBleLog.d(tag, "$userId 将要读取文件 $curFileName")
-        sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_START, PulsebitBleCmd.readFileStart(fileName))
+        sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_READ_START, CheckmeLeBleCmd.readFileStart(fileName))
     }
 
     override fun syncTime() {
-        sendOxyCmd(PulsebitBleCmd.OXY_CMD_PARA_SYNC, PulsebitBleCmd.syncTime())
+        sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_PARA_SYNC, CheckmeLeBleCmd.syncTime())
     }
 
     override fun getFileList() {
-        this.curFileName = "1dlc.dat"
-        sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_START, PulsebitBleCmd.readFileStart(curFileName))
+    }
+
+    fun getFileList(type: Int) {
+        when (type) {
+            CheckmeLeBleCmd.ListType.ECG_TYPE -> curFileName = "ecg.dat"
+            CheckmeLeBleCmd.ListType.OXY_TYPE -> curFileName = "oxi.dat"
+            CheckmeLeBleCmd.ListType.DLC_TYPE -> curFileName = "2dlc.dat"
+            CheckmeLeBleCmd.ListType.TEMP_TYPE -> curFileName = "temp.dat"
+        }
+        sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_READ_START, CheckmeLeBleCmd.readFileStart(curFileName))
     }
 
     override fun getInfo() {
-        sendOxyCmd(PulsebitBleCmd.OXY_CMD_INFO, PulsebitBleCmd.getInfo())
+        sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_INFO, CheckmeLeBleCmd.getInfo())
     }
 
     override fun factoryReset() {
+    }
+
+    override fun getRtData() {
     }
 
     override fun factoryResetAll() {

@@ -651,6 +651,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.spo2.value = rtData.param.spo2
                 viewModel.pi.value = rtData.param.pi
                 OxyDataController.receive(rtData.wave.wFs)
+                binding.dataStr.text = "$rtData"
             })
         //-------------------------pc300-------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtOxyWave)

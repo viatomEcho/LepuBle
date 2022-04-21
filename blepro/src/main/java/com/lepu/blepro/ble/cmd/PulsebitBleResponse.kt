@@ -189,7 +189,7 @@ class PulsebitBleResponse{
     @ExperimentalUnsignedTypes
     class FileList(val bytes: ByteArray) {
         var size: Int
-        var list = mutableSetOf<Record>()
+        var list = mutableListOf<Record>()
 
         init {
             size = bytes.size.div(17)
@@ -208,6 +208,7 @@ class PulsebitBleResponse{
 
     @ExperimentalUnsignedTypes
     class Record(val bytes: ByteArray) {
+        var recordName: String
         var year: Int
         var month: Int
         var day: Int
@@ -234,30 +235,31 @@ class PulsebitBleResponse{
             hr = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
             user = byte2UInt(bytes[15])
+            recordName = getTimeString()
         }
 
-        fun getTimeString(): String {
-            val monthStr = if (month < 9) {
+        private fun getTimeString(): String {
+            val monthStr = if (month < 10) {
                 "0$month"
             } else {
                 "$month"
             }
-            val dayStr = if (day < 9) {
+            val dayStr = if (day < 10) {
                 "0$day"
             } else {
                 "$day"
             }
-            val hourStr = if (hour < 9) {
+            val hourStr = if (hour < 10) {
                 "0$hour"
             } else {
                 "$hour"
             }
-            val minuteStr = if (minute < 9) {
+            val minuteStr = if (minute < 10) {
                 "0$minute"
             } else {
                 "$minute"
             }
-            val secondStr = if (second < 9) {
+            val secondStr = if (second < 10) {
                 "0$second"
             } else {
                 "$second"
@@ -275,6 +277,7 @@ class PulsebitBleResponse{
                 second : $second
                 hr : $hr
                 user : $user
+                recordName : $recordName
             """.trimIndent()
         }
     }

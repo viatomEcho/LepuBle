@@ -2,6 +2,16 @@ package com.lepu.blepro.utils;
 
 public class ByteUtils {
 
+
+    public static float bytesToFloat(byte[] b) {
+        int accum = 0;
+        accum = accum|(b[0] & 0xff) << 0;
+        accum = accum|(b[1] & 0xff) << 8;
+        accum = accum|(b[2] & 0xff) << 16;
+        accum = accum|(b[3] & 0xff) << 24;
+        return Float.intBitsToFloat(accum);
+    }
+
     /**
      * 转无符号整数
      * @param b

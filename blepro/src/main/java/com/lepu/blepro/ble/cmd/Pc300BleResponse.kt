@@ -321,7 +321,7 @@ object Pc300BleResponse {
 //        var digit: Int
 //        var sign: Boolean
         var waveData: ByteArray
-        var waveShortData: ShortArray  // 0—4095
+        var waveShortData: IntArray  // 0—4095
         var wFs: FloatArray
         var isProbeOff: Boolean
 
@@ -332,10 +332,10 @@ object Pc300BleResponse {
             waveData = bytes.copyOfRange(index, index+25*2)
             index += 50
             val len = waveData.size/2
-            waveShortData = ShortArray(len)
+            waveShortData = IntArray(len)
             wFs = FloatArray(len)
             for (i in 0 until len) {
-                waveShortData[i] = (((byte2UInt(bytes[i*2]) and 0x0F) shl 8) + byte2UInt(bytes[i*2+1])).toShort()
+                waveShortData[i] = ((byte2UInt(waveData[i*2]) and 0x0F) shl 8) + byte2UInt(waveData[i*2+1])
                 wFs[i] = (waveShortData[i]-2048) * 1.div(394f)
             }
             isProbeOff = ((byte2UInt(bytes[index]) and 0x80) shr 7) == 1

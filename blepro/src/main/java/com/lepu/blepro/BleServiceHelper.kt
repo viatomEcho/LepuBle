@@ -606,6 +606,7 @@ class BleServiceHelper private constructor() {
     /**
      * 获取设备文件列表
      * @param fileType LeBp2w获取文件列表类型（LeBp2wBleCmd.FileType.ECG_TYPE, BP_TYPE, USER_TYPE）
+     * @param fileType CheckmeLe获取文件列表类型（CheckmeLeBleCmd.ListType.ECG_TYPE, OXY_TYPE, DLC_TYPE）
      */
     @JvmOverloads
     fun getFileList(model: Int, fileType: Int? = /*LeBp2wBleCmd.FileType.ECG_TYPE*/ null){
@@ -615,6 +616,18 @@ class BleServiceHelper private constructor() {
                 getInterface(model)?.let { it1 ->
                     (it1 as LeBp2wBleInterface).let {
                         LepuBleLog.d(tag, "it as LeBp2wBleInterface--getFileList")
+                        if (fileType == null) {
+                            it.getFileList()
+                        } else {
+                            it.getFileList(fileType)
+                        }
+                    }
+                }
+            }
+            Bluetooth.MODEL_CHECKME_LE -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as CheckmeLeBleInterface).let {
+                        LepuBleLog.d(tag, "it as CheckmeLeBleInterface--getFileList")
                         if (fileType == null) {
                             it.getFileList()
                         } else {
@@ -1723,4 +1736,5 @@ class BleServiceHelper private constructor() {
             }
         }
     }
+
 }

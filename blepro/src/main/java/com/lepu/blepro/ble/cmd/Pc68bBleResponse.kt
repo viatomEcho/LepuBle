@@ -162,27 +162,27 @@ class Pc68bBleResponse{
         }
 
         fun getTimeString(): String {
-            val monthStr = if (month < 9) {
+            val monthStr = if (month < 10) {
                 "0$month"
             } else {
                 "$month"
             }
-            val dayStr = if (day < 9) {
+            val dayStr = if (day < 10) {
                 "0$day"
             } else {
                 "$day"
             }
-            val hourStr = if (hour < 9) {
+            val hourStr = if (hour < 10) {
                 "0$hour"
             } else {
                 "$hour"
             }
-            val minuteStr = if (minute < 9) {
+            val minuteStr = if (minute < 10) {
                 "0$minute"
             } else {
                 "$minute"
             }
-            val secondStr = if (second < 9) {
+            val secondStr = if (second < 10) {
                 "0$second"
             } else {
                 "$second"

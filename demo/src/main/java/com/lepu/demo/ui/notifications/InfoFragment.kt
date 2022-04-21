@@ -114,7 +114,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             pc68bList.clear()
 
             fileType++
-            if (fileType > 2) {
+            if (fileType > 3) {
                 fileType = 0
             }
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
@@ -511,11 +511,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 readFile()
             })
         //---------------------------Pulsebit--------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitFileList)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileList)
             .observe(this, {
                 val data = it.data as PulsebitBleResponse.FileList
                 for (file in data.list) {
-                    fileNames.add(file.getTimeString())
+                    fileNames.add(file.fileName)
                 }
                 Toast.makeText(context, "Pulsebit 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 binding.info.text = data.toString()
@@ -544,6 +544,74 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 binding.process.text = "EventPulsebitReadFileError $data"
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadingFileProgress)
+            .observe(this, {
+                val data = it.data as Int
+                binding.process.text = readFileProcess + curFileName + " 读取进度:" + data.toString() + "%"
+            })
+
+        //---------------------------CheckmeLE--------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileList)
+            .observe(this, {
+                val data = it.data as CheckmeLeBleResponse.ListContent
+                when (data.type) {
+                    CheckmeLeBleCmd.ListType.DLC_TYPE -> {
+                        val list = CheckmeLeBleResponse.DlcList(data.content)
+                        for (file in list.list) {
+                            fileNames.add(file.recordName)
+                        }
+                        Toast.makeText(context, "CheckmeLE 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                        binding.info.text = list.toString()
+                    }
+                    CheckmeLeBleCmd.ListType.TEMP_TYPE -> {
+                        val list = CheckmeLeBleResponse.TempList(data.content)
+                        for (file in list.list) {
+                            fileNames.add(file.recordName)
+                        }
+                        Toast.makeText(context, "CheckmeLE 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                        binding.info.text = list.toString()
+                    }
+                    CheckmeLeBleCmd.ListType.ECG_TYPE -> {
+                        val list = CheckmeLeBleResponse.EcgList(data.content)
+                        for (file in list.list) {
+                            fileNames.add(file.recordName)
+                        }
+                        Toast.makeText(context, "CheckmeLE 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                        binding.info.text = list.toString()
+                    }
+                    CheckmeLeBleCmd.ListType.OXY_TYPE -> {
+                        val list = CheckmeLeBleResponse.OxyList(data.content)
+                        for (file in list.list) {
+                            fileNames.add(file.recordName)
+                        }
+                        Toast.makeText(context, "CheckmeLE 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                        binding.info.text = list.toString()
+                    }
+                }
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileListError)
+            .observe(this, {
+                val data = it.data as Boolean
+                binding.process.text = "EventCheckmeLeGetFileListError $data"
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileListProgress)
+            .observe(this, {
+                val data = it.data as Int
+                binding.process.text = "读取进度:$data%"
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadFileComplete)
+            .observe(this, {
+                val data = it.data as CheckmeLeBleResponse.EcgFile
+                setReceiveCmd(data.bytes)
+                readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n "
+                fileNames.removeAt(0)
+                readFile()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadFileError)
+            .observe(this, {
+                val data = it.data as Boolean
+                binding.process.text = "EventCheckmeLeReadFileError $data"
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadingFileProgress)
             .observe(this, {
                 val data = it.data as Int
                 binding.process.text = readFileProcess + curFileName + " 读取进度:" + data.toString() + "%"

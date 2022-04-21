@@ -1,6 +1,7 @@
 package com.lepu.blepro.utils;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -25,6 +26,19 @@ public class DateUtil {
     public static String stringFromDate(Date date, String formatString) {
         DateFormat df = new SimpleDateFormat(formatString);
         return df.format(date);
+    }
+
+    /**
+     * 获取精确毫秒的时间戳
+     */
+    public static long getSecondTimestamp(String time){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        try {
+            return sdf.parse(time).getTime()/1000;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 }

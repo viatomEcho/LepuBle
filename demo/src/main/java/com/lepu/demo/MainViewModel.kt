@@ -107,6 +107,8 @@ class MainViewModel: ViewModel() {
     val _pulsebitInfo = MutableLiveData<PulsebitBleResponse.DeviceInfo>()
     val pulsebitInfo: LiveData<PulsebitBleResponse.DeviceInfo> = _pulsebitInfo
 
+    val _checkmeLeInfo = MutableLiveData<CheckmeLeBleResponse.DeviceInfo>()
+    val checkmeLeInfo: LiveData<CheckmeLeBleResponse.DeviceInfo> = _checkmeLeInfo
 
     /**
      * 当前蓝牙

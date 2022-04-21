@@ -307,6 +307,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
 
     override fun syncTime() {
         sendCmd(setTime())
+        sendCmd(ecgDataDigit(2))
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
