@@ -145,6 +145,7 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
                         return
                     }
                     val data = PC80BleResponse.RtContinuousData(response.content)
+                    sendCmd(Pc80BleCmd.responseDataMess(data.seqNo, Pc80BleCmd.ACK))
                     LepuBleLog.d(tag, "model:$model,DATA_MESS => RtContinuousData $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bContinuousData).post(InterfaceEvent(model, data))
                 }

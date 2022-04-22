@@ -1,5 +1,6 @@
 package com.lepu.demo.ui.notifications
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -14,6 +15,7 @@ import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
+import com.lepu.demo.WaveEcgActivity
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.databinding.FragmentInfoBinding
@@ -146,7 +148,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         }
         // 暂停读取文件
         binding.pauseRf.setOnClickListener {
-
+            startActivity(Intent(context, WaveEcgActivity::class.java))
         }
         // 继续读取文件
         binding.continueRf.setOnClickListener {
@@ -515,7 +517,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this, {
                 val data = it.data as PulsebitBleResponse.FileList
                 for (file in data.list) {
-                    fileNames.add(file.fileName)
+                    fileNames.add(file.recordName)
                 }
                 Toast.makeText(context, "Pulsebit 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 binding.info.text = data.toString()

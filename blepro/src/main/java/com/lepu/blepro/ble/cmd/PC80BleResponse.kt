@@ -176,7 +176,7 @@ object PC80BleResponse {
         // 2(Structure-2)：表示ECG数据部分为ECG测量结果
         init {
             seqNo = (bytes[0].toUInt() and 0xFFu).toInt()
-            gain = getGain((bytes[2].toInt() and 0xF0) shr 4)
+            gain = getGain((bytes[2].toInt() and 0x70) shr 4)
             channel = (bytes[3].toInt() and 0xC0) shr 6
             measure = (bytes[3].toInt() and 0x30) shr 4
             stage = bytes[3].toInt() and 0x0F
