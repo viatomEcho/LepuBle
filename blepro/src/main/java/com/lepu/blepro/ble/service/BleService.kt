@@ -463,8 +463,6 @@ open class BleService: LifecycleService() {
         this.scanModel = scanModel
         this.isReconnectScan = isReconnecting
 
-        isDiscovery = true
-
         startScan?.cancel()
 
         startScan = GlobalScope.launch {
@@ -481,7 +479,6 @@ open class BleService: LifecycleService() {
     fun stopDiscover() {
         LepuBleLog.d(tag, "stopDiscover...")
         startScan?.cancel()
-        isDiscovery = false
         scanDevice(false)
     }
 
@@ -622,6 +619,7 @@ open class BleService: LifecycleService() {
                     isWaitingScanResult = true
                     LepuBleLog.d(tag, "scanDevice isWaitingScanResult = true")
                     leScanner?.startScan(null, settings, leScanCallback)
+                    isDiscovery = true
                     scanTimeout = GlobalScope.launch {
                         delay(10000)
                         startDiscover(scanModel, needPair, isReconnectScan)
@@ -636,6 +634,7 @@ open class BleService: LifecycleService() {
                         leScanner = bluetoothAdapter?.bluetoothLeScanner
                     }
                     leScanner?.stopScan(leScanCallback)
+                    isDiscovery = false
                     isWaitingScanResult = false
                     LepuBleLog.d(tag, "scanDevice isWaitingScanResult = false")
                 }
