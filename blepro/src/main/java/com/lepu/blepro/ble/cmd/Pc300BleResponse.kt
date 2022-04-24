@@ -263,33 +263,35 @@ object Pc300BleResponse {
     }
 
     @ExperimentalUnsignedTypes
-    class BsResult(val bytes: ByteArray) {
-        var type: Int  // 结果类型
-        var unit: Int  // 血糖单位
-        var data: Int  // 血糖值
-
-        // 结果类型
-        // 0 血糖结果正常
-        // 1 血糖结果偏低
-        // 2 血糖结果偏高
-        // 血糖单位
-        // 1 单位为mg/dL
-        // 0 单位为mmol/L
+    class GluResult(val bytes: ByteArray) {
+        var result: Int         // 结果类型 0：血糖结果正常，1：血糖结果偏低，2：血糖结果偏高
+        var resultMess: String
+        var unit: Int           // 血糖单位 0：mmol/L，1：mg/dL
+        var data: Float         // 血糖值
         init {
             var index = 0
-            type = (byte2UInt(bytes[index]) and 0x30) shr 4
+            result = (byte2UInt(bytes[index]) and 0x30) shr 4
+            resultMess = getResultMess(result)
             unit = byte2UInt(bytes[index]) and 0x01
             index++
             data = if (unit == 1) {
-                bytes2UIntBig(bytes[index], bytes[index+1])
+                bytes2UIntBig(bytes[index], bytes[index+1]).div(10f)
             } else {
-                bytesToHex(bytes.copyOfRange(index, index+2)).toInt().div(10)
+                bytesToHex(bytes.copyOfRange(index, index+2)).toInt().div(10f)
             }
         }
-
+        private fun getResultMess(result: Int): String {
+            return when (result) {
+                0 -> "血糖结果正常"
+                1 -> "血糖结果偏低"
+                2 -> "血糖结果偏高"
+                else -> ""
+            }
+        }
         override fun toString(): String {
             return """
-                type : $type
+                result : $result
+                resultMess : $resultMess
                 unit : $unit
                 data : $data
             """.trimIndent()
@@ -316,9 +318,10 @@ object Pc300BleResponse {
     }
 
     @ExperimentalUnsignedTypes
-    class RtEcgWave(val bytes: ByteArray) {
+    class RtEcgWave(val bytes: ByteArray, var gain: Float) {
         var seqNo: Int
-//        var digit: Int
+        var digit: Int
+        var tempData: Float
 //        var sign: Boolean
         var waveData: ByteArray
         var waveShortData: IntArray  // 0—4095
@@ -330,20 +333,32 @@ object Pc300BleResponse {
             seqNo = byte2UInt(bytes[index])
             index++
             waveData = bytes.copyOfRange(index, index+25*2)
+            digit = (byte2UInt(waveData[0]) and 0x80) shr 7
+            tempData = if (digit == 0) {  // 8bit
+//                gain = 394.div(3f)
+                128 * 1.div(gain)
+            } else {
+//                gain = 394.div(2f)
+                2048 * 1.div(gain)
+            }
             index += 50
             val len = waveData.size/2
             waveShortData = IntArray(len)
             wFs = FloatArray(len)
             for (i in 0 until len) {
-                waveShortData[i] = ((byte2UInt(waveData[i*2]) and 0x0F) shl 8) + byte2UInt(waveData[i*2+1])
-                wFs[i] = (waveShortData[i]-2048) * 1.div(394f)
+                waveShortData[i] = ((byte2UInt(waveData[i*2]) and 0x0F) shl 8) + byte2UInt(waveData[i*2+1])  // 12bit
+                wFs[i] = waveShortData[i] * 1.div(gain) - tempData
             }
+            // reserved hr
+            index++
             isProbeOff = ((byte2UInt(bytes[index]) and 0x80) shr 7) == 1
         }
 
         override fun toString(): String {
             return """
                 seqNo : $seqNo
+                digit : $digit
+                gain : $gain
                 waveData : ${bytesToHex(waveData)}
                 waveShortData : ${Arrays.toString(waveShortData)}
                 wFs : ${Arrays.toString(wFs)}

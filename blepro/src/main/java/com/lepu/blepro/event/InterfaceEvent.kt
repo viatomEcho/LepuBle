@@ -454,17 +454,20 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface PC300 {
         companion object {
+            const val EventPc300DeviceInfo = "com.lepu.ble.pc300.device.info"         // 设备信息 Pc300DeviceInfo
             const val EventPc300BpStart = "com.lepu.ble.pc300.bp.start"               // 血压开始测量 true
             const val EventPc300BpStop = "com.lepu.ble.pc300.bp.stop"                 // 血压停止测量 true
             const val EventPc300BpResult = "com.lepu.ble.pc300.bp.result"             // 血压测量结果 Pc300BleResponse.BpResult
             const val EventPc300BpErrorResult = "com.lepu.ble.pc300.bp.error.result"  // 血压测量错误结果 Pc300BleResponse.BpResultError
-            const val EventPc300RtBpData = "com.lepu.ble.pc300.bp.rtdata"             // 血压实时测量值 Pc300BleResponse.RtBpData
+            const val EventPc300RtBpData = "com.lepu.ble.pc300.bp.rtdata"             // 血压实时测量值 int
             const val EventPc300RtOxyWave = "com.lepu.ble.pc300.oxy.rtwave"           // 血氧实时波形包 Pc300BleResponse.RtOxyWave
             const val EventPc300RtOxyParam = "com.lepu.ble.pc300.oxy.rtparam"         // 血氧实时参数包 Pc300BleResponse.RtOxyParam
             const val EventPc300EcgStart = "com.lepu.ble.pc300.ecg.start"             // 心电开始测量 true
             const val EventPc300EcgStop = "com.lepu.ble.pc300.ecg.stop"               // 心电停止测量 true
             const val EventPc300RtEcgWave = "com.lepu.ble.pc300.ecg.rtwave"           // 心电实时波形包 Pc300BleResponse.RtEcgWave
             const val EventPc300RtEcgResult = "com.lepu.ble.pc300.ecg.rtresult"       // 心电实时结果 Pc300BleResponse.RtEcgResult
+            const val EventPc300GluResult = "com.lepu.ble.pc300.glu.result"           // 血糖结果 Pc300BleResponse.GluResult
+            const val EventPc300TempResult = "com.lepu.ble.pc300.temp.result"         // 血糖结果 Pc300BleResponse.TempResult
         }
     }
 

@@ -78,6 +78,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.aoj20aLayout.visibility = View.GONE
         binding.pc68bLayout.visibility = View.GONE
         binding.ad5Layout.visibility = View.GONE
+        binding.pc300Layout.visibility = View.GONE
         if (v == null) return
         v.visibility = View.VISIBLE
     }
@@ -146,6 +147,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_PC_68B -> {
                     setViewVisible(binding.pc68bLayout)
                     LpBleUtil.pc68bGetConfig(it.modelNo)
+                }
+                Bluetooth.MODEL_VTM_AD5 -> {
+                    setViewVisible(binding.ad5Layout)
+                }
+                Bluetooth.MODEL_PC300 -> {
+                    setViewVisible(binding.pc300Layout)
                 }
                 else -> {
                     setViewVisible(null)
@@ -834,7 +841,94 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             } else {
                 "使能关"
             }
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
         }
+
+        //----------------------pc300--------------------
+        binding.pc300StartEcg.setOnClickListener {
+            LpBleUtil.startEcg(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.pc300StopEcg.setOnClickListener {
+            LpBleUtil.stopEcg(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.pc300SetDigit.setOnClickListener {
+            // 1:8bit 2:12bit
+            state++
+            if (state > 2) {
+                state = 1
+            }
+            LpBleUtil.pc300SetEcgDataDigit(Constant.BluetoothConfig.currentModel[0], state)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        /*binding.pc300SetGluUnit.setOnClickListener {
+            state++
+            if (state > Pc300BleCmd.GluUnit.MG_DL) {
+                state = Pc300BleCmd.GluUnit.MMOL_L
+            }
+            LpBleUtil.pc300SetGluUnit(Constant.BluetoothConfig.currentModel[0], state)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.pc300SetId.setOnClickListener {
+            state++
+            LpBleUtil.pc300SetDeviceId(Constant.BluetoothConfig.currentModel[0], state)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.pc300GetId.setOnClickListener {
+            LpBleUtil.pc300GetDeviceId(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }*/
+        binding.pc300SetBsType.setOnClickListener {
+            state++
+            if (state > Pc300BleCmd.GlucometerType.ON_CALL_SURE_SYNC) {
+                state = Pc300BleCmd.GlucometerType.AI_AO_LE
+            }
+            LpBleUtil.pc300SetGlucometerType(Constant.BluetoothConfig.currentModel[0], state)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.pc300GetBsType.setOnClickListener {
+            LpBleUtil.pc300GetGlucometerType(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        /*binding.pc300SetTempMode.setOnClickListener {
+                state++
+                if (state > Pc300BleCmd.TempMode.OBJECT_F) {
+                state = Pc300BleCmd.TempMode.EAR_C
+            }
+            LpBleUtil.pc300SetTempMode(Constant.BluetoothConfig.currentModel[0], state)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.pc300GetTempMode.setOnClickListener {
+            LpBleUtil.pc300GetTempMode(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.pc300SetBpMode.setOnClickListener {
+            state++
+            if (state > Pc300BleCmd.BpMode.CHILD_MODE) {
+                state = Pc300BleCmd.BpMode.ADULT_MODE
+            }
+            LpBleUtil.pc300SetBpMode(Constant.BluetoothConfig.currentModel[0], state)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.pc300GetBpMode.setOnClickListener {
+            LpBleUtil.pc300GetBpMode(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }*/
+
     }
 
     private fun setReceiveCmd(bytes: ByteArray) {

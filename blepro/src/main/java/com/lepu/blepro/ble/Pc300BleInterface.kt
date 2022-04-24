@@ -6,6 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.Pc300BleCmd.*
 import com.lepu.blepro.ble.cmd.*
+import com.lepu.blepro.ble.data.Pc300DeviceInfo
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
@@ -21,6 +22,8 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Pc300BleInterface"
 
     private lateinit var context: Context
+    private var gain = 394f
+    private var pc300Device = Pc300DeviceInfo()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
@@ -51,10 +54,12 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                     }
                     GET_DEVICE_ID -> {
                         val data = toUInt(response.content)
+                        pc300Device.deviceId = data
                         LepuBleLog.d(tag, "model:$model,GET_DEVICE_ID 查询产品 ID => success $data")
                     }
                     GET_DEVICE_NAME -> {
                         val data = trimStr(toString(response.content))
+                        pc300Device.deviceName = data
                         LepuBleLog.d(tag, "model:$model,GET_DEVICE_NAME 查询产品名称 => success $data")
                     }
                     DEVICE_INFO_2 -> {
@@ -63,9 +68,14 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                     }
                     DEVICE_INFO_4 -> {
                         val data = Pc300BleResponse.DeviceInfo(response.content)
+                        pc300Device.softwareV = data.softwareV
+                        pc300Device.hardwareV = data.hardwareV
+                        pc300Device.batLevel = data.batLevel
                         LepuBleLog.d(tag, "model:$model,DEVICE_INFO_4 查询版本及电量等级 => success $data")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300DeviceInfo).post(InterfaceEvent(model, pc300Device))
                     }
                     SET_TIME -> {
+                        syncTime()
                         LepuBleLog.d(tag, "model:$model,SET_TIME 设置时间 => success ${bytesToHex(response.content)}")
                     }
                 }
@@ -92,7 +102,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
             }
             TOKEN_0X42 -> {
                 val data = Pc300BleResponse.RtBpData(response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtBpData).post(InterfaceEvent(model, data))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtBpData).post(InterfaceEvent(model, data.psValue))
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X42 血压当前值和心跳信息 => success $data")
             }
             TOKEN_0X43 -> {
@@ -152,18 +162,22 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 when (response.type) {
                     TEMP_RESULT -> {
                         val data = Pc300BleResponse.TempResult(response.content)
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300TempResult).post(InterfaceEvent(model, data))
                         LepuBleLog.d(tag, "model:$model,TEMP_RESULT 体温测量结果 => success $data")
                     }
-                    SET_TEMP_CONFIG -> {
-                        LepuBleLog.d(tag, "model:$model,SET_TEMP_CONFIG 配置体温计参数 => success ${bytesToHex(response.content)}")
+                    SET_TEMP_MODE -> {
+                        LepuBleLog.d(tag, "model:$model,SET_TEMP_MODE 配置体温计参数 => success ${bytesToHex(response.content)}")
                     }
-                    GET_TEMP_CONFIG -> {
-                        LepuBleLog.d(tag, "model:$model,GET_TEMP_CONFIG 查询体温计参数 => success ${bytesToHex(response.content)}")
+                    GET_TEMP_MODE -> {
+                        LepuBleLog.d(tag, "model:$model,GET_TEMP_MODE 查询体温计参数 => success ${bytesToHex(response.content)}")
                     }
                 }
             }
             TOKEN_0X73 -> {
-                val data = Pc300BleResponse.BsResult(response.content)
+                val data = Pc300BleResponse.GluResult(response.content)
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300GluResult).post(
+                    InterfaceEvent(model, data)
+                )
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X73 血糖结果 => success $data")
             }
             TOKEN_0XE0 -> {
@@ -176,7 +190,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
             }
             TOKEN_0XE2 -> {
                 val data = bytes2UIntBig(response.content[0], response.content[1])
-                LepuBleLog.d(tag, "model:$model,TOKEN_0XE2 => success ${bytesToHex(response.content)}")
+                LepuBleLog.d(tag, "model:$model,TOKEN_0XE2 => success ${response.type}")
                 when (response.type) {
                     GLU_RESULT -> {
                         LepuBleLog.d(tag, "model:$model,GLU_RESULT 血糖 => success $data")
@@ -194,7 +208,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0XE3 设置下位机血糖仪类型 => success $data")
             }
             TOKEN_0XE4 -> {
-                LepuBleLog.d(tag, "model:$model,TOKEN_0XE4 查询下位机当前配置的血糖仪类型 => success ${bytesToHex(response.content)}")
+                LepuBleLog.d(tag, "model:$model,TOKEN_0XE4 查询下位机当前配置的血糖仪类型 => success ${response.type}")
             }
             TOKEN_0XE5 -> {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0XE5 清除血糖历史数据 => success ${bytesToHex(response.content)}")
@@ -229,7 +243,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 }
             }
             TOKEN_0X32 -> {
-                val data = Pc300BleResponse.RtEcgWave(response.content)
+                val data = Pc300BleResponse.RtEcgWave(response.content, gain)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtEcgWave).post(
                     InterfaceEvent(model, data)
                 )
@@ -241,6 +255,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X33 心电结果上传参数 => success $data")
             }
             TOKEN_0X34 -> {
+                gain = bytes2UIntBig(response.content[0], response.content[1]).toFloat()
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X34 设备硬件增益 => success ${bytesToHex(response.content)}")
             }
         }
@@ -294,35 +309,23 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getInfo() {
-        sendCmd(getVersion())
+        getDeviceId()
         sendCmd(getDeviceName())
-        sendCmd(getDeviceId())
-        sendCmd(getDeviceInfoFf2())
         sendCmd(getDeviceInfoFf4())
-        sendCmd(getDeviceInfo51())
-        sendCmd(getGlucometerType())
-        sendCmd(getBpMode())
-        sendCmd(getTempConfig())
     }
 
     override fun syncTime() {
         sendCmd(setTime())
-        sendCmd(ecgDataDigit(2))
+        setGlucometerType(GlucometerType.AI_AO_LE)
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
     }
 
     override fun getRtData() {
-//        sendCmd(ecgRtState())
-//        sendCmd(Pc300BleCmd.ecgDataDigit(1))
     }
 
     override fun getFileList() {
-        setDeviceId(18)
-        setBpMode(BpMode.ADULT_MODE)
-        setBsUnit(BsUnit.MMOL_L)
-        setGlucometerType(GlucometerType.ON_CALL_SURE_SYNC)
     }
 
     fun startEcg() {
@@ -330,6 +333,36 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
     }
     fun stopEcg() {
         sendCmd(Pc300BleCmd.stopEcg())
+    }
+    fun setBpMode(mode: Int) {
+        sendCmd(Pc300BleCmd.setBpMode(mode))
+    }
+    fun getBpMode() {
+        sendCmd(Pc300BleCmd.getBpMode())
+    }
+    fun setTempMode(mode: Int) {
+        sendCmd(Pc300BleCmd.setTempMode(mode))
+    }
+    fun getTempMode() {
+        sendCmd(Pc300BleCmd.getTempMode())
+    }
+    fun getGlucometerType() {
+        sendCmd(Pc300BleCmd.getGlucometerType())
+    }
+    fun setGlucometerType(type: Int) {
+        sendCmd(Pc300BleCmd.setGlucometerType(type))
+    }
+    fun setDeviceId(id: Int) {
+        sendCmd(Pc300BleCmd.setDeviceId(id))
+    }
+    fun getDeviceId() {
+        sendCmd(Pc300BleCmd.getDeviceId())
+    }
+    fun setEcgDataDigit(digit: Int) {
+        sendCmd(ecgDataDigit(digit))
+    }
+    fun setGluUnit(unit: Int) {
+        sendCmd(Pc300BleCmd.setGluUnit(unit))
     }
 
 }

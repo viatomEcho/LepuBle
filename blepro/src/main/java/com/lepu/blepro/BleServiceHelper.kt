@@ -1737,4 +1737,122 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    fun startEcg(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_PC300 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Pc300BleInterface).let {
+                        LepuBleLog.d(tag, "it as Pc300BleInterface--startEcg")
+                        it.startEcg()
+                    }
+                }
+            }
+        }
+    }
+    fun stopEcg(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_PC300 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Pc300BleInterface).let {
+                        LepuBleLog.d(tag, "it as Pc300BleInterface--stopEcg")
+                        it.stopEcg()
+                    }
+                }
+            }
+        }
+    }
+    fun pc300SetEcgDataDigit(model: Int, digit: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc300BleInterface).let {
+                LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetEcgDataDigit")
+                it.setEcgDataDigit(digit)
+            }
+        }
+    }
+    /*fun pc300SetGluUnit(model: Int, unit: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc300BleInterface).let {
+                LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetGluUnit")
+                it.setGluUnit(unit)
+            }
+        }
+    }
+    fun pc300SetDeviceId(model: Int, id: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc300BleInterface).let {
+                LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetDeviceId")
+                it.setDeviceId(id)
+            }
+        }
+    }
+    fun pc300GetDeviceId(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc300BleInterface).let {
+                LepuBleLog.d(tag, "it as Pc300BleInterface--pc300GetDeviceId")
+                it.getDeviceId()
+            }
+        }
+    }*/
+    fun pc300SetGlucometerType(model: Int, type: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc300BleInterface).let {
+                LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetGlucometerType")
+                it.setGlucometerType(type)
+            }
+        }
+    }
+    fun pc300GetGlucometerType(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc300BleInterface).let {
+                LepuBleLog.d(tag, "it as Pc300BleInterface--pc300GetGlucometerType")
+                it.getGlucometerType()
+            }
+        }
+    }
+    /*fun pc300SetTempMode(model: Int, mode: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc300BleInterface).let {
+                LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetTempMode")
+                it.setTempMode(mode)
+            }
+        }
+    }
+    fun pc300GetTempMode(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc300BleInterface).let {
+                LepuBleLog.d(tag, "it as Pc300BleInterface--pc300GetTempMode")
+                it.getTempMode()
+            }
+        }
+    }
+    fun pc300SetBpMode(model: Int, mode: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc300BleInterface).let {
+                LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetBpMode")
+                it.setBpMode(mode)
+            }
+        }
+    }
+    fun pc300GetBpMode(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc300BleInterface).let {
+                LepuBleLog.d(tag, "it as Pc300BleInterface--pc300GetBpMode")
+                it.getBpMode()
+            }
+        }
+    }*/
+
+
 }

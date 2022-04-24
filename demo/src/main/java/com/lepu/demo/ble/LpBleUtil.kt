@@ -258,6 +258,9 @@ class LpBleUtil {
         fun setBleMtu(model: Int, mtu: Int) {
             BleServiceHelper.setBleMtu(model, mtu)
         }
+        fun setTime(model: Int) {
+            BleServiceHelper.syncTime(model)
+        }
 
         /**
          *
@@ -765,6 +768,43 @@ class LpBleUtil {
                 BleServiceHelper.pc68bGetTime(model)
             }
         }
+        
+        fun startEcg(model: Int) {
+            BleServiceHelper.startEcg(model)
+        }
+        fun stopEcg(model: Int) {
+            BleServiceHelper.stopEcg(model)
+        }
+        fun pc300SetEcgDataDigit(model: Int, digit: Int) {
+            BleServiceHelper.pc300SetEcgDataDigit(model, digit)
+        }
+        /*fun pc300SetGluUnit(model: Int, unit: Int) {
+            BleServiceHelper.pc300SetGluUnit(model, unit)
+        }
+        fun pc300SetDeviceId(model: Int, id: Int) {
+            BleServiceHelper.pc300SetDeviceId(model, id)
+        }
+        fun pc300GetDeviceId(model: Int) {
+            BleServiceHelper.pc300GetDeviceId(model)
+        }*/
+        fun pc300SetGlucometerType(model: Int, type: Int) {
+            BleServiceHelper.pc300SetGlucometerType(model, type)
+        }
+        fun pc300GetGlucometerType(model: Int) {
+            BleServiceHelper.pc300GetGlucometerType(model)
+        }
+        /*fun pc300SetTempMode(model: Int, mode: Int) {
+            BleServiceHelper.pc300SetTempMode(model, mode)
+        }
+        fun pc300GetTempMode(model: Int) {
+            BleServiceHelper.pc300GetTempMode(model)
+        }
+        fun pc300SetBpMode(model: Int, mode: Int) {
+            BleServiceHelper.pc300SetBpMode(model, mode)
+        }
+        fun pc300GetBpMode(model: Int) {
+            BleServiceHelper.pc300GetBpMode(model)
+        }*/
 
     }
 

@@ -5,7 +5,7 @@ import com.lepu.blepro.utils.CrcUtil;
 
 import java.util.Date;
 
-import static com.lepu.blepro.utils.ByteArrayKt.int2ByteArrayBig;
+import static com.lepu.blepro.utils.ByteArrayKt.int2ByteArray;
 
 /**
  * @author chenyongfeng
@@ -49,8 +49,8 @@ public class Pc300BleCmd {
 
     public static final int TOKEN_0X72 = 0x72;
     public static final int TEMP_RESULT = 0x01;      // 体温测量结果
-    public static final int SET_TEMP_CONFIG = 0x02;  // 配置体温计参数
-    public static final int GET_TEMP_CONFIG = 0x03;  // 查询体温计参数
+    public static final int SET_TEMP_MODE = 0x02;  // 配置体温计参数
+    public static final int GET_TEMP_MODE = 0x03;  // 查询体温计参数
 
     public static final int TOKEN_0X73 = 0x73;       // 血糖结果
 
@@ -110,7 +110,7 @@ public class Pc300BleCmd {
         return getReq(TOKEN_0XFF, GET_DEVICE_ID, new byte[0]);
     }
     public static byte[] setDeviceId(int id) {
-        return getReq(TOKEN_0XFF, SET_DEVICE_ID, int2ByteArrayBig(id));
+        return getReq(TOKEN_0XFF, SET_DEVICE_ID, int2ByteArray(id));
     }
     public static byte[] setTime() {
         TimeData timeData = new TimeData(new Date());
@@ -138,17 +138,27 @@ public class Pc300BleCmd {
     public static byte[] getTempResult() {
         return getReq(TOKEN_0X72, TEMP_RESULT, new byte[0]);
     }
-    public static byte[] setTempConfig(int unit) {
-        return getReq(TOKEN_0X72, SET_TEMP_CONFIG, new byte[]{(byte)unit});
+    public static class TempMode {
+        public static final int EAR_C = 0x11;
+        public static final int ADULT_HEAD_C = 0x21;
+        public static final int CHILD_HEAD_C = 0x31;
+        public static final int OBJECT_C = 0x41;
+        public static final int EAR_F = 0x12;
+        public static final int ADULT_HEAD_F = 0x22;
+        public static final int CHILD_HEAD_F = 0x32;
+        public static final int OBJECT_F = 0x42;
     }
-    public static byte[] getTempConfig() {
-        return getReq(TOKEN_0X72, GET_TEMP_CONFIG, new byte[0]);
+    public static byte[] setTempMode(int mode) {
+        return getReq(TOKEN_0X72, SET_TEMP_MODE, new byte[]{(byte)mode});
+    }
+    public static byte[] getTempMode() {
+        return getReq(TOKEN_0X72, GET_TEMP_MODE, new byte[0]);
     }
 
     public static class GlucometerType {
-        public static final int AI_AO_LE = 0;
-        public static final int BAI_JIE = 1;
-        public static final int ON_CALL_SURE_SYNC = 2;
+        public static final int AI_AO_LE = 1;
+        public static final int BAI_JIE = 2;
+        public static final int ON_CALL_SURE_SYNC = 3;
     }
     public static byte[] setGlucometerType(int type) {
         return getReq(TOKEN_0XE3, type, new byte[]{0});
@@ -157,11 +167,11 @@ public class Pc300BleCmd {
         return getReq(TOKEN_0XE4, 0x01, new byte[0]);
     }
 
-    public static class BsUnit {
+    public static class GluUnit {
         public static final int MMOL_L = 0;
         public static final int MG_DL = 1;
     }
-    public static byte[] setBsUnit(int unit) {
+    public static byte[] setGluUnit(int unit) {
         return getReq(TOKEN_0XE0, BS_UNIT, new byte[]{(byte)unit});
     }
     public static byte[] deleteFile() {

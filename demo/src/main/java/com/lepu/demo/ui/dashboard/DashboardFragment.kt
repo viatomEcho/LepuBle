@@ -671,6 +671,30 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val data = it.data as Pc300BleResponse.RtEcgWave
                 DataController.receive(data.wFs)
             })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtBpData)
+            .observe(this, {
+                val data = it.data as Int
+                viewModel.ps.value = data
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300BpResult)
+            .observe(this, {
+                val data = it.data as Pc300BleResponse.BpResult
+                viewModel.sys.value = data.sys
+                viewModel.dia.value = data.dia
+                viewModel.mean.value = data.map
+                viewModel.bpPr.value = data.plus
+                binding.dataStr.text = "$data"
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300BpErrorResult)
+            .observe(this, {
+                val data = it.data as Pc300BleResponse.BpResultError
+                binding.dataStr.text = "$data"
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300GluResult)
+            .observe(this, {
+                val data = it.data as Pc300BleResponse.GluResult
+                binding.dataStr.text = "$data"
+            })
     }
 
     var oxyPpgSize = 0

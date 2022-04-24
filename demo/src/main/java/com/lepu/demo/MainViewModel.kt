@@ -110,6 +110,9 @@ class MainViewModel: ViewModel() {
     val _checkmeLeInfo = MutableLiveData<CheckmeLeBleResponse.DeviceInfo>()
     val checkmeLeInfo: LiveData<CheckmeLeBleResponse.DeviceInfo> = _checkmeLeInfo
 
+    val _pc300Info = MutableLiveData<Pc300DeviceInfo>()
+    val pc300Info: LiveData<Pc300DeviceInfo> = _pc300Info
+
     /**
      * 当前蓝牙
      */
