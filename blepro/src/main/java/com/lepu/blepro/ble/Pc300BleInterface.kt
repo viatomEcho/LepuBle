@@ -204,8 +204,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 }
             }
             TOKEN_0XE3 -> {
-                val data = toUInt(response.content)
-                LepuBleLog.d(tag, "model:$model,TOKEN_0XE3 设置下位机血糖仪类型 => success $data")
+                LepuBleLog.d(tag, "model:$model,TOKEN_0XE3 设置下位机血糖仪类型 => success ${response.type}")
             }
             TOKEN_0XE4 -> {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0XE4 查询下位机当前配置的血糖仪类型 => success ${response.type}")
@@ -217,10 +216,12 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X30 => success ${bytesToHex(response.content)}")
                 when (response.type) {
                     ECG_START -> {
+//                        setEcgDataDigit(1)
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300EcgStart).post(InterfaceEvent(model, true))
                         LepuBleLog.d(tag, "model:$model,ECG_START 心电开始测量命令 => success ${bytesToHex(response.content)}")
                     }
                     ECG_STOP -> {
+                        setEcgDataDigit(2)
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300EcgStop).post(InterfaceEvent(model, true))
                         LepuBleLog.d(tag, "model:$model,ECG_STOP 心电停止测量命令 => success ${bytesToHex(response.content)}")
                     }
@@ -250,8 +251,8 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X32 心电波形上传数据 => success $data")
             }
             TOKEN_0X33 -> {
-                val data = Pc300BleResponse.RtEcgResult(response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtEcgResult).post(InterfaceEvent(model, data))
+                val data = Pc300BleResponse.EcgResult(response.content)
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300EcgResult).post(InterfaceEvent(model, data))
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X33 心电结果上传参数 => success $data")
             }
             TOKEN_0X34 -> {
@@ -312,11 +313,14 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
         getDeviceId()
         sendCmd(getDeviceName())
         sendCmd(getDeviceInfoFf4())
+        setGlucometerType(GlucometerType.AI_AO_LE)
+        setEcgDataDigit(2)
     }
 
     override fun syncTime() {
         sendCmd(setTime())
         setGlucometerType(GlucometerType.AI_AO_LE)
+        setEcgDataDigit(2)
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
@@ -329,6 +333,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
     }
 
     fun startEcg() {
+        setEcgDataDigit(2)
         sendCmd(Pc300BleCmd.startEcg())
     }
     fun stopEcg() {

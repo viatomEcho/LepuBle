@@ -465,7 +465,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventPc300EcgStart = "com.lepu.ble.pc300.ecg.start"             // 心电开始测量 true
             const val EventPc300EcgStop = "com.lepu.ble.pc300.ecg.stop"               // 心电停止测量 true
             const val EventPc300RtEcgWave = "com.lepu.ble.pc300.ecg.rtwave"           // 心电实时波形包 Pc300BleResponse.RtEcgWave
-            const val EventPc300RtEcgResult = "com.lepu.ble.pc300.ecg.rtresult"       // 心电实时结果 Pc300BleResponse.RtEcgResult
+            const val EventPc300EcgResult = "com.lepu.ble.pc300.ecg.result"           // 心电实时结果 Pc300BleResponse.EcgResult
             const val EventPc300GluResult = "com.lepu.ble.pc300.glu.result"           // 血糖结果 Pc300BleResponse.GluResult
             const val EventPc300TempResult = "com.lepu.ble.pc300.temp.result"         // 血糖结果 Pc300BleResponse.TempResult
         }

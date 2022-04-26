@@ -17,6 +17,8 @@ public class CheckmeLeEcgDiagnosis {
     private boolean isHighSt = false;
     // Low ST Value
     private boolean isLowSt = false;
+    // Suspected Premature Beat
+    private boolean isPrematureBeat = false;
 
     public CheckmeLeEcgDiagnosis() {
 
@@ -32,25 +34,27 @@ public class CheckmeLeEcgDiagnosis {
         if (result == 0xFF) {
             isPoorSignal = true;
         } else {
-            if ((result & 0x04) == 0x04) {
-                isIrregular = true;
-            }
-            if ((result & 0x08) == 0x08) {
+            if ((result & 0x01) == 0x01) {
                 isHighHr = true;
             }
-            if ((result & 0x10) == 0x10) {
+            if ((result & 0x02) == 0x02) {
                 isLowHr = true;
             }
-            if ((result & 0x20) == 0x20) {
+            if ((result & 0x04) == 0x04) {
                 isHighQrs = true;
             }
-            if ((result & 0x40) == 0x40) {
+            if ((result & 0x08) == 0x08) {
                 isHighSt = true;
             }
-            if ((result & 0x80) == 0x80) {
+            if ((result & 0x10) == 0x10) {
                 isLowSt = true;
             }
-
+            if ((result & 0x20) == 0x20) {
+                isIrregular = true;
+            }
+            if ((result & 0x40) == 0x40) {
+                isPrematureBeat = true;
+            }
         }
 
     }
@@ -80,6 +84,9 @@ public class CheckmeLeEcgDiagnosis {
         }
         if (isPoorSignal) {
             str += "Unable to analyze; ";
+        }
+        if (isPrematureBeat) {
+            str += "Suspected Premature Beat; ";
         }
         return str;
     }
@@ -146,6 +153,14 @@ public class CheckmeLeEcgDiagnosis {
 
     public void setLowSt(boolean lowSt) {
         isLowSt = lowSt;
+    }
+
+    public boolean isPrematureBeat() {
+        return isPrematureBeat;
+    }
+
+    public void setPrematureBeat(boolean prematureBeat) {
+        isPrematureBeat = prematureBeat;
     }
 
     @Override

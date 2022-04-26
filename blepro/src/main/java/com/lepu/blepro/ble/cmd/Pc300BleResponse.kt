@@ -335,10 +335,10 @@ object Pc300BleResponse {
             waveData = bytes.copyOfRange(index, index+25*2)
             digit = (byte2UInt(waveData[0]) and 0x80) shr 7
             tempData = if (digit == 0) {  // 8bit
-//                gain = 394.div(3f)
+                gain = 28.5f
                 128 * 1.div(gain)
             } else {
-//                gain = 394.div(2f)
+//                gain = 394f
                 2048 * 1.div(gain)
             }
             index += 50
@@ -368,7 +368,7 @@ object Pc300BleResponse {
     }
 
     @ExperimentalUnsignedTypes
-    class RtEcgResult(val bytes: ByteArray) {
+    class EcgResult(val bytes: ByteArray) {
         var result: Int
         var resultMess: String
         var hr: Int
@@ -406,7 +406,7 @@ object Pc300BleResponse {
 
         override fun toString(): String {
             return """
-                RtEcgResult
+                EcgResult
                 result : $result
                 resultMess : $resultMess
                 hr : $hr

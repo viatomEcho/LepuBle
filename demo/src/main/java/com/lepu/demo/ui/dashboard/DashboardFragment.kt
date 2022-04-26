@@ -695,6 +695,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val data = it.data as Pc300BleResponse.GluResult
                 binding.dataStr.text = "$data"
             })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300EcgStart)
+            .observe(this, {
+                LpBleUtil.startRtTask()
+            })
     }
 
     var oxyPpgSize = 0
@@ -785,9 +789,15 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         })
         binding.startRtEcg.setOnClickListener {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300) {
+                LpBleUtil.startEcg(Constant.BluetoothConfig.currentModel[0])
+            }
             LpBleUtil.startRtTask()
         }
         binding.stopRtEcg.setOnClickListener {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300) {
+                LpBleUtil.stopEcg(Constant.BluetoothConfig.currentModel[0])
+            }
             // 停止实时任务后去获取设备列表
             LpBleUtil.stopRtTask {
                 LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0])

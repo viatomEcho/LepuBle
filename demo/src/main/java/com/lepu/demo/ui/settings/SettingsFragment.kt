@@ -846,16 +846,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
 
         //----------------------pc300--------------------
-        binding.pc300StartEcg.setOnClickListener {
-            LpBleUtil.startEcg(Constant.BluetoothConfig.currentModel[0])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.pc300StopEcg.setOnClickListener {
-            LpBleUtil.stopEcg(Constant.BluetoothConfig.currentModel[0])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
         binding.pc300SetDigit.setOnClickListener {
             // 1:8bit 2:12bit
             state++

@@ -741,21 +741,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <Button
-                        android:id="@+id/pc300_start_ecg"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="心电开始测量"/>
-                    <Button
-                        android:id="@+id/pc300_stop_ecg"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="心电停止测量"
-                        android:layout_marginStart="20dp"/>
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <Button
                         android:id="@+id/pc300_set_digit"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
