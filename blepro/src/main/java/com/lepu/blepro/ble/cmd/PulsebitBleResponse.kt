@@ -4,6 +4,7 @@ import com.lepu.blepro.ble.data.ExEcgDiagnosis
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.ByteUtils.toSignedShort
 import com.lepu.blepro.utils.bytesToHex
+import com.lepu.blepro.utils.bytesToSignedShort
 import com.lepu.blepro.utils.toUInt
 import org.json.JSONObject
 import java.util.*
@@ -93,7 +94,7 @@ class PulsebitBleResponse{
         var recordingTime: Int         // 记录时长 s
         var waveDataSize: Int          // 波形数据大小（byte）
         var hr: Int                    // 诊断结果：HR，单位为bpm
-        var st: Int                    // 诊断结果：ST（以ST/100存储），单位为mV(内部导联写0)
+        var st: Float                  // 诊断结果：ST（以ST/100存储），单位为mV(内部导联写0)
         var qrs: Int                   // 诊断结果：QRS，单位为ms
         var pvcs: Int                  // 诊断结果：PVCs(内部导联写0)
         var qtc: Int                   // 诊断结果：QTc单位为ms
@@ -117,7 +118,7 @@ class PulsebitBleResponse{
             index += 4
             hr = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
-            st = toUInt(bytes.copyOfRange(index, index+2))
+            st = bytesToSignedShort(bytes[index], bytes[index+1]).div(100f)
             index += 2
             qrs = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
