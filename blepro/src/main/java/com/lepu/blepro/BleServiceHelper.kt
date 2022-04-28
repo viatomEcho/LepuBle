@@ -1731,7 +1731,7 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         getInterface(model)?.let { it1 ->
             (it1 as Ad5FhrBleInterface).let {
-                LepuBleLog.d(tag, "it as VtmFhrBleInterface--ad5EnableRtData")
+                LepuBleLog.d(tag, "it as Ad5FhrBleInterface--ad5EnableRtData")
                 it.enableRtData(enable)
             }
         }
