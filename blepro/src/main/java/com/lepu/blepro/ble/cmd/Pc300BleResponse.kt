@@ -274,10 +274,14 @@ object Pc300BleResponse {
             resultMess = getResultMess(result)
             unit = byte2UInt(bytes[index]) and 0x01
             index++
-            data = if (unit == 1) {
-                bytes2UIntBig(bytes[index], bytes[index+1]).div(10f)
+            data = if (bytes.size > 2) {
+                if (unit == 1) {
+                    bytes2UIntBig(bytes[index], bytes[index+1]).div(10f)
+                } else {
+                    bytesToHex(bytes.copyOfRange(index, index+2)).toInt().div(10f)
+                }
             } else {
-                bytesToHex(bytes.copyOfRange(index, index+2)).toInt().div(10f)
+                0f
             }
         }
         private fun getResultMess(result: Int): String {

@@ -63,10 +63,16 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,GET_DEVICE_NAME 查询产品名称 => success $data")
                     }
                     DEVICE_INFO_2 -> {
+                        if (response.content.isEmpty() || response.content.size < 2) return
                         val data = Pc300BleResponse.DeviceInfo(response.content)
+                        pc300Device.softwareV = data.softwareV
+                        pc300Device.hardwareV = data.hardwareV
+                        pc300Device.batLevel = data.batLevel
                         LepuBleLog.d(tag, "model:$model,DEVICE_INFO_2 查询版本及电量等级 => success $data")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300DeviceInfo).post(InterfaceEvent(model, pc300Device))
                     }
                     DEVICE_INFO_4 -> {
+                        if (response.content.isEmpty() || response.content.size < 2) return
                         val data = Pc300BleResponse.DeviceInfo(response.content)
                         pc300Device.softwareV = data.softwareV
                         pc300Device.hardwareV = data.hardwareV
@@ -101,6 +107,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 }
             }
             TOKEN_0X42 -> {
+                if (response.content.isEmpty() || response.content.size < 2) return
                 val data = Pc300BleResponse.RtBpData(response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtBpData).post(InterfaceEvent(model, data.psValue))
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X42 血压当前值和心跳信息 => success $data")
@@ -109,11 +116,13 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X43 => success ${bytesToHex(response.content)}")
                 when (response.type) {
                     BP_RESULT -> {
+                        if (response.content.isEmpty() || response.content.size < 5) return
                         val data = Pc300BleResponse.BpResult(response.content)
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300BpResult).post(InterfaceEvent(model, data))
                         LepuBleLog.d(tag, "model:$model,BP_RESULT 血压测量结果 => success $data")
                     }
                     BP_ERROR_RESULT -> {
+                        if (response.content.isEmpty()) return
                         val data = Pc300BleResponse.BpResultError(response.content)
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300BpErrorResult).post(InterfaceEvent(model, data))
                         LepuBleLog.d(tag, "model:$model,BP_ERROR_RESULT 血压测量出现的错误结果 => success $data")
@@ -124,10 +133,12 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X51 => success ${bytesToHex(response.content)}")
                 when (response.type) {
                     OXY_RT_STATE -> {
+                        if (response.content.isEmpty()) return
                         val data = Pc300BleResponse.RtOxyState(response.content)
                         LepuBleLog.d(tag, "model:$model,OXY_RT_STATE 血氧上传状态数据包 => success $data")
                     }
                     DEVICE_INFO -> {
+                        if (response.content.isEmpty() || response.content.size < 2) return
                         val data = Pc300BleResponse.DeviceInfo(response.content)
                         LepuBleLog.d(tag, "model:$model,DEVICE_INFO 查询产品版本及电量等级 => success $data")
                     }
@@ -140,6 +151,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,DISABLE_WAVE 禁止主动发送数据 => success ${bytesToHex(response.content)}")
                     }
                     ENABLE_WAVE -> {
+                        if (response.content.isEmpty() || response.content.size < 2) return
                         val data = Pc300BleResponse.RtOxyWave(response.content)
                         LepuBleLog.d(tag, "model:$model,ENABLE_WAVE 允许主动发送数据 => success ${bytesToHex(data.bytes)}")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtOxyWave).post(InterfaceEvent(model, data))
@@ -147,6 +159,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 }
             }
             TOKEN_0X53 -> {
+                if (response.content.isEmpty() || response.content.size < 5) return
                 val data = Pc300BleResponse.RtOxyParam(response.content)
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X53 血氧上传参数数据包 => success $data")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtOxyParam).post(
@@ -154,6 +167,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 )
             }
             TOKEN_0X70 -> {
+                if (response.content.isEmpty()) return
                 val data = (byte2UInt(response.content[0]) and 0x40) shr 5
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X70 体温开始测量命令 => success $data")
             }
@@ -161,6 +175,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X72 => success ${bytesToHex(response.content)}")
                 when (response.type) {
                     TEMP_RESULT -> {
+                        if (response.content.isEmpty()) return
                         val data = Pc300BleResponse.TempResult(response.content)
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300TempResult).post(InterfaceEvent(model, data))
                         LepuBleLog.d(tag, "model:$model,TEMP_RESULT 体温测量结果 => success $data")
@@ -174,6 +189,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 }
             }
             TOKEN_0X73 -> {
+                if (response.content.isEmpty()) return
                 val data = Pc300BleResponse.GluResult(response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300GluResult).post(
                     InterfaceEvent(model, data)
@@ -189,6 +205,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 }
             }
             TOKEN_0XE2 -> {
+                if (response.content.isEmpty() || response.content.size < 2) return
                 val data = bytes2UIntBig(response.content[0], response.content[1])
                 LepuBleLog.d(tag, "model:$model,TOKEN_0XE2 => success ${response.type}")
                 when (response.type) {
@@ -216,7 +233,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X30 => success ${bytesToHex(response.content)}")
                 when (response.type) {
                     ECG_START -> {
-//                        setEcgDataDigit(1)
+                        setEcgDataDigit(2)
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300EcgStart).post(InterfaceEvent(model, true))
                         LepuBleLog.d(tag, "model:$model,ECG_START 心电开始测量命令 => success ${bytesToHex(response.content)}")
                     }
@@ -234,16 +251,19 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X31 => success ${bytesToHex(response.content)}")
                 when (response.type) {
                     GET_VERSION -> {
+                        if (response.content.isEmpty() || response.content.size < 2) return
                         val data = Pc300BleResponse.DeviceInfo(response.content)
                         LepuBleLog.d(tag, "model:$model,GET_VERSION 心电查询版本 => success $data")
                     }
                     ECG_RT_STATE -> {
+                        if (response.content.isEmpty()) return
                         val data = Pc300BleResponse.RtEcgState(response.content)
                         LepuBleLog.d(tag, "model:$model,ECG_RT_STATE 心电查询工作状态 => success $data")
                     }
                 }
             }
             TOKEN_0X32 -> {
+                if (response.content.isEmpty() || response.content.size < 53) return
                 val data = Pc300BleResponse.RtEcgWave(response.content, gain)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtEcgWave).post(
                     InterfaceEvent(model, data)
@@ -251,11 +271,13 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X32 心电波形上传数据 => success $data")
             }
             TOKEN_0X33 -> {
+                if (response.content.isEmpty() || response.content.size < 3) return
                 val data = Pc300BleResponse.EcgResult(response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300EcgResult).post(InterfaceEvent(model, data))
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X33 心电结果上传参数 => success $data")
             }
             TOKEN_0X34 -> {
+                if (response.content.isEmpty() || response.content.size < 2) return
                 gain = bytes2UIntBig(response.content[0], response.content[1]).toFloat()
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X34 设备硬件增益 => success ${bytesToHex(response.content)}")
             }
@@ -312,6 +334,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
     override fun getInfo() {
         getDeviceId()
         sendCmd(getDeviceName())
+        sendCmd(getDeviceInfoFf2())
         sendCmd(getDeviceInfoFf4())
         setGlucometerType(GlucometerType.AI_AO_LE)
         setEcgDataDigit(2)
