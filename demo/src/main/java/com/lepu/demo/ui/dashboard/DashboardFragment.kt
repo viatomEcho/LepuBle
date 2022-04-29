@@ -14,6 +14,10 @@ import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.ap20.*
+import com.lepu.blepro.ext.pc102.*
+import com.lepu.blepro.ext.pc60fw.*
+import com.lepu.blepro.ext.pc80b.*
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.LepuBleLog
@@ -232,23 +236,20 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         })
         //------------------------------pc80b------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bTrackData)
-            .observe(this, { event ->
-                val rtData = event.data as PC80BleResponse.RtTrackData
-                rtData.let { data ->
-                    viewModel.ecgHr.value = data.hr
-                    data.data.ecgData?.wFs.let {
-                        DataController.receive(it)
-                    }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bFastData)
+            .observe(this, {
+                val rtData = it.data as RtFastData
+                rtData.ecgData?.ecgFloats.let { data ->
+                    DataController.receive(data)
                     binding.dataStr.text = data.toString()
                 }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bContinuousData)
             .observe(this, { event ->
-                val rtData = event.data as PC80BleResponse.RtContinuousData
+                val rtData = event.data as RtContinuousData
                 rtData.let { data ->
                     viewModel.ecgHr.value = data.hr
-                    data.ecgData?.wFs.let {
+                    data.ecgData.ecgFloats.let {
                         DataController.receive(it)
                     }
                     binding.dataStr.text = data.toString()
@@ -477,82 +478,82 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 LpBleUtil.oxyGetPpgRt(it.model)
             })
         //------------------------------pc60fw------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataWave)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtWave)
             .observe(this, {
-                val rtWave = it.data as PC60FwBleResponse.RtDataWave
+                val rtWave = it.data as RtWave
                 OxyDataController.receive(rtWave.waveIntData)
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataParam)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtParam)
             .observe(this, {
-                val rtData = it.data as PC60FwBleResponse.RtDataParam
+                val rtData = it.data as RtParam
                 viewModel.oxyPr.value = rtData.pr
                 viewModel.spo2.value = rtData.spo2
-                viewModel.pi.value = rtData.pi.div(10f)
+                viewModel.pi.value = rtData.pi
                 binding.dataStr.text = rtData.toString()
             })
 
         //------------------------------pc100------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BoRtWave)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100RtOxyWave)
             .observe(this, {
                 val rtWave = it.data as ByteArray
                 binding.dataStr.text = bytesToHex(rtWave)
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BoRtParam)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100RtOxyParam)
             .observe(this, {
-                val rtData = it.data as Pc100BleResponse.RtBoParam
+                val rtData = it.data as com.lepu.blepro.ext.pc102.RtOxyParam
                 viewModel.oxyPr.value = rtData.pr
                 viewModel.spo2.value = rtData.spo2
-                viewModel.pi.value = rtData.pi.div(10f)
+                viewModel.pi.value = rtData.pi
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpRtData)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100RtBpData)
             .observe(this, {
-                val rtData = it.data as Pc100BleResponse.RtBpData
+                val rtData = it.data as RtBpData
                 rtData.let { data ->
-                    viewModel.ps.value = data.psValue
+                    viewModel.ps.value = data.ps
                     binding.dataStr.text = rtData.toString()
                 }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpResult)
             .observe(this, {
-                val rtData = it.data as Pc100BleResponse.BpResult
+                val rtData = it.data as BpResult
                 rtData.let { data ->
                     viewModel.sys.value = data.sys
                     viewModel.dia.value = data.dia
                     viewModel.mean.value = data.map
-                    viewModel.bpPr.value = data.plus
+                    viewModel.bpPr.value = data.pr
                     binding.dataStr.text = rtData.toString()
                 }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpErrorResult)
             .observe(this, {
-                val rtData = it.data as Pc100BleResponse.BpResultError
+                val rtData = it.data as BpResultError
                 rtData.let { data ->
                     binding.dataStr.text = rtData.toString()
                 }
             })
         //------------------------------ap20------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBoWave)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtOxyWave)
             .observe(this, {
-                val rtWave = it.data as Ap20BleResponse.RtBoWave
+                val rtWave = it.data as RtOxyWave
                 OxyDataController.receive(rtWave.waveIntData)
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBoParam)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtOxyParam)
             .observe(this, {
-                val rtData = it.data as Ap20BleResponse.RtBoParam
+                val rtData = it.data as com.lepu.blepro.ext.ap20.RtOxyParam
                 viewModel.oxyPr.value = rtData.pr
                 viewModel.spo2.value = rtData.spo2
-                viewModel.pi.value = rtData.pi.div(10f)
+                viewModel.pi.value = rtData.pi
                 binding.dataStr.text = rtData.toString()
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBreathWave)
             .observe(this, {
-                val rtWave = it.data as Ap20BleResponse.RtBreathWave
+                val rtWave = it.data as RtBreathWave
 //                dataString += "\n rtWave : $rtWave"
 //                binding.dataStr.text = dataString
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBreathParam)
             .observe(this, {
-                val rtData = it.data as Ap20BleResponse.RtBreathParam
+                val rtData = it.data as RtBreathParam
 //                dataString += "\n rtData : $rtData"
 //                binding.dataStr.text = dataString
             })

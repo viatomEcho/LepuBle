@@ -6,6 +6,9 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.pulsebit.DeviceInfo
+import com.lepu.blepro.ext.pulsebit.EcgFile
+import com.lepu.blepro.ext.pulsebit.ExEcgDiagnosis
 import com.lepu.blepro.utils.*
 import kotlin.experimental.inv
 
@@ -18,6 +21,14 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
     var curFileName:String = ""
     var curSize: Int = 0
     var fileContent : ByteArray? = null
+
+    lateinit var tempList: PulsebitBleResponse.FileList
+
+    private var deviceInfo = DeviceInfo()
+    private var fileList = arrayListOf<String>()
+
+    private var ecgFile = EcgFile()
+    private var result = ExEcgDiagnosis()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = OxyBleManager(context)
@@ -93,21 +104,31 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
             PulsebitBleCmd.OXY_CMD_PARA_SYNC -> {
                 clearTimeout()
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_PARA_SYNC => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitSetTime).post(
-                    InterfaceEvent(model, true)
-                )
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitSetTime).post(InterfaceEvent(model, true))
             }
             PulsebitBleCmd.OXY_CMD_INFO -> {
 
                 clearTimeout()
                 val info = PulsebitBleResponse.DeviceInfo(response.content)
 
+                deviceInfo.region = info.region
+                deviceInfo.model = info.model
+                deviceInfo.hwVersion = info.hwVersion
+                deviceInfo.swVersion = info.swVersion
+                deviceInfo.lgVersion = info.lgVersion
+                deviceInfo.curLanguage = info.curLanguage
+                deviceInfo.sn = info.sn
+                deviceInfo.fileVer = info.fileVer
+                deviceInfo.spcpVer = info.spcpVer
+                deviceInfo.branchCode = info.branchCode
+                deviceInfo.application = info.application
+
                 if (runRtImmediately) {
                     runRtTask()
                     runRtImmediately = false
                 }
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success $info")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitDeviceInfo).post(InterfaceEvent(model, info))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitDeviceInfo).post(InterfaceEvent(model, deviceInfo))
             }
 
             PulsebitBleCmd.OXY_CMD_READ_START -> {
@@ -153,12 +174,64 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
 
                 fileContent?.let {
                     if (curFileName.contains(".dat")) {
-                        val data = PulsebitBleResponse.FileList(it)
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileList).post(InterfaceEvent(model, data))
-                        LepuBleLog.d(tag, "model:$model,  FileList $data")
+                        tempList = PulsebitBleResponse.FileList(it)
+
+                        for (i in tempList.list) {
+                            fileList.add(i.recordName)
+                        }
+
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileList).post(InterfaceEvent(model, fileList))
+                        LepuBleLog.d(tag, "model:$model,  FileList $tempList")
                     } else {
                         val data = PulsebitBleResponse.EcgFile(curFileName, fileSize, it)
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadFileComplete).post(InterfaceEvent(model, data))
+
+                        result.isRegular = data.result.isRegular
+                        result.isPoorSignal = data.result.isPoorSignal
+                        result.isFastHr = data.result.isFastHr
+                        result.isSlowHr = data.result.isSlowHr
+                        result.isIrregular = data.result.isIrregular
+                        result.isPvcs = data.result.isPvcs
+                        result.isHeartPause = data.result.isHeartPause
+                        result.isFibrillation = data.result.isFibrillation
+                        result.isWideQrs = data.result.isWideQrs
+                        result.isProlongedQtc = data.result.isProlongedQtc
+                        result.isShortQtc = data.result.isShortQtc
+                        result.isStElevation = data.result.isStElevation
+                        result.isStDepression = data.result.isStDepression
+                        result.result = data.result.resultMess
+
+                        ecgFile.result = result
+                        ecgFile.hrsDataSize = data.hrsDataSize
+                        ecgFile.recordingTime = data.recordingTime
+                        ecgFile.waveDataSize = data.waveDataSize
+                        ecgFile.hr = data.hr
+                        ecgFile.st = data.st
+                        ecgFile.qrs = data.qrs
+                        ecgFile.pvcs = data.pvcs
+                        ecgFile.qtc = data.qtc
+                        ecgFile.measureMode = data.measureMode
+                        ecgFile.measureModeMess = data.measureModeMess
+                        ecgFile.filterMode = data.filterMode
+                        ecgFile.qt = data.qt
+                        ecgFile.hrsData = data.hrsData
+                        ecgFile.hrsIntData = data.hrsIntData
+                        ecgFile.waveData = data.waveData
+                        ecgFile.waveShortData = data.waveShortData
+                        ecgFile.wFs = data.wFs
+                        ecgFile.fileName = curFileName
+
+                        if (this::tempList.isInitialized) {
+                            val index = tempList.fileNames.indexOf(curFileName)
+                            ecgFile.user = tempList.list[index].user
+                            ecgFile.year = tempList.list[index].year
+                            ecgFile.month = tempList.list[index].month
+                            ecgFile.day = tempList.list[index].day
+                            ecgFile.hour = tempList.list[index].hour
+                            ecgFile.minute = tempList.list[index].minute
+                            ecgFile.second = tempList.list[index].second
+                        }
+
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadFileComplete).post(InterfaceEvent(model, ecgFile))
                         LepuBleLog.d(tag, "model:$model,  EcgFile $data")
                     }
                 } ?: run {
@@ -195,6 +268,7 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
 
     override fun getFileList() {
         this.curFileName = "1dlc.dat"
+        fileList.clear()
         sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_START, PulsebitBleCmd.readFileStart(curFileName))
     }
 

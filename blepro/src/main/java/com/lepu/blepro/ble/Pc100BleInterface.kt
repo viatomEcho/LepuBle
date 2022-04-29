@@ -7,6 +7,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.Pc100DeviceInfo
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.pc102.*
 import com.lepu.blepro.utils.*
 import java.util.*
 
@@ -19,7 +20,11 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "PC100BleInterface"
 
     private lateinit var context: Context
-    private var pc100Device = Pc100DeviceInfo()
+    private var pc100Device = DeviceInfo()
+    private var bpResult = BpResult()
+    private var bpResultError = BpResultError()
+    private var rtBpData = RtBpData()
+    private var oxyParam = RtOxyParam()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
@@ -71,7 +76,7 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,GET_DEVICE_INFO => success")
                 if (response.len != 5) {
                     LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BoFingerOut).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100OxyFingerOut).post(InterfaceEvent(model, true))
                 } else {
                     val info = Pc100BleResponse.DeviceInfo(response.content)
                     pc100Device.softwareV = info.softwareV
@@ -103,7 +108,13 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                     Pc100BleCmd.BP_RESULT -> {
                         LepuBleLog.d(tag, "model:$model,BP_GET_RESULT BP_RESULT => success")
                         val info = Pc100BleResponse.BpResult(response.content)
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpResult).post(InterfaceEvent(model, info))
+                        bpResult.sys = info.sys
+                        bpResult.dia = info.dia
+                        bpResult.map = info.map
+                        bpResult.pr = info.plus
+                        bpResult.result = info.result
+                        bpResult.resultMess = info.resultMess
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpResult).post(InterfaceEvent(model, bpResult))
                         LepuBleLog.d(tag, "model:$model,BP_RESULT info.sys => " + info.sys)
                         LepuBleLog.d(tag, "model:$model,BP_RESULT info.map => " + info.map)
                         LepuBleLog.d(tag, "model:$model,BP_RESULT info.dia => " + info.dia)
@@ -112,7 +123,9 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                     Pc100BleCmd.BP_RESULT_ERROR -> {
                         LepuBleLog.d(tag, "model:$model,BP_GET_RESULT BP_RESULT_ERROR => success")
                         val info = Pc100BleResponse.BpResultError(response.content)
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpErrorResult).post(InterfaceEvent(model, info))
+                        bpResultError.errorMess = info.errorMess
+                        bpResultError.errorNum = info.errorNum
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpErrorResult).post(InterfaceEvent(model, bpResultError))
                         LepuBleLog.d(tag, "model:$model,BP_RESULT_ERROR info.errorType => " + info.errorType)
                         LepuBleLog.d(tag, "model:$model,BP_RESULT_ERROR info.errorNum => " + info.errorNum)
                         LepuBleLog.d(tag, "model:$model,BP_RESULT_ERROR info.errorMess => " + info.errorMess)
@@ -122,14 +135,16 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             Pc100BleCmd.BP_GET_STATUS -> {
                 LepuBleLog.d(tag, "model:$model,BP_GET_STATUS => success")
                 val info = Pc100BleResponse.BpStatus(response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpStatus).post(InterfaceEvent(model, info))
+//                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpStatus).post(InterfaceEvent(model, info))
                 LepuBleLog.d(tag, "model:$model,BP_GET_STATUS info.status => " + info.status)
                 LepuBleLog.d(tag, "model:$model,BP_GET_STATUS info.statusMess => " + info.statusMess)
             }
             Pc100BleCmd.BP_RT_DATA -> {
                 LepuBleLog.d(tag, "model:$model,BP_RT_DATA => success")
                 val info = Pc100BleResponse.RtBpData(response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpRtData).post(InterfaceEvent(model, info))
+                rtBpData.sign = info.sign
+                rtBpData.ps = info.psValue
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100RtBpData).post(InterfaceEvent(model, rtBpData))
                 LepuBleLog.d(tag, "model:$model,BP_RT_DATA info.sign => " + info.sign)
                 LepuBleLog.d(tag, "model:$model,BP_RT_DATA info.psValue => " + info.psValue)
             }
@@ -157,12 +172,17 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             Pc100BleCmd.BO_RT_WAVE -> {
                 LepuBleLog.d(tag, "model:$model,BO_RT_WAVE => success")
                 val info = response.content.copyOfRange(0, response.content.size).toList().asSequence().map { (it.toInt() and 0x7f).toByte() }.toList().toByteArray()
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BoRtWave).post(InterfaceEvent(model, info))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100RtOxyWave).post(InterfaceEvent(model, info))
             }
             Pc100BleCmd.BO_RT_PARAM -> {
                 LepuBleLog.d(tag, "model:$model,BO_RT_PARAM => success")
                 val info = Pc100BleResponse.RtBoParam(response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BoRtParam).post(InterfaceEvent(model, info))
+                oxyParam.isDetecting = info.isDetecting
+                oxyParam.isScanning = info.isScanning
+                oxyParam.pi = info.pi.div(10f)
+                oxyParam.pr = info.pr
+                oxyParam.spo2 = info.spo2
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100RtOxyParam).post(InterfaceEvent(model, oxyParam))
                 LepuBleLog.d(tag, "model:$model,BO_RT_PARAM info.spo2 => " + info.spo2)
                 LepuBleLog.d(tag, "model:$model,BO_RT_PARAM info.pr => " + info.pr)
                 LepuBleLog.d(tag, "model:$model,BO_RT_PARAM info.pi => " + info.pi)
@@ -287,11 +307,11 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
      * get file list
      */
     override fun getFileList() {
-        sendCmd(Pc100BleCmd.getBpResult())
+//        sendCmd(Pc100BleCmd.getBpResult())
     }
 
     fun getBpState() {
-        sendCmd(Pc100BleCmd.getBpStatus())
+//        sendCmd(Pc100BleCmd.getBpStatus())
     }
     fun startBp() {
         sendCmd(
@@ -315,7 +335,7 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                 Pc100BleCmd.BO_END))
     }
     fun getBoState() {
-        sendCmd(Pc100BleCmd.getBoStatus())
+//        sendCmd(Pc100BleCmd.getBoStatus())
     }
 
 }

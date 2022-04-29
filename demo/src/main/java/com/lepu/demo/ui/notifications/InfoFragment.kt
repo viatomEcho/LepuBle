@@ -11,6 +11,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.pc102.*
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.demo.MainViewModel
@@ -91,6 +92,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             binding.info.text = it.toString()
         })
         mainViewModel.boInfo.observe(viewLifecycleOwner, {
+            binding.info.text = it.toString()
+        })
+        mainViewModel.pc60fwInfo.observe(viewLifecycleOwner, {
+            binding.info.text = it.toString()
+        })
+        mainViewModel.ap20Info.observe(viewLifecycleOwner, {
             binding.info.text = it.toString()
         })
         mainViewModel.aoj20aInfo.observe(viewLifecycleOwner, {
@@ -435,15 +442,15 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         //------------------------------pc100--------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpResult)
             .observe(this, { event ->
-                (event.data as Pc100BleResponse.BpResult).let {
-                    setReceiveCmd(it.bytes)
+                (event.data as BpResult).let {
+//                    setReceiveCmd(it.bytes)
                     binding.info.text = it.toString()
                 }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpErrorResult)
             .observe(this, { event ->
-                (event.data as Pc100BleResponse.BpResultError).let {
-                    setReceiveCmd(it.bytes)
+                (event.data as BpResultError).let {
+//                    setReceiveCmd(it.bytes)
                     binding.info.text = it.toString()
                 }
             })
@@ -501,7 +508,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 binding.info.text = data.toString()
             })
         //---------------------------pc68b---------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bFileList)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bFileList)
             .observe(this, {
                 val data = it.data as MutableList<String>
                 for (i in data) {
@@ -518,7 +525,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 fileNames.removeAt(0)
                 Toast.makeText(context, "pc68b 接收文件成功 已接收${pc68bList.size}个文件, 还剩${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 readFile()
-            })
+            })*/
         //---------------------------Pulsebit--------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileList)
             .observe(this, {

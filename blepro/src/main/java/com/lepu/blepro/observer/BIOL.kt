@@ -1,6 +1,6 @@
 package com.lepu.blepro.observer
 
-import com.lepu.blepro.BleServiceHelper
+import com.lepu.blepro.ext.BleServiceHelper
 import com.lepu.blepro.utils.LepuBleLog
 
 /**

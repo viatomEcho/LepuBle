@@ -119,19 +119,23 @@ class Ap20BleResponse{
     @ExperimentalUnsignedTypes
     @Parcelize
     class RtBreathWave(var byteArray: ByteArray) : Parcelable {
-        val flow: Int   // 呼吸波形数据（0-4095）
-        val snore: Int  // 鼾声波形数据（0-4095）
+        val flowBytes: ByteArray
+        val flowInt: Int           // 呼吸波形数据（0-4095）
+        val snoreBytes: ByteArray
+        val snoreInt: Int          // 鼾声波形数据（0-4095）
         init {
             var index = 0
-            flow = toUInt(byteArray.copyOfRange(index, index+2))
+            flowBytes = byteArray.copyOfRange(index, index+2)
+            flowInt = toUInt(flowBytes)
             index += 2
-            snore = toUInt(byteArray.copyOfRange(index, index+2))
+            snoreBytes = byteArray.copyOfRange(index, index+2)
+            snoreInt = toUInt(snoreBytes)
         }
 
         override fun toString(): String {
             return """
-                flow : $flow
-                snore : $snore
+                flowInt : $flowInt
+                snoreInt : $snoreInt
             """.trimIndent()
         }
     }

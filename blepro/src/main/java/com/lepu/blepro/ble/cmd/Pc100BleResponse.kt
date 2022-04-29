@@ -72,7 +72,7 @@ object Pc100BleResponse {
         init {
             sys = ((bytes[0].toInt() and 0x7F) shl 8) + ((bytes[1].toUInt() and 0xFFu).toInt())
             result = (bytes[0].toInt() and 0x80) shr 7
-            resultMess = if (result == 0) "心率正常" else "心率不齐"
+            resultMess = if (result == 0) "HR normal" else "HR irregular"
             map = (bytes[2].toUInt() and 0xFFu).toInt()
             dia = (bytes[3].toUInt() and 0xFFu).toInt()
             plus = (bytes[4].toUInt() and 0xFFu).toInt()
@@ -104,7 +104,7 @@ object Pc100BleResponse {
         }
 
         private fun getErrorMess(errorType: Int, errorNum: Int) : String {
-            if (errorType == 0) {
+            /*if (errorType == 0) {
                 when(errorNum) {
                     0 -> return "测量不到有效脉搏"
                     1 -> return "7秒内打气不上30mmHg，气袋没有绑好"
@@ -113,17 +113,17 @@ object Pc100BleResponse {
                     4 -> return "干预过多，测量中移动，说话等"
                     15 -> return "电量过低，血压测量停止"
                 }
-            } else if (errorType == 1) {
+            } else if (errorType == 1) {*/
                 when(errorNum) {
-                    1 -> return "7秒内打气不上30mmHg，气袋没有绑好"
-                    2 -> return "气袋压力超过295mmHg，进入超压保护"
-                    3 -> return "测量不到有效脉搏"
-                    4 -> return "干预过多，测量中移动，说话等"
-                    5 -> return "测量结果数值有误"
-                    6 -> return "漏气"
-                    15 -> return "电量过低，血压测量停止"
+                    1 -> return "Fail to inflate pressure to 30mmHg within 7 seconds(The cuff is not well-wrapped)"
+                    2 -> return "Cuff pressure is over 295mmHg(Overpressure protection)"
+                    3 -> return "No valid pulse is detected"
+                    4 -> return "Excessive motion artifact"
+                    5 -> return "The measurement fails"
+                    6 -> return "Air leakage"
+                    15 -> return "Low battery"
                 }
-            }
+//            }
             return ""
         }
 

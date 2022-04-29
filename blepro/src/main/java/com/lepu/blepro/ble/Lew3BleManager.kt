@@ -3,7 +3,7 @@ package com.lepu.blepro.ble
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.util.Log
-import com.lepu.blepro.BleServiceHelper
+import com.lepu.blepro.ext.BleServiceHelper
 import com.lepu.blepro.base.LpBleManager
 import com.lepu.blepro.utils.LepuBleLog
 import no.nordicsemi.android.ble.PhyRequest

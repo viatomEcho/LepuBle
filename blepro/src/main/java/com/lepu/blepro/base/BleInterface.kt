@@ -6,7 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import androidx.annotation.NonNull
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
+import com.lepu.blepro.ext.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth

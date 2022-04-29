@@ -218,15 +218,18 @@ object PC80BleResponse {
     class RtEcgData constructor(var bytes: ByteArray) : Parcelable {
         var len: Int
         var ecg: ByteArray
+        var ecgInt: IntArray
         var wFs : FloatArray
 
-        // ecg : 每个采样数据占两个字节，低字节在前，只有低12位是有效的ECG波形数据，采样点范围(0，4095)基线值2048，采样点对应的电压范围(0mV，3300mV)
+        // ecg : 每个采样数据占两个字节，低字节在前，只有低12位是有效的ECG波形数据，采样点范围(0，4095)基线值2048，采样点对应的电压范围(0mV，330mV)
         init {
             len = bytes.size
             ecg = bytes
+            ecgInt = IntArray(len/2)
             wFs = FloatArray(len/2)
             for (i in 0 until (len/2)) {
-                wFs[i] = PC80DataController.byteTomV(bytes[2 * i], bytes[2 * i + 1])
+                ecgInt[i] = ((byte2UInt(bytes[2*i+1]) and 0x0F) shl 8) + byte2UInt(bytes[2*i])
+                wFs[i] = (ecgInt[i] - 2048) * 1.div(330f)
             }
         }
     }
@@ -274,23 +277,23 @@ object PC80BleResponse {
     }
     fun getResult(int: Int) : String {
         when(int) {
-            0 -> return "节律无异常"
-            1 -> return "疑似心跳稍快，请注意休息"
-            2 -> return "疑似心跳过快，请注意休息"
-            3 -> return "疑似阵发性心跳过快 请咨询医生"
-            4 -> return "疑似心跳稍缓 请注意休息"
-            5 -> return "疑似心跳过缓 请注意休息"
-            6 -> return "疑似心跳间期缩短 请咨询医生"
-            7 -> return "疑似心跳间期不规则 请咨询医生"
-            8 -> return "疑似心跳稍快伴有心跳间期缩短 请咨询医生"
-            9 -> return "疑似心跳稍缓伴有心跳间期缩短 请咨询医生"
-            10 -> return "疑似心跳稍缓伴有心跳间期不规则 请咨询医生"
-            11 -> return "波形有漂移"
-            12 -> return "疑似心跳过快伴有波形漂移 请咨询医生"
-            13 -> return "疑似心跳过缓伴有波形漂移 请咨询医生"
-            14 -> return "疑似心跳间期缩短伴有波形漂移 请咨询医生"
-            15 -> return "疑似心跳间期不规则伴有波形漂移 请咨询医生"
-            16 -> return "信号较差，请重新测量"
+            0 -> return "No irregular rhythm found(60bpm <= HR <= 100 bpm)"
+            1 -> return "Suspected a little fast beat(100bpm < HR <= 110 bpm)"
+            2 -> return "Suspected fast beat(HR > 110 bpm)"
+            3 -> return "Suspected short run of fast beat"
+            4 -> return "Suspected a little slow beat(50 bpm <= HR < 60 bpm)"
+            5 -> return "Suspected slow beat(HR < 50 bpm)"
+            6 -> return "Suspected short beat interval"
+            7 -> return "Suspected irregular beat interval"
+            8 -> return "Suspected fast beat with short beat interval"
+            9 -> return "Suspected slow beat with short beat interval"
+            10 -> return "Suspected slow beat with irregular beat interval"
+            11 -> return "Waveform baseline wander"
+            12 -> return "Suspected fast beat with baseline wander"
+            13 -> return "Suspected slow beat with baseline wander"
+            14 -> return "Suspected short beat interval with baseline wander"
+            15 -> return "Suspected irregular beat interval with baseline wander"
+            16 -> return "Poor Signal, please try again"
             else -> return ""
         }
     }

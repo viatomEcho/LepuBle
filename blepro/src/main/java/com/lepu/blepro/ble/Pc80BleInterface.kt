@@ -6,6 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.pc80b.*
 import com.lepu.blepro.utils.CrcUtil
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
@@ -23,6 +24,13 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
 
     private var curFile: PC80BleResponse.RtRecordData? = null
     private var transType = 0
+
+    private var deviceInfo = DeviceInfo()
+    private var ecgFile = EcgFile()
+    private var rtFastData = RtFastData()
+    private var rtContinuousData = RtContinuousData()
+    private var rtEcgData = RtEcgData()
+    private var rtEcgResult = RtEcgResult()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
@@ -72,7 +80,12 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 LepuBleLog.d(tag, "model:$model,GET_INFO response.len => " + response.len)
                 val info = PC80BleResponse.DeviceInfo(response.content, response.len)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bDeviceInfo).post(InterfaceEvent(model, info))
+
+                deviceInfo.algorithmV = info.algorithmV
+                deviceInfo.hardwareV = info.hardwareV
+                deviceInfo.softwareV = info.softwareV
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bDeviceInfo).post(InterfaceEvent(model, deviceInfo))
             }
 
             // 查询设备信息无应答
@@ -134,8 +147,25 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
                                 )
                                 sendCmd(Pc80BleCmd.responseDataMess(this.seqNo, Pc80BleCmd.ACK))
                                 val scpEcgFile = PC80BleResponse.ScpEcgFile(this.content)
+                                ecgFile.year = scpEcgFile.section1.year
+                                ecgFile.month = scpEcgFile.section1.month
+                                ecgFile.day = scpEcgFile.section1.day
+                                ecgFile.hour = scpEcgFile.section1.hour
+                                ecgFile.minute = scpEcgFile.section1.minute
+                                ecgFile.second = scpEcgFile.section1.second
+
+                                ecgFile.ecgBytes = scpEcgFile.section6.ecgData.ecg
+                                ecgFile.ecgInts = scpEcgFile.section6.ecgData.ecgInt
+                                ecgFile.ecgFloats = scpEcgFile.section6.ecgData.wFs
+
+                                ecgFile.hr = scpEcgFile.section9.hr
+                                ecgFile.filterMode = scpEcgFile.section9.filterMode
+                                ecgFile.result = scpEcgFile.section9.result
+                                ecgFile.gain = scpEcgFile.section9.gain
+                                ecgFile.resultMess = scpEcgFile.section9.resultMess
+
                                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadFileComplete)
-                                    .post(InterfaceEvent(model, scpEcgFile))
+                                    .post(InterfaceEvent(model, ecgFile))
                             }
                         }
                     }
@@ -147,14 +177,73 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
                     val data = PC80BleResponse.RtContinuousData(response.content)
                     sendCmd(Pc80BleCmd.responseDataMess(data.seqNo, Pc80BleCmd.ACK))
                     LepuBleLog.d(tag, "model:$model,DATA_MESS => RtContinuousData $data")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bContinuousData).post(InterfaceEvent(model, data))
+
+                    rtContinuousData.seqNo = data.seqNo
+                    rtEcgData.ecgBytes = data.ecgData.ecg
+                    rtEcgData.ecgInts = data.ecgData.ecgInt
+                    rtEcgData.ecgFloats = data.ecgData.wFs
+                    rtContinuousData.ecgData = rtEcgData
+                    rtContinuousData.gain = data.gain
+                    rtContinuousData.hr = data.hr
+                    rtContinuousData.isLeadOff = data.leadOff
+                    rtContinuousData.vol = data.vol
+
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bContinuousData).post(InterfaceEvent(model, rtContinuousData))
                 }
             }
 
             Pc80BleCmd.TRACK_DATA_MESS -> {
                 LepuBleLog.d(tag, "model:$model,TRACK_DATA_MESS => success")
                 val info = PC80BleResponse.RtTrackData(response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bTrackData).post(InterfaceEvent(model, info))
+
+                rtFastData.channel = info.channel
+                rtFastData.gain = info.gain
+                rtFastData.isLeadOff = info.leadOff == 1
+                rtFastData.measureMode = info.measure
+                rtFastData.seqNo = info.seqNo
+                rtFastData.measureStage = info.stage
+                rtFastData.dataType = info.dataType
+                rtFastData.hr = info.hr
+                info.data.ecgData?.ecg.let {
+                    rtEcgData.ecgBytes = it
+                }
+                info.data.ecgData?.wFs.let {
+                    rtEcgData.ecgFloats = it
+                }
+                info.data.ecgData?.ecgInt.let {
+                    rtEcgData.ecgInts = it
+                }
+                rtFastData.ecgData = rtEcgData
+                info.data.result?.year?.let {
+                    rtEcgResult.year = it.toInt()
+                }
+                info.data.result?.month?.let {
+                    rtEcgResult.month = it.toInt()
+                }
+                info.data.result?.day?.let {
+                    rtEcgResult.day = it.toInt()
+                }
+                info.data.result?.hour?.let {
+                    rtEcgResult.hour = it.toInt()
+                }
+                info.data.result?.minute?.let {
+                    rtEcgResult.minute = it.toInt()
+                }
+                info.data.result?.second?.let {
+                    rtEcgResult.second = it.toInt()
+                }
+                info.data.result?.hr?.let {
+                    rtEcgResult.hr = it
+                }
+                info.data.result?.result?.let {
+                    rtEcgResult.result = it
+                }
+                info.data.result?.resultMess?.let {
+                    rtEcgResult.resultMess = it
+                }
+                rtFastData.ecgResult = rtEcgResult
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bFastData).post(InterfaceEvent(model, rtFastData))
             }
 
         }

@@ -6,6 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.checkmele.*
 import com.lepu.blepro.utils.*
 import kotlin.experimental.inv
 
@@ -18,6 +19,15 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
     var curFileName:String = ""
     var curSize: Int = 0
     var fileContent : ByteArray? = null
+
+    private var deviceInfo = DeviceInfo()
+    private var result = LeEcgDiagnosis()
+    private var ecgFile = EcgFile()
+
+    private var tempList = arrayListOf<TempRecord>()
+    private var dlcList = arrayListOf<DlcRecord>()
+    private var ecgList = arrayListOf<EcgRecord>()
+    private var oxyList = arrayListOf<OxyRecord>()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = OxyBleManager(context)
@@ -105,7 +115,19 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
                     runRtImmediately = false
                 }
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success $info")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeDeviceInfo).post(InterfaceEvent(model, info))
+
+                deviceInfo.region = info.region
+                deviceInfo.model = info.model
+                deviceInfo.hwVersion = info.hwVersion
+                deviceInfo.swVersion = info.swVersion
+                deviceInfo.lgVersion = info.lgVersion
+                deviceInfo.curLanguage = info.curLanguage
+                deviceInfo.sn = info.sn
+                deviceInfo.fileVer = info.fileVer
+                deviceInfo.spcpVer = info.spcpVer
+                deviceInfo.application = info.application
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeDeviceInfo).post(InterfaceEvent(model, deviceInfo))
             }
 
             CheckmeLeBleCmd.OXY_CMD_READ_START -> {
@@ -156,23 +178,134 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
                         when (curFileName) {
                             "temp.dat" -> {
                                 type = CheckmeLeBleCmd.ListType.TEMP_TYPE
+                                val data = CheckmeLeBleResponse.TempList(it)
+
+                                for (i in data.list) {
+                                    val tempRecord = TempRecord()
+                                    tempRecord.timestamp = i.timestamp
+                                    tempRecord.recordName = i.recordName
+                                    tempRecord.year = i.year
+                                    tempRecord.month = i.month
+                                    tempRecord.day = i.day
+                                    tempRecord.hour = i.hour
+                                    tempRecord.minute = i.minute
+                                    tempRecord.second = i.second
+                                    tempRecord.temp = i.temp
+                                    tempList.add(tempRecord)
+                                }
+
+                                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeTempList).post(InterfaceEvent(model, tempList))
                             }
                             "oxi.dat" -> {
                                 type = CheckmeLeBleCmd.ListType.OXY_TYPE
+                                val data = CheckmeLeBleResponse.OxyList(it)
+
+                                for (i in data.list) {
+                                    val oxyRecord = OxyRecord()
+                                    oxyRecord.timestamp = i.timestamp
+                                    oxyRecord.recordName = i.recordName
+                                    oxyRecord.year = i.year
+                                    oxyRecord.month = i.month
+                                    oxyRecord.day = i.day
+                                    oxyRecord.hour = i.hour
+                                    oxyRecord.minute = i.minute
+                                    oxyRecord.second = i.second
+                                    oxyRecord.measureMode = i.measureMode
+                                    oxyRecord.measureModeMess = i.measureModeMess
+                                    oxyRecord.spo2 = i.spo2
+                                    oxyRecord.pr = i.pr
+                                    oxyRecord.pi = i.pi
+                                    oxyRecord.isNormal = i.normal
+                                    oxyList.add(oxyRecord)
+                                }
+
+                                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeOxyList).post(InterfaceEvent(model, oxyList))
                             }
                             "ecg.dat" -> {
                                 type = CheckmeLeBleCmd.ListType.ECG_TYPE
+                                val data = CheckmeLeBleResponse.EcgList(it)
+
+                                for (i in data.list) {
+                                    val ecgRecord = EcgRecord()
+                                    ecgRecord.timestamp = i.timestamp
+                                    ecgRecord.recordName = i.recordName
+                                    ecgRecord.year = i.year
+                                    ecgRecord.month = i.month
+                                    ecgRecord.day = i.day
+                                    ecgRecord.hour = i.hour
+                                    ecgRecord.minute = i.minute
+                                    ecgRecord.second = i.second
+                                    ecgRecord.measureMode = i.measureMode
+                                    ecgRecord.measureModeMess = i.measureModeMess
+                                    ecgRecord.isNormal = i.normal
+                                    ecgList.add(ecgRecord)
+                                }
+
+                                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeEcgList).post(InterfaceEvent(model, ecgList))
                             }
                             "2dlc.dat" -> {
                                 type = CheckmeLeBleCmd.ListType.DLC_TYPE
+                                val data = CheckmeLeBleResponse.DlcList(it)
+
+                                for (i in data.list) {
+                                    val dlcRecord = DlcRecord()
+                                    dlcRecord.timestamp = i.timestamp
+                                    dlcRecord.recordName = i.recordName
+                                    dlcRecord.year = i.year
+                                    dlcRecord.month = i.month
+                                    dlcRecord.day = i.day
+                                    dlcRecord.hour = i.hour
+                                    dlcRecord.minute = i.minute
+                                    dlcRecord.second = i.second
+                                    dlcRecord.hr = i.hr
+                                    dlcRecord.isEcgNormal = i.ecgNormal
+                                    dlcRecord.spo2 = i.spo2
+                                    dlcRecord.pi = i.pi
+                                    dlcRecord.isOxyNormal = i.oxyNormal
+                                    dlcList.add(dlcRecord)
+                                }
+
+                                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeDlcList).post(InterfaceEvent(model, dlcList))
                             }
                         }
                         val data = CheckmeLeBleResponse.ListContent(type, it)
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileList).post(InterfaceEvent(model, data))
+//                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileList).post(InterfaceEvent(model, data))
                         LepuBleLog.d(tag, "model:$model, 读文件完成: $curFileName  data ==> $data")
                     } else {
                         val data = CheckmeLeBleResponse.EcgFile(curFileName, fileSize, it)
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadFileComplete).post(InterfaceEvent(model, data))
+
+                        result.isRegular = data.result.isRegular
+                        result.isPoorSignal = data.result.isPoorSignal
+                        result.isHighHr = data.result.isHighHr
+                        result.isLowHr = data.result.isLowHr
+                        result.isIrregular = data.result.isIrregular
+                        result.isHighQrs = data.result.isHighQrs
+                        result.isHighSt = data.result.isHighSt
+                        result.isLowSt = data.result.isLowSt
+                        result.isPrematureBeat = data.result.isPrematureBeat
+                        result.result = data.result.resultMess
+
+                        ecgFile.result = result
+                        ecgFile.hrsDataSize = data.hrsDataSize
+                        ecgFile.recordingTime = data.recordingTime
+                        ecgFile.waveDataSize = data.waveDataSize
+                        ecgFile.hr = data.hr
+                        ecgFile.st = data.st
+                        ecgFile.qrs = data.qrs
+                        ecgFile.pvcs = data.pvcs
+                        ecgFile.qtc = data.qtc
+                        ecgFile.measureMode = data.measureMode
+                        ecgFile.measureModeMess = data.measureModeMess
+                        ecgFile.filterMode = data.filterMode
+                        ecgFile.qt = data.qt
+                        ecgFile.hrsData = data.hrsData
+                        ecgFile.hrsIntData = data.hrsIntData
+                        ecgFile.waveData = data.waveData
+                        ecgFile.waveShortData = data.waveShortData
+                        ecgFile.wFs = data.wFs
+                        ecgFile.fileName = curFileName
+
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadFileComplete).post(InterfaceEvent(model, ecgFile))
                         LepuBleLog.d(tag, "model:$model,  EcgFile $data")
                     }
                 } ?: run {
@@ -205,6 +338,10 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
     }
 
     fun getFileList(type: Int) {
+        ecgList.clear()
+        tempList.clear()
+        oxyList.clear()
+        dlcList.clear()
         when (type) {
             CheckmeLeBleCmd.ListType.ECG_TYPE -> curFileName = "ecg.dat"
             CheckmeLeBleCmd.ListType.OXY_TYPE -> curFileName = "oxi.dat"

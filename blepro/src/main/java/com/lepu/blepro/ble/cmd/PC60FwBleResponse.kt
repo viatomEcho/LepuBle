@@ -139,9 +139,17 @@ class PC60FwBleResponse{
             index++
             step = (bytes[index].toUInt() and 0xFFu).toInt()
             index++
-            para1 = (bytes[index].toUInt() and 0xFFu).toInt()
+            para1 = if (index < bytes.size) {
+                (bytes[index].toUInt() and 0xFFu).toInt()
+            } else {
+                0
+            }
             index++
-            para2 = (bytes[index].toUInt() and 0xFFu).toInt()
+            para2 = if (index < bytes.size) {
+                (bytes[index].toUInt() and 0xFFu).toInt()
+            } else {
+                0
+            }
         }
 
         override fun toString(): String {
@@ -157,19 +165,23 @@ class PC60FwBleResponse{
 
     @ExperimentalUnsignedTypes
     class OriginalData(val bytes: ByteArray) {
-        var redFrq: Int  // 0-600Khz
-        var irFrq: Int
+        var redFrqBytes: ByteArray  // 0-600Khz
+        var redFrqInt: Int          // 0-600Khz
+        var irFrqBytes: ByteArray
+        var irFrqInt: Int
         init {
             var index = 0
-            redFrq = toUInt(bytes.copyOfRange(index, index+2))
+            redFrqBytes = bytes.copyOfRange(index, index+2)
+            redFrqInt = toUInt(redFrqBytes)
             index += 2
-            irFrq = toUInt(bytes.copyOfRange(index, index+2))
+            irFrqBytes = bytes.copyOfRange(index, index+2)
+            irFrqInt = toUInt(irFrqBytes)
         }
 
         override fun toString(): String {
             return """
-                redFrq : $redFrq
-                irFrq : $irFrq
+                redFrqInt : $redFrqInt
+                irFrqInt : $irFrqInt
             """.trimIndent()
         }
     }

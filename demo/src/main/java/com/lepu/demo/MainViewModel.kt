@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ext.pc80b.DeviceInfo
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.O2RING_MODEL
@@ -77,8 +78,8 @@ class MainViewModel: ViewModel() {
     val _er2Info = MutableLiveData<Er2DeviceInfo>()
     val er2Info: LiveData<Er2DeviceInfo> = _er2Info
 
-    val _pc80bInfo = MutableLiveData<PC80BleResponse.DeviceInfo>()
-    val pc80bInfo: LiveData<PC80BleResponse.DeviceInfo> = _pc80bInfo
+    val _pc80bInfo = MutableLiveData<DeviceInfo>()
+    val pc80bInfo: LiveData<DeviceInfo> = _pc80bInfo
 
     val _bp2Info = MutableLiveData<Bp2DeviceInfo>()
     val bp2Info: LiveData<Bp2DeviceInfo> = _bp2Info
@@ -89,11 +90,16 @@ class MainViewModel: ViewModel() {
     val _oxyInfo = MutableLiveData<OxyBleResponse.OxyInfo>()
     val oxyInfo: LiveData<OxyBleResponse.OxyInfo> = _oxyInfo
 
-    val _pc100Info = MutableLiveData<Pc100DeviceInfo>()
-    val pc100Info: LiveData<Pc100DeviceInfo> = _pc100Info
+    val _pc100Info = MutableLiveData<com.lepu.blepro.ext.pc102.DeviceInfo>()
+    val pc100Info: LiveData<com.lepu.blepro.ext.pc102.DeviceInfo> = _pc100Info
 
     val _boInfo = MutableLiveData<BoDeviceInfo>()
     val boInfo: LiveData<BoDeviceInfo> = _boInfo
+
+    val _pc60fwInfo = MutableLiveData<com.lepu.blepro.ext.pc60fw.DeviceInfo>()
+    val pc60fwInfo: LiveData<com.lepu.blepro.ext.pc60fw.DeviceInfo> = _pc60fwInfo
+    val _ap20Info = MutableLiveData<com.lepu.blepro.ext.ap20.DeviceInfo>()
+    val ap20Info: LiveData<com.lepu.blepro.ext.ap20.DeviceInfo> = _ap20Info
 
     val _oxyPrAlarmFlag = MutableLiveData<Boolean>().apply { value = false }
     val oxyPrAlarmFlag: LiveData<Boolean> = _oxyPrAlarmFlag

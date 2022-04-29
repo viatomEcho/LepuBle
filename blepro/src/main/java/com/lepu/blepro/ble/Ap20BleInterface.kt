@@ -7,6 +7,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.BoDeviceInfo
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.ap20.*
 import com.lepu.blepro.utils.CrcUtil
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
@@ -21,6 +22,14 @@ import java.util.*
 class Ap20BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Ap20BleInterface"
     private var ap20Device = BoDeviceInfo()
+
+    private var deviceInfo = DeviceInfo()
+    private var getConfig = GetConfigResult()
+    private var setConfig = SetConfigResult()
+    private var oxyRtParam = RtOxyParam()
+    private var oxyRtWave = RtOxyWave()
+    private var breathRtParam = RtBreathParam()
+    private var breathRtWave = RtBreathWave()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = Ap20BleManager(context)
@@ -58,26 +67,40 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
                     ap20Device.hardwareV = data.hardwareV
                     LepuBleLog.d(tag, "model:$model, data.toString() == $data")
                     LepuBleLog.d(tag, "model:$model, DeviceInfo.deviceName:ap20Device.sn == " + data.deviceName + ":" + ap20Device.sn)
+
+                    deviceInfo.deviceName = ap20Device.deviceName
+                    deviceInfo.softwareV = ap20Device.softwareV
+                    deviceInfo.hardwareV = ap20Device.hardwareV
+                    deviceInfo.sn = ap20Device.sn
+
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20DeviceInfo).post(
-                        InterfaceEvent(model, ap20Device)
+                        InterfaceEvent(model, deviceInfo)
                     )
                 }
                 Ap20BleCmd.MSG_GET_BATTERY -> {
                     LepuBleLog.d(tag, "model:$model,MSG_GET_BATTERY => success")
                     LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
                     val data = toUInt(response.content)
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20Battery).post(InterfaceEvent(model, data))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20BatLevel).post(InterfaceEvent(model, data))
                 }
                 Ap20BleCmd.MSG_GET_BACKLIGHT -> {
                     LepuBleLog.d(tag, "model:$model,MSG_GET_BACKLIGHT => success")
                     LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
                     val data = Ap20BleResponse.ConfigInfo(byteArrayOf(0, response.content[0]))
                     LepuBleLog.d(tag, "model:$model, data.toString() == $data")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20ConfigInfo).post(InterfaceEvent(model, data))
+
+                    getConfig.data = data.data
+                    getConfig.type = data.type
+
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20GetConfigResult).post(InterfaceEvent(model, getConfig))
                 }
                 Ap20BleCmd.MSG_SET_BACKLIGHT -> {
                     LepuBleLog.d(tag, "model:$model,MSG_SET_BACKLIGHT => success")
                     LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
+                    val data = Ap20BleResponse.ConfigInfo(byteArrayOf(0, response.content[0]))
+                    setConfig.success = data.data == 1
+                    setConfig.type = data.type
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20SetConfigResult).post(InterfaceEvent(model, setConfig))
                 }
             }
         } else if (response.token == Ap20BleCmd.TOKEN_0F) {
@@ -94,13 +117,25 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model,MSG_RT_BO_PARAM => success")
                     val data = Ap20BleResponse.RtBoParam(response.content)
                     LepuBleLog.d(tag, "model:$model, data.toString() == $data")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBoParam).post(InterfaceEvent(model, data))
+
+                    oxyRtParam.battery = data.battery
+                    oxyRtParam.isProbeOff = data.isProbeOff
+                    oxyRtParam.pr = data.pr
+                    oxyRtParam.isPulseSearching = data.isPulseSearching
+                    oxyRtParam.pi = data.pi.div(10f)
+                    oxyRtParam.spo2 = data.spo2
+
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtOxyParam).post(InterfaceEvent(model, oxyRtParam))
                 }
                 Ap20BleCmd.MSG_RT_OXY_WAVE -> {
                     LepuBleLog.d(tag, "model:$model,MSG_RT_BO_WAVE => success")
                     val data = Ap20BleResponse.RtBoWave(response.content)
                     LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBoWave).post(InterfaceEvent(model, data))
+
+                    oxyRtWave.waveData = data.waveData
+                    oxyRtWave.waveIntData = data.waveIntData
+
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtOxyWave).post(InterfaceEvent(model, oxyRtWave))
                 }
                 Ap20BleCmd.MSG_SET_TIME -> {
                     LepuBleLog.d(tag, "model:$model,MSG_SET_TIME => success")
@@ -111,11 +146,21 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model,MSG_GET_CONFIG => success")
                     val data = Ap20BleResponse.ConfigInfo(response.content)
                     LepuBleLog.d(tag, "model:$model, data.toString() == $data")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20ConfigInfo).post(InterfaceEvent(model, data))
+
+                    getConfig.data = data.data
+                    getConfig.type = data.type
+
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20GetConfigResult).post(InterfaceEvent(model, getConfig))
                 }
                 Ap20BleCmd.MSG_SET_CONFIG -> {
                     LepuBleLog.d(tag, "model:$model,MSG_SET_CONFIG => success")
-                    LepuBleLog.d(tag, "model:$model, bytesToHex(response.content) == " + bytesToHex(response.content))
+                    val data = Ap20BleResponse.ConfigInfo(response.content)
+                    LepuBleLog.d(tag, "model:$model, data.toString() == $data")
+
+                    setConfig.success = data.data == 1
+                    setConfig.type = data.type
+
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20SetConfigResult).post(InterfaceEvent(model, setConfig))
                 }
             }
         } else if (response.token == Ap20BleCmd.TOKEN_2D) {
@@ -133,14 +178,24 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
                     val data = Ap20BleResponse.RtBreathParam(response.content)
                     LepuBleLog.d(tag, "model:$model, data.toString() == $data")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBreathParam).post(InterfaceEvent(model, data))
+
+                    breathRtParam.rr = data.rr
+                    breathRtParam.sign = data.sign
+
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBreathParam).post(InterfaceEvent(model, breathRtParam))
                 }
                 Ap20BleCmd.MSG_RT_BREATH_WAVE -> {
                     LepuBleLog.d(tag, "model:$model,MSG_RT_BREATH_WAVE => success")
                     LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
                     val data = Ap20BleResponse.RtBreathWave(response.content)
                     LepuBleLog.d(tag, "model:$model, data.toString() == $data")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBreathWave).post(InterfaceEvent(model, data))
+
+                    breathRtWave.flowBytes = data.flowBytes
+                    breathRtWave.flowInt = data.flowInt
+                    breathRtWave.snoreBytes = data.snoreBytes
+                    breathRtWave.snoreInt = data.snoreInt
+
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBreathWave).post(InterfaceEvent(model, breathRtWave))
                 }
             }
         }

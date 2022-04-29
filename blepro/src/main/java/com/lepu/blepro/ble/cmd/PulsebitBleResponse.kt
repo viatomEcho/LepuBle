@@ -191,11 +191,14 @@ class PulsebitBleResponse{
     class FileList(val bytes: ByteArray) {
         var size: Int
         var list = mutableListOf<Record>()
+        var fileNames = mutableListOf<String>()
 
         init {
             size = bytes.size.div(17)
             for (i in 0 until size) {
-                list.add(Record(bytes.copyOfRange(i*17, (i+1)*17)))
+                val record = Record(bytes.copyOfRange(i*17, (i+1)*17))
+                list.add(record)
+                fileNames.add(record.recordName)
             }
         }
 

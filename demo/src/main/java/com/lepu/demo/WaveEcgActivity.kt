@@ -5,7 +5,7 @@ import android.os.Handler
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.BleServiceHelper
+//import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.ble.cmd.CheckmeLeBleResponse
 import com.lepu.blepro.ble.cmd.PulsebitBleResponse
 import com.lepu.blepro.event.InterfaceEvent
@@ -27,7 +27,7 @@ class WaveEcgActivity : AppCompatActivity() {
         setContentView(R.layout.activity_wave_ecg)
 
         initLiveEvent()
-        BleServiceHelper.BleServiceHelper.readFile("", "20220414183025", Bluetooth.MODEL_PULSEBITEX, 0)
+//        BleServiceHelper.BleServiceHelper.readFile("", "20220414183025", Bluetooth.MODEL_PULSEBITEX, 0)
     }
 
     fun ecgWave() {

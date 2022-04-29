@@ -5,8 +5,8 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.util.Log
-import com.lepu.blepro.BleServiceHelper
-import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
+import com.lepu.blepro.ext.BleServiceHelper
+import com.lepu.blepro.ext.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.LeBp2wBleCmd
 import com.lepu.blepro.ble.data.*
@@ -725,7 +725,7 @@ class LpBleUtil {
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.pc68bDeleteFile(model)
+//                BleServiceHelper.pc68bDeleteFile(model)
             }
         }
         fun pc68bGetStateInfo(model: Int, interval: Int) {
@@ -735,7 +735,7 @@ class LpBleUtil {
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.pc68bGetStateInfo(model, interval)
+//                BleServiceHelper.pc68bGetStateInfo(model, interval)
             }
         }
         fun pc68bSetConfig(model: Int, config: Pc68bConfig) {
@@ -745,7 +745,7 @@ class LpBleUtil {
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.pc68bSetConfig(model, config)
+//                BleServiceHelper.pc68bSetConfig(model, config)
             }
         }
         fun pc68bGetConfig(model: Int) {
@@ -755,7 +755,7 @@ class LpBleUtil {
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.pc68bGetConfig(model)
+//                BleServiceHelper.pc68bGetConfig(model)
             }
         }
         fun pc68bGetTime(model: Int) {
@@ -765,7 +765,7 @@ class LpBleUtil {
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.pc68bGetTime(model)
+//                BleServiceHelper.pc68bGetTime(model)
             }
         }
         

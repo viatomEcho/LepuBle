@@ -16,6 +16,7 @@ import com.lepu.blepro.ble.data.Lew3Config
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.ap20.*
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.HexString.hexToBytes
 import com.lepu.blepro.utils.LepuBleLog
@@ -1382,15 +1383,15 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 ).show()
             })
         //------------------------------ap20-------------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20Battery)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20BatLevel)
             .observe(this, {
                 var data = it.data as Int
                 binding.content.text = "电量${data.toString()}"
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20ConfigInfo)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20GetConfigResult)
             .observe(this, {
-                var data = it.data as Ap20BleResponse.ConfigInfo
-                setReceiveCmd(data.bytes)
+                var data = it.data as GetConfigResult
+//                setReceiveCmd(data.bytes)
                 binding.content.text = data.toString()
             })
         //------------------------------lew3-------------------------------------
@@ -1473,7 +1474,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             })
 
         //---------------------pc68b-------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bStatusInfo)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bStatusInfo)
             .observe(this, {
                 val data = it.data as Pc68bBleResponse.StatusInfo
                 binding.content.text = data.toString()
@@ -1488,7 +1489,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 val config = it.data as Pc68bConfig
                 this.config = config
                 binding.content.text = config.toString()
-            })
+            })*/
 
 
         //-----------------------------------

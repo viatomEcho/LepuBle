@@ -16,7 +16,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.util.isEmpty
 import androidx.lifecycle.LifecycleService
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.BleServiceHelper
+import com.lepu.blepro.ext.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.*
 import com.lepu.blepro.event.EventMsgConst
@@ -133,7 +133,7 @@ open class BleService: LifecycleService() {
      */
     private fun startForeground() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel("foreground_service", "后台服务", NotificationManager.IMPORTANCE_NONE)
+            val channel = NotificationChannel("foreground_service", "ble service", NotificationManager.IMPORTANCE_NONE)
             channel.setShowBadge(false)
             channel.setSound(null, null)
             channel.enableVibration(false)

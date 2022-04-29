@@ -87,7 +87,12 @@ object CheckmeLeBleResponse{
 
     @ExperimentalUnsignedTypes
     class ListContent(val type: Int, val content: ByteArray) {
-
+        override fun toString(): String {
+            return """
+                type : $type
+                content : ${bytesToHex(content)}
+            """.trimIndent()
+        }
     }
 
     @ExperimentalUnsignedTypes
@@ -356,7 +361,6 @@ object CheckmeLeBleResponse{
             measureModeMess = getModeMess(0, measureMode)
             index++
             normal = byte2UInt(bytes[index]) == 0
-            index++
             recordName = getTimeString(year, month, day, hour, minute, second)
             timestamp = getSecondTimestamp(recordName)
         }

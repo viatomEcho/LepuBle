@@ -90,7 +90,7 @@ object Pc300BleResponse {
             var index = 0
             sys = ((byte2UInt(bytes[index]) and 0x7F) shl 8) + byte2UInt(bytes[index+1])
             result = (byte2UInt(bytes[index]) and 0x80) shr 7
-            resultMess = if (result == 0) "心率正常" else "心率不齐"
+            resultMess = if (result == 0) "HR normal" else "HR irregular"
             index += 2
             map = byte2UInt(bytes[index])
             index++
@@ -125,17 +125,17 @@ object Pc300BleResponse {
         }
 
         private fun getErrorMess(errorType: Int, errorNum: Int) : String {
-            if (errorType == 0) {
-                when(errorNum) {
-                    1 -> return "7S内打气不上30mmHg(气袋没绑好)"
-                    2 -> return "气袋压力超过295mmHg，进入超压保护"
-                    3 -> return "测量不到有效的脉搏"
-                    4 -> return "干预过多（测量中移动、说话等）"
-                    5 -> return "测量结果数值有误"
-                    6 -> return "漏气"
-                    14 -> return "电量过低，暂停使用"
-                }
-            } else if (errorType == 1) {
+//            if (errorType == 0) {
+            when(errorNum) {
+                1 -> return "Fail to inflate pressure to 30mmHg within 7 seconds(The cuff is not well-wrapped)"
+                2 -> return "Cuff pressure is over 295mmHg(Overpressure protection)"
+                3 -> return "No valid pulse is detected"
+                4 -> return "Excessive motion artifact"
+                5 -> return "The measurement fails"
+                6 -> return "Air leakage"
+                14 -> return "Low battery"
+            }
+            /*} else if (errorType == 1) {
                 when(errorNum) {
                     1 -> return "7S内打气不上30mmHg(气袋没绑好)"
                     2 -> return "气袋压力超过295mmHg，进入超压保护"
@@ -151,7 +151,7 @@ object Pc300BleResponse {
                     12 -> return "某次测量超过规定时间，成人袖带压超过200mmHg时为120秒，未超过时为90秒，新生儿为90秒"
                     14 -> return "电量过低，暂停使用"
                 }
-            }
+            }*/
             return ""
         }
 
@@ -274,17 +274,21 @@ object Pc300BleResponse {
             resultMess = getResultMess(result)
             unit = byte2UInt(bytes[index]) and 0x01
             index++
-            data = if (unit == 1) {
-                bytes2UIntBig(bytes[index], bytes[index+1]).div(10f)
+            data = if (bytes.size > 2) {
+                if (unit == 1) {
+                    bytes2UIntBig(bytes[index], bytes[index+1]).div(10f)
+                } else {
+                    bytesToHex(bytes.copyOfRange(index, index+2)).toInt().div(10f)
+                }
             } else {
-                bytesToHex(bytes.copyOfRange(index, index+2)).toInt().div(10f)
+                0f
             }
         }
         private fun getResultMess(result: Int): String {
             return when (result) {
-                0 -> "血糖结果正常"
-                1 -> "血糖结果偏低"
-                2 -> "血糖结果偏高"
+                0 -> "Normal"
+                1 -> "Low"
+                2 -> "High"
                 else -> ""
             }
         }
@@ -383,23 +387,23 @@ object Pc300BleResponse {
 
         fun getMess(result: Int): String {
             return when(result) {
-                0x00 -> "波形未见异常"
-                0x01 -> "波形疑似心跳稍快请注意休息"
-                0x02 -> "波形疑似心跳过快请注意休息"
-                0x03 -> "波形疑似阵发性心跳过快请咨询医生"
-                0x04 -> "波形疑似心跳稍缓请注意休息"
-                0x05 -> "波形疑似心跳过缓请注意休息"
-                0x06 -> "波形疑似偶发心跳间期缩短请咨询医生"
-                0x07 -> "波形疑似心跳间期不规则请咨询医生"
-                0x08 -> "波形疑似心跳稍快伴有偶发心跳间期缩短请咨询医生"
-                0x09 -> "波形疑似心跳稍缓伴有偶发心跳间期缩短请咨询医生"
-                0x0A -> "波形疑似心跳稍缓伴有心跳间期不规则请咨询医生"
-                0x0B -> "波形有漂移请重新测量"
-                0x0C -> "波形疑似心跳过快伴有波形漂移请咨询医生"
-                0x0D -> "波形疑似心跳过缓伴有波形漂移请咨询医生"
-                0x0E -> "波形疑似偶发心跳间期缩短伴有波形漂移请咨询医生"
-                0x0F -> "波形疑似心跳间期不规则伴有波形漂移请咨询医生"
-                0xFF -> "信号较差请重新测量"
+                0x00 -> "No irregular rhythm found(60bpm <= HR <= 100 bpm)"
+                0x01 -> "Suspected a little fast beat(100bpm < HR <= 110 bpm)"
+                0x02 -> "Suspected fast beat(HR > 110 bpm)"
+                0x03 -> "Suspected short run of fast beat"
+                0x04 -> "Suspected a little slow beat(50 bpm <= HR < 60 bpm)"
+                0x05 -> "Suspected slow beat(HR < 50 bpm)"
+                0x06 -> "Suspected short beat interval"
+                0x07 -> "Suspected irregular beat interval"
+                0x08 -> "Suspected fast beat with short beat interval"
+                0x09 -> "Suspected slow beat with short beat interval"
+                0x0A -> "Suspected slow beat with irregular beat interval"
+                0x0B -> "Waveform baseline wander"
+                0x0C -> "Suspected fast beat with baseline wander"
+                0x0D -> "Suspected slow beat with baseline wander"
+                0x0E -> "Suspected short beat interval with baseline wander"
+                0x0F -> "Suspected irregular beat interval with baseline wander"
+                0xFF -> "Poor Signal, please try again"
                 else -> ""
             }
         }

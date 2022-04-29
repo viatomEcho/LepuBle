@@ -157,12 +157,12 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         //-------------------------pc80b---------------------------
         LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceReady)
             .observe(this, {
-                Toast.makeText(this, "EventBleDeviceReady 连接成功", Toast.LENGTH_SHORT).show()
-                LpBleUtil.getInfo(viewModel.curBluetooth.value!!.modelNo)
+                Toast.makeText(this, "EventBleDeviceReady 连接成功 model $it", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it)
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bDeviceInfo)
             .observe(this, { event ->
-                (event.data as PC80BleResponse.DeviceInfo).let {
+                (event.data as com.lepu.blepro.ext.pc80b.DeviceInfo).let {
                     Toast.makeText(this, "pc80b 获取设备信息成功", Toast.LENGTH_SHORT).show()
                     viewModel._pc80bInfo.value = it
                 }
@@ -249,7 +249,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         //-------------------------pc100---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100DeviceInfo)
             .observe(this, { event ->
-                (event.data as Pc100DeviceInfo).let {
+                (event.data as com.lepu.blepro.ext.pc102.DeviceInfo).let {
                     Toast.makeText(this, "pc100 获取设备信息成功", Toast.LENGTH_SHORT).show()
                     viewModel._pc100Info.value = it
                 }
@@ -258,9 +258,9 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         //-------------------------pc60fw pc6n---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo)
             .observe(this, { event ->
-                (event.data as BoDeviceInfo).let {
+                (event.data as com.lepu.blepro.ext.pc60fw.DeviceInfo).let {
                     Toast.makeText(this, "pc60fw pc6n获取设备信息成功", Toast.LENGTH_SHORT).show()
-                    viewModel._boInfo.value = it
+                    viewModel._pc60fwInfo.value = it
                 }
             })
         //-------------------------ap20---------------------------
@@ -271,9 +271,9 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20DeviceInfo)
             .observe(this, { event ->
-                (event.data as BoDeviceInfo).let {
+                (event.data as com.lepu.blepro.ext.ap20.DeviceInfo).let {
                     Toast.makeText(this, "ap20 获取设备信息成功", Toast.LENGTH_SHORT).show()
-                    viewModel._boInfo.value = it
+                    viewModel._ap20Info.value = it
                 }
             })
 
@@ -319,11 +319,11 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 }
             })
         //-------------------------pc68b---------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bSetTime)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bSetTime)
             .observe(this, {
                 Toast.makeText(this, "pc68b 完成时间同步", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
-            })
+            })*/
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bDeviceInfo)
             .observe(this, { event ->
                 (event.data as BoDeviceInfo).let {
