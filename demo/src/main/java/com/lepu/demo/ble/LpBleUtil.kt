@@ -808,6 +808,26 @@ class LpBleUtil {
             BleServiceHelper.pc300GetBpMode(model)
         }*/
 
+        fun lemDeviceSwitch(model: Int, on: Boolean) {
+            BleServiceHelper.lemDeviceSwitch(model, on)
+        }
+        fun lemHeatMode(model: Int, on: Boolean) {
+            BleServiceHelper.lemHeatMode(model, on)
+        }
+        fun lemGetBattery(model: Int) {
+            BleServiceHelper.lemGetBattery(model)
+        }
+        fun lemMassMode(model: Int, mode: Int) {
+            BleServiceHelper.lemMassageMode(model, mode)
+        }
+        fun lemMassLevel(model: Int, level: Int) {
+            BleServiceHelper.lemMassageLevel(model, level)
+        }
+        fun lemMassTime(model: Int, time: Int) {
+            BleServiceHelper.lemMassageTime(model, time)
+        }
+
+
     }
 
 
