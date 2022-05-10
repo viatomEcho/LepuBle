@@ -366,6 +366,10 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
         if (model == Bluetooth.MODEL_PC80B
             || model == Bluetooth.MODEL_PC60FW
+            || model == Bluetooth.MODEL_PF_10A
+            || model == Bluetooth.MODEL_PF_10B
+            || model == Bluetooth.MODEL_PF_20A
+            || model == Bluetooth.MODEL_PF_20B
             || model == Bluetooth.MODEL_POD_1W
             || model == Bluetooth.MODEL_PC_60NW
             || model == Bluetooth.MODEL_POD2B
@@ -381,6 +385,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             || model == Bluetooth.MODEL_FETAL
             || model == Bluetooth.MODEL_VTM_AD5
             || model == Bluetooth.MODEL_VCOMIN
+            || model == Bluetooth.MODEL_LEM
             || model == Bluetooth.MODEL_PC300) { // 部分设备没有同步时间命令，发送此消息通知获取设备信息，进行绑定操作
             LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceReady).post(model)
         } else {

@@ -73,7 +73,7 @@ object Aoj20aBleResponse {
         var day: Int
         var hour: Int
         var minute: Int
-        var temp: Float  // 测温数据
+        var temp: Float  // 测温数据 ℃
 
         init {
             var index = 0
@@ -109,7 +109,7 @@ object Aoj20aBleResponse {
     class DeviceData(val bytes: ByteArray) {
         var mode: Int           // 测温模式
         var modeMsg: String
-        var battery: Int        // 电量数值
+        var battery: Int        // 电量数值 1-10 (10:100%)
         var version: Int        // 主机版本号
         var versionMsg: String
 

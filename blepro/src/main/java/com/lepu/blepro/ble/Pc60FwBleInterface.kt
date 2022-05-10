@@ -40,10 +40,15 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
         manager = if (model == Bluetooth.MODEL_PC60FW
             || model == Bluetooth.MODEL_OXYSMART
             || model == Bluetooth.MODEL_POD_1W
+            || model == Bluetooth.MODEL_PF_10A
+            || model == Bluetooth.MODEL_PF_10B
             || model == Bluetooth.MODEL_PC_60NW
             || model == Bluetooth.MODEL_PC_60B
             || model == Bluetooth.MODEL_POD2B) {
             Pc60FwBleManager(context)
+        } else if (model == Bluetooth.MODEL_PF_20A
+            || model == Bluetooth.MODEL_PF_20B) {
+            Pf20BleManager(context)
         } else {
             Pc6nBleManager(context)
         }

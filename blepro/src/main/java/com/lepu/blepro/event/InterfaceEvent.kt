@@ -504,4 +504,19 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * LemBleInterface
+     * 包含model: MODEL_LEM
+     */
+    interface LEM {
+        companion object {
+            const val EventLemDeviceInfo = "com.lepu.ble.lem.device.info"             // LemBleResponse.DeviceInfo
+            const val EventLemBattery = "com.lepu.ble.lem.battery"                    // int 1-100%
+            const val EventLemSetHeatMode = "com.lepu.ble.lem.set.heat.mode"          // boolean (true设置开成功，false设置关成功)
+            const val EventLemSetMassageMode = "com.lepu.ble.lem.set.massage.mode"    // int (LemBleCmd.MassageMode) 设置成功
+            const val EventLemSetMassageLevel = "com.lepu.ble.lem.set.massage.level"  // int (1-15，0关闭) 设置成功
+            const val EventLemSetMassageTime = "com.lepu.ble.lem.set.massage.time"    // int (LemBleCmd.MassageTime) 设置成功
+        }
+    }
+
 }

@@ -366,6 +366,14 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._pc300Info.value = it
                 }
             })
+        //-------------------------lem---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemDeviceInfo)
+            .observe(this, { event ->
+                (event.data as LemBleResponse.DeviceInfo).let {
+                    Toast.makeText(this, "lem 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._lemInfo.value = it
+                }
+            })
     }
     private fun needPermission(){
         PermissionX.init(this)

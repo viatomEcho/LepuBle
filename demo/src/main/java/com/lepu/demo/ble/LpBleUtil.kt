@@ -704,7 +704,9 @@ class LpBleUtil {
                     Bluetooth.MODEL_SP20 -> {
                         BleServiceHelper.sp20EnableRtData(model, type, enable)
                     }
-                    Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_POD_1W -> {
+                    Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_POD_1W,
+                    Bluetooth.MODEL_PF_10A, Bluetooth.MODEL_PF_10B,
+                    Bluetooth.MODEL_PF_20A, Bluetooth.MODEL_PF_20B-> {
                         BleServiceHelper.pc60fwEnableRtData(model, type, enable)
                     }
                     Bluetooth.MODEL_PC_68B -> {
@@ -805,6 +807,26 @@ class LpBleUtil {
         fun pc300GetBpMode(model: Int) {
             BleServiceHelper.pc300GetBpMode(model)
         }*/
+
+        fun lemDeviceSwitch(model: Int, on: Boolean) {
+            BleServiceHelper.lemDeviceSwitch(model, on)
+        }
+        fun lemHeatMode(model: Int, on: Boolean) {
+            BleServiceHelper.lemHeatMode(model, on)
+        }
+        fun lemGetBattery(model: Int) {
+            BleServiceHelper.lemGetBattery(model)
+        }
+        fun lemMassMode(model: Int, mode: Int) {
+            BleServiceHelper.lemMassageMode(model, mode)
+        }
+        fun lemMassLevel(model: Int, level: Int) {
+            BleServiceHelper.lemMassageLevel(model, level)
+        }
+        fun lemMassTime(model: Int, time: Int) {
+            BleServiceHelper.lemMassageTime(model, time)
+        }
+
 
     }
 

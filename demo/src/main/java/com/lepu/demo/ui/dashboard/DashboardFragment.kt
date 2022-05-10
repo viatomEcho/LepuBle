@@ -130,6 +130,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_PC80B -> waveHandler.post(EcgWaveTask())
 
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
+            Bluetooth.MODEL_PF_10A, Bluetooth.MODEL_PF_10B,
+            Bluetooth.MODEL_PF_20A, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC66B,
             Bluetooth.MODEL_AP20, Bluetooth.MODEL_BABYO2,
             Bluetooth.MODEL_SP20, Bluetooth.MODEL_TV221U,
@@ -726,6 +728,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.oxyLayout.visibility = View.GONE
                 }
                 Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
+                Bluetooth.MODEL_PF_10A, Bluetooth.MODEL_PF_10B,
+                Bluetooth.MODEL_PF_20A, Bluetooth.MODEL_PF_20B,
                 Bluetooth.MODEL_PC66B, Bluetooth.MODEL_AP20,
                 Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_SP20,
                 Bluetooth.MODEL_TV221U, Bluetooth.MODEL_BABYO2N,
@@ -926,6 +930,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         }
                     }
                     Bluetooth.MODEL_SP20, Bluetooth.MODEL_PC60FW,
+                    Bluetooth.MODEL_PF_10A, Bluetooth.MODEL_PF_10B,
+                    Bluetooth.MODEL_PF_20A, Bluetooth.MODEL_PF_20B,
                     Bluetooth.MODEL_PC66B, Bluetooth.MODEL_POD_1W,
                     Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
                     Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_PC_60B -> {

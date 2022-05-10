@@ -285,7 +285,8 @@ class BleServiceHelper private constructor() {
     fun canReconnectByName(model: Int): Boolean {
         return when(model) {
             Bluetooth.MODEL_PC80B, Bluetooth.MODEL_FHR, Bluetooth.MODEL_BPW1,
-            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F5_SCALE -> false
+            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F5_SCALE,
+            Bluetooth.MODEL_AOJ20A -> false
             else -> true
         }
     }
@@ -564,7 +565,9 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
             Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW,
-            Bluetooth.MODEL_PC_60B -> {
+            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10A,
+            Bluetooth.MODEL_PF_10B, Bluetooth.MODEL_PF_20A,
+            Bluetooth.MODEL_PF_20B -> {
                 return inter is Pc60FwBleInterface
             }
             Bluetooth.MODEL_PC80B -> {
@@ -1973,6 +1976,61 @@ class BleServiceHelper private constructor() {
             (it1 as Pc300BleInterface).let {
                 LepuBleLog.d(tag, "it as Pc300BleInterface--pc300StopEcg")
                 it.stopEcg()
+            }
+        }
+    }
+
+    fun lemDeviceSwitch(model: Int, on: Boolean) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LemBleInterface).let {
+                LepuBleLog.d(tag, "it as LemBleInterface--lemDeviceSwitch")
+                it.deviceSwitch(on)
+            }
+        }
+    }
+    fun lemGetBattery(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LemBleInterface).let {
+                LepuBleLog.d(tag, "it as LemBleInterface--getBattery")
+                it.getBattery()
+            }
+        }
+    }
+    fun lemHeatMode(model: Int, on: Boolean) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LemBleInterface).let {
+                LepuBleLog.d(tag, "it as LemBleInterface--lemHeatMode")
+                it.heatMode(on)
+            }
+        }
+    }
+    fun lemMassageMode(model: Int, mode: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LemBleInterface).let {
+                LepuBleLog.d(tag, "it as LemBleInterface--lemMassageMode")
+                it.massageMode(mode)
+            }
+        }
+    }
+    fun lemMassageLevel(model: Int, level: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LemBleInterface).let {
+                LepuBleLog.d(tag, "it as LemBleInterface--lemMassageMode")
+                it.massageLevel(level)
+            }
+        }
+    }
+    fun lemMassageTime(model: Int, time: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LemBleInterface).let {
+                LepuBleLog.d(tag, "it as LemBleInterface--lemMassageTime")
+                it.massageTime(time)
             }
         }
     }

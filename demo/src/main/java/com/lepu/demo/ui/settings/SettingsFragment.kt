@@ -80,6 +80,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.pc68bLayout.visibility = View.GONE
         binding.ad5Layout.visibility = View.GONE
         binding.pc300Layout.visibility = View.GONE
+        binding.lemLayout.visibility = View.GONE
         if (v == null) return
         v.visibility = View.VISIBLE
     }
@@ -154,6 +155,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
                 Bluetooth.MODEL_PC300 -> {
                     setViewVisible(binding.pc300Layout)
+                }
+                Bluetooth.MODEL_LEM -> {
+                    setViewVisible(binding.lemLayout)
+                    LpBleUtil.getInfo(it.modelNo)
                 }
                 else -> {
                     setViewVisible(null)
@@ -920,6 +925,52 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }*/
 
+        // ---------------------------lem---------------------------
+        binding.lemDeviceSwitch.setOnClickListener {
+            switchState = !switchState
+            LpBleUtil.lemDeviceSwitch(Constant.BluetoothConfig.currentModel[0], switchState)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lemHeatSwitch.setOnClickListener {
+            switchState = !switchState
+            LpBleUtil.lemHeatMode(Constant.BluetoothConfig.currentModel[0], switchState)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lemGetBattery.setOnClickListener {
+            LpBleUtil.lemGetBattery(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lemMassMode.setOnClickListener {
+            state++
+            if (state > LemBleCmd.MassageMode.AUTOMATIC) {
+                state = LemBleCmd.MassageMode.VITALITY
+            }
+            LpBleUtil.lemMassMode(Constant.BluetoothConfig.currentModel[0], state)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lemMassTime.setOnClickListener {
+            state++
+            if (state > LemBleCmd.MassageTime.MIN_5) {
+                state = LemBleCmd.MassageTime.MIN_15
+            }
+            LpBleUtil.lemMassTime(Constant.BluetoothConfig.currentModel[0], state)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lemMassLevel.setOnClickListener {
+            state++
+            if (state > 15) {
+                state = 0
+            }
+            LpBleUtil.lemMassLevel(Constant.BluetoothConfig.currentModel[0], state)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+
     }
 
     private fun setReceiveCmd(bytes: ByteArray) {
@@ -1490,6 +1541,92 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 this.config = config
                 binding.content.text = config.toString()
             })*/
+
+        // --------------------------LEM--------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemDeviceInfo)
+            .observe(this, {
+                val data = it.data as LemBleResponse.DeviceInfo
+                binding.content.text = data.toString()
+                binding.lemGetBattery.text = "电量${data.battery}%"
+                binding.lemHeatSwitch.text = "加热${data.heatMode}"
+                binding.lemMassMode.text = when (data.massageMode) {
+                    LemBleCmd.MassageMode.VITALITY -> "活力模式"
+                    LemBleCmd.MassageMode.DYNAMIC -> "动感模式"
+                    LemBleCmd.MassageMode.HAMMERING -> "捶击模式"
+                    LemBleCmd.MassageMode.SOOTHING -> "舒缓模式"
+                    LemBleCmd.MassageMode.AUTOMATIC -> "自动模式"
+                    else -> ""
+                }
+                binding.lemMassLevel.text = "按摩力度${data.massageLevel}"
+                binding.lemMassTime.text = when (data.massageTime) {
+                    LemBleCmd.MassageTime.MIN_15 -> "15min"
+                    LemBleCmd.MassageTime.MIN_10 -> "10min"
+                    LemBleCmd.MassageTime.MIN_5 -> "5min"
+                    else -> ""
+                }
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemBattery)
+            .observe(this, {
+                val data = it.data as Int
+                binding.lemGetBattery.text = "电量$data%"
+                Toast.makeText(
+                    context,
+                    "lem 获取电量成功",
+                    Toast.LENGTH_SHORT
+                ).show()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetHeatMode)
+            .observe(this, {
+                val data = it.data as Boolean
+                binding.lemHeatSwitch.text = "加热$data"
+                Toast.makeText(
+                    context,
+                    "lem 设置加热模式 $data 成功",
+                    Toast.LENGTH_SHORT
+                ).show()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetMassageMode)
+            .observe(this, {
+                val data = it.data as Int
+                binding.lemMassMode.text = when (data) {
+                    LemBleCmd.MassageMode.VITALITY -> "活力模式"
+                    LemBleCmd.MassageMode.DYNAMIC -> "动感模式"
+                    LemBleCmd.MassageMode.HAMMERING -> "捶击模式"
+                    LemBleCmd.MassageMode.SOOTHING -> "舒缓模式"
+                    LemBleCmd.MassageMode.AUTOMATIC -> "自动模式"
+                    else -> ""
+                }
+                Toast.makeText(
+                    context,
+                    "lem 设置按摩模式 $data 成功",
+                    Toast.LENGTH_SHORT
+                ).show()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetMassageLevel)
+            .observe(this, {
+                val data = it.data as Int
+                binding.lemMassLevel.text = "按摩力度$data"
+                Toast.makeText(
+                    context,
+                    "lem 设置按摩力度 $data 成功",
+                    Toast.LENGTH_SHORT
+                ).show()
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetMassageTime)
+            .observe(this, {
+                val data = it.data as Int
+                binding.lemMassTime.text = when (data) {
+                    LemBleCmd.MassageTime.MIN_15 -> "15min"
+                    LemBleCmd.MassageTime.MIN_10 -> "10min"
+                    LemBleCmd.MassageTime.MIN_5 -> "5min"
+                    else -> ""
+                }
+                Toast.makeText(
+                    context,
+                    "lem 设置按摩时间 $data 成功",
+                    Toast.LENGTH_SHORT
+                ).show()
+            })
 
 
         //-----------------------------------
