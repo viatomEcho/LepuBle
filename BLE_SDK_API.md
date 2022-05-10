@@ -129,6 +129,12 @@
   >集成PC-300
   >
   >集成PF-10A, PF-10B, PF-20A, PF-20B
+  
+- 2.0.1.11
+
+  >集成护颈仪
+  >
+  >修改PF-20A，PF-20B接收数据速率问题
 
 
 
@@ -226,11 +232,11 @@
 
 - `getInfo(model: Int)` ：获取主机信息
 
-- `getFileList(model: Int, fileType: Int = LeBp2wBleCmd.FileType.ECG_TYPE)` 
+- `getFileList(model: Int, fileType: Int? = null)` 
 
   > 获取设备文件列表
   >
-  > fileType：LeBp2w获取文件列表类型
+  > fileType：LeBp2w (LeBp2wBleCmd.FileType)，CheckmeLE (CheckmeLeBleCmd.ListType)
 
 - `readFile(userId: String, fileName: String, model: Int, offset: Int = 0)` ：读取主机文件，进入读文件流程前APP要手动停止实时任务状态
 
@@ -418,12 +424,35 @@
 
 - `ad5EnableRtData(model: Int, enable: Boolean)` ：使能实时数据发送
 
+------------------------------------------------------------------------------LEM----------------------------------------------------------------------
+
+- `lemGetBattery(model: Int)` ：获取电量
+
+- `lemHeatMode(model: Int, on: Boolean)` : 恒温加热模式开关
+
+- `lemMassageMode(model: Int, mode: Int)` 
+
+  >设置按摩模式
+  >
+  >mode：LemBleCmd.MassageMode
+
+- `lemMassageLevel(model: Int, level: Int)` 
+
+  >设置按摩力度等级
+  >
+  >level：1-15挡，0关闭
+
+- `lemMassageTime(model: Int, time: Int)` 
+
+  >设置按摩时间
+  >
+  >time：LemBleCmd.MassageTime
+
 
 
 ## `InterfaceEvent` 
 
 ```kotlin
-
 class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
@@ -606,7 +635,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      * PC60FwBleInterface发出的通知
      * 包含model: MODEL_PC60FW, MODEL_PC66B, MODEL_OXYSMART,
      *           MODEL_POD_1W, MODEL_POD2B, MODEL_PC_60NW,
-     *           MODEL_PC_60B
+     *           MODEL_PC_60B, MODEL_PF_10A, MODEL_PF_10B,
+     *           MODEL_PF_20A, MODEL_PF_20B
      */
     interface PC60Fw {
         companion object {
@@ -902,6 +932,21 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventCheckmeLeReadingFileProgress = "com.lepu.ble.checkmele.reading.file.progress"   // 获取文件进度 int
             const val EventCheckmeLeReadFileComplete = "com.lepu.ble.checkmele.read.file.complete"         // 获取文件完成 CheckmeLeBleResponse.EcgFile
             const val EventCheckmeLeReadFileError = "com.lepu.ble.checkmele.read.file.error"               // 获取文件出错 boolean
+        }
+    }
+
+    /**
+     * LemBleInterface
+     * 包含model: MODEL_LEM
+     */
+    interface LEM {
+        companion object {
+            const val EventLemDeviceInfo = "com.lepu.ble.lem.device.info"             // LemBleResponse.DeviceInfo
+            const val EventLemBattery = "com.lepu.ble.lem.battery"                    // int 1-100%
+            const val EventLemSetHeatMode = "com.lepu.ble.lem.set.heat.mode"          // boolean (true设置开成功，false设置关成功)
+            const val EventLemSetMassageMode = "com.lepu.ble.lem.set.massage.mode"    // int (LemBleCmd.MassageMode) 设置成功
+            const val EventLemSetMassageLevel = "com.lepu.ble.lem.set.massage.level"  // int (1-15，0关闭) 设置成功
+            const val EventLemSetMassageTime = "com.lepu.ble.lem.set.massage.time"    // int (LemBleCmd.MassageTime) 设置成功
         }
     }
 

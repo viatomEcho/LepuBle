@@ -31,12 +31,13 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             || model == Bluetooth.MODEL_POD_1W
             || model == Bluetooth.MODEL_PF_10A
             || model == Bluetooth.MODEL_PF_10B
-            || model == Bluetooth.MODEL_PF_20A
-            || model == Bluetooth.MODEL_PF_20B
             || model == Bluetooth.MODEL_PC_60NW
             || model == Bluetooth.MODEL_PC_60B
             || model == Bluetooth.MODEL_POD2B) {
             Pc60FwBleManager(context)
+        } else if (model == Bluetooth.MODEL_PF_20A
+            || model == Bluetooth.MODEL_PF_20B) {
+            Pf20BleManager(context)
         } else {
             Pc6nBleManager(context)
         }
