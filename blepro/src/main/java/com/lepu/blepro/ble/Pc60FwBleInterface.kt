@@ -106,7 +106,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                 TYPE_BATTERY_LEVEL -> {
                     LepuBleLog.d(tag, "model:$model,EventPC60FwBattery => success")
                     PC60FwBleResponse.Battery(response.content).let {
-                        if (model == Bluetooth.MODEL_POD_1W) {
+                        if (model == Bluetooth.MODEL_POD_1W || model == Bluetooth.MODEL_POD2B) {
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.POD1w.EventPOD1wBatLevel).post(InterfaceEvent(model, it.batteryLevel.toInt()))
                         } else {
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwBatLevel).post(InterfaceEvent(model, it.batteryLevel.toInt()))
@@ -129,7 +129,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "it.hardwareV == " + it.hardwareV)
                         LepuBleLog.d(tag, "it.softwareV == " + it.softwareV)
 
-                        if (model == Bluetooth.MODEL_POD_1W) {
+                        if (model == Bluetooth.MODEL_POD_1W || model == Bluetooth.MODEL_POD2B) {
                             pod1wDeviceInfo.deviceName = pc60FwDevice.deviceName
                             pod1wDeviceInfo.hardwareV = pc60FwDevice.hardwareV
                             pod1wDeviceInfo.sn = pc60FwDevice.sn
@@ -152,7 +152,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model,EventPC60FwRtDataParam => success")
                     PC60FwBleResponse.RtDataParam(response.content).let {
 
-                        if (model == Bluetooth.MODEL_POD_1W) {
+                        if (model == Bluetooth.MODEL_POD_1W || model == Bluetooth.MODEL_POD2B) {
                             pod1wRtParam.isProbeOff = it.isProbeOff
                             pod1wRtParam.pr = it.pr
                             pod1wRtParam.isPulseSearching = it.isPulseSearching
@@ -180,7 +180,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model,EventPC60FwRtDataWave => success")
                     LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
                     PC60FwBleResponse.RtDataWave(response.content).let {
-                        if (model == Bluetooth.MODEL_POD_1W) {
+                        if (model == Bluetooth.MODEL_POD_1W || model == Bluetooth.MODEL_POD2B) {
                             pod1wRtWave.waveData = it.waveData
                             pod1wRtWave.waveIntData = it.waveIntData
 
