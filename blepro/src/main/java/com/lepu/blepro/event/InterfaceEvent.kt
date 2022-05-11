@@ -376,8 +376,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         companion object {
             const val EventAOJ20aTempRtData = "com.lepu.ble.aoj20a.temp.rtdata"         // 实时测温数据 Aoj20aBleResponse.TempRtData
             const val EventAOJ20aSetTime = "com.lepu.ble.aoj20a.set.time"               // 同步时间 boolean
-            const val EventAOJ20aTempRecord = "com.lepu.ble.aoj20a.temp.record"         // 历史测量数据 Aoj20aBleResponse.TempRecord
-            const val EventAOJ20aNoTempRecord = "com.lepu.ble.aoj20a.no.temp.record"    // 无历史数据 boolean
+            const val EventAOJ20aTempList = "com.lepu.ble.aoj20a.temp.list"             // 历史测量数据 ArrayList<Aoj20aBleResponse.TempRecord>
             const val EventAOJ20aDeviceData = "com.lepu.ble.aoj20a.device.data"         // 设备数据 Aoj20aBleResponse.DeviceData
             const val EventAOJ20aTempErrorMsg = "com.lepu.ble.aoj20a.temp.error.msg"    // 错误码数据 Aoj20aBleResponse.ErrorMsg
             const val EventAOJ20aDeleteData = "com.lepu.ble.aoj20a.delete.data"         // 删除历史数据 boolean

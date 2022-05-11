@@ -216,7 +216,7 @@ class CheckmePodBleResponse{
     @ExperimentalUnsignedTypes
     class FileList(val bytes: ByteArray) {
         var size: Int
-        var list = mutableSetOf<Record>()
+        var list = mutableListOf<Record>()
 
         init {
             size = bytes.size.div(17)

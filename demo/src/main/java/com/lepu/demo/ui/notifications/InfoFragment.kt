@@ -37,7 +37,6 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
     private var isReceive = false
 
-    private var tempList = mutableListOf<Aoj20aBleResponse.TempRecord>()
     private var pc68bList = mutableListOf<Pc68bBleResponse.Record>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -122,7 +121,6 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         binding.getFileList.setOnClickListener {
             fileCount = 0
             fileNames.clear()
-            tempList.clear()
             pc68bList.clear()
 
             fileType++
@@ -480,11 +478,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 }
             })
         //---------------------------aoj20a-----------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempRecord)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempList)
             .observe(this, {
-                val data = it.data as Aoj20aBleResponse.TempRecord
-                tempList.add(data)
-                binding.info.text = tempList.toString()
+                val data = it.data as ArrayList<Aoj20aBleResponse.TempRecord>
+                binding.info.text = data.toString()
+                Toast.makeText(context, "aoj20a 获取文件列表成功 共有${data.size}个文件", Toast.LENGTH_SHORT).show()
             })
         //---------------------------checkme pod--------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListError)

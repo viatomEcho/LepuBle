@@ -19,6 +19,8 @@ class Aoj20aBleInterface(model: Int): BleInterface(model) {
 
     private lateinit var context: Context
 
+    private var tempList = arrayListOf<Aoj20aBleResponse.TempRecord>()
+
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
         manager = Aoj20aBleManager(context)
@@ -53,14 +55,13 @@ class Aoj20aBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempRtData).post(InterfaceEvent(model, info))
             }
             Aoj20aBleCmd.MSG_GET_HISTORY_DATA -> {
-                if (response.len == 0) {
-                    LepuBleLog.d(tag, "model:$model,MSG_GET_HISTORY_DATA => null " + bytesToHex(response.bytes))
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aNoTempRecord).post(InterfaceEvent(model, true))
-                    return
-                }
                 LepuBleLog.d(tag, "model:$model,MSG_GET_HISTORY_DATA => success " + bytesToHex(response.bytes))
-                val info = Aoj20aBleResponse.TempRecord(response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempRecord).post(InterfaceEvent(model, info))
+                if (response.len != 0) {
+                    val info = Aoj20aBleResponse.TempRecord(response.content)
+                    tempList.add(info)
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempList).post(InterfaceEvent(model, tempList))
+                }
             }
             Aoj20aBleCmd.MSG_DELETE_HISTORY_DATA -> {
                 LepuBleLog.d(tag, "model:$model,MSG_DELETE_HISTORY_DATA => success " + bytesToHex(response.bytes))
@@ -141,6 +142,7 @@ class Aoj20aBleInterface(model: Int): BleInterface(model) {
      * get file list
      */
     override fun getFileList() {
+        tempList.clear()
         sendCmd(Aoj20aBleCmd.getHistoryData())
     }
 
