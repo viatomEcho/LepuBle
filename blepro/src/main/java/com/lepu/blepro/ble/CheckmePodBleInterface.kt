@@ -8,6 +8,7 @@ import com.lepu.blepro.ble.cmd.BleCRC
 import com.lepu.blepro.ble.cmd.CheckmePodBleCmd
 import com.lepu.blepro.ble.cmd.CheckmePodBleResponse
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.checkmepod.*
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toHex
 import com.lepu.blepro.utils.toUInt
@@ -19,6 +20,12 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
 
     var curFileName: String? = null
     var curFile: CheckmePodBleResponse.OxiTFile? = null
+
+    private var deviceInfo = DeviceInfo()
+    private var rtData = RtData()
+    private var rtParam = RtParam()
+    private var rtWave = RtWave()
+    private var fileList = arrayListOf<Record>()
 
     /**
      * 是否需要发送实时指令，不会停止实时任务
@@ -115,7 +122,20 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
                     runRtImmediately = false
                 }
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success $info")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodDeviceInfo).post(InterfaceEvent(model, info))
+
+                deviceInfo.region = info.region
+                deviceInfo.model = info.model
+                deviceInfo.hwVersion = info.hwVersion
+                deviceInfo.swVersion = info.swVersion
+                deviceInfo.lgVersion = info.lgVersion
+                deviceInfo.curLanguage = info.curLanguage
+                deviceInfo.sn = info.sn
+                deviceInfo.fileVer = info.fileVer
+                deviceInfo.spcpVer = info.spcpVer
+                deviceInfo.branchCode = info.branchCode
+                deviceInfo.application = info.application
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodDeviceInfo).post(InterfaceEvent(model, deviceInfo))
             }
 
             CheckmePodBleCmd.OXY_CMD_READ_START -> {
@@ -147,8 +167,25 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
                 }
                 val data = CheckmePodBleResponse.RtData(response.content)
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_RT_DATA => success $data")
+
+                rtParam.pr = data.param.pr
+                rtParam.spo2 = data.param.spo2
+                rtParam.pi = data.param.pi
+                rtParam.temp = data.param.temp
+                rtParam.oxyState = data.param.oxyState
+                rtParam.tempState = data.param.tempState
+                rtParam.batteryState = data.param.batteryState
+                rtParam.battery = data.param.battery
+                rtParam.runStatus = data.param.runStatus
+
+                rtWave.waveData = data.wave.waveByte
+                rtWave.waveIntData = data.wave.wFs
+
+                rtData.param = rtParam
+                rtData.wave = rtWave
+
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodRtData).post(
-                    InterfaceEvent(model, data)
+                    InterfaceEvent(model, rtData)
                 )
             }
 
@@ -175,8 +212,28 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
 
                 curFile?.let {
                     val data = CheckmePodBleResponse.FileList(it.fileContent)
+
+                    for (i in data.list) {
+                        val record = Record()
+                        record.timestamp = i.timestamp
+                        record.recordName = i.recordName
+                        record.year = i.year
+                        record.month = i.month
+                        record.day = i.day
+                        record.hour = i.hour
+                        record.minute = i.minute
+                        record.second = i.second
+                        record.leadType = i.leadType
+                        record.leadTypeMess = i.leadTypeMess
+                        record.spo2 = i.spo2
+                        record.pr = i.pr
+                        record.pi = i.pi
+                        record.temp = i.temp
+                        fileList.add(record)
+                    }
+
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodFileList).post(
-                        InterfaceEvent(model, data)
+                        InterfaceEvent(model, fileList)
                     )
                     LepuBleLog.d(tag, "model:$model,  FileList $data")
 
@@ -222,6 +279,7 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
 
     }
     override fun getFileList() {
+        fileList.clear()
         dealReadFile("", "oxi_T.dat")
     }
 

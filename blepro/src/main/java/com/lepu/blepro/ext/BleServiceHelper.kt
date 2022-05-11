@@ -1822,6 +1822,15 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    fun checkmePodGetInfo(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.getInfo()
+    }
+    fun checkmePodGetFileList(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.getFileList()
+    }
+
     fun checkmeLeGetInfo(model: Int) {
         if (!checkService()) return
         getInterface(model)?.getInfo()

@@ -1,13 +1,11 @@
 package com.lepu.blepro.ble.cmd
 
-import android.os.Parcelable
-import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.ByteUtils.toSignedShort
+import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
-import kotlinx.android.parcel.Parcelize
 import org.json.JSONObject
 import java.util.*
 
@@ -216,7 +214,7 @@ class CheckmePodBleResponse{
     @ExperimentalUnsignedTypes
     class FileList(val bytes: ByteArray) {
         var size: Int
-        var list = mutableSetOf<Record>()
+        var list = mutableListOf<Record>()
 
         init {
             size = bytes.size.div(17)
@@ -235,6 +233,8 @@ class CheckmePodBleResponse{
 
     @ExperimentalUnsignedTypes
     class Record(val bytes: ByteArray) {
+        var timestamp: Long   // 时间戳 秒s
+        var recordName: String
         var year: Int
         var month: Int
         var day: Int
@@ -242,6 +242,7 @@ class CheckmePodBleResponse{
         var minute: Int
         var second: Int
         var leadType: Int
+        var leadTypeMess: String
         var spo2: Int
         var pr: Int
         var pi: Float
@@ -262,6 +263,7 @@ class CheckmePodBleResponse{
             second = byte2UInt(bytes[index])
             index++
             leadType = byte2UInt(bytes[index])
+            leadTypeMess = getTypeMess(leadType)
             index++
             spo2 = byte2UInt(bytes[index])
             index++
@@ -270,6 +272,16 @@ class CheckmePodBleResponse{
             pi = byte2UInt(bytes[index]).div(10f)
             index++
             temp = toUInt(bytes.copyOfRange(index, index+2)).div(10f)
+            recordName = CheckmeLeBleResponse.getTimeString(year, month, day, hour, minute, second)
+            timestamp = DateUtil.getSecondTimestamp(recordName)
+        }
+
+        private fun getTypeMess(type: Int): String {
+            return when (type) {
+                0 -> "Internal"
+                1 -> "External"
+                else -> ""
+            }
         }
 
         override fun toString(): String {
@@ -281,10 +293,13 @@ class CheckmePodBleResponse{
                 minute : $minute
                 second : $second
                 leadType : $leadType
+                leadTypeMess : $leadTypeMess
                 spo2 : $spo2
                 pr : $pr
                 pi : $pi
                 temp : $temp
+                recordName : $recordName
+                timestamp : $timestamp
             """.trimIndent()
         }
     }
