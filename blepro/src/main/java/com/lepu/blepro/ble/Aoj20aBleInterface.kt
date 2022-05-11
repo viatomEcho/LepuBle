@@ -6,6 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.aoj20a.*
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 
@@ -19,7 +20,10 @@ class Aoj20aBleInterface(model: Int): BleInterface(model) {
 
     private lateinit var context: Context
 
-    private var tempList = arrayListOf<Aoj20aBleResponse.TempRecord>()
+    private var deviceInfo = DeviceInfo()
+    private var result = TempResult()
+    private var tempList = arrayListOf<Record>()
+    private var errorResult = ErrorResult()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
@@ -52,13 +56,26 @@ class Aoj20aBleInterface(model: Int): BleInterface(model) {
                 }
                 LepuBleLog.d(tag, "model:$model,MSG_TEMP_MEASURE => success " + bytesToHex(response.bytes))
                 val info = Aoj20aBleResponse.TempRtData(response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempRtData).post(InterfaceEvent(model, info))
+
+                result.temp = info.temp
+                result.mode = info.mode
+                result.modeMess = info.modeMsg
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempRtData).post(InterfaceEvent(model, result))
             }
             Aoj20aBleCmd.MSG_GET_HISTORY_DATA -> {
                 LepuBleLog.d(tag, "model:$model,MSG_GET_HISTORY_DATA => success " + bytesToHex(response.bytes))
                 if (response.len != 0) {
                     val info = Aoj20aBleResponse.TempRecord(response.content)
-                    tempList.add(info)
+                    val record = Record()
+                    record.num = info.num
+                    record.year = info.year
+                    record.month = info.month
+                    record.day = info.day
+                    record.hour = info.hour
+                    record.minute = info.minute
+                    record.temp = info.temp
+                    tempList.add(record)
                 } else {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempList).post(InterfaceEvent(model, tempList))
                 }
@@ -74,7 +91,13 @@ class Aoj20aBleInterface(model: Int): BleInterface(model) {
                 }
                 LepuBleLog.d(tag, "model:$model,MSG_GET_DEVICE_DATA => success " + bytesToHex(response.bytes))
                 val info = Aoj20aBleResponse.DeviceData(response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aDeviceData).post(InterfaceEvent(model, info))
+
+                deviceInfo.mode = info.mode
+                deviceInfo.modeMess = info.modeMsg
+                deviceInfo.battery = info.battery
+                deviceInfo.version = info.versionMsg
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aDeviceData).post(InterfaceEvent(model, deviceInfo))
             }
             Aoj20aBleCmd.MSG_ERROR_CODE -> {
                 if (response.len == 0) {
@@ -83,7 +106,11 @@ class Aoj20aBleInterface(model: Int): BleInterface(model) {
                 }
                 LepuBleLog.d(tag, "model:$model,MSG_ERROR_CODE => success " + bytesToHex(response.bytes))
                 val info = Aoj20aBleResponse.ErrorMsg(response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempErrorMsg).post(InterfaceEvent(model, info))
+
+                errorResult.code = info.code
+                errorResult.codeMess = info.codeMsg
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempErrorMsg).post(InterfaceEvent(model, errorResult))
 
             }
         }

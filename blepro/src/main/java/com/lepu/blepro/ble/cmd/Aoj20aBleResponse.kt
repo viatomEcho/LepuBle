@@ -57,10 +57,10 @@ object Aoj20aBleResponse {
 
     private fun getModeMsg(mode: Int): String {
         return when(mode) {
-            0x01 -> "成人额温模式"
-            0x02 -> "儿童额温模式"
-            0x03 -> "耳温模式"
-            0x04 -> "物温模式"
+            0x01 -> "Adult frontal temperature"
+            0x02 -> "Children's frontal temperature"
+            0x03 -> "Ear temperature"
+            0x04 -> "Material temperature"
             else -> ""
         }
     }
@@ -159,11 +159,11 @@ object Aoj20aBleResponse {
 
         private fun getCodeMsg(code: Int): String {
             return when(code) {
-                0xe1 -> "环境温度 > 40℃或 < 10℃（Er1）"
-                0xe2 -> "物温模式 < 0℃（Lo）"
-                0xe3 -> "物温模式 > 100℃（Hi）"
-                0xe4 -> "人体测温模式 < 32℃（Lo）"
-                0xe5 -> "人体测温模式 > 42.9℃（Hi）"
+                0xe1 -> "Ambient temperature > 40℃ or < 10℃"
+                0xe2 -> "Material temperature < 0℃"
+                0xe3 -> "Material temperature > 100℃"
+                0xe4 -> "Human body temperature < 32℃"
+                0xe5 -> "Human body temperature > 42.9℃"
                 else -> ""
             }
         }

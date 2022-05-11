@@ -1674,6 +1674,14 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    fun aoj20aGetInfo(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.getInfo()
+    }
+    fun aoj20aGetFileList(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.getFileList()
+    }
     /**
      * 删除历史数据（aoj20a）
      */
