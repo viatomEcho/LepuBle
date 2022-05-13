@@ -23,8 +23,16 @@ class Bp2Server() {
         index++
         addrLen = (bytes[index].toUInt() and 0xFFu).toInt()
         index++
-        addr = trimStr(String(bytes.copyOfRange(index, index+addrLen), Charset.defaultCharset()))
-        index += addrLen
+
+        val len = index+addrLen+2
+        if (len <= bytes.size) {
+            addr = trimStr(String(bytes.copyOfRange(index, index+addrLen), Charset.defaultCharset()))
+            index += addrLen
+        } else {
+            addr = trimStr(String(bytes.copyOfRange(index, index+16), Charset.defaultCharset()))
+            index += 16
+        }
+
         port = toUInt(bytes.copyOfRange(index, index+2))
         index += 2
 

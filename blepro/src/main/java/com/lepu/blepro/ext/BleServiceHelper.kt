@@ -565,9 +565,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
             Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW,
-            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10A,
-            Bluetooth.MODEL_PF_10B, Bluetooth.MODEL_PF_20A,
-            Bluetooth.MODEL_PF_20B -> {
+            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
+            Bluetooth.MODEL_PF_20 -> {
                 return inter is Pc60FwBleInterface
             }
             Bluetooth.MODEL_PC80B -> {
