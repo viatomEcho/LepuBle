@@ -626,6 +626,27 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 val data = it.data as Int
                 binding.process.text = readFileProcess + curFileName + " 读取进度:" + data.toString() + "%"
             })
+
+        //--------------------------------le S1-----------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1NoFile)
+            .observe(this, { event ->
+                (event.data as Boolean).let {
+                    binding.info.text = "没有文件 $it"
+                }
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1ReadingFileProgress)
+            .observe(this, { event ->
+                (event.data as Int).let {
+                    binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it/10).toString() + "%"
+                }
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1ReadFileComplete)
+            .observe(this, { event ->
+                (event.data as LeS1BleResponse.BleFile).let {
+                    setReceiveCmd(it.bytes)
+                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
+                }
+            })
     }
 
     private fun setReceiveCmd(bytes: ByteArray) {

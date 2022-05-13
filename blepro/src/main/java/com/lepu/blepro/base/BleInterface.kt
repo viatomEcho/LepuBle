@@ -252,7 +252,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         if (BleServiceHelper.isScanning()) BleServiceHelper.stopScan()
         state = true
         connecting = false
-        publish()
+//        publish()
 
         if (toConnectUpdater)
             LiveEventBus.get<BluetoothDevice>(EventMsgConst.Updater.EventBleConnected).post(device)
@@ -336,7 +336,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         state = false
 
         connecting = false
-
+        publish()
         LepuBleLog.d(tag, "onDeviceFailedToConnect=====isAutoReconnect:$isAutoReconnect")
 
         if (isAutoReconnect){
@@ -366,10 +366,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
         if (model == Bluetooth.MODEL_PC80B
             || model == Bluetooth.MODEL_PC60FW
-            || model == Bluetooth.MODEL_PF_10A
-            || model == Bluetooth.MODEL_PF_10B
-            || model == Bluetooth.MODEL_PF_20A
-            || model == Bluetooth.MODEL_PF_20B
+            || model == Bluetooth.MODEL_PF_10
+            || model == Bluetooth.MODEL_PF_20
             || model == Bluetooth.MODEL_POD_1W
             || model == Bluetooth.MODEL_PC_60NW
             || model == Bluetooth.MODEL_POD2B

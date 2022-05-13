@@ -118,7 +118,7 @@ object Aoj20aBleResponse {
             mode = byte2UInt(bytes[index])
             modeMsg = getModeMsg(mode)
             index++
-            battery = byte2UInt(bytes[index]).rem(10)
+            battery = (byte2UInt(bytes[index]) and 0xF0) shr 4
             index++
             version = byte2UInt(bytes[index])
             versionMsg = getVersionMsg(version.toString())

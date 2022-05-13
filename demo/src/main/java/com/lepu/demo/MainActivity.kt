@@ -374,6 +374,19 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._lemInfo.value = it
                 }
             })
+        //-------------------------le S1---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1SetTime)
+            .observe(this, {
+                Toast.makeText(this, "le S1 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1Info)
+            .observe(this, { event ->
+                (event.data as LepuDevice).let {
+                    Toast.makeText(this, "le S1 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._er1Info.value = it
+                }
+            })
     }
     private fun needPermission(){
         PermissionX.init(this)

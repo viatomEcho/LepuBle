@@ -123,11 +123,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2,
             Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LEW3,
             Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_LE_BP2W,
-            Bluetooth.MODEL_PC80B -> waveHandler.post(EcgWaveTask())
+            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_LES1 -> waveHandler.post(EcgWaveTask())
 
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
-            Bluetooth.MODEL_PF_10A, Bluetooth.MODEL_PF_10B,
-            Bluetooth.MODEL_PF_20A, Bluetooth.MODEL_PF_20B,
+            Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
             Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC66B,
             Bluetooth.MODEL_AP20, Bluetooth.MODEL_BABYO2,
             Bluetooth.MODEL_SP20, Bluetooth.MODEL_TV221U,
@@ -701,6 +700,22 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             .observe(this, {
                 LpBleUtil.startRtTask()
             })
+        // ------------------------le S1--------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1RtData)
+            .observe(this, {
+                val rtData = it.data as LeS1BleResponse.RtData
+                rtData.let { data ->
+                    Log.d("er1 data ", "len = ${data.wave.wave.size}")
+                    DataController.receive(data.wave.wFs)
+                    binding.dataStr.text = data.param.toString()
+                    viewModel.ecgHr.value = data.param.hr
+                }
+            })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1NoFile).observe(this, { event ->
+            (event.data as Boolean).let {
+                binding.dataStr.text = "没有文件 $it"
+            }
+        })
     }
 
     var oxyPpgSize = 0
@@ -711,7 +726,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             when (it!!.modelNo) {
                 Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK,
                 Bluetooth.MODEL_ER2, Bluetooth.MODEL_PC80B,
-                Bluetooth.MODEL_LEW3, Bluetooth.MODEL_ER1_N -> {
+                Bluetooth.MODEL_LEW3, Bluetooth.MODEL_ER1_N,
+                Bluetooth.MODEL_LES1 -> {
                     binding.ecgLayout.visibility = View.VISIBLE
                     binding.bpLayout.visibility = View.GONE
                     binding.oxyLayout.visibility = View.GONE
@@ -727,8 +743,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.oxyLayout.visibility = View.GONE
                 }
                 Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
-                Bluetooth.MODEL_PF_10A, Bluetooth.MODEL_PF_10B,
-                Bluetooth.MODEL_PF_20A, Bluetooth.MODEL_PF_20B,
+                Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
                 Bluetooth.MODEL_PC66B, Bluetooth.MODEL_AP20,
                 Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_SP20,
                 Bluetooth.MODEL_TV221U, Bluetooth.MODEL_BABYO2N,
@@ -929,8 +944,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         }
                     }
                     Bluetooth.MODEL_SP20, Bluetooth.MODEL_PC60FW,
-                    Bluetooth.MODEL_PF_10A, Bluetooth.MODEL_PF_10B,
-                    Bluetooth.MODEL_PF_20A, Bluetooth.MODEL_PF_20B,
+                    Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
                     Bluetooth.MODEL_PC66B, Bluetooth.MODEL_POD_1W,
                     Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
                     Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_PC_60B -> {

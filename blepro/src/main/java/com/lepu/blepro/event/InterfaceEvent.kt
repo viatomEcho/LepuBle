@@ -503,4 +503,22 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * LeS1BleInterface发出的通知
+     * 包含model: MODEL_LES1
+     */
+    interface LES1 {
+        companion object {
+            const val EventLeS1Info = "com.lepu.ble.les1.info"                                  // 设备信息 LepuDevice
+            const val EventLeS1RtData = "com.lepu.ble.les1.rtData"                              // 实时数据 LeS1BleResponse.RtData
+            const val EventLeS1NoFile = "com.lepu.ble.les1.no.file"                             // 没有文件
+            const val EventLeS1ReadFileError = "com.lepu.ble.les1.read.file.error"              // 传输文件出错 true
+            const val EventLeS1ReadingFileProgress = "com.lepu.ble.les1.reading.file.progress"  // 传输文件进度 int(0-100)
+            const val EventLeS1ReadFileComplete = "com.lepu.ble.les1.read.file.complete"        // 传输文件完成 LeS1BleResponse.Er1File
+            const val EventLeS1Reset = "com.lepu.ble.les1.reset"                                // 复位 boolean
+            const val EventLeS1ResetFactory = "com.lepu.ble.les1.reset.factory"                 // 恢复出厂设置 boolean
+            const val EventLeS1SetTime = "com.lepu.ble.les1.set.time"                           // 同步时间 boolean
+        }
+    }
+
 }
