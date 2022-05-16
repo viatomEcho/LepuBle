@@ -190,15 +190,19 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     /**
      * PC60FwBleInterface发出的通知
      * 包含model: MODEL_PC60FW, MODEL_PC66B, MODEL_OXYSMART,
-     *           MODEL_POD_1W, MODEL_POD2B, MODEL_PC_60NW,
+     *           MODEL_POD_1W, MODEL_POD2B, MODEL_PC_60NW_1,
      *           MODEL_PC_60B, MODEL_PF_10A, MODEL_PF_10B,
-     *           MODEL_PF_20A, MODEL_PF_20B
+     *           MODEL_PF_20A, MODEL_PF_20B, MODEL_PC_60NW
      */
     interface PC60Fw {
         companion object {
             const val EventPC60FwRtDataParam = "com.lepu.ble.pc60fw.rt.data.param"     // 血氧参数 PC60FwBleResponse.RtDataParam
             const val EventPC60FwRtDataWave = "com.lepu.ble.pc60fw.rt.data.wave"       // 血氧波形 PC60FwBleResponse.RtDataWave
             const val EventPC60FwBattery = "com.lepu.ble.pc60fw.battery"               // 电池电量 PC60FwBleResponse.Battery
+            /**
+             * MODEL_POD2B设备名解出PC-60B不正确，协议问题，设备端暂不处理
+             * app可识别model处理为POD-2
+             */
             const val EventPC60FwDeviceInfo = "com.lepu.ble.pc60fw.device.info"        // 设备信息 BoDeviceInfo
             const val EventPC60FwWorkingStatus = "com.lepu.ble.pc60fw.working.status"  // 工作状态 PC60FwBleResponse.WorkingStatus
             const val EventPC60FwOriginalData = "com.lepu.ble.pc60fw.original.data"    // 红外数据 PC60FwBleResponse.OriginalData

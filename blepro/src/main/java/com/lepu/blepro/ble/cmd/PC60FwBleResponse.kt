@@ -75,6 +75,30 @@ class PC60FwBleResponse{
             """.trimIndent()
         }
     }
+    @Parcelize
+    @ExperimentalUnsignedTypes
+    class DeviceInfo0F constructor(var bytes: ByteArray) : Parcelable {
+        var softwareV: String   // 软件版本
+        var hardwareV: String   // 硬件版本
+        var deviceName: String  // 设备名称
+
+        init {
+            var index = 0
+            softwareV = byteToPointHex(bytes[index])
+            index++
+            hardwareV = byteToPointHex(bytes[index])
+            index++
+            deviceName = com.lepu.blepro.utils.toString(bytes.copyOfRange(index, bytes.size))
+        }
+
+        override fun toString(): String {
+            return """
+                softwareV : $softwareV
+                hardwareV : $hardwareV
+                deviceName : $deviceName
+            """.trimIndent()
+        }
+    }
 
     @ExperimentalUnsignedTypes
     @Parcelize
@@ -84,12 +108,14 @@ class PC60FwBleResponse{
         var pi: Int
         var isProbeOff: Boolean        // 探头脱落，手指未接入
         var isPulseSearching: Boolean  // 脉搏检测
+        var battery: Int
         init {
             spo2 = byte2UInt(byteArray[0])
             pr = toUInt(byteArray.copyOfRange(1, 3))
             pi = byte2UInt(byteArray[3])
             isProbeOff = ((byteArray[4].toInt() and 0x02) shr 1) == 1
             isPulseSearching = ((byteArray[4].toInt() and 0x04) shr 2) == 1
+            battery = (byte2UInt(byteArray[5]) and 0xC0) shr 6
         }
         override fun toString(): String {
             return """
@@ -98,6 +124,7 @@ class PC60FwBleResponse{
                 pi : $pi
                 isProbeOff : $isProbeOff
                 isPulseSearching : $isPulseSearching
+                battery : $battery
             """.trimIndent()
         }
 

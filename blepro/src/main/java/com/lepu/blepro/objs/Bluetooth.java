@@ -58,7 +58,8 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_STATION = "Station";//BabyO2盒子升级专用
     public static final String BT_NAME_POD2B = "POD-2B_SN";//POD-2B_SN7295【蓝牙名】
     public static final String BT_NAME_POD2W = "POD-2W";//【显示名】
-    public static final String BT_NAME_PC_60NW = "PC-60NW-1_SN";//【蓝牙名】 + SN后六位
+    public static final String BT_NAME_PC_60NW = "PC-60NW_SN";//【蓝牙名】 + SN后六位
+    public static final String BT_NAME_PC_60NW_1 = "PC-60NW-1_SN";//【蓝牙名】 + SN后六位
     public static final String BT_NAME_PC_60NW_W = "PC-60NW-1";//显示名
     public static final String BT_NAME_POD_1W = "POD-1_SN";//【蓝牙名】 + SN后四位
     public static final String BT_NAME_POD_1W_W = "POD-1W";//显示名
@@ -129,7 +130,7 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_STATION = 34;
     public static final int MODEL_POD2B = 35;
 
-    public static final int MODEL_PC_60NW= 36;
+    public static final int MODEL_PC_60NW_1 = 36;
     public static final int MODEL_POD_1W= 37;
     public static final int MODEL_PC_60B= 38;
     public static final int MODEL_BPM_NO_BLE= 39;
@@ -156,11 +157,12 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_PF_20 = 58;
 
     public static final int MODEL_LES1 = 59;
+    public static final int MODEL_PC_60NW = 60;
 
     @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER1_N,
             MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL, MODEL_BABYO2, MODEL_OXYSMART,
             MODEL_TV221U, MODEL_PC100, MODEL_AOJ20A, MODEL_OXYFIT, MODEL_VCOMIN, MODEL_CHECK_POD, MODEL_BODY_FAT, MODEL_LEM,
-            MODEL_BABYO2N, MODEL_BP2T, MODEL_BP2W, MODEL_STATION, MODEL_POD2B, MODEL_PC_60NW, MODEL_POD_1W, MODEL_PC_60B,
+            MODEL_BABYO2N, MODEL_BP2T, MODEL_BP2W, MODEL_STATION, MODEL_POD2B, MODEL_PC_60NW_1, MODEL_PC_60NW, MODEL_POD_1W, MODEL_PC_60B,
             MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2M, MODEL_BPM,MODEL_BP2A, MODEL_PC60FW, MODEL_PC80B, MODEL_FHR, MODEL_BPW1,
             MODEL_F4_SCALE, MODEL_F5_SCALE, MODEL_PC66B, MODEL_AP20, MODEL_LEW3, MODEL_VETCORDER, MODEL_VTM_AD5, MODEL_SP20,
             MODEL_LE_BP2W, MODEL_F8_SCALE, MODEL_PC_68B, MODEL_PC300, MODEL_CHECKME_LE, MODEL_PF_10, MODEL_PF_20, MODEL_LES1})
@@ -194,6 +196,8 @@ public class Bluetooth implements Parcelable {
             return MODEL_BODY_FAT;
         } else if (deviceName.contains(BT_NAME_POD2B)) {
             return MODEL_POD2B;
+        } else if (deviceName.contains(BT_NAME_PC_60NW_1)){
+            return MODEL_PC_60NW_1;
         } else if (deviceName.contains(BT_NAME_PC_60NW)){
             return MODEL_PC_60NW;
         } else if (deviceName.contains(BT_NAME_POD_1W)) {
@@ -308,7 +312,7 @@ public class Bluetooth implements Parcelable {
             BT_NAME_DUOEK, BT_NAME_DEVICES_ER2, BT_NAME_PULSEBIT_EX, BT_NAME_OXY_LINK, BT_NAME_KIDS_O2, BT_NAME_BABY_O2, BT_NAME_OXY_SMART, BT_NAME_OXYFIT,
             BT_NAME_BP2, BT_NAME_BP2A, BT_NAME_BP2T, BT_NAME_BP2W, BT_NAME_RINGO2, BT_NAME_O2M, BT_NAME_LEM, BT_NAME_BPM,
             BT_NAME_FHR, BT_NAME_BABYO2N, BT_NAME_STATION, BT_NAME_BPW1, BT_NAME_LEW3, BT_NAME_VETCORDER, BT_NAME_PC60FW, FETAL_DEVICE_NAME,
-            BT_NAME_TV221U, BT_NAME_PC100, BT_NAME_AOJ20A, BT_NAME_VCOMIN, BT_NAME_CHECK_POD, BT_NAME_BODY_FAT, BT_NAME_POD2B, BT_NAME_PC_60NW,
+            BT_NAME_TV221U, BT_NAME_PC100, BT_NAME_AOJ20A, BT_NAME_VCOMIN, BT_NAME_CHECK_POD, BT_NAME_BODY_FAT, BT_NAME_POD2B, BT_NAME_PC_60NW_1, BT_NAME_PC_60NW,
             BT_NAME_POD_1W, BT_NAME_PC_60B, BT_NAME_KCA, BT_NAME_PC80B, BT_NAME_PC66B, BT_NAME_AP20, BT_NAME_F5_SCALE, BT_NAME_VTM_AD5, BT_NAME_SP20,
             BT_NAME_LE_BP2W, BT_NAME_F8_SCALE, BT_NAME_PC_68B, BT_NAME_F4_SCALE, BT_NAME_PC_300, BT_NAME_CHECKME_LE, BT_NAME_PF_10, BT_NAME_PF_20, BT_NAME_LES1})
     @Retention(RetentionPolicy.SOURCE)
@@ -397,6 +401,8 @@ public class Bluetooth implements Parcelable {
                 return BT_NAME_BODY_FAT;
             case MODEL_POD2B:
                 return BT_NAME_POD2B;
+            case MODEL_PC_60NW_1:
+                return BT_NAME_PC_60NW_1;
             case MODEL_PC_60NW:
                 return BT_NAME_PC_60NW;
             case MODEL_POD_1W:

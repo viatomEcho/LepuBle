@@ -40,6 +40,7 @@ class Constant{
             const val PF_10_MODEL: Int = Bluetooth.MODEL_PF_10
             const val PF_20_MODEL: Int = Bluetooth.MODEL_PF_20
             const val POD_1W_MODEL: Int = Bluetooth.MODEL_POD_1W
+            const val PC_60NW_1_MODEL: Int = Bluetooth.MODEL_PC_60NW_1
             const val PC_60NW_MODEL: Int = Bluetooth.MODEL_PC_60NW
             const val POD2B_MODEL: Int = Bluetooth.MODEL_POD2B
             const val PC_60B_MODEL: Int = Bluetooth.MODEL_PC_60B
@@ -71,7 +72,7 @@ class Constant{
                 LE_BP2W_MODEL, TV221U_MODEL, AOJ20A_MODEL, BABYO2N_MODEL, CHECKO2_MODEL, O2M_MODEL,
                 SLEEPO2_MODEL, SNOREO2_MODEL, WEARO2_MODEL, SLEEPU_MODEL, OXYLINK_MODEL, KIDSO2_MODEL,
                 OXYSMART_MODEL, OXYFIT_MODEL, POD_1W_MODEL, CHECK_POD_MODEL, PC_68B_MODEL, BP2T_MODEL,
-                POD2B_MODEL, PC_60NW_MODEL, PC_60B_MODEL, PC300_MODEL, PULSEBITEX_MODEL, FETAL_MODEL,
+                POD2B_MODEL, PC_60NW_1_MODEL, PC_60NW_MODEL, PC_60B_MODEL, PC300_MODEL, PULSEBITEX_MODEL, FETAL_MODEL,
                 VTM_AD5_MODEL, VCOMIN_MODEL, CHECKME_LE_MODEL, PF_10_MODEL, PF_20_MODEL, LEM_MODEL, LES1_MODEL
             )
 

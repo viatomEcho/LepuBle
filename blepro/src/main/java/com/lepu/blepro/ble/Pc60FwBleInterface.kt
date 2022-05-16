@@ -30,7 +30,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             || model == Bluetooth.MODEL_OXYSMART
             || model == Bluetooth.MODEL_POD_1W
             || model == Bluetooth.MODEL_PF_10
-            || model == Bluetooth.MODEL_PC_60NW
+            || model == Bluetooth.MODEL_PC_60NW_1
             || model == Bluetooth.MODEL_PC_60B
             || model == Bluetooth.MODEL_POD2B) {
             Pc60FwBleManager(context)
@@ -116,6 +116,20 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             }
         } else if (response.token == TOKEN_PO_0F){
             when (response.type) {
+                Pc60FwBleCmd.MSG_GET_DEVICE_INFO_0F.toByte() -> {
+                    LepuBleLog.d(tag, "model:$model,MSG_GET_DEVICE_INFO_0F => success")
+                    PC60FwBleResponse.DeviceInfo0F(response.content).let {
+                        pc60FwDevice.sn = device.name.substring(device.name.length-6, device.name.length)
+                        pc60FwDevice.deviceName = it.deviceName
+                        pc60FwDevice.hardwareV = it.hardwareV
+                        pc60FwDevice.softwareV = it.softwareV
+                        LepuBleLog.d(tag, "pc60FwDevice.sn == " + pc60FwDevice.sn)
+                        LepuBleLog.d(tag, "it.deviceName == " + it.deviceName)
+                        LepuBleLog.d(tag, "it.hardwareV == " + it.hardwareV)
+                        LepuBleLog.d(tag, "it.softwareV == " + it.softwareV)
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo).post(InterfaceEvent(model, pc60FwDevice))
+                    }
+                }
                 TYPE_SPO2_PARAM -> {
                     LepuBleLog.d(tag, "model:$model,EventPC60FwRtDataParam => success")
                     PC60FwBleResponse.RtDataParam(response.content).let {
@@ -123,6 +137,9 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "it.pi == " + it.pi)
                         LepuBleLog.d(tag, "it.pr == " + it.pr)
                         LepuBleLog.d(tag, "it.spo2 == " + it.spo2)
+                        LepuBleLog.d(tag, "it.isProbeOff == " + it.isProbeOff)
+                        LepuBleLog.d(tag, "it.isPulseSearching == " + it.isPulseSearching)
+                        LepuBleLog.d(tag, "it.battery == " + it.battery)
                     }
                 }
                 TYPE_SPO2_WAVE -> {
@@ -159,8 +176,12 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getInfo() {
-        sendCmd(Pc60FwBleCmd.getSn())
-        sendCmd(Pc60FwBleCmd.getInfo())
+        if (model == Bluetooth.MODEL_PC_60NW) {
+            sendCmd(Pc60FwBleCmd.getInfo0F())
+        } else {
+            sendCmd(Pc60FwBleCmd.getSn())
+            sendCmd(Pc60FwBleCmd.getInfoF0())
+        }
     }
 
     override fun syncTime() {
