@@ -5,7 +5,7 @@ import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
 
-object Lew3BleResponse {
+object LewBleResponse {
 
     @ExperimentalUnsignedTypes
     class BleResponse(val bytes: ByteArray) {
@@ -141,7 +141,7 @@ object Lew3BleResponse {
 
                 index += bytes.size
             }
-            LepuBleLog.d("LeW3File,bytes size = ${bytes.size}, index = $index")
+            LepuBleLog.d("LeWFile,bytes size = ${bytes.size}, index = $index")
         }
     }
 

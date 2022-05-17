@@ -139,16 +139,16 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._er2Info.value = it
                 }
             })
-        //-------------------------lew3---------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3SetTime)
+        //-------------------------lew---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetTime)
             .observe(this, {
-                Toast.makeText(this, "lew3 完成时间同步", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "lew 完成时间同步", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3Info)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewInfo)
             .observe(this, { event ->
                 (event.data as LepuDevice).let {
-                    Toast.makeText(this, "lew3 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "lew 获取设备信息成功", Toast.LENGTH_SHORT).show()
                     viewModel._er1Info.value = it
                 }
             })

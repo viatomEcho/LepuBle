@@ -295,26 +295,28 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * LeW3BleInterface发出的通知
-     * 包含model: MODEL_LEW3
+     * LewBleInterface发出的通知
+     * 包含model: MODEL_LEW
      */
-    interface Lew3 {
+    interface Lew {
         companion object {
-            const val EventLew3Info = "com.lepu.ble.lew3.info"                                  // 设备信息 LepuDevice
-            const val EventLew3BatteryInfo = "com.lepu.ble.lew3.battery.info"                   // 电量信息 KtBleBattery
-            const val EventLew3SetTime = "com.lepu.ble.lew3.set.time"                           // 同步时间 true
-            const val EventLew3BoundDevice = "com.lepu.ble.lew3.bound.device"                   // 请求绑定设备
-            const val EventLew3GetConfig = "com.lepu.ble.lew3.get.config"                       // 获取配置信息
-            const val EventLew3SetServer = "com.lepu.ble.lew3.set.server"                       // 配置服务器信息
-            const val EventLew3SystemSettings = "com.lepu.ble.lew3.system.settings"             // 配置系统设置
-            const val EventLew3Reset = "com.lepu.ble.lew3.reset"                                // 复位 true
-            const val EventLew3FactoryReset = "com.lepu.ble.lew3.factory.reset"                 // 恢复出厂设置 true
-            const val EventLew3FactoryResetAll = "com.lepu.ble.lew3.factory.reset.all"          // 恢复生产出厂状态 true
-            const val EventLew3RtData = "com.lepu.ble.lew3.realtime.data"                       // 实时数据 Lew3BleResponse.RtData
-            const val EventLew3FileList = "com.lepu.ble.lew3.file.list"                         // 文件列表 Lew3BleResponse.FileList
-            const val EventLew3ReadFileError = "com.lepu.ble.lew3.file.read.error"              // 传输文件出错 true
-            const val EventLew3ReadingFileProgress = "com.lepu.ble.lew3.file.reading.progress"  // 传输文件进度 int(0-100)
-            const val EventLew3ReadFileComplete = "com.lepu.ble.lew3.file.read.complete"        // 传输文件完成 Lew3BleResponse.EcgFile
+            const val EventLewInfo = "com.lepu.ble.lew.info"                                  // 设备信息 LepuDevice
+            const val EventLewBatteryInfo = "com.lepu.ble.lew.battery.info"                   // 电量信息 KtBleBattery
+            const val EventLewSetTime = "com.lepu.ble.lew.set.time"                           // 同步时间 true
+            const val EventLewBoundDevice = "com.lepu.ble.lew.bound.device"                   // 请求绑定设备
+            const val EventLewUnBoundDevice = "com.lepu.ble.lew.unbound.device"               // 请求解绑设备
+            const val EventLewGetSystemSetting = "com.lepu.ble.lew.get.system.setting"        // 获取系统配置
+            const val EventLewSetSystemSetting = "com.lepu.ble.lew.set.system.setting"        // 设置系统配置
+            const val EventLewGetMeasureSetting = "com.lepu.ble.lew.get.measure.setting"      // 获取测量配置
+            const val EventLewSetMeasureSetting = "com.lepu.ble.lew.set.measure.setting"      // 设置测量配置
+            const val EventLewReset = "com.lepu.ble.lew.reset"                                // 复位 true
+            const val EventLewFactoryReset = "com.lepu.ble.lew.factory.reset"                 // 恢复出厂设置 true
+            const val EventLewFactoryResetAll = "com.lepu.ble.lew.factory.reset.all"          // 恢复生产出厂状态 true
+            const val EventLewRtData = "com.lepu.ble.lew.realtime.data"                       // 实时数据 LewBleResponse.RtData
+            const val EventLewFileList = "com.lepu.ble.lew.file.list"                         // 文件列表 LewBleResponse.FileList
+            const val EventLewReadFileError = "com.lepu.ble.lew.file.read.error"              // 传输文件出错 true
+            const val EventLewReadingFileProgress = "com.lepu.ble.lew.file.reading.progress"  // 传输文件进度 int(0-100)
+            const val EventLewReadFileComplete = "com.lepu.ble.lew.file.read.complete"        // 传输文件完成 LewBleResponse.EcgFile
         }
     }
 

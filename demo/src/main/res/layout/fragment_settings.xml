@@ -571,42 +571,285 @@
                 </LinearLayout>
             </LinearLayout>
             <LinearLayout
-                android:id="@+id/lew3_layout"
+                android:id="@+id/lew_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="lew3"/>
+                    android:text="lew"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <Button
-                        android:id="@+id/lew3_bound"
+                        android:id="@+id/lew_bound"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="请求绑定"/>
+                        android:text="绑定"/>
                     <Button
-                        android:id="@+id/lew3_get_battery"
+                        android:id="@+id/lew_unbound"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="获取电量"
+                        android:text="解绑"
+                        android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/lew_get_battery"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取电池状态"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <Button
-                        android:id="@+id/lew3_get_config"
+                        android:id="@+id/lew_get_system_setting"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="获取参数"/>
+                        android:text="获取系统配置"/>
                     <Button
-                        android:id="@+id/lew3_set_config"
+                        android:id="@+id/lew_set_system_setting"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="设置参数"
+                        android:text="设置系统配置"
+                        android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/lew_find_device"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="找手表"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew_get_no_disturb"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取勿扰"/>
+                    <Button
+                        android:id="@+id/lew_set_no_disturb"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置勿扰"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew_get_app_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取app开关"/>
+                    <Button
+                        android:id="@+id/lew_set_app_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置app开关"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew_phone_noti"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="来电"/>
+                    <Button
+                        android:id="@+id/lew_message_noti"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="短信"
+                        android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/lew_other_noti"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="其他"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew_get_device_mode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置模式"/>
+                    <Button
+                        android:id="@+id/lew_set_device_mode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取模式"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew_get_alarm_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取闹钟"/>
+                    <Button
+                        android:id="@+id/lew_set_alarm_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置闹钟"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew_get_phone_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取手机开关"/>
+                    <Button
+                        android:id="@+id/lew_set_phone_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置手机开关"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew_get_measure_setting"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取测量配置"/>
+                    <Button
+                        android:id="@+id/lew_set_measure_setting"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置测量配置"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew_get_user_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取个人信息"/>
+                    <Button
+                        android:id="@+id/lew_set_user_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置个人信息"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew_get_phonebook"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取通讯录"/>
+                    <Button
+                        android:id="@+id/lew_set_phonebook"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="通讯录同步"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew_get_sos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取紧急"/>
+                    <Button
+                        android:id="@+id/lew_set_sos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置紧急"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew_get_dial"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取表盘"/>
+                    <Button
+                        android:id="@+id/lew_set_dial"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置表盘"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew_get_sport_data"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="运动数据"/>
+                    <Button
+                        android:id="@+id/lew_get_ecg_data"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="心电数据"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew_get_oxy_data"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="血氧数据"/>
+                    <Button
+                        android:id="@+id/lew_get_hr_data"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="心率数据"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew_get_hr_threshold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取心率预警"/>
+                    <Button
+                        android:id="@+id/lew_set_hr_threshold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置心率预警"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew_get_oxy_threshold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取血氧预警"/>
+                    <Button
+                        android:id="@+id/lew_set_oxy_threshold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置血氧预警"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
             </LinearLayout>

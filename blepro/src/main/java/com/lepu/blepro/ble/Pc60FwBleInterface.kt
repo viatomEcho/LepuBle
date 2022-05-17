@@ -125,6 +125,8 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "it.pi == " + it.pi)
                         LepuBleLog.d(tag, "it.pr == " + it.pr)
                         LepuBleLog.d(tag, "it.spo2 == " + it.spo2)
+                        LepuBleLog.d(tag, "it.isProbeOff == " + it.isProbeOff)
+                        LepuBleLog.d(tag, "it.isPulseSearching == " + it.isPulseSearching)
                     }
                 }
                 TYPE_SPO2_WAVE -> {

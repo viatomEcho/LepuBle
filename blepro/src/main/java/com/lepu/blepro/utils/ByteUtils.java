@@ -2,6 +2,26 @@ package com.lepu.blepro.utils;
 
 public class ByteUtils {
 
+    /**
+     * 转两个字节byte数组（小端模式）
+     */
+    public static byte[] int2Bytes(int i) {
+        byte[] b = new byte[2];
+        b[0] = (byte) (i & 0xFF);
+        b[1] = (byte) ((i >> 8) & 0xFF);
+        return b;
+    }
+    /**
+     * 转四个字节byte数组（小端模式）
+     */
+    public static byte[] int4Bytes(int i) {
+        byte[] b = new byte[4];
+        b[0] = (byte) (i & 0xFF);
+        b[1] = (byte) ((i >> 8) & 0xFF);
+        b[2] = (byte) ((i >> 16) & 0xFF);
+        b[3] = (byte) ((i >> 24) & 0xFF);
+        return b;
+    }
 
     public static float bytesToFloat(byte[] b) {
         int accum = 0;

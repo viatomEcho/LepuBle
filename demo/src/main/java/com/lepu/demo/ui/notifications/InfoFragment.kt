@@ -250,27 +250,27 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     readFile()
                 }
             })
-        //--------------------------------lew3-----------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3FileList)
+        //--------------------------------lew-----------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList)
             .observe(this, { event ->
-                (event.data as Lew3BleResponse.FileList).let {
+                (event.data as LewBleResponse.FileList).let {
                     setReceiveCmd(it.bytes)
                     binding.info.text = it.toString()
                     for (fileName in it.list) {
                         fileNames.add(fileName)
                     }
-                    Toast.makeText(context, "lew3 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "lew 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 }
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3ReadingFileProgress)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadingFileProgress)
             .observe(this, { event ->
                 (event.data as Int).let {
                     binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it/10).toString() + "%"
                 }
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3ReadFileComplete)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete)
             .observe(this, { event ->
-                (event.data as Lew3BleResponse.EcgFile).let {
+                (event.data as LewBleResponse.EcgFile).let {
                     setReceiveCmd(it.content)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
                     fileNames.removeAt(0)

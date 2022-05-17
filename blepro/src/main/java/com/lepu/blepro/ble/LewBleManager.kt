@@ -15,7 +15,7 @@ import java.util.*
  * created on: 2021/1/27 10:22
  * description:
  */
-class Lew3BleManager(context: Context): LpBleManager(context) {
+class LewBleManager(context: Context): LpBleManager(context) {
     override fun initUUID() {
         service_uuid = UUID.fromString("14839ac4-7d7e-415c-9a42-167340cf2339")
         write_uuid = UUID.fromString("8B00ACE7-EB0B-49B0-BBE9-9AEE0A26E1A3")
@@ -26,28 +26,28 @@ class Lew3BleManager(context: Context): LpBleManager(context) {
         if (BleServiceHelper.BleServiceHelper.bleService.support2MPhy) {
             requestQueue.add(requestMtu(247)
                 .with { device: BluetoothDevice?, mtu: Int ->
-                    log(Log.INFO, "Er1BleManager MTU set to $mtu")
+                    log(Log.INFO, "LewBleManager MTU set to $mtu")
                 }
                 .fail { device: BluetoothDevice?, status: Int ->
-                    log(Log.WARN, "Er1BleManager Requested MTU not supported: $status")
+                    log(Log.WARN, "LewBleManager Requested MTU not supported: $status")
                 })
                 .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
                     .fail { device: BluetoothDevice?, status: Int ->
-                        log(Log.WARN, "Er1BleManager Requested PHY not supported: $status")
+                        log(Log.WARN, "LewBleManager Requested PHY not supported: $status")
                     })
         } else {
             requestQueue.add(requestMtu(247)
                 .with { device: BluetoothDevice?, mtu: Int ->
-                    log(Log.INFO, "Er1BleManager MTU set to $mtu")
+                    log(Log.INFO, "LewBleManager MTU set to $mtu")
                 }
                 .fail { device: BluetoothDevice?, status: Int ->
-                    log(Log.WARN, "Er1BleManager Requested MTU not supported: $status")
+                    log(Log.WARN, "LewBleManager Requested MTU not supported: $status")
                 })
         }
         return requestQueue
     }
 
     override fun initialize() {
-        LepuBleLog.d("LeW3BleManager inited")
+        LepuBleLog.d("LewBleManager inited")
     }
 }
