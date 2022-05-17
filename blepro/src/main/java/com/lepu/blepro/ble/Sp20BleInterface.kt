@@ -34,6 +34,8 @@ class Sp20BleInterface(model: Int): BleInterface(model) {
             .retry(3, 100)
             .done {
                 LepuBleLog.d(tag, "Device Init")
+                enableRtData(Sp20BleCmd.EnableType.OXY_PARAM, true)
+                enableRtData(Sp20BleCmd.EnableType.OXY_WAVE, true)
             }
             .enqueue()
     }

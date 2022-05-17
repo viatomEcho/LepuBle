@@ -35,6 +35,7 @@ class Ad5FhrBleInterface(model: Int): BleInterface(model) {
             .retry(3, 100)
             .done {
                 LepuBleLog.d(tag, "Device Init")
+                enableRtData(true)
             }
             .enqueue()
     }

@@ -48,6 +48,10 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                 .retry(3, 100)
                 .done {
                     LepuBleLog.d(tag, "Device Init")
+                    if (model == Bluetooth.MODEL_PC_60NW) {
+                        enableRtData(Pc60FwBleCmd.EnableType.OXY_PARAM, true)
+                        enableRtData(Pc60FwBleCmd.EnableType.OXY_WAVE, true)
+                    }
                 }
                 .enqueue()
     }
