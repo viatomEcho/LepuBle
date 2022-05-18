@@ -687,21 +687,24 @@ open class BleService: LifecycleService() {
             }
 
             @Bluetooth.MODEL val model: Int = Bluetooth.getDeviceModel(deviceName)
-            if (model == Bluetooth.MODEL_UNRECOGNIZED && scanModel == null) {
-                if (needPair)
-                    result.scanRecord?.let {
-                        HashMap<String, Any>().apply {
-                            this[EventMsgConst.Discovery.EventDeviceFound_Device] = device
-                            this[EventMsgConst.Discovery.EventDeviceFound_ScanRecord] = it
+            if (model == Bluetooth.MODEL_UNRECOGNIZED) {
+                if (scanModel == null) {
+                    if (needPair)
+                        result.scanRecord?.let {
+                            HashMap<String, Any>().apply {
+                                this[EventMsgConst.Discovery.EventDeviceFound_Device] = device
+                                this[EventMsgConst.Discovery.EventDeviceFound_ScanRecord] = it
 
-                            LepuBleLog.d(tag, "post paring...${device.name}")
-                            LiveEventBus.get<HashMap<String, Any>>(EventMsgConst.Discovery.EventDeviceFound_ScanRecordUnRegister).post(this)
+                                LepuBleLog.d(tag, "post paring...${device.name}")
+                                LiveEventBus.get<HashMap<String, Any>>(EventMsgConst.Discovery.EventDeviceFound_ScanRecordUnRegister)
+                                    .post(this)
+
+                            }
 
                         }
 
-                    }
-
-                LiveEventBus.get<ScanResult>(EventMsgConst.Discovery.EventDeviceFoundForUnRegister).post(result)
+                    LiveEventBus.get<ScanResult>(EventMsgConst.Discovery.EventDeviceFoundForUnRegister).post(result)
+                }
                 return
             }
             val b = Bluetooth(
