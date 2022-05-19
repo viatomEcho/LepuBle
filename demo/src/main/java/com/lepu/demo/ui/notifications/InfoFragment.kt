@@ -214,8 +214,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileComplete)
             .observe(this, { event ->
                 (event.data as Er1BleResponse.Er1File).let {
+                    val data = Er1EcgFile(it.content)
+                    binding.info.text = "$data"
                     setReceiveCmd(it.content)
-                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
+                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                     fileNames.removeAt(0)
                     readFile()
                 }
@@ -242,8 +244,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileComplete)
             .observe(this, { event ->
                 (event.data as Er2File).let {
+                    val data = Er1EcgFile(it.content)
+                    binding.info.text = "$data"
                     setReceiveCmd(it.content)
-                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
+                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                     fileNames.removeAt(0)
                     readFile()
                 }
@@ -301,6 +305,13 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileComplete)
             .observe(this, { event ->
                 (event.data as Bp2BleFile).let {
+                    if (it.type == 2) {
+                        val data = Bp2EcgFile(it.content)
+                        binding.info.text = "$data"
+                    } else if (it.type == 1) {
+                        val data = Bp2BpFile(it.content)
+                        binding.info.text = "$data"
+                    }
                     setReceiveCmd(it.content)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
                     fileNames.removeAt(0)
@@ -330,6 +341,13 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileComplete)
             .observe(this, { event ->
                 (event.data as Bp2BleFile).let {
+                    if (it.type == 2) {
+                        val data = Bp2EcgFile(it.content)
+                        binding.info.text = "$data"
+                    } else if (it.type == 1) {
+                        val data = Bp2BpFile(it.content)
+                        binding.info.text = "$data"
+                    }
                     setReceiveCmd(it.content)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
                     fileNames.removeAt(0)
@@ -471,6 +489,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileComplete)
             .observe(this, { event ->
                 (event.data as OxyBleResponse.OxyFile).let {
+                    val data = O2OxyFile(it.fileContent)
+                    binding.info.text = "$data"
                     setReceiveCmd(it.fileContent)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
                     fileNames.removeAt(0)
