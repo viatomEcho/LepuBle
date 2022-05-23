@@ -178,6 +178,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         }
 
+        // -----------------------pc100-------------------
+        binding.pc100BoState.setOnClickListener {
+            LpBleUtil.pc100GetBoState(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+
         //-------------------------er1--------------------
         binding.er1SetSound.setOnClickListener {
             switchState = !switchState
@@ -1381,7 +1388,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this, {
                 Toast.makeText(
                     context,
-                    "o2/babyO2 设置参数成功",
+                    "o2/babyO2 设置参数成功 ${it.data}",
                     Toast.LENGTH_SHORT
                 ).show()
             })

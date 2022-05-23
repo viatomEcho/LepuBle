@@ -761,8 +761,17 @@ open class BleService: LifecycleService() {
                 if (isReconnectScan && isContains){
                     stopDiscover()
                     if (isReconnectByAddress) {
-                        vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
-                        LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
+                        // 避免体温计aoj20a在装电池开机后自动关机过程连接上设备，延迟重连
+                        if (model == Bluetooth.MODEL_AOJ20A) {
+                            GlobalScope.launch {
+                                delay(2000)
+                                vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
+                                LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
+                            }
+                        } else {
+                            vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
+                            LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
+                        }
                     } else {
                         if (BleServiceHelper.BleServiceHelper.canReconnectByName(b.model)) {
                             vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)

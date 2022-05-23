@@ -432,6 +432,10 @@ class LpBleUtil {
            return getInterface(model)?.isAutoReconnect ?: false
         }
 
+        fun pc100GetBoState(model: Int) {
+            BleServiceHelper.pc100GetBoState(model)
+        }
+
         fun setEr1Vibrate(model: Int, switcher: Boolean, threshold1: Int, threshold2: Int){
             BleServiceHelper.setEr1Vibrate(model, switcher, threshold1, threshold2)
         }

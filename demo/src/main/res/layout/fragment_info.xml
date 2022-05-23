@@ -82,6 +82,12 @@
                     android:text="Continute"
                     android:layout_marginStart="20dp"/>
             </LinearLayout>
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/file_name"
+                android:hint="文件名"
+                android:textSize="20sp"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -6,6 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BleCRC
 import com.lepu.blepro.ble.cmd.OxyBleCmd
+import com.lepu.blepro.ble.cmd.OxyBleCmd.SYNC_TYPE_TIME
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.event.InterfaceEvent
@@ -19,7 +20,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     
     private val tag: String = "OxyBleInterface"
 
-
+    var settingType = ""
 
     var curFileName: String? = null
     var curFile: OxyBleResponse.OxyFile? = null
@@ -294,10 +295,12 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun syncTime() {
+        settingType = SYNC_TYPE_TIME
         sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.syncTime())
     }
 
     fun updateSetting(type: String, value: Any) {
+        settingType = type
         sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.updateSetting(type, value as Int))
 
     }

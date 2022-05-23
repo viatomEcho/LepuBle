@@ -218,8 +218,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     binding.info.text = "$data"
                     setReceiveCmd(it.content)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                    fileNames.removeAt(0)
-                    readFile()
+                    if (binding.fileName.text.toString().isEmpty()) {
+                        fileNames.removeAt(0)
+                        readFile()
+                    }
                 }
             })
         //--------------------------------er2-----------------------------------
@@ -248,8 +250,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     binding.info.text = "$data"
                     setReceiveCmd(it.content)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                    fileNames.removeAt(0)
-                    readFile()
+                    if (binding.fileName.text.toString().isEmpty()) {
+                        fileNames.removeAt(0)
+                        readFile()
+                    }
                 }
             })
         //--------------------------------lew3-----------------------------------
@@ -274,9 +278,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this, { event ->
                 (event.data as Lew3BleResponse.EcgFile).let {
                     setReceiveCmd(it.content)
-                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
-                    fileNames.removeAt(0)
-                    readFile()
+                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $it \n"
+                    if (binding.fileName.text.toString().isEmpty()) {
+                        fileNames.removeAt(0)
+                        readFile()
+                    }
                 }
             })
         //--------------------------------bp2-----------------------------------
@@ -308,14 +314,17 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     if (it.type == 2) {
                         val data = Bp2EcgFile(it.content)
                         binding.info.text = "$data"
+                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                     } else if (it.type == 1) {
                         val data = Bp2BpFile(it.content)
                         binding.info.text = "$data"
+                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                     }
                     setReceiveCmd(it.content)
-                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
-                    fileNames.removeAt(0)
-                    readFile()
+                    if (binding.fileName.text.toString().isEmpty()) {
+                        fileNames.removeAt(0)
+                        readFile()
+                    }
                 }
             })
         //--------------------------------bp2w-----------------------------------
@@ -344,14 +353,17 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     if (it.type == 2) {
                         val data = Bp2EcgFile(it.content)
                         binding.info.text = "$data"
+                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                     } else if (it.type == 1) {
                         val data = Bp2BpFile(it.content)
                         binding.info.text = "$data"
+                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                     }
                     setReceiveCmd(it.content)
-                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
-                    fileNames.removeAt(0)
-                    readFile()
+                    if (binding.fileName.text.toString().isEmpty()) {
+                        fileNames.removeAt(0)
+                        readFile()
+                    }
                 }
             })
         //--------------------------------le bp2w-----------------------------------
@@ -373,51 +385,27 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                                 for (file in data.ecgFileList) {
                                     fileNames.add(file.fileName)
                                 }
-                                Toast.makeText(
-                                    context,
-                                    "le bp2w 获取心电文件列表成功 共有${fileNames.size}个文件",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(context, "le bp2w 获取心电文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                             } else {
-                                Toast.makeText(
-                                    context,
-                                    "le bp2w 获取心电文件列表为空",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(context, "le bp2w 获取心电文件列表为空", Toast.LENGTH_SHORT).show()
                             }
                         }
                         LeBp2wBleCmd.FileType.BP_TYPE -> {
                             val data = LeBp2wBpList(it.content)
                             binding.info.text = data.toString()
                             if (data.bpFileList.size != 0) {
-                                Toast.makeText(
-                                    context,
-                                    "le bp2w 获取血压文件列表成功 共有${data.bpFileList.size}个记录",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(context, "le bp2w 获取血压文件列表成功 共有${data.bpFileList.size}个记录", Toast.LENGTH_SHORT).show()
                             } else {
-                                Toast.makeText(
-                                    context,
-                                    "le bp2w 获取血压文件列表为空",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(context, "le bp2w 获取血压文件列表为空", Toast.LENGTH_SHORT).show()
                             }
                         }
                         LeBp2wBleCmd.FileType.USER_TYPE -> {
                             val data = LeBp2wUserList(it.content)
                             binding.info.text = data.toString()
                             if (data.userList.size != 0) {
-                                Toast.makeText(
-                                    context,
-                                    "le bp2w 获取用户文件列表成功 共有${data.userList.size}个用户",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(context, "le bp2w 获取用户文件列表成功 共有${data.userList.size}个用户", Toast.LENGTH_SHORT).show()
                             } else {
-                                Toast.makeText(
-                                    context,
-                                    "le bp2w 获取用户文件列表为空",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(context, "le bp2w 获取用户文件列表为空", Toast.LENGTH_SHORT).show()
                             }
                         }
                         else -> {
@@ -436,9 +424,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this, { event ->
                 (event.data as LeBp2wEcgFile).let {
                     setReceiveCmd(it.content)
-                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
-                    fileNames.removeAt(0)
-                    readFile()
+                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $it \n"
+                    if (binding.fileName.text.toString().isEmpty()) {
+                        fileNames.removeAt(0)
+                        readFile()
+                    }
                 }
             })
         //------------------------------bpm--------------------------------------
@@ -492,9 +482,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     val data = O2OxyFile(it.fileContent)
                     binding.info.text = "$data"
                     setReceiveCmd(it.fileContent)
-                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
-                    fileNames.removeAt(0)
-                    readFile()
+                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                    if (binding.fileName.text.toString().isEmpty()) {
+                        fileNames.removeAt(0)
+                        readFile()
+                    }
                 }
             })
         //---------------------------aoj20a-----------------------------
@@ -536,9 +528,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 val data = it.data as Pc68bBleResponse.Record
                 pc68bList.add(data)
                 binding.info.text = pc68bList.toString()
-                fileNames.removeAt(0)
+                if (binding.fileName.text.toString().isEmpty()) {
+                    fileNames.removeAt(0)
+                    readFile()
+                }
                 Toast.makeText(context, "pc68b 接收文件成功 已接收${pc68bList.size}个文件, 还剩${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                readFile()
             })
         //---------------------------Pulsebit--------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileList)
@@ -564,9 +558,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this, {
                 val data = it.data as PulsebitBleResponse.EcgFile
                 setReceiveCmd(data.bytes)
-                readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n "
-                fileNames.removeAt(0)
-                readFile()
+                readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                if (binding.fileName.text.toString().isEmpty()) {
+                    fileNames.removeAt(0)
+                    readFile()
+                }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadFileError)
             .observe(this, {
@@ -632,9 +628,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this, {
                 val data = it.data as CheckmeLeBleResponse.EcgFile
                 setReceiveCmd(data.bytes)
-                readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n "
-                fileNames.removeAt(0)
-                readFile()
+                readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                if (binding.fileName.text.toString().isEmpty()) {
+                    fileNames.removeAt(0)
+                    readFile()
+                }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadFileError)
             .observe(this, {
@@ -664,7 +662,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this, { event ->
                 (event.data as LeS1BleResponse.BleFile).let {
                     setReceiveCmd(it.bytes)
-                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
+                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $it \n"
                 }
             })
     }
@@ -676,10 +674,15 @@ class InfoFragment : Fragment(R.layout.fragment_info){
     }
 
     private fun readFile() {
-        if (fileNames.size == 0) return
-        curFileName = fileNames[0]
-        LpBleUtil.readFile("", fileNames[0], Constant.BluetoothConfig.currentModel[0])
-        binding.sendCmd.text = LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+        if (binding.fileName.text.toString().isNotEmpty()) {
+            LpBleUtil.readFile("", binding.fileName.text.toString(), Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+        } else {
+            if (fileNames.size == 0) return
+            curFileName = fileNames[0]
+            LpBleUtil.readFile("", fileNames[0], Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+        }
     }
 
 }

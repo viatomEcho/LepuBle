@@ -761,6 +761,16 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    fun pc100GetBoState(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Pc100BleInterface).let {
+                LepuBleLog.d(tag, "it as Pc100BleInterface--pc100GetBoState")
+                it.getBoState()
+            }
+        }
+    }
+
     /**
      * 开始测量血压
      */

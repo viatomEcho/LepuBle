@@ -1,9 +1,11 @@
 package com.lepu.blepro.ble.cmd
 
 import android.os.Parcelable
+import android.util.Log
 import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 import kotlinx.android.parcel.Parcelize
 import org.json.JSONObject
@@ -60,6 +62,7 @@ class OxyBleResponse{
         var ivThr: Int           // 无效值报警告警时间阈值
 
         init {
+            Log.d("test12345", "bytes : ${bytesToHex(bytes)}")
             infoStr = JSONObject(String(bytes))
 //            try {
 //                var infoStr = JSONObject(String(bytes))
