@@ -62,6 +62,7 @@ public class OxyBleCmd {
     public static final String SYNC_TYPE_IV_SW = "SetIvSW";
     public static final String SYNC_TYPE_IV_THR = "SetIvThr";
     /*************************参数同步相关**************************************/
+    public static final String SYNC_TYPE_ALL_SW = "AllSW";
 
 
     /**
@@ -116,6 +117,19 @@ public class OxyBleCmd {
         try {
             LepuBleLog.d("syncData type="+type+"value="+value);
             j.put(type, value+"");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return sync(j);
+
+    }
+    public static byte[] updateSetting(String[] type, int[] value) {
+        JSONObject j = new JSONObject();
+        try {
+            for (int i=0; i<type.length; i++) {
+                LepuBleLog.d("syncData type=" + type + "value=" + value);
+                j.put(type[i], value[i] + "");
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

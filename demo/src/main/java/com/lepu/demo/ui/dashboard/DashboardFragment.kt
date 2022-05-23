@@ -32,6 +32,7 @@ import com.lepu.demo.databinding.FragmentDashboardBinding
 import com.lepu.demo.views.EcgBkg
 import com.lepu.demo.views.EcgView
 import com.lepu.demo.views.OxyView
+import java.util.*
 import kotlin.math.floor
 
 class DashboardFragment : Fragment(R.layout.fragment_dashboard){
@@ -104,7 +105,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     40
                 }
                 else -> {
-                    100
+                    180
                 }
             }
 
@@ -141,8 +142,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYSMART,
             Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_PC_68B,
-            Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW,
-            Bluetooth.MODEL_PC_60B -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
+            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PC_60NW -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300 -> {
                 waveHandler.post(EcgWaveTask())
@@ -483,6 +484,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             .observe(this, {
                 val rtWave = it.data as RtWave
                 OxyDataController.receive(rtWave.waveIntData)
+                Log.d("test12345", "" + Arrays.toString(rtWave.waveIntData))
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtParam)
             .observe(this, {
@@ -755,7 +757,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_OXYFIT,
                 Bluetooth.MODEL_POD_1W, Bluetooth.MODEL_CHECK_POD,
                 Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
-                Bluetooth.MODEL_PC_60NW,Bluetooth.MODEL_PC_60B -> {
+                Bluetooth.MODEL_PC_60NW_1,Bluetooth.MODEL_PC_60B,
+                Bluetooth.MODEL_PC_60NW -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE
@@ -948,7 +951,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
                     Bluetooth.MODEL_PC66B, Bluetooth.MODEL_POD_1W,
                     Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
-                    Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_PC_60B -> {
+                    Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60B,
+                    Bluetooth.MODEL_PC_60NW -> {
                         LpBleUtil.enableRtData(it, type, state)
                         type++
                         if (type > Sp20BleCmd.EnableType.OXY_WAVE) {

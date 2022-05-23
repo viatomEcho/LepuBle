@@ -288,6 +288,9 @@ class LpBleUtil {
             }
 
         }
+        fun updateSetting(model: Int, type: Array<String>, value: IntArray) {
+            BleServiceHelper.updateSetting(model, type, value)
+        }
         fun updateSetting(model: Int, type: String, value: Any) {
             Log.d(TAG, "updateSetting")
             BleServiceHelper.getInterface(model)?.let {
@@ -430,6 +433,10 @@ class LpBleUtil {
 
         fun isAutoConnect(model: Int): Boolean{
            return getInterface(model)?.isAutoReconnect ?: false
+        }
+
+        fun pc100GetBoState(model: Int) {
+            BleServiceHelper.pc100GetBoState(model)
         }
 
         fun setEr1Vibrate(model: Int, switcher: Boolean, threshold1: Int, threshold2: Int){
@@ -705,7 +712,8 @@ class LpBleUtil {
                         BleServiceHelper.sp20EnableRtData(model, type, enable)
                     }
                     Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_POD_1W,
-                    Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20-> {
+                    Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
+                    Bluetooth.MODEL_PC_60NW -> {
                         BleServiceHelper.pc60fwEnableRtData(model, type, enable)
                     }
                     Bluetooth.MODEL_PC_68B -> {

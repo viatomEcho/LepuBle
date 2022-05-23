@@ -11,8 +11,8 @@ public class Pc60FwBleCmd {
     public static final int HEAD_1 = 0x55;
 
     public static final int TOKEN_F0 = 0xF0;
-    public static final int CMD_GET_DEVICE_INFO = 0x81;
-    public static final int MSG_GET_DEVICE_INFO = 0x01;
+    public static final int CMD_GET_DEVICE_INFO_F0 = 0x81;
+    public static final int MSG_GET_DEVICE_INFO_F0 = 0x01;
     public static final int CMD_GET_DEVICE_SN = 0x82;
     public static final int MSG_GET_DEVICE_SN = 0x02;
     public static final int MSG_GET_BATTERY = 0x03;
@@ -22,6 +22,8 @@ public class Pc60FwBleCmd {
     public static final int TOKEN_0F = 0x0F;
     public static final int MSG_RT_PARAM = 0x01;
     public static final int MSG_RT_WAVE = 0x02;
+    public static final int CMD_GET_DEVICE_INFO_0F = 0x83;
+    public static final int MSG_GET_DEVICE_INFO_0F = 0x03;
     public static final int CMD_ENABLE_PARAM = 0x84;
     public static final int MSG_ENABLE_PARAM = 0x04;
     public static final int CMD_ENABLE_WAVE = 0x85;
@@ -64,17 +66,27 @@ public class Pc60FwBleCmd {
         return cmd;
     }
 
+    public static byte[] getInfo0F() {
+        byte[] cmd = new byte[6];
+        cmd[0] = (byte) HEAD_0;
+        cmd[1] = (byte) HEAD_1;
+        cmd[2] = (byte) TOKEN_0F;
+        cmd[3] = (byte) 0x02;
+        cmd[4] = (byte) CMD_GET_DEVICE_INFO_0F;
+        cmd[5] = CrcUtil.calCRC8Pc(cmd);
+        return cmd;
+    }
     /**
      * 查询版本/名称
      * @return byte数组
      */
-    public static byte[] getInfo() {
+    public static byte[] getInfoF0() {
         byte[] cmd = new byte[6];
         cmd[0] = (byte) HEAD_0;
         cmd[1] = (byte) HEAD_1;
         cmd[2] = (byte) TOKEN_F0;
         cmd[3] = (byte) 0x02;
-        cmd[4] = (byte) CMD_GET_DEVICE_INFO;
+        cmd[4] = (byte) CMD_GET_DEVICE_INFO_F0;
         cmd[5] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }

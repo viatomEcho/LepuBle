@@ -46,6 +46,8 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
             .retry(3, 100)
             .done {
                 LepuBleLog.d(tag, "Device Init")
+                enableRtData(Pc68bBleCmd.EnableType.RT_PARAM, true)
+                enableRtData(Pc68bBleCmd.EnableType.RT_WAVE, true)
             }
             .enqueue()
     }

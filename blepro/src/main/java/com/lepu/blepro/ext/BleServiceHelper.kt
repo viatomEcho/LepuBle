@@ -564,9 +564,9 @@ class BleServiceHelper private constructor() {
             }
             Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
             Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
-            Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
-            Bluetooth.MODEL_PF_20 -> {
+            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW -> {
                 return inter is Pc60FwBleInterface
             }
             Bluetooth.MODEL_PC80B -> {
@@ -1379,6 +1379,7 @@ class BleServiceHelper private constructor() {
     }
     /**
      * 更新设备设置（O2Ring，BabyO2）
+     * 单个设置
      */
     fun updateSetting(model: Int, type: String, value: Any) {
         if (!checkService()) return
@@ -1388,7 +1389,18 @@ class BleServiceHelper private constructor() {
             }
         }
     }
-
+    /**
+     * 更新设备设置（O2Ring，BabyO2）
+     * 多个参数设置
+     */
+    fun updateSetting(model: Int, type: Array<String>, value: IntArray) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as OxyBleInterface).let {
+                it.updateSetting(type, value)
+            }
+        }
+    }
     /**
      * 获取盒子信息（BabyO2N）
      */

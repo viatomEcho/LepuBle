@@ -255,9 +255,9 @@ open class BleService: LifecycleService() {
             }
             Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
             Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
-            Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
-            Bluetooth.MODEL_PF_20 -> {
+            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW -> {
                 Pc60FwBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -687,21 +687,24 @@ open class BleService: LifecycleService() {
             }
 
             @Bluetooth.MODEL val model: Int = Bluetooth.getDeviceModel(deviceName)
-            if (model == Bluetooth.MODEL_UNRECOGNIZED && scanModel == null) {
-                if (needPair)
-                    result.scanRecord?.let {
-                        HashMap<String, Any>().apply {
-                            this[EventMsgConst.Discovery.EventDeviceFound_Device] = device
-                            this[EventMsgConst.Discovery.EventDeviceFound_ScanRecord] = it
+            if (model == Bluetooth.MODEL_UNRECOGNIZED) {
+                if (scanModel == null) {
+                    if (needPair)
+                        result.scanRecord?.let {
+                            HashMap<String, Any>().apply {
+                                this[EventMsgConst.Discovery.EventDeviceFound_Device] = device
+                                this[EventMsgConst.Discovery.EventDeviceFound_ScanRecord] = it
 
-                            LepuBleLog.d(tag, "post paring...${device.name}")
-                            LiveEventBus.get<HashMap<String, Any>>(EventMsgConst.Discovery.EventDeviceFound_ScanRecordUnRegister).post(this)
+                                LepuBleLog.d(tag, "post paring...${device.name}")
+                                LiveEventBus.get<HashMap<String, Any>>(EventMsgConst.Discovery.EventDeviceFound_ScanRecordUnRegister)
+                                    .post(this)
+
+                            }
 
                         }
 
-                    }
-
-                LiveEventBus.get<ScanResult>(EventMsgConst.Discovery.EventDeviceFoundForUnRegister).post(result)
+                    LiveEventBus.get<ScanResult>(EventMsgConst.Discovery.EventDeviceFoundForUnRegister).post(result)
+                }
                 return
             }
             val b = Bluetooth(
@@ -758,8 +761,17 @@ open class BleService: LifecycleService() {
                 if (isReconnectScan && isContains){
                     stopDiscover()
                     if (isReconnectByAddress) {
-                        vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
-                        LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
+                        // 避免体温计aoj20a在装电池开机后自动关机过程连接上设备，延迟重连
+                        if (model == Bluetooth.MODEL_AOJ20A) {
+                            GlobalScope.launch {
+                                delay(2000)
+                                vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
+                                LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
+                            }
+                        } else {
+                            vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
+                            LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
+                        }
                     } else {
                         if (BleServiceHelper.BleServiceHelper.canReconnectByName(b.model)) {
                             vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)

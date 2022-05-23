@@ -17,7 +17,7 @@ class KtBleFileList {
                 for (i in 0 until fileNum) {
                     val fileName:String = trimStr(toString(bytes.copyOfRange(1+i*16, 16*(i+1)+1)))
 //                Log.d(TAG, "$i: $fileName")
-                    fileNameList[i] = fileName
+                    fileNameList.add(fileName)
                 }
             }
 

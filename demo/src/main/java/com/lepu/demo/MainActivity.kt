@@ -96,11 +96,11 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
         // 开启/关闭扫描
         viewModel.scanning.observe(this, {
-            if (it){
+//            if (it){
                 LpBleUtil.startScan(SUPPORT_MODELS)
-            } else {
-                LpBleUtil.stopScan()
-            }
+//            } else {
+//                LpBleUtil.stopScan()
+//            }
 
         })
 
@@ -226,7 +226,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         // o2ring 同步时间
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxySyncDeviceInfo)
             .observe(this, {
-                Toast.makeText(this, "o2ring 完成时间同步", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "o2ring 完成时间同步 ${it.data}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
 
             })
