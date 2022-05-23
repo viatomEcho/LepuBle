@@ -6,7 +6,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BleCRC
 import com.lepu.blepro.ble.cmd.OxyBleCmd
-import com.lepu.blepro.ble.cmd.OxyBleCmd.SYNC_TYPE_TIME
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.event.InterfaceEvent
@@ -295,15 +294,24 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun syncTime() {
-        settingType = SYNC_TYPE_TIME
+        settingType = OxyBleCmd.SYNC_TYPE_TIME
         sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.syncTime())
     }
 
     fun updateSetting(type: String, value: Any) {
         settingType = type
-        sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.updateSetting(type, value as Int))
-
+        val data = value as Int
+        if (settingType == OxyBleCmd.SYNC_TYPE_ALL_SW) {
+            updateSetting(arrayOf(OxyBleCmd.SYNC_TYPE_OXI_SWITCH, OxyBleCmd.SYNC_TYPE_HR_SWITCH, OxyBleCmd.SYNC_TYPE_MT_SW, OxyBleCmd.SYNC_TYPE_IV_SW),
+                intArrayOf(data, data, data, data))
+        } else {
+            sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.updateSetting(type, data))
+        }
     }
+    fun updateSetting(type: Array<String>, value: IntArray) {
+        sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.updateSetting(type, value))
+    }
+
     override fun getFileList() {
         LepuBleLog.e(tag, "getFileList Not yet implemented")
     }

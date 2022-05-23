@@ -742,6 +742,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
+        binding.o2AllSwitch.setOnClickListener {
+            state++
+            if (state > 1)
+                state = 0
+            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_ALL_SW, state)
+//            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0],
+//                arrayOf(OxyBleCmd.SYNC_TYPE_OXI_SWITCH, OxyBleCmd.SYNC_TYPE_HR_SWITCH, OxyBleCmd.SYNC_TYPE_MT_SW, OxyBleCmd.SYNC_TYPE_IV_SW),
+//                intArrayOf(state, state, state, state))
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
 
         //-------------------------sp20-----------------------
         binding.sp20AlarmSwitch.setOnClickListener {

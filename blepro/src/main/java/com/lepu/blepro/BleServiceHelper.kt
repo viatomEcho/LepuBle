@@ -1337,6 +1337,7 @@ class BleServiceHelper private constructor() {
     }
     /**
      * 更新设备设置（O2Ring，BabyO2）
+     * 单个设置
      */
     fun updateSetting(model: Int, type: String, value: Any) {
         if (!checkService()) return
@@ -1346,7 +1347,18 @@ class BleServiceHelper private constructor() {
             }
         }
     }
-
+    /**
+     * 更新设备设置（O2Ring，BabyO2）
+     * 多个参数设置
+     */
+    fun updateSetting(model: Int, type: Array<String>, value: IntArray) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as OxyBleInterface).let {
+                it.updateSetting(type, value)
+            }
+        }
+    }
     /**
      * 获取盒子信息（BabyO2N）
      */

@@ -288,6 +288,9 @@ class LpBleUtil {
             }
 
         }
+        fun updateSetting(model: Int, type: Array<String>, value: IntArray) {
+            BleServiceHelper.updateSetting(model, type, value)
+        }
         fun updateSetting(model: Int, type: String, value: Any) {
             Log.d(TAG, "updateSetting")
             BleServiceHelper.getInterface(model)?.let {
