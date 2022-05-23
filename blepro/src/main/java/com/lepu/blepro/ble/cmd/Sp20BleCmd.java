@@ -134,6 +134,12 @@ public class Sp20BleCmd {
     public static byte[] setConfig(byte[] config) {
         return getReq(TOKEN_0F, CMD_SET_CONFIG, config);
     }
+    public static byte[] setConfig(int type, int config) {
+        byte[] data = new byte[2];
+        data[0] = (byte) type;
+        data[1] = (byte) config;
+        return getReq(TOKEN_0F, CMD_SET_CONFIG, data);
+    }
 
     private static byte[] getReq(int token, int sendCmd, byte[] data) {
         int len = data.length;

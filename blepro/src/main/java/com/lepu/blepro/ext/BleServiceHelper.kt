@@ -613,6 +613,10 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         getInterface(model)?.getInfo()
     }
+    fun sp20GetInfo(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.getInfo()
+    }
     fun pod1wGetInfo(model: Int) {
         if (!checkService()) return
         getInterface(model)?.getInfo()
@@ -1630,6 +1634,16 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    fun sp20SetConfig(model: Int, type: Int, config: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as Sp20BleInterface).let {
+                LepuBleLog.d(tag, "it as Sp20BleInterface--setAp20Config")
+                it.setConfig(type, config)
+            }
+        }
+    }
+
     /**
      * 配置参数（sp20）
      * @param config Sp20Config
@@ -1646,7 +1660,7 @@ class BleServiceHelper private constructor() {
 
     /**
      * 获取参数（sp20）
-     * @param type Ap20BleCmd.ConfigType
+     * @param type Sp20BleCmd.ConfigType
      */
     fun sp20GetConfig(model: Int, type: Int) {
         if (!checkService()) return

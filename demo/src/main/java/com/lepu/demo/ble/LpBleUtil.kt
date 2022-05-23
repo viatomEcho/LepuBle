@@ -436,7 +436,7 @@ class LpBleUtil {
         }
 
         fun pc100GetBoState(model: Int) {
-            BleServiceHelper.pc100GetBoState(model)
+//            BleServiceHelper.pc100GetBoState(model)
         }
 
         fun setEr1Vibrate(model: Int, switcher: Boolean, threshold1: Int, threshold2: Int){

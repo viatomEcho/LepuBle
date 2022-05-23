@@ -124,4 +124,53 @@ object Constant {
         }
     }
 
+    /**
+     * sp20配置参数类型
+     */
+    interface Sp20ConfigType {
+        companion object {
+            /**
+             * 警报功能开关
+             */
+            const val ALARM_SWITCH = 1
+
+            /**
+             * 血氧过低阈值
+             */
+            const val LOW_OXY_THRESHOLD = 2
+
+            /**
+             * 脉率过低阈值
+             */
+            const val LOW_HR_THRESHOLD = 3
+
+            /**
+             * 脉率过高阈值
+             */
+            const val HIGH_HR_THRESHOLD = 4
+
+            /**
+             * 搏动音开关
+             */
+            const val PULSE_BEEP = 5
+        }
+    }
+
+    /**
+     * sp20使能类型
+     */
+    interface Sp20EnableType {
+        companion object {
+            /**
+             * 使能血氧参数
+             */
+            const val OXY_PARAM = 0
+
+            /**
+             * 使能血氧波形
+             */
+            const val OXY_WAVE = 1
+        }
+    }
+
 }

@@ -8,6 +8,7 @@ import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.BoDeviceInfo
 import com.lepu.blepro.ble.data.Sp20Config
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.sp20.*
 import com.lepu.blepro.utils.CrcUtil
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
@@ -22,6 +23,13 @@ import java.util.*
 class Sp20BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Sp20BleInterface"
     private var sp20Device = BoDeviceInfo()
+
+    private var deviceInfo = DeviceInfo()
+    private var getResult = GetConfigResult()
+    private var setResult = SetConfigResult()
+    private var param = RtParam()
+    private var wave = RtWave()
+    private var temp = TempResult()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = Sp20BleManager(context)
@@ -52,6 +60,9 @@ class Sp20BleInterface(model: Int): BleInterface(model) {
                     Sp20BleCmd.MSG_GET_DEVICE_SN -> {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_DEVICE_SN => success")
                         sp20Device.sn = com.lepu.blepro.utils.toString(response.content)
+
+                        deviceInfo.sn = sp20Device.sn
+
                         LepuBleLog.d(tag, "model:$model, sp20Device.sn == " + sp20Device.sn)
                     }
                     Sp20BleCmd.MSG_GET_DEVICE_INFO -> {
@@ -60,25 +71,20 @@ class Sp20BleInterface(model: Int): BleInterface(model) {
                         sp20Device.deviceName = device.name
                         sp20Device.softwareV = data.softwareV
                         sp20Device.hardwareV = data.hardwareV
+
+                        deviceInfo.deviceName = sp20Device.deviceName
+                        deviceInfo.softwareV = sp20Device.softwareV
+                        deviceInfo.hardwareV = sp20Device.hardwareV
+
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
-                        LepuBleLog.d(
-                            tag,
-                            "model:$model, DeviceInfo.deviceName:sp20Device.sn == " + data.deviceName + ":" + sp20Device.sn
-                        )
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20DeviceInfo)
-                            .post(
-                                InterfaceEvent(model, sp20Device)
-                            )
+                        LepuBleLog.d(tag, "model:$model, DeviceInfo.deviceName:sp20Device.sn == " + data.deviceName + ":" + sp20Device.sn)
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20DeviceInfo).post(InterfaceEvent(model, deviceInfo))
                     }
                     Sp20BleCmd.MSG_GET_BATTERY -> {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_BATTERY => success")
-                        LepuBleLog.d(
-                            tag,
-                            "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content)
-                        )
+                        LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
                         val data = toUInt(response.content)
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20Battery)
-                            .post(InterfaceEvent(model, data))
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20Battery).post(InterfaceEvent(model, data))
                     }
                 }
             }
@@ -86,57 +92,61 @@ class Sp20BleInterface(model: Int): BleInterface(model) {
                 when (response.type) {
                     Sp20BleCmd.MSG_ENABLE_OXY_PARAM -> {
                         LepuBleLog.d(tag, "model:$model,MSG_ENABLE_OXY_PARAM => success")
-                        LepuBleLog.d(
-                            tag,
-                            "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content)
-                        )
+                        LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
                     }
                     Sp20BleCmd.MSG_ENABLE_OXY_WAVE -> {
                         LepuBleLog.d(tag, "model:$model,MSG_ENABLE_OXY_WAVE => success")
-                        LepuBleLog.d(
-                            tag,
-                            "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content)
-                        )
+                        LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
                     }
                     Sp20BleCmd.MSG_RT_OXY_PARAM -> {
                         LepuBleLog.d(tag, "model:$model,MSG_RT_OXY_PARAM => success")
                         val data = Sp20BleResponse.RtParam(response.content)
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20RtParam)
-                            .post(InterfaceEvent(model, data))
+
+                        param.spo2 = data.spo2
+                        param.pr = data.pr
+                        param.pi = data.pi.div(10f)
+                        param.isProbeOff = data.isProbeOff
+                        param.isPulseSearching = data.isPulseSearching
+                        param.isCheckProbe = data.isCheckProbe
+                        param.battery = data.battery
+
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20RtParam).post(InterfaceEvent(model, param))
                     }
                     Sp20BleCmd.MSG_RT_OXY_WAVE -> {
                         LepuBleLog.d(tag, "model:$model,MSG_RT_OXY_WAVE => success")
                         val data = Sp20BleResponse.RtWave(response.content)
-                        LepuBleLog.d(
-                            tag,
-                            "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content)
-                        )
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20RtWave)
-                            .post(InterfaceEvent(model, data))
+                        LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
+
+                        wave.waveData = data.waveData
+                        wave.waveIntData = data.waveIntData
+
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20RtWave).post(InterfaceEvent(model, wave))
                     }
                     Sp20BleCmd.MSG_SET_TIME -> {
                         LepuBleLog.d(tag, "model:$model,MSG_SET_TIME => success")
-                        LepuBleLog.d(
-                            tag,
-                            "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content)
-                        )
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20SetTime)
-                            .post(InterfaceEvent(model, true))
+                        LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20SetTime).post(InterfaceEvent(model, true))
                     }
                     Sp20BleCmd.MSG_GET_CONFIG -> {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_CONFIG => success")
                         val data = Sp20Config(response.content)
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20GetConfig)
-                            .post(InterfaceEvent(model, data))
+
+                        getResult.type = data.type
+                        getResult.data = data.value
+
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20GetConfig).post(InterfaceEvent(model, getResult))
                     }
                     Sp20BleCmd.MSG_SET_CONFIG -> {
                         LepuBleLog.d(tag, "model:$model,MSG_SET_CONFIG => success")
                         val data = Sp20Config(response.content)
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20SetConfig)
-                            .post(InterfaceEvent(model, data))
+
+                        setResult.type = data.type
+                        setResult.success = data.value == 1
+
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20SetConfig).post(InterfaceEvent(model, setResult))
                     }
                 }
             }
@@ -146,8 +156,12 @@ class Sp20BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,MSG_TEMP => success")
                         val data = Sp20BleResponse.TempData(response.content)
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20TempData)
-                            .post(InterfaceEvent(model, data))
+
+                        temp.result = data.result
+                        temp.unit = data.unit
+                        temp.temp = data.value
+
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20TempData).post(InterfaceEvent(model, temp))
                     }
                 }
             }
@@ -226,6 +240,9 @@ class Sp20BleInterface(model: Int): BleInterface(model) {
 
     fun setConfig(config: Sp20Config) {
         sendCmd(Sp20BleCmd.setConfig(config.getDataBytes()))
+    }
+    fun setConfig(type: Int, config: Int) {
+        sendCmd(Sp20BleCmd.setConfig(type, config))
     }
     fun getConfig(type: Int) {
         sendCmd(Sp20BleCmd.getConfig(type))
