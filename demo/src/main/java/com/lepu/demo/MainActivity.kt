@@ -201,6 +201,11 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 Toast.makeText(this, "le bp2w 完成时间同步", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSyncUtcTime)
+            .observe(this, {
+                Toast.makeText(this, "le bp2w 完成UTC时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wInfo)
             .observe(this, { event ->
                 (event.data as LepuDevice).let {

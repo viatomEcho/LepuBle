@@ -544,6 +544,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
+        binding.leBp2wUtcTime.setOnClickListener {
+            LpBleUtil.bp2SyncUtcTime(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
 
         LinearLayoutManager(context).apply {
             this.orientation = LinearLayoutManager.VERTICAL
@@ -1256,6 +1261,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
             })
         //------------------------------lp bp2w-------------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSyncUtcTime)
+            .observe(this, {
+                Toast.makeText(
+                    context,
+                    "le bp2w 同步 UTC 时间成功",
+                    Toast.LENGTH_SHORT
+                ).show()
+            })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wDeleteFile)
             .observe(this, {
                 Toast.makeText(

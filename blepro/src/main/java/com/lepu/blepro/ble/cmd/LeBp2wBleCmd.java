@@ -3,6 +3,7 @@ package com.lepu.blepro.ble.cmd;
 import com.lepu.blepro.utils.CrcUtil;
 import com.lepu.blepro.utils.LepuBleLog;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 /**
  * @author chenyongfeng
@@ -30,6 +31,7 @@ public class LeBp2wBleCmd {
     public static final int GET_CONFIG = 0x00;
     public static final int SET_CONFIG = 0x0B;
     public static final int SET_TIME = 0xEC;
+    public static final int SET_UTC_TIME = 0xC0;
     public static final int GET_INFO = 0xE1;
     public static final int GET_FILE_LIST = 0xF1;
     public static final int READ_FILE_START = 0xF2;
@@ -114,6 +116,28 @@ public class LeBp2wBleCmd {
 
         LepuBleLog.d("setTime===");
         return getReq(SET_TIME, data);
+    }
+
+    public static byte[] setUtcTime() {
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(System.currentTimeMillis());
+
+        int len = 8;
+        byte[] data = new byte[len];
+        data[0] = (byte) (c.get(Calendar.YEAR));
+        data[1] = (byte) (c.get(Calendar.YEAR) >> 8);
+        data[2] = (byte) (c.get(Calendar.MONTH) + 1);
+        data[3] = (byte) (c.get(Calendar.DATE));
+        data[4] = (byte) (c.get(Calendar.HOUR_OF_DAY));
+        data[5] = (byte) (c.get(Calendar.MINUTE));
+        data[6] = (byte) (c.get(Calendar.SECOND));
+
+        int timeZone = (int) (TimeZone.getDefault().getRawOffset()/360000f);
+        LepuBleLog.d("setUtcTime===" + timeZone);
+
+        data[7] = (byte) timeZone;
+
+        return getReq(SET_UTC_TIME, data);
     }
 
     //文件下载开始

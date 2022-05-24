@@ -497,6 +497,9 @@ class LpBleUtil {
         fun bp2DeleteFile(model: Int) {
             BleServiceHelper.bp2DeleteFile(model)
         }
+        fun bp2SyncUtcTime(model: Int) {
+            BleServiceHelper.bp2SyncUtcTime(model)
+        }
 
         fun oxyGetRtWave(model: Int) {
             BleServiceHelper.oxyGetRtWave(model)
