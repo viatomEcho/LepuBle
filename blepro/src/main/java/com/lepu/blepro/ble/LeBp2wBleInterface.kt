@@ -94,6 +94,12 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSyncTime)
                     .post(InterfaceEvent(model, true))
             }
+            SET_UTC_TIME -> {
+                //同步时间
+                LepuBleLog.d(tag, "model:$model,SET_UTC_TIME => success")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSyncUtcTime)
+                    .post(InterfaceEvent(model, true))
+            }
 
             RT_STATE -> {
                 if (bleResponse.len == 0) return
@@ -446,7 +452,13 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
 
     override fun syncTime() {
         LepuBleLog.d(tag, "syncTime...")
-        sendCmd(setTime())
+//        sendCmd(setTime())
+        sendCmd(setUtcTime())
+    }
+
+    fun syncUtcTime() {
+        LepuBleLog.d(tag, "syncUtcTime..." + bytesToHex(setUtcTime()))
+        sendCmd(setUtcTime())
     }
 
     fun deleteFile() {

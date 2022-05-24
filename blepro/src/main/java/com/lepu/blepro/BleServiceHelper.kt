@@ -1303,6 +1303,14 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.e(tag, "bp2WriteUserList model error")
         }
     }
+    fun bp2SyncUtcTime(model: Int) {
+        getInterface(model)?.let { it1 ->
+            (it1 as LeBp2wBleInterface).let {
+                LepuBleLog.d(tag, "it as LeBp2wBleInterface--bp2SyncUtcTime")
+                it.syncUtcTime()
+            }
+        }
+    }
 
     /**
      * 获取实时波形（O2Ring，BabyO2）

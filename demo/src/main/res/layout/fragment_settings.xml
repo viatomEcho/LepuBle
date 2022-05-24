@@ -279,6 +279,12 @@
                         android:layout_height="wrap_content"
                         android:text="删除文件"
                         android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/le_bp2w_utc_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="UTC时间"
+                        android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
