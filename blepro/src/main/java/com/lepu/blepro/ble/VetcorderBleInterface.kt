@@ -31,6 +31,7 @@ class VetcorderBleInterface(model: Int): BleInterface(model) {
             .retry(3, 100)
             .done {
                 LepuBleLog.d(tag, "Device Init")
+                getInfo()
             }
             .enqueue()
     }
