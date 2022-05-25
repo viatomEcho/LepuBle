@@ -2,9 +2,11 @@ package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.ByteUtils.toSignedShort
 import com.lepu.blepro.utils.toUInt
+import java.util.*
 
 class VetcorderInfo(var data: ByteArray) {
     var ecgWave: ByteArray
+    var ecgwIs: ShortArray
     var ecgwFs: FloatArray
     var hr: Int
     var qrs: Int
@@ -24,9 +26,12 @@ class VetcorderInfo(var data: ByteArray) {
     init {
         var index = 4
         ecgWave = data.copyOfRange(index, index+10)
-        ecgwFs = FloatArray(ecgWave.size/2)
+        val len = ecgWave.size/2
+        ecgwIs = ShortArray(len)
+        ecgwFs = FloatArray(len)
         for (i in ecgwFs.indices) {
-            ecgwFs[i] = toSignedShort(ecgWave[2 * i], ecgWave[2 * i + 1]).toFloat()
+            ecgwIs[i] = toSignedShort(ecgWave[2 * i], ecgWave[2 * i + 1])
+            ecgwFs[i] = (ecgwIs[i]*4033)/(32767*12*8f)
         }
 
         index += 10
@@ -69,14 +74,17 @@ class VetcorderInfo(var data: ByteArray) {
     override fun toString(): String {
         return """
             VetcorderInfo
-            ecgWave: $ecgWave
+            ecgWave: ${Arrays.toString(ecgWave)}
+            ecgwIs: ${Arrays.toString(ecgwIs)}
+            ecgwFs: ${Arrays.toString(ecgwFs)}
             hr: $hr
             qrs: $qrs
             st: $st
             pvcs: $pvcs
             mark: $mark
             ecgNote: $ecgNote
-            spo2Wave: $spo2Wave
+            spo2Wave: ${Arrays.toString(spo2Wave)}
+            spo2wIs: ${Arrays.toString(spo2wIs)}
             pr: $pr
             spo2: $spo2
             pi: $pi
