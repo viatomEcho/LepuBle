@@ -338,7 +338,7 @@ open class BleService: LifecycleService() {
                     return this
                 }
             }
-            Bluetooth.MODEL_VETCORDER -> {
+            Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV -> {
                 VetcorderBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 

@@ -380,6 +380,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             || model == Bluetooth.MODEL_PC66B
             || model == Bluetooth.MODEL_PC_68B
             || model == Bluetooth.MODEL_VETCORDER
+            || model == Bluetooth.MODEL_CHECK_ADV
             || model == Bluetooth.MODEL_FHR
             || model == Bluetooth.MODEL_FETAL
             || model == Bluetooth.MODEL_VTM_AD5
