@@ -10,10 +10,10 @@ import com.icomon.icbodyfatalgorithms.ICBodyFatAlgorithmsType;
  */
 public class FscaleUserInfo implements Cloneable {
     public Integer userIndex = 1;
-    public Integer height = 172;
-    public double weight = 60.0D;
+    public Integer height = 153;
+    public double weight = 40.0D;
     public double targetWeight;
-    public Integer age = 24;
+    public Integer age = 25;
     public Integer weightDirection;
     public ICBodyFatAlgorithmsType bfaType;
     public ICBodyFatAlgorithmsPeopleType peopleType;
@@ -24,7 +24,7 @@ public class FscaleUserInfo implements Cloneable {
     public boolean enableMeasureGravity;
 
     public FscaleUserInfo() {
-        this.sex = ICBodyFatAlgorithmsSex.Male;
+        this.sex = ICBodyFatAlgorithmsSex.Female;
         this.peopleType = ICBodyFatAlgorithmsPeopleType.ICBodyFatAlgorithmsPeopleTypeNormal;
         this.bfaType = ICBodyFatAlgorithmsType.ICBodyFatAlgorithmsTypeWLA07;
         this.enableMeasureBalance = true;

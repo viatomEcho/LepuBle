@@ -1489,7 +1489,7 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
 
         when(model){
-            Bluetooth.MODEL_F4_SCALE -> {
+            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as F4ScaleBleInterface).let {
                         LepuBleLog.d(tag, "it as F4ScaleBleInterface--setUserInfo")
@@ -1512,7 +1512,7 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
 
         when(model){
-            Bluetooth.MODEL_F4_SCALE -> {
+            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE -> {
                 getInterface(model)?.let {
                     it as F4ScaleBleInterface
                     it.setUserList(userList)

@@ -27,9 +27,9 @@ abstract class LpBleManager(context: Context): BleManager(context) {
     lateinit var service_uuid: UUID
     lateinit var write_uuid: UUID
     lateinit var notify_uuid: UUID
-//    var indicate_uuid: UUID = UUID.fromString("0000FFB3-0000-1000-8000-00805F9B34FB")
+    lateinit var indicate_uuid: UUID
 
-//    var indicate_char: BluetoothGattCharacteristic? = null
+    var indicate_char: BluetoothGattCharacteristic? = null
     var write_char: BluetoothGattCharacteristic? = null
 
     var notify_char:BluetoothGattCharacteristic? = null
@@ -63,11 +63,15 @@ abstract class LpBleManager(context: Context): BleManager(context) {
                 LepuBleLog.d(MANAGER_TAG, "service ==  $service")
                 
                 service?.let {
-//                    indicate_char = service.getCharacteristic(indicate_uuid)
+                    if (this@LpBleManager::indicate_uuid.isInitialized) {
+                        indicate_char = service.getCharacteristic(indicate_uuid)
+                    }
                     write_char = service.getCharacteristic(write_uuid)
                     notify_char = service.getCharacteristic(notify_uuid)
-                    
-//                    LepuBleLog.d(MANAGER_TAG, "indicate_char ==  $indicate_char")
+
+                    if (indicate_char != null) {
+                        LepuBleLog.d(MANAGER_TAG, "indicate_char ==  $indicate_char")
+                    }
                     LepuBleLog.d(MANAGER_TAG, "writeChar ==  $write_char")
                     LepuBleLog.d(MANAGER_TAG, "notifyChar ==  $notify_char")
                 }?: kotlin.run { 
@@ -124,7 +128,7 @@ abstract class LpBleManager(context: Context): BleManager(context) {
 
 
             override fun onDeviceDisconnected() {
-//                indicate_char = null
+                indicate_char = null
                 write_char = null
                 notify_char = null
             }
@@ -149,20 +153,27 @@ abstract class LpBleManager(context: Context): BleManager(context) {
                 }
             }
 
-        /*setIndicationCallback(indicate_char).with { device, data ->
-            data.value?.let {
-                LepuBleLog.d(MANAGER_TAG, device.name + " IndicationCallback received==" + bytesToHex(it) + " size=" + bytesToHex(data.value!!).length)
+        if (indicate_char != null) {
+            setIndicationCallback(indicate_char).with { device, data ->
+                data.value?.let {
+                    LepuBleLog.d(
+                        MANAGER_TAG,
+                        device.name + " IndicationCallback received==" + bytesToHex(it) + " size=" + bytesToHex(
+                            data.value!!
+                        ).length
+                    )
 
-            }?: kotlin.run {
-                log(Log.WARN, "IndicationCallback data.value == null")
-            }
+                } ?: kotlin.run {
+                    log(Log.WARN, "IndicationCallback data.value == null")
+                }
 
-            notifyListener?.let {
-                it.onNotify(device, data)
-            }?: kotlin.run {
-                log(Log.WARN, "IndicationCallback listener == null")
+                notifyListener?.let {
+                    it.onNotify(device, data)
+                } ?: kotlin.run {
+                    log(Log.WARN, "IndicationCallback listener == null")
+                }
             }
-        }*/
+        }
     }
 
     open fun buildRequestQueue() {
@@ -180,7 +191,6 @@ abstract class LpBleManager(context: Context): BleManager(context) {
             //                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
             //                    .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
             .add(enableNotifications(notify_char))
-//            .add(enableIndications(indicate_char))
             .done { device: BluetoothDevice? ->
                 log(Log.INFO, "Target initialized")
             }

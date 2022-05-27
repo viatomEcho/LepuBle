@@ -228,15 +228,15 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             LepuBleLog.d(tag, "manager unInitialized")
             return
         }
-        manager.disconnect()
-        manager.close()
-        if (!this::device.isInitialized){
-            LepuBleLog.d(tag, "device unInitialized")
-            return
-        }
-        LepuBleLog.d(tag,"tay disconnect..., isAutoReconnect = $isAutoReconnect" )
         this.isAutoReconnect = isAutoConnect
-        this.onDeviceDisconnected(device, ConnectionObserver.REASON_SUCCESS)
+        LepuBleLog.d(tag,"try disconnect..., isAutoReconnect = $isAutoConnect" )
+        manager.disconnect().enqueue()
+        manager.close()
+//        if (!this::device.isInitialized){
+//            LepuBleLog.d(tag, "device unInitialized")
+//            return
+//        }
+//        this.onDeviceDisconnected(device, ConnectionObserver.REASON_SUCCESS)
 
 
     }
@@ -380,6 +380,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             || model == Bluetooth.MODEL_PC66B
             || model == Bluetooth.MODEL_PC_68B
             || model == Bluetooth.MODEL_VETCORDER
+            || model == Bluetooth.MODEL_CHECK_ADV
             || model == Bluetooth.MODEL_FHR
             || model == Bluetooth.MODEL_FETAL
             || model == Bluetooth.MODEL_VTM_AD5

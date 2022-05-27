@@ -5,6 +5,7 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
+import com.lepu.blepro.ble.data.FhrData
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
@@ -50,13 +51,17 @@ class Ad5FhrBleInterface(model: Int): BleInterface(model) {
         val hr2 = byte2UInt(response[12])
         val hr = if (hr1 != 0) hr1 else hr2
 
+        val data = FhrData()
+        data.hr1 = hr1
+        data.hr2 = hr2
+
         LepuBleLog.d(tag, "received cmd : $cmd")
         LepuBleLog.d(tag, "received sn : $sn")
         LepuBleLog.d(tag, "received hr1 : $hr1")
         LepuBleLog.d(tag, "received hr2 : $hr2")
         LepuBleLog.d(tag, "received hr : $hr")
 
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AD5.EventAd5RtHr).post(InterfaceEvent(model, hr))
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AD5.EventAd5RtHr).post(InterfaceEvent(model, data))
 
     }
 

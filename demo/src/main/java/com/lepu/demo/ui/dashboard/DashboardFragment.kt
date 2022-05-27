@@ -145,7 +145,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PC_60NW -> waveHandler.post(OxyWaveTask())
 
-            Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300 -> {
+            Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
+            Bluetooth.MODEL_CHECK_ADV -> {
                 waveHandler.post(EcgWaveTask())
                 waveHandler.post(OxyWaveTask())
             }
@@ -768,7 +769,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                 }
-                Bluetooth.MODEL_VETCORDER -> {
+                Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV -> {
                     binding.ecgLayout.visibility = View.VISIBLE
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.bpLayout.visibility = View.GONE
