@@ -26,12 +26,13 @@ class VetcorderInfo(var data: ByteArray) {
     init {
         var index = 4
         ecgWave = data.copyOfRange(index, index+10)
-        val len = ecgWave.size/2
+        val len = ecgWave.size.div(2)
         ecgwIs = ShortArray(len)
         ecgwFs = FloatArray(len)
         for (i in ecgwFs.indices) {
             ecgwIs[i] = toSignedShort(ecgWave[2 * i], ecgWave[2 * i + 1])
-            ecgwFs[i] = (ecgwIs[i]*4033)/(32767*12*8f)
+//            ecgwFs[i] = (ecgwIs[i]*4033)/(32767*12*8f)
+            ecgwFs[i] = (ecgwIs[i]*4033)/(32767*12*1.05f)
         }
 
         index += 10

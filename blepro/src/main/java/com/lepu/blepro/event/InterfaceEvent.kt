@@ -341,6 +341,11 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventVetcorderInfo = "com.lepu.ble.vetcorder.info"  // VetcorderInfo
         }
     }
+    interface CheckmeMonitor {
+        companion object {
+            const val EventCheckmeMonitorRtData = "com.lepu.ble.checkme.monitor.rtdata"  // RtData
+        }
+    }
 
     /**
      * Sp20BleInterface

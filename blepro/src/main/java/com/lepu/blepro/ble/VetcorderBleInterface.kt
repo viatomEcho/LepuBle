@@ -4,13 +4,12 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.VetcorderInfo
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.checkmemonitor.RtData
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
-import java.util.*
 
 /**
  *
@@ -19,6 +18,8 @@ import java.util.*
 
 class VetcorderBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "VetcorderBleInterface"
+
+    private var data = RtData()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = Er1BleManager(context)
@@ -42,7 +43,27 @@ class VetcorderBleInterface(model: Int): BleInterface(model) {
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: VetcorderInfo) {
         LepuBleLog.d(tag, "received: $response")
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Vetcorder.EventVetcorderInfo).post(InterfaceEvent(model, response))
+
+        data.ecgData = response.ecgWave
+        data.ecgShortData = response.ecgwIs
+        data.ecgFloatData = response.ecgwFs
+        data.hr = response.hr
+        data.qrs = response.qrs
+        data.st = response.st
+        data.pvcs = response.pvcs
+        data.isRWaveMark = response.mark == 1
+        data.ecgNote = response.ecgNote
+        data.spo2Data = response.spo2Wave
+        data.spo2IntData = response.spo2wIs
+        data.pr = response.pr
+        data.spo2 = response.spo2
+        data.pi = response.pi.div(10f)
+        data.isPulseMark = response.pulseSound == 1
+        data.spo2Note = response.spo2Note
+        data.battery = response.battery
+
+//        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Vetcorder.EventVetcorderInfo).post(InterfaceEvent(model, response))
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeMonitor.EventCheckmeMonitorRtData).post(InterfaceEvent(model, data))
 
     }
 
