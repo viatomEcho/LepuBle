@@ -50,6 +50,7 @@ class F4ScaleBleInterface(model: Int): BleInterface(model) {
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: F4ScaleBleResponse.F4ScaleResponse) {
         LepuBleLog.d(tag, "received cmd : " + bytesToHex(response.bytes))
+        LepuBleLog.d(tag, "response.unit : " + response.unit)
 
         when(response.cmd) {
             F4ScaleBleCmd.A0 -> {

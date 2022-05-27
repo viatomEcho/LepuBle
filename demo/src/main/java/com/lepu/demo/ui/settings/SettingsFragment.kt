@@ -124,7 +124,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     setViewVisible(binding.o2Layout)
                     LpBleUtil.getInfo(it.modelNo)
                 }
-                Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F5_SCALE -> {
+                Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F5_SCALE,
+                Bluetooth.MODEL_F8_SCALE -> {
                     setViewVisible(binding.scaleLayout)
                 }
                 Bluetooth.MODEL_PC100 -> {
@@ -578,10 +579,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             adapter.notifyDataSetChanged()
         }
 
-        //-------------------------F4,F5-----------------------
+        //-------------------------F4,F5,F8-----------------------
         binding.scaleUserInfo.setOnClickListener {
             val userInfo = FscaleUserInfo()
-            LpBleUtil.setUserInfo(Bluetooth.MODEL_F5_SCALE, userInfo)
+            LpBleUtil.setUserInfo(Constant.BluetoothConfig.currentModel[0], userInfo)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -592,7 +593,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             userList.add(FscaleUserInfo())
             userList.add(FscaleUserInfo())
             userList.add(FscaleUserInfo())
-            LpBleUtil.setUserList(Bluetooth.MODEL_F5_SCALE, userList)
+            LpBleUtil.setUserList(Constant.BluetoothConfig.currentModel[0], userList)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }

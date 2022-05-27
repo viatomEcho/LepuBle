@@ -65,6 +65,9 @@ class Constant{
             const val VCOMIN_MODEL: Int = Bluetooth.MODEL_VCOMIN
             const val LEM_MODEL: Int = Bluetooth.MODEL_LEM
             const val LES1_MODEL: Int = Bluetooth.MODEL_LES1
+            const val F4_SCALE_MODEL: Int = Bluetooth.MODEL_F4_SCALE
+            const val F5_SCALE_MODEL: Int = Bluetooth.MODEL_F5_SCALE
+            const val F8_SCALE_MODEL: Int = Bluetooth.MODEL_F8_SCALE
             const val PATIENT_DEVICE_JSON: Int = 1004
 
             val SUPPORT_MODELS = intArrayOf(ER1_MODEL, DUOEK_MODEL, ER2_MODEL, PC80B_MODEL, BP2_MODEL,
@@ -75,7 +78,7 @@ class Constant{
                 OXYSMART_MODEL, OXYFIT_MODEL, POD_1W_MODEL, CHECK_POD_MODEL, PC_68B_MODEL, BP2T_MODEL,
                 POD2B_MODEL, PC_60NW_1_MODEL, PC_60NW_MODEL, PC_60B_MODEL, PC300_MODEL, PULSEBITEX_MODEL, FETAL_MODEL,
                 VTM_AD5_MODEL, VCOMIN_MODEL, CHECKME_LE_MODEL, PF_10_MODEL, PF_20_MODEL, LEM_MODEL, LES1_MODEL,
-                CHECK_ADV_MODEL
+                CHECK_ADV_MODEL, F4_SCALE_MODEL, F5_SCALE_MODEL, F8_SCALE_MODEL
             )
 
             val SUPPORT_FACES = SparseArray<Int>().apply {

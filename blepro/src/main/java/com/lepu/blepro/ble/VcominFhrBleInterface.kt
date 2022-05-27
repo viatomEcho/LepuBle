@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.cmd.*
+import com.lepu.blepro.ble.data.FhrData
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
@@ -49,7 +49,11 @@ class VcominFhrBleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "received hr1 : $hr1")
         LepuBleLog.d(tag, "received hr2 : $hr2")
 
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VCOMIN.EventVcominRtHr).post(InterfaceEvent(model, hr1))
+        val data = FhrData()
+        data.hr1 = hr1
+        data.hr2 = hr2
+
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VCOMIN.EventVcominRtHr).post(InterfaceEvent(model, data))
 
     }
 
