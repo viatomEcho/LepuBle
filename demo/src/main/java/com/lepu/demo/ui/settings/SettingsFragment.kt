@@ -124,8 +124,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     setViewVisible(binding.o2Layout)
                     LpBleUtil.getInfo(it.modelNo)
                 }
-                Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F5_SCALE,
-                Bluetooth.MODEL_F8_SCALE -> {
+                Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_MY_SCALE,
+                Bluetooth.MODEL_F5_SCALE, Bluetooth.MODEL_F8_SCALE -> {
                     setViewVisible(binding.scaleLayout)
                 }
                 Bluetooth.MODEL_PC100 -> {
