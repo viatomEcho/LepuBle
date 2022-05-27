@@ -285,7 +285,8 @@ class BleServiceHelper private constructor() {
     fun canReconnectByName(model: Int): Boolean {
         return when(model) {
             Bluetooth.MODEL_PC80B, Bluetooth.MODEL_FHR, Bluetooth.MODEL_BPW1,
-            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F5_SCALE,
+            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE,
+            Bluetooth.MODEL_MY_SCALE, Bluetooth.MODEL_F5_SCALE,
             Bluetooth.MODEL_AOJ20A -> false
             else -> true
         }
@@ -578,10 +579,10 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BPW1 -> {
                 return inter is Bpw1BleInterface
             }
-            Bluetooth.MODEL_F4_SCALE -> {
+            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE -> {
                 return inter is F4ScaleBleInterface
             }
-            Bluetooth.MODEL_F5_SCALE -> {
+            Bluetooth.MODEL_MY_SCALE, Bluetooth.MODEL_F5_SCALE -> {
                 return inter is F5ScaleBleInterface
             }
             Bluetooth.MODEL_AP20 -> {
@@ -1497,7 +1498,7 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
-            Bluetooth.MODEL_F5_SCALE -> {
+            Bluetooth.MODEL_MY_SCALE, Bluetooth.MODEL_F5_SCALE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as F5ScaleBleInterface).let {
                         LepuBleLog.d(tag, "it as F5ScaleBleInterface--setUserInfo")
@@ -1518,7 +1519,7 @@ class BleServiceHelper private constructor() {
                     it.setUserList(userList)
                 }
             }
-            Bluetooth.MODEL_F5_SCALE -> {
+            Bluetooth.MODEL_MY_SCALE, Bluetooth.MODEL_F5_SCALE -> {
                 getInterface(model)?.let {
                     it as F5ScaleBleInterface
                     it.setUserList(userList)

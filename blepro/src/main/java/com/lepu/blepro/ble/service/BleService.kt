@@ -298,7 +298,7 @@ open class BleService: LifecycleService() {
                     return this
                 }
             }
-            Bluetooth.MODEL_F5_SCALE -> {
+            Bluetooth.MODEL_MY_SCALE, Bluetooth.MODEL_F5_SCALE -> {
                 F5ScaleBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
