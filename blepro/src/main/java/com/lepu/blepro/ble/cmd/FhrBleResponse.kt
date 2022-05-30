@@ -25,9 +25,9 @@ object FhrBleResponse {
     class DeviceInfo constructor(var bytes: ByteArray) : Parcelable {
         var deviceName: String  // 设备名称
         var hr: Int             // 心率数据（心率测量范围为60~240，0表示无信号，255表示超出量程）
-        var volume: Int         // 音量数据
-        var strength: Int       // 心音强度数据
-        var battery: Int        // 电量数据
+        var volume: Int         // 音量数据（0-6）
+        var strength: Int       // 心音强度数据（0-2）
+        var battery: Int        // 电量数据（0-6）不准确，设备问题
 
         init {
             deviceName = toString(bytes.copyOfRange(1, 5))

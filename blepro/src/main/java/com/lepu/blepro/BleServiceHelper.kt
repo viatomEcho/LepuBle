@@ -286,7 +286,10 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PC80B, Bluetooth.MODEL_FHR, Bluetooth.MODEL_BPW1,
             Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE,
             Bluetooth.MODEL_MY_SCALE, Bluetooth.MODEL_F5_SCALE,
-            Bluetooth.MODEL_AOJ20A -> false
+            Bluetooth.MODEL_AOJ20A, Bluetooth.MODEL_TV221U,
+            Bluetooth.MODEL_FETAL, Bluetooth.MODEL_VTM_AD5,
+            Bluetooth.MODEL_VCOMIN, Bluetooth.MODEL_PC300,
+            Bluetooth.MODEL_LEM -> false
             else -> true
         }
     }
