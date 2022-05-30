@@ -6,6 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.vtm20f.*
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 
@@ -18,6 +19,9 @@ class Vtm20fBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Vtm20fBleInterface"
 
     private lateinit var context: Context
+
+    private var param = RtParam()
+    private var wave = RtWave()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
@@ -42,12 +46,27 @@ class Vtm20fBleInterface(model: Int): BleInterface(model) {
             Vtm20fBleResponse.RT_PARAM -> {
                 LepuBleLog.d(tag, "model:$model,RT_PARAM => success " + bytesToHex(response.bytes))
                 val info = Vtm20fBleResponse.RtParam(response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM20f.EventVTM20fRtParam).post(InterfaceEvent(model, info))
+
+                param.seqNo = info.seqNo
+                param.spo2 = info.spo2
+                param.pr = info.pr
+                param.pi = info.pi
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM20f.EventVTM20fRtParam).post(InterfaceEvent(model, param))
             }
             Vtm20fBleResponse.RT_WAVE -> {
                 LepuBleLog.d(tag, "model:$model,RT_WAVE => success " + bytesToHex(response.bytes))
                 val info = Vtm20fBleResponse.RtWave(response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM20f.EventVTM20fRtWave).post(InterfaceEvent(model, info))
+
+                wave.seqNo = info.seqNo
+                wave.wave = info.wave
+                wave.barChart = info.barChart
+                wave.isPulseSound = info.pulseSound
+                wave.isDisturb = info.isDisturb
+                wave.isSensorOff = info.isSensorOff
+                wave.isLowPi = info.isLowPi
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM20f.EventVTM20fRtWave).post(InterfaceEvent(model, wave))
             }
         }
 
