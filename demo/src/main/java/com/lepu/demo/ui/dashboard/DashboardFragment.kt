@@ -720,6 +720,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.dataStr.text = "没有文件 $it"
             }
         })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.FHR.EventFhrDeviceInfo)
+            .observe(this) {
+                val data = it.data as FhrBleResponse.DeviceInfo
+                binding.dataStr.text = "$data"
+            }
     }
 
     var oxyPpgSize = 0
