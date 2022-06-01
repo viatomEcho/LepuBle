@@ -361,8 +361,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         }
         connecting = false
         ready = true
-        publish()
         clearCmdTimeout()
+        publish()
 
         if (model == Bluetooth.MODEL_PC80B
             || model == Bluetooth.MODEL_PC60FW

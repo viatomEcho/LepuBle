@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -394,40 +395,80 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             })
     }
     private fun needPermission(){
-        PermissionX.init(this)
-            .permissions(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN
-            )
-            .onExplainRequestReason { scope, deniedList ->
-                // 当请求被拒绝后，说明权限原因
-                scope.showRequestReasonDialog(
-                    deniedList, getString(R.string.permission_location_reason), getString(
-                        R.string.open
-                    ), getString(R.string.ignore)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PermissionX.init(this)
+                .permissions(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.BLUETOOTH,
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.BLUETOOTH_ADVERTISE,
+                    Manifest.permission.BLUETOOTH_ADMIN
                 )
+                .onExplainRequestReason { scope, deniedList ->
+                    // 当请求被拒绝后，说明权限原因
+                    scope.showRequestReasonDialog(
+                        deniedList, getString(R.string.permission_location_reason), getString(
+                            R.string.open
+                        ), getString(R.string.ignore)
+                    )
 
 
-            }
-            .onForwardToSettings { scope, deniedList ->
-                //选择了拒绝且不再询问的权限，去设置
-                scope.showForwardToSettingsDialog(
-                    deniedList, getString(R.string.permission_location_setting), getString(
-                        R.string.confirm
-                    ), getString(R.string.ignore)
+                }
+                .onForwardToSettings { scope, deniedList ->
+                    //选择了拒绝且不再询问的权限，去设置
+                    scope.showForwardToSettingsDialog(
+                        deniedList, getString(R.string.permission_location_setting), getString(
+                            R.string.confirm
+                        ), getString(R.string.ignore)
+                    )
+                }
+                .request { allGranted, grantedList, deniedList ->
+                    Log.e("权限授权情况", "$allGranted, $grantedList, $deniedList")
+
+                    //权限OK, 检查蓝牙状态
+                    if (allGranted)
+                        checkBluetooth(CHECK_BLE_REQUEST_CODE).let {
+                            LepuBleLog.d(TAG, "蓝牙状态 $it")
+                            viewModel._bleEnable.value = true
+                        }
+                }
+        } else {
+            PermissionX.init(this)
+                .permissions(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.BLUETOOTH,
+                    Manifest.permission.BLUETOOTH_ADMIN
                 )
-            }
-            .request { allGranted, grantedList, deniedList ->
-                Log.e("权限授权情况", "$allGranted, $grantedList, $deniedList")
+                .onExplainRequestReason { scope, deniedList ->
+                    // 当请求被拒绝后，说明权限原因
+                    scope.showRequestReasonDialog(
+                        deniedList, getString(R.string.permission_location_reason), getString(
+                            R.string.open
+                        ), getString(R.string.ignore)
+                    )
 
-                //权限OK, 检查蓝牙状态
-                if (allGranted)
-                    checkBluetooth(CHECK_BLE_REQUEST_CODE).let {
-                        LepuBleLog.d(TAG, "蓝牙状态 $it")
-                        viewModel._bleEnable.value = true
-                    }
-            }
+
+                }
+                .onForwardToSettings { scope, deniedList ->
+                    //选择了拒绝且不再询问的权限，去设置
+                    scope.showForwardToSettingsDialog(
+                        deniedList, getString(R.string.permission_location_setting), getString(
+                            R.string.confirm
+                        ), getString(R.string.ignore)
+                    )
+                }
+                .request { allGranted, grantedList, deniedList ->
+                    Log.e("权限授权情况", "$allGranted, $grantedList, $deniedList")
+
+                    //权限OK, 检查蓝牙状态
+                    if (allGranted)
+                        checkBluetooth(CHECK_BLE_REQUEST_CODE).let {
+                            LepuBleLog.d(TAG, "蓝牙状态 $it")
+                            viewModel._bleEnable.value = true
+                        }
+                }
+        }
 
     }
 
