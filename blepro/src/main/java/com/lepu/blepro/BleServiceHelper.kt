@@ -563,7 +563,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_O2M, Bluetooth.MODEL_SLEEPO2,
             Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
-            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT -> {
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
+            Bluetooth.MODEL_OXYRING -> {
                 return inter is OxyBleInterface
             }
             Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T ->{
@@ -1782,26 +1783,26 @@ class BleServiceHelper private constructor() {
     /**
      * 闹钟
      */
-    fun lewGetAlarmClockInfo(model: Int) {
+    fun lewGetAlarmClock(model: Int) {
         if (!checkService()) return
         getInterface(model)?.let { it1 ->
             (it1 as LewBleInterface).let {
-                LepuBleLog.d(tag, "it as LewBleInterface--lewGetAlarmClockInfo")
-                it.getAlarmClockInfo()
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetAlarmClock")
+                it.getAlarmClock()
             }
         }
     }
-    fun lewSetAlarmClockInfo(model: Int, info: AlarmClockInfo) {
+    fun lewSetAlarmClock(model: Int, info: AlarmClockInfo) {
         if (!checkService()) return
         getInterface(model)?.let { it1 ->
             (it1 as LewBleInterface).let {
-                LepuBleLog.d(tag, "it as LewBleInterface--lewSetAlarmClockInfo")
-                it.setAlarmClockInfo(info)
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetAlarmClock")
+                it.setAlarmClock(info)
             }
         }
     }
     /**
-     * 手机消息提醒开关（包括短信、来电）
+     * 手机短信、来电消息提醒开关
      */
     fun lewGetPhoneSwitch(model: Int) {
         if (!checkService()) return
@@ -1992,7 +1993,7 @@ class BleServiceHelper private constructor() {
         }
     }
     /**
-     * 心率阈值
+     * 心率阈值，大于等于提醒
      */
     fun lewGetHrThreshold(model: Int) {
         if (!checkService()) return
@@ -2013,7 +2014,7 @@ class BleServiceHelper private constructor() {
         }
     }
     /**
-     * 血氧阈值
+     * 血氧阈值，小于等于提醒
      */
     fun lewGetOxyThreshold(model: Int) {
         if (!checkService()) return

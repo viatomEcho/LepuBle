@@ -576,11 +576,11 @@ class LewBleInterface(model: Int): BleInterface(model) {
     fun setDeviceMode(mode: Int) {
         sendCmd(LewBleCmd.setDeviceMode(mode))
     }
-    fun getAlarmClockInfo() {
-        sendCmd(LewBleCmd.getAlarmClockInfo())
+    fun getAlarmClock() {
+        sendCmd(LewBleCmd.getAlarmClock())
     }
-    fun setAlarmClockInfo(alarm: AlarmClockInfo) {
-        sendCmd(LewBleCmd.setAlarmClockInfo(alarm.getDataBytes()))
+    fun setAlarmClock(alarm: AlarmClockInfo) {
+        sendCmd(LewBleCmd.setAlarmClock(alarm.getDataBytes()))
     }
     fun getPhoneSwitch() {
         sendCmd(LewBleCmd.getPhoneSwitch())

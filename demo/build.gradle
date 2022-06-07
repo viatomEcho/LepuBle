@@ -73,7 +73,7 @@ dependencies {
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     implementation 'io.github.jeremyliao:live-event-bus-x:1.8.0'
 
-
+    implementation 'com.blankj:utilcode:1.21.2'
 
     //room
     implementation "androidx.room:room-runtime:2.3.0-rc01"

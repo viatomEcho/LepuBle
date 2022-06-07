@@ -10,7 +10,7 @@ class SportTarget() {
     var step = 0       // 单位:步数
     var distance = 0   // 单位:⽶
     var calories = 0   // 单位:卡路⾥
-    var sleep = 0      // 单位:分钟 ??
+    var sleep = 0      // 单位:分钟
     var sportTime = 0  // 单位:分钟
 
     constructor(bytes: ByteArray) : this() {

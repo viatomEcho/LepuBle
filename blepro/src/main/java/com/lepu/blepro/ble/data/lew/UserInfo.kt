@@ -6,6 +6,7 @@ import com.lepu.blepro.utils.int2ByteArray
 import com.lepu.blepro.utils.int4ByteArray
 import com.lepu.blepro.utils.toUInt
 import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 
 class UserInfo() {
 
@@ -24,9 +25,11 @@ class UserInfo() {
         index += 4
         uid = toUInt(bytes.copyOfRange(index, index+4))
         index += 4
-        fName = trimStr(String(bytes.copyOfRange(index, index+32), Charset.defaultCharset()))
+//        fName = trimStr(String(bytes.copyOfRange(index, index+32), StandardCharsets.US_ASCII))
+        fName = trimStr(String(bytes.copyOfRange(index, index+32), StandardCharsets.UTF_8))
         index += 32
-        name = trimStr(String(bytes.copyOfRange(index, index+32), Charset.defaultCharset()))
+//        name = trimStr(String(bytes.copyOfRange(index, index+32), StandardCharsets.US_ASCII))
+        name = trimStr(String(bytes.copyOfRange(index, index+32), StandardCharsets.UTF_8))
         index += 32
         birthday = "" + toUInt(bytes.copyOfRange(index, index+2)) + "-" + bytes[index+2].toInt() + "-" + bytes[index+3].toInt()
         index += 4
@@ -39,11 +42,21 @@ class UserInfo() {
 
     fun getDataBytes(): ByteArray {
         val fNameByteArray = ByteArray(32)
-        val fNameData = fName.toByteArray(Charset.defaultCharset())
-        System.arraycopy(fNameData, 0, fNameByteArray, 0, fNameData.size)
+//        val fNameData = fName.toByteArray(StandardCharsets.US_ASCII)
+        val fNameData = fName.toByteArray(StandardCharsets.UTF_8)
+        if (fNameData.size > 32) {
+            System.arraycopy(fNameData, 0, fNameByteArray, 0, 32)
+        } else {
+            System.arraycopy(fNameData, 0, fNameByteArray, 0, fNameData.size)
+        }
         val nameByteArray = ByteArray(32)
-        val nameData = name.toByteArray(Charset.defaultCharset())
-        System.arraycopy(nameData, 0, nameByteArray, 0, nameData.size)
+//        val nameData = name.toByteArray(StandardCharsets.US_ASCII)
+        val nameData = name.toByteArray(StandardCharsets.UTF_8)
+        if (nameData.size > 32) {
+            System.arraycopy(nameData, 0, nameByteArray, 0, 32)
+        } else {
+            System.arraycopy(nameData, 0, nameByteArray, 0, nameData.size)
+        }
 
         return int4ByteArray(aid)
             .plus(int4ByteArray(uid))

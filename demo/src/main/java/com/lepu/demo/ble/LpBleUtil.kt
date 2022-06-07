@@ -5,10 +5,11 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.util.Log
+import android.util.SparseArray
+import com.blankj.utilcode.util.PathUtils
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.cmd.LeBp2wBleCmd
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
@@ -90,10 +91,16 @@ class LpBleUtil {
          */
         fun initBle(application: Application) {
 
+            val RAW_FOLDERS = SparseArray<String>()
+            RAW_FOLDERS.put(Bluetooth.MODEL_ER1, PathUtils.getExternalAppFilesPath() + "/demo/er1/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_LEW, PathUtils.getExternalAppFilesPath() + "/demo/lew/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_DUOEK, PathUtils.getExternalAppFilesPath() + "/demo/duoek/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_ER2, PathUtils.getExternalAppFilesPath() + "/demo/er2/")
+
             getServiceHelper()
                 .initLog(BuildConfig.DEBUG)
 //                .initModelConfig(Constant.BluetoothConfig.SUPPORT_FACES) // 配置要支持的设备
-
+                .initRawFolder(RAW_FOLDERS)
                 .initService(
                     application,
                     BleSO.getInstance(application)
@@ -700,11 +707,11 @@ class LpBleUtil {
         fun lewSetDeviceMode(model: Int, mode: Int) {
             BleServiceHelper.lewSetDeviceMode(model, mode)
         }
-        fun lewGetAlarmClockInfo(model: Int) {
-            BleServiceHelper.lewGetAlarmClockInfo(model)
+        fun lewGetAlarmClock(model: Int) {
+            BleServiceHelper.lewGetAlarmClock(model)
         }
-        fun lewSetAlarmClockInfo(model: Int, info: AlarmClockInfo) {
-            BleServiceHelper.lewSetAlarmClockInfo(model, info)
+        fun lewSetAlarmClock(model: Int, info: AlarmClockInfo) {
+            BleServiceHelper.lewSetAlarmClock(model, info)
         }
         fun lewGetPhoneSwitch(model: Int) {
             BleServiceHelper.lewGetPhoneSwitch(model)

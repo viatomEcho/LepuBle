@@ -139,7 +139,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_PC_68B,
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
-            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PC_60NW -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_OXYRING -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_CHECK_ADV -> {
@@ -730,7 +731,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
     private fun initView() {
 
-        mainViewModel.curBluetooth.observe(viewLifecycleOwner, {
+        mainViewModel.curBluetooth.observe(viewLifecycleOwner) {
             when (it!!.modelNo) {
                 Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK,
                 Bluetooth.MODEL_ER2, Bluetooth.MODEL_PC80B,
@@ -762,8 +763,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_OXYFIT,
                 Bluetooth.MODEL_POD_1W, Bluetooth.MODEL_CHECK_POD,
                 Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
-                Bluetooth.MODEL_PC_60NW_1,Bluetooth.MODEL_PC_60B,
-                Bluetooth.MODEL_PC_60NW -> {
+                Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60B,
+                Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_OXYRING -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE
@@ -784,8 +785,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.bpLayout.visibility = View.VISIBLE
                 }
             }
-        })
-        mainViewModel.bleState.observe(viewLifecycleOwner, {
+        }
+        mainViewModel.bleState.observe(viewLifecycleOwner) {
             it?.let {
                 if (it) {
                     binding.bleState.setImageResource(R.mipmap.bluetooth_ok)
@@ -803,7 +804,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 }
             }
 
-        })
+        }
 
         //------------------------------ecg------------------------------
         binding.ecgBkg.post{
@@ -913,6 +914,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         })
         binding.startRtOxy.setOnClickListener {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M

@@ -129,6 +129,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 fileType = 0
             }
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKO2

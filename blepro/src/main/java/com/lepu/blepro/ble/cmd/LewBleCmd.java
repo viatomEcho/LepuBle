@@ -181,8 +181,8 @@ public class LewBleCmd {
         public static final int MODE_FREE = 2;     // 省心模式
     }
     public static byte[] setDeviceMode(int mode) { return getReq(DEVICE_MODE, new byte[]{(byte)mode}); }
-    public static byte[] getAlarmClockInfo() { return getReq(ALARM_CLOCK_INFO, new byte[0]); }
-    public static byte[] setAlarmClockInfo(byte[] alarm) { return getReq(ALARM_CLOCK_INFO, alarm); }
+    public static byte[] getAlarmClock() { return getReq(ALARM_CLOCK_INFO, new byte[0]); }
+    public static byte[] setAlarmClock(byte[] alarm) { return getReq(ALARM_CLOCK_INFO, alarm); }
     public static byte[] getPhoneSwitch() { return getReq(PHONE_SWITCH, new byte[0]); }
     public static byte[] setPhoneSwitch(byte[] switches) { return getReq(PHONE_SWITCH, switches); }
 

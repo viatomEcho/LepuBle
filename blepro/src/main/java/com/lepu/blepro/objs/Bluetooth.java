@@ -16,6 +16,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_SNO2 = "O2BAND";
     public static final String BT_NAME_SPO2 = "SleepO2";
     public static final String BT_NAME_O2RING = "O2Ring";
+    public static final String BT_NAME_OXYRING = "OxyRing";
     public static final String BT_NAME_WEARO2 = "WearO2";
     public static final String BT_NAME_SLEEPU = "SleepU";
     public static final String BT_NAME_ER1 = "ER1";
@@ -162,8 +163,9 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_PC_60NW = 60;
     public static final int MODEL_CHECK_ADV = 61;
     public static final int MODEL_F5_SCALE = 62;
+    public static final int MODEL_OXYRING = 63;
 
-    @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER1_N,
+    @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_OXYRING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER1_N,
             MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL, MODEL_BABYO2, MODEL_OXYSMART,
             MODEL_TV221U, MODEL_PC100, MODEL_AOJ20A, MODEL_OXYFIT, MODEL_VCOMIN, MODEL_CHECK_POD, MODEL_BODY_FAT, MODEL_LEM,
             MODEL_BABYO2N, MODEL_BP2T, MODEL_BP2W, MODEL_STATION, MODEL_POD2B, MODEL_PC_60NW_1, MODEL_PC_60NW, MODEL_POD_1W, MODEL_PC_60B,
@@ -250,6 +252,8 @@ public class Bluetooth implements Parcelable {
                 return MODEL_SLEEPO2;
             case BT_NAME_O2RING:
                 return MODEL_O2RING;
+            case BT_NAME_OXYRING:
+                return MODEL_OXYRING;
             case BT_NAME_WEARO2:
                 return MODEL_WEARO2;
             case BT_NAME_SLEEPU:
@@ -316,7 +320,7 @@ public class Bluetooth implements Parcelable {
                 return MODEL_UNRECOGNIZED;
         }
     }
-    @StringDef({"", BT_NAME_O2, BT_NAME_SNO2, BT_NAME_SPO2, BT_NAME_O2RING, BT_NAME_WEARO2, BT_NAME_SLEEPU, BT_NAME_ER1, BT_NAME_ER1_N,
+    @StringDef({"", BT_NAME_O2, BT_NAME_SNO2, BT_NAME_SPO2, BT_NAME_O2RING, BT_NAME_OXYRING, BT_NAME_WEARO2, BT_NAME_SLEEPU, BT_NAME_ER1, BT_NAME_ER1_N,
             BT_NAME_DUOEK, BT_NAME_DEVICES_ER2, BT_NAME_PULSEBIT_EX, BT_NAME_OXY_LINK, BT_NAME_KIDS_O2, BT_NAME_BABY_O2, BT_NAME_OXY_SMART, BT_NAME_OXYFIT,
             BT_NAME_BP2, BT_NAME_BP2A, BT_NAME_BP2T, BT_NAME_BP2W, BT_NAME_RINGO2, BT_NAME_O2M, BT_NAME_LEM, BT_NAME_BPM,
             BT_NAME_FHR, BT_NAME_BABYO2N, BT_NAME_STATION, BT_NAME_BPW1, BT_NAME_LEW, BT_NAME_VETCORDER, BT_NAME_PC60FW, FETAL_DEVICE_NAME,
@@ -340,6 +344,8 @@ public class Bluetooth implements Parcelable {
                 return BT_NAME_SPO2;
             case MODEL_O2RING:
                 return BT_NAME_O2RING;
+            case MODEL_OXYRING:
+                return BT_NAME_OXYRING;
             case MODEL_WEARO2:
                 return BT_NAME_WEARO2;
             case MODEL_SLEEPU:

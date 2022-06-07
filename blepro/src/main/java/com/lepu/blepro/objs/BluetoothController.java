@@ -50,6 +50,7 @@ public class BluetoothController {
     synchronized public static boolean checkO2Device(int model) {
         boolean isO2 = false;
         if (model == Bluetooth.MODEL_O2RING
+                || model == Bluetooth.MODEL_OXYRING
                 || model == Bluetooth.MODEL_O2M
                 || model == Bluetooth.MODEL_OXYLINK
                 || model == Bluetooth.MODEL_BABYO2

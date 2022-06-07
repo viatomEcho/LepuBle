@@ -121,7 +121,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_O2M, Bluetooth.MODEL_SLEEPO2,
                 Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
                 Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
-                Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT -> {
+                Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
+                Bluetooth.MODEL_OXYRING -> {
                     setViewVisible(binding.o2Layout)
                     LpBleUtil.getInfo(it.modelNo)
                 }
@@ -507,7 +508,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
         // 闹钟
         binding.lewGetAlarmInfo.setOnClickListener {
-            LpBleUtil.lewGetAlarmClockInfo(Constant.BluetoothConfig.currentModel[0])
+            LpBleUtil.lewGetAlarmClock(Constant.BluetoothConfig.currentModel[0])
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -555,7 +556,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             info.items.add(item)
             info.items.add(item2)
             Log.d("test12345", "lewSetAlarmInfo $info")
-            LpBleUtil.lewSetAlarmClockInfo(Constant.BluetoothConfig.currentModel[0], info)
+            LpBleUtil.lewSetAlarmClock(Constant.BluetoothConfig.currentModel[0], info)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -1339,10 +1340,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             state++
             if (state > 1)
                 state = 0
-            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_ALL_SW, state)
-//            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0],
-//                arrayOf(OxyBleCmd.SYNC_TYPE_OXI_SWITCH, OxyBleCmd.SYNC_TYPE_HR_SWITCH, OxyBleCmd.SYNC_TYPE_MT_SW, OxyBleCmd.SYNC_TYPE_IV_SW),
-//                intArrayOf(state, state, state, state))
+//            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_ALL_SW, state)
+            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0],
+                arrayOf(OxyBleCmd.SYNC_TYPE_OXI_SWITCH, OxyBleCmd.SYNC_TYPE_HR_SWITCH, OxyBleCmd.SYNC_TYPE_MT_SW, OxyBleCmd.SYNC_TYPE_IV_SW),
+                intArrayOf(state, state, state, state))
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
