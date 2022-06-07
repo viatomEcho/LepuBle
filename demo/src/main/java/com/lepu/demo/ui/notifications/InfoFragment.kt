@@ -10,6 +10,7 @@ import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ble.data.lew.EcgList
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.bytesToHex
@@ -252,31 +253,35 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             })
         //--------------------------------lew-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList)
-            .observe(this, { event ->
+            .observe(this) { event ->
                 (event.data as LewBleResponse.FileList).let {
-                    setReceiveCmd(it.bytes)
+                    setReceiveCmd(it.content)
                     binding.info.text = it.toString()
-                    for (fileName in it.list) {
-                        fileNames.add(fileName)
+                    if (it.type == LewBleCmd.ListType.ECG) {
+                        val data = EcgList(it.content)
+                        for (item in data.items) {
+                            fileNames.add(item.name)
+                        }
                     }
                     Toast.makeText(context, "lew 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 }
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadingFileProgress)
-            .observe(this, { event ->
+            .observe(this) { event ->
                 (event.data as Int).let {
-                    binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it/10).toString() + "%"
+                    binding.process.text =
+                        readFileProcess + curFileName + " 读取进度:" + (it / 10).toString() + "%"
                 }
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete)
-            .observe(this, { event ->
+            .observe(this) { event ->
                 (event.data as LewBleResponse.EcgFile).let {
                     setReceiveCmd(it.content)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
                     fileNames.removeAt(0)
                     readFile()
                 }
-            })
+            }
         //--------------------------------bp2-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList)
             .observe(this, { event ->

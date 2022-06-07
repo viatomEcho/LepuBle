@@ -92,17 +92,17 @@ class LewBleInterface(model: Int): BleInterface(model) {
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: LewBleResponse.BleResponse) {
-        LiveEventBus.get<String>(EventMsgConst.Cmd.EventCmdResponseContent).post(bytesToHex(response.bytes))
         when(response.cmd) {
             LewBleCmd.SET_TIME -> {
                 LepuBleLog.d(tag, "model:$model,SET_TIME => success")
                 if (response.len == 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetTime).post(InterfaceEvent(model, true))
                 } else {
                     val data = TimeData(response.content)
                     LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetTime).post(InterfaceEvent(model, data))
                 }
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetTime).post(InterfaceEvent(model, true))
             }
             LewBleCmd.GET_BATTERY -> {
                 if (response.len == 0) return
@@ -114,7 +114,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 if (response.len == 0) return
                 val data = DeviceInfo(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewInfo).post(InterfaceEvent(model, data))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewDeviceInfo).post(InterfaceEvent(model, data))
                 if (runRtImmediately){
                     runRtTask()
                     runRtImmediately = false
@@ -146,56 +146,113 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,SET_SYSTEM_SETTING => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetSystemSetting).post(InterfaceEvent(model, true))
             }
+            LewBleCmd.LANGUAGE_SETTING -> {
+                LepuBleLog.d(tag, "model:$model,LANGUAGE_SETTING => success")
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetLanguageSetting).post(InterfaceEvent(model, true))
+                } else {
+                    val data = toUInt(response.content)
+                    LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetLanguageSetting).post(InterfaceEvent(model, data))
+                }
+            }
+            LewBleCmd.UNIT_SETTING -> {
+                LepuBleLog.d(tag, "model:$model,UNIT_SETTING => success")
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetUnitSetting).post(InterfaceEvent(model, true))
+                } else {
+                    val data = UnitSetting(response.content)
+                    LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetUnitSetting).post(InterfaceEvent(model, data))
+                }
+            }
+            LewBleCmd.HAND_RAISE_SETTING -> {
+                LepuBleLog.d(tag, "model:$model,HAND_RAISE_SETTING => success")
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetHandRaiseSetting).post(InterfaceEvent(model, true))
+                } else {
+                    val data = HandRaiseSetting(response.content)
+                    LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetHandRaiseSetting).post(InterfaceEvent(model, data))
+                }
+            }
+            LewBleCmd.LR_HAND_SETTING -> {
+                LepuBleLog.d(tag, "model:$model,LR_HAND_SETTING => success")
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetLrHandSetting).post(InterfaceEvent(model, true))
+                } else {
+                    val data = toUInt(response.content)
+                    LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetLrHandSetting).post(InterfaceEvent(model, data))
+                }
+            }
+
             LewBleCmd.NO_DISTURB_MODE -> {
                 LepuBleLog.d(tag, "model:$model,NO_DISTURB_MODE => success")
                 if (response.len == 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetNoDisturbMode).post(InterfaceEvent(model, true))
                 } else {
                     val data = NoDisturbMode(response.content)
                     LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetNoDisturbMode).post(InterfaceEvent(model, data))
                 }
             }
             LewBleCmd.APP_SWITCH -> {
                 LepuBleLog.d(tag, "model:$model,APP_SWITCH => success")
                 if (response.len == 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetAppSwitch).post(InterfaceEvent(model, true))
                 } else {
                     val data = AppSwitch(response.content)
                     LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetAppSwitch).post(InterfaceEvent(model, data))
                 }
             }
             LewBleCmd.NOTIFICATION_INFO -> {
                 LepuBleLog.d(tag, "model:$model,NOTIFICATION_INFO => success")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSendNotification).post(InterfaceEvent(model, true))
             }
             LewBleCmd.DEVICE_MODE -> {
                 LepuBleLog.d(tag, "model:$model,DEVICE_MODE => success")
                 if (response.len == 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetDeviceMode).post(InterfaceEvent(model, true))
                 } else {
                     val data = toUInt(response.content)
                     LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetDeviceMode).post(InterfaceEvent(model, data))
                 }
             }
             LewBleCmd.ALARM_CLOCK_INFO -> {
                 LepuBleLog.d(tag, "model:$model,ALARM_CLOCK_INFO => success")
                 if (response.len == 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetAlarmClock).post(InterfaceEvent(model, true))
                 } else {
                     val data = AlarmClockInfo(response.content)
                     LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetAlarmClock).post(InterfaceEvent(model, data))
                 }
             }
             LewBleCmd.PHONE_SWITCH -> {
                 LepuBleLog.d(tag, "model:$model,PHONE_SWITCH => success")
                 if (response.len == 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetPhoneSwitch).post(InterfaceEvent(model, true))
                 } else {
                     val data = PhoneSwitch(response.content)
                     LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetPhoneSwitch).post(InterfaceEvent(model, data))
                 }
             }
             LewBleCmd.CALL_CONTROL -> {
                 LepuBleLog.d(tag, "model:$model,CALL_CONTROL => success")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewPhoneCall).post(InterfaceEvent(model, true))
             }
             LewBleCmd.GET_MEASURE_SETTING -> {
                 if (response.len == 0) return
@@ -207,75 +264,139 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,SET_MEASURE_SETTING => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetMeasureSetting).post(InterfaceEvent(model, true))
             }
+            LewBleCmd.SPORT_TARGET -> {
+                LepuBleLog.d(tag, "model:$model,SPORT_TARGET => success")
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetSportTarget).post(InterfaceEvent(model, true))
+                } else {
+                    val data = SportTarget(response.content)
+                    LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetSportTarget).post(InterfaceEvent(model, data))
+                }
+            }
+            LewBleCmd.TARGET_REMIND -> {
+                LepuBleLog.d(tag, "model:$model,TARGET_REMIND => success")
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetTargetRemind).post(InterfaceEvent(model, true))
+                } else {
+                    val data = toUInt(response.content)
+                    LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetTargetRemind).post(InterfaceEvent(model, data))
+                }
+            }
+            LewBleCmd.SITTING_REMIND -> {
+                LepuBleLog.d(tag, "model:$model,SITTING_REMIND => success")
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetSittingRemind).post(InterfaceEvent(model, true))
+                } else {
+                    val data = SittingRemind(response.content)
+                    LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetSittingRemind).post(InterfaceEvent(model, data))
+                }
+            }
+            LewBleCmd.HR_DETECT -> {
+                LepuBleLog.d(tag, "model:$model,HR_DETECT => success")
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetHrDetect).post(InterfaceEvent(model, true))
+                } else {
+                    val data = HrDetect(response.content)
+                    LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetHrDetect).post(InterfaceEvent(model, data))
+                }
+            }
+
             LewBleCmd.USER_INFO -> {
                 LepuBleLog.d(tag, "model:$model,USER_INFO => success")
                 if (response.len == 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetUserInfo).post(InterfaceEvent(model, true))
                 } else {
                     val data = UserInfo(response.content)
                     LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetUserInfo).post(InterfaceEvent(model, data))
                 }
             }
             LewBleCmd.PHONE_BOOK -> {
                 LepuBleLog.d(tag, "model:$model,PHONE_BOOK => success")
                 if (response.len == 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetPhoneBook).post(InterfaceEvent(model, true))
                 } else {
                     val data = PhoneBook(response.content)
                     LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetPhoneBook).post(InterfaceEvent(model, data))
                 }
             }
             LewBleCmd.SOS_CONTACT -> {
                 LepuBleLog.d(tag, "model:$model,SOS_CONTACT => success")
                 if (response.len == 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetSosContact).post(InterfaceEvent(model, true))
                 } else {
                     val data = SosContact(response.content)
                     LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetSosContact).post(InterfaceEvent(model, data))
                 }
             }
             LewBleCmd.GET_SPORT_LIST -> {
                 if (response.len == 0) return
                 val data = SportList(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_SPORT_LIST => success $data")
+                val list = LewBleResponse.FileList(LewBleCmd.ListType.SPORT, response.content)
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
             }
             LewBleCmd.GET_ECG_LIST -> {
                 if (response.len == 0) return
                 val data = EcgList(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_ECG_LIST => success $data")
+                val list = LewBleResponse.FileList(LewBleCmd.ListType.ECG, response.content)
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
             }
             LewBleCmd.GET_HR_LIST -> {
                 if (response.len == 0) return
                 val data = HrList(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_HR_LIST => success $data")
+                val list = LewBleResponse.FileList(LewBleCmd.ListType.HR, response.content)
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
             }
             LewBleCmd.GET_OXY_LIST -> {
                 if (response.len == 0) return
                 val data = OxyList(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_OXY_LIST => success $data")
+                val list = LewBleResponse.FileList(LewBleCmd.ListType.OXY, response.content)
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
             }
             LewBleCmd.HR_THRESHOLD -> {
                 LepuBleLog.d(tag, "model:$model,HR_THRESHOLD => success")
                 if (response.len == 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetHrThreshold).post(InterfaceEvent(model, true))
                 } else {
                     val data = HrThreshold(response.content)
                     LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetHrThreshold).post(InterfaceEvent(model, data))
                 }
             }
             LewBleCmd.OXY_THRESHOLD -> {
                 LepuBleLog.d(tag, "model:$model,OXY_THRESHOLD => success")
                 if (response.len == 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetOxyThreshold).post(InterfaceEvent(model, true))
                 } else {
                     val data = OxyThreshold(response.content)
                     LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetOxyThreshold).post(InterfaceEvent(model, data))
                 }
             }
             LewBleCmd.RT_DATA -> {
                 if (response.len == 0) return
                 val data = RtData(response.content)
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success $data")
+
             }
 
             LewBleCmd.RESET -> {
@@ -291,6 +412,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFactoryResetAll).post(InterfaceEvent(model, true))
             }
 
+            // 以下部分是之前协议，需测试手表是否兼容
             LewBleCmd.GET_FILE_LIST -> {
                 if (response.len == 0) return
                 fileListName = trimStr(com.lepu.blepro.utils.toString(response.content.copyOfRange(1, response.content.size)))
@@ -310,12 +432,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
                     sendCmd(LewBleCmd.readFileData(0))
                 } else {
                     LepuBleLog.d(tag, "read file failed：${response.pkgType}")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileError).post(
-                        InterfaceEvent(
-                            model,
-                            true
-                        )
-                    )
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileError).post(InterfaceEvent(model, true))
                 }
 
             }
@@ -359,14 +476,9 @@ class LewBleInterface(model: Int): BleInterface(model) {
                             if ((isCancelRF || isPausedRF) ) return
                         } else {
                             val list =
-                                LewBleResponse.FileList(it.content)
+                                LewBleResponse.FileList(0, it.content)
 
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(
-                                InterfaceEvent(
-                                    model,
-                                    list
-                                )
-                            )
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
                         }
                     }?: LepuBleLog.d(tag, "READ_FILE_END EventLewFileList  model:$model,  curFile error!!")
                 } else {
@@ -375,8 +487,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
                         if (it.index < it.fileSize ){
                             if ((isCancelRF || isPausedRF) ) return
                         }else {
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete)
-                                .post(InterfaceEvent(model, it))
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete).post(InterfaceEvent(model, it))
                         }
                     }?: LepuBleLog.d(tag, "READ_FILE_END EventLewReadFileComplete  model:$model,  curFile error!!")
                 }
@@ -395,6 +506,13 @@ class LewBleInterface(model: Int): BleInterface(model) {
     }
     override fun syncTime() {
         sendCmd(LewBleCmd.setTime())
+    }
+
+    fun setTime(data: TimeData) {
+        sendCmd(LewBleCmd.setTime(data.getDataBytes()))
+    }
+    fun getTime() {
+        sendCmd(LewBleCmd.getTime())
     }
 
     fun boundDevice(b: Boolean) {

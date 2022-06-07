@@ -11,6 +11,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.LeBp2wBleCmd
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.lew.*
+import com.lepu.blepro.ble.data.lew.TimeData
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.demo.BuildConfig
@@ -250,6 +251,7 @@ class LpBleUtil {
         }
 
         fun getSendCmd(model: Int): String {
+            Log.d("test12345", "${BleServiceHelper.getSendCmd(model)}")
             return BleServiceHelper.getSendCmd(model)
         }
 
@@ -628,6 +630,12 @@ class LpBleUtil {
                 BleServiceHelper.lewGetBattery(model)
             }
         }
+        fun lewSetTime(model: Int, data: TimeData) {
+            BleServiceHelper.lewSetTime(model, data)
+        }
+        fun lewGetTime(model: Int) {
+            BleServiceHelper.lewGetTime(model)
+        }
         fun lewFindDevice(model: Int) {
             BleServiceHelper.lewFindDevice(model)
         }
@@ -636,6 +644,30 @@ class LpBleUtil {
         }
         fun lewSetSystemSetting(model: Int, setting: SystemSetting) {
             BleServiceHelper.lewSetSystemSetting(model,setting)
+        }
+        fun lewGetLanguage(model: Int) {
+            BleServiceHelper.lewGetLanguage(model)
+        }
+        fun lewSetLanguage(model: Int, language: Int) {
+            BleServiceHelper.lewSetLanguage(model,language)
+        }
+        fun lewGetUnit(model: Int) {
+            BleServiceHelper.lewGetUnit(model)
+        }
+        fun lewSetUnit(model: Int, setting: UnitSetting) {
+            BleServiceHelper.lewSetUnit(model,setting)
+        }
+        fun lewGetHandRaise(model: Int) {
+            BleServiceHelper.lewGetHandRaise(model)
+        }
+        fun lewSetHandRaise(model: Int, setting: HandRaiseSetting) {
+            BleServiceHelper.lewSetHandRaise(model,setting)
+        }
+        fun lewGetLrHand(model: Int) {
+            BleServiceHelper.lewGetLrHand(model)
+        }
+        fun lewSetLrHand(model: Int, hand: Int) {
+            BleServiceHelper.lewSetLrHand(model,hand)
         }
         fun lewGetNoDisturbMode(model: Int) {
             BleServiceHelper.lewGetNoDisturbMode(model)
@@ -649,8 +681,8 @@ class LpBleUtil {
         fun lewSetAppSwitch(model: Int, app: AppSwitch) {
             BleServiceHelper.lewSetAppSwitch(model, app)
         }
-        fun lewNotification(model: Int, info: NotificationInfo) {
-            BleServiceHelper.lewNotification(model, info)
+        fun lewSendNotification(model: Int, info: NotificationInfo) {
+            BleServiceHelper.lewSendNotification(model, info)
         }
         fun lewGetDeviceMode(model: Int) {
             BleServiceHelper.lewGetDeviceMode(model)
@@ -675,6 +707,30 @@ class LpBleUtil {
         }
         fun lewSetMeasureSetting(model: Int, setting: MeasureSetting) {
             BleServiceHelper.lewSetMeasureSetting(model, setting)
+        }
+        fun lewGetSportTarget(model: Int) {
+            BleServiceHelper.lewGetSportTarget(model)
+        }
+        fun lewSetSportTarget(model: Int, target: SportTarget) {
+            BleServiceHelper.lewSetSportTarget(model, target)
+        }
+        fun lewGetTargetRemind(model: Int) {
+            BleServiceHelper.lewGetTargetRemind(model)
+        }
+        fun lewSetTargetRemind(model: Int, remind: Boolean) {
+            BleServiceHelper.lewSetTargetRemind(model, remind)
+        }
+        fun lewGetSittingRemind(model: Int) {
+            BleServiceHelper.lewGetSittingRemind(model)
+        }
+        fun lewSetSittingRemind(model: Int, remind: SittingRemind) {
+            BleServiceHelper.lewSetSittingRemind(model, remind)
+        }
+        fun lewGetHrDetect(model: Int) {
+            BleServiceHelper.lewGetHrDetect(model)
+        }
+        fun lewSetHrDetect(model: Int, detect: HrDetect) {
+            BleServiceHelper.lewSetHrDetect(model, detect)
         }
         fun lewGetUserInfo(model: Int) {
             BleServiceHelper.lewGetUserInfo(model)

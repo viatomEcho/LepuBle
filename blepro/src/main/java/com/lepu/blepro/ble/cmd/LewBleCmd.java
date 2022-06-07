@@ -2,13 +2,10 @@ package com.lepu.blepro.ble.cmd;
 
 import android.util.Log;
 
-import com.lepu.blepro.ble.data.TimeData;
+import com.lepu.blepro.ble.data.lew.TimeData;
 import com.lepu.blepro.utils.CrcUtil;
-
-import java.util.Date;
-import java.util.TimeZone;
-
 import static com.lepu.blepro.utils.ByteUtils.int4Bytes;
+import static com.lepu.blepro.utils.HexString.bytesToHex;
 
 /**
  * @author chenyongfeng
@@ -222,10 +219,14 @@ public class LewBleCmd {
         public static final int DAY_MONTH = 1;   // 日-月
     }
     public static byte[] setTime() {
-        int absTime = (int) System.currentTimeMillis()/1000;
-        int offsetTime = TimeZone.getDefault().getRawOffset()/1000;
-        Log.d("test12345", "absTime = " + absTime);
-        Log.d("test12345", "offsetTime = " + offsetTime);
+        TimeData data = new TimeData();
+        Log.d("test12345", "setTime = " + bytesToHex(data.getDataBytes()));
+        return getReq(SET_TIME, data.getDataBytes());
+    }
+    public static byte[] setTime(byte[] data) {
+        return getReq(SET_TIME, data);
+    }
+    public static byte[] getTime() {
         return getReq(SET_TIME, new byte[0]);
     }
     public static byte[] setDialNum(int num) { return getReq(CLOCK_DIAL, new byte[]{1, (byte)num}); }

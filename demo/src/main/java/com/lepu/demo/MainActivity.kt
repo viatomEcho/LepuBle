@@ -145,7 +145,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 Toast.makeText(this, "lew 完成时间同步", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewInfo)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewDeviceInfo)
             .observe(this, { event ->
                 (event.data as LepuDevice).let {
                     Toast.makeText(this, "lew 获取设备信息成功", Toast.LENGTH_SHORT).show()

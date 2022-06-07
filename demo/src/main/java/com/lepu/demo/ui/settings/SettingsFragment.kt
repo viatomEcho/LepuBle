@@ -15,7 +15,7 @@ import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.FscaleUserInfo
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.lew.*
-import com.lepu.blepro.event.EventMsgConst
+import com.lepu.blepro.ble.data.lew.TimeData
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.HexString.hexToBytes
@@ -214,6 +214,24 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         //-------------------------lew------------------------
+        // 时间
+        binding.lewGetTime.setOnClickListener {
+            LpBleUtil.lewGetTime(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewSetTime.setOnClickListener {
+            state++
+            if (state > LewBleCmd.TimeFormat.FORMAT_24H) {
+                state = LewBleCmd.TimeFormat.FORMAT_12H
+            }
+            val data = TimeData()
+            data.formatHour = state
+            data.formatDay = state
+            LpBleUtil.lewSetTime(Constant.BluetoothConfig.currentModel[0], data)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
         // 绑定
         binding.lewBound.setOnClickListener {
             LpBleUtil.lewBoundDevice(Constant.BluetoothConfig.currentModel[0], true)
@@ -260,6 +278,81 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             setting.hand = LewBleCmd.Hand.RIGHT
             Log.d("test12345", "lewSetSystemSetting $setting")
             LpBleUtil.lewSetSystemSetting(Constant.BluetoothConfig.currentModel[0], setting)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewGetLanguage.setOnClickListener {
+            LpBleUtil.lewGetLanguage(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewSetLanguage.setOnClickListener {
+            state++
+            if (state > LewBleCmd.Language.FARSI) {
+                state = LewBleCmd.Language.ENGLISH
+            }
+            Log.d("test12345", "lewSetLanguage $state")
+            LpBleUtil.lewSetLanguage(Constant.BluetoothConfig.currentModel[0], state)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewGetUnit.setOnClickListener {
+            LpBleUtil.lewGetUnit(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewSetUnit.setOnClickListener {
+            val unit = UnitSetting()
+            state++
+            if (state > LewBleCmd.Unit.LENGTH_FEET_INCH) {
+                state = LewBleCmd.Unit.LENGTH_KM_M
+            }
+            unit.lengthUnit = state
+            state++
+            if (state > LewBleCmd.Unit.WEIGHT_KG_G) {
+                state = LewBleCmd.Unit.WEIGHT_QUARTZ
+            }
+            unit.weightUnit = state
+            state++
+            if (state > LewBleCmd.Unit.TEMP_F) {
+                state = LewBleCmd.Unit.TEMP_C
+            }
+            unit.tempUnit = state
+            Log.d("test12345", "lewSetUnit $unit")
+            LpBleUtil.lewSetUnit(Constant.BluetoothConfig.currentModel[0], unit)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewGetHandRaise.setOnClickListener {
+            LpBleUtil.lewGetHandRaise(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewSetHandRaise.setOnClickListener {
+            val handRaise = HandRaiseSetting()
+            switchState = !switchState
+            handRaise.switch = switchState
+            handRaise.startHour = 0
+            handRaise.startMin = 0
+            handRaise.stopHour = 24
+            handRaise.stopMin = 0
+            Log.d("test12345", "lewSetHandRaise $handRaise")
+            LpBleUtil.lewSetHandRaise(Constant.BluetoothConfig.currentModel[0], handRaise)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewGetLrHand.setOnClickListener {
+            LpBleUtil.lewGetLrHand(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewSetLrHand.setOnClickListener {
+            state++
+            if (state > LewBleCmd.Hand.RIGHT) {
+                state = LewBleCmd.Hand.LEFT
+            }
+            Log.d("test12345", "lewSetLrHand $state")
+            LpBleUtil.lewSetLrHand(Constant.BluetoothConfig.currentModel[0], state)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -353,7 +446,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
             noti.info = phone
             Log.d("test12345", "lewPhoneNoti $noti")
-            LpBleUtil.lewNotification(Constant.BluetoothConfig.currentModel[0], noti)
+            LpBleUtil.lewSendNotification(Constant.BluetoothConfig.currentModel[0], noti)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -369,7 +462,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
             noti.info = mess
             Log.d("test12345", "lewMessageNoti $noti")
-            LpBleUtil.lewNotification(Constant.BluetoothConfig.currentModel[0], noti)
+            LpBleUtil.lewSendNotification(Constant.BluetoothConfig.currentModel[0], noti)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -384,7 +477,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
             noti.info = other
             Log.d("test12345", "lewOtherNoti $noti")
-            LpBleUtil.lewNotification(Constant.BluetoothConfig.currentModel[0], noti)
+            LpBleUtil.lewSendNotification(Constant.BluetoothConfig.currentModel[0], noti)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -399,6 +492,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             if (state > LewBleCmd.DeviceMode.MODE_FREE) {
                 state = LewBleCmd.DeviceMode.MODE_NORMAL
             }
+            Log.d("test12345", "lewSetDeviceMode $state")
             LpBleUtil.lewSetDeviceMode(Constant.BluetoothConfig.currentModel[0], state)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
@@ -523,6 +617,83 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             setting.hrDetect = hrDetect
             Log.d("test12345", "lewSetMeasureSetting $setting")
             LpBleUtil.lewSetMeasureSetting(Constant.BluetoothConfig.currentModel[0], setting)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewGetSportTarget.setOnClickListener {
+            LpBleUtil.lewGetSportTarget(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewSetSportTarget.setOnClickListener {
+            val sportTarget = SportTarget()
+            sportTarget.step = 10000
+            sportTarget.distance = 5000
+            sportTarget.calories = 2000
+            sportTarget.sleep = 30
+            sportTarget.sportTime = 60
+            Log.d("test12345", "lewSetSportTarget $sportTarget")
+            LpBleUtil.lewSetSportTarget(Constant.BluetoothConfig.currentModel[0], sportTarget)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewGetTargetRemind.setOnClickListener {
+            LpBleUtil.lewGetTargetRemind(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewSetTargetRemind.setOnClickListener {
+            switchState = !switchState
+            Log.d("test12345", "lewSetTargetRemind $switchState")
+            LpBleUtil.lewSetTargetRemind(Constant.BluetoothConfig.currentModel[0], switchState)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewGetSittingRemind.setOnClickListener {
+            LpBleUtil.lewGetSittingRemind(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewSetSittingRemind.setOnClickListener {
+            val sittingRemind = SittingRemind()
+            switchState = !switchState
+            sittingRemind.switch = switchState
+            switchState = !switchState
+            sittingRemind.noonSwitch = switchState
+            sittingRemind.everySunday = switchState
+            switchState = !switchState
+            sittingRemind.everyMonday = switchState
+            switchState = !switchState
+            sittingRemind.everyTuesday = switchState
+            switchState = !switchState
+            sittingRemind.everyWednesday = switchState
+            switchState = !switchState
+            sittingRemind.everyThursday = switchState
+            switchState = !switchState
+            sittingRemind.everyFriday = switchState
+            switchState = !switchState
+            sittingRemind.everySaturday = switchState
+            sittingRemind.startHour = 10
+            sittingRemind.startMin = 0
+            sittingRemind.stopHour = 18
+            sittingRemind.stopMin = 30
+            Log.d("test12345", "lewSetSittingRemind $sittingRemind")
+            LpBleUtil.lewSetSittingRemind(Constant.BluetoothConfig.currentModel[0], sittingRemind)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewGetHrDetect.setOnClickListener {
+            LpBleUtil.lewGetHrDetect(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewSetHrDetect.setOnClickListener {
+            switchState = !switchState
+            val hrDetect = HrDetect()
+            hrDetect.switch = switchState
+            hrDetect.interval = 2
+            Log.d("test12345", "lewSetHrDetect $hrDetect")
+            LpBleUtil.lewSetHrDetect(Constant.BluetoothConfig.currentModel[0], hrDetect)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -1395,11 +1566,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun initLiveEvent() {
-        LiveEventBus.get<String>(EventMsgConst.Cmd.EventCmdResponseContent)
-            .observe(this, {
-                cmdStr += "\n receive : $it"
-                binding.receiveCmd.text = cmdStr
-            })
         //----------------------------er1/duoek-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetSwitcherState)
             .observe(this, {
@@ -1862,21 +2028,317 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             })
         //------------------------------lew-------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewBoundDevice)
-            .observe(this, {
-                var data = it.data as Boolean
+            .observe(this) {
+                val data = it.data as Boolean
                 binding.content.text = "请求绑定 : $data"
-            })
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewUnBoundDevice)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "请求解绑 : $data"
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewBatteryInfo)
-            .observe(this, {
-                val data = it.data as KtBleBattery
+            .observe(this) {
+                val data = it.data as BatteryInfo
                 setReceiveCmd(data.bytes)
                 binding.content.text = data.toString()
-                Toast.makeText(
-                    context,
-                    "lew手表 获取电量成功",
-                    Toast.LENGTH_SHORT
-                ).show()
-            })
+                Toast.makeText(context, "lew手表 获取电量成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetTime)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "设置时间 : $data"
+                Toast.makeText(context, "lew手表 设置时间成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetTime)
+            .observe(this) {
+                val data = it.data as TimeData
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取时间成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetSystemSetting)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置系统配置成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetSystemSetting)
+            .observe(this) {
+                val data = it.data as SystemSetting
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取系统配置成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetLanguageSetting)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置语言成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetLanguageSetting)
+            .observe(this) {
+                val data = it.data as Int
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取语言成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetUnitSetting)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置单位成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetUnitSetting)
+            .observe(this) {
+                val data = it.data as UnitSetting
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取单位成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetHandRaiseSetting)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置翻腕亮屏成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetHandRaiseSetting)
+            .observe(this) {
+                val data = it.data as HandRaiseSetting
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取翻腕亮屏成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetLrHandSetting)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置左右手成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetLrHandSetting)
+            .observe(this) {
+                val data = it.data as Int
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取左右手成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetNoDisturbMode)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置勿扰模式成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetNoDisturbMode)
+            .observe(this) {
+                val data = it.data as NoDisturbMode
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取勿扰模式成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetAppSwitch)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置app提醒成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetAppSwitch)
+            .observe(this) {
+                val data = it.data as AppSwitch
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取app提醒成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSendNotification)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 发送消息成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetDeviceMode)
+            .observe(this) {
+                val data = it.data as Int
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取设备模式成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetDeviceMode)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置设备模式成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetAlarmClock)
+            .observe(this) {
+                val data = it.data as AlarmClockInfo
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取闹钟成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetAlarmClock)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置闹钟成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetPhoneSwitch)
+            .observe(this) {
+                val data = it.data as PhoneSwitch
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取手机提醒成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetPhoneSwitch)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置手机提醒成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewPhoneCall)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 已挂断", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetMeasureSetting)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置测量配置成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetMeasureSetting)
+            .observe(this) {
+                val data = it.data as MeasureSetting
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取测量配置成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetSportTarget)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置运动目标值成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetSportTarget)
+            .observe(this) {
+                val data = it.data as SportTarget
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取运动目标值成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetTargetRemind)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置目标提醒成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetTargetRemind)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取目标提醒成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetSittingRemind)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置久坐提醒成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetSittingRemind)
+            .observe(this) {
+                val data = it.data as SittingRemind
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取久坐提醒成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetHrDetect)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置测量配置成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetHrDetect)
+            .observe(this) {
+                val data = it.data as HrDetect
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取自测心率成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetUserInfo)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置用户信息成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetUserInfo)
+            .observe(this) {
+                val data = it.data as UserInfo
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取用户信息成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetPhoneBook)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置通讯录成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetPhoneBook)
+            .observe(this) {
+                val data = it.data as PhoneBook
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取通讯录成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetSosContact)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置紧急联系人成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetSosContact)
+            .observe(this) {
+                val data = it.data as SosContact
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取紧急联系人成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetHrThreshold)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置心率阈值成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetHrThreshold)
+            .observe(this) {
+                val data = it.data as HrThreshold
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取心率阈值成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetOxyThreshold)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置血氧阈值成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetOxyThreshold)
+            .observe(this) {
+                val data = it.data as OxyThreshold
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取血氧阈值成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList)
+            .observe(this) {
+                val data = it.data as LewBleResponse.FileList
+                when (data.type) {
+                    LewBleCmd.ListType.SPORT -> {
+                        val list = SportList(data.content)
+                        binding.content.text = "$list"
+                    }
+                    LewBleCmd.ListType.ECG -> {
+                        val list = EcgList(data.content)
+                        binding.content.text = "$list"
+                    }
+                    LewBleCmd.ListType.HR -> {
+                        val list = HrList(data.content)
+                        binding.content.text = "$list"
+                    }
+                    LewBleCmd.ListType.OXY -> {
+                        val list = OxyList(data.content)
+                        binding.content.text = "$list"
+                    }
+                }
+                Toast.makeText(context, "lew手表 获取列表成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete)
+            .observe(this) {
+                val data = it.data as LewBleResponse.EcgFile
+                binding.content.text = "${data.fileName} ${bytesToHex(data.content)}"
+                Toast.makeText(context, "lew手表 获取心电文件成功", Toast.LENGTH_SHORT).show()
+            }
+
+
 
         //------------------------------sp20-------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20Battery)
