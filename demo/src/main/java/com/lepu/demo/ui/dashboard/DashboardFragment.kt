@@ -122,7 +122,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         when(model) {
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK,
             Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2,
-            Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LEW3,
+            Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LEW,
             Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_LE_BP2W,
             Bluetooth.MODEL_PC80B, Bluetooth.MODEL_LES1 -> waveHandler.post(EcgWaveTask())
 
@@ -208,29 +208,29 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.dataStr.text = it.toString()
             }
         })
-        //------------------------------lew3------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3BatteryInfo)
+        //------------------------------lew------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewBatteryInfo)
             .observe(this, {
                 val data = it.data as KtBleBattery
                 dataString += "\n" + data.toString()
                 binding.dataStr.text = dataString
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3RtData)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewRtData)
             .observe(this, {
-                val rtData = it.data as Lew3BleResponse.RtData
+                val rtData = it.data as LewBleResponse.RtData
                 rtData.let { data ->
-                    Log.d("lew3 data ", "len = ${data.wave.samplingNum}")
+                    Log.d("lew data ", "len = ${data.wave.samplingNum}")
                     DataController.receive(data.wave.wFs)
                     dataString = data.param.toString()
                     binding.dataStr.text = dataString
                     viewModel.ecgHr.value = data.param.hr
 
-                    LpBleUtil.lew3GetBattery(it.model)
+                    LpBleUtil.lewGetBattery(it.model)
 
                 }
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3FileList).observe(this, { event ->
-            (event.data as Lew3BleResponse.FileList).let {
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).observe(this, { event ->
+            (event.data as LewBleResponse.FileList).let {
                 binding.dataStr.text = it.toString()
             }
         })
@@ -734,7 +734,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             when (it!!.modelNo) {
                 Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK,
                 Bluetooth.MODEL_ER2, Bluetooth.MODEL_PC80B,
-                Bluetooth.MODEL_LEW3, Bluetooth.MODEL_ER1_N,
+                Bluetooth.MODEL_LEW, Bluetooth.MODEL_ER1_N,
                 Bluetooth.MODEL_LES1 -> {
                     binding.ecgLayout.visibility = View.VISIBLE
                     binding.bpLayout.visibility = View.GONE

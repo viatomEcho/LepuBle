@@ -29,7 +29,7 @@ public class DateUtil {
     }
 
     /**
-     * 获取精确毫秒的时间戳
+     * 获取精确秒的时间戳
      */
     public static long getSecondTimestamp(String time){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");

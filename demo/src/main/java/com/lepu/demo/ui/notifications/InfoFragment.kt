@@ -10,6 +10,7 @@ import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ble.data.lew.EcgList
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.bytesToHex
@@ -256,27 +257,31 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     }
                 }
             })
-        //--------------------------------lew3-----------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3FileList)
-            .observe(this, { event ->
-                (event.data as Lew3BleResponse.FileList).let {
-                    setReceiveCmd(it.bytes)
+        //--------------------------------lew-----------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList)
+            .observe(this) { event ->
+                (event.data as LewBleResponse.FileList).let {
+                    setReceiveCmd(it.content)
                     binding.info.text = it.toString()
-                    for (fileName in it.list) {
-                        fileNames.add(fileName)
+                    if (it.type == LewBleCmd.ListType.ECG) {
+                        val data = EcgList(it.content)
+                        for (item in data.items) {
+                            fileNames.add(item.name)
+                        }
                     }
-                    Toast.makeText(context, "lew3 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "lew 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 }
-            })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3ReadingFileProgress)
-            .observe(this, { event ->
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadingFileProgress)
+            .observe(this) { event ->
                 (event.data as Int).let {
-                    binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it/10).toString() + "%"
+                    binding.process.text =
+                        readFileProcess + curFileName + " 读取进度:" + (it / 10).toString() + "%"
                 }
-            })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3ReadFileComplete)
-            .observe(this, { event ->
-                (event.data as Lew3BleResponse.EcgFile).let {
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete)
+            .observe(this) { event ->
+                (event.data as LewBleResponse.EcgFile).let {
                     setReceiveCmd(it.content)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $it \n"
                     if (binding.fileName.text.toString().isEmpty()) {
@@ -284,7 +289,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         readFile()
                     }
                 }
-            })
+            }
         //--------------------------------bp2-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList)
             .observe(this, { event ->

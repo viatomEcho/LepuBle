@@ -11,7 +11,11 @@ import android.util.SparseArray
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.*
+import com.lepu.blepro.ble.cmd.LewBleCmd
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ble.data.FactoryConfig
+import com.lepu.blepro.ble.data.lew.*
+import com.lepu.blepro.ble.data.lew.TimeData
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
@@ -1523,6 +1527,7 @@ class BleServiceHelper private constructor() {
     /**
      * 使能实时数据发送（ap20）
      * @param type Ap20BleCmd.EnableType
+     * @param enable true打开，false关闭
      */
     fun ap20EnableRtData(model: Int, type: Int, enable: Boolean) {
         if (!checkService()) return
@@ -1548,54 +1553,483 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * 请求绑定设备（lew3）
+     * 时间
      */
-    fun lew3BoundDevice(model: Int) {
+    fun lewGetTime(model: Int) {
         if (!checkService()) return
         getInterface(model)?.let { it1 ->
-            (it1 as Lew3BleInterface).let {
-                LepuBleLog.d(tag, "it as Lew3BleInterface--boundDevice")
-                it.boundDevice()
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetTime")
+                it.getTime()
+            }
+        }
+    }
+    fun lewSetTime(model: Int, data: TimeData) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetTime")
+                it.setTime(data)
             }
         }
     }
 
     /**
-     * 获取服务器信息（lew3）
+     * 请求绑定/解绑设备（lew）
+     * @param bound true绑定，false解绑
      */
-    fun lew3GetConfig(model: Int) {
+    fun lewBoundDevice(model: Int, bound: Boolean) {
         if (!checkService()) return
         getInterface(model)?.let { it1 ->
-            (it1 as Lew3BleInterface).let {
-                LepuBleLog.d(tag, "it as Lew3BleInterface--lew3GetConfig")
-                it.getConfig()
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--boundDevice")
+                it.boundDevice(bound)
             }
         }
     }
-
     /**
-     * 配置服务器信息（lew3）
-     * @param server 服务器信息
+     * 获取电量（lew）
      */
-    fun lew3SetServer(model: Int, server: Lew3Config) {
+    fun lewGetBattery(model: Int) {
         if (!checkService()) return
         getInterface(model)?.let { it1 ->
-            (it1 as Lew3BleInterface).let {
-                LepuBleLog.d(tag, "it as Lew3BleInterface--lew3SetServer")
-                it.setServer(server)
-            }
-        }
-    }
-
-    /**
-     * 获取电量（lew3）
-     */
-    fun lew3GetBattery(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as Lew3BleInterface).let {
-                LepuBleLog.d(tag, "it as Lew3BleInterface--lew3GetBattery")
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetBattery")
                 it.getBattery()
+            }
+        }
+    }
+    /**
+     * 寻找设备
+     */
+    fun lewFindDevice(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewFindDevice")
+                it.findDevice()
+            }
+        }
+    }
+    /**
+     * 系统配置（包括语言、单位、翻腕亮屏、左右手）
+     */
+    fun lewGetSystemSetting(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetSystemSetting")
+                it.getSystemSetting()
+            }
+        }
+    }
+    fun lewSetSystemSetting(model: Int, setting: SystemSetting) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetSystemSetting")
+                it.setSystemSetting(setting)
+            }
+        }
+    }
+    fun lewGetLanguage(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetLanguage")
+                it.getLanguage()
+            }
+        }
+    }
+    fun lewSetLanguage(model: Int, language: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetLanguage")
+                it.setLanguage(language)
+            }
+        }
+    }
+    fun lewGetUnit(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetUnit")
+                it.getUnit()
+            }
+        }
+    }
+    fun lewSetUnit(model: Int, unit: UnitSetting) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetUnit")
+                it.setUnit(unit)
+            }
+        }
+    }
+    fun lewGetHandRaise(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetHandRaise")
+                it.getHandRaise()
+            }
+        }
+    }
+    fun lewSetHandRaise(model: Int, handRaise: HandRaiseSetting) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetHandRaise")
+                it.setHandRaise(handRaise)
+            }
+        }
+    }
+    fun lewGetLrHand(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetLrHand")
+                it.getLrHand()
+            }
+        }
+    }
+    fun lewSetLrHand(model: Int, hand: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetLrHand")
+                it.setLrHand(hand)
+            }
+        }
+    }
+    /**
+     * 勿扰模式
+     */
+    fun lewGetNoDisturbMode(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetNoDisturbMode")
+                it.getNoDisturbMode()
+            }
+        }
+    }
+    fun lewSetNoDisturbMode(model: Int, mode: NoDisturbMode) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetNoDisturbMode")
+                it.setNoDisturbMode(mode)
+            }
+        }
+    }
+    /**
+     * app消息提醒开关
+     */
+    fun lewGetAppSwitch(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetAppSwitch")
+                it.getAppSwitch()
+            }
+        }
+    }
+    fun lewSetAppSwitch(model: Int, app: AppSwitch) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetAppSwitch")
+                it.setAppSwitch(app)
+            }
+        }
+    }
+    /**
+     * 发送消息
+     */
+    fun lewSendNotification(model: Int, info: NotificationInfo) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSendNotification")
+                it.notification(info)
+            }
+        }
+    }
+    /**
+     * 设备模式
+     */
+    fun lewGetDeviceMode(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetDeviceMode")
+                it.getDeviceMode()
+            }
+        }
+    }
+    fun lewSetDeviceMode(model: Int, mode: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetDeviceMode")
+                it.setDeviceMode(mode)
+            }
+        }
+    }
+    /**
+     * 闹钟
+     */
+    fun lewGetAlarmClockInfo(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetAlarmClockInfo")
+                it.getAlarmClockInfo()
+            }
+        }
+    }
+    fun lewSetAlarmClockInfo(model: Int, info: AlarmClockInfo) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetAlarmClockInfo")
+                it.setAlarmClockInfo(info)
+            }
+        }
+    }
+    /**
+     * 手机消息提醒开关（包括短信、来电）
+     */
+    fun lewGetPhoneSwitch(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetPhoneSwitch")
+                it.getPhoneSwitch()
+            }
+        }
+    }
+    fun lewSetPhoneSwitch(model: Int, phone: PhoneSwitch) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetPhoneSwitch")
+                it.setPhoneSwitch(phone)
+            }
+        }
+    }
+    /**
+     * 测量配置（包括运动目标值、达标提醒、久坐提醒、自测心率）
+     */
+    fun lewGetMeasureSetting(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetMeasureSetting")
+                it.getMeasureSetting()
+            }
+        }
+    }
+    fun lewSetMeasureSetting(model: Int, setting: MeasureSetting) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetMeasureSetting")
+                it.setMeasureSetting(setting)
+            }
+        }
+    }
+    fun lewGetSportTarget(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetSportTarget")
+                it.getSportTarget()
+            }
+        }
+    }
+    fun lewSetSportTarget(model: Int, target: SportTarget) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetSportTarget")
+                it.setSportTarget(target)
+            }
+        }
+    }
+    fun lewGetTargetRemind(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetTargetRemind")
+                it.getTargetRemind()
+            }
+        }
+    }
+    fun lewSetTargetRemind(model: Int, remind: Boolean) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetTargetRemind")
+                it.setTargetRemind(remind)
+            }
+        }
+    }
+    fun lewGetSittingRemind(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetSittingRemind")
+                it.getSittingRemind()
+            }
+        }
+    }
+    fun lewSetSittingRemind(model: Int, remind: SittingRemind) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetSittingRemind")
+                it.setSittingRemind(remind)
+            }
+        }
+    }
+    fun lewGetHrDetect(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetHrDetect")
+                it.getHrDetect()
+            }
+        }
+    }
+    fun lewSetHrDetect(model: Int, detect: HrDetect) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetHrDetect")
+                it.setHrDetect(detect)
+            }
+        }
+    }
+    /**
+     * 用户信息
+     */
+    fun lewGetUserInfo(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetUserInfo")
+                it.getUserInfo()
+            }
+        }
+    }
+    fun lewSetUserInfo(model: Int, info: UserInfo) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetUserInfo")
+                it.setUserInfo(info)
+            }
+        }
+    }
+    /**
+     * 通讯录
+     */
+    fun lewGetPhoneBook(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetPhoneBook")
+                it.getPhoneBook()
+            }
+        }
+    }
+    fun lewSetPhoneBook(model: Int, book: PhoneBook) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetPhoneBook")
+                it.setPhoneBook(book)
+            }
+        }
+    }
+    /**
+     * 紧急联系人
+     */
+    fun lewGetSosContact(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetSosContact")
+                it.getSosContact()
+            }
+        }
+    }
+    fun lewSetSosContact(model: Int, sos: SosContact) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetSosContact")
+                it.setSosContact(sos)
+            }
+        }
+    }
+    /**
+     * 获取手表记录数据
+     * @param type LewBleCmd.ListType
+     * @param startTime 起始时间戳 单位秒
+     */
+    fun lewGetFileList(model: Int, type: Int, startTime: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetFileList")
+                it.getFileList(type, startTime)
+            }
+        }
+    }
+    /**
+     * 心率阈值
+     */
+    fun lewGetHrThreshold(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetHrThreshold")
+                it.getHrThreshold()
+            }
+        }
+    }
+    fun lewSetHrThreshold(model: Int, threshold: HrThreshold) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetHrThreshold")
+                it.setHrThreshold(threshold)
+            }
+        }
+    }
+    /**
+     * 血氧阈值
+     */
+    fun lewGetOxyThreshold(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetOxyThreshold")
+                it.getOxyThreshold()
+            }
+        }
+    }
+    fun lewSetOxyThreshold(model: Int, threshold: OxyThreshold) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewSetOxyThreshold")
+                it.setOxyThreshold(threshold)
             }
         }
     }
@@ -1631,6 +2065,7 @@ class BleServiceHelper private constructor() {
     /**
      * 使能实时数据发送（sp20）
      * @param type Sp20BleCmd.EnableType
+     * @param enable true打开，false关闭
      */
     fun sp20EnableRtData(model: Int, type: Int, enable: Boolean) {
         if (!checkService()) return
@@ -1671,6 +2106,7 @@ class BleServiceHelper private constructor() {
     /**
      * 使能实时数据发送（pc60fw，pc66b，oxysmart，pod1w）
      * @param type Pc60FwBleCmd.EnableType
+     * @param enable true打开，false关闭
      */
     fun pc60fwEnableRtData(model: Int, type: Int, enable: Boolean) {
         if (!checkService()) return
@@ -1685,6 +2121,7 @@ class BleServiceHelper private constructor() {
     /**
      * 使能实时数据发送（pc68b）
      * @param type Pc68bBleCmd.EnableType
+     * @param enable true打开，false关闭
      */
     fun pc68bEnableRtData(model: Int, type: Int, enable: Boolean) {
         if (!checkService()) return

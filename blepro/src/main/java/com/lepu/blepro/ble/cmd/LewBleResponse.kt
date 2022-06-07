@@ -1,11 +1,12 @@
 package com.lepu.blepro.ble.cmd
 
+import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
 
-object Lew3BleResponse {
+object LewBleResponse {
 
     @ExperimentalUnsignedTypes
     class BleResponse(val bytes: ByteArray) {
@@ -120,16 +121,12 @@ object Lew3BleResponse {
     }
 
     @ExperimentalUnsignedTypes
-    class EcgFile(val model: Int, val name: String, val size: Int) {
-        var fileName: String
-        var fileSize: Int
+    class EcgFile(val model: Int, val fileName: String, val fileSize: Int) {
         var content: ByteArray
         var index: Int // 标识当前下载index
 
         init {
-            fileName = name
-            fileSize = size
-            content = ByteArray(size)
+            content = ByteArray(fileSize)
             index = 0
         }
 
@@ -138,60 +135,19 @@ object Lew3BleResponse {
                 return // 已下载完成
             } else {
                 System.arraycopy(bytes, 0, content, index, bytes.size)
-
+                DownloadHelper.writeFile(model, "test", fileName, "dat", bytes)
                 index += bytes.size
             }
-            LepuBleLog.d("LeW3File,bytes size = ${bytes.size}, index = $index")
+            LepuBleLog.d("LeWFile,bytes size = ${bytes.size}, index = $index")
         }
     }
 
     @ExperimentalUnsignedTypes
-    class FileList(val bytes: ByteArray) {
-        var size: Int
-        var list = mutableListOf<String>()
-
-        init {
-            size = (bytes.size-10).div(44)
-            for (i in 0 until size) {
-                val fileName = getFileName(bytes.copyOfRange(10+i*44, 10+(i+1)*44))
-                list.add(fileName)
-            }
-        }
-
-        private fun getFileName(bytes: ByteArray): String {
-            val year = toUInt(bytes.copyOfRange(0, 2))
-            val month = byte2UInt(bytes[2])
-            val day = byte2UInt(bytes[3])
-            val hour = byte2UInt(bytes[4])
-            val min = byte2UInt(bytes[5])
-            val second = byte2UInt(bytes[6])
-            var mon = ""+month
-            if (month<10) {
-                mon = "0$month"
-            }
-            var d = ""+day
-            if (day<10) {
-                d = "0$day"
-            }
-            var h = ""+hour
-            if (hour<10) {
-                h = "0$hour"
-            }
-            var m = ""+min
-            if (min<10) {
-                m = "0$min"
-            }
-            var sec = ""+second
-            if (second<10) {
-                sec = "0$second"
-            }
-            return "R$year$mon$d$h$m$sec"
-        }
-
+    class FileList(val type: Int, val content: ByteArray) {
         override fun toString(): String {
             return """
-                size : $size
-                list : $list
+                type : $type
+                content : $content
             """.trimIndent()
         }
     }
