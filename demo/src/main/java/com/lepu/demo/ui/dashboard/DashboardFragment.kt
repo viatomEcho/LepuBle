@@ -130,6 +130,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
             Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC66B,
             Bluetooth.MODEL_AP20, Bluetooth.MODEL_BABYO2,
+            Bluetooth.MODEL_BBSM_S1, Bluetooth.MODEL_BBSM_S2,
             Bluetooth.MODEL_SP20, Bluetooth.MODEL_TV221U,
             Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_CHECKO2,
             Bluetooth.MODEL_O2M, Bluetooth.MODEL_SLEEPO2,
@@ -755,6 +756,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
                 Bluetooth.MODEL_PC66B, Bluetooth.MODEL_AP20,
                 Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_SP20,
+                Bluetooth.MODEL_BBSM_S1, Bluetooth.MODEL_BBSM_S2,
                 Bluetooth.MODEL_TV221U, Bluetooth.MODEL_BABYO2N,
                 Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_O2M,
                 Bluetooth.MODEL_SLEEPO2, Bluetooth.MODEL_SNOREO2,
@@ -917,6 +919,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S1
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_WEARO2

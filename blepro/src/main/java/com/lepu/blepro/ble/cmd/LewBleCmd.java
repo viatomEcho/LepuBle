@@ -57,6 +57,7 @@ public class LewBleCmd {
     public static final int ALARM_CLOCK_INFO = 0x21;
     public static final int PHONE_SWITCH = 0x22;
     public static final int CALL_CONTROL = 0x23;
+    public static final int MEDICINE_REMIND = 0x24;
 
     public static final int GET_MEASURE_SETTING = 0x30;
     public static final int SET_MEASURE_SETTING = 0x31;
@@ -64,14 +65,18 @@ public class LewBleCmd {
     public static final int TARGET_REMIND = 0x33;
     public static final int SITTING_REMIND = 0x34;
     public static final int HR_DETECT = 0x35;
+    public static final int OXY_DETECT = 0x36;
 
     public static final int USER_INFO = 0x40;
     public static final int PHONE_BOOK = 0x41;
     public static final int SOS_CONTACT = 0x42;
     public static final int SET_TIME = 0x44;
     public static final int CLOCK_DIAL = 0x45;
+    public static final int SECOND_SCREEN = 0x46;
+    public static final int CARDS = 0x47;
 
     public static final int GET_SPORT_LIST = 0x50;
+    public static final int GET_SLEEP_LIST = 0x52;
     public static final int GET_ECG_LIST = 0x60;
     public static final int GET_HR_LIST = 0x61;
     public static final int GET_OXY_LIST = 0x63;
@@ -161,9 +166,14 @@ public class LewBleCmd {
         public static final int WHATSAPP = 7;
         public static final int INSTAGRAM = 8;
         public static final int SKYPE = 9;
-        public static final int LINKED_IN = 10;
+        public static final int LINKED_IN = 10;    // 领英
         public static final int LINE = 11;
-        public static final int WEIBO = 12;
+        public static final int WEIBO = 12;        // 微博
+        public static final int LEPU_HEALTH = 13;  // 乐普健康
+        public static final int DING_TALK = 14;    // 钉钉
+        public static final int WECOM = 15;        // 企业微信
+        public static final int FEISHU = 16;       // 飞书
+
         public static final int OTHER = 31;
     }
     public static class PhoneStatus {
@@ -185,6 +195,8 @@ public class LewBleCmd {
     public static byte[] setAlarmClock(byte[] alarm) { return getReq(ALARM_CLOCK_INFO, alarm); }
     public static byte[] getPhoneSwitch() { return getReq(PHONE_SWITCH, new byte[0]); }
     public static byte[] setPhoneSwitch(byte[] switches) { return getReq(PHONE_SWITCH, switches); }
+    public static byte[] getMedicineRemind() { return getReq(MEDICINE_REMIND, new byte[0]); }
+    public static byte[] setMedicineRemind(byte[] remind) { return getReq(MEDICINE_REMIND, remind); }
 
     public static byte[] getMeasureSetting() { return getReq(GET_MEASURE_SETTING, new byte[0]); }
     public static byte[] setMeasureSetting(byte[] setting) { return getReq(SET_MEASURE_SETTING, setting); }
@@ -202,6 +214,8 @@ public class LewBleCmd {
     public static byte[] setSittingRemind(byte[] remind) { return getReq(SITTING_REMIND, remind); }
     public static byte[] getHrDetect() { return getReq(HR_DETECT, new byte[0]); }
     public static byte[] setHrDetect(byte[] detect) { return getReq(HR_DETECT, detect); }
+    public static byte[] getOxyDetect() { return getReq(OXY_DETECT, new byte[0]); }
+    public static byte[] setOxyDetect(byte[] detect) { return getReq(OXY_DETECT, detect); }
     public static byte[] getUserInfo() { return getReq(USER_INFO, new byte[0]); }
     public static class Gender {
         public static final int BOY = 0;   // 男
@@ -211,6 +225,17 @@ public class LewBleCmd {
     public static byte[] getPhoneBook() { return getReq(PHONE_BOOK, new byte[0]); }
     public static byte[] setPhoneBook(byte[] book) { return getReq(PHONE_BOOK, book); }
     public static byte[] getSosContact() { return getReq(SOS_CONTACT, new byte[0]); }
+    public static class RelationShip {
+        public static final int FATHER = 0;       // 爸爸
+        public static final int MOTHER = 1;       // 妈妈
+        public static final int GRANDFATHER = 2;  // 公公
+        public static final int GRANDMOTHER = 3;  // 婆婆
+        public static final int GRANDPA = 4;      // 爷爷
+        public static final int GRANDMA = 5;      // 奶奶
+        public static final int SON = 6;          // 儿子
+        public static final int DAUGHTER = 7;     // 女儿
+        public static final int OTHER = 8;        // 其他
+    }
     public static byte[] setSosContact(byte[] sos) { return getReq(SOS_CONTACT, sos); }
     public static class TimeFormat {
         public static final int FORMAT_12H = 0;  // 12进制
@@ -230,12 +255,29 @@ public class LewBleCmd {
         return getReq(SET_TIME, new byte[0]);
     }
     public static byte[] setDialNum(int num) { return getReq(CLOCK_DIAL, new byte[]{1, (byte)num}); }
+    public static byte[] getSecondScreen() { return getReq(SECOND_SCREEN, new byte[0]); }
+    public static byte[] setSecondScreen(byte[] screen) { return getReq(SECOND_SCREEN, screen); }
+    public static byte[] getCards() { return getReq(CARDS, new byte[0]); }
+    public static class Cards {
+        public static final int TARGET = 0;   // 活动目标
+        public static final int HR = 1;       // 心率
+        public static final int WEATHER = 2;  // 天气
+        public static final int ALIPAY = 3;   // 支付宝
+    }
+    public static byte[] setCards(int[] cards) {
+        byte[] data = new byte[cards.length];
+        for (int i=0; i<data.length; i++) {
+            data[i] = (byte) cards[i];
+        }
+        return getReq(CARDS, data);
+    }
 
     public static class ListType {
         public static final int SPORT = 0;   // 运动数据
         public static final int ECG = 1;     // 心电数据
         public static final int HR = 2;      // 心率数据
         public static final int OXY = 3;     // 血氧数据
+        public static final int SLEEP = 4;   // 睡眠数据
     }
     public static class SportType {
         public static final int NULL = 0;
@@ -275,6 +317,13 @@ public class LewBleCmd {
         public static final int WALKING_MACHINE = 34;         // 走步机
     }
     public static byte[] getSportList(int time) { return getReq(GET_SPORT_LIST, int4Bytes(time)); }
+    public static class SleepType {
+        public static final int SOBER = 0;        // 清醒
+        public static final int REM = 1;          // REM，快速眼动
+        public static final int LIGHT_SLEEP = 2;  // 浅睡
+        public static final int DEEP_SLEEP = 3;   // 深睡
+    }
+    public static byte[] getSleepList(int time) { return getReq(GET_SLEEP_LIST, int4Bytes(time)); }
     public static byte[] getEcgList(int time) { return getReq(GET_ECG_LIST, int4Bytes(time)); }
     public static byte[] getHrList(int time) { return getReq(GET_HR_LIST, int4Bytes(time)); }
     public static byte[] getOxyList(int time) { return getReq(GET_OXY_LIST, int4Bytes(time)); }

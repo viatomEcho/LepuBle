@@ -55,6 +55,8 @@ public class BluetoothController {
                 || model == Bluetooth.MODEL_OXYLINK
                 || model == Bluetooth.MODEL_BABYO2
                 || model == Bluetooth.MODEL_BABYO2N
+                || model == Bluetooth.MODEL_BBSM_S1
+                || model == Bluetooth.MODEL_BBSM_S2
                 || model == Bluetooth.MODEL_CHECKO2
                 || model == Bluetooth.MODEL_SLEEPO2
                 || model == Bluetooth.MODEL_SNOREO2

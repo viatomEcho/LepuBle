@@ -719,6 +719,12 @@ class LpBleUtil {
         fun lewSetPhoneSwitch(model: Int, phone: PhoneSwitch) {
             BleServiceHelper.lewSetPhoneSwitch(model, phone)
         }
+        fun lewGetMedicineRemind(model: Int) {
+            BleServiceHelper.lewGetMedicineRemind(model)
+        }
+        fun lewSetMedicineRemind(model: Int, remind: MedicineRemind) {
+            BleServiceHelper.lewSetMedicineRemind(model, remind)
+        }
         fun lewGetMeasureSetting(model: Int) {
             BleServiceHelper.lewGetMeasureSetting(model)
         }
@@ -749,6 +755,12 @@ class LpBleUtil {
         fun lewSetHrDetect(model: Int, detect: HrDetect) {
             BleServiceHelper.lewSetHrDetect(model, detect)
         }
+        fun lewGetOxyDetect(model: Int) {
+            BleServiceHelper.lewGetOxyDetect(model)
+        }
+        fun lewSetOxyDetect(model: Int, detect: OxyDetect) {
+            BleServiceHelper.lewSetOxyDetect(model, detect)
+        }
         fun lewGetUserInfo(model: Int) {
             BleServiceHelper.lewGetUserInfo(model)
         }
@@ -766,6 +778,18 @@ class LpBleUtil {
         }
         fun lewSetSosContact(model: Int, sos: SosContact) {
             BleServiceHelper.lewSetSosContact(model, sos)
+        }
+        fun lewGetSecondScreen(model: Int) {
+            BleServiceHelper.lewGetSecondScreen(model)
+        }
+        fun lewSetSecondScreen(model: Int, screen: SecondScreen) {
+            BleServiceHelper.lewSetSecondScreen(model, screen)
+        }
+        fun lewGetCards(model: Int) {
+            BleServiceHelper.lewGetCards(model)
+        }
+        fun lewSetCards(model: Int, cards: IntArray) {
+            BleServiceHelper.lewSetCards(model, cards)
         }
         fun lewGetFileList(model: Int, type: Int, startTime: Int) {
             BleServiceHelper.lewGetFileList(model, type, startTime)

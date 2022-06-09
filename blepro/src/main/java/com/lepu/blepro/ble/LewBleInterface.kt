@@ -5,23 +5,15 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.LepuBleLog
-import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
-import java.util.*
 import kotlin.experimental.inv
 
-/**
- * author: chenyongfeng
- * created on: 2022/1/11 16:24
- * description:
- */
 class LewBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "LewBleInterface"
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
@@ -254,6 +246,17 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,CALL_CONTROL => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewPhoneCall).post(InterfaceEvent(model, true))
             }
+            LewBleCmd.MEDICINE_REMIND -> {
+                LepuBleLog.d(tag, "model:$model,MEDICINE_REMIND => success")
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetMedicineRemind).post(InterfaceEvent(model, true))
+                } else {
+                    val data = MedicineRemind(response.content)
+                    LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetMedicineRemind).post(InterfaceEvent(model, data))
+                }
+            }
             LewBleCmd.GET_MEASURE_SETTING -> {
                 if (response.len == 0) return
                 val data = MeasureSetting(response.content)
@@ -308,6 +311,17 @@ class LewBleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetHrDetect).post(InterfaceEvent(model, data))
                 }
             }
+            LewBleCmd.OXY_DETECT -> {
+                LepuBleLog.d(tag, "model:$model,OXY_DETECT => success")
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetOxyDetect).post(InterfaceEvent(model, true))
+                } else {
+                    val data = OxyDetect(response.content)
+                    LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetOxyDetect).post(InterfaceEvent(model, data))
+                }
+            }
 
             LewBleCmd.USER_INFO -> {
                 LepuBleLog.d(tag, "model:$model,USER_INFO => success")
@@ -342,6 +356,31 @@ class LewBleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetSosContact).post(InterfaceEvent(model, data))
                 }
             }
+            LewBleCmd.SECOND_SCREEN -> {
+                LepuBleLog.d(tag, "model:$model,SECOND_SCREEN => success")
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetSecondScreen).post(InterfaceEvent(model, true))
+                } else {
+                    val data = SecondScreen(response.content)
+                    LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetSecondScreen).post(InterfaceEvent(model, data))
+                }
+            }
+            LewBleCmd.CARDS -> {
+                LepuBleLog.d(tag, "model:$model,CARDS => success")
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "model:$model,set => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetCards).post(InterfaceEvent(model, true))
+                } else {
+                    val data = IntArray(0)
+                    for (i in 0 until response.content.size) {
+                        data.plus(byte2UInt(response.content[i]))
+                    }
+                    LepuBleLog.d(tag, "model:$model,get => success $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetCards).post(InterfaceEvent(model, data))
+                }
+            }
             LewBleCmd.GET_SPORT_LIST -> {
                 if (response.len == 0) return
                 val data = SportList(response.content)
@@ -368,6 +407,13 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 val data = OxyList(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_OXY_LIST => success $data")
                 val list = LewBleResponse.FileList(LewBleCmd.ListType.OXY, response.content)
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
+            }
+            LewBleCmd.GET_SLEEP_LIST -> {
+                if (response.len == 0) return
+                val data = SleepList(response.content)
+                LepuBleLog.d(tag, "model:$model,GET_SLEEP_LIST => success $data")
+                val list = LewBleResponse.FileList(LewBleCmd.ListType.SLEEP, response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
             }
             LewBleCmd.HR_THRESHOLD -> {
@@ -588,6 +634,12 @@ class LewBleInterface(model: Int): BleInterface(model) {
     fun setPhoneSwitch(switches: PhoneSwitch) {
         sendCmd(LewBleCmd.setPhoneSwitch(switches.getDataBytes()))
     }
+    fun getMedicineRemind() {
+        sendCmd(LewBleCmd.getMedicineRemind())
+    }
+    fun setMedicineRemind(remind: MedicineRemind) {
+        sendCmd(LewBleCmd.setMedicineRemind(remind.getDataBytes()))
+    }
     fun getMeasureSetting() {
         sendCmd(LewBleCmd.getMeasureSetting())
     }
@@ -618,6 +670,12 @@ class LewBleInterface(model: Int): BleInterface(model) {
     fun setHrDetect(detect: HrDetect) {
         sendCmd(LewBleCmd.setHrDetect(detect.getDataBytes()))
     }
+    fun getOxyDetect() {
+        sendCmd(LewBleCmd.getOxyDetect())
+    }
+    fun setOxyDetect(detect: OxyDetect) {
+        sendCmd(LewBleCmd.setOxyDetect(detect.getDataBytes()))
+    }
     fun getUserInfo() {
         sendCmd(LewBleCmd.getUserInfo())
     }
@@ -642,6 +700,18 @@ class LewBleInterface(model: Int): BleInterface(model) {
     fun setDialFormat() {
         // ???
     }
+    fun getSecondScreen() {
+        sendCmd(LewBleCmd.getSecondScreen())
+    }
+    fun setSecondScreen(screen: SecondScreen) {
+        sendCmd(LewBleCmd.setSecondScreen(screen.getDataBytes()))
+    }
+    fun getCards() {
+        sendCmd(LewBleCmd.getCards())
+    }
+    fun setCards(cards: IntArray) {
+        sendCmd(LewBleCmd.setCards(cards))
+    }
     override fun getFileList() {
         offset = 0
         isCancelRF = false
@@ -661,6 +731,9 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.ListType.OXY -> {
                 sendCmd(LewBleCmd.getOxyList(startTime))
+            }
+            LewBleCmd.ListType.SLEEP -> {
+                sendCmd(LewBleCmd.getSleepList(startTime))
             }
         }
     }

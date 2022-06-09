@@ -28,6 +28,7 @@ import com.lepu.demo.cofig.Constant
 import com.lepu.demo.databinding.FragmentSettingsBinding
 import com.lepu.demo.util.FileUtil
 import com.lepu.demo.util.icon.BitmapConvertor
+import java.util.*
 
 /**
  * @ClassName SettingsFragment
@@ -117,6 +118,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     LpBleUtil.bp2GetConfig(it.modelNo)
                 }
                 Bluetooth.MODEL_O2RING, Bluetooth.MODEL_BABYO2,
+                Bluetooth.MODEL_BBSM_S1, Bluetooth.MODEL_BBSM_S2,
                 Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_CHECKO2,
                 Bluetooth.MODEL_O2M, Bluetooth.MODEL_SLEEPO2,
                 Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
@@ -576,6 +578,60 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
+        binding.lewGetMedicineRemind.setOnClickListener {
+            LpBleUtil.lewGetMedicineRemind(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewSetMedicineRemind.setOnClickListener {
+            val remind = MedicineRemind()
+            val item = MedicineRemind.Item()
+            item.hour = 9
+            item.minute = 10
+            item.repeat = switchState
+            item.switch = switchState
+            item.everySunday = switchState
+            switchState = !switchState
+            item.everyMonday = switchState
+            switchState = !switchState
+            item.everyTuesday = switchState
+            switchState = !switchState
+            item.everyWednesday = switchState
+            switchState = !switchState
+            item.everyThursday = switchState
+            switchState = !switchState
+            item.everyFriday = switchState
+            switchState = !switchState
+            item.everySaturday = switchState
+            item.name = "感冒药"
+
+            val item2 = MedicineRemind.Item()
+            item2.hour = 17
+            item2.minute = 10
+            item2.repeat = switchState
+            item2.switch = switchState
+            item2.everySunday = switchState
+            switchState = !switchState
+            item2.everyMonday = switchState
+            switchState = !switchState
+            item2.everyTuesday = switchState
+            switchState = !switchState
+            item2.everyWednesday = switchState
+            switchState = !switchState
+            item2.everyThursday = switchState
+            switchState = !switchState
+            item2.everyFriday = switchState
+            switchState = !switchState
+            item2.everySaturday = switchState
+            item2.name = "发烧药"
+
+            remind.items.add(item)
+            remind.items.add(item2)
+            Log.d("test12345", "lewSetMedicineRemind $remind")
+            LpBleUtil.lewSetMedicineRemind(Constant.BluetoothConfig.currentModel[0], remind)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
         binding.lewGetMeasureSetting.setOnClickListener {
             LpBleUtil.lewGetMeasureSetting(Constant.BluetoothConfig.currentModel[0])
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
@@ -698,11 +754,26 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
         binding.lewSetHrDetect.setOnClickListener {
             switchState = !switchState
-            val hrDetect = HrDetect()
-            hrDetect.switch = switchState
-            hrDetect.interval = 2
-            Log.d("test12345", "lewSetHrDetect $hrDetect")
-            LpBleUtil.lewSetHrDetect(Constant.BluetoothConfig.currentModel[0], hrDetect)
+            val detect = HrDetect()
+            detect.switch = switchState
+            detect.interval = 2
+            Log.d("test12345", "lewSetHrDetect $detect")
+            LpBleUtil.lewSetHrDetect(Constant.BluetoothConfig.currentModel[0], detect)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewGetOxyDetect.setOnClickListener {
+            LpBleUtil.lewGetOxyDetect(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewSetOxyDetect.setOnClickListener {
+            switchState = !switchState
+            val detect = OxyDetect()
+            detect.switch = switchState
+            detect.interval = 5
+            Log.d("test12345", "lewSetOxyDetect $detect")
+            LpBleUtil.lewSetOxyDetect(Constant.BluetoothConfig.currentModel[0], detect)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -739,15 +810,15 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             val item = PhoneBook.Item()
             item.id = 11111
             item.name = "张三里abc111"
-            item.phone = "13420111811"
+            item.phone = "13420111867"
             val item2 = PhoneBook.Item()
             item2.id = 11112
             item2.name = "张三里abc112"
-            item2.phone = "13420111812"
+            item2.phone = "13420111867"
             val item3 = PhoneBook.Item()
             item3.id = 11113
             item3.name = "张三里abc113"
-            item3.phone = "13420111813"
+            item3.phone = "13420111867"
 
             list.items.add(item)
             list.items.add(item2)
@@ -766,8 +837,26 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             val sos = SosContact()
             switchState = !switchState
             sos.switch = switchState
-            sos.name = "张三里abc123"
-            sos.phone = "13420111867"
+
+            val item = SosContact.Item()
+            item.name = "张三里abc111"
+            item.phone = "13420111867"
+            state++
+            if (state > LewBleCmd.RelationShip.OTHER) {
+                state = LewBleCmd.RelationShip.FATHER
+            }
+            item.relation = state
+            val item2 = SosContact.Item()
+            item2.name = "张三里abc112"
+            item2.phone = "13420111867"
+            state++
+            if (state > LewBleCmd.RelationShip.OTHER) {
+                state = LewBleCmd.RelationShip.FATHER
+            }
+            item2.relation = state
+
+            sos.items.add(item)
+            sos.items.add(item2)
             Log.d("test12345", "lewSetSos $sos")
             LpBleUtil.lewSetSosContact(Constant.BluetoothConfig.currentModel[0], sos)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
@@ -779,6 +868,39 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
         binding.lewSetDial.setOnClickListener {
             // ???
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewGetSecondScreen.setOnClickListener {
+            LpBleUtil.lewGetSecondScreen(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewSetSecondScreen.setOnClickListener {
+            val screen = SecondScreen()
+            switchState = !switchState
+            screen.medicineRemind = switchState
+            screen.calendar = switchState
+            switchState = !switchState
+            screen.clock = switchState
+            screen.heartRate = switchState
+            switchState = !switchState
+            screen.spo2 = switchState
+            screen.peripherals = switchState
+            Log.d("test12345", "lewSetSecondScreen $screen")
+            LpBleUtil.lewSetSecondScreen(Constant.BluetoothConfig.currentModel[0], screen)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewGetCards.setOnClickListener {
+            LpBleUtil.lewGetCards(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewSetCards.setOnClickListener {
+            val cards = intArrayOf(LewBleCmd.Cards.HR, LewBleCmd.Cards.TARGET, LewBleCmd.Cards.WEATHER)
+            Log.d("test12345", "lewSetCards ${Arrays.toString(cards)}")
+            LpBleUtil.lewSetCards(Constant.BluetoothConfig.currentModel[0], cards)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -799,6 +921,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
         binding.lewGetHrData.setOnClickListener {
             LpBleUtil.lewGetFileList(Constant.BluetoothConfig.currentModel[0], LewBleCmd.ListType.HR, 0)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewGetSleepData.setOnClickListener {
+            LpBleUtil.lewGetFileList(Constant.BluetoothConfig.currentModel[0], LewBleCmd.ListType.SLEEP, 0)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -1278,6 +1405,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYLINK
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S1
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N) {
                 LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MOTOR, motor2[volume])
             } else {

@@ -20,7 +20,11 @@ class PhoneBook() {
         currentSize = byte2UInt(bytes[index])
         index++
         for (i in 0 until currentSize) {
-            items.add(Item())
+            val nameLen = byte2UInt(bytes[index+2])
+            val phoneLen = byte2UInt(bytes[index+3+nameLen])
+            val len = 4 + nameLen + phoneLen
+            items.add(Item(bytes.copyOfRange(index, index+len)))
+            index += len
         }
     }
 

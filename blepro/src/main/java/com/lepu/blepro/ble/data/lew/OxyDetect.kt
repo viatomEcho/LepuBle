@@ -3,10 +3,10 @@ package com.lepu.blepro.ble.data.lew
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.bytesToHex
 
-class HrDetect() {
+class OxyDetect() {
 
-    var switch = false  // ⾃动⼼率检测开关
-    var interval = 10   // ⾃动⼼率间隔，单位分钟
+    var switch = false  // ⾃动血氧检测开关
+    var interval = 10   // ⾃动血氧间隔，单位分钟
     // reserved 2
 
     constructor(bytes: ByteArray) : this() {
@@ -28,7 +28,7 @@ class HrDetect() {
 
     override fun toString(): String {
         return """
-            HrDetect : 
+            OxyDetect : 
             bytes : ${bytesToHex(getDataBytes())}
             switch : $switch
             interval : $interval

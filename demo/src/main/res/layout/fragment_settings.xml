@@ -766,12 +766,12 @@
                         android:id="@+id/lew_get_device_mode"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="设置模式"/>
+                        android:text="获取模式"/>
                     <Button
                         android:id="@+id/lew_set_device_mode"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="获取模式"
+                        android:text="设置模式"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <LinearLayout
@@ -802,6 +802,21 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="设置手机开关"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew_get_medicine_remind"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取用药提醒"/>
+                    <Button
+                        android:id="@+id/lew_set_medicine_remind"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置用药提醒"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <LinearLayout
@@ -883,6 +898,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <Button
+                        android:id="@+id/lew_get_oxy_detect"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取自测血氧"/>
+                    <Button
+                        android:id="@+id/lew_set_oxy_detect"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置自测血氧"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
                         android:id="@+id/lew_get_user_info"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -943,6 +973,36 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <Button
+                        android:id="@+id/lew_get_second_screen"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取副屏"/>
+                    <Button
+                        android:id="@+id/lew_set_second_screen"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置副屏"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/lew_get_cards"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取卡片"/>
+                    <Button
+                        android:id="@+id/lew_set_cards"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置卡片"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
                         android:id="@+id/lew_get_sport_data"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -967,6 +1027,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="心率数据"
+                        android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/lew_get_sleep_data"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="睡眠数据"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <LinearLayout
