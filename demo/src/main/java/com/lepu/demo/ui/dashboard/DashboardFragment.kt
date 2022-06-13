@@ -12,6 +12,7 @@ import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ble.data.lew.BatteryInfo
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
@@ -213,7 +214,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         //------------------------------lew------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewBatteryInfo)
             .observe(this, {
-                val data = it.data as KtBleBattery
+                val data = it.data as BatteryInfo
                 dataString += "\n" + data.toString()
                 binding.dataStr.text = dataString
             })
