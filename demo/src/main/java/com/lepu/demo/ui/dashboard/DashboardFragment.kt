@@ -12,6 +12,7 @@ import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ble.data.lew.BatteryInfo
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
@@ -122,7 +123,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         when(model) {
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK,
             Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2,
-            Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LEW3,
+            Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LEW,
             Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_LE_BP2W,
             Bluetooth.MODEL_PC80B, Bluetooth.MODEL_LES1 -> waveHandler.post(EcgWaveTask())
 
@@ -130,6 +131,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
             Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC66B,
             Bluetooth.MODEL_AP20, Bluetooth.MODEL_BABYO2,
+            Bluetooth.MODEL_BBSM_S1, Bluetooth.MODEL_BBSM_S2,
             Bluetooth.MODEL_SP20, Bluetooth.MODEL_TV221U,
             Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_CHECKO2,
             Bluetooth.MODEL_O2M, Bluetooth.MODEL_SLEEPO2,
@@ -139,7 +141,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_PC_68B,
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
-            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PC_60NW -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_OXYRING -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_CHECK_ADV -> {
@@ -208,29 +211,29 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.dataStr.text = it.toString()
             }
         })
-        //------------------------------lew3------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3BatteryInfo)
+        //------------------------------lew------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewBatteryInfo)
             .observe(this, {
-                val data = it.data as KtBleBattery
+                val data = it.data as BatteryInfo
                 dataString += "\n" + data.toString()
                 binding.dataStr.text = dataString
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3RtData)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewRtData)
             .observe(this, {
-                val rtData = it.data as Lew3BleResponse.RtData
+                val rtData = it.data as LewBleResponse.RtData
                 rtData.let { data ->
-                    Log.d("lew3 data ", "len = ${data.wave.samplingNum}")
+                    Log.d("lew data ", "len = ${data.wave.samplingNum}")
                     DataController.receive(data.wave.wFs)
                     dataString = data.param.toString()
                     binding.dataStr.text = dataString
                     viewModel.ecgHr.value = data.param.hr
 
-                    LpBleUtil.lew3GetBattery(it.model)
+                    LpBleUtil.lewGetBattery(it.model)
 
                 }
             })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3FileList).observe(this, { event ->
-            (event.data as Lew3BleResponse.FileList).let {
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).observe(this, { event ->
+            (event.data as LewBleResponse.FileList).let {
                 binding.dataStr.text = it.toString()
             }
         })
@@ -730,11 +733,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
     private fun initView() {
 
-        mainViewModel.curBluetooth.observe(viewLifecycleOwner, {
+        mainViewModel.curBluetooth.observe(viewLifecycleOwner) {
             when (it!!.modelNo) {
                 Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK,
                 Bluetooth.MODEL_ER2, Bluetooth.MODEL_PC80B,
-                Bluetooth.MODEL_LEW3, Bluetooth.MODEL_ER1_N,
+                Bluetooth.MODEL_LEW, Bluetooth.MODEL_ER1_N,
                 Bluetooth.MODEL_LES1 -> {
                     binding.ecgLayout.visibility = View.VISIBLE
                     binding.bpLayout.visibility = View.GONE
@@ -754,6 +757,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
                 Bluetooth.MODEL_PC66B, Bluetooth.MODEL_AP20,
                 Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_SP20,
+                Bluetooth.MODEL_BBSM_S1, Bluetooth.MODEL_BBSM_S2,
                 Bluetooth.MODEL_TV221U, Bluetooth.MODEL_BABYO2N,
                 Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_O2M,
                 Bluetooth.MODEL_SLEEPO2, Bluetooth.MODEL_SNOREO2,
@@ -762,8 +766,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_OXYFIT,
                 Bluetooth.MODEL_POD_1W, Bluetooth.MODEL_CHECK_POD,
                 Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
-                Bluetooth.MODEL_PC_60NW_1,Bluetooth.MODEL_PC_60B,
-                Bluetooth.MODEL_PC_60NW -> {
+                Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60B,
+                Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_OXYRING -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE
@@ -784,8 +788,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.bpLayout.visibility = View.VISIBLE
                 }
             }
-        })
-        mainViewModel.bleState.observe(viewLifecycleOwner, {
+        }
+        mainViewModel.bleState.observe(viewLifecycleOwner) {
             it?.let {
                 if (it) {
                     binding.bleState.setImageResource(R.mipmap.bluetooth_ok)
@@ -803,7 +807,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 }
             }
 
-        })
+        }
 
         //------------------------------ecg------------------------------
         binding.ecgBkg.post{
@@ -913,8 +917,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         })
         binding.startRtOxy.setOnClickListener {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S1
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_WEARO2

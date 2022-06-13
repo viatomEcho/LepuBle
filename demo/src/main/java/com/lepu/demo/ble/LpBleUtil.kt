@@ -5,11 +5,14 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.util.Log
+import android.util.SparseArray
+import com.blankj.utilcode.util.PathUtils
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.cmd.LeBp2wBleCmd
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ble.data.lew.*
+import com.lepu.blepro.ble.data.lew.TimeData
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.demo.BuildConfig
@@ -88,10 +91,16 @@ class LpBleUtil {
          */
         fun initBle(application: Application) {
 
+            val RAW_FOLDERS = SparseArray<String>()
+            RAW_FOLDERS.put(Bluetooth.MODEL_ER1, PathUtils.getExternalAppFilesPath() + "/demo/er1/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_LEW, PathUtils.getExternalAppFilesPath() + "/demo/lew/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_DUOEK, PathUtils.getExternalAppFilesPath() + "/demo/duoek/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_ER2, PathUtils.getExternalAppFilesPath() + "/demo/er2/")
+
             getServiceHelper()
                 .initLog(BuildConfig.DEBUG)
 //                .initModelConfig(Constant.BluetoothConfig.SUPPORT_FACES) // 配置要支持的设备
-
+                .initRawFolder(RAW_FOLDERS)
                 .initService(
                     application,
                     BleSO.getInstance(application)
@@ -249,6 +258,7 @@ class LpBleUtil {
         }
 
         fun getSendCmd(model: Int): String {
+            Log.d("test12345", "${BleServiceHelper.getSendCmd(model)}")
             return BleServiceHelper.getSendCmd(model)
         }
 
@@ -617,46 +627,187 @@ class LpBleUtil {
             }
         }
 
-        fun lew3BoundDevice(model: Int){
-            Log.d(TAG, "lew3BoundDevice")
+        fun lewBoundDevice(model: Int, bound: Boolean){
+            Log.d(TAG, "lewBoundDevice")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.lew3BoundDevice(model)
+                BleServiceHelper.lewBoundDevice(model, bound)
             }
         }
-        fun lew3SetServer(model: Int, server: Lew3Config){
-            Log.d(TAG, "lew3SetServer")
+        fun lewGetBattery(model: Int){
+            Log.d(TAG, "lewGetBattery")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.lew3SetServer(model, server)
+                BleServiceHelper.lewGetBattery(model)
             }
         }
-        fun lew3GetConfig(model: Int){
-            Log.d(TAG, "lew3GetConfig")
-            BleServiceHelper.getInterface(model)?.let {
-                if(getBleState(model) != State.CONNECTED){
-                    Log.d(TAG, "设备未连接")
-                    return
-                }
-                BleServiceHelper.lew3GetConfig(model)
-            }
+        fun lewSetTime(model: Int, data: TimeData) {
+            BleServiceHelper.lewSetTime(model, data)
         }
-        fun lew3GetBattery(model: Int){
-            Log.d(TAG, "lew3GetBattery")
-            BleServiceHelper.getInterface(model)?.let {
-                if(getBleState(model) != State.CONNECTED){
-                    Log.d(TAG, "设备未连接")
-                    return
-                }
-                BleServiceHelper.lew3GetBattery(model)
-            }
+        fun lewGetTime(model: Int) {
+            BleServiceHelper.lewGetTime(model)
         }
+        fun lewFindDevice(model: Int) {
+            BleServiceHelper.lewFindDevice(model)
+        }
+        fun lewGetSystemSetting(model: Int) {
+            BleServiceHelper.lewGetSystemSetting(model)
+        }
+        fun lewSetSystemSetting(model: Int, setting: SystemSetting) {
+            BleServiceHelper.lewSetSystemSetting(model,setting)
+        }
+        fun lewGetLanguage(model: Int) {
+            BleServiceHelper.lewGetLanguage(model)
+        }
+        fun lewSetLanguage(model: Int, language: Int) {
+            BleServiceHelper.lewSetLanguage(model,language)
+        }
+        fun lewGetUnit(model: Int) {
+            BleServiceHelper.lewGetUnit(model)
+        }
+        fun lewSetUnit(model: Int, setting: UnitSetting) {
+            BleServiceHelper.lewSetUnit(model,setting)
+        }
+        fun lewGetHandRaise(model: Int) {
+            BleServiceHelper.lewGetHandRaise(model)
+        }
+        fun lewSetHandRaise(model: Int, setting: HandRaiseSetting) {
+            BleServiceHelper.lewSetHandRaise(model,setting)
+        }
+        fun lewGetLrHand(model: Int) {
+            BleServiceHelper.lewGetLrHand(model)
+        }
+        fun lewSetLrHand(model: Int, hand: Int) {
+            BleServiceHelper.lewSetLrHand(model,hand)
+        }
+        fun lewGetNoDisturbMode(model: Int) {
+            BleServiceHelper.lewGetNoDisturbMode(model)
+        }
+        fun lewSetNoDisturbMode(model: Int, mode: NoDisturbMode) {
+            BleServiceHelper.lewSetNoDisturbMode(model, mode)
+        }
+        fun lewGetAppSwitch(model: Int) {
+            BleServiceHelper.lewGetAppSwitch(model)
+        }
+        fun lewSetAppSwitch(model: Int, app: AppSwitch) {
+            BleServiceHelper.lewSetAppSwitch(model, app)
+        }
+        fun lewSendNotification(model: Int, info: NotificationInfo) {
+            BleServiceHelper.lewSendNotification(model, info)
+        }
+        fun lewGetDeviceMode(model: Int) {
+            BleServiceHelper.lewGetDeviceMode(model)
+        }
+        fun lewSetDeviceMode(model: Int, mode: Int) {
+            BleServiceHelper.lewSetDeviceMode(model, mode)
+        }
+        fun lewGetAlarmClock(model: Int) {
+            BleServiceHelper.lewGetAlarmClock(model)
+        }
+        fun lewSetAlarmClock(model: Int, info: AlarmClockInfo) {
+            BleServiceHelper.lewSetAlarmClock(model, info)
+        }
+        fun lewGetPhoneSwitch(model: Int) {
+            BleServiceHelper.lewGetPhoneSwitch(model)
+        }
+        fun lewSetPhoneSwitch(model: Int, phone: PhoneSwitch) {
+            BleServiceHelper.lewSetPhoneSwitch(model, phone)
+        }
+        fun lewGetMedicineRemind(model: Int) {
+            BleServiceHelper.lewGetMedicineRemind(model)
+        }
+        fun lewSetMedicineRemind(model: Int, remind: MedicineRemind) {
+            BleServiceHelper.lewSetMedicineRemind(model, remind)
+        }
+        fun lewGetMeasureSetting(model: Int) {
+            BleServiceHelper.lewGetMeasureSetting(model)
+        }
+        fun lewSetMeasureSetting(model: Int, setting: MeasureSetting) {
+            BleServiceHelper.lewSetMeasureSetting(model, setting)
+        }
+        fun lewGetSportTarget(model: Int) {
+            BleServiceHelper.lewGetSportTarget(model)
+        }
+        fun lewSetSportTarget(model: Int, target: SportTarget) {
+            BleServiceHelper.lewSetSportTarget(model, target)
+        }
+        fun lewGetTargetRemind(model: Int) {
+            BleServiceHelper.lewGetTargetRemind(model)
+        }
+        fun lewSetTargetRemind(model: Int, remind: Boolean) {
+            BleServiceHelper.lewSetTargetRemind(model, remind)
+        }
+        fun lewGetSittingRemind(model: Int) {
+            BleServiceHelper.lewGetSittingRemind(model)
+        }
+        fun lewSetSittingRemind(model: Int, remind: SittingRemind) {
+            BleServiceHelper.lewSetSittingRemind(model, remind)
+        }
+        fun lewGetHrDetect(model: Int) {
+            BleServiceHelper.lewGetHrDetect(model)
+        }
+        fun lewSetHrDetect(model: Int, detect: HrDetect) {
+            BleServiceHelper.lewSetHrDetect(model, detect)
+        }
+        fun lewGetOxyDetect(model: Int) {
+            BleServiceHelper.lewGetOxyDetect(model)
+        }
+        fun lewSetOxyDetect(model: Int, detect: OxyDetect) {
+            BleServiceHelper.lewSetOxyDetect(model, detect)
+        }
+        fun lewGetUserInfo(model: Int) {
+            BleServiceHelper.lewGetUserInfo(model)
+        }
+        fun lewSetUserInfo(model: Int, info: UserInfo) {
+            BleServiceHelper.lewSetUserInfo(model, info)
+        }
+        fun lewGetPhoneBook(model: Int) {
+            BleServiceHelper.lewGetPhoneBook(model)
+        }
+        fun lewSetPhoneBook(model: Int, book: PhoneBook) {
+            BleServiceHelper.lewSetPhoneBook(model, book)
+        }
+        fun lewGetSosContact(model: Int) {
+            BleServiceHelper.lewGetSosContact(model)
+        }
+        fun lewSetSosContact(model: Int, sos: SosContact) {
+            BleServiceHelper.lewSetSosContact(model, sos)
+        }
+        fun lewGetSecondScreen(model: Int) {
+            BleServiceHelper.lewGetSecondScreen(model)
+        }
+        fun lewSetSecondScreen(model: Int, screen: SecondScreen) {
+            BleServiceHelper.lewSetSecondScreen(model, screen)
+        }
+        fun lewGetCards(model: Int) {
+            BleServiceHelper.lewGetCards(model)
+        }
+        fun lewSetCards(model: Int, cards: IntArray) {
+            BleServiceHelper.lewSetCards(model, cards)
+        }
+        fun lewGetFileList(model: Int, type: Int, startTime: Int) {
+            BleServiceHelper.lewGetFileList(model, type, startTime)
+        }
+        fun lewGetHrThreshold(model: Int) {
+            BleServiceHelper.lewGetHrThreshold(model)
+        }
+        fun lewSetHrThreshold(model: Int, threshold: HrThreshold) {
+            BleServiceHelper.lewSetHrThreshold(model, threshold)
+        }
+        fun lewGetOxyThreshold(model: Int) {
+            BleServiceHelper.lewGetOxyThreshold(model)
+        }
+        fun lewSetOxyThreshold(model: Int, threshold: OxyThreshold) {
+            BleServiceHelper.lewSetOxyThreshold(model, threshold)
+        }
+
+
 
         fun sp20GetBattery(model: Int) {
             Log.d(TAG, "sp20GetBattery")

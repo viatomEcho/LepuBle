@@ -2,6 +2,7 @@ package com.lepu.demo.ui.notifications
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -10,8 +11,10 @@ import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ble.data.lew.EcgList
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
+import com.lepu.blepro.utils.ByteUtils.toSignedShort
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
@@ -33,7 +36,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
     private var readFileProcess = ""
     private var fileCount = 0
 
-    private var fileType = LeBp2wBleCmd.FileType.ECG_TYPE
+    private var fileType = 0
 
     private var isReceive = false
 
@@ -123,13 +126,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             fileNames.clear()
             pc68bList.clear()
 
-            fileType++
-            if (fileType > 3) {
-                fileType = 0
-            }
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S1
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPO2
@@ -140,13 +142,27 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYFIT) {
                 LpBleUtil.getInfo(Constant.BluetoothConfig.currentModel[0])
-            } else {
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LEW) {
+                fileType++
+                if (fileType > LewBleCmd.ListType.SLEEP) {
+                    fileType = LewBleCmd.ListType.SPORT
+                }
+                LpBleUtil.lewGetFileList(Constant.BluetoothConfig.currentModel[0], fileType, 0)
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W) {
+                fileType++
+                if (fileType > LeBp2wBleCmd.FileType.ECG_TYPE) {
+                    fileType = LeBp2wBleCmd.FileType.USER_TYPE
+                }
                 LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0], fileType)
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKME_LE) {
+                fileType++
+                if (fileType > CheckmeLeBleCmd.ListType.TEMP_TYPE) {
+                    fileType = CheckmeLeBleCmd.ListType.ECG_TYPE
+                }
+                LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0], fileType)
+            } else {
+                LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0])
             }
-            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-        }
-        binding.getList.setOnClickListener {
-            LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
         }
         // 读文件
@@ -256,27 +272,31 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     }
                 }
             })
-        //--------------------------------lew3-----------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3FileList)
-            .observe(this, { event ->
-                (event.data as Lew3BleResponse.FileList).let {
-                    setReceiveCmd(it.bytes)
+        //--------------------------------lew-----------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList)
+            .observe(this) { event ->
+                (event.data as LewBleResponse.FileList).let {
+                    setReceiveCmd(it.content)
                     binding.info.text = it.toString()
-                    for (fileName in it.list) {
-                        fileNames.add(fileName)
+                    if (it.type == LewBleCmd.ListType.ECG) {
+                        val data = EcgList(it.content)
+                        for (item in data.items) {
+                            fileNames.add(item.name)
+                        }
                     }
-                    Toast.makeText(context, "lew3 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "lew 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 }
-            })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3ReadingFileProgress)
-            .observe(this, { event ->
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadingFileProgress)
+            .observe(this) { event ->
                 (event.data as Int).let {
-                    binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it/10).toString() + "%"
+                    binding.process.text =
+                        readFileProcess + curFileName + " 读取进度:" + (it / 10).toString() + "%"
                 }
-            })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew3.EventLew3ReadFileComplete)
-            .observe(this, { event ->
-                (event.data as Lew3BleResponse.EcgFile).let {
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete)
+            .observe(this) { event ->
+                (event.data as LewBleResponse.EcgFile).let {
                     setReceiveCmd(it.content)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $it \n"
                     if (binding.fileName.text.toString().isEmpty()) {
@@ -284,7 +304,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         readFile()
                     }
                 }
-            })
+            }
         //--------------------------------bp2-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList)
             .observe(this, { event ->
@@ -313,6 +333,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (event.data as Bp2BleFile).let {
                     if (it.type == 2) {
                         val data = Bp2EcgFile(it.content)
+                        val shortData = ShortArray(data.waveData.size.div(2))
+                        for (i in 0 until shortData.size) {
+                            shortData[i] = toSignedShort(data.waveData[i*2], data.waveData[i*2+1])
+                        }
+                        Log.d("mytest", "${shortData.joinToString()}")
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                     } else if (it.type == 1) {

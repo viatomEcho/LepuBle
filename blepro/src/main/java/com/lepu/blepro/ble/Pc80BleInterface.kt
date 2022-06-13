@@ -152,8 +152,8 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
             }
 
             Pc80BleCmd.TRACK_DATA_MESS -> {
-                LepuBleLog.d(tag, "model:$model,TRACK_DATA_MESS => success")
                 val info = PC80BleResponse.RtTrackData(response.content)
+                LepuBleLog.d(tag, "model:$model,TRACK_DATA_MESS => success $info")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bTrackData).post(InterfaceEvent(model, info))
             }
 

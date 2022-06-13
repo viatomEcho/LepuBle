@@ -19,7 +19,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     
     private val tag: String = "OxyBleInterface"
 
-    var settingType = ""
+    lateinit var settingType: Array<String>
 
     var curFileName: String? = null
     var curFile: OxyBleResponse.OxyFile? = null
@@ -294,14 +294,14 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun syncTime() {
-        settingType = OxyBleCmd.SYNC_TYPE_TIME
+        settingType = arrayOf(OxyBleCmd.SYNC_TYPE_TIME)
         sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.syncTime())
     }
 
     fun updateSetting(type: String, value: Any) {
-        settingType = type
+        settingType = arrayOf(type)
         val data = value as Int
-        if (settingType == OxyBleCmd.SYNC_TYPE_ALL_SW) {
+        if (settingType[0] == OxyBleCmd.SYNC_TYPE_ALL_SW) {
             updateSetting(arrayOf(OxyBleCmd.SYNC_TYPE_OXI_SWITCH, OxyBleCmd.SYNC_TYPE_HR_SWITCH, OxyBleCmd.SYNC_TYPE_MT_SW, OxyBleCmd.SYNC_TYPE_IV_SW),
                 intArrayOf(data, data, data, data))
         } else {
@@ -309,6 +309,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
         }
     }
     fun updateSetting(type: Array<String>, value: IntArray) {
+        settingType = type
         sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.updateSetting(type, value))
     }
 

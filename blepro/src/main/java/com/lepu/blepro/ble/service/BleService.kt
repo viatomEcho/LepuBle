@@ -150,6 +150,7 @@ open class BleService: LifecycleService() {
             channel.setSound(null, null)
             channel.enableVibration(false)
             channel.enableLights(false)
+            channel.enableLights(false)
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
             val notification = NotificationCompat.Builder(this, "foreground_service").build()
@@ -211,7 +212,9 @@ open class BleService: LifecycleService() {
             Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
             Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
-            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT -> {
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
+            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
+            Bluetooth.MODEL_BBSM_S2 -> {
                 OxyBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
@@ -342,8 +345,8 @@ open class BleService: LifecycleService() {
                     return this
                 }
             }
-            Bluetooth.MODEL_LEW3 -> {
-                Lew3BleInterface(m).apply {
+            Bluetooth.MODEL_LEW -> {
+                LewBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
                     vailFace.put(m, this)
