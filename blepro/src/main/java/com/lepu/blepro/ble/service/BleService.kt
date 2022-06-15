@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.Build
+import android.os.CountDownTimer
 import android.os.IBinder
 import android.text.TextUtils
 import android.util.SparseArray
@@ -110,6 +111,17 @@ open class BleService: LifecycleService() {
      */
     var isWaitingScanResult = false
     var scanTimeout: Job? = null
+    var scanTimer = object : CountDownTimer(3000, 3000) {
+        override fun onTick(millisUntilFinished: Long) {
+
+        }
+
+        override fun onFinish() {
+            startDiscover(scanModel, needPair, isReconnectScan)
+            LepuBleLog.d(tag, "-------scanTimer-onFinish------")
+        }
+
+    }
 
     var startScan: Job? = null
 
@@ -137,6 +149,7 @@ open class BleService: LifecycleService() {
             channel.setShowBadge(false)
             channel.setSound(null, null)
             channel.enableVibration(false)
+            channel.enableLights(false)
             channel.enableLights(false)
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
@@ -199,7 +212,9 @@ open class BleService: LifecycleService() {
             Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
             Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
-            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT -> {
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
+            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
+            Bluetooth.MODEL_BBSM_S2 -> {
                 OxyBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
@@ -330,8 +345,8 @@ open class BleService: LifecycleService() {
                     return this
                 }
             }
-            Bluetooth.MODEL_LEW3 -> {
-                Lew3BleInterface(m).apply {
+            Bluetooth.MODEL_LEW -> {
+                LewBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
                     vailFace.put(m, this)
@@ -483,7 +498,7 @@ open class BleService: LifecycleService() {
         startScan?.cancel()
 
         startScan = GlobalScope.launch {
-            delay(3000)
+            delay(1000)
             scanDevice(true)
         }
 
@@ -611,10 +626,11 @@ open class BleService: LifecycleService() {
     private fun scanDevice(enable: Boolean) {
         LepuBleLog.d(tag, "scanDevice => $enable")
 
-        scanTimeout?.cancel()
+//        scanTimeout?.cancel()
+        scanTimer.cancel()
         LepuBleLog.d(tag, "scanDevice scanTimeout.cancel()")
 
-        GlobalScope.launch {
+//        GlobalScope.launch {
 
             if (enable) {
                 if (bluetoothAdapter?.isEnabled!!) {
@@ -637,11 +653,12 @@ open class BleService: LifecycleService() {
                     LepuBleLog.d(tag, "scanDevice isWaitingScanResult = true")
                     leScanner?.startScan(null, settings, leScanCallback)
                     isDiscovery = true
-                    scanTimeout = GlobalScope.launch {
+                    scanTimer.start()
+                    /*scanTimeout = GlobalScope.launch {
                         delay(10000)
                         startDiscover(scanModel, needPair, isReconnectScan)
                         LepuBleLog.d(tag, "-------scanTimeout-------")
-                    }
+                    }*/
                     LepuBleLog.d(tag, "scanDevice scanTimeout.start()")
                     LepuBleLog.d(tag, "scanDevice started")
                 }
@@ -656,7 +673,7 @@ open class BleService: LifecycleService() {
                     LepuBleLog.d(tag, "scanDevice isWaitingScanResult = false")
                 }
             }
-        }
+//        }
 
     }
 
@@ -675,7 +692,8 @@ open class BleService: LifecycleService() {
             if (isWaitingScanResult) {
                 isWaitingScanResult = false
                 LepuBleLog.d(tag, "onScanResult isWaitingScanResult = false")
-                scanTimeout?.cancel()
+//                scanTimeout?.cancel()
+                scanTimer.cancel()
                 LepuBleLog.d(tag, "onScanResult scanTimeout.cancel()")
             }
 

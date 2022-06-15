@@ -121,6 +121,7 @@ class OxyBleResponse{
         override fun toString(): String {
             return """
                 OxyInfo : 
+                infoStr = $infoStr
                 region = $region
                 model = $model
                 hwVersion = $hwVersion

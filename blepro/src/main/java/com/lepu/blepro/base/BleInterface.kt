@@ -230,13 +230,13 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         }
         this.isAutoReconnect = isAutoConnect
         LepuBleLog.d(tag,"try disconnect..., isAutoReconnect = $isAutoConnect" )
-        manager.disconnect().enqueue()
+        manager.disconnect()/*.enqueue()*/ // 此方式华为手机只走了disconnecting，没有走disconnected
         manager.close()
-//        if (!this::device.isInitialized){
-//            LepuBleLog.d(tag, "device unInitialized")
-//            return
-//        }
-//        this.onDeviceDisconnected(device, ConnectionObserver.REASON_SUCCESS)
+        if (!this::device.isInitialized){
+            LepuBleLog.d(tag, "device unInitialized")
+            return
+        }
+        this.onDeviceDisconnected(device, ConnectionObserver.REASON_SUCCESS)
 
 
     }
@@ -251,6 +251,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
         if (BleServiceHelper.isScanning()) BleServiceHelper.stopScan()
         state = true
+        ready = false
         connecting = false
 //        publish()
 
@@ -272,6 +273,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
     override fun onDeviceConnecting(device: BluetoothDevice) {
         state = false
+        ready = false
         connecting = true
         publish()
 
@@ -284,6 +286,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
 
         state = false
+        ready = false
         connecting = false
         ready = false
         stopRtTask()
@@ -321,6 +324,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     override fun onDeviceDisconnecting(device: BluetoothDevice) {
 
         state = false
+        ready = false
         connecting = false
 
         publish()
@@ -334,7 +338,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
 
         state = false
-
+        ready = false
         connecting = false
         publish()
         LepuBleLog.d(tag, "onDeviceFailedToConnect=====isAutoReconnect:$isAutoReconnect")
@@ -359,10 +363,11 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         device.name?.let {
             LepuBleLog.d(tag, "$it onDeviceReady, state: $state")
         }
-        connecting = false
+        state = true
         ready = true
-        publish()
+        connecting = false
         clearCmdTimeout()
+        publish()
 
         if (model == Bluetooth.MODEL_PC80B
             || model == Bluetooth.MODEL_PC60FW
@@ -374,7 +379,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             || model == Bluetooth.MODEL_POD2B
             || model == Bluetooth.MODEL_PC_60B
             || model == Bluetooth.MODEL_OXYSMART
-            || model == Bluetooth.MODEL_BABYO2N
+//            || model == Bluetooth.MODEL_BABYO2N
             || model == Bluetooth.MODEL_TV221U
             || model == Bluetooth.MODEL_PC100
             || model == Bluetooth.MODEL_PC66B
@@ -436,6 +441,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         LepuBleLog.d(tag, "publish=>${stateSubscriber.size}")
         for (i in stateSubscriber) {
             i.onBleStateChanged(model, calBleState())
+            LepuBleLog.d(tag, "calBleState() : ${calBleState()}")
         }
     }
 
