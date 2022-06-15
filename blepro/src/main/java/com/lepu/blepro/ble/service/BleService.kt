@@ -111,7 +111,7 @@ open class BleService: LifecycleService() {
      */
     var isWaitingScanResult = false
     var scanTimeout: Job? = null
-    var scanTimer = object : CountDownTimer(10000, 10000) {
+    var scanTimer = object : CountDownTimer(3000, 3000) {
         override fun onTick(millisUntilFinished: Long) {
 
         }
@@ -498,7 +498,7 @@ open class BleService: LifecycleService() {
         startScan?.cancel()
 
         startScan = GlobalScope.launch {
-            delay(3000)
+            delay(1000)
             scanDevice(true)
         }
 
