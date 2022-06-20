@@ -118,7 +118,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         // 获取设备信息
         binding.getInfo.setOnClickListener {
             LpBleUtil.getInfo(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])}"
         }
         // 获取文件列表
         binding.getFileList.setOnClickListener {
@@ -224,7 +224,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadingFileProgress)
             .observe(this, { event ->
                 (event.data as Int).let {
-                    binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it/10).toString() + "%"
+                    binding.process.text = "$readFileProcess $curFileName 读取进度: ${(it/10)} %"
                 }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileComplete)
@@ -459,13 +459,19 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         //------------------------------bpm--------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordData)
             .observe(this, { event ->
-                (event.data as BpmCmd).let {
-                    setReceiveCmd(it.byteArray)
+                (event.data as BpmBleResponse.RecordData).let {
+                    setReceiveCmd(it.bytes)
                     fileCount++
-                    readFileProcess += BpmData(it.data).toString() + " fileCount : $fileCount \n\n"
+                    readFileProcess += BpmBleResponse.RecordData(it.bytes).toString() + " fileCount : $fileCount \n\n"
                     binding.info.text = readFileProcess
                 }
             })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordEnd)
+            .observe(this) { event ->
+                (event.data as Boolean).let {
+                    Toast.makeText(context, "bpm 获取用户文件列表完成", Toast.LENGTH_SHORT).show()
+                }
+            }
         //------------------------------pc100--------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpResult)
             .observe(this, { event ->
@@ -504,7 +510,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileComplete)
             .observe(this, { event ->
                 (event.data as OxyBleResponse.OxyFile).let {
-                    val data = O2OxyFile(it.fileContent)
+                    val data = OxyBleFile(it.fileContent)
                     binding.info.text = "$data"
                     setReceiveCmd(it.fileContent)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"

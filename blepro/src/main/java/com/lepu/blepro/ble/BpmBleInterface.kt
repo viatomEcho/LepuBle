@@ -2,12 +2,11 @@ package com.lepu.blepro.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
-import android.util.Log
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BpmBleCmd
-import com.lepu.blepro.ble.data.BpmCmd
-import com.lepu.blepro.ble.data.BpmDeviceInfo
+import com.lepu.blepro.ble.cmd.BpmBleResponse
+import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
@@ -69,7 +68,7 @@ class BpmBleInterface(model: Int): BleInterface(model) {
             if (i + 5 + length > bytes.size) {
                 return bytes.copyOfRange(i, bytes.size)
             }
-            val cmd = bytes[i + 4]  // 数据标志位
+//            val cmd = bytes[i + 4]  // 数据标志位
             val temp: ByteArray = bytes.copyOfRange(i, i + 5 + length)
             if (temp.last() == BpmBleCmd.calcNum(temp)) {
                 onResponseReceived(temp)
@@ -105,44 +104,51 @@ class BpmBleInterface(model: Int): BleInterface(model) {
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_GET_BP_STATE -> {
 
-                LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_BP_STATE => success")
                 //发送实时state : byte
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmState).post(InterfaceEvent(model, bytes))
+                val data = BpmBleResponse.RtState(bytes)
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmState).post(InterfaceEvent(model, data))
+                LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_BP_STATE => success $data")
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_GET_RECORDS -> {
                 //获取留存记录
-                LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_RECORDS => success")
 
-               BpmCmd(bytes).let {
-                   LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordData).post(InterfaceEvent(model, it))
+                val data = BpmCmd(bytes)
+                BpmBleResponse.RecordData(bytes).let {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordData).post(InterfaceEvent(model, it))
+                    LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_RECORDS => success $it")
 
-                   if (it.type == 0xB3.toByte()) {
-                       if (bytes[11] == 0x00.toByte()) {
+                    if (data.type == 0xB3.toByte()) {
+                        if (bytes[11] == 0x00.toByte()) {
                            isUserAEnd = true
-                       }
-                       if (bytes[11] == 0x01.toByte()) {
+                        }
+                        if (bytes[11] == 0x01.toByte()) {
                            isUserBEnd = true
-                       }
-                       if (isUserAEnd && isUserBEnd) {
-                           //AB都读取完成
-                           LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordEnd).post(InterfaceEvent(model, true))
-                       }
-                   }
+                        }
+                        if (isUserAEnd && isUserBEnd) {
+                            //AB都读取完成
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordEnd).post(InterfaceEvent(model, true))
+                        }
+                    }
                }
 
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_GET_RESULT -> {
                 // 返回测量数据
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmMeasureResult).post(InterfaceEvent(model, BpmCmd(bytes)))
+                val data = BpmBleResponse.RecordData(bytes)
+                LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_RESULT => success $data")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmMeasureResult).post(InterfaceEvent(model, data))
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_ERROR_RESULT -> {
                 // 返回测量数据错误
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmMeasureErrorResult).post(InterfaceEvent(model, BpmCmd(bytes)))
+                val data = BpmBleResponse.ErrorResult(bytes)
+                LepuBleLog.d(tag, "model:$model,MSG_TYPE_ERROR_RESULT => success $data")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmMeasureErrorResult).post(InterfaceEvent(model, data))
             }
             else -> {
                 //实时指标
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRtData).post(InterfaceEvent(model, BpmCmd(bytes)))
-
+                val data = BpmBleResponse.RtData(bytes)
+                LepuBleLog.d(tag, "model:$model,EventBpmRtData => success $data")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRtData).post(InterfaceEvent(model, data))
             }
         }
     }

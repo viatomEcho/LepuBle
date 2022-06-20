@@ -14,8 +14,6 @@ import com.lepu.blepro.utils.CrcUtil.calCRC8
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
 import com.lepu.blepro.utils.toUInt
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
 import kotlin.experimental.inv
 
 /**
@@ -86,8 +84,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,CMD_INFO => success")
 
                 val info = Bp2DeviceInfo(bleResponse.content, device.name)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Info)
-                    .post(InterfaceEvent(model, info))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Info).post(InterfaceEvent(model, info))
                 if (runRtImmediately) {
                     runRtTask()
                     runRtImmediately = false
@@ -97,8 +94,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             SET_TIME -> {
                 //同步时间
                 LepuBleLog.d(tag, "model:$model,CMD_SET_TIME => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SyncTime)
-                    .post(InterfaceEvent(model, true))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SyncTime).post(InterfaceEvent(model, true))
             }
             GET_FILE_LIST -> {
 
@@ -106,8 +102,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 //发送实时state : byte
                 if (bleResponse.content.isNotEmpty()) {
                     val list = KtBleFileList(bleResponse.content, device.name)
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList)
-                        .post(InterfaceEvent(model, list))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList).post(InterfaceEvent(model, list))
                 }
             }
 
@@ -125,8 +120,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
                     LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, CMD_FILE_READ_START => error")
 
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileError)
-                        .post(InterfaceEvent(model, fileName))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileError).post(InterfaceEvent(model, fileName))
                     return
                 }
 
@@ -155,8 +149,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 fileContent = add(fileContent, bleResponse.content)
                 LepuBleLog.d(tag, "download file $fileName CMD_FILE_READ_PKG curSize == $curSize | fileSize == $fileSize")
 
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadingFileProgress)
-                    .post(InterfaceEvent(model, part))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadingFileProgress).post(InterfaceEvent(model, part))
                 if (curSize < fileSize) {
                     sendCmd(fileReadPkg(curSize))
                 } else {
@@ -178,8 +171,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 fileContent?.let {
                     if (it.isNotEmpty()) {
                         val file = Bp2BleFile(fileName, it, device.name)
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileComplete)
-                            .post(InterfaceEvent(model, file))
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileComplete).post(InterfaceEvent(model, file))
                     }
                 }
 
@@ -192,8 +184,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
                 if (bleResponse.content.size > 31) {
                     val rtData = Bp2BleRtData(bleResponse.content)
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData)
-                        .post(InterfaceEvent(model, rtData))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData).post(InterfaceEvent(model, rtData))
                 }else{
                     Log.d(tag, "bytes.content.size < 31")
                 }
@@ -203,8 +194,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,CMD_BP2_RT_STATE => success")
 
                 val rtState = Bp2BleRtState(bleResponse.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2State)
-                    .post(InterfaceEvent(model, rtState))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2State).post(InterfaceEvent(model, rtState))
 
             }
 
@@ -213,11 +203,9 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
                 //心跳音开关
                 if (bleResponse.type != 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSetConfigResult)
-                        .post(InterfaceEvent(model, 0))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SetConfigResult).post(InterfaceEvent(model, 0))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSetConfigResult)
-                        .post(InterfaceEvent(model, 1))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SetConfigResult).post(InterfaceEvent(model, 1))
                 }
             }
             GET_CONFIG -> {
@@ -225,15 +213,13 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
                 //获取返回的开关状态
                 if (bleResponse.type != 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
-                        .post(InterfaceEvent(model, 0))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2GetConfigError).post(InterfaceEvent(model, true))
                 } else {
-                    if (bleResponse.content.size > 24 && bleResponse.content[24].toInt() == 1) {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
-                            .post(InterfaceEvent(model, 1))
+                    if (bleResponse.content.size > 24) {
+                        val data = Bp2Config(bleResponse.content)
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2GetConfigResult).post(InterfaceEvent(model, data))
                     } else {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpGetConfigResult)
-                            .post(InterfaceEvent(model, 0))
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2GetConfigError).post(InterfaceEvent(model, true))
                     }
                 }
             }
@@ -242,11 +228,9 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
                 //重置
                 if (bleResponse.type != 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Reset)
-                        .post(InterfaceEvent(model, 0))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Reset).post(InterfaceEvent(model, 0))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Reset)
-                        .post(InterfaceEvent(model, 1))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Reset).post(InterfaceEvent(model, 1))
                 }
             }
 
@@ -255,11 +239,9 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
                 //重置
                 if (bleResponse.type != 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FactoryReset)
-                        .post(InterfaceEvent(model, 0))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FactoryReset).post(InterfaceEvent(model, 0))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FactoryReset)
-                        .post(InterfaceEvent(model, 1))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FactoryReset).post(InterfaceEvent(model, 1))
                 }
             }
 
@@ -268,11 +250,9 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
                 //重置
                 if (bleResponse.type != 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FactoryResetAll)
-                        .post(InterfaceEvent(model, 0))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FactoryResetAll).post(InterfaceEvent(model, 0))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FactoryResetAll)
-                        .post(InterfaceEvent(model, 1))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FactoryResetAll).post(InterfaceEvent(model, 1))
                 }
             }
 
@@ -280,23 +260,19 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,SWITCH_STATE => success")
                 //切换状态
                 if (bleResponse.type != 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSwitchState)
-                        .post(InterfaceEvent(model, false))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SwitchState).post(InterfaceEvent(model, false))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBpSwitchState).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SwitchState).post(InterfaceEvent(model, true))
                 }
             }
 
             GET_PHY_STATE -> {
                 LepuBleLog.d(tag, "model:$model,CMD_BP2_GET_PHY_STATE => success")
                 if (bleResponse.type != 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2GetPhyStateError)
-                        .post(InterfaceEvent(model, false))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2GetPhyStateError).post(InterfaceEvent(model, false))
                 } else {
                     val data = Bp2BlePhyState(bleResponse.content)
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2GetPhyState).post(
-                        InterfaceEvent(model, data)
-                    )
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2GetPhyState).post(InterfaceEvent(model, data))
                 }
             }
 
@@ -370,6 +346,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
+        //
     }
 
 
