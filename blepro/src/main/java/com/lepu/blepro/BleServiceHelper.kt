@@ -283,6 +283,7 @@ class BleServiceHelper private constructor() {
 
     /**
      * 判断设备名重连是否符合标准：过滤pc80b,fhr,bpw1
+     * 有app控制，sdk不做处理
      */
     fun canReconnectByName(model: Int): Boolean {
         return when(model) {
