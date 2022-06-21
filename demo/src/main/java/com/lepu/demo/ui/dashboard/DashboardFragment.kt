@@ -142,7 +142,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_PC_68B,
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PC_60NW,
-            Bluetooth.MODEL_OXYRING -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_CMRING -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_CHECK_ADV -> {
@@ -772,7 +772,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_POD_1W, Bluetooth.MODEL_CHECK_POD,
                 Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
                 Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60B,
-                Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_OXYRING -> {
+                Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_OXYRING,
+                Bluetooth.MODEL_CMRING -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE
@@ -922,6 +923,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         })
         binding.startRtOxy.setOnClickListener {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CMRING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N

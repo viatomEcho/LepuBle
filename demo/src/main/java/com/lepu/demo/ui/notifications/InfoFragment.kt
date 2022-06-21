@@ -18,6 +18,7 @@ import com.lepu.blepro.utils.ByteUtils.toSignedShort
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
+import com.lepu.demo.UpdateActivity
 import com.lepu.demo.WaveEcgActivity
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant
@@ -128,6 +129,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CMRING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S1
@@ -177,6 +179,13 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         // 继续读取文件
         binding.continueRf.setOnClickListener {
 
+        }
+        //  dfu升级
+        binding.upgrade.setOnClickListener {
+            val intent = Intent(context, UpdateActivity::class.java)
+            intent.putExtra("macAddr", mainViewModel._curBluetooth.value?.deviceMacAddress)
+            intent.putExtra("bleName", mainViewModel._curBluetooth.value?.deviceName)
+            startActivity(intent)
         }
 
         // 复位
