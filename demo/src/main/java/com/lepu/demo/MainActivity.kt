@@ -472,6 +472,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
     }
 
+    override fun onDestroy() {
+        LpBleUtil.stopService(application)
+        super.onDestroy()
+    }
 
     override fun onBleStateChanged(model: Int, state: Int) {
         LepuBleLog.d("onBleStateChanged model = $model, state = $state")
