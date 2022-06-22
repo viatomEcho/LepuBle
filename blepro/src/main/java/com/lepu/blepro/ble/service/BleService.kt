@@ -111,7 +111,7 @@ open class BleService: LifecycleService() {
      */
     var isWaitingScanResult = false
     var scanTimeout: Job? = null
-    var scanTimer = object : CountDownTimer(10000, 10000) {
+    var scanTimer = object : CountDownTimer(3000, 3000) {
         override fun onTick(millisUntilFinished: Long) {
 
         }
@@ -498,7 +498,7 @@ open class BleService: LifecycleService() {
         startScan?.cancel()
 
         startScan = GlobalScope.launch {
-            delay(3000)
+            delay(1000)
             scanDevice(true)
         }
 
@@ -778,7 +778,7 @@ open class BleService: LifecycleService() {
 
                 if (isReconnectScan && isContains){
                     stopDiscover()
-                    if (isReconnectByAddress) {
+//                    if (isReconnectByAddress) {
                         // 避免体温计aoj20a在装电池开机后自动关机过程连接上设备，延迟重连
                         if (model == Bluetooth.MODEL_AOJ20A) {
                             GlobalScope.launch {
@@ -790,14 +790,14 @@ open class BleService: LifecycleService() {
                             vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
                             LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
                         }
-                    } else {
-                        if (BleServiceHelper.BleServiceHelper.canReconnectByName(b.model)) {
-                            vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
-                            LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
-                        } else {
-                            LepuBleLog.d(tag, "发现需要重连的设备不可使用蓝牙名重连 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
-                        }
-                    }
+//                    } else {
+//                        if (BleServiceHelper.BleServiceHelper.canReconnectByName(b.model)) {
+//                            vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
+//                            LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
+//                        } else {
+//                            LepuBleLog.d(tag, "发现需要重连的设备不可使用蓝牙名重连 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
+//                        }
+//                    }
 
                 } else {
                     if (isReconnectScan) {
