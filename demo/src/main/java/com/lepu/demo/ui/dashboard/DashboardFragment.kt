@@ -142,7 +142,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_PC_68B,
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PC_60NW,
-            Bluetooth.MODEL_OXYRING -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_CMRING -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_CHECK_ADV -> {
@@ -300,7 +300,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val mvs = ByteUtils.bytes2mvs(bp2Rt.rtWave.waveform)
                 DataController.receive(mvs)
 
-                binding.dataStr.text = "dataType: " + bp2Rt.rtWave.waveDataType + " " + data.toString() + "----rtState--" + bp2Rt.rtState.toString()
+                binding.dataStr.text = "dataType: ${bp2Rt.rtWave.waveDataType} $data ----rtState-- ${bp2Rt.rtState}"
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList).observe(this, { event ->
             (event.data as KtBleFileList).let {
@@ -412,12 +412,19 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         //------------------------------bpm------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRtData)
             .observe(this, {
-                val rtData = it.data as BpmCmd
-                rtData.let { data ->
-                    viewModel.ps.value = (data.data[0].toUInt() and 0xFFu).toInt()
-                    binding.dataStr.text = data.toString()
-                }
+                val rtData = it.data as BpmBleResponse.RtData
+                viewModel.ps.value = rtData.ps
             })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmMeasureResult)
+            .observe(this) {
+                val rtData = it.data as BpmBleResponse.RecordData
+                binding.dataStr.text = "$rtData"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmMeasureErrorResult)
+            .observe(this) {
+                val rtData = it.data as BpmBleResponse.ErrorResult
+                binding.dataStr.text = "$rtData"
+            }
 
         //------------------------------o2ring------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtData).observeForever { event ->
@@ -533,9 +540,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpErrorResult)
             .observe(this, {
                 val rtData = it.data as Pc100BleResponse.BpResultError
-                rtData.let { data ->
-                    binding.dataStr.text = rtData.toString()
-                }
+                binding.dataStr.text = "$rtData"
             })
         //------------------------------ap20------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBoWave)
@@ -553,13 +558,13 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBreathWave)
             .observe(this, {
-                val rtWave = it.data as Ap20BleResponse.RtBreathWave
+//                val rtWave = it.data as Ap20BleResponse.RtBreathWave
 //                dataString += "\n rtWave : $rtWave"
 //                binding.dataStr.text = dataString
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBreathParam)
             .observe(this, {
-                val rtData = it.data as Ap20BleResponse.RtBreathParam
+//                val rtData = it.data as Ap20BleResponse.RtBreathParam
 //                dataString += "\n rtData : $rtData"
 //                binding.dataStr.text = dataString
             })
@@ -767,7 +772,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_POD_1W, Bluetooth.MODEL_CHECK_POD,
                 Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
                 Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60B,
-                Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_OXYRING -> {
+                Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_OXYRING,
+                Bluetooth.MODEL_CMRING -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE
@@ -917,6 +923,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         })
         binding.startRtOxy.setOnClickListener {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CMRING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N

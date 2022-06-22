@@ -153,7 +153,7 @@ object LeS1BleResponse {
     class RtWave constructor(var bytes: ByteArray) : Parcelable {
         var len: Int
         var wave: ByteArray
-        var wFs : FloatArray? = null
+        var wFs : FloatArray
 
         init {
             len = toUInt(bytes.copyOfRange(0, 2))
@@ -165,7 +165,7 @@ object LeS1BleResponse {
 
             wFs = FloatArray(len)
             for (i in 0 until len) {
-                wFs!![i] = Er1DataController.byteTomV(wave[2 * i], wave[2 * i + 1])
+                wFs[i] = Er1DataController.byteTomV(wave[2 * i], wave[2 * i + 1])
             }
         }
     }

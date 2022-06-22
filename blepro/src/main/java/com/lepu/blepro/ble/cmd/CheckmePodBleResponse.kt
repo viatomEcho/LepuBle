@@ -1,13 +1,10 @@
 package com.lepu.blepro.ble.cmd
 
-import android.os.Parcelable
-import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.ByteUtils.toSignedShort
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
-import kotlinx.android.parcel.Parcelize
 import org.json.JSONObject
 import java.util.*
 
@@ -162,7 +159,7 @@ class CheckmePodBleResponse{
     class RtWave (var bytes: ByteArray) {
         var len: Int
         var waveByte: ByteArray
-        var wFs: IntArray? = null
+        var wFs: IntArray
 
         init {
             var index = 0
@@ -174,7 +171,7 @@ class CheckmePodBleResponse{
             }
             wFs = IntArray(len)
             for (i in 0 until len) {
-                wFs!![i] = toSignedShort(waveByte[i*2], waveByte[i*2+1]).toInt()
+                wFs[i] = toSignedShort(waveByte[i*2], waveByte[i*2+1]).toInt()
             }
         }
         override fun toString(): String {

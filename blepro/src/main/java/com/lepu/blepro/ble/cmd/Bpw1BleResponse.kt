@@ -150,12 +150,11 @@ object Bpw1BleResponse {
     @Parcelize
     class Bpw1FileList constructor(val size: Int) : Parcelable {
         var listSize: Int
-        var fileList: Array<BpData?>
+        var fileList = mutableListOf<BpData>()
         var index: Int // 标识当前下载index
 
         init {
             listSize = size
-            fileList = arrayOfNulls(listSize)
             index = 0
         }
 
@@ -163,7 +162,7 @@ object Bpw1BleResponse {
             if (index >= listSize) {
                 return // 已下载完成
             } else {
-                fileList[index] = data
+                fileList.add(data)
                 index++
             }
             LepuBleLog.d("Bpw1FileList, size = ${size}, index = $index")
@@ -172,13 +171,12 @@ object Bpw1BleResponse {
         override fun toString(): String {
             var temp = ""
             for (file in fileList)
-                temp += "date: " + file?.year + " " + file?.month +  " "  + file?.day + " " + file?.hour +  " "  + file?.minute + " sys: " + file?.sys + " dia: " + file?.dia + " pul: " + file?.pul + " fg: " + file?.fg + "\n"
-            val string = """
-            Bpw1FileList 
-            size: $listSize
-            $temp
-        """.trimIndent()
-            return string
+                temp += "date: ${file.year} ${file.month} ${file.day} ${file.hour} ${file.minute} sys: ${file.sys} dia: ${file.dia} pul: ${file.pul} fg: ${file.fg} \n"
+            return """
+                Bpw1FileList 
+                size: $listSize
+                $temp
+            """.trimIndent()
         }
     }
 

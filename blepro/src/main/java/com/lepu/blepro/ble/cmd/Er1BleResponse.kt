@@ -79,7 +79,7 @@ object Er1BleResponse {
         var content: ByteArray = bytes
         var len: Int
         var wave: ByteArray
-        var wFs : FloatArray? = null
+        var wFs : FloatArray
 
         init {
             len = toUInt(bytes.copyOfRange(0, 2))
@@ -91,7 +91,7 @@ object Er1BleResponse {
 
             wFs = FloatArray(len)
             for (i in 0 until len) {
-                wFs!![i] = Er1DataController.byteTomV(wave[2 * i], wave[2 * i + 1])
+                wFs[i] = Er1DataController.byteTomV(wave[2 * i], wave[2 * i + 1])
             }
         }
     }
@@ -114,7 +114,7 @@ object Er1BleResponse {
         var len: Int
         val lead = 4
         var wave = mutableListOf<ByteArray>()
-        var wFs : FloatArray? = null
+        var wFs : FloatArray
 
         init {
             len = toUInt(bytes.copyOfRange(0, 2))
@@ -139,7 +139,7 @@ object Er1BleResponse {
 
             wFs = FloatArray(len)
             for (i in 0 until len) {
-                wFs!![i] = Er1DataController.byteTomV(lead1[2 * i], lead1[2 * i + 1])
+                wFs[i] = Er1DataController.byteTomV(lead1[2 * i], lead1[2 * i + 1])
             }
         }
     }

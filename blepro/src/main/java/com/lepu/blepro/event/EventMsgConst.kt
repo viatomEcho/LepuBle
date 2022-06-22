@@ -18,6 +18,7 @@ object EventMsgConst {
      */
     interface Discovery{
         companion object{
+            const val EventDeviceFoundError = "com.lepu.ble.device.found.error"  // 扫描设备出错 int(ScanCallback.errorCode)
             const val EventDeviceFound = "com.lepu.ble.device.found"  // 扫描到sdk已有model设备会发送 Bluetooth
             const val EventDeviceFound_Device = "com.lepu.ble.device.found.device"  // 开始扫描设置需要配对的信息 Bluetooth/BluetoothDevice
             const val EventDeviceFound_ScanRecord = "com.lepu.ble.device.found.scanResult"  // 开始扫描设置需要配对的信息 ScanRecord

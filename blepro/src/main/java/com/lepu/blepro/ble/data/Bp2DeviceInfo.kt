@@ -36,8 +36,8 @@ class Bp2DeviceInfo {
         this.bytes=bytes;
         this.name = deviceName
         this.hwV = bytes[0].toChar().toString()
-        this.fmV = "${bytes[3]}.${bytes[2]}.${bytes[1]}"
-        this.btlV = "${bytes[7]}.${bytes[6]}.${bytes[5]}"
+        this.fmV = "${bytes[4]}.${bytes[3]}.${bytes[2]}.${bytes[1]}"
+        this.btlV = "${bytes[8]}.${bytes[7]}.${bytes[6]}.${bytes[5]}"
         this.branchCode = toString(bytes.copyOfRange(9, 17))
         this.deviceType = toUInt(bytes.copyOfRange(20, 22))
         this.protocolV = "${bytes[23]}.${bytes[22]}"
@@ -65,6 +65,7 @@ class Bp2DeviceInfo {
             deviceType : $deviceType
             protocolV : $protocolV
             curTime : $curTime
+            dateStr : $dateStr
             protocolMaxLen : $protocolMaxLen
             snLen : $snLen
             sn : $sn

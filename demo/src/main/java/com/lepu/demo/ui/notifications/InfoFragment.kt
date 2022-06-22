@@ -18,6 +18,7 @@ import com.lepu.blepro.utils.ByteUtils.toSignedShort
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
+import com.lepu.demo.UpdateActivity
 import com.lepu.demo.WaveEcgActivity
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant
@@ -118,7 +119,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         // 获取设备信息
         binding.getInfo.setOnClickListener {
             LpBleUtil.getInfo(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])}"
         }
         // 获取文件列表
         binding.getFileList.setOnClickListener {
@@ -128,6 +129,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CMRING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S1
@@ -178,6 +180,13 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         binding.continueRf.setOnClickListener {
 
         }
+        //  dfu升级
+        binding.upgrade.setOnClickListener {
+            val intent = Intent(context, UpdateActivity::class.java)
+            intent.putExtra("macAddr", mainViewModel._curBluetooth.value?.deviceMacAddress)
+            intent.putExtra("bleName", mainViewModel._curBluetooth.value?.deviceName)
+            startActivity(intent)
+        }
 
         // 复位
         binding.reset.setOnClickListener {
@@ -224,7 +233,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadingFileProgress)
             .observe(this, { event ->
                 (event.data as Int).let {
-                    binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it/10).toString() + "%"
+                    binding.process.text = "$readFileProcess $curFileName 读取进度: ${(it/10)} %"
                 }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileComplete)
@@ -459,13 +468,19 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         //------------------------------bpm--------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordData)
             .observe(this, { event ->
-                (event.data as BpmCmd).let {
-                    setReceiveCmd(it.byteArray)
+                (event.data as BpmBleResponse.RecordData).let {
+                    setReceiveCmd(it.bytes)
                     fileCount++
-                    readFileProcess += BpmData(it.data).toString() + " fileCount : $fileCount \n\n"
+                    readFileProcess += BpmBleResponse.RecordData(it.bytes).toString() + " fileCount : $fileCount \n\n"
                     binding.info.text = readFileProcess
                 }
             })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordEnd)
+            .observe(this) { event ->
+                (event.data as Boolean).let {
+                    Toast.makeText(context, "bpm 获取用户文件列表完成", Toast.LENGTH_SHORT).show()
+                }
+            }
         //------------------------------pc100--------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpResult)
             .observe(this, { event ->
@@ -504,7 +519,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileComplete)
             .observe(this, { event ->
                 (event.data as OxyBleResponse.OxyFile).let {
-                    val data = O2OxyFile(it.fileContent)
+                    val data = OxyBleFile(it.fileContent)
                     binding.info.text = "$data"
                     setReceiveCmd(it.fileContent)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"

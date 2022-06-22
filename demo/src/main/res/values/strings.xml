@@ -25,4 +25,16 @@
     <string name="permission_bluetooth">需要开启蓝牙，连接设备。</string>
     <string name="permission_location_reason">定位权限是使用程序必须依赖的权限</string>
     <string name="permission_location_setting">您需要去应用程序设置当中手动开启权限</string>
+
+    <string name="start_update">开始升级</string>
+    <string name="use_str">如何使用</string>
+    <string name="open_boot_str">请按【开机键】开机</string>
+    <string name="search">正在搜索中</string>
+    <string name="during_upgrade">升级中...</string>
+    <string name="update_successed">升级成功</string>
+    <string name="update_successful">升级失败</string>
+    <string name="version">版本</string>
+    <string name="ok">确认</string>
+    <string name="upgrade_unsuccessful">升级失败，请断电重启</string>
+
 </resources>

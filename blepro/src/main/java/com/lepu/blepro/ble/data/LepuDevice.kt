@@ -8,19 +8,19 @@ import kotlinx.android.parcel.Parcelize
 @ExperimentalUnsignedTypes
 @Parcelize
 class LepuDevice constructor(var bytes: ByteArray) : Parcelable {
-    var hwV: Char? = null            // 硬件版本
-    var fwV: String? = null          // 固件版本
-    var btlV: String? = null         // 引导版本
-    var branchCode: String? = null   // Branch编码
-    var fileV: Int? = null           // 文件系统版本
+    var hwV: Char            // 硬件版本
+    var fwV: String          // 固件版本
+    var btlV: String         // 引导版本
+    var branchCode: String   // Branch编码
+    var fileV: Int           // 文件系统版本
     // reserve 2
-    var deviceType: Int? = null      // 设备类型
-    var protocolV: String? = null    // 协议版本
-    var curTime: String? = null      // 时间
-    var protocolMaxLen: Int? = null  // 通信协议数据段最大长度
+    var deviceType: Int      // 设备类型
+    var protocolV: String    // 协议版本
+    var curTime: String      // 时间
+    var protocolMaxLen: Int  // 通信协议数据段最大长度
     // reserve 4
-    var snLen: Int? = null           // SN长度(小于18)
-    var sn: String? = null           // SN号
+    var snLen: Int           // SN长度(小于18)
+    var sn: String           // SN号
 
 
     // reserve 4

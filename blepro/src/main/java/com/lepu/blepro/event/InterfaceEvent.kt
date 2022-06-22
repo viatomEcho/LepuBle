@@ -69,13 +69,13 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     interface BPM {
         companion object {
             const val EventBpmInfo = "com.lepu.ble.bpm.info"                     // 设备信息 BpmDeviceInfo
-            const val EventBpmRtData = "com.lepu.ble.bpm.rtData"                 // 实时数据 BpmCmd
-            const val EventBpmState = "com.lepu.ble.bpm.state"                   // 实时状态 byte数组
+            const val EventBpmRtData = "com.lepu.ble.bpm.rtData"                 // 实时压力值 int
+            const val EventBpmState = "com.lepu.ble.bpm.state"                   // 实时状态 BpmBleResponse.RtState
             const val EventBpmSyncTime = "com.lepu.ble.bpm.sync.time"            // 同步时间 true
-            const val EventBpmRecordData = "com.lepu.ble.bpm.record.data"        // 记录数据 BpmCmd
+            const val EventBpmRecordData = "com.lepu.ble.bpm.record.data"        // 记录数据 BpmBleResponse.RecordData
             const val EventBpmRecordEnd = "com.lepu.ble.bpm.record.end"          // 传输完成 true
-            const val EventBpmMeasureResult = "com.lepu.ble.bpm.measure.result"  // 测量结果 BpmCmd
-            const val EventBpmMeasureErrorResult = "com.lepu.ble.bpm.measure.error.result"  // 测量错误结果 BpmCmd
+            const val EventBpmMeasureResult = "com.lepu.ble.bpm.measure.result"  // 测量结果 BpmBleResponse.RecordData
+            const val EventBpmMeasureErrorResult = "com.lepu.ble.bpm.measure.error.result"  // 测量错误结果 BpmBleResponse.ErrorResult
         }
     }
 
@@ -95,10 +95,11 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBp2Reset = "com.lepu.ble.bp2.reset"                                // 复位 int(0：失败 1：成功)
             const val EventBp2FactoryReset = "com.lepu.ble.bp2.factory.reset"                 // 恢复出厂设置 int(0：失败 1：成功)
             const val EventBp2FactoryResetAll = "com.lepu.ble.bp2.factory.reset.all"          // 恢复生产出厂状态 int(0：失败 1：成功)
-            const val EventBpSetConfigResult = "com.lepu.ble.bp2.set.config"                  // 设置心跳音开关 int(0：失败 1：成功)
-            const val EventBpGetConfigResult = "com.lepu.ble.bp2.get.config"                  // 心跳音开关 int(0：关 1：开)
+            const val EventBp2SetConfigResult = "com.lepu.ble.bp2.set.config.result"          // 设置心跳音开关 int(0：失败 1：成功)
+            const val EventBp2GetConfigResult = "com.lepu.ble.bp2.get.config.result"          // 获取配置信息 Bp2Config
+            const val EventBp2GetConfigError = "com.lepu.ble.bp2.get.config.error"            // 获取配置信息失败 true
             const val EventBp2SyncTime = "com.lepu.ble.bp2.sync.time"                         // 同步时间 boolean
-            const val EventBpSwitchState = "com.lepu.ble.bp2.switch.state"                    // 切换设备状态 boolean
+            const val EventBp2SwitchState = "com.lepu.ble.bp2.switch.state"                   // 切换设备状态 boolean
             const val EventBp2SetPhyState = "com.lepu.ble.bp2.set.phy.state"                  // 设置理疗状态 Bp2BlePhyState
             const val EventBp2GetPhyState = "com.lepu.ble.bp2.get.phy.state"                  // 获取理疗状态 Bp2BlePhyState
             const val EventBp2GetPhyStateError = "com.lepu.ble.bp2.get.phy.state.error"       // 获取理疗状态出错 boolean
@@ -186,6 +187,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventEr2ReadFileError = "com.lepu.ble.er2.file.read.error"              // 传输文件出错 true
             const val EventEr2ReadingFileProgress = "com.lepu.ble.er2.file.reading.progress"  // 传输文件进度 int(0-100)
             const val EventEr2ReadFileComplete = "com.lepu.ble.er2.file.read.complete"        // 传输文件完成 Er2File
+            const val EventEr2BurnFactoryInfo = "com.lepu.ble.er2.burn.factory.info"          // 烧录出厂信息 boolean
+            const val EventEr2BurnLockFlash = "com.lepu.ble.er2.burn.lock.flash"              // 加密Flash boolean
         }
     }
 

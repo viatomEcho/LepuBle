@@ -26,7 +26,14 @@
             </intent-filter>
         </activity>
         <activity android:name=".WaveEcgActivity"/>
-
+        <activity android:name=".UpdateActivity"/>
+        <service  android:name=".dfu.DfuService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="no.nordicsemi.android.action.DFU_UPLOAD" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
