@@ -204,13 +204,16 @@ class Pc68bBleResponse{
 
     @ExperimentalUnsignedTypes
     class Record(val bytes: ByteArray, val name: String) {
-        var spo2 = mutableListOf<Int>()
-        var hr = mutableListOf<Int>()
+        var spo2 : IntArray
+        var hr : IntArray
 
         init {
-            for (i in 0 until bytes.size.div(2)) {
-                spo2.add(byte2UInt(bytes[i*2]))
-                hr.add(byte2UInt(bytes[i*2+1]))
+            val len = bytes.size.div(2)
+            spo2 = IntArray(len)
+            hr = IntArray(len)
+            for (i in 0 until len) {
+                spo2[i] = byte2UInt(bytes[i*2])
+                hr[i] = byte2UInt(bytes[i*2+1])
             }
         }
 

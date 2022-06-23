@@ -51,6 +51,7 @@ public class BluetoothController {
         boolean isO2 = false;
         if (model == Bluetooth.MODEL_O2RING
                 || model == Bluetooth.MODEL_OXYRING
+                || model == Bluetooth.MODEL_CMRING
                 || model == Bluetooth.MODEL_O2M
                 || model == Bluetooth.MODEL_OXYLINK
                 || model == Bluetooth.MODEL_BABYO2

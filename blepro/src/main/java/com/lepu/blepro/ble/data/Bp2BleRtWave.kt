@@ -8,7 +8,7 @@ class Bp2BleRtWave {
     var waveDataType : Int
     var waveData : ByteArray
     var waveformSize : Int
-    var waveform : ByteArray?
+    var waveform : ByteArray
 
 
     @ExperimentalUnsignedTypes

@@ -5,7 +5,7 @@ import com.lepu.blepro.utils.DateUtil.getSecondTimestamp
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 
-class O2OxyFile(val bytes: ByteArray) {
+class OxyBleFile(val bytes: ByteArray) {
 
     var version: Int
     var operationMode: Int
@@ -112,7 +112,7 @@ class O2OxyFile(val bytes: ByteArray) {
 
     override fun toString(): String {
         return """
-            O2OxyFile : 
+            OxyBleFile : 
             version : $version
             operationMode : $operationMode
             startTime : $startTime

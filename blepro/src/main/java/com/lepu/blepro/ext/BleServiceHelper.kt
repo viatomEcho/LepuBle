@@ -11,7 +11,6 @@ import android.util.SparseArray
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.*
-import com.lepu.blepro.ble.cmd.LewBleCmd
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.lew.*
@@ -285,6 +284,7 @@ class BleServiceHelper private constructor() {
 
     /**
      * 判断设备名重连是否符合标准：过滤pc80b,fhr,bpw1
+     * 有app控制，sdk不做处理
      */
     fun canReconnectByName(model: Int): Boolean {
         return when(model) {
@@ -566,7 +566,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2 -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_CMRING -> {
                 return inter is OxyBleInterface
             }
             Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T ->{
@@ -910,6 +910,14 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
+            Bluetooth.MODEL_ER2 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Er2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Er2BleInterface--burnFactoryInfo")
+                        it.burnFactoryInfo(config)
+                    }
+                }
+            }
         }
     }
 
@@ -923,6 +931,14 @@ class BleServiceHelper private constructor() {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er1BleInterface).let {
                         LepuBleLog.d(tag, "it as Er1BleInterface--burnLockFlash")
+                        it.burnLockFlash()
+                    }
+                }
+            }
+            Bluetooth.MODEL_ER2 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Er2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Er2BleInterface--burnLockFlash")
                         it.burnLockFlash()
                     }
                 }

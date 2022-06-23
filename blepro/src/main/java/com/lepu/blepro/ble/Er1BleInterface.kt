@@ -5,14 +5,10 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.ble.data.Er1DataController
-import com.lepu.blepro.ble.data.FactoryConfig
-import com.lepu.blepro.ble.data.LepuDevice
-import com.lepu.blepro.event.EventMsgConst
+import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
-import java.util.*
 import kotlin.experimental.inv
 
 /**
@@ -161,122 +157,57 @@ class Er1BleInterface(model: Int): BleInterface(model) {
             Er1BleCmd.SET_VIBRATE_STATE -> {
                 LepuBleLog.d(tag, "model:$model,SET_SWITCHER_STATE => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetSwitcherState).post(
-                        InterfaceEvent(
-                            model,
-                            true
-                        )
-                    )
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetSwitcherState).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetSwitcherState).post(
-                        InterfaceEvent(
-                            model,
-                            false
-                        )
-                    )
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetSwitcherState).post(InterfaceEvent(model, false))
                 }
             }
 
             Er1BleCmd.RESET -> {
                 LepuBleLog.d(tag, "model:$model,RESET => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1Reset).post(
-                        InterfaceEvent(
-                            model,
-                            true
-                        )
-                    )
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1Reset).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1Reset).post(
-                        InterfaceEvent(
-                            model,
-                            false
-                        )
-                    )
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1Reset).post(InterfaceEvent(model, false))
                 }
             }
 
             Er1BleCmd.FACTORY_RESET -> {
                 LepuBleLog.d(tag, "model:$model,CMD_FACTORY_RESET => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ResetFactory).post(
-                        InterfaceEvent(
-                            model,
-                            true
-                        )
-                    )
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ResetFactory).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ResetFactory).post(
-                        InterfaceEvent(
-                            model,
-                            false
-                        )
-                    )
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ResetFactory).post(InterfaceEvent(model, false))
                 }
             }
 
             Er1BleCmd.FACTORY_RESET_ALL -> {
                 LepuBleLog.d(tag, "model:$model,FACTORY_RESET_ALL => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ResetFactoryAll).post(
-                        InterfaceEvent(
-                            model,
-                            true
-                        )
-                    )
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ResetFactoryAll).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ResetFactoryAll).post(
-                        InterfaceEvent(
-                            model,
-                            false
-                        )
-                    )
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ResetFactoryAll).post(InterfaceEvent(model, false))
                 }
             }
             Er1BleCmd.SET_TIME -> {
                 LepuBleLog.d(tag, "model:$model,SET_TIME => success")
 
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetTime).post(
-                    InterfaceEvent(
-                        model,
-                        true
-                    )
-                )
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetTime).post(InterfaceEvent(model, true))
             }
             Er1BleCmd.BURN_FACTORY_INFO -> {
                 LepuBleLog.d(tag, "model:$model,BURN_FACTORY_INFO => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnFactoryInfo).post(
-                        InterfaceEvent(
-                            model,
-                            true
-                        )
-                    )
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnFactoryInfo).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnFactoryInfo).post(
-                        InterfaceEvent(
-                            model,
-                            false
-                        )
-                    )
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnFactoryInfo).post(InterfaceEvent(model, false))
                 }
             }
             Er1BleCmd.BURN_LOCK_FLASH -> {
                 LepuBleLog.d(tag, "model:$model,BURN_LOCK_FLASH => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnLockFlash).post(
-                        InterfaceEvent(
-                            model,
-                            true
-                        )
-                    )
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnLockFlash).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnLockFlash).post(
-                        InterfaceEvent(
-                            model,
-                            false
-                        )
-                    )
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnLockFlash).post(InterfaceEvent(model, false))
                 }
             }
         }

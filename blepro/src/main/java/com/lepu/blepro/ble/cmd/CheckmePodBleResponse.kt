@@ -160,7 +160,7 @@ class CheckmePodBleResponse{
     class RtWave (var bytes: ByteArray) {
         var len: Int
         var waveByte: ByteArray
-        var wFs: IntArray? = null
+        var wFs: IntArray
 
         init {
             var index = 0
@@ -172,7 +172,7 @@ class CheckmePodBleResponse{
             }
             wFs = IntArray(len)
             for (i in 0 until len) {
-                wFs!![i] = toSignedShort(waveByte[i*2], waveByte[i*2+1]).toInt()
+                wFs[i] = toSignedShort(waveByte[i*2], waveByte[i*2+1]).toInt()
             }
         }
         override fun toString(): String {

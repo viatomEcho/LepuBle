@@ -214,7 +214,7 @@ open class BleService: LifecycleService() {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2 -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_CMRING -> {
                 OxyBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
@@ -778,7 +778,7 @@ open class BleService: LifecycleService() {
 
                 if (isReconnectScan && isContains){
                     stopDiscover()
-                    if (isReconnectByAddress) {
+//                    if (isReconnectByAddress) {
                         // 避免体温计aoj20a在装电池开机后自动关机过程连接上设备，延迟重连
                         if (model == Bluetooth.MODEL_AOJ20A) {
                             GlobalScope.launch {
@@ -790,14 +790,14 @@ open class BleService: LifecycleService() {
                             vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
                             LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
                         }
-                    } else {
-                        if (BleServiceHelper.BleServiceHelper.canReconnectByName(b.model)) {
-                            vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
-                            LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
-                        } else {
-                            LepuBleLog.d(tag, "发现需要重连的设备不可使用蓝牙名重连 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
-                        }
-                    }
+//                    } else {
+//                        if (BleServiceHelper.BleServiceHelper.canReconnectByName(b.model)) {
+//                            vailFace.get(b.model)?.connect(this@BleService, b.device, true, toConnectUpdater)
+//                            LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
+//                        } else {
+//                            LepuBleLog.d(tag, "发现需要重连的设备不可使用蓝牙名重连 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
+//                        }
+//                    }
 
                 } else {
                     if (isReconnectScan) {
@@ -822,6 +822,7 @@ open class BleService: LifecycleService() {
 
         override fun onScanFailed(errorCode: Int) {
             LepuBleLog.e(tag, "scan error: $errorCode")
+            LiveEventBus.get<Int>(EventMsgConst.Discovery.EventDeviceFoundError).post(errorCode)
             if (errorCode == SCAN_FAILED_ALREADY_STARTED) {
                 LepuBleLog.e(tag, "Fails to start scan as BLE scan with the same settings is already started by the app.")
 
@@ -848,10 +849,10 @@ open class BleService: LifecycleService() {
                 LepuBleLog.e(tag, "Fails to start scan as application tries to scan too frequently.")
 
             }
-            if (errorCode == 2){ // 连接超时，去重连扫描时候可能碰到，解决办法重启蓝牙 待验证
+            /*if (errorCode == 2){ // 连接超时，去重连扫描时候可能碰到，解决办法重启蓝牙 待验证
                 LepuBleLog.e(tag, "去重启蓝牙")
                 whenScanFail()
-            }
+            }*/
 
         }
     }

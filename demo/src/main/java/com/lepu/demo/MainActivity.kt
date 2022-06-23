@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -117,13 +116,21 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         //-------------------------er1---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetTime)
             .observe(this, {
-                Toast.makeText(this, "er1 完成时间同步", Toast.LENGTH_SHORT).show()
+                if (it.model == Bluetooth.MODEL_DUOEK) {
+                    Toast.makeText(this, "duoek 完成时间同步", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "er1 完成时间同步", Toast.LENGTH_SHORT).show()
+                }
                 LpBleUtil.getInfo(it.model)
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1Info)
             .observe(this, { event ->
                 (event.data as LepuDevice).let {
-                    Toast.makeText(this, "er1 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    if (event.model == Bluetooth.MODEL_DUOEK) {
+                        Toast.makeText(this, "duoek 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "er1 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    }
                     viewModel._er1Info.value = it
                 }
             })
@@ -479,6 +486,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
         when(state){
             LpBleUtil.State.CONNECTED ->{
+                //
             }
             LpBleUtil.State.DISCONNECTED ->{
                 LpBleUtil.stopRtTask(model)

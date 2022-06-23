@@ -237,8 +237,8 @@ class OxyBleResponse{
         var state: Int
         var len: Int
         var waveByte: ByteArray
-        var wFs: IntArray? = null
-        var wByte: ByteArray? = null
+        var wFs: IntArray
+        var wByte: ByteArray
 
         init {
             spo2 = bytes[0].toUInt().toInt()
@@ -266,8 +266,8 @@ class OxyBleResponse{
                     }
                 }
 
-                wFs!![i] = temp
-                wByte!![i] = (100 - temp/2).toByte()
+                wFs[i] = temp
+                wByte[i] = (100 - temp/2).toByte()
             }
         }
         override fun toString(): String {
@@ -319,32 +319,28 @@ class OxyBleResponse{
         var len: Int
         var rawDataBytes: ByteArray
 
-        var rawDataArray: Array<PpgRawData?>
-        var irArray: Array<Int?>
-        var irByteArray: Array<ByteArray?>
-        var redArray: Array<Int?>
-        var redByteArray: Array<ByteArray?>
-        var motionArray: Array<Int?>
+        var rawDataArray = mutableListOf<PpgRawData>()
+        var irArray : IntArray
+        var irByteArray = mutableListOf<ByteArray>()
+        var redArray : IntArray
+        var redByteArray = mutableListOf<ByteArray>()
+        var motionArray : IntArray
 
         init {
             len = toUInt(bytes.copyOfRange(0, 2))
             rawDataBytes =  bytes.copyOfRange(2, bytes.size)
-            rawDataArray = arrayOfNulls(len)
-            irArray = arrayOfNulls(len)
-            irByteArray = arrayOfNulls(len)
-            redArray = arrayOfNulls(len)
-            redByteArray = arrayOfNulls(len)
-            motionArray = arrayOfNulls(len)
+            irArray = IntArray(len)
+            redArray = IntArray(len)
+            motionArray = IntArray(len)
             for (i in 0  until len ){
                 if (bytes.size < (i * 9) + 11) break
 
                 PpgRawData(bytes.copyOfRange(2 + (i * 9), (i * 9) + 11 )).let {
-                    rawDataArray[i] = it
-
+                    rawDataArray.add(it)
                     irArray[i] = it.ir
-                    irByteArray[i] = it.irBytes
+                    irByteArray.add(it.irBytes)
                     redArray[i] = it.red
-                    redByteArray[i] = it.redBytes
+                    redByteArray.add(it.redBytes)
                     motionArray[i] = it.motion
                 }
             }

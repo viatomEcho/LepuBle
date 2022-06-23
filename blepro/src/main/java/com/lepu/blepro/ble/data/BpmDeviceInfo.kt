@@ -3,14 +3,12 @@ package com.lepu.blepro.ble.data
 import java.text.SimpleDateFormat
 import java.util.*
 
-class BpmDeviceInfo {
-    var name: String
+class BpmDeviceInfo(val bytes: ByteArray, val name: String) {
     var mainVersion: Int
     var secondVersion: Int
     var lastDate: Date
 
-    constructor(bytes: ByteArray, deviceName: String) {
-        this.name = deviceName
+    init {
         mainVersion = bytes[5].toInt()
         secondVersion = bytes[6].toInt()
 
