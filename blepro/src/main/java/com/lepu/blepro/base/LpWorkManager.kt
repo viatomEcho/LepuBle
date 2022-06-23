@@ -14,7 +14,7 @@ import android.text.TextUtils
 import android.util.SparseArray
 import androidx.core.util.isEmpty
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.BleServiceHelper
+import com.lepu.blepro.ext.BleServiceHelper
 import com.lepu.blepro.ble.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth

@@ -684,6 +684,10 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         getInterface(model)?.getInfo()
     }
+    fun oxyGetInfo(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.getInfo()
+    }
 
 
     /**
@@ -1437,6 +1441,12 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    fun oxyReadFile(model: Int, fileName: String) {
+        if (!checkService()) return
+        getInterface(model)?.let {
+            it.readFile("", fileName, 0)
+        }
+    }
     /**
      * 获取实时波形（O2Ring，BabyO2）
      */
@@ -1465,6 +1475,22 @@ class BleServiceHelper private constructor() {
         getInterface(model)?.let { it1 ->
             (it1 as OxyBleInterface).let {
                 it.getPpgRT()
+            }
+        }
+    }
+    fun oxyUpdateSetting(model: Int, type: String, value: Any) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as OxyBleInterface).let {
+                it.updateSetting(type, value)
+            }
+        }
+    }
+    fun oxyUpdateSetting(model: Int, type: Array<String>, value: IntArray) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as OxyBleInterface).let {
+                it.updateSetting(type, value)
             }
         }
     }

@@ -8,7 +8,9 @@ import com.lepu.blepro.ble.cmd.BleCRC
 import com.lepu.blepro.ble.cmd.OxyBleCmd
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.LepuDevice
+import com.lepu.blepro.ble.data.OxyBleFile
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.oxy.*
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toHex
 import com.lepu.blepro.utils.toUInt
@@ -31,6 +33,11 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
     var isPiRt: Boolean = true
 
+    private var deviceInfo = DeviceInfo()
+    private var boxInfo = BoxInfo()
+    private var wave = RtWave()
+    private var param = RtParam()
+    private var oxyFile = OxyFile()
 
     /**
      * 是否需要发送实时指令，不会停止实时任务
@@ -123,8 +130,21 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
             OxyBleCmd.OXY_CMD_BOX_INFO -> {
                 clearTimeout()
-                val boxInfo = LepuDevice(response.content.copyOfRange(1, response.len))
-                LepuBleLog.d(tag, "model:$model, OXY_CMD_BOX_INFO => success $boxInfo")
+                val info = LepuDevice(response.content.copyOfRange(1, response.len))
+                LepuBleLog.d(tag, "model:$model, OXY_CMD_BOX_INFO => success $info")
+
+                boxInfo.hwVersion = info.hwV!!
+                boxInfo.swVersion = info.fwV!!
+                boxInfo.btlVersion = info.btlV!!
+                boxInfo.branchCode = info.branchCode!!
+                boxInfo.fileVer = info.fileV!!
+                boxInfo.deviceType = info.deviceType!!
+                boxInfo.spcpVer = info.protocolV!!
+                boxInfo.curTime = info.curTime!!
+                boxInfo.protocolMaxLen = info.protocolMaxLen!!
+                boxInfo.snLen = info.snLen!!
+                boxInfo.sn = info.sn!!
+
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBoxInfo).post(InterfaceEvent(model, boxInfo))
             }
 
@@ -138,7 +158,39 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                     runRtImmediately = false
                 }
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success $info")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo).post(InterfaceEvent(model, info))
+
+                deviceInfo.region = info.region
+                deviceInfo.model = info.model
+                deviceInfo.hwVersion = info.hwVersion
+                deviceInfo.swVersion = info.swVersion
+                deviceInfo.btlVersion = info.btlVersion
+                deviceInfo.pedTar = info.pedTar
+                deviceInfo.sn = info.sn
+                deviceInfo.curTime = info.curTime
+                deviceInfo.batteryState = info.batteryState
+                deviceInfo.batteryValue = info.batteryValue
+                deviceInfo.oxiThr = info.oxiThr
+                deviceInfo.motor = info.motor
+                deviceInfo.mode = info.mode
+                deviceInfo.fileList = info.fileList
+                deviceInfo.oxiSwitch = info.oxiSwitch
+                deviceInfo.hrSwitch = info.hrSwitch
+                deviceInfo.hrLowThr = info.hrLowThr
+                deviceInfo.hrHighThr = info.hrHighThr
+                deviceInfo.fileVer = info.fileVer
+                deviceInfo.spcpVer = info.spcpVer
+                deviceInfo.curState = info.curState
+                deviceInfo.lightingMode = info.lightingMode
+                deviceInfo.lightStr = info.lightStr
+                deviceInfo.branchCode = info.branchCode
+                deviceInfo.spo2Switch = info.spo2Switch
+                deviceInfo.buzzer = info.buzzer
+                deviceInfo.mtSwitch = info.mtSwitch
+                deviceInfo.mtThr = info.mtThr
+                deviceInfo.ivSwitch = info.ivSwitch
+                deviceInfo.ivThr = info.ivThr
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo).post(InterfaceEvent(model, deviceInfo))
 
             }
 
@@ -154,8 +206,18 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
                 val rtWave = OxyBleResponse.RtWave(response.content)
 
+                wave.spo2 = rtWave.spo2
+                wave.pr = rtWave.pr
+                wave.battery = rtWave.battery
+                wave.batteryState = rtWave.batteryState
+                wave.pi = rtWave.pi.div(10f)
+                wave.state = rtWave.state
+                wave.len = rtWave.len
+                wave.waveByte = rtWave.waveByte
+                wave.wFs = rtWave.wFs
+
                 //发送实时数据
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtData).post(InterfaceEvent(model, rtWave))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtData).post(InterfaceEvent(model, wave))
 
             }
 
@@ -169,7 +231,22 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 }
                 val rtParam = OxyBleResponse.RtParam(response.content)
                 //发送实时数据
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamData).post(InterfaceEvent(model, rtParam))
+
+                param.spo2 = rtParam.spo2
+                param.pr = rtParam.pr
+                param.steps = rtParam.steps
+                param.battery = rtParam.battery
+                param.batteryState = rtParam.batteryState
+                param.vector = rtParam.vector
+                param.pi = rtParam.pi.div(10f)
+                param.state = rtParam.state
+                param.countDown = rtParam.countDown
+                param.invalidIvState = rtParam.invalidIvState
+                param.spo2IvState = rtParam.spo2IvState
+                param.hrIvState = rtParam.hrIvState
+                param.vectorIvState = rtParam.vectorIvState
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamData).post(InterfaceEvent(model, param))
 
             }
             OxyBleCmd.OXY_CMD_READ_START -> {
@@ -227,7 +304,39 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 curFileName = null // 一定要放在发通知之前
 
                 curFile?.let {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileComplete).post(InterfaceEvent(model, it))
+                    oxyFile.data.clear()
+                    val tempFile = OxyBleFile(it.fileContent)
+
+                    oxyFile.version = tempFile.version
+                    oxyFile.operationMode = tempFile.operationMode
+                    oxyFile.year = tempFile.year
+                    oxyFile.month = tempFile.month
+                    oxyFile.day = tempFile.day
+                    oxyFile.hour = tempFile.hour
+                    oxyFile.minute = tempFile.minute
+                    oxyFile.second = tempFile.second
+                    oxyFile.startTime = tempFile.startTime
+                    oxyFile.size = tempFile.size
+                    oxyFile.recordingTime = tempFile.recordingTime
+                    oxyFile.asleepTime = tempFile.asleepTime
+                    oxyFile.avgSpo2 = tempFile.avgSpo2
+                    oxyFile.minSpo2 = tempFile.minSpo2
+                    oxyFile.dropsTimes3Percent = tempFile.dropsTimes3Percent
+                    oxyFile.dropsTimes4Percent = tempFile.dropsTimes4Percent
+                    oxyFile.asleepTimePercent = tempFile.asleepTimePercent
+                    oxyFile.durationTime90Percent = tempFile.durationTime90Percent
+                    oxyFile.dropsTimes90Percent = tempFile.dropsTimes90Percent
+                    oxyFile.o2Score = tempFile.o2Score
+                    oxyFile.stepCounter = tempFile.stepCounter
+                    for (i in tempFile.data) {
+                        val data = oxyFile.EachData()
+                        data.spo2 = i.spo2
+                        data.pr = i.pr
+                        data.vector = i.vector
+                        oxyFile.data.add(data)
+                    }
+
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileComplete).post(InterfaceEvent(model, oxyFile))
                 } ?: LepuBleLog.d(tag, "model:$model,  curFile error!!")
 
                 curFile = null
