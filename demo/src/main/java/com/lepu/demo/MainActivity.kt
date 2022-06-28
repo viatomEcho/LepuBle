@@ -395,7 +395,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             })
     }
     private fun needPermission(){
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PermissionX.init(this)
                 .permissions(
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -433,7 +433,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                             viewModel._bleEnable.value = true
                         }
                 }
-        } else {*/
+        } else {
             PermissionX.init(this)
                 .permissions(
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -468,7 +468,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                             viewModel._bleEnable.value = true
                         }
                 }
-//        }
+        }
 
     }
 
