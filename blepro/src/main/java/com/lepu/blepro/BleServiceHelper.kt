@@ -106,6 +106,7 @@ class BleServiceHelper private constructor() {
         }*/
         LpBleInterfaceManager.application = application
         LpBleInterfaceManager.reInitBle()
+        initCurrentFace()
         return this
     }
 
