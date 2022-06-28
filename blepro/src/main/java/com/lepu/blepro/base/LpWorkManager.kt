@@ -673,7 +673,7 @@ object LpWorkManager {
 
                 if (isReconnectScan && isContains){
                     stopDiscover()
-                    if (isReconnectByAddress) {
+//                    if (isReconnectByAddress) {
                         // 避免体温计aoj20a在装电池开机后自动关机过程连接上设备，延迟重连
                         if (model == Bluetooth.MODEL_AOJ20A) {
                             GlobalScope.launch {
@@ -685,14 +685,14 @@ object LpWorkManager {
                             vailFace.get(b.model)?.connect(application!!, b.device, true, toConnectUpdater)
                             LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
                         }
-                    } else {
-                        if (BleServiceHelper.BleServiceHelper.canReconnectByName(b.model)) {
-                            vailFace.get(b.model)?.connect(application!!, b.device, true, toConnectUpdater)
-                            LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
-                        } else {
-                            LepuBleLog.d(tag, "发现需要重连的设备不可使用蓝牙名重连 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
-                        }
-                    }
+//                    } else {
+//                        if (BleServiceHelper.BleServiceHelper.canReconnectByName(b.model)) {
+//                            vailFace.get(b.model)?.connect(application!!, b.device, true, toConnectUpdater)
+//                            LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
+//                        } else {
+//                            LepuBleLog.d(tag, "发现需要重连的设备不可使用蓝牙名重连 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
+//                        }
+//                    }
 
                 } else {
                     if (isReconnectScan) {
