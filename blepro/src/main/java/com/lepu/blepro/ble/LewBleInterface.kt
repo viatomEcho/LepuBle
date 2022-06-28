@@ -7,6 +7,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.HexString.trimStr
@@ -84,6 +85,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: LewBleResponse.BleResponse) {
+        LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseContent).post(response.bytes)
         when(response.cmd) {
             LewBleCmd.SET_TIME -> {
                 LepuBleLog.d(tag, "model:$model,SET_TIME => success")
@@ -116,9 +118,9 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 if (response.len == 0) return
                 LepuBleLog.d(tag, "model:$model,BOUND_DEVICE => success")
                 if (response.content[0].toInt() == 0) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewBoundDevice).post(InterfaceEvent(model, true))
-                } else {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewBoundDevice).post(InterfaceEvent(model, false))
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewBoundDevice).post(InterfaceEvent(model, true))
                 }
             }
             LewBleCmd.UNBOUND_DEVICE -> {
