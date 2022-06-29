@@ -255,9 +255,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (event.data as Er2FileList).let {
                     binding.info.text = it.toString()
                     for (fileName in it.fileNames) {
-                        if (fileName.contains("R")) {
+//                        if (fileName.contains("R")) {
                             fileNames.add(fileName)
-                        }
+//                        }
                     }
                     Toast.makeText(context, "er2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 }
@@ -271,10 +271,16 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileComplete)
             .observe(this, { event ->
                 (event.data as Er2File).let {
-                    val data = Er1EcgFile(it.content)
-                    binding.info.text = "$data"
+                    if (it.fileName.contains("R")) {
+                        val data = Er1EcgFile(it.content)
+                        binding.info.text = "$data"
+                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                    } else {
+                        val data = Er2AnalysisFile(it.content)
+                        binding.info.text = "$data"
+                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                    }
                     setReceiveCmd(it.content)
-                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
                         readFile()
