@@ -36,12 +36,12 @@ class Er2AnalysisFile(val bytes: ByteArray) {
     }
 
     class AnalysisResult(val bytes: ByteArray) {
-        var result: Er2EcgDiagnosis
-        var hr: Int
-        var qrs: Int
-        var pvcs: Int
-        var qtc: Int
-        var st: Short
+        var result: Er2EcgDiagnosis  // 诊断结果
+        var hr: Int                  // 心率 单位：bpm
+        var qrs: Int                 // QRS 单位：ms
+        var pvcs: Int                // PVC个数
+        var qtc: Int                 // QTc 单位：ms
+        var st: Short                // ST（以ST*100存储），单位为mV
         // reserved 18
         init {
             var index = 0
