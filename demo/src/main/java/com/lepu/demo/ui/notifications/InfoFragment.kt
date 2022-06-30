@@ -114,6 +114,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         mainViewModel.lemInfo.observe(viewLifecycleOwner, {
             binding.info.text = it.toString()
         })
+        mainViewModel.lewInfo.observe(viewLifecycleOwner, {
+            binding.info.text = it.toString()
+        })
 
         // 公共方法测试
         // 获取设备信息

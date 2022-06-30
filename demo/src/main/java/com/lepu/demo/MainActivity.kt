@@ -21,6 +21,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ble.data.lew.DeviceInfo
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
@@ -156,9 +157,9 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewDeviceInfo)
             .observe(this, { event ->
-                (event.data as LepuDevice).let {
+                (event.data as DeviceInfo).let {
                     Toast.makeText(this, "lew 获取设备信息成功", Toast.LENGTH_SHORT).show()
-                    viewModel._er1Info.value = it
+                    viewModel._lewInfo.value = it
                 }
             })
         //-------------------------fhr---------------------------

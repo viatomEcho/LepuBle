@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ble.data.lew.DeviceInfo
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.O2RING_MODEL
@@ -114,6 +115,9 @@ class MainViewModel: ViewModel() {
     val pc300Info: LiveData<Pc300DeviceInfo> = _pc300Info
     val _lemInfo = MutableLiveData<LemBleResponse.DeviceInfo>()
     val lemInfo: LiveData<LemBleResponse.DeviceInfo> = _lemInfo
+
+    val _lewInfo = MutableLiveData<DeviceInfo>()
+    val lewInfo: LiveData<DeviceInfo> = _lewInfo
 
     /**
      * 当前蓝牙

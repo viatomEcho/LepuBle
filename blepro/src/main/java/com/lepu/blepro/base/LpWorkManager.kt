@@ -717,6 +717,7 @@ object LpWorkManager {
 
         override fun onScanFailed(errorCode: Int) {
             LepuBleLog.e(tag, "scan error: $errorCode")
+            LiveEventBus.get<Int>(EventMsgConst.Discovery.EventDeviceFoundError).post(errorCode)
             if (errorCode == SCAN_FAILED_ALREADY_STARTED) {
                 LepuBleLog.e(tag, "Fails to start scan as BLE scan with the same settings is already started by the app.")
 
