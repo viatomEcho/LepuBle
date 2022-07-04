@@ -254,6 +254,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $data"
             binding.sendCmd.text = cmdStr
         }
+        binding.lewGetInfo.setOnClickListener {
+            LpBleUtil.getInfo(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
         // 绑定
         binding.lewBound.setOnClickListener {
             LpBleUtil.lewBoundDevice(Constant.BluetoothConfig.currentModel[0], true)
@@ -2274,6 +2282,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this) {
                 binding.responseCmd.text = "receive : ${bytesToHex(it)}"
 
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewDeviceInfo)
+            .observe(this) {
+                val data = it.data as DeviceInfo
+                binding.content.text = "$data"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewBoundDevice)
             .observe(this) {

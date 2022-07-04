@@ -87,4 +87,7 @@ dependencies {
     implementation "com.google.code.gson:gson:2.8.7"
     implementation 'commons-io:commons-io:2.6'
 
+    //scan code
+    implementation 'me.dm7.barcodescanner:zxing:1.9.13'
+
 }

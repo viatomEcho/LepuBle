@@ -408,6 +408,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             PermissionX.init(this)
                 .permissions(
                     Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.CAMERA,
                     Manifest.permission.BLUETOOTH,
                     Manifest.permission.BLUETOOTH_SCAN,
                     Manifest.permission.BLUETOOTH_CONNECT,
@@ -446,6 +447,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             PermissionX.init(this)
                 .permissions(
                     Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.CAMERA,
                     Manifest.permission.BLUETOOTH,
                     Manifest.permission.BLUETOOTH_ADMIN
                 )

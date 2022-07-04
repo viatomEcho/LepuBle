@@ -12,14 +12,12 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.lew.EcgList
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.ByteUtils.toSignedShort
 import com.lepu.blepro.utils.bytesToHex
-import com.lepu.demo.MainViewModel
-import com.lepu.demo.R
-import com.lepu.demo.UpdateActivity
-import com.lepu.demo.WaveEcgActivity
+import com.lepu.demo.*
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.databinding.FragmentInfoBinding
@@ -190,6 +188,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             intent.putExtra("bleName", mainViewModel._curBluetooth.value?.deviceName)
             startActivity(intent)
         }
+        binding.scanCode.setOnClickListener {
+            startActivity(Intent(context, ScanCodeActivity::class.java))
+        }
 
         // 复位
         binding.reset.setOnClickListener {
@@ -220,6 +221,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
     }
 
     private fun initEvent(){
+        LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseContent)
+            .observe(this) {
+                binding.responseCmd.text = "receive : ${bytesToHex(it)}"
+            }
         //--------------------------------er1 duoek-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1FileList)
             .observe(this, { event ->

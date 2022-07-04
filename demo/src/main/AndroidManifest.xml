@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.lepu.demo">
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -27,6 +28,7 @@
         </activity>
         <activity android:name=".WaveEcgActivity"/>
         <activity android:name=".UpdateActivity"/>
+        <activity android:name=".ScanCodeActivity"/>
         <service  android:name=".dfu.DfuService"
             android:exported="true">
             <intent-filter>
