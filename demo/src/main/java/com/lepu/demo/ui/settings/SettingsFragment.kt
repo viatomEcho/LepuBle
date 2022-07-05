@@ -16,6 +16,7 @@ import com.lepu.blepro.ble.data.FscaleUserInfo
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.ap20.*
 import com.lepu.blepro.objs.Bluetooth
@@ -233,6 +234,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         // 时间
         binding.lewGetTime.setOnClickListener {
             LpBleUtil.lewGetTime(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -245,30 +249,53 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             data.formatHour = state
             data.formatDay = state
             LpBleUtil.lewSetTime(Constant.BluetoothConfig.currentModel[0], data)
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $data"
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewGetInfo.setOnClickListener {
+            LpBleUtil.getInfo(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
         // 绑定
         binding.lewBound.setOnClickListener {
             LpBleUtil.lewBoundDevice(Constant.BluetoothConfig.currentModel[0], true)
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
         // 解绑
         binding.lewUnbound.setOnClickListener {
             LpBleUtil.lewBoundDevice(Constant.BluetoothConfig.currentModel[0], false)
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
         // 获取电量
         binding.lewGetBattery.setOnClickListener {
             LpBleUtil.lewGetBattery(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
         // 系统配置（语言、单位、翻腕亮屏、左右手）
         binding.lewGetSystemSetting.setOnClickListener {
             LpBleUtil.lewGetSystemSetting(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -294,11 +321,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             setting.hand = LewBleCmd.Hand.RIGHT
             Log.d("test12345", "lewSetSystemSetting $setting")
             LpBleUtil.lewSetSystemSetting(Constant.BluetoothConfig.currentModel[0], setting)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $setting"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetLanguage.setOnClickListener {
             LpBleUtil.lewGetLanguage(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -309,11 +342,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
             Log.d("test12345", "lewSetLanguage $state")
             LpBleUtil.lewSetLanguage(Constant.BluetoothConfig.currentModel[0], state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $state"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetUnit.setOnClickListener {
             LpBleUtil.lewGetUnit(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -336,11 +375,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             unit.tempUnit = state
             Log.d("test12345", "lewSetUnit $unit")
             LpBleUtil.lewSetUnit(Constant.BluetoothConfig.currentModel[0], unit)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $unit"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetHandRaise.setOnClickListener {
             LpBleUtil.lewGetHandRaise(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -354,11 +399,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             handRaise.stopMin = 0
             Log.d("test12345", "lewSetHandRaise $handRaise")
             LpBleUtil.lewSetHandRaise(Constant.BluetoothConfig.currentModel[0], handRaise)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $handRaise"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetLrHand.setOnClickListener {
             LpBleUtil.lewGetLrHand(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -369,18 +420,27 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
             Log.d("test12345", "lewSetLrHand $state")
             LpBleUtil.lewSetLrHand(Constant.BluetoothConfig.currentModel[0], state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $state"
             binding.sendCmd.text = cmdStr
         }
         // 寻找设备
         binding.lewFindDevice.setOnClickListener {
             LpBleUtil.lewFindDevice(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
         // 勿扰模式
         binding.lewGetNoDisturb.setOnClickListener {
             LpBleUtil.lewGetNoDisturbMode(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -404,12 +464,18 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             mode.items.add(item2)
             Log.d("test12345", "lewSetNoDisturb $mode")
             LpBleUtil.lewSetNoDisturbMode(Constant.BluetoothConfig.currentModel[0], mode)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $mode"
             binding.sendCmd.text = cmdStr
         }
         // app通知开关
         binding.lewGetAppSwitch.setOnClickListener {
             LpBleUtil.lewGetAppSwitch(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -447,7 +513,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             appSwitch.other = switchState
             Log.d("test12345", "lewSetAppSwitch $appSwitch")
             LpBleUtil.lewSetAppSwitch(Constant.BluetoothConfig.currentModel[0], appSwitch)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $appSwitch"
             binding.sendCmd.text = cmdStr
         }
         // 消息通知
@@ -463,7 +532,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             noti.info = phone
             Log.d("test12345", "lewPhoneNoti $noti")
             LpBleUtil.lewSendNotification(Constant.BluetoothConfig.currentModel[0], noti)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $noti"
             binding.sendCmd.text = cmdStr
         }
         binding.lewMessageNoti.setOnClickListener {
@@ -479,7 +551,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             noti.info = mess
             Log.d("test12345", "lewMessageNoti $noti")
             LpBleUtil.lewSendNotification(Constant.BluetoothConfig.currentModel[0], noti)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $noti"
             binding.sendCmd.text = cmdStr
         }
         binding.lewOtherNoti.setOnClickListener {
@@ -494,12 +569,18 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             noti.info = other
             Log.d("test12345", "lewOtherNoti $noti")
             LpBleUtil.lewSendNotification(Constant.BluetoothConfig.currentModel[0], noti)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $noti"
             binding.sendCmd.text = cmdStr
         }
         // 设备模式
         binding.lewGetDeviceMode.setOnClickListener {
             LpBleUtil.lewGetDeviceMode(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -510,12 +591,18 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
             Log.d("test12345", "lewSetDeviceMode $state")
             LpBleUtil.lewSetDeviceMode(Constant.BluetoothConfig.currentModel[0], state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $state"
             binding.sendCmd.text = cmdStr
         }
         // 闹钟
         binding.lewGetAlarmInfo.setOnClickListener {
             LpBleUtil.lewGetAlarmClock(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -564,11 +651,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             info.items.add(item2)
             Log.d("test12345", "lewSetAlarmInfo $info")
             LpBleUtil.lewSetAlarmClock(Constant.BluetoothConfig.currentModel[0], info)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $info"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetPhoneSwitch.setOnClickListener {
             LpBleUtil.lewGetPhoneSwitch(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -580,11 +673,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             phoneSwitch.message = switchState
             Log.d("test12345", "lewSetPhoneSwitch $phoneSwitch")
             LpBleUtil.lewSetPhoneSwitch(Constant.BluetoothConfig.currentModel[0], phoneSwitch)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $phoneSwitch"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetMedicineRemind.setOnClickListener {
             LpBleUtil.lewGetMedicineRemind(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -634,11 +733,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             remind.items.add(item2)
             Log.d("test12345", "lewSetMedicineRemind $remind")
             LpBleUtil.lewSetMedicineRemind(Constant.BluetoothConfig.currentModel[0], remind)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $remind"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetMeasureSetting.setOnClickListener {
             LpBleUtil.lewGetMeasureSetting(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -687,11 +792,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             setting.hrDetect = hrDetect
             Log.d("test12345", "lewSetMeasureSetting $setting")
             LpBleUtil.lewSetMeasureSetting(Constant.BluetoothConfig.currentModel[0], setting)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $setting"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetSportTarget.setOnClickListener {
             LpBleUtil.lewGetSportTarget(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -704,11 +815,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             sportTarget.sportTime = 60
             Log.d("test12345", "lewSetSportTarget $sportTarget")
             LpBleUtil.lewSetSportTarget(Constant.BluetoothConfig.currentModel[0], sportTarget)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $sportTarget"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetTargetRemind.setOnClickListener {
             LpBleUtil.lewGetTargetRemind(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -716,11 +833,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             switchState = !switchState
             Log.d("test12345", "lewSetTargetRemind $switchState")
             LpBleUtil.lewSetTargetRemind(Constant.BluetoothConfig.currentModel[0], switchState)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $switchState"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetSittingRemind.setOnClickListener {
             LpBleUtil.lewGetSittingRemind(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -749,11 +872,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             sittingRemind.stopMin = 30
             Log.d("test12345", "lewSetSittingRemind $sittingRemind")
             LpBleUtil.lewSetSittingRemind(Constant.BluetoothConfig.currentModel[0], sittingRemind)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $sittingRemind"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetHrDetect.setOnClickListener {
             LpBleUtil.lewGetHrDetect(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -764,11 +893,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             detect.interval = 2
             Log.d("test12345", "lewSetHrDetect $detect")
             LpBleUtil.lewSetHrDetect(Constant.BluetoothConfig.currentModel[0], detect)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $detect"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetOxyDetect.setOnClickListener {
             LpBleUtil.lewGetOxyDetect(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -779,11 +914,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             detect.interval = 5
             Log.d("test12345", "lewSetOxyDetect $detect")
             LpBleUtil.lewSetOxyDetect(Constant.BluetoothConfig.currentModel[0], detect)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $detect"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetUserInfo.setOnClickListener {
             LpBleUtil.lewGetUserInfo(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -799,11 +940,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             info.gender = 0
             Log.d("test12345", "lewSetUserInfo $info")
             LpBleUtil.lewSetUserInfo(Constant.BluetoothConfig.currentModel[0], info)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $info"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetPhonebook.setOnClickListener {
             LpBleUtil.lewGetPhoneBook(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -830,11 +977,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             list.items.add(item3)
             Log.d("test12345", "lewSetPhonebook $list")
             LpBleUtil.lewSetPhoneBook(Constant.BluetoothConfig.currentModel[0], list)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $list"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetSos.setOnClickListener {
             LpBleUtil.lewGetSosContact(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -864,20 +1017,32 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             sos.items.add(item2)
             Log.d("test12345", "lewSetSos $sos")
             LpBleUtil.lewSetSosContact(Constant.BluetoothConfig.currentModel[0], sos)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $sos"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetDial.setOnClickListener {
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
         binding.lewSetDial.setOnClickListener {
             // ???
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetSecondScreen.setOnClickListener {
             LpBleUtil.lewGetSecondScreen(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -894,11 +1059,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             screen.peripherals = switchState
             Log.d("test12345", "lewSetSecondScreen $screen")
             LpBleUtil.lewSetSecondScreen(Constant.BluetoothConfig.currentModel[0], screen)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $screen"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetCards.setOnClickListener {
             LpBleUtil.lewGetCards(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -906,36 +1077,57 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             val cards = intArrayOf(LewBleCmd.Cards.HR, LewBleCmd.Cards.TARGET, LewBleCmd.Cards.WEATHER)
             Log.d("test12345", "lewSetCards ${Arrays.toString(cards)}")
             LpBleUtil.lewSetCards(Constant.BluetoothConfig.currentModel[0], cards)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n ${Arrays.toString(cards)}"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetSportData.setOnClickListener {
             LpBleUtil.lewGetFileList(Constant.BluetoothConfig.currentModel[0], LewBleCmd.ListType.SPORT, 0)
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetEcgData.setOnClickListener {
             LpBleUtil.lewGetFileList(Constant.BluetoothConfig.currentModel[0], LewBleCmd.ListType.ECG, 0)
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetOxyData.setOnClickListener {
             LpBleUtil.lewGetFileList(Constant.BluetoothConfig.currentModel[0], LewBleCmd.ListType.OXY, 0)
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetHrData.setOnClickListener {
             LpBleUtil.lewGetFileList(Constant.BluetoothConfig.currentModel[0], LewBleCmd.ListType.HR, 0)
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetSleepData.setOnClickListener {
             LpBleUtil.lewGetFileList(Constant.BluetoothConfig.currentModel[0], LewBleCmd.ListType.SLEEP, 0)
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetHrThreshold.setOnClickListener {
             LpBleUtil.lewGetHrThreshold(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -946,12 +1138,18 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             threshold.threshold = 100
             Log.d("test12345", "lewSetHrThreshold $threshold")
             LpBleUtil.lewSetHrThreshold(Constant.BluetoothConfig.currentModel[0], threshold)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $threshold"
             binding.sendCmd.text = cmdStr
         }
         binding.lewGetOxyThreshold.setOnClickListener {
             LpBleUtil.lewGetOxyThreshold(Constant.BluetoothConfig.currentModel[0])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])}"
             binding.sendCmd.text = cmdStr
         }
         binding.lewSetOxyThreshold.setOnClickListener {
@@ -961,7 +1159,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             threshold.threshold = 90
             Log.d("test12345", "lewSetOxyThreshold $threshold")
             LpBleUtil.lewSetOxyThreshold(Constant.BluetoothConfig.currentModel[0], threshold)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $threshold"
             binding.sendCmd.text = cmdStr
         }
 
@@ -1715,7 +1916,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        // ---------------------------lem---------------------------
+        // ---------------------------bpm---------------------------
         binding.bpmGetState.setOnClickListener {
             if (LpBleUtil.isRtStop(Constant.BluetoothConfig.currentModel[0])) {
                 LpBleUtil.startRtTask()
@@ -2078,6 +2279,16 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.content.text = data.toString()
             })
         //------------------------------lew-------------------------------------
+        LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseContent)
+            .observe(this) {
+                binding.responseCmd.text = "receive : ${bytesToHex(it)}"
+
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewDeviceInfo)
+            .observe(this) {
+                val data = it.data as DeviceInfo
+                binding.content.text = "$data"
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewBoundDevice)
             .observe(this) {
                 val data = it.data as Boolean
@@ -2091,7 +2302,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewBatteryInfo)
             .observe(this) {
                 val data = it.data as BatteryInfo
-                setReceiveCmd(data.bytes)
                 binding.content.text = data.toString()
                 Toast.makeText(context, "lew手表 获取电量成功", Toast.LENGTH_SHORT).show()
             }

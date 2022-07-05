@@ -1,4 +1,4 @@
-apply plugin: 'maven'
+//apply plugin: 'maven'
 
 //def定义的变量才会在project中
 

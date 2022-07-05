@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -20,6 +21,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ble.data.lew.DeviceInfo
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
@@ -155,9 +157,9 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewDeviceInfo)
             .observe(this, { event ->
-                (event.data as LepuDevice).let {
+                (event.data as DeviceInfo).let {
                     Toast.makeText(this, "lew 获取设备信息成功", Toast.LENGTH_SHORT).show()
-                    viewModel._er1Info.value = it
+                    viewModel._lewInfo.value = it
                 }
             })
         //-------------------------fhr---------------------------
@@ -402,10 +404,11 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             })
     }
     private fun needPermission(){
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PermissionX.init(this)
                 .permissions(
                     Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.CAMERA,
                     Manifest.permission.BLUETOOTH,
                     Manifest.permission.BLUETOOTH_SCAN,
                     Manifest.permission.BLUETOOTH_CONNECT,
@@ -440,10 +443,11 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                             viewModel._bleEnable.value = true
                         }
                 }
-        } else {*/
+        } else {
             PermissionX.init(this)
                 .permissions(
                     Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.CAMERA,
                     Manifest.permission.BLUETOOTH,
                     Manifest.permission.BLUETOOTH_ADMIN
                 )
@@ -475,7 +479,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                             viewModel._bleEnable.value = true
                         }
                 }
-//        }
+        }
 
     }
 

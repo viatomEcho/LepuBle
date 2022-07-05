@@ -12,15 +12,13 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.lew.EcgList
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.pc102.*
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.ByteUtils.toSignedShort
 import com.lepu.blepro.utils.bytesToHex
-import com.lepu.demo.MainViewModel
-import com.lepu.demo.R
-import com.lepu.demo.UpdateActivity
-import com.lepu.demo.WaveEcgActivity
+import com.lepu.demo.*
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.databinding.FragmentInfoBinding
@@ -121,6 +119,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         mainViewModel.lemInfo.observe(viewLifecycleOwner, {
             binding.info.text = it.toString()
         })
+        mainViewModel.lewInfo.observe(viewLifecycleOwner, {
+            binding.info.text = it.toString()
+        })
 
         // 公共方法测试
         // 获取设备信息
@@ -194,6 +195,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             intent.putExtra("bleName", mainViewModel._curBluetooth.value?.deviceName)
             startActivity(intent)
         }
+        binding.scanCode.setOnClickListener {
+            startActivity(Intent(context, ScanCodeActivity::class.java))
+        }
 
         // 复位
         binding.reset.setOnClickListener {
@@ -224,6 +228,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
     }
 
     private fun initEvent(){
+        LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseContent)
+            .observe(this) {
+                binding.responseCmd.text = "receive : ${bytesToHex(it)}"
+            }
         //--------------------------------er1 duoek-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1FileList)
             .observe(this, { event ->
@@ -262,9 +270,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (event.data as Er2FileList).let {
                     binding.info.text = it.toString()
                     for (fileName in it.fileNames) {
-                        if (fileName.contains("R")) {
+//                        if (fileName.contains("R")) {
                             fileNames.add(fileName)
-                        }
+//                        }
                     }
                     Toast.makeText(context, "er2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 }
@@ -278,10 +286,16 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileComplete)
             .observe(this, { event ->
                 (event.data as Er2File).let {
-                    val data = Er1EcgFile(it.content)
-                    binding.info.text = "$data"
+                    if (it.fileName.contains("R")) {
+                        val data = Er1EcgFile(it.content)
+                        binding.info.text = "$data"
+                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                    } else {
+                        val data = Er2AnalysisFile(it.content)
+                        binding.info.text = "$data"
+                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                    }
                     setReceiveCmd(it.content)
-                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
                         readFile()
