@@ -15,6 +15,7 @@ import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.FscaleUserInfo
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.lew.*
+import com.lepu.blepro.ble.data.lew.DeviceInfo
 import com.lepu.blepro.ble.data.lew.TimeData
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent

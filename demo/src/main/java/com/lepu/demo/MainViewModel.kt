@@ -121,8 +121,8 @@ class MainViewModel: ViewModel() {
     val _lemInfo = MutableLiveData<LemBleResponse.DeviceInfo>()
     val lemInfo: LiveData<LemBleResponse.DeviceInfo> = _lemInfo
 
-    val _lewInfo = MutableLiveData<DeviceInfo>()
-    val lewInfo: LiveData<DeviceInfo> = _lewInfo
+    val _lewInfo = MutableLiveData<com.lepu.blepro.ble.data.lew.DeviceInfo>()
+    val lewInfo: LiveData<com.lepu.blepro.ble.data.lew.DeviceInfo> = _lewInfo
 
     /**
      * 当前蓝牙
