@@ -25,6 +25,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 object LpWorkManager {
 
@@ -661,6 +664,9 @@ object LpWorkManager {
 
                 }
 
+            LepuBleLog.d(tag, "!filterResult(b) == ${!filterResult(b)}")
+            LepuBleLog.d(tag, "scanModel == ${Arrays.toString(scanModel)}")
+
             if (BluetoothController.addDevice(b)) {
                 LepuBleLog.d(tag, "model = ${b.model}, isReconnecting::$isReconnectScan, b= ${b.name}, recName = ${reconnectDeviceName.joinToString()}, " +
                         "toConnectUpdater = $toConnectUpdater,  isReconnectByAddress = $isReconnectByAddress ,  recAddress:${reconnectDeviceAddress.joinToString()}")
@@ -755,7 +761,7 @@ object LpWorkManager {
      * （singleScanMode = false） model 属于套装的设备被过滤出
      */
     private fun filterResult(b: Bluetooth): Boolean{
-        LepuBleLog.d(tag, "filterResult scanModel:${scanModel?.joinToString()}, b.model:${b.model} b.name:${b.name} b.address:${b.macAddr}")
+        LepuBleLog.d(tag, "filterResult scanModel:${scanModel?.joinToString()}, b.model:${b.model} b.name:${b.name} b.address:${b.macAddr} contains:${scanModel?.contains(b.model)}")
         return scanModel?.contains(b.model) ?: return false
     }
 
