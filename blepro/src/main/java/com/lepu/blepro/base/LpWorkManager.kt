@@ -636,8 +636,8 @@ object LpWorkManager {
 //                return
 //            }
 
-            if(scanModel != null)
-                if (!filterResult(b)) return
+//            if(scanModel != null)
+//                if (!filterResult(b)) return
 
             if (isScanDefineDevice) {
                 if (isScanByName) {
