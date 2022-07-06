@@ -755,7 +755,7 @@ object LpWorkManager {
      * （singleScanMode = false） model 属于套装的设备被过滤出
      */
     private fun filterResult(b: Bluetooth): Boolean{
-        LepuBleLog.d(tag, "scanModel:${scanModel?.joinToString()}, b.model${b.model}")
+        LepuBleLog.d(tag, "filterResult scanModel:${scanModel?.joinToString()}, b.model:${b.model} b.name:${b.name} b.address:${b.macAddr}")
         return scanModel?.contains(b.model) ?: return false
     }
 
