@@ -466,6 +466,7 @@ object LpBleInterfaceManager {
             this.isReconnectByAddress = false
             this.toConnectUpdater = toConnectUpdater
             this.needPair = needPair
+            setScanDefineDevice(false, false, "")
             startDiscover(scanModel, needPair, isReconnecting = true)
 
             LepuBleLog.d(tag, "reconnectByName: => ${reconnectDeviceName.joinToString()} => ReScan: $reScan")
@@ -501,6 +502,7 @@ object LpBleInterfaceManager {
             this.isReconnectByAddress = true
             this.needPair = needPair
             this.toConnectUpdater = toConnectUpdater
+            setScanDefineDevice(false, false, "")
             startDiscover(scanModel, isReconnecting = true)
         }
 
