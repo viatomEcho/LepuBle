@@ -33,15 +33,20 @@ class CheckmePodBleResponse{
         var hwVersion: String    // 硬件版本
         var swVersion: String    // 软件版本
         var lgVersion: String    // 语言版本
-        var curLanguage: String    // 语言版本
+        var curLanguage: String  // 语言版本
         var sn: String           // 序列号
         var fileVer:String       // 文件解析协议版本
         var spcpVer:String       // 蓝牙通讯协议版本
         var branchCode:String    // code码
-        var application:String    // code码
+        var application:String   //
 
         init {
-            infoStr = JSONObject(String(bytes))
+            val data = String(bytes)
+            infoStr = if (data.contains("{")) {
+                JSONObject(data)
+            } else {
+                JSONObject()
+            }
 //            try {
 //                var infoStr = JSONObject(String(bytes))
 //            } catch (e: JSONException) {
@@ -112,7 +117,7 @@ class CheckmePodBleResponse{
         var pr: Int               // 脉率值
         var spo2: Int             // 血氧值
         var pi: Float             // pi值
-        var temp: Float           // 温度值
+        var temp: Float           // 温度值 ℃
         var oxyState: Int         // 血氧探头（0：未接入血氧电缆 1：未接入手指 2：接入手指）
         var tempState: Int        // 体温探头（0：未接入 1：接入）
         var batteryState: Int     // 充电状态（0：没有充电 1：充电中 2：充电完成 3：低电量）
@@ -238,11 +243,11 @@ class CheckmePodBleResponse{
         var hour: Int
         var minute: Int
         var second: Int
-        var leadType: Int
+        var leadType: Int  // 导联方式 0：内部，1：外部
         var spo2: Int
         var pr: Int
         var pi: Float
-        var temp: Float
+        var temp: Float    // 温度值 ℃
 
         init {
             var index = 0

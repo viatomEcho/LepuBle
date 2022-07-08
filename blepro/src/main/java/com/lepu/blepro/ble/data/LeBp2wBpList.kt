@@ -50,7 +50,7 @@ class LeBp2wBpList(var bytes: ByteArray) {
         var mean: Int         // 平均压
         var pr: Int           // 脉率
         var result: Int       // 诊断结果 0：心律不齐 1：动作干扰
-        var level: Int        // 血压等级
+        var level: Int        // 血压等级，协议没有具体数值含义
 
         init {
             var index = 0

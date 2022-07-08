@@ -22,11 +22,11 @@ object LemBleResponse {
     class DeviceInfo(val bytes: ByteArray) {
 //        var deviceSwitch: Boolean
         var battery: Int             // 1-100%
-        var heatMode: Boolean
-        var massageMode: Int
+        var heatMode: Boolean        // 恒温加热模式开关
+        var massageMode: Int         // 按摩模式 0：活力，1：动感，2：捶击，3：舒缓，4：自动
         var massageModeMess: String
-        var massageLevel: Int
-        var massageTime: Int
+        var massageLevel: Int        // 按摩力度挡位 1-15
+        var massageTime: Int         // 按摩时间 0：15min，1：10min，2：5min
         var massageTimeMess: String
 
         init {

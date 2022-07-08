@@ -11,7 +11,7 @@ const val LOW_BATTERY = 3
 public class KtBleBattery constructor(val bytes: ByteArray) {
     var state: Int        // 0：正常使用 1：充电中 2：充满 3：低电量
     var stateMsg: String
-    var percent: Int      // 电量百分比
+    var percent: Int      // 电量百分比 100%
     var vol: Float        // 3.92V
 
     init {

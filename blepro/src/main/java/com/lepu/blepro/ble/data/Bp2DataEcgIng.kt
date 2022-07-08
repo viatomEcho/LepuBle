@@ -6,11 +6,11 @@ import com.lepu.blepro.utils.toUInt
 
 class Bp2DataEcgIng {
     var bytes: ByteArray
-    var curDuration : Int
-    var isPoolSignal : Boolean = false
-    var isLeadOff : Boolean = false
-    var hr : Int
+    var curDuration : Int               // 当前测量时长 s
     var flag: Int
+    var isPoolSignal : Boolean = false  // 是否信号弱
+    var isLeadOff : Boolean = false     // 是否导联脱落
+    var hr : Int
 
     constructor(bytes: ByteArray) {
         this.bytes = bytes

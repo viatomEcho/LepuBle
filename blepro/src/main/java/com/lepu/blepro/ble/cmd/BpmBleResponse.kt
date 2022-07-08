@@ -12,8 +12,8 @@ object BpmBleResponse {
         var dia: Int
         var regularHrFlag: Boolean
         var pr: Int
-        var deviceUserId: Int
-        var storeId: Int
+        var deviceUserId: Int  // 用户id
+        var storeId: Int       // 数据序号
         var year: Int
         var month: Int
         var day: Int
@@ -67,7 +67,8 @@ object BpmBleResponse {
     }
 
     class RtState(val bytes: ByteArray)  {
-        var state: Int
+        var state: Int           // 设备状态 0：时间设置状态，1：历史界面状态，2：测量状态，3：测量加压状态，
+                                 //         4：泄气心率闪烁状态，5：测量结束状态，6：待机界面/时间界面
         var stateMessZh: String
         var stateMessEn: String
         init {
@@ -112,7 +113,8 @@ object BpmBleResponse {
     }
 
     class ErrorResult(val bytes: ByteArray)  {
-        var result: Int
+        var result: Int           // 测量错误结果 1：传感器震荡异常，2：检测不到足够的心跳或算不出血压，3：测量结果异常，4：袖带过松或漏气(10 秒内加压不到 30mmHg)，
+                                  //            5：气管被堵住，6：测量时压力波动大，7：压力超过上限，8：标定数据异常或未标定
         var resultMessZh: String
         var resultMessEn: String
         init {

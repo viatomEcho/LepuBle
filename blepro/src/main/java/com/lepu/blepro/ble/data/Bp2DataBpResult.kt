@@ -6,13 +6,15 @@ import com.lepu.blepro.utils.toUInt
 
 class Bp2DataBpResult {
     var bytes: ByteArray
-    var isDeflate : Boolean = false
-    var pressure : Int = 0
-    var sys : Int = 0
-    var dia : Int = 0
-    var mean : Int = 0
-    var pr : Int = 0
-    var code : Int = 0
+    var isDeflate : Boolean = false  // 是否放气
+    var pressure : Int = 0           // 实时压
+    var sys : Int = 0                // 收缩压
+    var dia : Int = 0                // 舒张压
+    var mean : Int = 0               // 平均圧
+    var pr : Int = 0                 // 脉率
+    var code : Int = 0               // 状态码 0：正常，1：无法分析（袖套绑的太松，充气慢，缓慢漏气，气容大），
+                                     //       2：波形混乱（打气过程中检测到胳膊有动作或者有其他干扰），3：信号弱，检测不到脉搏波（有干扰袖套的衣物），
+                                     //       >=4：设备错误（堵阀，血压测量超量程，袖套漏气严重，软件系统异常，硬件系统错误，以及其他异常）
 
     constructor(bytes: ByteArray) {
         this.bytes = bytes

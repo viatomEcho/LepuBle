@@ -129,100 +129,20 @@ public class ExEcgDiagnosis {
         return str;
     }
 
+    public byte[] getBytes() {
+        return bytes;
+    }
+
+    public void setBytes(byte[] bytes) {
+        this.bytes = bytes;
+    }
+
     public boolean isRegular() {
         return isRegular;
     }
 
     public void setRegular(boolean regular) {
         isRegular = regular;
-    }
-
-    public boolean isStDepression() {
-        return isStDepression;
-    }
-
-    public void setStDepression(boolean stDepression) {
-        isStDepression = stDepression;
-    }
-
-    public boolean isStElevation() {
-        return isStElevation;
-    }
-
-    public void setStElevation(boolean stElevation) {
-        isStElevation = stElevation;
-    }
-
-    public boolean isShortQtc() {
-        return isShortQtc;
-    }
-
-    public void setShortQtc(boolean shortQtc) {
-        isShortQtc = shortQtc;
-    }
-
-    public boolean isProlongedQtc() {
-        return isProlongedQtc;
-    }
-
-    public void setProlongedQtc(boolean prolongedQtc) {
-        isProlongedQtc = prolongedQtc;
-    }
-
-    public boolean isWideQrs() {
-        return isWideQrs;
-    }
-
-    public void setWideQrs(boolean wideQrs) {
-        isWideQrs = wideQrs;
-    }
-
-    public boolean isFibrillation() {
-        return isFibrillation;
-    }
-
-    public void setFibrillation(boolean fibrillation) {
-        isFibrillation = fibrillation;
-    }
-
-    public boolean isHeartPause() {
-        return isHeartPause;
-    }
-
-    public void setHeartPause(boolean heartPause) {
-        isHeartPause = heartPause;
-    }
-
-    public boolean isPvcs() {
-        return isPvcs;
-    }
-
-    public void setPvcs(boolean pvcs) {
-        isPvcs = pvcs;
-    }
-
-    public boolean isIrregular() {
-        return isIrregular;
-    }
-
-    public void setIrregular(boolean irregular) {
-        isIrregular = irregular;
-    }
-
-    public boolean isSlowHr() {
-        return isSlowHr;
-    }
-
-    public void setSlowHr(boolean slowHr) {
-        isSlowHr = slowHr;
-    }
-
-    public boolean isFastHr() {
-        return isFastHr;
-    }
-
-    public void setFastHr(boolean fastHr) {
-        isFastHr = fastHr;
     }
 
     public boolean isPoorSignal() {
@@ -233,17 +153,97 @@ public class ExEcgDiagnosis {
         isPoorSignal = poorSignal;
     }
 
-    public byte[] getBytes() {
-        return bytes;
+    public boolean isFastHr() {
+        return isFastHr;
     }
 
-    public void setBytes(byte[] bytes) {
-        this.bytes = bytes;
+    public void setFastHr(boolean fastHr) {
+        isFastHr = fastHr;
+    }
+
+    public boolean isSlowHr() {
+        return isSlowHr;
+    }
+
+    public void setSlowHr(boolean slowHr) {
+        isSlowHr = slowHr;
+    }
+
+    public boolean isIrregular() {
+        return isIrregular;
+    }
+
+    public void setIrregular(boolean irregular) {
+        isIrregular = irregular;
+    }
+
+    public boolean isPvcs() {
+        return isPvcs;
+    }
+
+    public void setPvcs(boolean pvcs) {
+        isPvcs = pvcs;
+    }
+
+    public boolean isHeartPause() {
+        return isHeartPause;
+    }
+
+    public void setHeartPause(boolean heartPause) {
+        isHeartPause = heartPause;
+    }
+
+    public boolean isFibrillation() {
+        return isFibrillation;
+    }
+
+    public void setFibrillation(boolean fibrillation) {
+        isFibrillation = fibrillation;
+    }
+
+    public boolean isWideQrs() {
+        return isWideQrs;
+    }
+
+    public void setWideQrs(boolean wideQrs) {
+        isWideQrs = wideQrs;
+    }
+
+    public boolean isProlongedQtc() {
+        return isProlongedQtc;
+    }
+
+    public void setProlongedQtc(boolean prolongedQtc) {
+        isProlongedQtc = prolongedQtc;
+    }
+
+    public boolean isShortQtc() {
+        return isShortQtc;
+    }
+
+    public void setShortQtc(boolean shortQtc) {
+        isShortQtc = shortQtc;
+    }
+
+    public boolean isStElevation() {
+        return isStElevation;
+    }
+
+    public void setStElevation(boolean stElevation) {
+        isStElevation = stElevation;
+    }
+
+    public boolean isStDepression() {
+        return isStDepression;
+    }
+
+    public void setStDepression(boolean stDepression) {
+        isStDepression = stDepression;
     }
 
     @Override
     public String toString() {
-        return "EcgDiagnosis{" +
+        return "ExEcgDiagnosis{" +
                 "isRegular = " + isRegular +
                 ", isPoorSignal = " + isPoorSignal +
                 ", isFastHr = " + isFastHr +

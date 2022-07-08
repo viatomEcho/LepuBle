@@ -42,7 +42,12 @@ class PulsebitBleResponse{
         var application:String   //
 
         init {
-            infoStr = JSONObject(String(bytes))
+            val data = String(bytes)
+            infoStr = if (data.contains("{")) {
+                JSONObject(data)
+            } else {
+                JSONObject()
+            }
 //            try {
 //                var infoStr = JSONObject(String(bytes))
 //            } catch (e: JSONException) {
@@ -99,7 +104,7 @@ class PulsebitBleResponse{
         var pvcs: Int                  // 诊断结果：PVCs(内部导联写0)
         var qtc: Int                   // 诊断结果：QTc单位为ms
         var result: ExEcgDiagnosis     // 心电异常诊断结果
-        var measureMode: Int           // 测量模式
+        var measureMode: Int           // 测量模式 1、3："Lead I"，2、4、5："Lead II"，6："Chest Lead"
         var measureModeMess: String
         var filterMode: Int            // 滤波模式（1：wide   0：normal）
         var qt: Int                    // 诊断结果：QT单位为ms

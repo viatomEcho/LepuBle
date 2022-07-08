@@ -8,6 +8,7 @@ class Bp2DataEcgResult {
 
     var bytes: ByteArray
     var result : Int = 0
+    var diagnosis: Bp2EcgDiagnosis  // 诊断结果
     var code : Int
     var hr : Int = 0
     var qrs : Int = 0
@@ -17,6 +18,7 @@ class Bp2DataEcgResult {
     constructor(bytes: ByteArray) {
         this.bytes = bytes
         this.result = toUInt(bytes.copyOfRange(0,4))
+        diagnosis = Bp2EcgDiagnosis(bytes.copyOfRange(0, 4))
         this.code = toInt(bytes.copyOfRange(0,4))
         this.hr = toUInt(bytes.copyOfRange(4,6))
         this.qrs = toUInt(bytes.copyOfRange(6,8))
@@ -29,6 +31,7 @@ class Bp2DataEcgResult {
             Bp2DataEcgResult : 
             bytes : ${bytesToHex(bytes)}
             ecgResult: $result
+            diagnosis: $diagnosis
             hr: $hr
             qrs: $qrs
             pvcs: $pvcs

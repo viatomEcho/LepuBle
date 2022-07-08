@@ -93,6 +93,14 @@ public class CheckmeLeEcgDiagnosis {
         return str;
     }
 
+    public byte getData() {
+        return data;
+    }
+
+    public void setData(byte data) {
+        this.data = data;
+    }
+
     public boolean isRegular() {
         return isRegular;
     }
@@ -165,14 +173,6 @@ public class CheckmeLeEcgDiagnosis {
         isPrematureBeat = prematureBeat;
     }
 
-    public byte getData() {
-        return data;
-    }
-
-    public void setData(byte data) {
-        this.data = data;
-    }
-
     @Override
     public String toString() {
         return "CheckmeLeEcgDiagnosis{" +
@@ -184,6 +184,7 @@ public class CheckmeLeEcgDiagnosis {
                 ", isHighQrs=" + isHighQrs +
                 ", isHighSt=" + isHighSt +
                 ", isLowSt=" + isLowSt +
+                ", isPrematureBeat=" + isPrematureBeat +
                 ", getResultMess=" + getResultMess() +
                 '}';
     }

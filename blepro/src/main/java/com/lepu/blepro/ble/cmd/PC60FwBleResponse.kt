@@ -108,7 +108,7 @@ class PC60FwBleResponse{
         var pi: Int
         var isProbeOff: Boolean        // 探头脱落，手指未接入
         var isPulseSearching: Boolean  // 脉搏检测
-        var battery: Int
+        var battery: Int               // 电量等级 0-3
         init {
             spo2 = byte2UInt(byteArray[0])
             pr = toUInt(byteArray.copyOfRange(1, 3))

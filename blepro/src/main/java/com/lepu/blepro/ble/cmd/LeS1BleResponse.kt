@@ -59,9 +59,10 @@ object LeS1BleResponse {
 
     @Parcelize
     class RtParam constructor(var bytes: ByteArray) : Parcelable {
-        var runStatus: Int
-        var hr: Int
-        var recordTime: Int
+        var runStatus: Int    // 运行状态 0：待机，1：称端测量中，2：称端测量结束，3：心电准备阶段，
+                              //         4：心电测量中，5：心电正常结束，6：带阻抗心电异常结束，7：不带阻抗异常结束
+        var hr: Int           // 30-250有效
+        var recordTime: Int   // 记录时长 s
         var leadOff: Boolean
         var bleStatus: Int
         // reserve 7
@@ -94,11 +95,11 @@ object LeS1BleResponse {
 
     @Parcelize
     class ScaleData constructor(var bytes: ByteArray) : Parcelable {
-        var stable: Boolean
-        var unit: Int
-        var precision: Int
-        var weight: Float
-        var resistance: Int
+        var stable: Boolean  // 体重是否已测量稳定
+        var unit: Int        // 单位 0:kg, 1:LB, 2:ST, 3:LB-ST, 4:斤
+        var precision: Int   // 精度 表示后面的重量被放大了10^n
+        var weight: Float    // 体重 单位:KG
+        var resistance: Int  // 阻值 单位:Ω
         var crc: Int
 
         init {
@@ -171,14 +172,14 @@ object LeS1BleResponse {
     }
 
     class EcgResult(val bytes: ByteArray) {
-        var recordingTime: Int
+        var recordingTime: Int  // 记录时长 s
         // reserved 2
-        var result: Int
+        var result: Int         // 诊断结果，协议没有写具体数值含义
         var resultMess: String
-        var hr: Int
-        var qrs: Int
-        var pvcs: Int
-        var qtc: Int
+        var hr: Int             // 心率 单位：bpm
+        var qrs: Int            // QRS 单位：ms
+        var pvcs: Int           // PVC个数
+        var qtc: Int            // QTc 单位：ms
         // reserved 20
 
         init {

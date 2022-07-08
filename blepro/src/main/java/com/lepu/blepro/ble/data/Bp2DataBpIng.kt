@@ -6,9 +6,9 @@ import com.lepu.blepro.utils.toUInt
 
 class Bp2DataBpIng {
     var bytes: ByteArray
-    var isDeflate : Boolean = false
-    var pressure : Int = 0
-    var isPulse : Boolean = false // is pulse wave
+    var isDeflate : Boolean = false  // 是否放气
+    var pressure : Int = 0           // 实时压
+    var isPulse : Boolean = false    // 是否检测到脉搏波
     var pr : Int = 0
 
     constructor(bytes: ByteArray) {
