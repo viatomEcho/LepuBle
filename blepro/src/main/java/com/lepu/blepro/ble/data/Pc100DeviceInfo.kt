@@ -16,7 +16,7 @@ class Pc100DeviceInfo : Parcelable {
 
     override fun toString(): String {
         return """
-            Pc100DeviceInfo
+            Pc100DeviceInfo : 
             sn : $sn
             deviceId : $deviceId
             deviceName : $deviceName

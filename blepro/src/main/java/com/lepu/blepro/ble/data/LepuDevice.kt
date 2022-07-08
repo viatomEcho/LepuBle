@@ -2,6 +2,7 @@ package com.lepu.blepro.ble.data
 
 import android.os.Parcelable
 import com.lepu.blepro.utils.HexString.trimStr
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 import kotlinx.android.parcel.Parcelize
 
@@ -48,6 +49,7 @@ class LepuDevice constructor(var bytes: ByteArray) : Parcelable {
     override fun toString(): String {
         return """
             LepuDevice :
+            bytes : ${bytesToHex(bytes)}
             hwV : $hwV
             fwV : $fwV
             btlV : $btlV

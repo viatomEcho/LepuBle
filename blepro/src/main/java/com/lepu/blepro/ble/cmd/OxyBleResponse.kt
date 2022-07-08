@@ -13,7 +13,7 @@ import org.json.JSONObject
 class OxyBleResponse{
 
     @ExperimentalUnsignedTypes
-    class OxyResponse(bytes: ByteArray) {
+    class OxyResponse(val bytes: ByteArray) {
         var no: Int
         var len: Int
         var state: Boolean

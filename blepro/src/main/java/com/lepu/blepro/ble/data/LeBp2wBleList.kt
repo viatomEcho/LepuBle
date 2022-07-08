@@ -1,6 +1,7 @@
 package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.HexString.trimStr
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toString
 
 class LeBp2wBleList(val bytes: ByteArray) {
@@ -20,6 +21,8 @@ class LeBp2wBleList(val bytes: ByteArray) {
 
     override fun toString(): String {
         return """
+            LeBp2wBleList : 
+            bytes : ${bytesToHex(bytes)}
             listNum : $listNum
             listName : $listName
         """.trimIndent()

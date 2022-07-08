@@ -12,13 +12,15 @@ class LemBleManager(context: Context): LpBleManager(context) {
         service_uuid = UUID.fromString("0000FFB0-0000-1000-8000-00805F9B34FB")
         write_uuid = UUID.fromString("0000FFB1-0000-1000-8000-00805F9B34FB")
         notify_uuid = UUID.fromString("0000FFB2-0000-1000-8000-00805F9B34FB")
+        LepuBleLog.d("LemBleManager initUUID")
     }
 
     override fun initialize() {
-        LepuBleLog.d("LemBleManager inited")
+        LepuBleLog.d("LemBleManager initialize")
     }
 
     override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {
+        LepuBleLog.d("LemBleManager dealReqQueue")
         return requestQueue
     }
 

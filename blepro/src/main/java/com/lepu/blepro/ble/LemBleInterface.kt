@@ -10,8 +10,14 @@ import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 
 /**
- *
- * 蓝牙操作
+ * lem1护颈仪：
+ * send:
+ * 1.获取电量
+ * 2.恒温加热模式开关
+ * 3.设置按摩模式
+ * 4.设置按摩力度等级
+ * 5.设置按摩时间
+ * 6.获取设备信息
  */
 
 class LemBleInterface(model: Int): BleInterface(model) {
@@ -30,14 +36,14 @@ class LemBleInterface(model: Int): BleInterface(model) {
             .timeout(10000)
             .retry(3, 100)
             .done {
-                LepuBleLog.d(tag, "Device Init")
+                LepuBleLog.d(tag, "manager.connect done")
             }
             .enqueue()
     }
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: LemBleResponse.BleResponse) {
-        LepuBleLog.d(tag, "received : ${bytesToHex(response.bytes)}")
+        LepuBleLog.d(tag, "onResponseReceived bytes: ${bytesToHex(response.bytes)}")
         when (response.cmd) {
             LemBleCmd.DEVICE_SWITCH -> {
                 LepuBleLog.d(tag, "model:$model,DEVICE_SWITCH => success ${bytesToHex(response.content)}")
@@ -114,61 +120,67 @@ class LemBleInterface(model: Int): BleInterface(model) {
 
     fun getBattery() {
         sendCmd(LemBleCmd.getBattery())
+        LepuBleLog.e(tag, "getBattery")
     }
     fun deviceSwitch(on: Boolean) {
         sendCmd(LemBleCmd.deviceSwitch(on))
+        LepuBleLog.e(tag, "deviceSwitch on:$on")
     }
     fun heatMode(on: Boolean) {
         sendCmd(LemBleCmd.heatMode(on))
+        LepuBleLog.e(tag, "heatMode on:$on")
     }
     fun massageMode(mode: Int) {
         sendCmd(LemBleCmd.massageMode(mode))
+        LepuBleLog.e(tag, "massageMode mode:$mode")
     }
     /**
      * 1-15挡
      */
     fun massageLevel(level: Int) {
         sendCmd(LemBleCmd.massageLevel(level))
+        LepuBleLog.e(tag, "massageLevel level:$level")
     }
     fun massageTime(time: Int) {
         sendCmd(LemBleCmd.massageTime(time))
+        LepuBleLog.e(tag, "massageTime time:$time")
+    }
+
+    override fun getInfo() {
+        sendCmd(LemBleCmd.getDeviceState())
+        LepuBleLog.e(tag, "getInfo")
     }
 
     override fun syncTime() {
-    }
-
-    /**
-     * get device info
-     */
-    override fun getInfo() {
-        sendCmd(LemBleCmd.getDeviceState())
+        LepuBleLog.e(tag, "syncTime not yet implemented")
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
-
+        LepuBleLog.e(tag, "dealReadFile not yet implemented")
     }
 
     override fun reset() {
+        LepuBleLog.e(tag, "reset not yet implemented")
     }
 
     override fun factoryReset() {
+        LepuBleLog.e(tag, "factoryReset not yet implemented")
     }
 
     override fun factoryResetAll() {
+        LepuBleLog.e(tag, "factoryResetAll not yet implemented")
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
-    }
-    /**
-     * get real-time data
-     */
-    override fun getRtData() {
+        LepuBleLog.e(tag, "dealContinueRF not yet implemented")
     }
 
-    /**
-     * get file list
-     */
+    override fun getRtData() {
+        LepuBleLog.e(tag, "getRtData not yet implemented")
+    }
+
     override fun getFileList() {
+        LepuBleLog.e(tag, "getFileList not yet implemented")
     }
 
 }

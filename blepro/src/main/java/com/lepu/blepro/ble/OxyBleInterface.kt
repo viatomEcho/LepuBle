@@ -10,11 +10,22 @@ import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toHex
 import com.lepu.blepro.utils.toUInt
+import java.util.*
 import kotlin.experimental.inv
 
-
+/**
+ * O2血氧设备：
+ * send:
+ * 1.同步时间
+ * 2.获取设备信息
+ * 3.获取实时血氧
+ * 4.恢复出厂设置
+ * 5.下载文件内容
+ * 6.配置参数
+ */
 class OxyBleInterface(model: Int): BleInterface(model) {
     
     private val tag: String = "OxyBleInterface"
@@ -25,17 +36,10 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     var curFile: OxyBleResponse.OxyFile? = null
 
     private var userId: String? = null
-    
 
     var isPpgRt: Boolean = false
 
     var isPiRt: Boolean = true
-
-
-    /**
-     * 是否需要发送实时指令，不会停止实时任务
-     */
-
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = OxyBleManager(context)
@@ -47,13 +51,10 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 .timeout(10000)
                 .retry(3, 100)
                 .done {
-                    LepuBleLog.d(tag, "Device Init")
+                    LepuBleLog.d(tag, "manager.connect done")
                 }
                 .enqueue()
     }
-
-
-
 
     private fun sendOxyCmd(cmd: Int, bs: ByteArray){
         LepuBleLog.d(tag, "sendOxyCmd $cmd")
@@ -94,8 +95,6 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
                 val tempBytes: ByteArray? = if (i + 8 + len == bytes.size) null else bytes.copyOfRange(i + 8 + len, bytes.size)
 
-                LepuBleLog.d("hasResponse", "end")
-
                 return hasResponse(tempBytes)
             }
         }
@@ -107,8 +106,9 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: OxyBleResponse.OxyResponse) {
-        LepuBleLog.d(tag, "Response: $curCmd, ${response.content.toHex()}")
+        LepuBleLog.d(tag, "onResponseReceived curCmd: $curCmd, bytes: ${bytesToHex(response.bytes)}")
         if (curCmd == -1) {
+            LepuBleLog.d(tag, "onResponseReceived curCmd:$curCmd")
             return
         }
 
@@ -132,11 +132,11 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
                 clearTimeout()
                 val info = OxyBleResponse.OxyInfo(response.content)
-
-                if (runRtImmediately) {
+                // 本版本注释，测试通过后删除
+                /*if (runRtImmediately) {
                     runRtTask()
                     runRtImmediately = false
-                }
+                }*/
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success $info")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo).post(InterfaceEvent(model, info))
 
@@ -149,6 +149,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 if (response.content.size < 13) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtWaveRes)
                         .post(InterfaceEvent(model, true))
+                    LepuBleLog.d(tag, "OXY_CMD_RT_WAVE response.content.size:${response.content.size}")
                     return
                 }
 
@@ -165,6 +166,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 if (response.len < 12) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamRes)
                         .post(InterfaceEvent(model, true))
+                    LepuBleLog.d(tag, "OXY_CMD_RT_PARAM response.len:${response.len}")
                     return
                 }
                 val rtParam = OxyBleResponse.RtParam(response.content)
@@ -255,7 +257,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
      * 注意默认获取实时参数
      */
     override fun getRtData() {
-        LepuBleLog.d(tag, "getRtData...isPpgRt = $isPpgRt")
+        LepuBleLog.d(tag, "getRtData...isPpgRt = $isPpgRt, isPiRt = $isPiRt")
         if (isPpgRt){
             getPpgRT()
             return
@@ -270,32 +272,37 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
     fun getRtParam() {
         sendOxyCmd(OxyBleCmd.OXY_CMD_RT_PARAM, OxyBleCmd.getRtParam())
+        LepuBleLog.e(tag, "getRtParam")
     }
 
     fun getRtWave() {
         sendOxyCmd(OxyBleCmd.OXY_CMD_RT_WAVE, OxyBleCmd.getRtWave())
+        LepuBleLog.e(tag, "getRtWave")
     }
 
     fun getPpgRT(){
         sendOxyCmd(OxyBleCmd.OXY_CMD_PPG_RT_DATA, OxyBleCmd.getPpgRt())
+        LepuBleLog.e(tag, "getPpgRT")
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
         this.curFileName = fileName
         this.userId = userId
-        LepuBleLog.d(tag, "$userId 将要读取文件 $curFileName")
 //        20201210095928
 //        AA03FC00000F003230323031323130303935393238004C
         sendOxyCmd(OxyBleCmd.OXY_CMD_READ_START, OxyBleCmd.readFileStart(fileName))
+        LepuBleLog.d(tag, "userId:$userId 将要读取文件fileName: $curFileName")
     }
 
     fun getBoxInfo() {
         sendOxyCmd(OxyBleCmd.OXY_CMD_BOX_INFO, OxyBleCmd.getBoxInfo())
+        LepuBleLog.e(tag, "getBoxInfo")
     }
 
     override fun syncTime() {
         settingType = arrayOf(OxyBleCmd.SYNC_TYPE_TIME)
         sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.syncTime())
+        LepuBleLog.e(tag, "syncTime")
     }
 
     fun updateSetting(type: String, value: Any) {
@@ -307,37 +314,38 @@ class OxyBleInterface(model: Int): BleInterface(model) {
         } else {
             sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.updateSetting(type, data))
         }
+        LepuBleLog.e(tag, "updateSetting type:$type")
     }
     fun updateSetting(type: Array<String>, value: IntArray) {
         settingType = type
         sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.updateSetting(type, value))
+        LepuBleLog.e(tag, "updateSetting type:${Arrays.toString(type)}, value:${Arrays.toString(value)}")
+    }
+
+    override fun getInfo() {
+        sendOxyCmd(OxyBleCmd.OXY_CMD_INFO, OxyBleCmd.getInfo())
+        LepuBleLog.e(tag, "getInfo")
+    }
+
+    override fun factoryReset() {
+        sendOxyCmd(OxyBleCmd.OXY_CMD_FACTORY_RESET, OxyBleCmd.factoryReset())
+        LepuBleLog.e(tag, "factoryReset")
+    }
+
+    override fun factoryResetAll() {
+        LepuBleLog.e(tag, "factoryResetAll Not yet implemented")
+    }
+
+    override fun reset() {
+        LepuBleLog.e(tag, "reset Not yet implemented")
     }
 
     override fun getFileList() {
         LepuBleLog.e(tag, "getFileList Not yet implemented")
     }
 
-    override fun getInfo() {
-        sendOxyCmd(OxyBleCmd.OXY_CMD_INFO, OxyBleCmd.getInfo())
-    }
-
-    override fun factoryReset() {
-        sendOxyCmd(OxyBleCmd.OXY_CMD_FACTORY_RESET, OxyBleCmd.factoryReset())
-    }
-
-    override fun factoryResetAll() {
-        LepuBleLog.e(tag, "factoryReset Not yet implemented")
-    }
-
-    override fun reset() {
-        LepuBleLog.e(tag, "reset Not yet implemented")
-
-    }
-
     override fun dealContinueRF(userId: String, fileName: String) {
-       LepuBleLog.e(tag, "o2 暂不支持断点下载")
+        LepuBleLog.e(tag, "dealContinueRF Not yet implemented")
     }
-
-
 
 }

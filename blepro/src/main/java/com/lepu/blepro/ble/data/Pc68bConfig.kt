@@ -1,9 +1,11 @@
 package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.bytesToHex
 
 class Pc68bConfig() {
 
+    var bytes = byteArrayOf(0)
     var alert: Boolean = false
     var spo2Lo: Int = 85
     var prLo: Int = 25
@@ -12,6 +14,7 @@ class Pc68bConfig() {
     var sensorAlert: Boolean = false
 
     constructor(bytes: ByteArray) : this() {
+        this.bytes = bytes
         var index = 0
         alert = byte2UInt(bytes[index]) == 1
         index++
@@ -53,6 +56,8 @@ class Pc68bConfig() {
     override fun toString(): String {
         return """
             Pc68bConfig:
+            bytes : ${bytesToHex(bytes)}
+            getDataBytes : ${bytesToHex(getDataBytes())}
             alert : $alert
             spo2Lo : $spo2Lo
             prLo : $prLo

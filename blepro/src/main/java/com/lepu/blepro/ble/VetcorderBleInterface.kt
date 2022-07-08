@@ -13,8 +13,9 @@ import com.lepu.blepro.utils.toUInt
 import java.util.*
 
 /**
- *
- * 蓝牙操作
+ * vetcorder心电血氧设备：
+ * receive:
+ * 1.实时心电、血氧
  */
 
 class VetcorderBleInterface(model: Int): BleInterface(model) {
@@ -30,18 +31,15 @@ class VetcorderBleInterface(model: Int): BleInterface(model) {
             .timeout(10000)
             .retry(3, 100)
             .done {
-                LepuBleLog.d(tag, "Device Init")
+                LepuBleLog.d(tag, "manager.connect done")
                 getInfo()
             }
             .enqueue()
     }
 
-    override fun dealReadFile(userId: String, fileName: String) {
-    }
-
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: VetcorderInfo) {
-        LepuBleLog.d(tag, "received: $response")
+        LepuBleLog.d(tag, "onResponseReceived: $response")
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Vetcorder.EventVetcorderInfo).post(InterfaceEvent(model, response))
 
     }
@@ -83,40 +81,41 @@ class VetcorderBleInterface(model: Int): BleInterface(model) {
         return bytesLeft
     }
 
-    /**
-     * get device info
-     */
     override fun getInfo() {
         sendCmd(byteArrayOf(0x01))
+        LepuBleLog.d(tag, "getInfo")
     }
 
     override fun syncTime() {
+        LepuBleLog.e(tag, "syncTime not yet implemented")
     }
 
+    override fun dealReadFile(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealReadFile not yet implemented")
+    }
 
     override fun reset() {
+        LepuBleLog.e(tag, "reset not yet implemented")
     }
 
     override fun factoryReset() {
+        LepuBleLog.e(tag, "factoryReset not yet implemented")
     }
 
     override fun factoryResetAll() {
+        LepuBleLog.e(tag, "factoryResetAll not yet implemented")
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
-        dealReadFile(userId, fileName)
+        LepuBleLog.e(tag, "dealContinueRF not yet implemented")
     }
-    /**
-     * get real-time data
-     */
+
     override fun getRtData() {
+        LepuBleLog.e(tag, "getRtData not yet implemented")
     }
 
-
-    /**
-     * get file list
-     */
     override fun getFileList() {
+        LepuBleLog.e(tag, "getFileList not yet implemented")
     }
 
 }

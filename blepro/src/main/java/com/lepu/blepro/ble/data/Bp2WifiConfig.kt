@@ -1,5 +1,7 @@
 package com.lepu.blepro.ble.data
 
+import com.lepu.blepro.utils.bytesToHex
+
 class Bp2WifiConfig() {
 
     var bytes = byteArrayOf(0)
@@ -29,6 +31,9 @@ class Bp2WifiConfig() {
 
     override fun toString(): String {
         return """
+            Bp2WifiConfig : 
+            bytes : ${bytesToHex(bytes)}
+            getDataBytes : ${bytesToHex(getDataBytes())}
             length : $length
             option : $option
             wifi : $wifi

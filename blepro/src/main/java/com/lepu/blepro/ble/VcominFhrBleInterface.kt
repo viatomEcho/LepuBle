@@ -10,8 +10,9 @@ import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 
 /**
- *
- * 蓝牙操作
+ * vcomin胎心仪：
+ * receive:
+ * 1.实时心率
  */
 
 class VcominFhrBleInterface(model: Int): BleInterface(model) {
@@ -30,29 +31,25 @@ class VcominFhrBleInterface(model: Int): BleInterface(model) {
             .timeout(10000)
             .retry(3, 100)
             .done {
-                LepuBleLog.d(tag, "Device Init")
+                LepuBleLog.d(tag, "manager.connect done")
             }
             .enqueue()
     }
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: ByteArray) {
-        LepuBleLog.d(tag, "received : ${bytesToHex(response)}")
+        LepuBleLog.d(tag, "onResponseReceived bytes: ${bytesToHex(response)}")
 
         val cmd = byte2UInt(response[2])
         val hr1 = byte2UInt(response[3])
         val hr2 = byte2UInt(response[4])
-        val hr = if (hr2 != 0) hr2 else hr1
-
-        LepuBleLog.d(tag, "received cmd : $cmd")
-        LepuBleLog.d(tag, "received hr : $hr")
-        LepuBleLog.d(tag, "received hr1 : $hr1")
-        LepuBleLog.d(tag, "received hr2 : $hr2")
 
         val data = FhrData()
         data.hr1 = hr1
         data.hr2 = hr2
 
+        LepuBleLog.d(tag, "received cmd : $cmd")
+        LepuBleLog.d(tag, "received data : $data")
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VCOMIN.EventVcominRtHr).post(InterfaceEvent(model, data))
 
     }
@@ -89,39 +86,39 @@ class VcominFhrBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun syncTime() {
+        LepuBleLog.e(tag, "syncTime not yet implemented")
     }
 
-    /**
-     * get device info
-     */
     override fun getInfo() {
+        LepuBleLog.e(tag, "getInfo not yet implemented")
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
-
+        LepuBleLog.e(tag, "dealReadFile not yet implemented")
     }
 
     override fun reset() {
+        LepuBleLog.e(tag, "reset not yet implemented")
     }
 
     override fun factoryReset() {
+        LepuBleLog.e(tag, "factoryReset not yet implemented")
     }
 
     override fun factoryResetAll() {
+        LepuBleLog.e(tag, "factoryResetAll not yet implemented")
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
-    }
-    /**
-     * get real-time data
-     */
-    override fun getRtData() {
+        LepuBleLog.e(tag, "dealContinueRF not yet implemented")
     }
 
-    /**
-     * get file list
-     */
+    override fun getRtData() {
+        LepuBleLog.e(tag, "getRtData not yet implemented")
+    }
+
     override fun getFileList() {
+        LepuBleLog.e(tag, "getFileList not yet implemented")
     }
 
 }

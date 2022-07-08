@@ -12,9 +12,16 @@ import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 
 /**
- * author: wujuan
- * created on: 2021/2/5 15:13
- * description:
+ * bpm血压计：
+ * send:
+ * 1.同步时间
+ * 2.获取设备信息
+ * 3.获取列表记录
+ * 4.获取设备状态
+ * 5.开始/结束测量
+ * receive:
+ * 1.血压正常测量结果
+ * 2.错误测量结果
  */
 class BpmBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "BpmBleInterface"
@@ -29,17 +36,14 @@ class BpmBleInterface(model: Int): BleInterface(model) {
                 .timeout(10000)
                 .retry(3, 100)
                 .done {
-                    LepuBleLog.d(tag, "Device Init")
+                    LepuBleLog.d(tag, "manager.connect done")
                 }
                 .enqueue()
     }
 
-
     // 数据记录下载标志
     private var isUserAEnd: Boolean = true
     private var isUserBEnd: Boolean = true
-
-
 
     override fun hasResponse(bytes: ByteArray?): ByteArray? {
         val bytesLeft: ByteArray? = bytes
@@ -91,10 +95,11 @@ class BpmBleInterface(model: Int): BleInterface(model) {
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmInfo).post(InterfaceEvent(model, deviceInfo))
-                if (runRtImmediately){
+                // 本版本注释，测试通过后删除
+                /*if (runRtImmediately){
                     runRtTask()
                     runRtImmediately = false
-                }
+                }*/
 
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_SET_TIME -> {
@@ -156,71 +161,62 @@ class BpmBleInterface(model: Int): BleInterface(model) {
 
 
     override fun getInfo() {
-        LepuBleLog.d(tag, "getInfo...")
         sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_INFO))
+        LepuBleLog.d(tag, "getInfo...")
     }
 
     override fun syncTime() {
-        LepuBleLog.d(tag, "syncTime...")
         sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_SET_TIME))
+        LepuBleLog.d(tag, "syncTime...")
     }
 
     override fun getRtData() {
-        LepuBleLog.d(tag, "getRtData...")
         sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_BP_STATE))
+        LepuBleLog.d(tag, "getRtData...device state")
     }
 
     override fun getFileList() {
         isUserAEnd = false
         isUserBEnd = false
-        LepuBleLog.d(tag, "getFileList...")
         sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_RECORDS))
+        LepuBleLog.d(tag, "getFileList...")
     }
 
     fun getBpmFileList(map: HashMap<String, Any>){
         isUserAEnd = false
         isUserBEnd = false
-        LepuBleLog.d(tag, "getBpmFileList...")
         sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_RECORDS, map))
+        LepuBleLog.d(tag, "getBpmFileList...")
     }
 
-    override fun dealReadFile(userId: String, fileName: String) {
-        LepuBleLog.e(tag, "dealReadFile Not yet implemented")
-
+    fun startBp() {
+        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_START_BP))
+        LepuBleLog.d(tag, "startBp...")
     }
 
-
-    override fun dealContinueRF(userId: String, fileName: String) {
-        LepuBleLog.e(tag, "dealContinueRF Not yet implemented")
-
+    fun stopBp() {
+        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_STOP_BP))
+        LepuBleLog.d(tag, "stopBp...")
     }
-
 
     override fun reset() {
         LepuBleLog.e(tag, "reset Not yet implemented")
-
     }
     override fun factoryReset() {
         LepuBleLog.e(tag, "factoryReset Not yet implemented")
-
     }
 
     override fun factoryResetAll() {
         LepuBleLog.e(tag, "factoryResetAll Not yet implemented")
     }
 
-    fun startBp() {
-        LepuBleLog.d(tag, "startBp...")
-        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_START_BP))
+    override fun dealReadFile(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealReadFile Not yet implemented")
     }
 
-    fun stopBp() {
-        LepuBleLog.d(tag, "stopBp...")
-        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_STOP_BP))
+    override fun dealContinueRF(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealContinueRF Not yet implemented")
     }
-
-
-
 
 
 }

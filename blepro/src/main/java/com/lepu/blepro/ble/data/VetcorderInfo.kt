@@ -74,7 +74,7 @@ class VetcorderInfo(var data: ByteArray) {
 
     override fun toString(): String {
         return """
-            VetcorderInfo
+            VetcorderInfo : 
             ecgWave: ${Arrays.toString(ecgWave)}
             ecgwIs: ${Arrays.toString(ecgwIs)}
             ecgwFs: ${Arrays.toString(ecgwFs)}

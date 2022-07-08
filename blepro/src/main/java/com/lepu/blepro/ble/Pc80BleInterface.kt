@@ -8,12 +8,19 @@ import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.CrcUtil
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 import java.util.*
 
 /**
- *
- * 蓝牙操作
+ * pc80b心电设备：
+ * send:
+ * 1.同步时间
+ * 2.获取设备信息
+ * 3.获取电量
+ * receive:
+ * 1.实时心电
+ * 2.接收历史文件内容
  */
 
 class Pc80BleInterface(model: Int): BleInterface(model) {
@@ -35,27 +42,14 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
             .timeout(10000)
             .retry(3, 100)
             .done {
-                LepuBleLog.d(tag, "Device Init")
+                LepuBleLog.d(tag, "manager.connect done")
             }
             .enqueue()
     }
 
-    override fun dealReadFile(userId: String, fileName: String) {
-
-    }
-
-    override fun reset() {
-    }
-
-    override fun factoryReset() {
-    }
-
-    override fun factoryResetAll() {
-    }
-
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: PC80BleResponse.PC80Response) {
-        LepuBleLog.d(tag, "received: ${response.cmd}")
+        LepuBleLog.d(tag, "onResponseReceived cmd: ${response.cmd}, bytes: ${bytesToHex(response.bytes)}")
         when(response.cmd) {
             Pc80BleCmd.HEARTBEAT -> {
                 LepuBleLog.d(tag, "model:$model,HEARTBEAT => success")
@@ -93,9 +87,7 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
                 val data = PC80BleResponse.TransSet(response.content)
                 // 1---传输文件 0---连续测量模式实时
                 transType = data.transType
-                sendCmd(
-                    Pc80BleCmd.responseTransSet(
-                        Pc80BleCmd.ACK))
+                sendCmd(Pc80BleCmd.responseTransSet(Pc80BleCmd.ACK))
                 if (transType == 1) {
                     curFile = null
                     curFile = PC80BleResponse.RtRecordData(Pc80BleCmd.SCP_ECG_LENGTH, 0)
@@ -114,34 +106,26 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
                         val size: Long = nowSize * 100
                         val poSize: Int = (size).div(this.fileSize).toInt()
                         LepuBleLog.d(tag, "model:$model,DATA_MESS info poSize => $poSize")
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadingFileProgress)
-                            .post(InterfaceEvent(model, poSize))
-                        LepuBleLog.d(
-                            tag,
-                            "model======:${response.len}:${this.index}:${this.fileSize}"
-                        )
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadingFileProgress).post(InterfaceEvent(model, poSize))
+                        LepuBleLog.d(tag, "model======:${response.len}:${this.index}:${this.fileSize}")
                         sendCmd(Pc80BleCmd.responseDataMess(this.seqNo, Pc80BleCmd.ACK))
                         if (response.len == 1) {
                             if (this.index != this.fileSize) {
                                 LepuBleLog.d(tag, "model:$model,DATA_MESS EventPc80bReadFileError")
                                 sendCmd(Pc80BleCmd.responseDataMess(this.seqNo, Pc80BleCmd.NAK))
-                                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadFileError)
-                                    .post(InterfaceEvent(model, true))
+                                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadFileError).post(InterfaceEvent(model, true))
                             } else {
-                                LepuBleLog.d(
-                                    tag,
-                                    "model:$model,DATA_MESS EventPC80BReadFileComplete"
-                                )
+                                LepuBleLog.d(tag, "model:$model,DATA_MESS EventPC80BReadFileComplete")
                                 sendCmd(Pc80BleCmd.responseDataMess(this.seqNo, Pc80BleCmd.ACK))
                                 val scpEcgFile = PC80BleResponse.ScpEcgFile(this.content)
-                                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadFileComplete)
-                                    .post(InterfaceEvent(model, scpEcgFile))
+                                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadFileComplete).post(InterfaceEvent(model, scpEcgFile))
                             }
                         }
                     }
                 } else if (transType == 0) {
                     if (response.len == 1) {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bContinuousDataEnd).post(InterfaceEvent(model, true))
+                        LepuBleLog.d(tag, "DATA_MESS response.len:${response.len}")
                         return
                     }
                     val data = PC80BleResponse.RtContinuousData(response.content)
@@ -189,33 +173,47 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
         return bytesLeft
     }
 
-    /**
-     * get device info
-     */
     override fun getInfo() {
         sendCmd(Pc80BleCmd.getInfo())
+        LepuBleLog.d(tag, "getInfo")
     }
 
     override fun syncTime() {
         sendCmd(Pc80BleCmd.setTime())
-    }
-
-    override fun dealContinueRF(userId: String, fileName: String) {
-    }
-    /**
-     * get real-time data
-     */
-    override fun getRtData() {
-    }
-
-    /**
-     * get file list
-     */
-    override fun getFileList() {
+        LepuBleLog.d(tag, "syncTime")
     }
 
     fun sendHeartbeat() {
         sendCmd(Pc80BleCmd.sendHeartbeat())
+        LepuBleLog.d(tag, "sendHeartbeat")
+    }
+
+    override fun dealContinueRF(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealContinueRF not yet implemented")
+    }
+
+    override fun getRtData() {
+        LepuBleLog.e(tag, "getRtData not yet implemented")
+    }
+
+    override fun getFileList() {
+        LepuBleLog.e(tag, "getFileList not yet implemented")
+    }
+
+    override fun dealReadFile(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealReadFile not yet implemented")
+    }
+
+    override fun reset() {
+        LepuBleLog.e(tag, "reset not yet implemented")
+    }
+
+    override fun factoryReset() {
+        LepuBleLog.e(tag, "factoryReset not yet implemented")
+    }
+
+    override fun factoryResetAll() {
+        LepuBleLog.e(tag, "factoryResetAll not yet implemented")
     }
 
 }

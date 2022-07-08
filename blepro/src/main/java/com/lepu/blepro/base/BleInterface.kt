@@ -95,8 +95,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     var isRtStop: Boolean = true
 
 
-
-
     /**
      * 初始化后是否在第一次获取设备信息后立即执行实时任务
      * 默认：false
@@ -115,11 +113,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     var cmdTimeout: Job? = null
 
     var curCmd = -1
-
-
-
-
-
 
 
     inner class RtTask : Runnable {
@@ -195,7 +188,9 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      * @param isAutoReconnect Boolean 默认参数值为true，目的：当设备自然断开后会重新开启扫描并尝试连接。
      */
     fun connect(context: Context, @NonNull device: BluetoothDevice, isAutoReconnect: Boolean = true, toConnectUpdater: Boolean = false) {
+        LepuBleLog.d(tag, "into connect ")
         if (connecting || state) {
+            LepuBleLog.d(tag, "connect connecting:$connecting, state:$state")
             return
         }
         if (!isRtStop){
@@ -213,8 +208,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         initManager(context, device, toConnectUpdater)
 
     }
-
-
 
 
     /**
@@ -238,7 +231,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         }
         this.onDeviceDisconnected(device, ConnectionObserver.REASON_SUCCESS)
 
-
     }
 
 
@@ -247,8 +239,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     abstract fun hasResponse(bytes: ByteArray?): ByteArray?
 
     override fun onDeviceConnected(device: BluetoothDevice) {
-
-
+        LepuBleLog.d(tag, "into onDeviceConnected ")
         if (BleServiceHelper.isScanning()) BleServiceHelper.stopScan()
         state = true
         ready = false
@@ -272,6 +263,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
 
     override fun onDeviceConnecting(device: BluetoothDevice) {
+        LepuBleLog.d(tag, "into onDeviceConnecting ")
         state = false
         ready = false
         connecting = true
@@ -294,35 +286,19 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
         //断开后
         LepuBleLog.d(tag, "onDeviceDisconnected=====isAutoReconnect:$isAutoReconnect")
-//        if (BleServiceHelper.canReconnectByName(model)) {
-//            device.name?.let {
-//                if (isAutoReconnect){
-//                    //重开扫描, 扫描该interface的设备
-//                    LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnect")
-//                    BleServiceHelper.reconnect(model, it)
-//                }else{
-//                    BleServiceHelper.removeReconnectName(it)
-//                }
-//                LepuBleLog.d(tag, "$it onDeviceDisconnected")
-//            }
-//        } else {
-            device.address?.let {
-                if (isAutoReconnect){
-                    //重开扫描, 扫描该interface的设备
-                    LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByAddress")
-                    BleServiceHelper.reconnectByAddress(model, it)
-                }else{
-                    BleServiceHelper.removeReconnectAddress(it)
-                }
-
+        device.address?.let {
+            if (isAutoReconnect){
+                //重开扫描, 扫描该interface的设备
+                LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByAddress")
+                BleServiceHelper.reconnectByAddress(model, it)
+            }else{
+                BleServiceHelper.removeReconnectAddress(it)
             }
-
-//        }
-
+        }
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {
-
+        LepuBleLog.d(tag, "into onDeviceDisconnecting ")
         state = false
         ready = false
         connecting = false
@@ -360,6 +336,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
 
     override fun onDeviceReady(device: BluetoothDevice) {
+        LepuBleLog.d(tag, "into onDeviceReady ")
         device.name?.let {
             LepuBleLog.d(tag, "$it onDeviceReady, state: $state")
         }
@@ -379,7 +356,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             || model == Bluetooth.MODEL_POD2B
             || model == Bluetooth.MODEL_PC_60B
             || model == Bluetooth.MODEL_OXYSMART
-//            || model == Bluetooth.MODEL_BABYO2N
             || model == Bluetooth.MODEL_TV221U
             || model == Bluetooth.MODEL_PC100
             || model == Bluetooth.MODEL_PC66B

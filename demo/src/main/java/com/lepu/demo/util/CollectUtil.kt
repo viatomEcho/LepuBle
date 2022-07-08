@@ -82,7 +82,10 @@ class CollectUtil private constructor(val context: Context) {
     }
 
    @Synchronized fun collectO2RtData(rtData: ByteArray) {
-        if (!isTasking || isSaving) return
+        if (!isTasking || isSaving) {
+            LepuBleLog.d(TAG, "collectO2RtData isTasking:$isTasking, isSaving:$isSaving")
+            return
+        }
         o2ringCrtData = addByteArrayData(o2ringCrtData, rtData)
         LepuBleLog.d(TAG, "collectO2RtData size =  ${o2ringCrtData.size}")
     }

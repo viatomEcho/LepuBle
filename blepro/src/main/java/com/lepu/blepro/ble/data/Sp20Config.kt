@@ -1,6 +1,7 @@
 package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.bytesToHex
 
 class Sp20Config() {
 
@@ -27,6 +28,9 @@ class Sp20Config() {
 
     override fun toString(): String {
         return """
+            Sp20Config : 
+            bytes : ${bytesToHex(bytes)}
+            getDataBytes : ${bytesToHex(getDataBytes())}
             type : $type
             value : $value
         """.trimIndent()

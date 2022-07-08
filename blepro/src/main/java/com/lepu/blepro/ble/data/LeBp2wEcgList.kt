@@ -1,6 +1,7 @@
 package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.DateUtil.stringFromDate
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 import java.util.*
 
@@ -28,7 +29,17 @@ class LeBp2wEcgList(var bytes: ByteArray) {
 
     }
 
-    data class EcgRecord(val bytes: ByteArray) {
+    override fun toString(): String {
+        return """
+            LeBp2wEcgList : 
+            bytes : ${bytesToHex(bytes)}
+            fileVersion : $fileVersion
+            fileType : $fileType
+            ecgFileList : $ecgFileList
+        """.trimIndent()
+    }
+
+    class EcgRecord(val bytes: ByteArray) {
         var time: Long          // 测量时间戳s
         var fileName: String    // 文件名
         var uid: Int            // 用户id
@@ -66,6 +77,8 @@ class LeBp2wEcgList(var bytes: ByteArray) {
 
         override fun toString(): String {
             return """
+                EcgRecord :
+                bytes : ${bytesToHex(bytes)}
                 time : $time
                 fileName : $fileName
                 uid : $uid
@@ -78,13 +91,5 @@ class LeBp2wEcgList(var bytes: ByteArray) {
                 qtc : $qtc
             """.trimIndent()
         }
-    }
-
-    override fun toString(): String {
-        return """
-            fileVersion : $fileVersion
-            fileType : $fileType
-            ecgFileList : $ecgFileList
-        """.trimIndent()
     }
 }

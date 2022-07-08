@@ -1,6 +1,7 @@
 package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.HexString.trimStr
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.int2ByteArray
 import com.lepu.blepro.utils.toUInt
 import java.nio.charset.Charset
@@ -14,8 +15,10 @@ class Bp2Server() {
     var addrLen: Int = 0
     var addr: String = ""      // 服务器地址 e.g. “192.168.1.33”
     var port: Int = 0          // 服务器端口号
+    var bytes = byteArrayOf(0)
 
     constructor(i: Int, bytes: ByteArray) : this() {
+        this.bytes = bytes
         var index = i
         state = (bytes[index].toUInt() and 0xFFu).toInt()
         index++
@@ -49,7 +52,9 @@ class Bp2Server() {
 
     override fun toString(): String {
         return """
-            Bp2wServer
+            Bp2wServer : 
+            bytes : ${bytesToHex(bytes)}
+            getDataBytes : ${bytesToHex(getDataBytes())}
             state : $state
             addrType : $addrType
             addrLen : $addrLen

@@ -10,8 +10,9 @@ import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 
 /**
- *
- * 蓝牙操作
+ * vtm20f指甲血氧：
+ * receive:
+ * 1.实时血氧
  */
 
 class Vtm20fBleInterface(model: Int): BleInterface(model) {
@@ -30,14 +31,14 @@ class Vtm20fBleInterface(model: Int): BleInterface(model) {
             .timeout(10000)
             .retry(3, 100)
             .done {
-                LepuBleLog.d(tag, "Device Init")
+                LepuBleLog.d(tag, "manager.connect done")
             }
             .enqueue()
     }
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: Vtm20fBleResponse.BleResponse) {
-
+        LepuBleLog.d(tag, "onResponseReceived bytes: ${bytesToHex(response.bytes)}")
         when (response.cmd) {
             Vtm20fBleResponse.RT_PARAM -> {
                 LepuBleLog.d(tag, "model:$model,RT_PARAM => success " + bytesToHex(response.bytes))
@@ -85,41 +86,40 @@ class Vtm20fBleInterface(model: Int): BleInterface(model) {
         return bytesLeft
     }
 
-    /**
-     * get device info
-     */
     override fun getInfo() {
+        LepuBleLog.e(tag, "getInfo not yet implemented")
     }
 
     override fun syncTime() {
-
+        LepuBleLog.e(tag, "syncTime not yet implemented")
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
-    }
-    /**
-     * get real-time data
-     */
-    override fun getRtData() {
+        LepuBleLog.e(tag, "dealContinueRF not yet implemented")
     }
 
-    /**
-     * get file list
-     */
+    override fun getRtData() {
+        LepuBleLog.e(tag, "getRtData not yet implemented")
+    }
+
     override fun getFileList() {
+        LepuBleLog.e(tag, "getFileList not yet implemented")
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
-
+        LepuBleLog.e(tag, "dealReadFile not yet implemented")
     }
 
     override fun reset() {
+        LepuBleLog.e(tag, "reset not yet implemented")
     }
 
     override fun factoryReset() {
+        LepuBleLog.e(tag, "factoryReset not yet implemented")
     }
 
     override fun factoryResetAll() {
+        LepuBleLog.e(tag, "factoryResetAll not yet implemented")
     }
 
 }

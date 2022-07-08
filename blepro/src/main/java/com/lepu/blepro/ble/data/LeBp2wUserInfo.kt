@@ -23,8 +23,10 @@ class LeBp2wUserInfo() {
     var weight: Float = 0f          // 体重 kg (init 75.5kg -> cmdSend 755)
     var gender: Int = 0             // 性别 0：男 1：女
     lateinit var icon: Icon
+    var bytes = byteArrayOf(0)
 
     constructor(bytes: ByteArray) : this() {
+        this.bytes = bytes
         var index = 0
         len = toUInt(bytes.copyOfRange(index, index+2))
         index += 2
@@ -47,45 +49,6 @@ class LeBp2wUserInfo() {
         gender = (bytes[index].toUInt() and 0xFFu).toInt()
         index += 12
         icon = Icon(bytes.copyOfRange(index, bytes.size))
-    }
-
-    class Icon() {
-        var type: Int = 0             // 格式 0：bmp
-        var width: Int = 0            // 宽
-        var height: Int = 0           // 高
-        var iconLen: Int = 0          // 图标内容长度
-        lateinit var icon: ByteArray  // 图标内容
-
-        constructor(bytes: ByteArray) : this() {
-            var index = 0
-            type = (bytes[index].toUInt() and 0xFFu).toInt()
-            index++
-            width = toUInt(bytes.copyOfRange(index, index + 2))
-            index += 2
-            height = toUInt(bytes.copyOfRange(index, index + 2))
-            index += 2
-            iconLen = toUInt(bytes.copyOfRange(index, index + 2))
-            index += 2
-            icon = bytes.copyOfRange(index, index + iconLen)
-        }
-
-        fun getDataBytes(): ByteArray {
-            val data = byteArrayOf(type.toByte())
-            return data.plus(int2ByteArray(width))
-                .plus(int2ByteArray(height))
-                .plus(int2ByteArray(icon.size))
-                .plus(icon)
-        }
-
-        override fun toString(): String {
-            return """
-                type : $type
-                width : $width
-                height : $height
-                iconLen : $iconLen
-                icon : ${bytesToHex(icon)}
-            """.trimIndent()
-        }
     }
 
     fun getDataBytes(): ByteArray {
@@ -124,6 +87,9 @@ class LeBp2wUserInfo() {
 
     override fun toString(): String {
         return """
+            LeBp2wUserInfo : 
+            bytes : ${bytesToHex(bytes)}
+            getDataBytes : ${bytesToHex(getDataBytes())}
             len : $len
             aid : $aid
             uid : $uid
@@ -137,4 +103,47 @@ class LeBp2wUserInfo() {
         """.trimIndent()
     }
 
+    class Icon() {
+        var type: Int = 0             // 格式 0：bmp
+        var width: Int = 0            // 宽
+        var height: Int = 0           // 高
+        var iconLen: Int = 0          // 图标内容长度
+        lateinit var icon: ByteArray  // 图标内容
+        var bytes = byteArrayOf(0)
+
+        constructor(bytes: ByteArray) : this() {
+            this.bytes = bytes
+            var index = 0
+            type = (bytes[index].toUInt() and 0xFFu).toInt()
+            index++
+            width = toUInt(bytes.copyOfRange(index, index + 2))
+            index += 2
+            height = toUInt(bytes.copyOfRange(index, index + 2))
+            index += 2
+            iconLen = toUInt(bytes.copyOfRange(index, index + 2))
+            index += 2
+            icon = bytes.copyOfRange(index, index + iconLen)
+        }
+
+        fun getDataBytes(): ByteArray {
+            val data = byteArrayOf(type.toByte())
+            return data.plus(int2ByteArray(width))
+                .plus(int2ByteArray(height))
+                .plus(int2ByteArray(icon.size))
+                .plus(icon)
+        }
+
+        override fun toString(): String {
+            return """
+                Icon : 
+                bytes : ${bytesToHex(bytes)}
+                getDataBytes : ${bytesToHex(getDataBytes())}
+                type : $type
+                width : $width
+                height : $height
+                iconLen : $iconLen
+                icon : ${bytesToHex(icon)}
+            """.trimIndent()
+        }
+    }
 }

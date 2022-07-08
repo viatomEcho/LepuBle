@@ -1,6 +1,7 @@
 package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.int2ByteArray
 import com.lepu.blepro.utils.toUInt
 
@@ -58,7 +59,9 @@ class Bp2Config() {
 
     override fun toString(): String {
         return """
-            Bp2wConfig
+            Bp2Config : 
+            bytes : ${bytesToHex(bytes)}
+            getDataBytes : ${bytesToHex(getDataBytes())}
             prevCalibZero : $prevCalibZero
             lastCalibZero : $lastCalibZero
             calibSlope : $calibSlope

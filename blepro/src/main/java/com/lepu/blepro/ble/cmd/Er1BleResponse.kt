@@ -159,6 +159,7 @@ object Er1BleResponse {
 
         fun addContent(bytes: ByteArray) {
             if (index >= fileSize) {
+                LepuBleLog.d("index >= fileSize index:$index, fileSize:$fileSize 已下载完成")
                 return // 已下载完成
             } else {
                 System.arraycopy(bytes, 0, content, index, bytes.size)

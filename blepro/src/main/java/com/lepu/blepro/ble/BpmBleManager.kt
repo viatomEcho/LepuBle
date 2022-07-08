@@ -18,47 +18,19 @@ import java.util.*
 class BpmBleManager(context: Context): LpBleManager(context) {
 
     override fun initUUID() {
-        service_uuid =
-            UUID.fromString("000018F0-0000-1000-8000-00805F9B34FB")
-        write_uuid =
-            UUID.fromString("00002AF1-0000-1000-8000-00805F9B34FB")
-        notify_uuid =
-            UUID.fromString("00002AF0-0000-1000-8000-00805F9B34FB")
+        service_uuid = UUID.fromString("000018F0-0000-1000-8000-00805F9B34FB")
+        write_uuid = UUID.fromString("00002AF1-0000-1000-8000-00805F9B34FB")
+        notify_uuid = UUID.fromString("00002AF0-0000-1000-8000-00805F9B34FB")
+        LepuBleLog.d("BpmBleManager initUUID ")
     }
-
 
     override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {
+        LepuBleLog.d("BpmBleManager dealReqQueue ")
         return requestQueue
     }
-//
-//    override fun dealReqQueue() {
-//
-//        beginAtomicRequestQueue()
-//            // .add(requestMtu(247) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
-//            //                            .with((device, mtu) -> log(Log.INFO, "MTU set to " + mtu))
-//            //                            .fail((device, status) -> log(Log.WARN, "Requested MTU not supported: " + status)))
-//            //                    .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
-//            //                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
-//            .add(enableNotifications(notify_char))
-//            .done { device: BluetoothDevice? ->
-//                log(
-//                    Log.INFO,
-//                    "Target initialized"
-//                )
-//            }
-//            .enqueue()
-//    }
-
 
     override fun initialize() {
-//        if (!isUpdater)
-//            syncTime()
-        LepuBleLog.d("BpmBleManager inited ")
+        LepuBleLog.d("BpmBleManager initialize ")
     }
-
-    private fun syncTime() {
-        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_SET_TIME));
-    }
-
 
 }

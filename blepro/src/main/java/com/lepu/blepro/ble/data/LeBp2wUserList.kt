@@ -1,5 +1,6 @@
 package com.lepu.blepro.ble.data
 
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 
 class LeBp2wUserList() {
@@ -8,8 +9,10 @@ class LeBp2wUserList() {
     var fileType: Int = 0
     lateinit var listContent: ByteArray
     var userList = mutableListOf<LeBp2wUserInfo>()
+    var bytes = byteArrayOf(0)
 
     constructor(bytes: ByteArray) : this() {
+        this.bytes = bytes
         var index = 0
         fileVersion = (bytes[index].toUInt() and 0xFFu).toInt()
         index++
@@ -37,6 +40,9 @@ class LeBp2wUserList() {
 
     override fun toString(): String {
         return """
+            LeBp2wUserList : 
+            bytes : ${bytesToHex(bytes)}
+            getDataBytes : ${bytesToHex(getDataBytes())}
             fileVersion : $fileVersion
             fileType : $fileType
             userList : $userList

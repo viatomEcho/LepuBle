@@ -19,7 +19,16 @@ import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 
-
+/**
+ * 指甲血氧设备：
+ * send:
+ * 1.获取设备信息
+ * 2.实时血氧使能开关
+ * receive:
+ * 1.实时电量
+ * 2.实时血氧
+ * 3.实时工作状态
+ */
 class Pc60FwBleInterface(model: Int): BleInterface(model) {
     
     private val tag: String = "Pc60FwBleInterface"
@@ -47,7 +56,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                 .timeout(10000)
                 .retry(3, 100)
                 .done {
-                    LepuBleLog.d(tag, "Device Init")
+                    LepuBleLog.d(tag, "manager.connect done")
                     if (model == Bluetooth.MODEL_PC_60NW) {
                         enableRtData(Pc60FwBleCmd.EnableType.OXY_PARAM, true)
                         enableRtData(Pc60FwBleCmd.EnableType.OXY_WAVE, true)
@@ -91,6 +100,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: PC60FwBleResponse.PC60FwResponse) {
+        LepuBleLog.d(tag, "onResponseReceived bytes: ${bytesToHex(response.bytes)}")
         if (response.token == TOKEN_EPI_F0) {
             when (response.type) {
                 TYPE_BATTERY_LEVEL -> {
@@ -177,6 +187,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
 
     fun enableRtData(type: Int, enable: Boolean) {
         sendCmd(Pc60FwBleCmd.enableSwitch(type, enable))
+        LepuBleLog.d(tag, "enableRtData type:$type, enable:$enable")
     }
 
     override fun getInfo() {
@@ -186,30 +197,39 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             sendCmd(Pc60FwBleCmd.getSn())
             sendCmd(Pc60FwBleCmd.getInfoF0())
         }
+        LepuBleLog.d(tag, "getInfo")
     }
 
     override fun syncTime() {
+        LepuBleLog.e(tag, "syncTime not yet implemented")
     }
 
     override fun getRtData() {
+        LepuBleLog.e(tag, "getRtData not yet implemented")
     }
 
     override fun getFileList() {
+        LepuBleLog.e(tag, "getFileList not yet implemented")
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealReadFile not yet implemented")
     }
 
     override fun reset() {
+        LepuBleLog.e(tag, "reset not yet implemented")
     }
 
     override fun factoryReset() {
+        LepuBleLog.e(tag, "factoryReset not yet implemented")
     }
 
     override fun factoryResetAll() {
+        LepuBleLog.e(tag, "factoryResetAll not yet implemented")
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealContinueRF not yet implemented")
     }
 
 

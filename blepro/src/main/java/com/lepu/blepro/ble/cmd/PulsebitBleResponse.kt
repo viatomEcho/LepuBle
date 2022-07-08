@@ -12,7 +12,7 @@ import java.util.*
 class PulsebitBleResponse{
 
     @ExperimentalUnsignedTypes
-    class BleResponse(bytes: ByteArray) {
+    class BleResponse(val bytes: ByteArray) {
         var no: Int
         var len: Int
         var state: Boolean

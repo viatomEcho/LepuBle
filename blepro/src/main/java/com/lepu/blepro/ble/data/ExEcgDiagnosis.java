@@ -1,6 +1,8 @@
 package com.lepu.blepro.ble.data;
 
 public class ExEcgDiagnosis {
+    // 原始bytes数据
+    private byte[] bytes;
     // Regular ECG Rhythm (心电未见明显异常，遵循医生意见)
     private boolean isRegular = false;
     // Unable to analyze (心电信号幅度低或噪声干扰)
@@ -33,7 +35,7 @@ public class ExEcgDiagnosis {
     }
 
     public ExEcgDiagnosis(byte[] bytes) {
-
+        this.bytes = bytes;
         if (bytes.length != 4) {
             return;
         }
@@ -229,6 +231,14 @@ public class ExEcgDiagnosis {
 
     public void setPoorSignal(boolean poorSignal) {
         isPoorSignal = poorSignal;
+    }
+
+    public byte[] getBytes() {
+        return bytes;
+    }
+
+    public void setBytes(byte[] bytes) {
+        this.bytes = bytes;
     }
 
     @Override

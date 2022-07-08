@@ -9,7 +9,14 @@ import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import kotlin.experimental.inv
 
-
+/**
+ * pulsebit ex心电设备：
+ * send:
+ * 1.同步时间
+ * 2.获取设备信息
+ * 3.获取列表
+ * 4.下载文件内容
+ */
 class PulsebitBleInterface(model: Int): BleInterface(model) {
     
     private val tag: String = "PulsebitBleInterface"
@@ -29,7 +36,7 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
                 .timeout(10000)
                 .retry(3, 100)
                 .done {
-                    LepuBleLog.d(tag, "Device Init")
+                    LepuBleLog.d(tag, "manager.connect done")
                 }
                 .enqueue()
     }
@@ -73,8 +80,6 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
 
                 val tempBytes: ByteArray? = if (i + 8 + len == bytes.size) null else bytes.copyOfRange(i + 8 + len, bytes.size)
 
-                LepuBleLog.d("hasResponse", "end")
-
                 return hasResponse(tempBytes)
             }
         }
@@ -84,8 +89,9 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: PulsebitBleResponse.BleResponse) {
-        LepuBleLog.d(tag, "Response: $curCmd, ${response.content.toHex()}")
+        LepuBleLog.d(tag, "onResponseReceived curCmd: $curCmd, bytes: ${bytesToHex(response.bytes)}")
         if (curCmd == -1) {
+            LepuBleLog.d(tag, "onResponseReceived curCmd:$curCmd")
             return
         }
 
@@ -93,19 +99,13 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
             PulsebitBleCmd.OXY_CMD_PARA_SYNC -> {
                 clearTimeout()
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_PARA_SYNC => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitSetTime).post(
-                    InterfaceEvent(model, true)
-                )
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitSetTime).post(InterfaceEvent(model, true))
             }
             PulsebitBleCmd.OXY_CMD_INFO -> {
 
                 clearTimeout()
                 val info = PulsebitBleResponse.DeviceInfo(response.content)
 
-                if (runRtImmediately) {
-                    runRtTask()
-                    runRtImmediately = false
-                }
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success $info")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitDeviceInfo).post(InterfaceEvent(model, info))
             }
@@ -177,47 +177,47 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
         curCmd = -1
     }
 
-    /**
-     * 注意默认获取实时参数
-     */
-    override fun getRtData() {
-    }
-
     override fun dealReadFile(userId: String, fileName: String) {
         this.curFileName = fileName
         LepuBleLog.d(tag, "$userId 将要读取文件 $curFileName")
         sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_START, PulsebitBleCmd.readFileStart(fileName))
+        LepuBleLog.e(tag, "dealReadFile")
     }
 
     override fun syncTime() {
         sendOxyCmd(PulsebitBleCmd.OXY_CMD_PARA_SYNC, PulsebitBleCmd.syncTime())
+        LepuBleLog.e(tag, "syncTime")
     }
 
     override fun getFileList() {
         this.curFileName = "1dlc.dat"
         sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_START, PulsebitBleCmd.readFileStart(curFileName))
+        LepuBleLog.e(tag, "getFileList")
     }
 
     override fun getInfo() {
         sendOxyCmd(PulsebitBleCmd.OXY_CMD_INFO, PulsebitBleCmd.getInfo())
+        LepuBleLog.e(tag, "getInfo")
+    }
+
+    override fun getRtData() {
+        LepuBleLog.e(tag, "getRtData Not yet implemented")
     }
 
     override fun factoryReset() {
+        LepuBleLog.e(tag, "factoryReset Not yet implemented")
     }
 
     override fun factoryResetAll() {
-        LepuBleLog.e(tag, "factoryReset Not yet implemented")
+        LepuBleLog.e(tag, "factoryResetAll Not yet implemented")
     }
 
     override fun reset() {
         LepuBleLog.e(tag, "reset Not yet implemented")
-
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
-       LepuBleLog.e(tag, "o2 暂不支持断点下载")
+        LepuBleLog.e(tag, "dealContinueRF Not yet implemented")
     }
-
-
 
 }

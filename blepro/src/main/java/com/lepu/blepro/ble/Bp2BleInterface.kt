@@ -17,9 +17,17 @@ import com.lepu.blepro.utils.toUInt
 import kotlin.experimental.inv
 
 /**
- * author: wujuan
- * created on: 2021/2/5 15:13
- * description:
+ * bp2心电血压计，bp2a血压计，bp2t理疗血压计：
+ * send:
+ * 1.同步时间
+ * 2.获取设备信息
+ * 3.获取实时心电、血压
+ * 4.获取/配置参数
+ * 5.获取/设置理疗参数
+ * 6.获取/设置设备状态
+ * 7.获取文件列表
+ * 8.下载文件内容
+ * 9.恢复出厂设置
  */
 class Bp2BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Bp2BleInterface"
@@ -34,7 +42,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 .timeout(10000)
                 .retry(3, 100)
                 .done {
-                    LepuBleLog.d(tag, "Device Init")
+                    LepuBleLog.d(tag, "manager.connect done")
                 }
                 .enqueue()
     }
@@ -85,10 +93,11 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
                 val info = Bp2DeviceInfo(bleResponse.content, device.name)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Info).post(InterfaceEvent(model, info))
-                if (runRtImmediately) {
+                // 本版本注释，测试通过后删除
+                /*if (runRtImmediately) {
                     runRtTask()
                     runRtImmediately = false
-                }
+                }*/
 
             }
             SET_TIME -> {
@@ -112,6 +121,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 //检查当前的下载状态
                 if (isCancelRF || isPausedRF) {
                     sendCmd(fileReadEnd())
+                    LepuBleLog.d(tag, "FILE_READ_START isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
                     return
                 }
 
@@ -140,6 +150,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 //检查当前的下载状态
                 if (isCancelRF || isPausedRF) {
                     sendCmd(fileReadEnd())
+                    LepuBleLog.d(tag, "FILE_READ_PKG isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
                     return
                 }
 
@@ -294,7 +305,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
     override fun syncTime() {
         LepuBleLog.d(tag, "syncTime...")
-        sendCmd(Bp2BleCmd.setTime())
+        sendCmd(setTime())
     }
 
     //实时波形命令
@@ -315,40 +326,42 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
     }
     fun setPhyState(state: Bp2BlePhyState) {
         LepuBleLog.d(tag, "setPhyState...")
-        sendCmd(Bp2BleCmd.setPhyState(state.getDataBytes()))
+        sendCmd(setPhyState(state.getDataBytes()))
     }
 
     fun setConfig(switch: Boolean, volume: Int){
         sendCmd(Bp2BleCmd.setConfig(switch, volume))
+        LepuBleLog.d(tag, "setConfig...switch:$switch, volume:$volume")
     }
      fun getConfig(){
-        sendCmd(Bp2BleCmd.getConfig())
+         sendCmd(Bp2BleCmd.getConfig())
+         LepuBleLog.d(tag, "getConfig...")
     }
 
     override fun getFileList() {
         sendCmd(Bp2BleCmd.getFileList())
+        LepuBleLog.d(tag, "getFileList...")
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
         this.fileName = fileName
         sendCmd(getFileStart(fileName.toByteArray(), 0))
+        LepuBleLog.d(tag, "dealReadFile...userId:$userId, fileName:$fileName")
     }
     override fun reset() {
         sendCmd(Bp2BleCmd.reset())
+        LepuBleLog.d(tag, "reset...")
     }
 
     override fun factoryReset() {
         sendCmd(Bp2BleCmd.factoryReset())
+        LepuBleLog.d(tag, "factoryReset...")
     }
 
     override fun factoryResetAll() {
         sendCmd(Bp2BleCmd.factoryResetAll())
+        LepuBleLog.d(tag, "factoryResetAll...")
     }
-
-    override fun dealContinueRF(userId: String, fileName: String) {
-        //
-    }
-
 
     /**
      * 0：进入血压测量
@@ -359,8 +372,12 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
      * 5：进入理疗模式
      */
     fun switchState(state: Int){
-        LepuBleLog.e("switchState===$state")
         sendCmd(Bp2BleCmd.switchState(state))
+        LepuBleLog.e("switchState===$state")
+    }
+
+    override fun dealContinueRF(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealContinueRF not yet implemented")
     }
 
 }

@@ -2,6 +2,7 @@ package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.ByteUtils.toSignedShort
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 
 class Er2AnalysisFile(val bytes: ByteArray) {
@@ -29,6 +30,7 @@ class Er2AnalysisFile(val bytes: ByteArray) {
     override fun toString(): String {
         return """
             Er2AnalysisFile : 
+            bytes : ${bytesToHex(bytes)}
             fileVersion : $fileVersion
             recordingTime : $recordingTime
             resultList : $resultList
@@ -60,6 +62,7 @@ class Er2AnalysisFile(val bytes: ByteArray) {
         override fun toString(): String {
             return """
                 AnalysisResult : 
+                bytes : ${bytesToHex(bytes)}
                 result : $result
                 hr : $hr
                 qrs : $qrs

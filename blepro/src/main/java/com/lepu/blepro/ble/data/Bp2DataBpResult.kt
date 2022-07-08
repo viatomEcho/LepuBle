@@ -1,10 +1,11 @@
 package com.lepu.blepro.ble.data
 
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toInt
 import com.lepu.blepro.utils.toUInt
 
-
 class Bp2DataBpResult {
+    var bytes: ByteArray
     var isDeflate : Boolean = false
     var pressure : Int = 0
     var sys : Int = 0
@@ -14,6 +15,7 @@ class Bp2DataBpResult {
     var code : Int = 0
 
     constructor(bytes: ByteArray) {
+        this.bytes = bytes
         this.isDeflate = bytes[0].toInt() == 1
         this.pressure = toInt(bytes.copyOfRange(1,3))
         this.sys = toUInt(bytes.copyOfRange(3,5))
@@ -25,7 +27,8 @@ class Bp2DataBpResult {
 
     override fun toString(): String {
         return """
-            BP Result
+            Bp2DataBpResult : 
+            bytes : ${bytesToHex(bytes)}
             isDeflate: $isDeflate
             pressure: $pressure
             sys: $sys

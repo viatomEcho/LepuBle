@@ -11,8 +11,11 @@ import com.lepu.blepro.utils.*
 import java.util.*
 
 /**
- *
- * 蓝牙操作
+ * pc100血压血氧体温设备：
+ * send:
+ * 1.获取设备信息
+ * receive:
+ * 1.实时血氧、血压
  */
 
 class Pc100BleInterface(model: Int): BleInterface(model) {
@@ -32,21 +35,14 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             .timeout(10000)
             .retry(3, 100)
             .done {
-                LepuBleLog.d(tag, "Device Init")
+                LepuBleLog.d(tag, "manager.connect done")
             }
             .enqueue()
     }
 
-    override fun dealReadFile(userId: String, fileName: String) {
-    }
-
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: Pc100BleResponse.Pc100Response) {
-        LepuBleLog.d(tag, "received: ${response.cmd}")
-        LepuBleLog.d(tag, "model:$model,=======response.type=====" + response.type)
-        LepuBleLog.d(tag, "model:$model,=======response.bytes.size=======" + response.bytes.size)
-        LepuBleLog.d(tag, "model:$model,=======response.len=====" + response.len)
-        LepuBleLog.d(tag, "model:$model,=======response.content.size=======" + response.content.size)
+        LepuBleLog.d(tag, "onResponseReceived cmd: ${response.cmd}, bytes: ${bytesToHex(response.bytes)}")
         when (response.cmd) {
             Pc100BleCmd.TOKEN_0XFF -> {
                 when (response.type) {
@@ -257,65 +253,70 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
         return bytesLeft
     }
 
-    /**
-     * get device info
-     */
     override fun getInfo() {
         sendCmd(Pc100BleCmd.handShake())
         sendCmd(Pc100BleCmd.getDeviceId())
         sendCmd(Pc100BleCmd.getDeviceInfo())
+        LepuBleLog.d(tag, "getInfo")
     }
 
-    override fun syncTime() {
-    }
-    override fun reset() {
-    }
-    override fun factoryReset() {
-    }
-    override fun factoryResetAll() {
-    }
-
-    override fun dealContinueRF(userId: String, fileName: String) {
-    }
-    /**
-     * get real-time data
-     */
-    override fun getRtData() {
-    }
-
-    /**
-     * get file list
-     */
     override fun getFileList() {
         sendCmd(Pc100BleCmd.getBpResult())
+        LepuBleLog.d(tag, "getFileList")
     }
 
     fun getBpState() {
         sendCmd(Pc100BleCmd.getBpStatus())
+        LepuBleLog.d(tag, "getBpState")
     }
     fun startBp() {
-        sendCmd(
-            Pc100BleCmd.setBpModuleState(
-                Pc100BleCmd.BP_START))
+        sendCmd(Pc100BleCmd.setBpModuleState(Pc100BleCmd.BP_START))
+        LepuBleLog.d(tag, "startBp")
     }
     fun stopBp() {
-        sendCmd(
-            Pc100BleCmd.setBpModuleState(
-                Pc100BleCmd.BP_END))
+        sendCmd(Pc100BleCmd.setBpModuleState(Pc100BleCmd.BP_END))
+        LepuBleLog.d(tag, "stopBp")
     }
 
     fun startBo() {
-        sendCmd(
-            Pc100BleCmd.setBoModuleState(
-                Pc100BleCmd.BO_START))
+        sendCmd(Pc100BleCmd.setBoModuleState(Pc100BleCmd.BO_START))
+        LepuBleLog.d(tag, "startBo")
     }
     fun stopBo() {
-        sendCmd(
-            Pc100BleCmd.setBoModuleState(
-                Pc100BleCmd.BO_END))
+        sendCmd(Pc100BleCmd.setBoModuleState(Pc100BleCmd.BO_END))
+        LepuBleLog.d(tag, "stopBo")
     }
     fun getBoState() {
         sendCmd(Pc100BleCmd.getBoStatus())
+        LepuBleLog.d(tag, "getBoState")
+    }
+
+    override fun dealReadFile(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealReadFile not yet implemented")
+    }
+
+    override fun syncTime() {
+        LepuBleLog.e(tag, "syncTime not yet implemented")
+    }
+
+    override fun reset() {
+        LepuBleLog.e(tag, "reset not yet implemented")
+    }
+
+    override fun factoryReset() {
+        LepuBleLog.e(tag, "factoryReset not yet implemented")
+    }
+
+    override fun factoryResetAll() {
+        LepuBleLog.e(tag, "factoryResetAll not yet implemented")
+    }
+
+    override fun dealContinueRF(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealContinueRF not yet implemented")
+    }
+
+    override fun getRtData() {
+        LepuBleLog.e(tag, "getRtData not yet implemented")
     }
 
 }

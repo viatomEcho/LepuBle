@@ -324,7 +324,10 @@ class Bpw1BleInterface(model: Int): BleInterface(model) {
             sendCmd(Bpw1BleCmd.getMeasureTime())
     }
     fun setMeasureTime(measureTime: Array<String?>) {
-        if (!alreadySendDelayCmd) return
+        if (!alreadySendDelayCmd) {
+            LepuBleLog.d(tag, "setMeasureTime alreadySendDelayCmd:$alreadySendDelayCmd")
+            return
+        }
         this.measureTime = measureTime
         var index = 0
         for (time in measureTime) {
@@ -338,7 +341,10 @@ class Bpw1BleInterface(model: Int): BleInterface(model) {
         }
     }
     fun setTimingSwitch(timingSwitch: Boolean) {
-        if (!alreadySendDelayCmd) return
+        if (!alreadySendDelayCmd) {
+            LepuBleLog.d(tag, "setTimingSwitch alreadySendDelayCmd:$alreadySendDelayCmd")
+            return
+        }
         this.timingSwitch = timingSwitch
         sendCmd(Bpw1BleCmd.setTimingSwitch(timingSwitch))
     }

@@ -1,6 +1,8 @@
 package com.lepu.blepro.ble.data;
 
 public class Er2EcgDiagnosis {
+    // 原始bytes数据
+    private byte[] bytes;
     // 除下列异常情况之外 (正常心电图)
     private boolean isRegular = false;
     // 波形质量差，或者导联一直脱落等算法无法分析的情况 (无法分析)
@@ -37,7 +39,7 @@ public class Er2EcgDiagnosis {
     }
 
     public Er2EcgDiagnosis(byte[] bytes) {
-
+        this.bytes = bytes;
         if (bytes.length != 4) {
             return;
         }
@@ -245,6 +247,14 @@ public class Er2EcgDiagnosis {
 
     public void setPoorSignal(boolean poorSignal) {
         isPoorSignal = poorSignal;
+    }
+
+    public byte[] getBytes() {
+        return bytes;
+    }
+
+    public void setBytes(byte[] bytes) {
+        this.bytes = bytes;
     }
 
     @Override

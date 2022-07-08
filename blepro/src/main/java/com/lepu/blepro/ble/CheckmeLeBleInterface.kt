@@ -9,7 +9,14 @@ import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import kotlin.experimental.inv
 
-
+/**
+ * checkmele心电血氧体温设备:
+ * send:
+ * 1.同步时间
+ * 2.获取设备信息
+ * 3.获取文件列表
+ * 4.下载文件内容
+ */
 class CheckmeLeBleInterface(model: Int): BleInterface(model) {
     
     private val tag: String = "CheckmeLeBleInterface"
@@ -29,7 +36,7 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
                 .timeout(10000)
                 .retry(3, 100)
                 .done {
-                    LepuBleLog.d(tag, "Device Init")
+                    LepuBleLog.d(tag, "manager.connect done")
                 }
                 .enqueue()
     }
@@ -73,8 +80,6 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
 
                 val tempBytes: ByteArray? = if (i + 8 + len == bytes.size) null else bytes.copyOfRange(i + 8 + len, bytes.size)
 
-                LepuBleLog.d("hasResponse", "end")
-
                 return hasResponse(tempBytes)
             }
         }
@@ -84,8 +89,9 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: CheckmeLeBleResponse.BleResponse) {
-        LepuBleLog.d(tag, "Response: $curCmd, ${response.content.toHex()}")
+        LepuBleLog.d(tag, "onResponseReceived curCmd: $curCmd, bytes: ${bytesToHex(response.bytes)}")
         if (curCmd == -1) {
+            LepuBleLog.d(tag, "onResponseReceived curCmd:$curCmd")
             return
         }
 
@@ -100,10 +106,6 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
                 clearTimeout()
                 val info = CheckmeLeBleResponse.DeviceInfo(response.content)
 
-                if (runRtImmediately) {
-                    runRtTask()
-                    runRtImmediately = false
-                }
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success $info")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeDeviceInfo).post(InterfaceEvent(model, info))
             }
@@ -193,15 +195,13 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
 
     override fun dealReadFile(userId: String, fileName: String) {
         this.curFileName = fileName
-        LepuBleLog.d(tag, "$userId 将要读取文件 $curFileName")
         sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_READ_START, CheckmeLeBleCmd.readFileStart(fileName))
+        LepuBleLog.d(tag, "dealReadFile userId:$userId 将要读取文件 $curFileName")
     }
 
     override fun syncTime() {
         sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_PARA_SYNC, CheckmeLeBleCmd.syncTime())
-    }
-
-    override fun getFileList() {
+        LepuBleLog.e(tag, "syncTime")
     }
 
     fun getFileList(type: Int) {
@@ -212,16 +212,24 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
             CheckmeLeBleCmd.ListType.TEMP_TYPE -> curFileName = "temp.dat"
         }
         sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_READ_START, CheckmeLeBleCmd.readFileStart(curFileName))
+        LepuBleLog.e(tag, "getFileList type:$type")
     }
 
     override fun getInfo() {
         sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_INFO, CheckmeLeBleCmd.getInfo())
+        LepuBleLog.e(tag, "getInfo")
+    }
+
+    override fun getFileList() {
+        LepuBleLog.e(tag, "getFileList Not yet implemented")
     }
 
     override fun factoryReset() {
+        LepuBleLog.e(tag, "factoryReset Not yet implemented")
     }
 
     override fun getRtData() {
+        LepuBleLog.e(tag, "getRtData Not yet implemented")
     }
 
     override fun factoryResetAll() {
@@ -234,9 +242,7 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
-       LepuBleLog.e(tag, "o2 暂不支持断点下载")
+        LepuBleLog.e(tag, "dealContinueRF Not yet implemented")
     }
-
-
 
 }

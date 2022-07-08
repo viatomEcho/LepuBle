@@ -15,14 +15,16 @@ class Vtm20fBleManager(context: Context): LpBleManager(context) {
         service_uuid = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
         write_uuid = UUID.fromString("0000FFF2-0000-1000-8000-00805F9B34FB")
         notify_uuid = UUID.fromString("0000FFE4-0000-1000-8000-00805F9B34FB")
+        LepuBleLog.d("Vtm20fBleManager initUUID")
     }
 
     override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {
+        LepuBleLog.d("Vtm20fBleManager dealReqQueue")
         return requestQueue
     }
 
     override fun initialize() {
-        LepuBleLog.d("Vtm20fBleManager inited")
+        LepuBleLog.d("Vtm20fBleManager initialize")
     }
 
     override fun getGattCallback(): BleManagerGattCallback {

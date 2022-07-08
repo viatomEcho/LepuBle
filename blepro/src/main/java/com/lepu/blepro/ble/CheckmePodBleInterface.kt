@@ -9,20 +9,25 @@ import com.lepu.blepro.ble.cmd.CheckmePodBleCmd
 import com.lepu.blepro.ble.cmd.CheckmePodBleResponse
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toHex
 import com.lepu.blepro.utils.toUInt
 import kotlin.experimental.inv
 
+/**
+ * checkmepod血氧体温设备:
+ * send:
+ * 1.同步时间
+ * 2.获取设备信息
+ * 3.获取实时血氧、体温
+ * 4.获取列表数据
+ */
 class CheckmePodBleInterface(model: Int): BleInterface(model) {
     
     private val tag: String = "CheckmePodBleInterface"
 
     var curFileName: String? = null
     var curFile: CheckmePodBleResponse.OxiTFile? = null
-
-    /**
-     * 是否需要发送实时指令，不会停止实时任务
-     */
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = OxyBleManager(context)
@@ -34,7 +39,7 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
                 .timeout(10000)
                 .retry(3, 100)
                 .done {
-                    LepuBleLog.d(tag, "Device Init")
+                    LepuBleLog.d(tag, "manager.connect done")
                 }
                 .enqueue()
     }
@@ -78,8 +83,6 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
 
                 val tempBytes: ByteArray? = if (i + 8 + len == bytes.size) null else bytes.copyOfRange(i + 8 + len, bytes.size)
 
-                LepuBleLog.d("hasResponse", "end")
-
                 return hasResponse(tempBytes)
             }
         }
@@ -87,12 +90,11 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
         return bytesLeft
     }
 
-
-
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: CheckmePodBleResponse.BleResponse) {
-        LepuBleLog.d(tag, "Response: $curCmd, ${response.content.toHex()}")
+        LepuBleLog.d(tag, "onResponseReceived curCmd : $curCmd, bytes : ${bytesToHex(response.bytes)}")
         if (curCmd == -1) {
+            LepuBleLog.d(tag, "onResponseReceived curCmd:$curCmd")
             return
         }
 
@@ -100,9 +102,7 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
             CheckmePodBleCmd.OXY_CMD_PARA_SYNC -> {
                 clearTimeout()
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_PARA_SYNC => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodSetTime).post(
-                    InterfaceEvent(model, true)
-                )
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodSetTime).post(InterfaceEvent(model, true))
             }
 
             CheckmePodBleCmd.OXY_CMD_INFO -> {
@@ -110,10 +110,6 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
                 clearTimeout()
                 val info = CheckmePodBleResponse.DeviceInfo(response.content)
 
-                if (runRtImmediately) {
-                    runRtTask()
-                    runRtImmediately = false
-                }
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success $info")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodDeviceInfo).post(InterfaceEvent(model, info))
             }
@@ -133,23 +129,19 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
 
                 } else {
                     LepuBleLog.d(tag, "model:$model, 读文件失败：${response.content.toHex()}")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListError).post(
-                        InterfaceEvent(model, true)
-                    )
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListError).post(InterfaceEvent(model, true))
                 }
             }
             CheckmePodBleCmd.OXY_CMD_RT_DATA -> {
                 clearTimeout()
                 if (response.len < 22) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodRtDataError)
-                        .post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodRtDataError).post(InterfaceEvent(model, true))
+                    LepuBleLog.d(tag, "OXY_CMD_RT_DATA response.len:${response.len}")
                     return
                 }
                 val data = CheckmePodBleResponse.RtData(response.content)
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_RT_DATA => success $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodRtData).post(
-                    InterfaceEvent(model, data)
-                )
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodRtData).post(InterfaceEvent(model, data))
             }
 
             CheckmePodBleCmd.OXY_CMD_READ_CONTENT -> {
@@ -175,15 +167,12 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
 
                 curFile?.let {
                     val data = CheckmePodBleResponse.FileList(it.fileContent)
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodFileList).post(
-                        InterfaceEvent(model, data)
-                    )
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodFileList).post(InterfaceEvent(model, data))
                     LepuBleLog.d(tag, "model:$model,  FileList $data")
 
                 } ?: run {
                     LepuBleLog.d(tag, "model:$model,  curFile error!!")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListError)
-                        .post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListError).post(InterfaceEvent(model, true))
                 }
 
                 curFile = null
@@ -200,33 +189,31 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
         curCmd = -1
     }
 
-    /**
-     * 注意默认获取实时参数
-     */
     override fun getRtData() {
-        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_RT_DATA, CheckmePodBleCmd.getRtData())// 无法支持1.4.1之前获取pi
+        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_RT_DATA, CheckmePodBleCmd.getRtData())
+        LepuBleLog.e(tag, "getRtData")
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
         this.curFileName = fileName
         LepuBleLog.d(tag, "$userId 将要读取文件 $curFileName")
         sendOxyCmd(CheckmePodBleCmd.OXY_CMD_READ_START, CheckmePodBleCmd.readFileStart(fileName))
+        LepuBleLog.e(tag, "dealReadFile userId:$userId, fileName:$fileName")
     }
 
     override fun syncTime() {
         sendOxyCmd(CheckmePodBleCmd.OXY_CMD_PARA_SYNC, CheckmePodBleCmd.syncTime())
+        LepuBleLog.e(tag, "syncTime")
     }
 
-    fun updateSetting(type: String, value: Any) {
-        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_PARA_SYNC, CheckmePodBleCmd.updateSetting(type, value as Int))
-
-    }
     override fun getFileList() {
         dealReadFile("", "oxi_T.dat")
+        LepuBleLog.e(tag, "getFileList")
     }
 
     override fun getInfo() {
         sendOxyCmd(CheckmePodBleCmd.OXY_CMD_INFO, CheckmePodBleCmd.getInfo())
+        LepuBleLog.e(tag, "getInfo")
     }
 
     override fun factoryReset() {
@@ -239,13 +226,10 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
 
     override fun reset() {
         LepuBleLog.e(tag, "reset Not yet implemented")
-
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
-       LepuBleLog.e(tag, "o2 暂不支持断点下载")
+        LepuBleLog.e(tag, "dealContinueRF Not yet implemented")
     }
-
-
 
 }

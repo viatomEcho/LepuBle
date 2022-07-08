@@ -12,7 +12,9 @@ import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
+import java.util.*
 import kotlin.experimental.inv
 
 class LewBleInterface(model: Int): BleInterface(model) {
@@ -27,7 +29,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             .timeout(10000)
             .retry(3, 100)
             .done {
-                LepuBleLog.d(tag, "Device Init")
+                LepuBleLog.d(tag, "manager.connect done")
             }
             .enqueue()
     }
@@ -39,13 +41,6 @@ class LewBleInterface(model: Int): BleInterface(model) {
     var curFileName: String? = null
     private var userId: String? = null
     var curFile: LewBleResponse.EcgFile? = null
-
-    override fun dealReadFile(userId: String, fileName: String) {
-        this.userId = userId
-        this.curFileName =fileName
-        LepuBleLog.d(tag, "dealReadFile:: $userId, $fileName, offset = $offset")
-        sendCmd(LewBleCmd.readFileStart(fileName.toByteArray(), 0))
-    }
 
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun hasResponse(bytes: ByteArray?): ByteArray? {
@@ -85,6 +80,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: LewBleResponse.BleResponse) {
+        LepuBleLog.d(tag, "onResponseReceived bytes: ${bytesToHex(response.bytes)}")
         LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseContent).post(response.bytes)
         when(response.cmd) {
             LewBleCmd.SET_TIME -> {
@@ -99,23 +95,28 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 }
             }
             LewBleCmd.GET_BATTERY -> {
-                if (response.len == 0) return
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "GET_BATTERY response.len == 0")
+                    return
+                }
                 val data = BatteryInfo(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_BATTERY => success $data")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewBatteryInfo).post(InterfaceEvent(model, data))
             }
             LewBleCmd.GET_INFO -> {
-                if (response.len == 0) return
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "GET_INFO response.len == 0")
+                    return
+                }
                 val data = DeviceInfo(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success $data")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewDeviceInfo).post(InterfaceEvent(model, data))
-                if (runRtImmediately){
-                    runRtTask()
-                    runRtImmediately = false
-                }
             }
             LewBleCmd.BOUND_DEVICE -> {
-                if (response.len == 0) return
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "BOUND_DEVICE response.len == 0")
+                    return
+                }
                 LepuBleLog.d(tag, "model:$model,BOUND_DEVICE => success")
                 if (response.content[0].toInt() == 0) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewBoundDevice).post(InterfaceEvent(model, false))
@@ -131,7 +132,10 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,FIND_DEVICE => success")
             }
             LewBleCmd.GET_SYSTEM_SETTING -> {
-                if (response.len == 0) return
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "GET_SYSTEM_SETTING response.len == 0")
+                    return
+                }
                 val data = SystemSetting(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_SYSTEM_SETTING => success $data")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetSystemSetting).post(InterfaceEvent(model, data))
@@ -260,7 +264,10 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 }
             }
             LewBleCmd.GET_MEASURE_SETTING -> {
-                if (response.len == 0) return
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "GET_MEASURE_SETTING response.len == 0")
+                    return
+                }
                 val data = MeasureSetting(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_MEASURE_SETTING => success $data")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetMeasureSetting).post(InterfaceEvent(model, data))
@@ -384,35 +391,50 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 }
             }
             LewBleCmd.GET_SPORT_LIST -> {
-                if (response.len == 0) return
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "GET_SPORT_LIST response.len == 0")
+                    return
+                }
                 val data = SportList(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_SPORT_LIST => success $data")
                 val list = LewBleResponse.FileList(LewBleCmd.ListType.SPORT, response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
             }
             LewBleCmd.GET_ECG_LIST -> {
-                if (response.len == 0) return
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "GET_ECG_LIST response.len == 0")
+                    return
+                }
                 val data = EcgList(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_ECG_LIST => success $data")
                 val list = LewBleResponse.FileList(LewBleCmd.ListType.ECG, response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
             }
             LewBleCmd.GET_HR_LIST -> {
-                if (response.len == 0) return
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "GET_HR_LIST response.len == 0")
+                    return
+                }
                 val data = HrList(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_HR_LIST => success $data")
                 val list = LewBleResponse.FileList(LewBleCmd.ListType.HR, response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
             }
             LewBleCmd.GET_OXY_LIST -> {
-                if (response.len == 0) return
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "GET_OXY_LIST response.len == 0")
+                    return
+                }
                 val data = OxyList(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_OXY_LIST => success $data")
                 val list = LewBleResponse.FileList(LewBleCmd.ListType.OXY, response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
             }
             LewBleCmd.GET_SLEEP_LIST -> {
-                if (response.len == 0) return
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "GET_SLEEP_LIST response.len == 0")
+                    return
+                }
                 val data = SleepList(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_SLEEP_LIST => success $data")
                 val list = LewBleResponse.FileList(LewBleCmd.ListType.SLEEP, response.content)
@@ -441,7 +463,10 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 }
             }
             LewBleCmd.RT_DATA -> {
-                if (response.len == 0) return
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "RT_DATA response.len == 0")
+                    return
+                }
                 val data = RtData(response.content)
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success $data")
 
@@ -462,7 +487,10 @@ class LewBleInterface(model: Int): BleInterface(model) {
 
             // 以下部分是之前协议，需测试手表是否兼容
             LewBleCmd.GET_FILE_LIST -> {
-                if (response.len == 0) return
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "GET_FILE_LIST response.len == 0")
+                    return
+                }
                 fileListName = trimStr(com.lepu.blepro.utils.toString(response.content.copyOfRange(1, response.content.size)))
                 LepuBleLog.d(tag, "model:$model,GET_FILE_LIST => success")
                 curFileName = fileListName
@@ -492,11 +520,13 @@ class LewBleInterface(model: Int): BleInterface(model) {
                     //检查当前的下载状态
                     if (isCancelRF || isPausedRF) {
                         sendCmd(LewBleCmd.readFileEnd())
+                        LepuBleLog.d(tag, "READ_FILE_DATA isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
                         return
                     }
                     // 心电文件数据不知为何有空数据的文件
                     if (response.len == 0) {
                         sendCmd(LewBleCmd.readFileEnd())
+                        LepuBleLog.d(tag, "READ_FILE_DATA response.len == 0")
                         return
                     }
 
@@ -521,7 +551,10 @@ class LewBleInterface(model: Int): BleInterface(model) {
                     curFileName = null// 一定要放在发通知之前
                     curFile?.let {
                         if (it.index < it.fileSize ) {
-                            if ((isCancelRF || isPausedRF) ) return
+                            if ((isCancelRF || isPausedRF) ) {
+                                LepuBleLog.d(tag, "READ_FILE_END isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
+                                return
+                            }
                         } else {
                             val list =
                                 LewBleResponse.FileList(0, it.content)
@@ -532,8 +565,11 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 } else {
                     curFileName = null// 一定要放在发通知之前
                     curFile?.let {
-                        if (it.index < it.fileSize ){
-                            if ((isCancelRF || isPausedRF) ) return
+                        if (it.index < it.fileSize){
+                            if ((isCancelRF || isPausedRF)) {
+                                LepuBleLog.d(tag, "READ_FILE_END isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
+                                return
+                            }
                         }else {
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete).post(InterfaceEvent(model, it))
                         }
@@ -548,19 +584,24 @@ class LewBleInterface(model: Int): BleInterface(model) {
 
     fun getBattery() {
         sendCmd(LewBleCmd.getBattery())
+        LepuBleLog.d(tag, "getBattery")
     }
     override fun getInfo() {
         sendCmd(LewBleCmd.getDeviceInfo())
+        LepuBleLog.d(tag, "getInfo")
     }
     override fun syncTime() {
         sendCmd(LewBleCmd.setTime())
+        LepuBleLog.d(tag, "syncTime")
     }
 
     fun setTime(data: TimeData) {
         sendCmd(LewBleCmd.setTime(data.getDataBytes()))
+        LepuBleLog.d(tag, "setTime data:$data")
     }
     fun getTime() {
         sendCmd(LewBleCmd.getTime())
+        LepuBleLog.d(tag, "getTime")
     }
 
     fun boundDevice(b: Boolean) {
@@ -569,156 +610,206 @@ class LewBleInterface(model: Int): BleInterface(model) {
         } else {
             sendCmd(LewBleCmd.unBoundDevice())
         }
+        LepuBleLog.d(tag, "boundDevice b:$b")
     }
     fun findDevice() {
         sendCmd(LewBleCmd.findDevice())
+        LepuBleLog.d(tag, "findDevice")
     }
     fun getSystemSetting() {
         sendCmd(LewBleCmd.getSystemSetting())
+        LepuBleLog.d(tag, "getSystemSetting")
     }
     fun setSystemSetting(setting: SystemSetting) {
         sendCmd(LewBleCmd.setSystemSetting(setting.getDataBytes()))
+        LepuBleLog.d(tag, "setSystemSetting setting:$setting")
     }
     fun getLanguage() {
         sendCmd(LewBleCmd.getLanguageSetting())
+        LepuBleLog.d(tag, "getLanguage")
     }
     fun setLanguage(num: Int) {
         sendCmd(LewBleCmd.setLanguageSetting(num))
+        LepuBleLog.d(tag, "setLanguage num:$num")
     }
     fun getUnit() {
         sendCmd(LewBleCmd.getUnitSetting())
+        LepuBleLog.d(tag, "getUnit")
     }
     fun setUnit(unit: UnitSetting) {
         sendCmd(LewBleCmd.setUnitSetting(unit.getDataBytes()))
+        LepuBleLog.d(tag, "setUnit unit:$unit")
     }
     fun getHandRaise() {
         sendCmd(LewBleCmd.getHandRaiseSetting())
+        LepuBleLog.d(tag, "getHandRaise")
     }
     fun setHandRaise(handRaise: HandRaiseSetting) {
         sendCmd(LewBleCmd.setHandRaiseSetting(handRaise.getDataBytes()))
+        LepuBleLog.d(tag, "setHandRaise handRaise:$handRaise")
     }
     fun getLrHand() {
         sendCmd(LewBleCmd.getLrHandSetting())
+        LepuBleLog.d(tag, "getLrHand")
     }
     fun setLrHand(hand: Int) {
         sendCmd(LewBleCmd.setLrHandSetting(hand))
+        LepuBleLog.d(tag, "setLrHand hand:$hand")
     }
     fun getNoDisturbMode() {
         sendCmd(LewBleCmd.getNoDisturbMode())
+        LepuBleLog.d(tag, "getNoDisturbMode")
     }
     fun setNoDisturbMode(mode: NoDisturbMode) {
         sendCmd(LewBleCmd.setNoDisturbMode(mode.getDataBytes()))
+        LepuBleLog.d(tag, "setNoDisturbMode mode:$mode")
     }
     fun getAppSwitch() {
         sendCmd(LewBleCmd.getAppSwitch())
+        LepuBleLog.d(tag, "getAppSwitch")
     }
     fun setAppSwitch(switches: AppSwitch) {
         sendCmd(LewBleCmd.setAppSwitch(switches.getDataBytes()))
+        LepuBleLog.d(tag, "setAppSwitch switches:$switches")
     }
     fun notification(info: NotificationInfo) {
         sendCmd(LewBleCmd.notificationInfo(info.getDataBytes()))
+        LepuBleLog.d(tag, "notification info:$info")
     }
     fun getDeviceMode() {
         sendCmd(LewBleCmd.getDeviceMode())
+        LepuBleLog.d(tag, "getDeviceMode")
     }
     fun setDeviceMode(mode: Int) {
         sendCmd(LewBleCmd.setDeviceMode(mode))
+        LepuBleLog.d(tag, "setDeviceMode mode:$mode")
     }
     fun getAlarmClock() {
         sendCmd(LewBleCmd.getAlarmClock())
+        LepuBleLog.d(tag, "getAlarmClock")
     }
     fun setAlarmClock(alarm: AlarmClockInfo) {
         sendCmd(LewBleCmd.setAlarmClock(alarm.getDataBytes()))
+        LepuBleLog.d(tag, "setAlarmClock alarm:$alarm")
     }
     fun getPhoneSwitch() {
         sendCmd(LewBleCmd.getPhoneSwitch())
+        LepuBleLog.d(tag, "getPhoneSwitch")
     }
     fun setPhoneSwitch(switches: PhoneSwitch) {
         sendCmd(LewBleCmd.setPhoneSwitch(switches.getDataBytes()))
+        LepuBleLog.d(tag, "setPhoneSwitch switches:$switches")
     }
     fun getMedicineRemind() {
         sendCmd(LewBleCmd.getMedicineRemind())
+        LepuBleLog.d(tag, "getMedicineRemind")
     }
     fun setMedicineRemind(remind: MedicineRemind) {
         sendCmd(LewBleCmd.setMedicineRemind(remind.getDataBytes()))
+        LepuBleLog.d(tag, "setMedicineRemind remind:$remind")
     }
     fun getMeasureSetting() {
         sendCmd(LewBleCmd.getMeasureSetting())
+        LepuBleLog.d(tag, "getMeasureSetting")
     }
     fun setMeasureSetting(setting: MeasureSetting) {
         sendCmd(LewBleCmd.setMeasureSetting(setting.getDataBytes()))
+        LepuBleLog.d(tag, "setMeasureSetting setting:$setting")
     }
     fun getSportTarget() {
         sendCmd(LewBleCmd.getSportTarget())
+        LepuBleLog.d(tag, "getSportTarget")
     }
     fun setSportTarget(target: SportTarget) {
         sendCmd(LewBleCmd.setSportTarget(target.getDataBytes()))
+        LepuBleLog.d(tag, "setSportTarget target:$target")
     }
     fun getTargetRemind() {
         sendCmd(LewBleCmd.getTargetRemind())
+        LepuBleLog.d(tag, "getTargetRemind")
     }
     fun setTargetRemind(remind: Boolean) {
         sendCmd(LewBleCmd.setTargetRemind(remind))
+        LepuBleLog.d(tag, "setTargetRemind remind:$remind")
     }
     fun getSittingRemind() {
         sendCmd(LewBleCmd.getSittingRemind())
+        LepuBleLog.d(tag, "getSittingRemind")
     }
     fun setSittingRemind(remind: SittingRemind) {
         sendCmd(LewBleCmd.setSittingRemind(remind.getDataBytes()))
+        LepuBleLog.d(tag, "setSittingRemind remind:$remind")
     }
     fun getHrDetect() {
         sendCmd(LewBleCmd.getHrDetect())
+        LepuBleLog.d(tag, "getHrDetect")
     }
     fun setHrDetect(detect: HrDetect) {
         sendCmd(LewBleCmd.setHrDetect(detect.getDataBytes()))
+        LepuBleLog.d(tag, "setHrDetect detect:$detect")
     }
     fun getOxyDetect() {
         sendCmd(LewBleCmd.getOxyDetect())
+        LepuBleLog.d(tag, "getOxyDetect")
     }
     fun setOxyDetect(detect: OxyDetect) {
         sendCmd(LewBleCmd.setOxyDetect(detect.getDataBytes()))
+        LepuBleLog.d(tag, "setOxyDetect detect:$detect")
     }
     fun getUserInfo() {
         sendCmd(LewBleCmd.getUserInfo())
+        LepuBleLog.d(tag, "getUserInfo")
     }
     fun setUserInfo(info: UserInfo) {
         sendCmd(LewBleCmd.setUserInfo(info.getDataBytes()))
+        LepuBleLog.d(tag, "setUserInfo info:$info")
     }
     fun getPhoneBook() {
         sendCmd(LewBleCmd.getPhoneBook())
+        LepuBleLog.d(tag, "getPhoneBook")
     }
     fun setPhoneBook(book: PhoneBook) {
         sendCmd(LewBleCmd.setPhoneBook(book.getDataBytes()))
+        LepuBleLog.d(tag, "setPhoneBook book:$book")
     }
     fun getSosContact() {
         sendCmd(LewBleCmd.getSosContact())
+        LepuBleLog.d(tag, "getSosContact")
     }
     fun setSosContact(sos: SosContact) {
         sendCmd(LewBleCmd.setSosContact(sos.getDataBytes()))
+        LepuBleLog.d(tag, "setSosContact sos:$sos")
     }
     fun setDialNum(num: Int) {
         sendCmd(LewBleCmd.setDialNum(num))
+        LepuBleLog.d(tag, "setDialNum")
     }
     fun setDialFormat() {
         // ???
+        LepuBleLog.d(tag, "setDialFormat")
     }
     fun getSecondScreen() {
         sendCmd(LewBleCmd.getSecondScreen())
+        LepuBleLog.d(tag, "getSecondScreen")
     }
     fun setSecondScreen(screen: SecondScreen) {
         sendCmd(LewBleCmd.setSecondScreen(screen.getDataBytes()))
+        LepuBleLog.d(tag, "setSecondScreen screen:$screen")
     }
     fun getCards() {
         sendCmd(LewBleCmd.getCards())
+        LepuBleLog.d(tag, "getCards")
     }
     fun setCards(cards: IntArray) {
         sendCmd(LewBleCmd.setCards(cards))
+        LepuBleLog.d(tag, "setCards cards:${Arrays.toString(cards)}")
     }
     override fun getFileList() {
         offset = 0
         isCancelRF = false
         isPausedRF = false
         sendCmd(LewBleCmd.listFiles())
+        LepuBleLog.d(tag, "getFileList")
     }
     fun getFileList(type: Int, startTime: Int) {
         when (type) {
@@ -738,44 +829,60 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 sendCmd(LewBleCmd.getSleepList(startTime))
             }
         }
+        LepuBleLog.d(tag, "getFileList type:$type, startTime:$startTime")
     }
     fun getHrThreshold() {
         sendCmd(LewBleCmd.getHrThreshold())
+        LepuBleLog.d(tag, "getHrThreshold")
     }
     fun setHrThreshold(threshold: HrThreshold) {
         sendCmd(LewBleCmd.setHrThreshold(threshold.getDataBytes()))
+        LepuBleLog.d(tag, "setHrThreshold")
     }
     fun getOxyThreshold() {
         sendCmd(LewBleCmd.getOxyThreshold())
+        LepuBleLog.d(tag, "getOxyThreshold")
     }
     fun setOxyThreshold(threshold: OxyThreshold) {
         sendCmd(LewBleCmd.setOxyThreshold(threshold.getDataBytes()))
+        LepuBleLog.d(tag, "setOxyThreshold")
     }
 
     override fun getRtData() {
         sendCmd(LewBleCmd.getRtData())
+        LepuBleLog.d(tag, "getRtData")
     }
 
     fun deleteFile(fileName: String) {
         sendCmd(LewBleCmd.deleteFile(fileName.toByteArray()))
+        LepuBleLog.d(tag, "deleteFile fileName:$fileName")
     }
 
     override fun factoryReset() {
         sendCmd(LewBleCmd.factoryReset())
+        LepuBleLog.d(tag, "factoryReset")
     }
 
     override fun reset() {
         sendCmd(LewBleCmd.reset())
+        LepuBleLog.d(tag, "reset")
     }
 
     override fun factoryResetAll() {
         sendCmd(LewBleCmd.factoryResetAll())
+        LepuBleLog.d(tag, "factoryResetAll")
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
         readFile(userId, fileName)
+        LepuBleLog.d(tag, "dealContinueRF userId:$userId, fileName:$fileName")
     }
 
-
+    override fun dealReadFile(userId: String, fileName: String) {
+        this.userId = userId
+        this.curFileName =fileName
+        sendCmd(LewBleCmd.readFileStart(fileName.toByteArray(), 0))
+        LepuBleLog.d(tag, "dealReadFile:: $userId, $fileName, offset = $offset")
+    }
 
 }
