@@ -97,7 +97,7 @@ public class LewBleCmd {
         return getReq(BOUND_DEVICE, new byte[0]);
     }
     public static byte[] unBoundDevice() { return getReq(UNBOUND_DEVICE, new byte[0]); }
-    public static byte[] findDevice() { return getReq(FIND_DEVICE, new byte[0]); }
+    public static byte[] findDevice(int on) { return getReq(FIND_DEVICE, new byte[]{(byte)on}); }
 
     public static byte[] getSystemSetting() { return getReq(GET_SYSTEM_SETTING, new byte[0]); }
     public static byte[] setSystemSetting(byte[] setting) { return getReq(SET_SYSTEM_SETTING, setting); }

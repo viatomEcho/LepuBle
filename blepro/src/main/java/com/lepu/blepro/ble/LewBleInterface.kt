@@ -129,7 +129,17 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewUnBoundDevice).post(InterfaceEvent(model, true))
             }
             LewBleCmd.FIND_DEVICE -> {
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "FIND_DEVICE response.len == 0")
+                    return
+                }
                 LepuBleLog.d(tag, "model:$model,FIND_DEVICE => success")
+                val data = toUInt(response.content)
+                if (data == 1) {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFindPhone).post(InterfaceEvent(model, true))
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFindPhone).post(InterfaceEvent(model, false))
+                }
             }
             LewBleCmd.GET_SYSTEM_SETTING -> {
                 if (response.len == 0) {
@@ -612,8 +622,13 @@ class LewBleInterface(model: Int): BleInterface(model) {
         }
         LepuBleLog.d(tag, "boundDevice b:$b")
     }
-    fun findDevice() {
-        sendCmd(LewBleCmd.findDevice())
+    fun findDevice(on: Boolean) {
+        //0:关闭查找，1:打开查找
+        if (on) {
+            sendCmd(LewBleCmd.findDevice(1))
+        } else {
+            sendCmd(LewBleCmd.findDevice(0))
+        }
         LepuBleLog.d(tag, "findDevice")
     }
     fun getSystemSetting() {

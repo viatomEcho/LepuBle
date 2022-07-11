@@ -625,7 +625,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_CMRING -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_CMRING,
+            Bluetooth.MODEL_OXYU -> {
                 return inter is OxyBleInterface
             }
             Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T ->{
@@ -635,7 +636,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
-            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW -> {
+            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_S5W -> {
                 return inter is Pc60FwBleInterface
             }
             Bluetooth.MODEL_PC80B -> {
@@ -1680,12 +1682,12 @@ class BleServiceHelper private constructor() {
     /**
      * 寻找设备
      */
-    fun lewFindDevice(model: Int) {
+    fun lewFindDevice(model: Int, on: Boolean) {
         if (!checkService()) return
         getInterface(model)?.let { it1 ->
             (it1 as LewBleInterface).let {
                 LepuBleLog.d(tag, "it as LewBleInterface--lewFindDevice")
-                it.findDevice()
+                it.findDevice(on)
             }
         }
     }

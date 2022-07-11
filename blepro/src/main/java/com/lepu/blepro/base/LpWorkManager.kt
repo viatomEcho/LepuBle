@@ -146,7 +146,7 @@ object LpWorkManager {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2 -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
                 OxyBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
@@ -204,7 +204,8 @@ object LpWorkManager {
             Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
-            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW -> {
+            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_S5W -> {
                 Pc60FwBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -277,7 +278,7 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_LEW -> {
+            Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
                 LewBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -590,6 +591,11 @@ object LpWorkManager {
             val device = result.device
             var deviceName = result.device.name
             val deviceAddress = result.device.address
+            // 更新广播的蓝牙名
+            result.scanRecord?.let {
+                deviceName = it.deviceName
+            }
+
             if (TextUtils.isEmpty(deviceName)) {
                 deviceName = BluetoothController.getDeviceName(deviceAddress)
             }

@@ -16,7 +16,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      *           MODEL_CHECKO2, MODEL_O2M, MODEL_SLEEPO2,
      *           MODEL_SNOREO2, MODEL_WEARO2, MODEL_SLEEPU,
      *           MODEL_OXYLINK, MODEL_KIDSO2, MODEL_OXYFIT,
-     *           MODEL_OXYRING, MODEL_BBSM_S1, MODEL_BBSM_S2
+     *           MODEL_OXYRING, MODEL_BBSM_S1, MODEL_BBSM_S2,
+     *           MODEL_OXYU
      *
      * MODEL_BABYO2N 接收 EventBleDeviceReady 消息为连接成功，因为需要app先同步设备信息再同步时间处理或者在3s后再发指令给设备
      */
@@ -197,7 +198,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      * 包含model: MODEL_PC60FW, MODEL_PC66B, MODEL_OXYSMART,
      *           MODEL_POD_1W, MODEL_POD2B, MODEL_PC_60NW_1,
      *           MODEL_PC_60B, MODEL_PF_10A, MODEL_PF_10B,
-     *           MODEL_PF_20A, MODEL_PF_20B, MODEL_PC_60NW
+     *           MODEL_PF_20A, MODEL_PF_20B, MODEL_PC_60NW,
+     *           MODEL_S5W
      */
     interface PC60Fw {
         companion object {
@@ -307,7 +309,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * LewBleInterface发出的通知
-     * 包含model: MODEL_LEW
+     * 包含model: MODEL_LEW, MODEL_W12C
      */
     interface Lew {
         companion object {
@@ -317,6 +319,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventLewGetTime = "com.lepu.ble.lew.get.time"                             // 同步时间 TimeData
             const val EventLewBoundDevice = "com.lepu.ble.lew.bound.device"                     // 请求绑定设备 boolean
             const val EventLewUnBoundDevice = "com.lepu.ble.lew.unbound.device"                 // 解绑设备
+            const val EventLewFindPhone = "com.lepu.ble.lew.find.phone"                         // 找手机 boolean（true打开查找，false关闭查找）
             const val EventLewGetSystemSetting = "com.lepu.ble.lew.get.system.setting"          // 获取系统配置 SystemSetting（包含语言、单位、翻腕、左右手）
             const val EventLewSetSystemSetting = "com.lepu.ble.lew.set.system.setting"          // 设置系统配置（包含语言、单位、翻腕、左右手）
             const val EventLewGetLanguageSetting = "com.lepu.ble.lew.get.language.setting"      // 获取语言配置 LewBleCmd.Language

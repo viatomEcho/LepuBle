@@ -57,6 +57,7 @@ class Constant{
             const val AP20_MODEL: Int = Bluetooth.MODEL_AP20
             const val SP20_MODEL: Int = Bluetooth.MODEL_SP20
             const val LEW_MODEL: Int = Bluetooth.MODEL_LEW
+            const val W12C_MODEL: Int = Bluetooth.MODEL_W12C
             const val VETCORDER_MODEL: Int = Bluetooth.MODEL_VETCORDER
             const val CHECK_ADV_MODEL: Int = Bluetooth.MODEL_CHECK_ADV
             const val CHECK_POD_MODEL: Int = Bluetooth.MODEL_CHECK_POD
@@ -75,6 +76,8 @@ class Constant{
             const val F8_SCALE_MODEL: Int = Bluetooth.MODEL_F8_SCALE
             const val LPRE_MODEL: Int = Bluetooth.MODEL_LPRE
             const val LE_B1_MODEL: Int = Bluetooth.MODEL_LE_B1
+            const val OXYU_MODEL: Int = Bluetooth.MODEL_OXYU
+            const val S5W_MODEL: Int = Bluetooth.MODEL_S5W
             const val PATIENT_DEVICE_JSON: Int = 1004
 
             val SUPPORT_MODELS = intArrayOf(ER1_MODEL, DUOEK_MODEL, ER2_MODEL, PC80B_MODEL, BP2_MODEL,
@@ -86,7 +89,7 @@ class Constant{
                 POD2B_MODEL, PC_60NW_1_MODEL, PC_60NW_MODEL, PC_60B_MODEL, PC300_MODEL, PULSEBITEX_MODEL, FETAL_MODEL,
                 VTM_AD5_MODEL, VCOMIN_MODEL, CHECKME_LE_MODEL, PF_10_MODEL, PF_20_MODEL, LEM_MODEL, LES1_MODEL,
                 CHECK_ADV_MODEL, F4_SCALE_MODEL, MY_SCALE_MODEL, F5_SCALE_MODEL, F8_SCALE_MODEL, OXYRING_MODEL,
-                BBSM_S1_MODEL, BBSM_S2_MODEL, CMRING_MODEL, LPRE_MODEL, LE_B1_MODEL
+                BBSM_S1_MODEL, BBSM_S2_MODEL, CMRING_MODEL, LPRE_MODEL, LE_B1_MODEL, OXYU_MODEL, S5W_MODEL, W12C_MODEL
             )
 
             val SUPPORT_FACES = SparseArray<Int>().apply {
