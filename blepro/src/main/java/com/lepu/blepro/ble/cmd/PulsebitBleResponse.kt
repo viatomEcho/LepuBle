@@ -42,7 +42,12 @@ class PulsebitBleResponse{
         var application:String   //
 
         init {
-            infoStr = JSONObject(String(bytes))
+            val data = String(bytes)
+            infoStr = if (data.contains("{")) {
+                JSONObject(data)
+            } else {
+                JSONObject()
+            }
 //            try {
 //                var infoStr = JSONObject(String(bytes))
 //            } catch (e: JSONException) {

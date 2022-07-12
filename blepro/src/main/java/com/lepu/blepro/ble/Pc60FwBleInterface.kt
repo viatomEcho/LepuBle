@@ -26,18 +26,17 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
     private var pc60FwDevice = BoDeviceInfo()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = if (model == Bluetooth.MODEL_PC60FW
-            || model == Bluetooth.MODEL_OXYSMART
-            || model == Bluetooth.MODEL_POD_1W
-            || model == Bluetooth.MODEL_PF_10
-            || model == Bluetooth.MODEL_PC_60NW_1
-            || model == Bluetooth.MODEL_PC_60B
-            || model == Bluetooth.MODEL_POD2B) {
-            Pc60FwBleManager(context)
-        } else if (model == Bluetooth.MODEL_PF_20) {
-            Pf20BleManager(context)
-        } else {
-            Pc6nBleManager(context)
+        manager = when (model) {
+            Bluetooth.MODEL_PC60FW,
+            Bluetooth.MODEL_OXYSMART,
+            Bluetooth.MODEL_POD_1W,
+            Bluetooth.MODEL_PF_10,
+            Bluetooth.MODEL_PC_60NW_1,
+            Bluetooth.MODEL_PC_60B,
+            Bluetooth.MODEL_POD2B,
+            Bluetooth.MODEL_S5W -> Pc60FwBleManager(context)
+            Bluetooth.MODEL_PF_20 -> Pf20BleManager(context)
+            else -> Pc6nBleManager(context)
         }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)

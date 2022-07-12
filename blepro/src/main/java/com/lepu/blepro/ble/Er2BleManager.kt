@@ -3,11 +3,8 @@ package com.lepu.blepro.ble
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.util.Log
-import com.lepu.blepro.BleServiceHelper
-import com.lepu.blepro.base.BaseBleManager
-import com.lepu.blepro.base.LpBleInterfaceManager
+import com.lepu.blepro.base.LpWorkManager
 import com.lepu.blepro.base.LpBleManager
-import com.lepu.blepro.ble.cmd.Er1BleCmd
 import com.lepu.blepro.ble.cmd.Er2BleCmd
 import com.lepu.blepro.utils.LepuBleLog
 import no.nordicsemi.android.ble.ConnectionPriorityRequest
@@ -56,7 +53,7 @@ class Er2BleManager(context: Context): LpBleManager(context) {
 //    }
 
     override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {
-        if (LpBleInterfaceManager.support2MPhy) {
+        if (LpWorkManager.support2MPhy) {
             requestQueue.add(requestMtu(247)
                 .with { device: BluetoothDevice?, mtu: Int ->
                     log(Log.INFO, "Er2BleManager MTU set to $mtu")

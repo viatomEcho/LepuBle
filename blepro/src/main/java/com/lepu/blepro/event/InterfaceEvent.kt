@@ -17,6 +17,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      *           MODEL_SNOREO2, MODEL_WEARO2, MODEL_SLEEPU,
      *           MODEL_OXYLINK, MODEL_KIDSO2, MODEL_OXYFIT,
      *           MODEL_OXYRING, MODEL_BBSM_S1, MODEL_BBSM_S2
+     *           MODEL_OXYU
      *
      * MODEL_BABYO2N 接收 EventBleDeviceReady 消息为连接成功，因为需要app先同步设备信息再同步时间处理或者在3s后再发指令给设备
      */
@@ -195,6 +196,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      *           MODEL_POD_1W, MODEL_POD2B, MODEL_PC_60NW_1,
      *           MODEL_PC_60B, MODEL_PF_10A, MODEL_PF_10B,
      *           MODEL_PF_20A, MODEL_PF_20B, MODEL_PC_60NW
+     *           MODEL_S5W
      */
     interface PC60Fw {
         companion object {

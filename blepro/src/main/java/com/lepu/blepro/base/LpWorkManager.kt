@@ -26,7 +26,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-object LpBleInterfaceManager {
+object LpWorkManager {
 
     val tag: String = "LpBleInterfaceManager"
 
@@ -91,7 +91,7 @@ object LpBleInterfaceManager {
      */
     var isWaitingScanResult = false
     var scanTimeout: Job? = null
-    var scanTimer = object : CountDownTimer(10000, 10000) {
+    var scanTimer = object : CountDownTimer(3000, 3000) {
         override fun onTick(millisUntilFinished: Long) {
 
         }
@@ -146,7 +146,7 @@ object LpBleInterfaceManager {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2 -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
                 OxyBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
@@ -204,7 +204,8 @@ object LpBleInterfaceManager {
             Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
-            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW -> {
+            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_S5W -> {
                 Pc60FwBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -426,7 +427,7 @@ object LpBleInterfaceManager {
         startScan?.cancel()
 
         startScan = GlobalScope.launch {
-            delay(3000)
+            delay(1000)
             scanDevice(true)
         }
 
@@ -596,6 +597,11 @@ object LpBleInterfaceManager {
             val device = result.device
             var deviceName = result.device.name
             val deviceAddress = result.device.address
+            // 更新广播的蓝牙名
+            result.scanRecord?.let {
+                deviceName = it.deviceName
+            }
+
             if (TextUtils.isEmpty(deviceName)) {
                 deviceName = BluetoothController.getDeviceName(deviceAddress)
             }
@@ -718,6 +724,7 @@ object LpBleInterfaceManager {
 
         override fun onScanFailed(errorCode: Int) {
             LepuBleLog.e(tag, "scan error: $errorCode")
+            LiveEventBus.get<Int>(EventMsgConst.Discovery.EventDeviceFoundError).post(errorCode)
             if (errorCode == SCAN_FAILED_ALREADY_STARTED) {
                 LepuBleLog.e(tag, "Fails to start scan as BLE scan with the same settings is already started by the app.")
 

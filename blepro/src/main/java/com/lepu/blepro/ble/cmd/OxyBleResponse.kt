@@ -62,8 +62,12 @@ class OxyBleResponse{
         var ivThr: Int           // 无效值报警告警时间阈值
 
         init {
-            Log.d("test12345", "bytes : ${bytesToHex(bytes)}")
-            infoStr = JSONObject(String(bytes))
+            val data = String(bytes)
+            infoStr = if (data.contains("{")) {
+                JSONObject(data)
+            } else {
+                JSONObject()
+            }
 //            try {
 //                var infoStr = JSONObject(String(bytes))
 //            } catch (e: JSONException) {

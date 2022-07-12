@@ -124,7 +124,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
                 Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
                 Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
-                Bluetooth.MODEL_OXYRING -> {
+                Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_OXYU -> {
                     setViewVisible(binding.o2Layout)
                     LpBleUtil.getInfo(it.modelNo)
                 }

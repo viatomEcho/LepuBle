@@ -4,15 +4,13 @@ import android.app.Application
 import android.bluetooth.BluetoothDevice
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.SparseArray
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.base.LpBleInterfaceManager
+import com.lepu.blepro.base.LpWorkManager
 import com.lepu.blepro.ble.*
-import com.lepu.blepro.ble.cmd.LewBleCmd
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.lew.*
@@ -97,15 +95,15 @@ class BleServiceHelper private constructor() {
     fun initService(application: Application, observer: BleServiceObserver?): BleServiceHelper {
 
         LepuBleLog.d("BleServiceHelper initService  start")
-//        BleService.observer = observer
-        LpBleInterfaceManager.observer = observer
-        /*BleService.startService(application)
+        /*BleService.observer = observer
+        BleService.startService(application)
 
         Intent(application, BleService::class.java).also { intent ->
             application.bindService(intent, bleConn, Context.BIND_AUTO_CREATE)
         }*/
-        LpBleInterfaceManager.application = application
-        LpBleInterfaceManager.reInitBle()
+        LpWorkManager.observer = observer
+        LpWorkManager.application = application
+        LpWorkManager.reInitBle()
         initCurrentFace()
         return this
     }
@@ -137,7 +135,7 @@ class BleServiceHelper private constructor() {
      */
     private fun initCurrentFace(): BleServiceHelper{
 //        if (this::bleService.isInitialized) {
-        if (LpBleInterfaceManager.application != null) {
+        if (LpWorkManager.application != null) {
 
             LepuBleLog.d("initVailFace", "${modelConfig.size()}")
             for (i in 0 until modelConfig.size()) {
@@ -165,7 +163,7 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         LepuBleLog.d(tag, "setInterfaces")
 //        if (getInterface(model) == null) bleService.initInterfaces(model, runRtImmediately)
-        if (getInterface(model) == null) LpBleInterfaceManager.initInterfaces(model, runRtImmediately)
+        if (getInterface(model) == null) LpWorkManager.initInterfaces(model, runRtImmediately)
     }
 
 
@@ -176,7 +174,7 @@ class BleServiceHelper private constructor() {
     fun reInitBle(): BleServiceHelper {
         if (!checkService()) return this
 //        BleServiceHelper.bleService.reInitBle()
-        LpBleInterfaceManager.reInitBle()
+        LpWorkManager.reInitBle()
         return this
     }
 
@@ -210,13 +208,13 @@ class BleServiceHelper private constructor() {
     fun startScan(scanModel: Int? = null, needPair: Boolean = false) {
         if (!checkService()) return
 //        bleService.setScanDefineDevice(false, false, "")
-        LpBleInterfaceManager.setScanDefineDevice(false, false, "")
+        LpWorkManager.setScanDefineDevice(false, false, "")
         if (scanModel != null) {
 //            bleService.startDiscover(intArrayOf(scanModel), needPair)
-            LpBleInterfaceManager.startDiscover(intArrayOf(scanModel), needPair)
+            LpWorkManager.startDiscover(intArrayOf(scanModel), needPair)
         } else {
 //            bleService.startDiscover(null, needPair)
-            LpBleInterfaceManager.startDiscover(null, needPair)
+            LpWorkManager.startDiscover(null, needPair)
         }
     }
 
@@ -227,9 +225,9 @@ class BleServiceHelper private constructor() {
     fun startScan(scanModel: IntArray, needPair: Boolean = false) {
         if (!checkService()) return
 //        bleService.setScanDefineDevice(false, false, "")
-        LpBleInterfaceManager.setScanDefineDevice(false, false, "")
+        LpWorkManager.setScanDefineDevice(false, false, "")
 //        bleService.startDiscover(scanModel, needPair)
-        LpBleInterfaceManager.startDiscover(scanModel, needPair)
+        LpWorkManager.startDiscover(scanModel, needPair)
     }
 
     /**
@@ -239,13 +237,13 @@ class BleServiceHelper private constructor() {
     fun startScanByName(deviceName: String, scanModel: Int? = null, needPair: Boolean = false) {
         if (!checkService()) return
 //        bleService.setScanDefineDevice(true, true, deviceName)
-        LpBleInterfaceManager.setScanDefineDevice(true, true, deviceName)
+        LpWorkManager.setScanDefineDevice(true, true, deviceName)
         if (scanModel != null) {
 //            bleService.startDiscover(intArrayOf(scanModel), needPair)
-            LpBleInterfaceManager.startDiscover(intArrayOf(scanModel), needPair)
+            LpWorkManager.startDiscover(intArrayOf(scanModel), needPair)
         } else {
 //            bleService.startDiscover(null, needPair)
-            LpBleInterfaceManager.startDiscover(null, needPair)
+            LpWorkManager.startDiscover(null, needPair)
         }
     }
 
@@ -256,13 +254,13 @@ class BleServiceHelper private constructor() {
     fun startScanByAddress(address: String, scanModel: Int? = null, needPair: Boolean = false) {
         if (!checkService()) return
 //        bleService.setScanDefineDevice(true, false, address)
-        LpBleInterfaceManager.setScanDefineDevice(true, false, address)
+        LpWorkManager.setScanDefineDevice(true, false, address)
         if (scanModel != null) {
 //            bleService.startDiscover(intArrayOf(scanModel), needPair)
-            LpBleInterfaceManager.startDiscover(intArrayOf(scanModel), needPair)
+            LpWorkManager.startDiscover(intArrayOf(scanModel), needPair)
         } else {
 //            bleService.startDiscover(null, needPair)
-            LpBleInterfaceManager.startDiscover(null, needPair)
+            LpWorkManager.startDiscover(null, needPair)
         }
     }
 
@@ -273,7 +271,7 @@ class BleServiceHelper private constructor() {
      */
     fun stopScan() {
 //        if (checkService()) bleService.stopDiscover()
-        if (checkService()) LpBleInterfaceManager.stopDiscover()
+        if (checkService()) LpWorkManager.stopDiscover()
     }
 
     /**
@@ -283,7 +281,7 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return null
 
 //        val vailFace = bleService.vailFace
-        val vailFace = LpBleInterfaceManager.vailFace
+        val vailFace = LpWorkManager.vailFace
         LepuBleLog.d(tag, "getInterface: getInterface => currentModel：$model, vailFaceSize：${vailFace.size()}}")
         vailFace.get(model)?.let {
             return vailFace.get(model)
@@ -301,7 +299,7 @@ class BleServiceHelper private constructor() {
     fun getInterfaces(): SparseArray<BleInterface>? {
         if (!checkService()) return null
 //        return bleService.vailFace
-        return LpBleInterfaceManager.vailFace
+        return LpWorkManager.vailFace
     }
 
     /**
@@ -351,7 +349,7 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
 
 //        bleService.reconnect(scanModel, name, needPair, toConnectUpdater)
-        LpBleInterfaceManager.reconnect(scanModel, name, needPair, toConnectUpdater)
+        LpWorkManager.reconnect(scanModel, name, needPair, toConnectUpdater)
 
     }
 
@@ -365,7 +363,7 @@ class BleServiceHelper private constructor() {
         LepuBleLog.d(tag, "into reconnect" )
         if (!checkService()) return
 //        bleService.reconnect(intArrayOf(scanModel), arrayOf(name), needPair, toConnectUpdater)
-        LpBleInterfaceManager.reconnect(intArrayOf(scanModel), arrayOf(name), needPair, toConnectUpdater)
+        LpWorkManager.reconnect(intArrayOf(scanModel), arrayOf(name), needPair, toConnectUpdater)
 
     }
 
@@ -381,7 +379,7 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
 
 //        bleService.reconnectByAddress(scanModel, macAddress, needPair, toConnectUpdater)
-        LpBleInterfaceManager.reconnectByAddress(scanModel, macAddress, needPair, toConnectUpdater)
+        LpWorkManager.reconnectByAddress(scanModel, macAddress, needPair, toConnectUpdater)
 
     }
 
@@ -395,7 +393,7 @@ class BleServiceHelper private constructor() {
         LepuBleLog.d(tag, "into reconnectByAddress" )
         if (!checkService()) return
 //        bleService.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress), needPair, toConnectUpdater)
-        LpBleInterfaceManager.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress), needPair, toConnectUpdater)
+        LpWorkManager.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress), needPair, toConnectUpdater)
 
     }
 
@@ -407,11 +405,11 @@ class BleServiceHelper private constructor() {
 
         if (!checkService()) return
 //        val vailFace = bleService.vailFace
-        val vailFace = LpBleInterfaceManager.vailFace
+        val vailFace = LpWorkManager.vailFace
         for (i in 0 until vailFace.size()) {
             getInterface(vailFace.keyAt(i))?.let { it ->
 //                if (bleService.isDiscovery)stopScan()
-                if (LpBleInterfaceManager.isDiscovery)stopScan()
+                if (LpWorkManager.isDiscovery)stopScan()
                 it.disconnect(autoReconnect)
             }
         }
@@ -458,7 +456,7 @@ class BleServiceHelper private constructor() {
     fun isScanning(): Boolean{
         if (!checkService()) return false
 //        return bleService.isDiscovery
-        return LpBleInterfaceManager.isDiscovery
+        return LpWorkManager.isDiscovery
     }
 
     /**
@@ -492,12 +490,12 @@ class BleServiceHelper private constructor() {
      */
     fun setNeedPair(needPair : Boolean){
 //        BleServiceHelper.bleService.needPair = needPair
-        LpBleInterfaceManager.needPair = needPair
+        LpWorkManager.needPair = needPair
     }
 
     fun removeReconnectName(name: String) {
 //        val iterator = bleService.reconnectDeviceName.iterator()
-        val iterator = LpBleInterfaceManager.reconnectDeviceName.iterator()
+        val iterator = LpWorkManager.reconnectDeviceName.iterator()
         while (iterator.hasNext()) {
             val i = iterator.next()
             if (i == name) {
@@ -505,7 +503,7 @@ class BleServiceHelper private constructor() {
                 LepuBleLog.d(
                     tag,
 //                    "从重连名单中移除 $name,  list = ${bleService.reconnectDeviceName.joinToString()}"
-                    "从重连名单中移除 $name,  list = ${LpBleInterfaceManager.reconnectDeviceName.joinToString()}"
+                    "从重连名单中移除 $name,  list = ${LpWorkManager.reconnectDeviceName.joinToString()}"
                 )
             }
         }
@@ -513,7 +511,7 @@ class BleServiceHelper private constructor() {
 
     fun removeReconnectAddress(address: String) {
 //        val iterator = bleService.reconnectDeviceAddress.iterator()
-        val iterator = LpBleInterfaceManager.reconnectDeviceAddress.iterator()
+        val iterator = LpWorkManager.reconnectDeviceAddress.iterator()
         while (iterator.hasNext()) {
             val i = iterator.next()
             if (i == address) {
@@ -521,7 +519,7 @@ class BleServiceHelper private constructor() {
                 LepuBleLog.d(
                     tag,
 //                    "从重连名单中移除 $address,  list = ${bleService.reconnectDeviceAddress.joinToString()}"
-                    "从重连名单中移除 $address,  list = ${LpBleInterfaceManager.reconnectDeviceAddress.joinToString()}"
+                    "从重连名单中移除 $address,  list = ${LpWorkManager.reconnectDeviceAddress.joinToString()}"
                 )
             }
         }
@@ -529,7 +527,7 @@ class BleServiceHelper private constructor() {
 
     fun getReconnectDeviceName(): ArrayList<String>{
 //        return bleService.reconnectDeviceName
-        return LpBleInterfaceManager.reconnectDeviceName
+        return LpWorkManager.reconnectDeviceName
     }
 
     /**
@@ -557,9 +555,9 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return false
         LepuBleLog.d(tag, "into hasUnConnected...")
 //        for (x in 0 until bleService.vailFace.size()) {
-        for (x in 0 until LpBleInterfaceManager.vailFace.size()) {
+        for (x in 0 until LpWorkManager.vailFace.size()) {
 //            bleService.vailFace[bleService.vailFace.keyAt(x)]?.let {
-            LpBleInterfaceManager.vailFace[LpBleInterfaceManager.vailFace.keyAt(x)]?.let {
+            LpWorkManager.vailFace[LpWorkManager.vailFace.keyAt(x)]?.let {
                 it.let {
                     LepuBleLog.d(tag, "hasUnConnected  有未连接的设备: model = ${it.model}")
 
@@ -577,7 +575,7 @@ class BleServiceHelper private constructor() {
      */
     fun checkService(): Boolean{
 //        if (!this::bleService.isInitialized){
-        if (LpBleInterfaceManager.application == null) {
+        if (LpWorkManager.application == null) {
             LepuBleLog.d("Error: bleService unInitialized")
             return false
         }
@@ -604,7 +602,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2 -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
                 return inter is OxyBleInterface
             }
             Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T ->{
@@ -614,7 +612,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
-            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW -> {
+            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_S5W -> {
                 return inter is Pc60FwBleInterface
             }
             Bluetooth.MODEL_PC80B -> {
