@@ -97,7 +97,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_LES1 = "le S1";
     public static final String BT_NAME_CHECK_ADV = "CheckADV";
     public static final String BT_NAME_OXYU = "OxyU";
-    public static final String BT_NAME_S5W = "S5W";
+    public static final String BT_NAME_S5W = "S5W_SN";
 
     public static final int MODEL_UNRECOGNIZED = 0;
     public static final int MODEL_CHECKO2 = 1;
