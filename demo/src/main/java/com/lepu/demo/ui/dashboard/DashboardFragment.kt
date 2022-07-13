@@ -102,7 +102,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     40
                 }
                 else -> {
-                    180
+                    101  // 血氧波形50HZ，1s有50个点，速度大于100即可
                 }
             }
 
@@ -992,9 +992,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     private fun initEcgView() {
         // cal screen
         val dm =resources.displayMetrics
+        // 最多可以画多少点=屏幕宽度像素/每英寸像素*25.4mm/25mm/s走速*125个点/s
         val index = floor(binding.ecgBkg.width / dm.xdpi * 25.4 / 25 * 125).toInt()
         DataController.maxIndex = index
 
+        // 每像素占多少mm=每英寸长25.4mm/每英寸像素
         val mm2px = 25.4f / dm.xdpi
         DataController.mm2px = mm2px
 
