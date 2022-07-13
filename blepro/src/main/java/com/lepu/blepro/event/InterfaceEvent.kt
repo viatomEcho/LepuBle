@@ -70,7 +70,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     interface BPM {
         companion object {
             const val EventBpmInfo = "com.lepu.ble.bpm.info"                     // 设备信息 BpmDeviceInfo
-            const val EventBpmRtData = "com.lepu.ble.bpm.rtData"                 // 实时压力值 int
+            const val EventBpmRtData = "com.lepu.ble.bpm.rtData"                 // 实时压力值 BpmBleResponse.RtData
             const val EventBpmState = "com.lepu.ble.bpm.state"                   // 实时状态 BpmBleResponse.RtState
             const val EventBpmSyncTime = "com.lepu.ble.bpm.sync.time"            // 同步时间 true
             const val EventBpmRecordData = "com.lepu.ble.bpm.record.data"        // 记录数据 BpmBleResponse.RecordData
