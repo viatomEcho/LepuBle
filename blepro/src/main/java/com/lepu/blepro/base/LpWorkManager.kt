@@ -20,6 +20,7 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BleServiceObserver
+import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.LepuBleLog
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -28,7 +29,7 @@ import kotlinx.coroutines.launch
 
 object LpWorkManager {
 
-    val tag: String = "LpBleInterfaceManager"
+    val tag: String = "LpWorkManager"
 
     var application: Application? = null
     var observer: BleServiceObserver? = null
@@ -600,6 +601,9 @@ object LpWorkManager {
             // 更新广播的蓝牙名
             result.scanRecord?.let {
                 deviceName = it.deviceName
+                if (!TextUtils.isEmpty(deviceName)) {
+                    deviceName = trimStr(deviceName)
+                }
             }
 
             if (TextUtils.isEmpty(deviceName)) {
