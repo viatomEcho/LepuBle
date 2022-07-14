@@ -110,7 +110,7 @@ class DeviceInfo(val bytes: ByteArray) {
         } else {
             "$second"
         }
-        return "$year-$mon-$d $h:$min:$s"
+        return "$year$mon$d$h$min$s"
     }
 
     override fun toString(): String {
@@ -122,6 +122,12 @@ class DeviceInfo(val bytes: ByteArray) {
             btlV : $btlV
             fileV : $fileV
             protocolV : $protocolV
+            year : $year
+            month : $month
+            day : $day
+            hour : $hour
+            minute : $minute
+            second : $second
             curTime : $curTime
             protocolMaxLen : $protocolMaxLen
             snLen : $snLen
