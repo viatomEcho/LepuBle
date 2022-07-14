@@ -54,6 +54,7 @@ public class LewBleCmd {
     public static final int APP_SWITCH = 0x17;
     public static final int NOTIFICATION_INFO = 0x18;
     public static final int DEVICE_MODE = 0x19;
+    public static final int GET_DEVICE_NETWORK = 0x1A;
     public static final int ALARM_CLOCK_INFO = 0x21;
     public static final int PHONE_SWITCH = 0x22;
     public static final int CALL_CONTROL = 0x23;
@@ -184,6 +185,7 @@ public class LewBleCmd {
     public static byte[] getAppSwitch() { return getReq(APP_SWITCH, new byte[0]); }
     public static byte[] setAppSwitch(byte[] switches) { return getReq(APP_SWITCH, switches); }
     public static byte[] notificationInfo(byte[] info) { return getReq(NOTIFICATION_INFO, info); }
+    public static byte[] getDeviceNetwork() { return getReq(GET_DEVICE_NETWORK, new byte[0]); }
     public static byte[] getDeviceMode() { return getReq(DEVICE_MODE, new byte[0]); }
     public static class DeviceMode {
         public static final int MODE_NORMAL = 0;   // 普通模式
