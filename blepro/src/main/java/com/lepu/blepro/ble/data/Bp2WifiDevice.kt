@@ -1,5 +1,7 @@
 package com.lepu.blepro.ble.data
 
+import com.lepu.blepro.utils.bytesToHex
+
 class Bp2WifiDevice(val bytes: ByteArray) {
 
     var num: Int
@@ -20,6 +22,8 @@ class Bp2WifiDevice(val bytes: ByteArray) {
 
     override fun toString(): String {
         return """
+            Bp2WifiDevice : 
+            bytes : ${bytesToHex(bytes)}
             num : $num
             wifiList : $wifiList
         """.trimIndent()

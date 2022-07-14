@@ -10,9 +10,9 @@ class Bp2EcgFile(val bytes: ByteArray) {
 
     var fileVersion: Int       // 文件版本 e.g.  0x01 :  V1
     var fileType: Int          // 文件类型 1：血压；2：心电
-    var measureTime: Int       // 测量时间时间戳s
+    var measureTime: Int       // 测量时间时间戳 s
     // reserved 4
-    var recordingTime: Int     // 记录时长
+    var recordingTime: Int     // 记录时长 s
     // reserved 2
     var result: Int            // 诊断结果
     var hr: Int                // 心率 单位：bpm

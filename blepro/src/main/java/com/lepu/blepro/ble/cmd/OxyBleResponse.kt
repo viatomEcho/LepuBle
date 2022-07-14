@@ -13,7 +13,7 @@ import org.json.JSONObject
 class OxyBleResponse{
 
     @ExperimentalUnsignedTypes
-    class OxyResponse(bytes: ByteArray) {
+    class OxyResponse(val bytes: ByteArray) {
         var no: Int
         var len: Int
         var state: Boolean
@@ -168,7 +168,7 @@ class OxyBleResponse{
         var steps: Int            // 步数
         var battery: Int          // 电量（0-100%）
         var batteryState: Int     // 充电状态（0：没有充电 1：充电中 2：充电完成）
-        var vector: Int           // 三轴矢量
+        var vector: Int           // 三轴矢量，体动
         var pi: Int               // pi值
         var state: Int            // 工作状态（0：导联脱落 1：导联连上 其他：异常）
         var countDown: Int        // 导联脱落倒计时（10s-0）
@@ -235,10 +235,10 @@ class OxyBleResponse{
     class RtWave constructor(var bytes: ByteArray) : Parcelable {
         var spo2: Int
         var pr: Int
-        var battery: Int
-        var batteryState: Int
+        var battery: Int         // 电量（0-100%）
+        var batteryState: Int    // 充电状态（0：没有充电 1：充电中 2：充电完成）
         var pi: Int
-        var state: Int
+        var state: Int           // 工作状态（0：导联脱落 1：导联连上 其他：异常）
         var len: Int
         var waveByte: ByteArray
         var wFs: IntArray

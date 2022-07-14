@@ -1,6 +1,8 @@
 package com.lepu.blepro.ble.data;
 
 public class CheckmeLeEcgDiagnosis {
+    // 原始byte数据
+    private byte data;
     // Regular ECG Rhythm
     private boolean isRegular = false;
     // Unable to analyze
@@ -25,7 +27,7 @@ public class CheckmeLeEcgDiagnosis {
     }
 
     public CheckmeLeEcgDiagnosis(byte data) {
-
+        this.data = data;
         int result = data & 0xFF;
 
         if (result == 0) {
@@ -89,6 +91,14 @@ public class CheckmeLeEcgDiagnosis {
             str += "Suspected Premature Beat; ";
         }
         return str;
+    }
+
+    public byte getData() {
+        return data;
+    }
+
+    public void setData(byte data) {
+        this.data = data;
     }
 
     public boolean isRegular() {
@@ -174,6 +184,7 @@ public class CheckmeLeEcgDiagnosis {
                 ", isHighQrs=" + isHighQrs +
                 ", isHighSt=" + isHighSt +
                 ", isLowSt=" + isLowSt +
+                ", isPrematureBeat=" + isPrematureBeat +
                 ", getResultMess=" + getResultMess() +
                 '}';
     }

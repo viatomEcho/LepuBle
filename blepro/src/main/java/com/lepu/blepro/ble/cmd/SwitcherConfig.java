@@ -6,10 +6,10 @@ import com.lepu.blepro.utils.Convertible;
  * @author wujuan
  */
 public class SwitcherConfig implements Convertible {
-    private int switcher;
-    private int vector;
-    private int motionCount;
-    private int motionWindows;
+    private int switcher;       // 心跳音开关 bit0
+    private int vector;         // 加速度阈值
+    private int motionCount;    // 加速度检测次数
+    private int motionWindows;  // 加速度检测窗口
 
     public boolean getSwitcher() {
         return switcher == 1;

@@ -37,7 +37,7 @@ public class BluetoothController {
             modelList.add(b.getModel());
             needNotify = true;
         }
-        LepuBleLog.d("addDevice => " + b.getName() + "macAddr:" + b.getMacAddr() + " needNotify:" + needNotify);
+        LepuBleLog.d("addDevice => " + b.getName() + " macAddr:" + b.getMacAddr() + " needNotify:" + needNotify);
 
 
         return needNotify;
@@ -64,7 +64,8 @@ public class BluetoothController {
                 || model == Bluetooth.MODEL_WEARO2
                 || model == Bluetooth.MODEL_SLEEPU
                 || model == Bluetooth.MODEL_KIDSO2
-                || model == Bluetooth.MODEL_OXYFIT) {
+                || model == Bluetooth.MODEL_OXYFIT
+                || model == Bluetooth.MODEL_OXYU) {
             isO2 = true;
         }
         return isO2;

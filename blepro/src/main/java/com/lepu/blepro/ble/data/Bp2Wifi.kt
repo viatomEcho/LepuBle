@@ -5,7 +5,7 @@ import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.bytesToHex
 import java.nio.charset.Charset
 
-class Bp2Wifi(i: Int, bytes: ByteArray) {
+class Bp2Wifi(i: Int, val bytes: ByteArray) {
 
     var length = 0
 
@@ -80,7 +80,9 @@ class Bp2Wifi(i: Int, bytes: ByteArray) {
 
     override fun toString(): String {
         return """
-            Bp2Wifi
+            Bp2Wifi : 
+            bytes : ${bytesToHex(bytes)}
+            getDataBytes : ${bytesToHex(getDataBytes())}
             state : $state
             ssidLen : $ssidLen
             ssid : $ssid

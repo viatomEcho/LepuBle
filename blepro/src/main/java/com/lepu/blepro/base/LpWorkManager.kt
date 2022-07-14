@@ -20,6 +20,7 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BleServiceObserver
+import com.lepu.blepro.utils.HexString
 import com.lepu.blepro.utils.LepuBleLog
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -90,10 +91,9 @@ object LpWorkManager {
      * 等待扫描结果（当status=6重新开启扫描）
      */
     var isWaitingScanResult = false
-    var scanTimeout: Job? = null
     var scanTimer = object : CountDownTimer(3000, 3000) {
         override fun onTick(millisUntilFinished: Long) {
-
+            LepuBleLog.d(tag, "-------scanTimer-onTick------")
         }
 
         override fun onFinish() {
@@ -110,6 +110,7 @@ object LpWorkManager {
      */
     fun reInitBle(){
         initBle()
+        LepuBleLog.d(tag, "reInitBle")
     }
 
     private fun initBle() {
@@ -146,7 +147,7 @@ object LpWorkManager {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2 -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
                 OxyBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
@@ -204,7 +205,8 @@ object LpWorkManager {
             Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
-            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW -> {
+            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_S5W -> {
                 Pc60FwBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -277,7 +279,7 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_LEW -> {
+            Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
                 LewBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -392,6 +394,7 @@ object LpWorkManager {
     }
 
     fun setScanDefineDevice(isScanDefineDevice: Boolean, isScanByName: Boolean, defineDevice: String) {
+        LepuBleLog.d(tag, "setScanDefineDevice isScanDefineDevice:$isScanDefineDevice, isScanByName:$isScanByName, defineDevice:$defineDevice")
         this.isScanDefineDevice = isScanDefineDevice
         this.isScanByName = isScanByName
         if (isScanDefineDevice) {
@@ -417,7 +420,10 @@ object LpWorkManager {
         LepuBleLog.d(tag, "start discover.....${vailFace.size()}, needPair = $needPair, isReconnecting = $isReconnecting")
         stopDiscover()
 
-        if (vailFace.isEmpty() && isReconnecting)return
+        if (vailFace.isEmpty() && isReconnecting) {
+            LepuBleLog.d(tag, "startDiscover vailFace.isEmpty(), isReconnecting:$isReconnecting")
+            return
+        }
 
         BluetoothController.clear()
         this.needPair = needPair
@@ -453,7 +459,10 @@ object LpWorkManager {
      */
     fun reconnect(scanModel : IntArray,reconnectDeviceName: Array<String>, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
 
-        if (vailFace.isEmpty())return
+        if (vailFace.isEmpty()){
+            LepuBleLog.d(tag, "reconnect vailFace.isEmpty()")
+            return
+        }
 
         var reScan = false
 
@@ -467,12 +476,10 @@ object LpWorkManager {
             this.isReconnectByAddress = false
             this.toConnectUpdater = toConnectUpdater
             this.needPair = needPair
+            setScanDefineDevice(false, false, "")
             startDiscover(scanModel, needPair, isReconnecting = true)
-
-            LepuBleLog.d(tag, "reconnectByName: => ${reconnectDeviceName.joinToString()} => ReScan: $reScan")
         }
-
-
+        LepuBleLog.d(tag, "reconnect: scanModel=> ${scanModel.joinToString()} reconnectDeviceName=> ${reconnectDeviceName.joinToString()} ReScan: $reScan")
     }
 
 
@@ -484,12 +491,11 @@ object LpWorkManager {
      */
     fun reconnectByAddress(scanModel: IntArray, reconnectDeviceAddress: Array<String>, needPair: Boolean,  toConnectUpdater: Boolean = false) {
 
-        if (vailFace.isEmpty())return
+        if (vailFace.isEmpty()) {
+            LepuBleLog.d(tag, "reconnectByAddress vailFace.isEmpty()")
+            return
+        }
 
-//        if (scanModel.size != reconnectDeviceAddress.size){
-//            LepuBleLog.d(tag,"请检查重连model && reconnectDeviceAddress  size")
-//            return
-//        }
         var reScan = false
 
         if (BleServiceHelper.BleServiceHelper.hasUnConnected()) {
@@ -502,10 +508,11 @@ object LpWorkManager {
             this.isReconnectByAddress = true
             this.needPair = needPair
             this.toConnectUpdater = toConnectUpdater
+            setScanDefineDevice(false, false, "")
             startDiscover(scanModel, isReconnecting = true)
         }
 
-        LepuBleLog.d(tag, "reconnect: => ${reconnectDeviceAddress.joinToString()} => ReScan: $reScan")
+        LepuBleLog.d(tag, "reconnectByAddress: => ${reconnectDeviceAddress.joinToString()} => ReScan: $reScan")
     }
 
 
@@ -521,11 +528,8 @@ object LpWorkManager {
     private fun scanDevice(enable: Boolean) {
         LepuBleLog.d(tag, "scanDevice => $enable")
 
-//        scanTimeout?.cancel()
         scanTimer.cancel()
-        LepuBleLog.d(tag, "scanDevice scanTimeout.cancel()")
-
-//        GlobalScope.launch {
+        LepuBleLog.d(tag, "scanDevice scanTimer.cancel()")
 
         if (enable) {
             if (bluetoothAdapter?.isEnabled!!) {
@@ -549,13 +553,7 @@ object LpWorkManager {
                 leScanner?.startScan(null, settings, leScanCallback)
                 isDiscovery = true
                 scanTimer.start()
-                /*scanTimeout = GlobalScope.launch {
-                    delay(10000)
-                    startDiscover(scanModel, needPair, isReconnectScan)
-                    LepuBleLog.d(tag, "-------scanTimeout-------")
-                }*/
-                LepuBleLog.d(tag, "scanDevice scanTimeout.start()")
-                LepuBleLog.d(tag, "scanDevice started")
+                LepuBleLog.d(tag, "scanDevice scanTimer.start()")
             }
         } else {
             if (bluetoothAdapter?.isEnabled!! && leScanCallback != null) {
@@ -568,7 +566,6 @@ object LpWorkManager {
                 LepuBleLog.d(tag, "scanDevice isWaitingScanResult = false")
             }
         }
-//        }
 
     }
 
@@ -584,17 +581,25 @@ object LpWorkManager {
         ) {
             super.onScanResult(callbackType, result)
 
+            // 扫描有结果返回，取消定时重扫机制
             if (isWaitingScanResult) {
                 isWaitingScanResult = false
-                LepuBleLog.d(tag, "onScanResult isWaitingScanResult = false")
-//                scanTimeout?.cancel()
+                LepuBleLog.d(tag, "onScanResult 扫描有结果返回")
                 scanTimer.cancel()
-                LepuBleLog.d(tag, "onScanResult scanTimeout.cancel()")
+                LepuBleLog.d(tag, "onScanResult 取消定时重扫机制")
             }
 
             val device = result.device
             var deviceName = result.device.name
             val deviceAddress = result.device.address
+            // 更新广播的蓝牙名
+            result.scanRecord?.let {
+                deviceName = it.deviceName
+                if (!TextUtils.isEmpty(deviceName)) {
+                    deviceName = HexString.trimStr(deviceName)
+                }
+            }
+
             if (TextUtils.isEmpty(deviceName)) {
                 deviceName = BluetoothController.getDeviceName(deviceAddress)
             }
@@ -615,9 +620,10 @@ object LpWorkManager {
                             }
 
                         }
-
+                    LepuBleLog.d(tag, "onScanResult 外发sdk未能识别model的信息")
                     LiveEventBus.get<ScanResult>(EventMsgConst.Discovery.EventDeviceFoundForUnRegister).post(result)
                 }
+                LepuBleLog.d(tag, "onScanResult sdk未能识别到此model")
                 return
             }
             val b = Bluetooth(
@@ -626,23 +632,26 @@ object LpWorkManager {
                 device,
                 result.rssi
             )
-//            if (vailFace.isEmpty()){
-//                //切换设备 先断开连接 再clear interface
-//                LepuBleLog.d(tag, "Warning: vailFace isEmpty!!")
-//                stopDiscover()
-//                return
-//            }
 
             if(scanModel != null)
-                if (!filterResult(b)) return
+                if (!filterResult(b)) {
+                    LepuBleLog.d(tag, "filterResult 未扫描到指定model的设备")
+                    return
+                }
 
             if (isScanDefineDevice) {
                 if (isScanByName) {
-                    if (!b.name.equals(scanByName)) return
+                    if (!b.name.equals(scanByName)) {
+                        LepuBleLog.d(tag, "isScanDefineDevice 未扫描到指定蓝牙名的设备")
+                        return
+                    }
                     LepuBleLog.d(tag, "b.name == " + b.name)
                     LepuBleLog.d(tag, "scanByName == " + scanByName)
                 } else {
-                    if (!b.macAddr.equals(scanByAddress)) return
+                    if (!b.macAddr.equals(scanByAddress)) {
+                        LepuBleLog.d(tag, "isScanDefineDevice 未扫描到指定蓝牙地址的设备")
+                        return
+                    }
                     LepuBleLog.d(tag, "b.macAddr == " + b.macAddr)
                     LepuBleLog.d(tag, "scanByAddress == " + scanByAddress)
                 }
@@ -667,33 +676,20 @@ object LpWorkManager {
 
                 LiveEventBus.get<Bluetooth>(EventMsgConst.Discovery.EventDeviceFound).post(b)
 
-
-
                 val isContains: Boolean = if(isReconnectByAddress) reconnectDeviceAddress.contains(b.device.address) else reconnectDeviceName.contains(b.name)
 
                 if (isReconnectScan && isContains){
                     stopDiscover()
-//                    if (isReconnectByAddress) {
-                        // 避免体温计aoj20a在装电池开机后自动关机过程连接上设备，延迟重连
-                        if (model == Bluetooth.MODEL_AOJ20A) {
-                            GlobalScope.launch {
-                                delay(2000)
-                                vailFace.get(b.model)?.connect(application!!, b.device, true, toConnectUpdater)
-                                LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
-                            }
-                        } else {
+                    if (model == Bluetooth.MODEL_AOJ20A) {
+                        GlobalScope.launch {
+                            delay(2000)
                             vailFace.get(b.model)?.connect(application!!, b.device, true, toConnectUpdater)
                             LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
                         }
-//                    } else {
-//                        if (BleServiceHelper.BleServiceHelper.canReconnectByName(b.model)) {
-//                            vailFace.get(b.model)?.connect(application!!, b.device, true, toConnectUpdater)
-//                            LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
-//                        } else {
-//                            LepuBleLog.d(tag, "发现需要重连的设备不可使用蓝牙名重连 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
-//                        }
-//                    }
-
+                    } else {
+                        vailFace.get(b.model)?.connect(application!!, b.device, true, toConnectUpdater)
+                        LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
+                    }
                 } else {
                     if (isReconnectScan) {
                         LepuBleLog.d(tag, "找到了新蓝牙名设备， 去连接Updater${b.name}")
@@ -705,15 +701,10 @@ object LpWorkManager {
 
             }
 
-
         }
 
         override fun onBatchScanResults(results: List<ScanResult>) {
         }
-
-
-
-
 
         override fun onScanFailed(errorCode: Int) {
             LepuBleLog.e(tag, "scan error: $errorCode")
@@ -755,7 +746,7 @@ object LpWorkManager {
      * （singleScanMode = false） model 属于套装的设备被过滤出
      */
     private fun filterResult(b: Bluetooth): Boolean{
-        LepuBleLog.d(tag, "scanModel:${scanModel?.joinToString()}, b.model${b.model}")
+        LepuBleLog.d(tag, "filterResult scanModel:${scanModel?.joinToString()}, b.model:${b.model} b.name:${b.name} b.address:${b.macAddr}")
         return scanModel?.contains(b.model) ?: return false
     }
 

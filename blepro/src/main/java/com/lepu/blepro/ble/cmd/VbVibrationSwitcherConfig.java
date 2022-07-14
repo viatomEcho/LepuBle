@@ -6,9 +6,9 @@ import com.lepu.blepro.utils.Convertible;
  * @author wujuan
  */
 public class VbVibrationSwitcherConfig implements Convertible {
-	private int switcher;
-	private int hr1;
-	private int hr2;
+	private int switcher;  // 心率震动开关
+	private int hr1;       // 阈值1 每十秒震动一次
+	private int hr2;       // 阈值2 每二秒震动一次
 
 
 	public boolean getSwitcher() {

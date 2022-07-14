@@ -128,7 +128,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
                 Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
                 Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
-                Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_CMRING -> {
+                Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_CMRING,
+                Bluetooth.MODEL_OXYU -> {
                     setViewVisible(binding.o2Layout)
                     LpBleUtil.getInfo(it.modelNo)
                 }
@@ -143,7 +144,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     setViewVisible(binding.ap20Layout)
                     LpBleUtil.ap20GetConfig(it.modelNo, state)
                 }
-                Bluetooth.MODEL_LEW -> {
+                Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
                     setViewVisible(binding.lewLayout)
                 }
                 Bluetooth.MODEL_SP20 -> {
@@ -429,7 +430,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
         // 寻找设备
         binding.lewFindDevice.setOnClickListener {
-            LpBleUtil.lewFindDevice(Constant.BluetoothConfig.currentModel[0])
+            switchState = !switchState
+            LpBleUtil.lewFindDevice(Constant.BluetoothConfig.currentModel[0], switchState)
             binding.responseCmd.text = ""
             binding.content.text = ""
             binding.sendCmd.text = ""
@@ -2283,7 +2285,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseContent)
             .observe(this) {
                 binding.responseCmd.text = "receive : ${bytesToHex(it)}"
-
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewDeviceInfo)
             .observe(this) {
@@ -2299,6 +2300,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this) {
                 val data = it.data as Boolean
                 binding.content.text = "请求解绑 : $data"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFindPhone)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = data.toString()
+                Toast.makeText(context, "lew手表 查找手机 $data", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewBatteryInfo)
             .observe(this) {

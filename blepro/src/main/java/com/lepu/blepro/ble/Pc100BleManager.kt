@@ -16,13 +16,15 @@ class Pc100BleManager(context: Context): LpBleManager(context) {
         service_uuid = UUID.fromString("0000FFF0-0000-1000-8000-00805f9b34fb")
         write_uuid = UUID.fromString("0000FFF2-0000-1000-8000-00805f9b34fb")
         notify_uuid = UUID.fromString("0000FFF1-0000-1000-8000-00805f9b34fb")
+        LepuBleLog.d("Pc100BleManager initUUID")
     }
 
     override fun initialize() {
-        LepuBleLog.d("Pc100BleManager init")
+        LepuBleLog.d("Pc100BleManager initialize")
     }
 
     override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {
+        LepuBleLog.d("Pc100BleManager dealReqQueue")
         return requestQueue
     }
 

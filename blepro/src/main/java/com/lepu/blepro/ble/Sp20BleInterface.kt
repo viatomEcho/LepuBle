@@ -16,8 +16,15 @@ import com.lepu.blepro.utils.toUInt
 import java.util.*
 
 /**
- *
- * 蓝牙操作
+ * sp20血氧体温设备：
+ * send:
+ * 1.同步时间
+ * 2.获取设备信息
+ * 3.获取电量
+ * 4.实时血氧使能开关
+ * 5.获取/配置参数
+ * receive:
+ * 1.实时血氧、体温
  */
 
 class Sp20BleInterface(model: Int): BleInterface(model) {
@@ -41,19 +48,16 @@ class Sp20BleInterface(model: Int): BleInterface(model) {
             .timeout(10000)
             .retry(3, 100)
             .done {
-                LepuBleLog.d(tag, "Device Init")
+                LepuBleLog.d(tag, "manager.connect done")
                 enableRtData(Sp20BleCmd.EnableType.OXY_PARAM, true)
                 enableRtData(Sp20BleCmd.EnableType.OXY_WAVE, true)
             }
             .enqueue()
     }
 
-    override fun dealReadFile(userId: String, fileName: String) {
-
-    }
-
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: Sp20BleResponse.Sp20Response) {
+        LepuBleLog.d(tag, "onResponseReceived bytes:${bytesToHex(response.bytes)}")
         when (response.token) {
             Sp20BleCmd.TOKEN_F0 -> {
                 when (response.type) {
@@ -205,54 +209,62 @@ class Sp20BleInterface(model: Int): BleInterface(model) {
     override fun getInfo() {
         sendCmd(Sp20BleCmd.getSn())
         sendCmd(Sp20BleCmd.getInfo())
-//        enableRtData(Sp20BleCmd.EnableType.OXY_PARAM, true)
-//        enableRtData(Sp20BleCmd.EnableType.OXY_WAVE, true)
+        LepuBleLog.e(tag, "getInfo")
     }
 
     override fun syncTime() {
         sendCmd(Sp20BleCmd.setTime())
-    }
-
-
-    override fun reset() {
-
-    }
-
-    override fun factoryReset() {
-
-    }
-
-    override fun factoryResetAll() {
-
-    }
-
-    override fun dealContinueRF(userId: String, fileName: String) {
-        dealReadFile(userId, fileName)
-    }
-
-    override fun getRtData() {
-
-    }
-
-    override fun getFileList() {
-
+        LepuBleLog.e(tag, "syncTime")
     }
 
     fun setConfig(config: Sp20Config) {
         sendCmd(Sp20BleCmd.setConfig(config.getDataBytes()))
+        LepuBleLog.e(tag, "setConfig")
     }
     fun setConfig(type: Int, config: Int) {
         sendCmd(Sp20BleCmd.setConfig(type, config))
+        LepuBleLog.e(tag, "setConfig type:$type, config:$config")
     }
     fun getConfig(type: Int) {
         sendCmd(Sp20BleCmd.getConfig(type))
+        LepuBleLog.e(tag, "getConfig")
     }
     fun enableRtData(type: Int, enable: Boolean) {
         sendCmd(Sp20BleCmd.enableSwitch(type, enable))
+        LepuBleLog.e(tag, "enableRtData")
     }
 
     fun getBattery() {
         sendCmd(Sp20BleCmd.getBattery())
+        LepuBleLog.e(tag, "getBattery")
+    }
+
+    override fun dealReadFile(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealReadFile not yet implemented")
+    }
+
+    override fun reset() {
+        LepuBleLog.e(tag, "reset not yet implemented")
+    }
+
+    override fun factoryReset() {
+        LepuBleLog.e(tag, "factoryReset not yet implemented")
+    }
+
+    override fun factoryResetAll() {
+        LepuBleLog.e(tag, "factoryResetAll not yet implemented")
+    }
+
+    override fun dealContinueRF(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealContinueRF not yet implemented")
+    }
+
+    override fun getRtData() {
+        LepuBleLog.e(tag, "getRtData not yet implemented")
+    }
+
+    override fun getFileList() {
+        LepuBleLog.e(tag, "getFileList not yet implemented")
     }
 
 }

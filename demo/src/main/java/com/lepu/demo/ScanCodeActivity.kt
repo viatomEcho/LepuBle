@@ -15,9 +15,10 @@ class ScanCodeActivity : AppCompatActivity(), ZXingScannerView.ResultHandler {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scan_code)
+        mCodeContent = findViewById(R.id.code_content)
         mScannerView = findViewById(R.id.scanner)
         mScannerView.setAutoFocus(true)
-        mCodeContent = findViewById(R.id.code_content)
+        mScannerView.setAspectTolerance(0.5f)
     }
 
     override fun onResume() {

@@ -11,14 +11,16 @@ class Sp20BleManager(context: Context): LpBleManager(context) {
         service_uuid = UUID.fromString("0000FFF0-0000-1000-8000-00805f9b34fb")
         write_uuid = UUID.fromString("0000FFF2-0000-1000-8000-00805f9b34fb")
         notify_uuid = UUID.fromString("0000FFF1-0000-1000-8000-00805f9b34fb")
+        LepuBleLog.d("Sp20BleManager initUUID")
     }
 
     override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {
+        LepuBleLog.d("Sp20BleManager dealReqQueue")
         return requestQueue
     }
 
     override fun initialize() {
-        LepuBleLog.d("Sp20BleManager inited")
+        LepuBleLog.d("Sp20BleManager initialize")
     }
 
 }

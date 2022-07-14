@@ -11,12 +11,12 @@ class Pc100DeviceInfo : Parcelable {
     var deviceName = ""
     var softwareV = ""
     var hardwareV = ""
-    var batLevel = 0
-    var batStatus = 0
+    var batLevel = 0    // 电量等级 0-3
+    var batStatus = 0   // 0：为没有充电，1：表示充电中，2：表示充电完成，3：保留
 
     override fun toString(): String {
         return """
-            Pc100DeviceInfo
+            Pc100DeviceInfo : 
             sn : $sn
             deviceId : $deviceId
             deviceName : $deviceName

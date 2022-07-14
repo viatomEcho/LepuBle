@@ -12,7 +12,7 @@ import java.util.*
 object CheckmeLeBleResponse{
 
     @ExperimentalUnsignedTypes
-    class BleResponse(bytes: ByteArray) {
+    class BleResponse(val bytes: ByteArray) {
         var no: Int
         var len: Int
         var state: Boolean
@@ -41,7 +41,12 @@ object CheckmeLeBleResponse{
         var application:String   //
 
         init {
-            infoStr = JSONObject(String(bytes))
+            val data = String(bytes)
+            infoStr = if (data.contains("{")) {
+                JSONObject(data)
+            } else {
+                JSONObject()
+            }
 //            try {
 //                var infoStr = JSONObject(String(bytes))
 //            } catch (e: JSONException) {
@@ -392,7 +397,7 @@ object CheckmeLeBleResponse{
         var qtc: Int                       // 诊断结果：QTc单位为ms
         var re: Int
         var result: CheckmeLeEcgDiagnosis  // 心电异常诊断结果
-        var measureMode: Int               // 测量模式
+        var measureMode: Int               // 测量模式 1：Hand-Hand，2：Hand-Chest，3：1-Lead，4：2-Lead
         var measureModeMess: String
         var filterMode: Int                // 滤波模式（1：wide   0：normal）
         var qt: Int                        // 诊断结果：QT单位为ms

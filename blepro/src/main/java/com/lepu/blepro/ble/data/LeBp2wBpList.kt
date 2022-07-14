@@ -1,6 +1,7 @@
 package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.DateUtil.stringFromDate
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 import java.util.*
 
@@ -27,7 +28,17 @@ class LeBp2wBpList(var bytes: ByteArray) {
         }
     }
 
-    data class BpRecord(val bytes: ByteArray) {
+    override fun toString(): String {
+        return """
+            LeBp2wBpList : 
+            bytes : ${bytesToHex(bytes)}
+            fileVersion : $fileVersion
+            fileType : $fileType
+            bpFileList : $bpFileList
+        """.trimIndent()
+    }
+
+    class BpRecord(val bytes: ByteArray) {
         var time: Long        // 测量时间戳s
         var fileName: String  // 文件名
         var uid: Int          // 用户id
@@ -39,7 +50,7 @@ class LeBp2wBpList(var bytes: ByteArray) {
         var mean: Int         // 平均压
         var pr: Int           // 脉率
         var result: Int       // 诊断结果 0：心律不齐 1：动作干扰
-        var level: Int        // 血压等级
+        var level: Int        // 血压等级，协议没有具体数值含义
 
         init {
             var index = 0
@@ -71,6 +82,8 @@ class LeBp2wBpList(var bytes: ByteArray) {
 
         override fun toString(): String {
             return """
+                BpRecord : 
+                bytes : ${bytesToHex(bytes)}
                 time : $time
                 fileName : $fileName
                 uid : $uid
@@ -85,14 +98,6 @@ class LeBp2wBpList(var bytes: ByteArray) {
                 level : $level
             """.trimIndent()
         }
-    }
-
-    override fun toString(): String {
-        return """
-            fileVersion : $fileVersion
-            fileType : $fileType
-            bpFileList : $bpFileList
-        """.trimIndent()
     }
 
 }

@@ -1,16 +1,18 @@
 package com.lepu.blepro.ble.data
 
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toInt
 import com.lepu.blepro.utils.toUInt
 
-
 class Bp2DataBpIng {
-    var isDeflate : Boolean = false
-    var pressure : Int = 0
-    var isPulse : Boolean = false // is pulse wave
+    var bytes: ByteArray
+    var isDeflate : Boolean = false  // 是否放气
+    var pressure : Int = 0           // 实时压
+    var isPulse : Boolean = false    // 是否检测到脉搏波
     var pr : Int = 0
 
     constructor(bytes: ByteArray) {
+        this.bytes = bytes
         this.pressure = toInt(bytes.copyOfRange(1,3))/100
         this.isPulse = bytes[3].toInt() == 0
         this.pr = toUInt(bytes.copyOfRange(4, 6))
@@ -19,7 +21,8 @@ class Bp2DataBpIng {
 
     override fun toString(): String {
         return """
-            Bping
+            Bp2DataBpIng : 
+            bytes : ${bytesToHex(bytes)}
             isDeflate: $isDeflate
             pressure: $pressure
             isPulse: $isPulse

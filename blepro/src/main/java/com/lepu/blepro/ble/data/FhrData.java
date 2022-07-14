@@ -2,8 +2,8 @@ package com.lepu.blepro.ble.data;
 
 public class FhrData {
 
-    private int hr1;
-    private int hr2;
+    private int hr1;  // 当前心率
+    private int hr2;  // 上一次心率
 
     public int getHr1() {
         return hr1;

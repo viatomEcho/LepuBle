@@ -106,7 +106,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     40
                 }
                 else -> {
-                    180
+                    101  // 血氧波形50HZ，1s有50个点，速度大于100即可
                 }
             }
 
@@ -129,7 +129,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2,
             Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LEW,
             Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_LE_BP2W,
-            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_LES1 -> waveHandler.post(EcgWaveTask())
+            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_LES1,
+            Bluetooth.MODEL_W12C -> waveHandler.post(EcgWaveTask())
 
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
             Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
@@ -146,7 +147,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_PC_68B,
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PC_60NW,
-            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_CMRING -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_CMRING,
+            Bluetooth.MODEL_OXYU, Bluetooth.MODEL_S5W -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_CHECK_ADV -> {
@@ -746,7 +748,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK,
                 Bluetooth.MODEL_ER2, Bluetooth.MODEL_PC80B,
                 Bluetooth.MODEL_LEW, Bluetooth.MODEL_ER1_N,
-                Bluetooth.MODEL_LES1 -> {
+                Bluetooth.MODEL_LES1, Bluetooth.MODEL_W12C -> {
                     binding.ecgLayout.visibility = View.VISIBLE
                     binding.bpLayout.visibility = View.GONE
                     binding.oxyLayout.visibility = View.GONE
@@ -776,7 +778,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
                 Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60B,
                 Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_OXYRING,
-                Bluetooth.MODEL_CMRING -> {
+                Bluetooth.MODEL_CMRING, Bluetooth.MODEL_OXYU,
+                Bluetooth.MODEL_S5W -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE
@@ -940,7 +943,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SNOREO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYFIT
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYLINK) {
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYLINK
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYU
+            ) {
                 LpBleUtil.oxyGetRtParam(Constant.BluetoothConfig.currentModel[0])
                 startWave(Constant.BluetoothConfig.currentModel[0])
             } else {
@@ -974,7 +979,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     Bluetooth.MODEL_PC66B, Bluetooth.MODEL_POD_1W,
                     Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
                     Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60B,
-                    Bluetooth.MODEL_PC_60NW -> {
+                    Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_S5W -> {
                         LpBleUtil.enableRtData(it, type, state)
                         type++
                         if (type > Sp20BleCmd.EnableType.OXY_WAVE) {
@@ -990,9 +995,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     private fun initEcgView() {
         // cal screen
         val dm =resources.displayMetrics
+        // 最多可以画多少点=屏幕宽度像素/每英寸像素*25.4mm/25mm/s走速*125个点/s
         val index = floor(binding.ecgBkg.width / dm.xdpi * 25.4 / 25 * 125).toInt()
         DataController.maxIndex = index
 
+        // 每像素占多少mm=每英寸长25.4mm/每英寸像素
         val mm2px = 25.4f / dm.xdpi
         DataController.mm2px = mm2px
 

@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.FhrData
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
@@ -15,10 +14,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- *
- * 蓝牙操作
+ * ad5胎心仪：
+ * send:
+ * 1.实时心率使能开关
+ * receive:
+ * 1.实时心率
  */
-
 class Ad5FhrBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Ad5FhrBleInterface"
 
@@ -35,7 +36,7 @@ class Ad5FhrBleInterface(model: Int): BleInterface(model) {
             .timeout(10000)
             .retry(3, 100)
             .done {
-                LepuBleLog.d(tag, "Device Init")
+                LepuBleLog.d(tag, "manager.connect done")
                 enableRtData(true)
             }
             .enqueue()
@@ -43,23 +44,20 @@ class Ad5FhrBleInterface(model: Int): BleInterface(model) {
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: ByteArray) {
-        LepuBleLog.d(tag, "received : ${bytesToHex(response)}")
+        LepuBleLog.d(tag, "onResponseReceived received : ${bytesToHex(response)}")
 
         val cmd = byte2UInt(response[2])
         val sn = trimStr(toString(response.copyOfRange(3, 10)))
         val hr1 = byte2UInt(response[11])
         val hr2 = byte2UInt(response[12])
-        val hr = if (hr1 != 0) hr1 else hr2
 
         val data = FhrData()
         data.hr1 = hr1
         data.hr2 = hr2
 
-        LepuBleLog.d(tag, "received cmd : $cmd")
-        LepuBleLog.d(tag, "received sn : $sn")
-        LepuBleLog.d(tag, "received hr1 : $hr1")
-        LepuBleLog.d(tag, "received hr2 : $hr2")
-        LepuBleLog.d(tag, "received hr : $hr")
+        LepuBleLog.d(tag, "cmd : $cmd")
+        LepuBleLog.d(tag, "sn : $sn")
+        LepuBleLog.d(tag, "data : $data")
 
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AD5.EventAd5RtHr).post(InterfaceEvent(model, data))
 
@@ -97,6 +95,7 @@ class Ad5FhrBleInterface(model: Int): BleInterface(model) {
     }
 
     fun enableRtData(enable: Boolean) {
+        LepuBleLog.d(tag, "enableRtData enable:$enable")
         if (enable) {
             GlobalScope.launch {
                 delay(2000)
@@ -111,39 +110,39 @@ class Ad5FhrBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun syncTime() {
+        LepuBleLog.e(tag, "syncTime not yet implemented")
     }
 
-    /**
-     * get device info
-     */
     override fun getInfo() {
+        LepuBleLog.e(tag, "getInfo not yet implemented")
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
-
+        LepuBleLog.e(tag, "dealReadFile not yet implemented")
     }
 
     override fun reset() {
+        LepuBleLog.e(tag, "reset not yet implemented")
     }
 
     override fun factoryReset() {
+        LepuBleLog.e(tag, "factoryReset not yet implemented")
     }
 
     override fun factoryResetAll() {
+        LepuBleLog.e(tag, "factoryResetAll not yet implemented")
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
-    }
-    /**
-     * get real-time data
-     */
-    override fun getRtData() {
+        LepuBleLog.e(tag, "dealContinueRF not yet implemented")
     }
 
-    /**
-     * get file list
-     */
+    override fun getRtData() {
+        LepuBleLog.e(tag, "getRtData not yet implemented")
+    }
+
     override fun getFileList() {
+        LepuBleLog.e(tag, "getFileList not yet implemented")
     }
 
 }

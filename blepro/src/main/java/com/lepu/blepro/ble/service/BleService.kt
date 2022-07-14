@@ -488,7 +488,10 @@ open class BleService: LifecycleService() {
         LepuBleLog.d(tag, "start discover.....${vailFace.size()}, needPair = $needPair, isReconnecting = $isReconnecting")
         stopDiscover()
 
-        if (vailFace.isEmpty() && isReconnecting)return
+        if (vailFace.isEmpty() && isReconnecting) {
+            LepuBleLog.d(tag, "startDiscover vailFace.isEmpty(), isReconnecting:$isReconnecting")
+            return
+        }
 
         BluetoothController.clear()
         this.needPair = needPair
@@ -558,7 +561,10 @@ open class BleService: LifecycleService() {
      */
     fun reconnect(scanModel : IntArray,reconnectDeviceName: Array<String>, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
 
-        if (vailFace.isEmpty())return
+        if (vailFace.isEmpty()) {
+            LepuBleLog.d(tag, "reconnect vailFace.isEmpty()")
+            return
+        }
 
         var reScan = false
 
@@ -589,7 +595,10 @@ open class BleService: LifecycleService() {
      */
     fun reconnectByAddress(scanModel: IntArray, reconnectDeviceAddress: Array<String>, needPair: Boolean,  toConnectUpdater: Boolean = false) {
 
-        if (vailFace.isEmpty())return
+        if (vailFace.isEmpty()) {
+            LepuBleLog.d(tag, "reconnectByAddress vailFace.isEmpty()")
+            return
+        }
 
 //        if (scanModel.size != reconnectDeviceAddress.size){
 //            LepuBleLog.d(tag,"请检查重连model && reconnectDeviceAddress  size")
@@ -723,6 +732,7 @@ open class BleService: LifecycleService() {
 
                     LiveEventBus.get<ScanResult>(EventMsgConst.Discovery.EventDeviceFoundForUnRegister).post(result)
                 }
+                LepuBleLog.d(tag, "onScanResult 未识别model:$model")
                 return
             }
             val b = Bluetooth(
@@ -739,15 +749,24 @@ open class BleService: LifecycleService() {
 //            }
 
             if(scanModel != null)
-                if (!filterResult(b)) return
+                if (!filterResult(b)) {
+                    LepuBleLog.d(tag, "filterResult 未扫描到指定model设备 b.model:${b.model}, b.name:${b.name}")
+                    return
+                }
 
             if (isScanDefineDevice) {
                 if (isScanByName) {
-                    if (!b.name.equals(scanByName)) return
+                    if (!b.name.equals(scanByName)) {
+                        LepuBleLog.d(tag, "isScanDefineDevice 未扫描到指定蓝牙名设备 isScanByName:$scanByName, b.model:${b.model}, b.name:${b.name}")
+                        return
+                    }
                     LepuBleLog.d(tag, "b.name == " + b.name)
                     LepuBleLog.d(tag, "scanByName == " + scanByName)
                 } else {
-                    if (!b.macAddr.equals(scanByAddress)) return
+                    if (!b.macAddr.equals(scanByAddress)) {
+                        LepuBleLog.d(tag, "isScanDefineDevice 未扫描到指定地址设备 scanByAddress:$scanByAddress, b.model:${b.model}, b.macAddr:${b.macAddr}")
+                        return
+                    }
                     LepuBleLog.d(tag, "b.macAddr == " + b.macAddr)
                     LepuBleLog.d(tag, "scanByAddress == " + scanByAddress)
                 }

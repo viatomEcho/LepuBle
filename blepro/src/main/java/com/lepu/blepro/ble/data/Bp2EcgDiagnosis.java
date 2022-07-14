@@ -1,16 +1,14 @@
 package com.lepu.blepro.ble.data;
 
-public class Er2EcgDiagnosis {
+public class Bp2EcgDiagnosis {
     // 原始bytes数据
     private byte[] bytes;
     // 除下列异常情况之外 (正常心电图)
     private boolean isRegular = false;
     // 波形质量差，或者导联一直脱落等算法无法分析的情况 (无法分析)
     private boolean isPoorSignal = false;
-    // 不满30s (不满30s不分析)
-    private boolean isLessThan30s = false;
-    // 检测到动作 (不分析)
-    private boolean isMoving = false;
+    // 导联一直脱落 (无法分析)
+    private boolean isLeadOff = false;
     // HR>100bpm (心率过速)
     private boolean isFastHr = false;
     // HR<50bpm (心率过缓)
@@ -29,16 +27,12 @@ public class Er2EcgDiagnosis {
     private boolean isProlongedQtc = false;
     // QTc<300ms (QTc间期缩短)
     private boolean isShortQtc = false;
-    // ST>+0.2mV (ST段抬高)
-    private boolean isStElevation = false;
-    // ST<-0.2mV (ST段压低)
-    private boolean isStDepression = false;
 
-    public Er2EcgDiagnosis() {
+    public Bp2EcgDiagnosis() {
 
     }
 
-    public Er2EcgDiagnosis(byte[] bytes) {
+    public Bp2EcgDiagnosis(byte[] bytes) {
         this.bytes = bytes;
         if (bytes.length != 4) {
             return;
@@ -53,10 +47,7 @@ public class Er2EcgDiagnosis {
             isPoorSignal = true;
         } else {
             if ((result & 0xFFFFFFFE) == 0xFFFFFFFE) {
-                isLessThan30s = true;
-            }
-            if ((result & 0xFFFFFFFD) == 0xFFFFFFFD) {
-                isMoving = true;
+                isLeadOff = true;
             }
             if ((result & 0x00000001) == 0x00000001) {
                 isFastHr = true;
@@ -85,12 +76,6 @@ public class Er2EcgDiagnosis {
             if ((result & 0x00000100) == 0x00000100) {
                 isShortQtc = true;
             }
-            if ((result & 0x00000200) == 0x00000200) {
-                isStElevation = true;
-            }
-            if ((result & 0x00000400) == 0x00000400) {
-                isStDepression = true;
-            }
         }
 
     }
@@ -99,12 +84,6 @@ public class Er2EcgDiagnosis {
         String str = "";
         if (isRegular) {
             str += "正常心电; ";
-        }
-        if (isStDepression) {
-            str += "ST<-0.2mV，ST段压低; ";
-        }
-        if (isStElevation) {
-            str += "ST>+0.2mV，ST段抬高; ";
         }
         if (isShortQtc) {
             str += "QTc<300ms，QTc间期缩短; ";
@@ -133,11 +112,8 @@ public class Er2EcgDiagnosis {
         if (isFastHr) {
             str += "HR>100bpm，心率过速; ";
         }
-        if (isMoving) {
-            str += "检测到动作，不分析; ";
-        }
-        if (isLessThan30s) {
-            str += "不满30s不分析; ";
+        if (isLeadOff) {
+            str += "导联一直脱落; ";
         }
         if (isPoorSignal) {
             str += "波形质量差，或者导联一直脱落等算法无法分析; ";
@@ -169,20 +145,12 @@ public class Er2EcgDiagnosis {
         isPoorSignal = poorSignal;
     }
 
-    public boolean isLessThan30s() {
-        return isLessThan30s;
+    public boolean isLeadOff() {
+        return isLeadOff;
     }
 
-    public void setLessThan30s(boolean lessThan30s) {
-        isLessThan30s = lessThan30s;
-    }
-
-    public boolean isMoving() {
-        return isMoving;
-    }
-
-    public void setMoving(boolean moving) {
-        isMoving = moving;
+    public void setLeadOff(boolean leadOff) {
+        isLeadOff = leadOff;
     }
 
     public boolean isFastHr() {
@@ -257,29 +225,12 @@ public class Er2EcgDiagnosis {
         isShortQtc = shortQtc;
     }
 
-    public boolean isStElevation() {
-        return isStElevation;
-    }
-
-    public void setStElevation(boolean stElevation) {
-        isStElevation = stElevation;
-    }
-
-    public boolean isStDepression() {
-        return isStDepression;
-    }
-
-    public void setStDepression(boolean stDepression) {
-        isStDepression = stDepression;
-    }
-
     @Override
     public String toString() {
-        return "Er2EcgDiagnosis{" +
+        return "Bp2EcgDiagnosis{" +
                 "isRegular = " + isRegular +
                 ", isPoorSignal = " + isPoorSignal +
-                ", isLessThan30s = " + isLessThan30s +
-                ", isMoving = " + isMoving +
+                ", isLeadOff = " + isLeadOff +
                 ", isFastHr = " + isFastHr +
                 ", isSlowHr = " + isSlowHr +
                 ", isIrregular = " + isIrregular +
@@ -289,8 +240,6 @@ public class Er2EcgDiagnosis {
                 ", isWideQrs = " + isWideQrs +
                 ", isProlongedQtc = " + isProlongedQtc +
                 ", isShortQtc = " + isShortQtc +
-                ", isStElevation = " + isStElevation +
-                ", isStDepression = " + isStDepression +
                 ", resultMess = " + getResultMess() +
                 '}';
     }

@@ -14,14 +14,12 @@ class Bp2FilePart {
     }
 
     override fun toString(): String {
-
-        val string = """
-            
-            download file: $name
-            total: $fileSize; 
+        return """
+            Bp2FilePart : 
+            name: $name
+            total: $fileSize
             current: $curSize
             percent: $percent
         """.trimIndent()
-        return string
     }
 }

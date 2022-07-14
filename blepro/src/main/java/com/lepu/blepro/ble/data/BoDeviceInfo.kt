@@ -13,6 +13,7 @@ class BoDeviceInfo : Parcelable {
 
     override fun toString(): String {
         return """
+            BoDeviceInfo : 
             deviceName : $deviceName
             sn : $sn
             softwareV : $softwareV

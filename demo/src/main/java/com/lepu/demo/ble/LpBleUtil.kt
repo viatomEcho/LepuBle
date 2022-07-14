@@ -94,6 +94,7 @@ class LpBleUtil {
             val RAW_FOLDERS = SparseArray<String>()
             RAW_FOLDERS.put(Bluetooth.MODEL_ER1, PathUtils.getExternalAppFilesPath() + "/demo/er1/")
             RAW_FOLDERS.put(Bluetooth.MODEL_LEW, PathUtils.getExternalAppFilesPath() + "/demo/lew/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_W12C, PathUtils.getExternalAppFilesPath() + "/demo/w12c/")
             RAW_FOLDERS.put(Bluetooth.MODEL_DUOEK, PathUtils.getExternalAppFilesPath() + "/demo/duoek/")
             RAW_FOLDERS.put(Bluetooth.MODEL_ER2, PathUtils.getExternalAppFilesPath() + "/demo/er2/")
 
@@ -653,8 +654,8 @@ class LpBleUtil {
         fun lewGetTime(model: Int) {
             BleServiceHelper.lewGetTime(model)
         }
-        fun lewFindDevice(model: Int) {
-            BleServiceHelper.lewFindDevice(model)
+        fun lewFindDevice(model: Int, on: Boolean) {
+            BleServiceHelper.lewFindDevice(model, on)
         }
         fun lewGetSystemSetting(model: Int) {
             BleServiceHelper.lewGetSystemSetting(model)
@@ -867,7 +868,7 @@ class LpBleUtil {
                     }
                     Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_POD_1W,
                     Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
-                    Bluetooth.MODEL_PC_60NW -> {
+                    Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_S5W -> {
                         BleServiceHelper.pc60fwEnableRtData(model, type, enable)
                     }
                     Bluetooth.MODEL_PC_68B -> {

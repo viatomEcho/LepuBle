@@ -2,7 +2,6 @@ package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.toUInt
 
-
 class Bp2BleRtWave {
 
     var waveDataType : Int
@@ -10,12 +9,19 @@ class Bp2BleRtWave {
     var waveformSize : Int
     var waveform : ByteArray
 
-
     @ExperimentalUnsignedTypes
     constructor(bytes : ByteArray) {
         waveDataType = bytes[0].toInt()
         waveData = bytes.copyOfRange(1, 21)
         waveformSize = toUInt(bytes.copyOfRange(21, 23))
         waveform = bytes.copyOfRange(23, bytes.size)
+    }
+
+    override fun toString(): String {
+        return """
+            Bp2BleRtWave : 
+            waveDataType : $waveDataType
+            waveformSize : $waveformSize
+        """.trimIndent()
     }
 }

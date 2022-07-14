@@ -16,13 +16,15 @@ class FhrBleManager(context: Context): LpBleManager(context) {
         service_uuid = UUID.fromString("0000AE30-0000-1000-8000-00805F9B34FB")
         write_uuid = UUID.fromString("0000AE01-0000-1000-8000-00805F9B34FB")
         notify_uuid = UUID.fromString("0000AE02-0000-1000-8000-00805F9B34FB")
+        LepuBleLog.d("FhrBleManager initUUID")
     }
 
     override fun initialize() {
-        LepuBleLog.d("FhrBleManager inited")
+        LepuBleLog.d("FhrBleManager initialize")
     }
 
     override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {
+        LepuBleLog.d("FhrBleManager dealReqQueue")
         return requestQueue
     }
 

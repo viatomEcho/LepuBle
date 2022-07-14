@@ -16,7 +16,7 @@ class Bp2BleFile {
 
     override fun toString(): String {
         val string = """
-            download file:
+            Bp2BleFile:
             file name: $name
             file type: $type
             file size: $size

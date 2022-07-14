@@ -11,10 +11,16 @@ import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 
 /**
- *
- * 蓝牙操作
+ * aoj20a体温计：
+ * send:
+ * 1.同步时间
+ * 2.获取设备信息
+ * 3.获取列表
+ * 4.删除数据
+ * receive:
+ * 1.体温数据测量正常结果
+ * 2.测量错误结果
  */
-
 class Aoj20aBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Aoj20aBleInterface"
 
@@ -36,14 +42,14 @@ class Aoj20aBleInterface(model: Int): BleInterface(model) {
             .timeout(10000)
             .retry(3, 100)
             .done {
-                LepuBleLog.d(tag, "Device Init")
+                LepuBleLog.d(tag, "manager.connect done")
             }
             .enqueue()
     }
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: Aoj20aBleResponse.BleResponse) {
-
+        LepuBleLog.d(tag, "onResponseReceived received : ${bytesToHex(response.bytes)}")
         when (response.cmd) {
             Aoj20aBleCmd.MSG_SET_TIME -> {
                 LepuBleLog.d(tag, "model:$model,MSG_SET_TIME => success " + bytesToHex(response.bytes))
@@ -154,52 +160,54 @@ class Aoj20aBleInterface(model: Int): BleInterface(model) {
         return bytesLeft
     }
 
-    /**
-     * get device info
-     */
     override fun getInfo() {
         sendCmd(Aoj20aBleCmd.getDeviceData())
+        LepuBleLog.e(tag, "getInfo")
     }
 
     override fun syncTime() {
         sendCmd(Aoj20aBleCmd.setTime())
+        LepuBleLog.e(tag, "syncTime")
     }
 
-    /**
-     * get file list
-     */
     override fun getFileList() {
         tempList.clear()
         sendCmd(Aoj20aBleCmd.getHistoryData())
+        LepuBleLog.e(tag, "getFileList")
     }
 
     fun deleteData() {
         sendCmd(Aoj20aBleCmd.deleteHistoryData())
+        LepuBleLog.e(tag, "deleteData")
     }
 
     fun tempMeasure() {
         sendCmd(Aoj20aBleCmd.tempMeasure())
+        LepuBleLog.e(tag, "tempMeasure")
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealContinueRF not yet implemented")
     }
-    /**
-     * get real-time data
-     */
+
     override fun getRtData() {
+        LepuBleLog.e(tag, "getRtData not yet implemented")
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
-
+        LepuBleLog.e(tag, "dealReadFile not yet implemented")
     }
 
     override fun reset() {
+        LepuBleLog.e(tag, "reset not yet implemented")
     }
 
     override fun factoryReset() {
+        LepuBleLog.e(tag, "factoryReset not yet implemented")
     }
 
     override fun factoryResetAll() {
+        LepuBleLog.e(tag, "factoryResetAll not yet implemented")
     }
 
 }

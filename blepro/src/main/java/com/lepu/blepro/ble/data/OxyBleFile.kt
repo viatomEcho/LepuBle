@@ -8,26 +8,26 @@ import com.lepu.blepro.utils.toUInt
 class OxyBleFile(val bytes: ByteArray) {
 
     var version: Int
-    var operationMode: Int
+    var operationMode: Int          // Operation Mode, 0 for Sleep Mode, 1 for Minitor Mode
     var year: Int
     var month: Int
     var day: Int
     var hour: Int
     var minute: Int
     var second: Int
-    var startTime: Int
-    var size: Int
-    var recordingTime: Int
-    var asleepTime: Int
-    var avgSpo2: Int
-    var minSpo2: Int
-    var dropsTimes3Percent: Int
-    var dropsTimes4Percent: Int
-    var asleepTimePercent: Int
-    var durationTime90Percent: Int
-    var dropsTimes90Percent: Int
-    var o2Score: Int
-    var stepCounter: Int
+    var startTime: Int              // timestamp s
+    var size: Int                   // Total bytes of this data file package
+    var recordingTime: Int          // Total recording time
+    var asleepTime: Int             // Reserved for total asleep time future
+    var avgSpo2: Int                // Average blood oxygen saturation
+    var minSpo2: Int                // Minimum blood oxygen saturation
+    var dropsTimes3Percent: Int     // drops below baseline - 3
+    var dropsTimes4Percent: Int     // drops below baseline - 4
+    var asleepTimePercent: Int      // T90 = (<90% duration time) / (total recording time) *100%
+    var durationTime90Percent: Int  // Duration time when SpO2 lower than 90%
+    var dropsTimes90Percent: Int    // Reserved for drop times when SpO2 lower than 90%
+    var o2Score: Int                // Range: 0~100 For range 0~10, should be (O2 Score) / 10
+    var stepCounter: Int            // Total steps
     // reserved 10
     var data = mutableListOf<EachData>()
 

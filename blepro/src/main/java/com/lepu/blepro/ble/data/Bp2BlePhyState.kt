@@ -1,6 +1,7 @@
 package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.bytesToHex
 
 class Bp2BlePhyState() {
     var bytes = byteArrayOf(0)
@@ -30,6 +31,9 @@ class Bp2BlePhyState() {
 
     override fun toString(): String {
         return """
+            Bp2BlePhyState : 
+            bytes : ${bytesToHex(bytes)}
+            getDataBytes : ${bytesToHex(getDataBytes())}
             leadOff : $leadOff
             mode : $mode
             intensy : $intensy

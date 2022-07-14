@@ -34,8 +34,8 @@ object Aoj20aBleResponse {
 
     @ExperimentalUnsignedTypes
     class TempRtData (val bytes: ByteArray) {
-        var temp: Float      // 测温数据
-        var mode: Int        // 测温模式
+        var temp: Float      // 测温数据 ℃
+        var mode: Int        // 测温模式 1：成人额温，2：儿童额温，3：耳温，4：物温
         var modeMsg: String
 
         init {
@@ -107,7 +107,7 @@ object Aoj20aBleResponse {
 
     @ExperimentalUnsignedTypes
     class DeviceData(val bytes: ByteArray) {
-        var mode: Int           // 测温模式
+        var mode: Int           // 测温模式 1：成人额温，2：儿童额温，3：耳温，4：物温
         var modeMsg: String
         var battery: Int        // 电量数值 1-10 (10:100%)
         var version: Int        // 主机版本号
@@ -118,6 +118,7 @@ object Aoj20aBleResponse {
             mode = byte2UInt(bytes[index])
             modeMsg = getModeMsg(mode)
             index++
+            // 协议有问题
             battery = (byte2UInt(bytes[index]) and 0xF0) shr 4
             index++
             version = byte2UInt(bytes[index])
@@ -149,7 +150,8 @@ object Aoj20aBleResponse {
 
     @ExperimentalUnsignedTypes
     class ErrorMsg(val bytes: ByteArray) {
-        var code: Int
+        var code: Int        // 错误码 0xe1：环境温度 > 40℃或 < 10℃（Er1），0xe2：物温模式 < 0℃（Lo），
+                             //       0xe3：物温模式 > 100℃（Hi），0xe4：人体测温模式 < 32℃（Lo），0xe5：人体测温模式 > 42.9℃（Hi）
         var codeMsg: String
 
         init {

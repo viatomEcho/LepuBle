@@ -21,7 +21,16 @@ import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 
-
+/**
+ * 指甲血氧设备：
+ * send:
+ * 1.获取设备信息
+ * 2.实时血氧使能开关
+ * receive:
+ * 1.实时电量
+ * 2.实时血氧
+ * 3.实时工作状态
+ */
 class Pc60FwBleInterface(model: Int): BleInterface(model) {
     
     private val tag: String = "Pc60FwBleInterface"
@@ -37,18 +46,17 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
     private var workingStatus = WorkingStatus()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = if (model == Bluetooth.MODEL_PC60FW
-            || model == Bluetooth.MODEL_OXYSMART
-            || model == Bluetooth.MODEL_POD_1W
-            || model == Bluetooth.MODEL_PF_10
-            || model == Bluetooth.MODEL_PC_60NW_1
-            || model == Bluetooth.MODEL_PC_60B
-            || model == Bluetooth.MODEL_POD2B) {
-            Pc60FwBleManager(context)
-        } else if (model == Bluetooth.MODEL_PF_20) {
-            Pf20BleManager(context)
-        } else {
-            Pc6nBleManager(context)
+        manager = when (model) {
+            Bluetooth.MODEL_PC60FW,
+            Bluetooth.MODEL_OXYSMART,
+            Bluetooth.MODEL_POD_1W,
+            Bluetooth.MODEL_S5W,
+            Bluetooth.MODEL_PF_10,
+            Bluetooth.MODEL_PC_60NW_1,
+            Bluetooth.MODEL_PC_60B,
+            Bluetooth.MODEL_POD2B -> Pc60FwBleManager(context)
+            Bluetooth.MODEL_PF_20 -> Pf20BleManager(context)
+            else -> Pc6nBleManager(context)
         }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
@@ -58,7 +66,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                 .timeout(10000)
                 .retry(3, 100)
                 .done {
-                    LepuBleLog.d(tag, "Device Init")
+                    LepuBleLog.d(tag, "manager.connect done")
                     if (model == Bluetooth.MODEL_PC_60NW) {
                         enableRtData(Pc60FwBleCmd.EnableType.OXY_PARAM, true)
                         enableRtData(Pc60FwBleCmd.EnableType.OXY_WAVE, true)
@@ -142,8 +150,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                             pc60fwDeviceInfo.hardwareV = pc60FwDevice.hardwareV
                             pc60fwDeviceInfo.sn = pc60FwDevice.sn
                             pc60fwDeviceInfo.softwareV = pc60FwDevice.softwareV
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo)
-                                .post(InterfaceEvent(model, pc60fwDeviceInfo))
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo).post(InterfaceEvent(model, pc60fwDeviceInfo))
                         }
                     }
                 }
@@ -175,8 +182,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                             pod1wRtParam.pi = it.pi.div(10f)
                             pod1wRtParam.spo2 = it.spo2
 
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.POD1w.EventPOD1wRtParam)
-                                .post(InterfaceEvent(model, pod1wRtParam))
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.POD1w.EventPOD1wRtParam).post(InterfaceEvent(model, pod1wRtParam))
                         } else {
                             pc60fwRtParam.isProbeOff = it.isProbeOff
                             pc60fwRtParam.pr = it.pr
@@ -184,8 +190,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                             pc60fwRtParam.pi = it.pi.div(10f)
                             pc60fwRtParam.spo2 = it.spo2
 
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtParam)
-                                .post(InterfaceEvent(model, pc60fwRtParam))
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtParam).post(InterfaceEvent(model, pc60fwRtParam))
                         }
                         LepuBleLog.d(tag, "it.pi == " + it.pi)
                         LepuBleLog.d(tag, "it.pr == " + it.pr)
@@ -203,14 +208,12 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                             pod1wRtWave.waveData = it.waveData
                             pod1wRtWave.waveIntData = it.waveIntData
 
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.POD1w.EventPOD1wRtWave)
-                                .post(InterfaceEvent(model, pod1wRtWave))
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.POD1w.EventPOD1wRtWave).post(InterfaceEvent(model, pod1wRtWave))
                         } else {
                             pc60fwRtWave.waveData = it.waveData
                             pc60fwRtWave.waveIntData = it.waveIntData
 
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtWave)
-                                .post(InterfaceEvent(model, pc60fwRtWave))
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtWave).post(InterfaceEvent(model, pc60fwRtWave))
                         }
                     }
                 }
@@ -250,6 +253,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
 
     fun enableRtData(type: Int, enable: Boolean) {
         sendCmd(Pc60FwBleCmd.enableSwitch(type, enable))
+        LepuBleLog.d(tag, "enableRtData type:$type, enable:$enable")
     }
 
     override fun getInfo() {
@@ -259,30 +263,39 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             sendCmd(Pc60FwBleCmd.getSn())
             sendCmd(Pc60FwBleCmd.getInfoF0())
         }
+        LepuBleLog.d(tag, "getInfo")
     }
 
     override fun syncTime() {
+        LepuBleLog.e(tag, "syncTime not yet implemented")
     }
 
     override fun getRtData() {
+        LepuBleLog.e(tag, "getRtData not yet implemented")
     }
 
     override fun getFileList() {
+        LepuBleLog.e(tag, "getFileList not yet implemented")
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealReadFile not yet implemented")
     }
 
     override fun reset() {
+        LepuBleLog.e(tag, "reset not yet implemented")
     }
 
     override fun factoryReset() {
+        LepuBleLog.e(tag, "factoryReset not yet implemented")
     }
 
     override fun factoryResetAll() {
+        LepuBleLog.e(tag, "factoryResetAll not yet implemented")
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealContinueRF not yet implemented")
     }
 
 

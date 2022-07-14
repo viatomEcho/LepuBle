@@ -1,6 +1,6 @@
 package com.lepu.blepro.ble.data
 
-
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toString
 import com.lepu.blepro.utils.toUInt
 import java.text.SimpleDateFormat
@@ -51,12 +51,14 @@ class Bp2DeviceInfo {
     }
 
     override fun toString(): String {
-        val format : SimpleDateFormat = SimpleDateFormat("HH:mm:ss MMM dd, yyyy", Locale.getDefault())
-        val d : Date = Date(curTime)
+        val format: SimpleDateFormat =
+            SimpleDateFormat("HH:mm:ss MMM dd, yyyy", Locale.getDefault())
+        val d: Date = Date(curTime)
         val dateStr = format.format(d)
 
-        val string = """
+        return """
             Bp2DeviceInfo :
+            bytes : ${bytesToHex(bytes)}
             name : $name
             hwV : $hwV
             fmV : $fmV
@@ -70,7 +72,6 @@ class Bp2DeviceInfo {
             snLen : $snLen
             sn : $sn
         """.trimIndent()
-        return string
     }
 
 }

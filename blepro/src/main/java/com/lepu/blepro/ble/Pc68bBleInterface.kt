@@ -19,8 +19,17 @@ import com.lepu.blepro.utils.bytesToHex
 import java.util.*
 
 /**
- *
- * 蓝牙操作
+ * pc68b指甲血氧：
+ * send:
+ * 1.同步时间
+ * 2.获取设备信息
+ * 3.获取设备状态
+ * 4.获取历史数据
+ * 5.删除文件
+ * 6.获取/配置参数
+ * 7.实时血氧使能开关
+ * receive:
+ * 1.实时血氧
  */
 
 class Pc68bBleInterface(model: Int): BleInterface(model) {
@@ -45,7 +54,7 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
             .timeout(10000)
             .retry(3, 100)
             .done {
-                LepuBleLog.d(tag, "Device Init")
+                LepuBleLog.d(tag, "manager.connect done")
                 enableRtData(Pc68bBleCmd.EnableType.RT_PARAM, true)
                 enableRtData(Pc68bBleCmd.EnableType.RT_WAVE, true)
             }
@@ -54,6 +63,7 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: Pc68bBleResponse.BleResponse) {
+        LepuBleLog.d(tag, "onResponseReceived bytes: ${bytesToHex(response.bytes)}")
         when (response.token) {
             Pc68bBleCmd.TOKEN_F0 -> {
                 when (response.type) {
@@ -131,7 +141,10 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                     }
                     Pc68bBleCmd.MSG_STATE_INFO -> {
                         LepuBleLog.d(tag, "model:$model,MSG_STATE_INFO => success")
-                        if (response.len < 4) return
+                        if (response.len < 4) {
+                            LepuBleLog.d(tag, "MSG_STATE_INFO response.len:${response.len}")
+                            return
+                        }
                         val data = Pc68bBleResponse.StatusInfo(response.content)
                         LepuBleLog.d(tag, "model:$model, data == $data")
 
@@ -235,59 +248,71 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
     override fun getInfo() {
         sendCmd(Pc68bBleCmd.getSn())
         sendCmd(Pc68bBleCmd.getInfo())
+        LepuBleLog.e(tag, "getInfo")
     }
 
     override fun syncTime() {
         sendCmd(Pc68bBleCmd.setTime())
-//        enableRtData(Pc68bBleCmd.EnableType.RT_PARAM, true)
-//        enableRtData(Pc68bBleCmd.EnableType.RT_WAVE, true)
+        LepuBleLog.e(tag, "syncTime")
     }
 
     fun deleteFile() {
         sendCmd(Pc68bBleCmd.deleteFile())
+        LepuBleLog.e(tag, "deleteFile")
     }
 
     override fun getFileList() {
         fileName = ""
         fileList.clear()
         sendCmd(Pc68bBleCmd.getFiles(0xFFFF))
+        LepuBleLog.e(tag, "getFileList")
     }
 
     fun setConfig(config: Pc68bConfig) {
         sendCmd(Pc68bBleCmd.setConfig(config.getDataBytes()))
+        LepuBleLog.e(tag, "setConfig config:$config")
     }
     fun getConfig() {
         sendCmd(Pc68bBleCmd.getConfig())
+        LepuBleLog.e(tag, "getConfig")
     }
     fun enableRtData(type: Int, enable: Boolean) {
         sendCmd(Pc68bBleCmd.enableSwitch(type, enable))
+        LepuBleLog.e(tag, "enableRtData type:$type, enable:$enable")
     }
 
     fun getStateInfo(interval: Int) {
         sendCmd(Pc68bBleCmd.getStateInfo(interval))
+        LepuBleLog.e(tag, "getStateInfo interval:$interval")
     }
     fun getTime() {
         sendCmd(Pc68bBleCmd.getTime())
+        LepuBleLog.e(tag, "getTime")
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
         this.fileName = fileName
         sendCmd(Pc68bBleCmd.getFiles(fileList.indexOf(fileName)))
+        LepuBleLog.e(tag, "dealReadFile userId:$userId, fileName:$fileName")
     }
     override fun reset() {
+        LepuBleLog.e(tag, "reset not yet implemented")
     }
 
     override fun factoryReset() {
+        LepuBleLog.e(tag, "factoryReset not yet implemented")
     }
 
     override fun factoryResetAll() {
+        LepuBleLog.e(tag, "factoryResetAll not yet implemented")
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
+        LepuBleLog.e(tag, "dealContinueRF not yet implemented")
     }
 
     override fun getRtData() {
-
+        LepuBleLog.e(tag, "getRtData not yet implemented")
     }
 
 }

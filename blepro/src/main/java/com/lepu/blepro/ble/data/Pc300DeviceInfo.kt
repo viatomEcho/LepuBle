@@ -10,11 +10,11 @@ class Pc300DeviceInfo : Parcelable {
     var deviceName = ""
     var softwareV = ""
     var hardwareV = ""
-    var batLevel = 0
+    var batLevel = 0     // 电量等级 0-3
 
     override fun toString(): String {
         return """
-            Pc300DeviceInfo
+            Pc300DeviceInfo : 
             deviceId : $deviceId
             deviceName : $deviceName
             softwareV : $softwareV

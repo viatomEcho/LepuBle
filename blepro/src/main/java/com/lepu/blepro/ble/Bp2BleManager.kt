@@ -20,12 +20,10 @@ import java.util.*
 class Bp2BleManager(context: Context): LpBleManager(context) {
 
     override fun initUUID() {
-        service_uuid =
-            UUID.fromString("14839AC4-7D7E-415C-9A42-167340CF2339")
-        write_uuid =
-            UUID.fromString("8B00ACE7-EB0B-49B0-BBE9-9AEE0A26E1A3")
-        notify_uuid =
-            UUID.fromString("0734594A-A8E7-4B1A-A6B1-CD5243059A57")
+        service_uuid = UUID.fromString("14839AC4-7D7E-415C-9A42-167340CF2339")
+        write_uuid = UUID.fromString("8B00ACE7-EB0B-49B0-BBE9-9AEE0A26E1A3")
+        notify_uuid = UUID.fromString("0734594A-A8E7-4B1A-A6B1-CD5243059A57")
+        LepuBleLog.d("Bp2BleManager initUUID ")
     }
 
     override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {
@@ -53,11 +51,12 @@ class Bp2BleManager(context: Context): LpBleManager(context) {
                 })
                 .add(requestConnectionPriority(ConnectionPriorityRequest.CONNECTION_PRIORITY_HIGH))
         }
+        LepuBleLog.d("Bp2BleManager dealReqQueue ")
         return requestQueue
     }
 
     override fun initialize() {
-        LepuBleLog.d("Bp2BleManager inited ")
+        LepuBleLog.d("Bp2BleManager initialize ")
     }
 
 }

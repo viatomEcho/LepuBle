@@ -1,18 +1,19 @@
 package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.int2ByteArray
 import com.lepu.blepro.utils.toUInt
 
 class Bp2Config() {
 
     var bytes = byteArrayOf(0)
-    var prevCalibZero: Int = 0
-    var lastCalibZero: Int = 0
-    var calibSlope: Int = 0
-    var slopePressure: Int = 0
-    var calibTicks: Int = 0
-    var sleepTicks: Int = 0
+    var prevCalibZero: Int = 0          // 上一次校零adc值	e.g.	2800<=zero<=12000 128mV~550mV
+    var lastCalibZero: Int = 0          // 最后一次校零adc值	e.g.	2800<=zero<=12000 128mV~550mV
+    var calibSlope: Int = 0             // 校准斜率值*100	e.g.	13630<=slope<=17040 136.3LSB/mmHg-170.4LSB/mmHg
+    var slopePressure: Int = 0          // 校准斜率时用的压力值
+    var calibTicks: Int = 0             // 最后一次校准时间
+    var sleepTicks: Int = 0             // 上次进休眠待机时间
     var bpTestTargetPressure: Int = 0   // 目标压力值
     var beepSwitch: Boolean = false     // 心电音开关
     var avgMeasureMode: Int = 0         // 0：x3模式关闭 1：x3模式开启（时间间隔30s） 2：时间间隔60s 3：时间间隔90s 4：时间间隔120s
@@ -58,7 +59,9 @@ class Bp2Config() {
 
     override fun toString(): String {
         return """
-            Bp2wConfig
+            Bp2Config : 
+            bytes : ${bytesToHex(bytes)}
+            getDataBytes : ${bytesToHex(getDataBytes())}
             prevCalibZero : $prevCalibZero
             lastCalibZero : $lastCalibZero
             calibSlope : $calibSlope

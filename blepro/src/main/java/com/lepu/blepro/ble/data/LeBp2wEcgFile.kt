@@ -28,14 +28,13 @@ class LeBp2wEcgFile {
     }
 
     override fun toString(): String {
-        val string = """
-            download file:
+        return """
+            LeBp2wEcgFile:
             file name: $fileName
             file version: $fileVersion
             file type: $fileType
             timestamp: $timestamp
             device name: $deviceName
         """.trimIndent()
-        return string
     }
 }

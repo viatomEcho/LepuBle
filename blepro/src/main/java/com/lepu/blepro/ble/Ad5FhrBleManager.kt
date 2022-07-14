@@ -16,17 +16,18 @@ class Ad5FhrBleManager(context: Context): LpBleManager(context) {
         service_uuid = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
         write_uuid = UUID.fromString("0000FFF2-0000-1000-8000-00805F9B34FB")
         notify_uuid = UUID.fromString("0000FFE4-0000-1000-8000-00805F9B34FB")
-
+        LepuBleLog.d("Ad5FhrBleManager initUUID")
         /*service_uuid = UUID.fromString("0000FFE5-0000-1000-8000-00805F9B34FB")
         write_uuid = UUID.fromString("0000FFE9-0000-1000-8000-00805F9B34FB")
         notify_uuid = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")*/
     }
 
     override fun initialize() {
-        LepuBleLog.d("Ad5FhrBleManager inited")
+        LepuBleLog.d("Ad5FhrBleManager initialize")
     }
 
     override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {
+        LepuBleLog.d("Ad5FhrBleManager dealReqQueue")
         return requestQueue
     }
 

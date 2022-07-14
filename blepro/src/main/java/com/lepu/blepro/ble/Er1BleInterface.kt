@@ -8,14 +8,22 @@ import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 import kotlin.experimental.inv
 
 /**
- *
- * 蓝牙操作
+ * er1心电贴：
+ * send:
+ * 1.同步时间
+ * 2.获取设备信息
+ * 3.获取实时心电
+ * 4.获取列表
+ * 5.下载文件内容
+ * 6.恢复出厂设置
+ * 7.获取/配置参数
+ * 8.烧录
  */
-
 class Er1BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Er1BleInterface"
 
@@ -29,12 +37,10 @@ class Er1BleInterface(model: Int): BleInterface(model) {
             .timeout(10000)
             .retry(3, 100)
             .done {
-                LepuBleLog.d(tag, "Device Init")
+                LepuBleLog.d(tag, "manager.connect done")
             }
             .enqueue()
     }
-
-
 
     /**
      * download a file, name come from filelist
@@ -44,27 +50,20 @@ class Er1BleInterface(model: Int): BleInterface(model) {
     var fileList: Er1BleResponse.Er1FileList? = null
     private var userId: String? = null
 
-    override fun dealReadFile(userId: String, fileName: String) {
-        this.userId = userId
-        this.curFileName =fileName
-        LepuBleLog.d(tag, "dealReadFile:: $userId, $fileName, offset = $offset")
-        sendCmd(Er1BleCmd.readFileStart(fileName.toByteArray(), 0)) // 读开始永远是0
-    }
-
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: Er1BleResponse.Er1Response) {
-//        LepuBleLog.d(TAG, "received: ${response.cmd}")
+        LepuBleLog.d(tag, "onResponseReceived cmd: ${response.cmd}, bytes: ${bytesToHex(response.bytes)}")
         when(response.cmd) {
             Er1BleCmd.GET_INFO -> {
                 val info = LepuDevice(response.content)
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1Info).post(InterfaceEvent(model, info))
-
-                if (runRtImmediately){
+                // 本版本注释，测试通过后删除
+                /*if (runRtImmediately){
                     runRtTask()
                     runRtImmediately = false
-                }
+                }*/
 
             }
 
@@ -89,6 +88,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                 //检查当前的下载状态
                 if (isCancelRF || isPausedRF) {
                     sendCmd(Er1BleCmd.readFileEnd())
+                    LepuBleLog.d(tag, "READ_FILE_START isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
                     return
                 }
 
@@ -112,6 +112,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                     //检查当前的下载状态
                     if (isCancelRF || isPausedRF) {
                         sendCmd(Er1BleCmd.readFileEnd())
+                        LepuBleLog.d(tag, "READ_FILE_DATA isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
                         return
                     }
 
@@ -137,7 +138,10 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                 curFileName = null// 一定要放在发通知之前
                 curFile?.let {
                     if (it.index < it.fileSize ){
-                        if ((isCancelRF || isPausedRF) ) return
+                        if ((isCancelRF || isPausedRF) ) {
+                            LepuBleLog.d(tag, "READ_FILE_END isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
+                            return
+                        }
                     }else {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileComplete).post(InterfaceEvent(model, it))
                     }
@@ -253,68 +257,77 @@ class Er1BleInterface(model: Int): BleInterface(model) {
      */
     override fun getInfo() {
         sendCmd(Er1BleCmd.getInfo())
+        LepuBleLog.d(tag, "getInfo...")
     }
 
     override fun syncTime() {
         sendCmd(Er1BleCmd.setTime())
+        LepuBleLog.d(tag, "syncTime...")
     }
-
 
     override fun reset() {
         sendCmd(Er1BleCmd.reset())
+        LepuBleLog.d(tag, "reset...")
     }
 
     override fun factoryReset() {
         sendCmd(Er1BleCmd.factoryReset())
+        LepuBleLog.d(tag, "factoryReset...")
     }
 
     override fun factoryResetAll() {
         sendCmd(Er1BleCmd.factoryResetAll())
+        LepuBleLog.d(tag, "factoryResetAll...")
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
         dealReadFile(userId, fileName)
+        LepuBleLog.d(tag, "setVibrateConfig...userId:$userId, fileName:$fileName")
     }
     /**
      * get real-time data
      */
     override fun getRtData() {
         sendCmd(Er1BleCmd.getRtData())
+        LepuBleLog.d(tag, "getRtData...")
     }
 
+    override fun dealReadFile(userId: String, fileName: String) {
+        this.userId = userId
+        this.curFileName =fileName
+        sendCmd(Er1BleCmd.readFileStart(fileName.toByteArray(), 0)) // 读开始永远是0
+        LepuBleLog.d(tag, "dealReadFile:: $userId, $fileName, offset = $offset")
+    }
 
     /**
      * get file list
      */
     override fun getFileList() {
         sendCmd(Er1BleCmd.getFileList())
+        LepuBleLog.d(tag, "getFileList...")
     }
 
     fun getVibrateConfig(){
-        LepuBleLog.d(tag, "getVibrateConfig...")
         sendCmd(Er1BleCmd.getVibrateConfig())
-
+        LepuBleLog.d(tag, "getVibrateConfig...")
     }
     fun setVibrateConfig(switcher: Boolean, threshold1: Int, threshold2: Int){
-        LepuBleLog.d(tag, "setVibrateConfig...")
         sendCmd(Er1BleCmd.setVibrate(switcher, threshold1, threshold2))
-
+        LepuBleLog.d(tag, "setVibrateConfig...switcher:$switcher, threshold1:$threshold1, threshold2:$threshold2")
     }
 
     fun setVibrateConfig(switcher: Boolean, vector: Int, motionCount: Int, motionWindows: Int){
-        LepuBleLog.d(tag, "setVibrateConfig...")
         sendCmd(Er1BleCmd.setSwitcher(switcher, vector,motionCount, motionWindows))
-
+        LepuBleLog.d(tag, "setVibrateConfig...switcher:$switcher, vector:$vector, motionCount:$motionCount, motionWindows:$motionWindows")
     }
 
     fun burnFactoryInfo(config: FactoryConfig) {
-        LepuBleLog.d(tag, "burnFactoryInfo...")
         sendCmd(Er1BleCmd.burnFactoryInfo(config.convert2Data()))
+        LepuBleLog.d(tag, "burnFactoryInfo...config:$config")
     }
     fun burnLockFlash() {
-        LepuBleLog.d(tag, "burnLockFlash...")
         sendCmd(Er1BleCmd.burnLockFlash())
+        LepuBleLog.d(tag, "burnLockFlash...")
     }
-
 
 }

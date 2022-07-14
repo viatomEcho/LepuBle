@@ -11,8 +11,13 @@ import com.lepu.blepro.utils.*
 import kotlin.experimental.inv
 
 /**
- *
- * 蓝牙操作
+ * S1心电体脂秤：
+ * send:
+ * 1.同步时间
+ * 2.获取设备信息
+ * 3.恢复出厂设置
+ * 4.获取实时心电
+ * 5.获取体重数据
  */
 
 class LeS1BleInterface(model: Int): BleInterface(model) {
@@ -28,12 +33,10 @@ class LeS1BleInterface(model: Int): BleInterface(model) {
             .timeout(10000)
             .retry(3, 100)
             .done {
-                LepuBleLog.d(tag, "Device Init")
+                LepuBleLog.d(tag, "manager.connect done")
             }
             .enqueue()
     }
-
-
 
     /**
      * download a file, name come from filelist
@@ -45,28 +48,15 @@ class LeS1BleInterface(model: Int): BleInterface(model) {
     var fileList: LeS1BleResponse.FileList? = null
     private var userId: String? = null
 
-    override fun dealReadFile(userId: String, fileName: String) {
-        this.userId = userId
-        this.curFileName =fileName
-        LepuBleLog.d(tag, "dealReadFile:: $userId, $fileName, offset = $offset")
-        sendCmd(LeS1BleCmd.readFileStart(fileName.toByteArray(), 0)) // 读开始永远是0
-    }
-
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: LeS1BleResponse.BleResponse) {
-//        LepuBleLog.d(TAG, "received: ${response.cmd}")
+        LepuBleLog.d(tag, "onResponseReceived cmd: ${response.cmd}, bytes: ${bytesToHex(response.bytes)}")
         when(response.cmd) {
             LeS1BleCmd.GET_INFO -> {
                 val info = LepuDevice(response.content)
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success $info")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1Info).post(
-                    InterfaceEvent(model, info)
-                )
-                if (runRtImmediately){
-                    runRtTask()
-                    runRtImmediately = false
-                }
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1Info).post(InterfaceEvent(model, info))
 
             }
 
@@ -80,6 +70,7 @@ class LeS1BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,READ_FILE_LIST => success")
                 if (response.len == 0) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1NoFile).post(InterfaceEvent(model, true))
+                    LepuBleLog.d(tag, "READ_FILE_LIST bleResponse.len == 0")
                     return
                 }
                 fileList = LeS1BleResponse.FileList(response.content)
@@ -93,6 +84,7 @@ class LeS1BleInterface(model: Int): BleInterface(model) {
                 //检查当前的下载状态
                 if (isCancelRF || isPausedRF) {
                     sendCmd(LeS1BleCmd.readFileEnd())
+                    LepuBleLog.d(tag, "READ_FILE_START isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
                     return
                 }
 
@@ -116,6 +108,7 @@ class LeS1BleInterface(model: Int): BleInterface(model) {
                 //检查当前的下载状态
                 if (isCancelRF || isPausedRF) {
                     sendCmd(LeS1BleCmd.readFileEnd())
+                    LepuBleLog.d(tag, "READ_FILE_DATA isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
                     return
                 }
                 curSize += response.len
@@ -219,45 +212,50 @@ class LeS1BleInterface(model: Int): BleInterface(model) {
         return bytesLeft
     }
 
-    /**
-     * get device info
-     */
     override fun getInfo() {
         sendCmd(LeS1BleCmd.getInfo())
+        LepuBleLog.e(tag, "getInfo")
     }
 
     override fun syncTime() {
         sendCmd(LeS1BleCmd.setTime())
+        LepuBleLog.e(tag, "syncTime")
     }
-
 
     override fun reset() {
         sendCmd(LeS1BleCmd.reset())
+        LepuBleLog.e(tag, "reset")
     }
 
     override fun factoryReset() {
         sendCmd(LeS1BleCmd.factoryReset())
-    }
-
-    override fun factoryResetAll() {
+        LepuBleLog.e(tag, "factoryReset")
     }
 
     override fun dealContinueRF(userId: String, fileName: String) {
         dealReadFile(userId, fileName)
-    }
-    /**
-     * get real-time data
-     */
-    override fun getRtData() {
-        sendCmd(LeS1BleCmd.getRtData())
-    }
-    
-    /**
-     * get file list
-     */
-    override fun getFileList() {
-        sendCmd(LeS1BleCmd.getFileList())
+        LepuBleLog.e(tag, "dealContinueRF userId:$userId, fileName:$fileName")
     }
 
+    override fun dealReadFile(userId: String, fileName: String) {
+        this.userId = userId
+        this.curFileName =fileName
+        sendCmd(LeS1BleCmd.readFileStart(fileName.toByteArray(), 0)) // 读开始永远是0
+        LepuBleLog.d(tag, "dealReadFile:: $userId, $fileName, offset = $offset")
+    }
+
+    override fun getRtData() {
+        sendCmd(LeS1BleCmd.getRtData())
+        LepuBleLog.e(tag, "getRtData")
+    }
+
+    override fun getFileList() {
+        sendCmd(LeS1BleCmd.getFileList())
+        LepuBleLog.e(tag, "getFileList")
+    }
+
+    override fun factoryResetAll() {
+        LepuBleLog.e(tag, "factoryResetAll not yet implemented")
+    }
 
 }
