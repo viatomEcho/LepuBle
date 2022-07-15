@@ -657,6 +657,9 @@ class LpBleUtil {
         fun lewFindDevice(model: Int, on: Boolean) {
             BleServiceHelper.lewFindDevice(model, on)
         }
+        fun lewGetDeviceNetwork(model: Int) {
+            BleServiceHelper.lewGetDeviceNetwork(model)
+        }
         fun lewGetSystemSetting(model: Int) {
             BleServiceHelper.lewGetSystemSetting(model)
         }

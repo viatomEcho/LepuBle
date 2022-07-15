@@ -141,6 +141,15 @@ class LewBleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFindPhone).post(InterfaceEvent(model, false))
                 }
             }
+            LewBleCmd.GET_DEVICE_NETWORK -> {
+                if (response.len == 0) {
+                    LepuBleLog.d(tag, "GET_DEVICE_NETWORK response.len == 0")
+                    return
+                }
+                val data = DeviceNetwork(response.content)
+                LepuBleLog.d(tag, "model:$model,GET_DEVICE_NETWORK => success $data")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetDeviceNetwork).post(InterfaceEvent(model, data))
+            }
             LewBleCmd.GET_SYSTEM_SETTING -> {
                 if (response.len == 0) {
                     LepuBleLog.d(tag, "GET_SYSTEM_SETTING response.len == 0")
@@ -630,6 +639,10 @@ class LewBleInterface(model: Int): BleInterface(model) {
             sendCmd(LewBleCmd.findDevice(0))
         }
         LepuBleLog.d(tag, "findDevice")
+    }
+    fun getDeviceNetwork() {
+        sendCmd(LewBleCmd.getDeviceNetwork())
+        LepuBleLog.d(tag, "getDeviceNetwork")
     }
     fun getSystemSetting() {
         sendCmd(LewBleCmd.getSystemSetting())

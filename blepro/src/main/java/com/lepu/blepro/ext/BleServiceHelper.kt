@@ -1763,6 +1763,18 @@ class BleServiceHelper private constructor() {
         }
     }
     /**
+     * 获取设备联网模式
+     */
+    fun lewGetDeviceNetwork(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let { it1 ->
+            (it1 as LewBleInterface).let {
+                LepuBleLog.d(tag, "it as LewBleInterface--lewGetDeviceNetwork")
+                it.getDeviceNetwork()
+            }
+        }
+    }
+    /**
      * 系统配置（包括语言、单位、翻腕亮屏、左右手）
      */
     fun lewGetSystemSetting(model: Int) {

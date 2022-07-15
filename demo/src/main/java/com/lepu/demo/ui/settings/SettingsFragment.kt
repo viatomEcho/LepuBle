@@ -350,6 +350,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $state"
             binding.sendCmd.text = cmdStr
         }
+        binding.lewGetNetwork.setOnClickListener {
+            LpBleUtil.lewGetDeviceNetwork(Constant.BluetoothConfig.currentModel[0])
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
         binding.lewGetUnit.setOnClickListener {
             LpBleUtil.lewGetUnit(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
@@ -2306,6 +2314,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 val data = it.data as Boolean
                 binding.content.text = data.toString()
                 Toast.makeText(context, "lew手表 查找手机 $data", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetDeviceNetwork)
+            .observe(this) {
+                val data = it.data as DeviceNetwork
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取联网模式成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewBatteryInfo)
             .observe(this) {
