@@ -3083,12 +3083,16 @@ class BleServiceHelper private constructor() {
     }
     fun checkmeLeGetFileList(model: Int, fileType: Int) {
         if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as CheckmeLeBleInterface).let {
-                LepuBleLog.d(tag, "it as CheckmeLeBleInterface--checkmeLeGetList")
-                it.getFileList(fileType)
+        when (model) {
+            Bluetooth.MODEL_CHECKME_LE -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as CheckmeLeBleInterface).let {
+                        LepuBleLog.d(tag, "it as CheckmeLeBleInterface--checkmeLeGetList")
+                        it.getFileList(fileType)
+                    }
+                }
             }
-            else -> LepuBleLog.d(tag, "ad5EnableRtData current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "checkmeLeGetList current model $model unsupported!!")
         }
     }
 
