@@ -3088,6 +3088,7 @@ class BleServiceHelper private constructor() {
                 LepuBleLog.d(tag, "it as CheckmeLeBleInterface--checkmeLeGetList")
                 it.getFileList(fileType)
             }
+            else -> LepuBleLog.d(tag, "ad5EnableRtData current model $model unsupported!!")
         }
     }
 
