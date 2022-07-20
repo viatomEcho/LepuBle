@@ -626,7 +626,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_CMRING,
-            Bluetooth.MODEL_OXYU -> {
+            Bluetooth.MODEL_OXYU, Bluetooth.MODEL_AI_S100 -> {
                 return inter is OxyBleInterface
             }
             Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T ->{
@@ -1442,7 +1442,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetRtWave")
@@ -1467,7 +1468,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetRtParam")
@@ -1492,7 +1494,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetPpgRt")
@@ -1517,7 +1520,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--updateSetting")
@@ -1542,7 +1546,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--updateSetting")

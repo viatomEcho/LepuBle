@@ -144,7 +144,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PC_60NW,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_CMRING,
-            Bluetooth.MODEL_OXYU, Bluetooth.MODEL_S5W -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_OXYU, Bluetooth.MODEL_S5W,
+            Bluetooth.MODEL_AI_S100 -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_CHECK_ADV -> {
@@ -776,7 +777,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60B,
                 Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_OXYRING,
                 Bluetooth.MODEL_CMRING, Bluetooth.MODEL_OXYU,
-                Bluetooth.MODEL_S5W -> {
+                Bluetooth.MODEL_S5W, Bluetooth.MODEL_AI_S100 -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE
@@ -942,6 +943,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYLINK
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYU
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_AI_S100
             ) {
                 LpBleUtil.oxyGetRtParam(Constant.BluetoothConfig.currentModel[0])
                 startWave(Constant.BluetoothConfig.currentModel[0])

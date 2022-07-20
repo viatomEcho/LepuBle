@@ -127,7 +127,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
                 Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
                 Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_CMRING,
-                Bluetooth.MODEL_OXYU -> {
+                Bluetooth.MODEL_OXYU, Bluetooth.MODEL_AI_S100 -> {
                     setViewVisible(binding.o2Layout)
                     LpBleUtil.getInfo(it.modelNo)
                 }
@@ -899,7 +899,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             switchState = !switchState
             val detect = HrDetect()
             detect.switch = switchState
-            detect.interval = 2
+            detect.interval = 5
             Log.d("test12345", "lewSetHrDetect $detect")
             LpBleUtil.lewSetHrDetect(Constant.BluetoothConfig.currentModel[0], detect)
             binding.responseCmd.text = ""
@@ -1059,7 +1059,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             val screen = SecondScreen()
             switchState = !switchState
             screen.medicineRemind = switchState
-            screen.calendar = switchState
+            screen.weather = switchState
             switchState = !switchState
             screen.clock = switchState
             screen.heartRate = switchState
@@ -2564,6 +2564,30 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 val data = it.data as SosContact
                 binding.content.text = "$data"
                 Toast.makeText(context, "lew手表 获取紧急联系人成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetSecondScreen)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置副屏成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetSecondScreen)
+            .observe(this) {
+                val data = it.data as SecondScreen
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取副屏设置成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetCards)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置卡片成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetCards)
+            .observe(this) {
+                val data = it.data as IntArray
+                binding.content.text = "${data.joinToString()}"
+                Toast.makeText(context, "lew手表 获取卡片成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetHrThreshold)
             .observe(this) {

@@ -147,7 +147,8 @@ object LpWorkManager {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100 -> {
                 OxyBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)

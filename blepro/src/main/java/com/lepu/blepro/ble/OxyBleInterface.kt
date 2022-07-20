@@ -147,8 +147,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 clearTimeout()
 
                 if (response.content.size < 13) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtWaveRes)
-                        .post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtWaveRes).post(InterfaceEvent(model, true))
                     LepuBleLog.d(tag, "OXY_CMD_RT_WAVE response.content.size:${response.content.size}")
                     return
                 }
@@ -164,8 +163,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             OxyBleCmd.OXY_CMD_RT_PARAM -> {
                 clearTimeout()
                 if (response.len < 12) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamRes)
-                        .post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamRes).post(InterfaceEvent(model, true))
                     LepuBleLog.d(tag, "OXY_CMD_RT_PARAM response.len:${response.len}")
                     return
                 }
@@ -198,11 +196,9 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
                 if (response.content.size > 10) {
                     val ppgData = OxyBleResponse.PPGData(response.content)
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
-                        .post(InterfaceEvent(model, ppgData))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData).post(InterfaceEvent(model, ppgData))
                 }else{
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgRes)
-                        .post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgRes).post(InterfaceEvent(model, true))
                 }
             }
 

@@ -194,9 +194,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 }
                 val data = Pc300BleResponse.RtOxyParam(response.content)
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X53 血氧上传参数数据包 => success $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtOxyParam).post(
-                    InterfaceEvent(model, data)
-                )
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtOxyParam).post(InterfaceEvent(model, data))
             }
             TOKEN_0X70 -> {
                 if (response.content.isEmpty()) {
@@ -232,9 +230,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                     return
                 }
                 val data = Pc300BleResponse.GluResult(response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300GluResult).post(
-                    InterfaceEvent(model, data)
-                )
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300GluResult).post(InterfaceEvent(model, data))
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X73 血糖结果 => success $data")
             }
             TOKEN_0XE0 -> {
@@ -318,9 +314,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                     return
                 }
                 val data = Pc300BleResponse.RtEcgWave(response.content, gain)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtEcgWave).post(
-                    InterfaceEvent(model, data)
-                )
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtEcgWave).post(InterfaceEvent(model, data))
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X32 心电波形上传数据 => success $data")
             }
             TOKEN_0X33 -> {
