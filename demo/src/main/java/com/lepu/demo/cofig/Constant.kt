@@ -14,6 +14,9 @@ class Constant{
         companion object{
 
             const val ER1_MODEL: Int = Bluetooth.MODEL_ER1
+            const val HHM1_MODEL: Int = Bluetooth.MODEL_HHM1
+            const val HHM2_MODEL: Int = Bluetooth.MODEL_HHM2
+            const val HHM3_MODEL: Int = Bluetooth.MODEL_HHM3
             const val ER1_N_MODEL: Int = Bluetooth.MODEL_ER1_N
             const val DUOEK_MODEL: Int = Bluetooth.MODEL_DUOEK
             const val ER2_MODEL: Int = Bluetooth.MODEL_ER2
@@ -85,7 +88,7 @@ class Constant{
                 POD2B_MODEL, PC_60NW_1_MODEL, PC_60NW_MODEL, PC_60B_MODEL, PC300_MODEL, PULSEBITEX_MODEL, FETAL_MODEL,
                 VTM_AD5_MODEL, VCOMIN_MODEL, CHECKME_LE_MODEL, PF_10_MODEL, PF_20_MODEL, LEM_MODEL, LES1_MODEL,
                 CHECK_ADV_MODEL, F4_SCALE_MODEL, MY_SCALE_MODEL, F5_SCALE_MODEL, F8_SCALE_MODEL, OXYRING_MODEL,
-                BBSM_S1_MODEL, BBSM_S2_MODEL, OXYU_MODEL, S5W_MODEL
+                BBSM_S1_MODEL, BBSM_S2_MODEL, OXYU_MODEL, S5W_MODEL, HHM1_MODEL, HHM2_MODEL, HHM3_MODEL
             )
 
             val SUPPORT_FACES = SparseArray<Int>().apply {

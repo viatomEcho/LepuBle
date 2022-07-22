@@ -96,11 +96,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         })
         mainViewModel.curBluetooth.observe(viewLifecycleOwner, {
             when (it!!.modelNo) {
-                Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N -> {
+                Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
                     setViewVisible(binding.er1Layout)
                     LpBleUtil.getEr1VibrateConfig(it.modelNo)
                 }
-                Bluetooth.MODEL_ER2, Bluetooth.MODEL_DUOEK -> {
+                Bluetooth.MODEL_ER2, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_HHM2,
+                Bluetooth.MODEL_HHM3, -> {
                     setViewVisible(binding.er2Layout)
                     LpBleUtil.getEr2SwitcherState(it.modelNo)
                 }
@@ -1734,7 +1735,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this, {
                 val data = it.data as ByteArray
                 setReceiveCmd(data)
-                if (it.model == Bluetooth.MODEL_ER1 || it.model == Bluetooth.MODEL_ER1_N) {
+                if (it.model == Bluetooth.MODEL_ER1
+                    || it.model == Bluetooth.MODEL_ER1_N
+                    || it.model == Bluetooth.MODEL_HHM1) {
                     val config = VbVibrationSwitcherConfig.parse(data)
                     this.config = config
                     var temp = "关"

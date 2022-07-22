@@ -586,7 +586,8 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return false
 
         when (model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N -> {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
+            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 return inter is Er1BleInterface
             }
             Bluetooth.MODEL_ER2 -> {
@@ -894,7 +895,8 @@ class BleServiceHelper private constructor() {
     fun burnFactoryInfo(model: Int, config: FactoryConfig) {
         if (!checkService()) return
         when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N -> {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
+            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er1BleInterface).let {
                         LepuBleLog.d(tag, "it as Er1BleInterface--burnFactoryInfo")
@@ -911,7 +913,8 @@ class BleServiceHelper private constructor() {
     fun burnLockFlash(model: Int) {
         if (!checkService()) return
         when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N -> {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
+            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er1BleInterface).let {
                         LepuBleLog.d(tag, "it as Er1BleInterface--burnLockFlash")
@@ -984,7 +987,8 @@ class BleServiceHelper private constructor() {
     fun getEr1VibrateConfig(model: Int){
         if (!checkService()) return
         when(model){
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N ->{
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
+            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 ->{
                 getInterface(model)?.let { ble ->
                     (ble as Er1BleInterface).getVibrateConfig()
                 }
@@ -1000,7 +1004,8 @@ class BleServiceHelper private constructor() {
     fun setEr1Vibrate(model: Int, switcher: Boolean, threshold1: Int, threshold2: Int){
         if (!checkService()) return
         when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N -> {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
+            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 getInterface(model)?.let { ble ->
                     (ble as Er1BleInterface).setVibrateConfig(switcher, threshold1, threshold2)
                 }
