@@ -218,7 +218,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             if (binding.er1Code.text.isEmpty()) {
                 enableCode = false
             } else {
-                config.setSnCode(binding.er1Code.text.toString())
+                config.setBranchCode(binding.er1Code.text.toString())
             }
             config.setBurnFlag(enableSn, false, enableCode)
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
@@ -255,7 +255,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             if (binding.er2Code.text.isEmpty()) {
                 enableCode = false
             } else {
-                config.setSnCode(binding.er2Code.text.toString())
+                config.setBranchCode(binding.er2Code.text.toString())
             }
             config.setBurnFlag(enableSn, false, enableCode)
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
@@ -1407,7 +1407,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             if (binding.o2Code.text.isEmpty()) {
                 enableCode = false
             } else {
-                config.setSnCode(binding.o2Code.text.toString())
+                config.setBranchCode(binding.o2Code.text.toString())
             }
             config.setBurnFlag(enableSn, false, enableCode)
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
