@@ -17,7 +17,9 @@ class SleepList(val bytes: ByteArray) {
         currentSize = byte2UInt(bytes[index])
         index++
         for (i in 0 until currentSize) {
-            items.add(Item(bytes.copyOfRange(index+i*27, index+(i+1)*27)))
+            val len = byte2UInt(bytes[index+10])
+            items.add(Item(bytes.copyOfRange(index, index+len*3+11)))
+            index += len*3 + 11
         }
     }
 
@@ -35,6 +37,7 @@ class SleepList(val bytes: ByteArray) {
         var startTime: Int
         var stopTime: Int
         // reserved 2
+        var len: Int
         var datas = mutableListOf<Sleep>()
         init {
             var index = 0
@@ -43,7 +46,8 @@ class SleepList(val bytes: ByteArray) {
             stopTime = toUInt(bytes.copyOfRange(index, index + 4))
             index += 4
             index += 2
-            val len = (bytes.size - index).div(3)
+            len = byte2UInt(bytes[index])
+            index++
             for (i in 0 until len) {
                 datas.add(Sleep(bytes.copyOfRange(index+i*3, index+(i+1)*3)))
             }
@@ -54,6 +58,7 @@ class SleepList(val bytes: ByteArray) {
                 bytes : ${bytesToHex(bytes)}
                 startTime : $startTime
                 stopTime : $stopTime
+                len : $len
                 datas : $datas
             """.trimIndent()
         }

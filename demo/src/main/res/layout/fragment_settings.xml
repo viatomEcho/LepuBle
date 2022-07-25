@@ -647,12 +647,6 @@
                         android:layout_height="wrap_content"
                         android:text="设置系统配置"
                         android:layout_marginStart="20dp"/>
-                    <Button
-                        android:id="@+id/lew_find_device"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="找手表"
-                        android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -688,6 +682,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="设置单位"
+                        android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/lew_find_device"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="找手表"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <LinearLayout
@@ -1024,6 +1024,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="心电数据"
+                        android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/lew_get_rt_data"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="实时数据"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <LinearLayout

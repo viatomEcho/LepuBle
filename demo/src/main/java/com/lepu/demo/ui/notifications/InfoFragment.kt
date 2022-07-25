@@ -11,7 +11,7 @@ import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
-import com.lepu.blepro.ble.data.lew.EcgList
+import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
@@ -301,18 +301,37 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             })
         //--------------------------------lew-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList)
-            .observe(this) { event ->
-                (event.data as LewBleResponse.FileList).let {
-                    setReceiveCmd(it.content)
-                    binding.info.text = it.toString()
-                    if (it.type == LewBleCmd.ListType.ECG) {
-                        val data = EcgList(it.content)
-                        for (item in data.items) {
+            .observe(this) {
+                val data = it.data as LewBleResponse.FileList
+                when (data.type) {
+                    LewBleCmd.ListType.SPORT -> {
+                        val list = SportList(data.content)
+                        binding.info.text = "$list"
+                    }
+                    LewBleCmd.ListType.ECG -> {
+                        val list = EcgList(data.content)
+                        binding.info.text = "$list"
+                        for (item in list.items) {
                             fileNames.add(item.name)
                         }
                     }
-                    Toast.makeText(context, "lew 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                    LewBleCmd.ListType.HR -> {
+                        val list = HrList(data.content)
+                        binding.info.text = "$list"
+                    }
+                    LewBleCmd.ListType.OXY -> {
+                        val list = OxyList(data.content)
+                        binding.info.text = "$list"
+                    }
                 }
+                Toast.makeText(context, "lew手表 获取列表成功 ${data.type}", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete)
+            .observe(this) {
+                val data = it.data as LewBleResponse.EcgFile
+                val file = EcgFile(data.content)
+                binding.info.text = "$file"
+                Toast.makeText(context, "lew手表 获取心电文件成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadingFileProgress)
             .observe(this) { event ->

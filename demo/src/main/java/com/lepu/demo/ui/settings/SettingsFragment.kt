@@ -760,11 +760,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             val setting = MeasureSetting()
 
             val sportTarget = SportTarget()
-            sportTarget.step = 10000
+            sportTarget.step = 12
             sportTarget.distance = 5000
-            sportTarget.calories = 2000
+            sportTarget.calories = 12
             sportTarget.sleep = 30
-            sportTarget.sportTime = 60
+            sportTarget.sportTime = 12
             setting.sportTarget = sportTarget
 
             switchState = !switchState
@@ -796,9 +796,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
             val hrDetect = HrDetect()
             hrDetect.switch = switchState
-            hrDetect.interval = 2
+            hrDetect.interval = 5
+
+            val oxyDetect = OxyDetect()
+            oxyDetect.switch = switchState
+            oxyDetect.interval = 5
 
             setting.hrDetect = hrDetect
+            setting.oxyDetect = oxyDetect
             Log.d("test12345", "lewSetMeasureSetting $setting")
             LpBleUtil.lewSetMeasureSetting(Constant.BluetoothConfig.currentModel[0], setting)
             binding.responseCmd.text = ""
@@ -817,11 +822,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
         binding.lewSetSportTarget.setOnClickListener {
             val sportTarget = SportTarget()
-            sportTarget.step = 10000
+            sportTarget.step = 22
             sportTarget.distance = 5000
-            sportTarget.calories = 2000
+            sportTarget.calories = 22
             sportTarget.sleep = 30
-            sportTarget.sportTime = 60
+            sportTarget.sportTime = 22
             Log.d("test12345", "lewSetSportTarget $sportTarget")
             LpBleUtil.lewSetSportTarget(Constant.BluetoothConfig.currentModel[0], sportTarget)
             binding.responseCmd.text = ""
@@ -1023,7 +1028,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             item2.relation = state
 
             sos.items.add(item)
-            sos.items.add(item2)
+//            sos.items.add(item2)
             Log.d("test12345", "lewSetSos $sos")
             LpBleUtil.lewSetSosContact(Constant.BluetoothConfig.currentModel[0], sos)
             binding.responseCmd.text = ""
@@ -1102,6 +1107,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
         binding.lewGetEcgData.setOnClickListener {
             LpBleUtil.lewGetFileList(Constant.BluetoothConfig.currentModel[0], LewBleCmd.ListType.ECG, 0)
+            binding.responseCmd.text = ""
+            binding.content.text = ""
+            binding.sendCmd.text = ""
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.lewGetRtData.setOnClickListener {
+            LpBleUtil.lewGetRtData(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
             binding.sendCmd.text = ""
@@ -2497,13 +2510,25 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this) {
                 val data = it.data as Boolean
                 binding.content.text = "$data"
-                Toast.makeText(context, "lew手表 设置目标提醒成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "lew手表 设置达标提醒成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetTargetRemind)
             .observe(this) {
                 val data = it.data as Boolean
                 binding.content.text = "$data"
-                Toast.makeText(context, "lew手表 获取目标提醒成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "lew手表 获取达标提醒成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetMedicineRemind)
+            .observe(this) {
+                val data = it.data as MedicineRemind
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取用药提醒成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetMedicineRemind)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置用药提醒成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetSittingRemind)
             .observe(this) {
@@ -2521,13 +2546,25 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this) {
                 val data = it.data as Boolean
                 binding.content.text = "$data"
-                Toast.makeText(context, "lew手表 设置测量配置成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "lew手表 设置自动心率成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetHrDetect)
             .observe(this) {
                 val data = it.data as HrDetect
                 binding.content.text = "$data"
                 Toast.makeText(context, "lew手表 获取自测心率成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetOxyDetect)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 设置自动血氧成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetOxyDetect)
+            .observe(this) {
+                val data = it.data as HrDetect
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取自测血氧成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetUserInfo)
             .observe(this) {
@@ -2613,6 +2650,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.content.text = "$data"
                 Toast.makeText(context, "lew手表 获取血氧阈值成功", Toast.LENGTH_SHORT).show()
             }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewRtData)
+            .observe(this) {
+                val data = it.data as RtData
+                binding.content.text = "$data"
+                Toast.makeText(context, "lew手表 获取实时数据成功", Toast.LENGTH_SHORT).show()
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList)
             .observe(this) {
                 val data = it.data as LewBleResponse.FileList
@@ -2633,8 +2676,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                         val list = OxyList(data.content)
                         binding.content.text = "$list"
                     }
+                    LewBleCmd.ListType.SLEEP -> {
+                        val list = SleepList(data.content)
+                        binding.content.text = "$list"
+                    }
                 }
-                Toast.makeText(context, "lew手表 获取列表成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "lew手表 获取列表成功 ${data.type}", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete)
             .observe(this) {

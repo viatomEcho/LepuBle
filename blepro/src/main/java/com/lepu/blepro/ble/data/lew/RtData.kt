@@ -10,6 +10,7 @@ class RtData(val bytes: ByteArray) {
 
     var deviceStatus: DeviceStatus
     var sportData: SportData
+    var moduleData : ModuleData
 
     init {
         var index = 0
@@ -18,7 +19,17 @@ class RtData(val bytes: ByteArray) {
 //        val type = byte2UInt(bytes[index])
         sportData = SportData(bytes.copyOfRange(index, index+36))
         index += 36
+        moduleData = ModuleData(bytes.copyOfRange(index, bytes.size))
+    }
 
+    override fun toString(): String {
+        return """
+            RtData : 
+            bytes : ${bytesToHex(bytes)}
+            deviceStatus : $deviceStatus
+            sportData : $sportData
+            moduleData : $moduleData
+        """.trimIndent()
     }
 
     class DeviceStatus(val bytes: ByteArray) {

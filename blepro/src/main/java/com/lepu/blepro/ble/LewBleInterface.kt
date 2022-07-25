@@ -488,7 +488,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 }
                 val data = RtData(response.content)
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success $data")
-
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewRtData).post(InterfaceEvent(model, data))
             }
 
             LewBleCmd.RESET -> {

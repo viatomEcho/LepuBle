@@ -2560,6 +2560,20 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "lewSetCards current model $model unsupported!!")
         }
     }
+    fun lewGetRtData(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LewBleInterface).let {
+                        LepuBleLog.d(tag, "it as LewBleInterface--lewGetRtData")
+                        it.getRtData()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lewGetRtData current model $model unsupported!!")
+        }
+    }
     /**
      * 获取手表记录数据
      * @param type LewBleCmd.ListType

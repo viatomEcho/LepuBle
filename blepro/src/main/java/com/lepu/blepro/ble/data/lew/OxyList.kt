@@ -17,13 +17,13 @@ class OxyList(val bytes: ByteArray) {
         currentSize = byte2UInt(bytes[index])
         index++
         for (i in 0 until currentSize) {
-            items.add(Item(bytes.copyOfRange(index+i*7, index+(i+1)*7)))
+            items.add(Item(bytes.copyOfRange(index+i*8, index+(i+1)*8)))
         }
     }
 
     override fun toString(): String {
         return """
-            HrList : 
+            OxyList : 
             bytes : ${bytesToHex(bytes)}
             leftSize : $leftSize
             currentSize : $currentSize
@@ -35,6 +35,7 @@ class OxyList(val bytes: ByteArray) {
         var recordingTime: Int
         var pr: Int
         var spo2: Int
+        // reserved 1
         init {
             var index = 0
             recordingTime = toUInt(bytes.copyOfRange(index, index + 4))

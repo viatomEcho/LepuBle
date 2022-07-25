@@ -393,7 +393,7 @@ class LpBleUtil {
             }
         }
 
-        fun startRtTask(delayMillis: Long = 200){
+        fun startRtTask(delayMillis: Long = 2000){
             if(BluetoothConfig.singleConnect && BluetoothConfig.currentModel.isNotEmpty()){
                     startRtTask(BluetoothConfig.currentModel[0], delayMillis)
 
@@ -794,6 +794,9 @@ class LpBleUtil {
         }
         fun lewSetCards(model: Int, cards: IntArray) {
             BleServiceHelper.lewSetCards(model, cards)
+        }
+        fun lewGetRtData(model: Int) {
+            BleServiceHelper.lewGetRtData(model)
         }
         fun lewGetFileList(model: Int, type: Int, startTime: Int) {
             BleServiceHelper.lewGetFileList(model, type, startTime)
