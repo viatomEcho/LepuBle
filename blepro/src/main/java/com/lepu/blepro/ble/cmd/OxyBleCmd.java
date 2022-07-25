@@ -274,5 +274,20 @@ public class OxyBleCmd {
         return buf;
     }
 
+    public static byte[] burnFactoryInfo(byte[] data) {
+        int len = data.length;
+        byte[] buf = new byte[8+len];
+        buf[0] = (byte) 0xAA;
+        buf[1] = (byte) OXY_CMD_BURN_FACTORY_INFO;
+        buf[2] = (byte) ~OXY_CMD_BURN_FACTORY_INFO;
+
+        System.arraycopy(data, 0, buf, 7, len);
+
+        buf[buf.length-1] = BleCRC.calCRC8(buf);
+
+
+        return buf;
+    }
+
 
 }

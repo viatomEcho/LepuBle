@@ -27,6 +27,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventOxyReadFileComplete = "com.lepu.ble.oxy.read.file.complete"        // 传输文件成功 OxyBleResponse.OxyFile
             const val EventOxyReadingFileProgress = "com.lepu.ble.oxy.reading.file.progress"  // 当前文件进度 展示时：(dialogProgress / 10.0) + "%")
             const val EventOxyFactoryReset = "com.lepu.ble.oxy.factory.reset"                 // 恢复出厂设置 true
+            const val EventOxyBurnFactoryInfo = "com.lepu.ble.oxy.burn.factory.info"          // 烧录出厂信息 boolean
             const val EventOxySyncDeviceInfo = "com.lepu.ble.oxy.sync"                        // 同步参数 true
             const val EventOxyInfo = "com.lepu.ble.oxy.info"                                  // 设备信息 OxyBleResponse.OxyInfo
             const val EventOxyBoxInfo = "com.lepu.ble.oxy.box.info"                           // 盒子信息 LepuDevice

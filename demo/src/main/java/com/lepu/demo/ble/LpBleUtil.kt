@@ -11,6 +11,7 @@ import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
 import com.lepu.blepro.constants.Ble
@@ -452,6 +453,9 @@ class LpBleUtil {
             BleServiceHelper.pc100GetBoState(model)
         }
 
+        fun burnFactoryInfo(model: Int, config: FactoryConfig) {
+            BleServiceHelper.burnFactoryInfo(model, config)
+        }
         fun setEr1Vibrate(model: Int, switcher: Boolean, threshold1: Int, threshold2: Int){
             BleServiceHelper.setEr1Vibrate(model, switcher, threshold1, threshold2)
         }

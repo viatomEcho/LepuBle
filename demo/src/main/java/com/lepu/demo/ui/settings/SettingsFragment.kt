@@ -14,6 +14,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.FscaleUserInfo
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
 import com.lepu.blepro.event.InterfaceEvent
@@ -205,6 +206,23 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.er1SetHr.setOnClickListener {
             LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, binding.er1Hr1.text.toString().toInt(), binding.er1Hr2.text.toString().toInt())
         }
+        binding.er1FactoryConfig.setOnClickListener {
+            val config = FactoryConfig()
+            var enableSn = true
+            if (binding.er1Sn.text.isEmpty()) {
+                enableSn = false
+            } else {
+                config.setSnCode(binding.er1Sn.text.toString())
+            }
+            var enableCode = true
+            if (binding.er1Code.text.isEmpty()) {
+                enableCode = false
+            } else {
+                config.setSnCode(binding.er1Code.text.toString())
+            }
+            config.setBurnFlag(enableSn, false, enableCode)
+            LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
+        }
         //-------------------------er2/duoek------------------------
         binding.er2GetConfig.setOnClickListener {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER2) {
@@ -224,6 +242,23 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
+        }
+        binding.er2FactoryConfig.setOnClickListener {
+            val config = FactoryConfig()
+            var enableSn = true
+            if (binding.er2Sn.text.isEmpty()) {
+                enableSn = false
+            } else {
+                config.setSnCode(binding.er2Sn.text.toString())
+            }
+            var enableCode = true
+            if (binding.er2Code.text.isEmpty()) {
+                enableCode = false
+            } else {
+                config.setSnCode(binding.er2Code.text.toString())
+            }
+            config.setBurnFlag(enableSn, false, enableCode)
+            LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
         }
         //-------------------------lew------------------------
         // 时间
@@ -1360,6 +1395,23 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.ap20SetConfig.text = "设置参数$state"
         }
         //-------------------------o2-----------------------
+        binding.o2FactoryConfig.setOnClickListener {
+            val config = FactoryConfig()
+            var enableSn = true
+            if (binding.o2Sn.text.isEmpty()) {
+                enableSn = false
+            } else {
+                config.setSnCode(binding.o2Sn.text.toString())
+            }
+            var enableCode = true
+            if (binding.o2Code.text.isEmpty()) {
+                enableCode = false
+            } else {
+                config.setSnCode(binding.o2Code.text.toString())
+            }
+            config.setBurnFlag(enableSn, false, enableCode)
+            LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
+        }
         binding.o2SetOxiThr.setOnClickListener {
             LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_OXI_THR, binding.o2OxiThr.text.toString().toInt())
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
@@ -1767,6 +1819,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     ).show()
                 }
             })
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnFactoryInfo)
+            .observe(this) {
+                Toast.makeText(context, "烧录成功", Toast.LENGTH_SHORT).show()
+            }
         //-----------------------------er2------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetSwitcherState)
             .observe(this, {
@@ -2124,6 +2180,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
             })
         //------------------------------o2/babyO2-----------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBurnFactoryInfo)
+            .observe(this) {
+                Toast.makeText(context, "烧录成功", Toast.LENGTH_SHORT).show()
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxySyncDeviceInfo)
             .observe(this, {
                 Toast.makeText(

@@ -73,6 +73,37 @@
                         android:text="获取配置"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="sn:" />
+                    <EditText
+                        android:id="@+id/er1_sn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="branch code:" />
+                    <EditText
+                        android:id="@+id/er1_code"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <Button
+                    android:id="@+id/er1_factory_config"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="确认" />
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/er2_layout"
@@ -98,6 +129,37 @@
                         android:text="获取配置"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="sn:" />
+                    <EditText
+                        android:id="@+id/er2_sn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="branch code:" />
+                    <EditText
+                        android:id="@+id/er2_code"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <Button
+                    android:id="@+id/er2_factory_config"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="确认" />
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/bp2_bp2a_layout"
@@ -352,6 +414,37 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="o2/babyO2"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="sn:" />
+                    <EditText
+                        android:id="@+id/o2_sn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="branch code:" />
+                    <EditText
+                        android:id="@+id/o2_code"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <Button
+                    android:id="@+id/o2_factory_config"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="确认" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">

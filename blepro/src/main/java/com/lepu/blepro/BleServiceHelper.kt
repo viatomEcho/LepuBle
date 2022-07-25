@@ -904,6 +904,21 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_BABYO2,
+            Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_CHECKO2,
+            Bluetooth.MODEL_O2M, Bluetooth.MODEL_SLEEPO2,
+            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
+            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
+            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as OxyBleInterface).let {
+                        LepuBleLog.d(tag, "it as OxyBleInterface--burnFactoryInfo")
+                        it.burnFactoryInfo(config)
+                    }
+                }
+            }
         }
     }
 
