@@ -336,7 +336,7 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_PULSEBITEX -> {
+            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4 -> {
                 PulsebitBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
