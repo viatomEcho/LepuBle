@@ -155,7 +155,8 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N -> {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
+            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 Er1BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -336,7 +337,7 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_PULSEBITEX -> {
+            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4 -> {
                 PulsebitBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 

@@ -42,6 +42,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     /**
      * Er1BleInterface发出的通知
      * 包含model: MODEL_ER1, MODEL_ER1_N, MODEL_DUOEK
+     *           MODEL_HHM1, MODEL_HHM2, MODEL_HHM3
      */
     interface ER1 {
         companion object {

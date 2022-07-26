@@ -14,8 +14,11 @@ class Constant{
         companion object{
 
             const val ER1_MODEL: Int = Bluetooth.MODEL_ER1
+            const val HHM1_MODEL: Int = Bluetooth.MODEL_HHM1
             const val ER1_N_MODEL: Int = Bluetooth.MODEL_ER1_N
             const val DUOEK_MODEL: Int = Bluetooth.MODEL_DUOEK
+            const val HHM2_MODEL: Int = Bluetooth.MODEL_HHM2
+            const val HHM3_MODEL: Int = Bluetooth.MODEL_HHM3
             const val ER2_MODEL: Int = Bluetooth.MODEL_ER2
             const val PC80B_MODEL: Int = Bluetooth.MODEL_PC80B
             const val BP2_MODEL: Int = Bluetooth.MODEL_BP2
@@ -66,6 +69,7 @@ class Constant{
             const val PC_68B_MODEL: Int = Bluetooth.MODEL_PC_68B
             const val PC300_MODEL: Int = Bluetooth.MODEL_PC300
             const val PULSEBITEX_MODEL: Int = Bluetooth.MODEL_PULSEBITEX
+            const val HHM4_MODEL: Int = Bluetooth.MODEL_HHM4
             const val FETAL_MODEL: Int = Bluetooth.MODEL_FETAL
             const val VTM_AD5_MODEL: Int = Bluetooth.MODEL_VTM_AD5
             const val VCOMIN_MODEL: Int = Bluetooth.MODEL_VCOMIN
@@ -91,7 +95,7 @@ class Constant{
                 VTM_AD5_MODEL, VCOMIN_MODEL, CHECKME_LE_MODEL, PF_10_MODEL, PF_20_MODEL, LEM_MODEL, LES1_MODEL,
                 CHECK_ADV_MODEL, F4_SCALE_MODEL, MY_SCALE_MODEL, F5_SCALE_MODEL, F8_SCALE_MODEL, OXYRING_MODEL,
                 BBSM_S1_MODEL, BBSM_S2_MODEL, CMRING_MODEL, LPRE_MODEL, LE_B1_MODEL, OXYU_MODEL, S5W_MODEL, W12C_MODEL,
-                AI_S100_MODEL
+                AI_S100_MODEL, HHM1_MODEL, HHM2_MODEL, HHM3_MODEL, HHM4_MODEL
             )
 
             val SUPPORT_FACES = SparseArray<Int>().apply {

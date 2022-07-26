@@ -98,11 +98,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         })
         mainViewModel.curBluetooth.observe(viewLifecycleOwner, {
             when (it!!.modelNo) {
-                Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N -> {
+                Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
                     setViewVisible(binding.er1Layout)
                     LpBleUtil.getEr1VibrateConfig(it.modelNo)
                 }
-                Bluetooth.MODEL_ER2, Bluetooth.MODEL_DUOEK -> {
+                Bluetooth.MODEL_ER2, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_HHM2,
+                Bluetooth.MODEL_HHM3 -> {
                     setViewVisible(binding.er2Layout)
                     LpBleUtil.getEr2SwitcherState(it.modelNo)
                 }
@@ -1959,7 +1960,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetSwitcherState)
             .observe(this, {
                 LpBleUtil.getEr1VibrateConfig(it.model)
-                if (it.model == Bluetooth.MODEL_DUOEK) {
+                if (it.model == Bluetooth.MODEL_DUOEK || it.model == Bluetooth.MODEL_HHM2 || it.model == Bluetooth.MODEL_HHM3) {
                     Toast.makeText(context, "duoek 设置参数成功", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(context, "er1 设置参数成功", Toast.LENGTH_SHORT).show()
@@ -1969,7 +1970,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this, {
                 val data = it.data as ByteArray
                 setReceiveCmd(data)
-                if (it.model == Bluetooth.MODEL_DUOEK) {
+                if (it.model == Bluetooth.MODEL_DUOEK || it.model == Bluetooth.MODEL_HHM2 || it.model == Bluetooth.MODEL_HHM3) {
                     val data = it.data as ByteArray
                     val config = SwitcherConfig.parse(data)
                     var temp = "关"

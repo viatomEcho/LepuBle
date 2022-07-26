@@ -93,6 +93,9 @@ class LpBleUtil {
 
             val RAW_FOLDERS = SparseArray<String>()
             RAW_FOLDERS.put(Bluetooth.MODEL_ER1, PathUtils.getExternalAppFilesPath() + "/demo/er1/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_HHM1, PathUtils.getExternalAppFilesPath() + "/demo/hhm1/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_HHM2, PathUtils.getExternalAppFilesPath() + "/demo/hhm2/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_HHM3, PathUtils.getExternalAppFilesPath() + "/demo/hhm3/")
             RAW_FOLDERS.put(Bluetooth.MODEL_LEW, PathUtils.getExternalAppFilesPath() + "/demo/lew/")
             RAW_FOLDERS.put(Bluetooth.MODEL_W12C, PathUtils.getExternalAppFilesPath() + "/demo/w12c/")
             RAW_FOLDERS.put(Bluetooth.MODEL_DUOEK, PathUtils.getExternalAppFilesPath() + "/demo/duoek/")
@@ -393,7 +396,7 @@ class LpBleUtil {
             }
         }
 
-        fun startRtTask(delayMillis: Long = 2000){
+        fun startRtTask(delayMillis: Long = 200){
             if(BluetoothConfig.singleConnect && BluetoothConfig.currentModel.isNotEmpty()){
                     startRtTask(BluetoothConfig.currentModel[0], delayMillis)
 
