@@ -674,7 +674,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             item.everySaturday = switchState
 
             val item2 = AlarmClockInfo.Item()
-            item2.hour = 7
+            item2.hour = 17
             item2.minute = 10
             item2.repeat = switchState
             item2.switch = switchState
