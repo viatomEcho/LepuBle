@@ -1019,8 +1019,7 @@ class BleServiceHelper private constructor() {
     fun setEr1Vibrate(model: Int, switcher: Boolean, threshold1: Int, threshold2: Int){
         if (!checkService()) return
         when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
-            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
                 getInterface(model)?.let { ble ->
                     (ble as Er1BleInterface).setVibrateConfig(switcher, threshold1, threshold2)
                 }
@@ -1037,7 +1036,7 @@ class BleServiceHelper private constructor() {
     fun setEr1Vibrate(model: Int,switcher: Boolean, vector: Int, motionCount: Int,motionWindows: Int ){
         if (!checkService()) return
         when(model) {
-            Bluetooth.MODEL_DUOEK -> {
+            Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 getInterface(model)?.let { ble ->
                     (ble as Er1BleInterface).setVibrateConfig(switcher, vector, motionCount, motionWindows)
                 }
