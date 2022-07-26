@@ -11,6 +11,7 @@ import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
 import com.lepu.blepro.constants.Ble
@@ -344,6 +345,10 @@ class LpBleUtil {
                 }
                 BleServiceHelper.factoryResetAll(model)
             }
+        }
+
+        fun burnFactoryInfo(model: Int, config: FactoryConfig) {
+            BleServiceHelper.burnFactoryInfo(model, config)
         }
 
         /**

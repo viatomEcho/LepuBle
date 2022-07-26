@@ -7,6 +7,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BleCRC
 import com.lepu.blepro.ble.cmd.OxyBleCmd
 import com.lepu.blepro.ble.cmd.OxyBleResponse
+import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
@@ -239,6 +240,13 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyFactoryReset).post(InterfaceEvent(model, true))
             }
 
+            OxyBleCmd.OXY_CMD_BURN_FACTORY_INFO -> {
+                clearTimeout()
+                LepuBleLog.d(tag, "model:$model,  OXY_CMD_BURN_FACTORY_INFO => success")
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBurnFactoryInfo).post(InterfaceEvent(model, true))
+            }
+
             else -> {
                 clearTimeout()
             }
@@ -326,6 +334,10 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     override fun factoryReset() {
         sendOxyCmd(OxyBleCmd.OXY_CMD_FACTORY_RESET, OxyBleCmd.factoryReset())
         LepuBleLog.e(tag, "factoryReset")
+    }
+
+    fun burnFactoryInfo(config: FactoryConfig) {
+        sendOxyCmd(OxyBleCmd.OXY_CMD_BURN_FACTORY_INFO, OxyBleCmd.burnFactoryInfo(config.convert2DataO2()))
     }
 
     override fun factoryResetAll() {
