@@ -1,8 +1,10 @@
 package com.lepu.blepro.ble.data.lew
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
+import java.util.*
 
 class SportList(val bytes: ByteArray) {
 
@@ -70,7 +72,9 @@ class SportList(val bytes: ByteArray) {
             bytes : ${bytesToHex(bytes)}
             type : $type
             startTime : $startTime
+            startTimeStr : ${stringFromDate(Date(startTime * 1000L), "yyyy-MM-dd HH:mm:ss")}
             stopTime : $stopTime
+            stopTimeStr : ${stringFromDate(Date(stopTime * 1000L), "yyyy-MM-dd HH:mm:ss")}
             distance : $distance
             averHr : $averHr
             maxHr : $maxHr

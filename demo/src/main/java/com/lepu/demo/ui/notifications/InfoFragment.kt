@@ -255,6 +255,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     binding.info.text = "$data"
                     setReceiveCmd(it.content)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                    binding.process.text = readFileProcess
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
                         readFile()
@@ -292,6 +293,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                     }
+                    binding.process.text = readFileProcess
                     setReceiveCmd(it.content)
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
@@ -326,25 +328,20 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 }
                 Toast.makeText(context, "lew手表 获取列表成功 ${data.type}", Toast.LENGTH_SHORT).show()
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete)
-            .observe(this) {
-                val data = it.data as LewBleResponse.EcgFile
-                val file = EcgFile(data.content)
-                binding.info.text = "$file"
-                Toast.makeText(context, "lew手表 获取心电文件成功", Toast.LENGTH_SHORT).show()
-            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Int).let {
-                    binding.process.text =
-                        readFileProcess + curFileName + " 读取进度:" + (it / 10).toString() + "%"
+                    binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it / 10).toString() + "%"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete)
             .observe(this) { event ->
                 (event.data as LewBleResponse.EcgFile).let {
                     setReceiveCmd(it.content)
-                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $it \n"
+                    val file = EcgFile(it.content)
+                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $file \n"
+                    binding.process.text = readFileProcess
+                    Toast.makeText(context, "lew手表 获取心电文件$curFileName 成功", Toast.LENGTH_SHORT).show()
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
                         readFile()
@@ -358,14 +355,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     setReceiveCmd(it.bytes)
                     binding.info.text = it.toString()
                     for (fileName in it.fileNameList) {
-                        if (fileName != null)
-                            fileNames.add(fileName)
+                        fileNames.add(fileName)
                     }
-                    Toast.makeText(
-                        context,
-                        "bp2 获取文件列表成功 共有${fileNames.size}个文件",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(context, "bp2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadingFileProgress)
@@ -391,6 +383,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                     }
+                    binding.process.text = readFileProcess
                     setReceiveCmd(it.content)
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
@@ -430,6 +423,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                     }
+                    binding.process.text = readFileProcess
                     setReceiveCmd(it.content)
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
@@ -496,6 +490,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (event.data as LeBp2wEcgFile).let {
                     setReceiveCmd(it.content)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $it \n"
+                    binding.process.text = readFileProcess
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
                         readFile()
@@ -560,6 +555,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     binding.info.text = "$data"
                     setReceiveCmd(it.fileContent)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                    binding.process.text = readFileProcess
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
                         readFile()
@@ -636,6 +632,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 val data = it.data as PulsebitBleResponse.EcgFile
                 setReceiveCmd(data.bytes)
                 readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                binding.process.text = readFileProcess
                 if (binding.fileName.text.toString().isEmpty()) {
                     fileNames.removeAt(0)
                     readFile()
@@ -706,6 +703,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 val data = it.data as CheckmeLeBleResponse.EcgFile
                 setReceiveCmd(data.bytes)
                 readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                binding.process.text = readFileProcess
                 if (binding.fileName.text.toString().isEmpty()) {
                     fileNames.removeAt(0)
                     readFile()
@@ -740,6 +738,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (event.data as LeS1BleResponse.BleFile).let {
                     setReceiveCmd(it.bytes)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $it \n"
+                    binding.process.text = readFileProcess
                 }
             })
     }

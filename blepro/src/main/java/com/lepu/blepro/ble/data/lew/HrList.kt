@@ -1,8 +1,10 @@
 package com.lepu.blepro.ble.data.lew
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
+import java.util.*
 
 class HrList(val bytes: ByteArray) {
 
@@ -45,6 +47,7 @@ class HrList(val bytes: ByteArray) {
             Item : 
             bytes : ${bytesToHex(bytes)}
             recordingTime : $recordingTime
+            recordingTimeStr : ${stringFromDate(Date(recordingTime * 1000L), "yyyy-MM-dd HH:mm:ss")}
             hr : $hr
         """.trimIndent()
         }
