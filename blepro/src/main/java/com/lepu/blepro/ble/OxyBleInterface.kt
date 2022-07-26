@@ -277,7 +277,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     }
 
     fun burnFactoryInfo(config: FactoryConfig) {
-        sendOxyCmd(OxyBleCmd.OXY_CMD_BURN_FACTORY_INFO, OxyBleCmd.burnFactoryInfo(config.convert2Data()))
+        sendOxyCmd(OxyBleCmd.OXY_CMD_BURN_FACTORY_INFO, OxyBleCmd.burnFactoryInfo(config.convert2DataO2()))
     }
 
     fun getRtParam() {

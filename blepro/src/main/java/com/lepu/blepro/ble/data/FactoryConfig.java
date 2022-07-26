@@ -13,6 +13,7 @@ public class FactoryConfig implements Convertible {
     private String branchCode = "40010000";
     private int snLength = 18;
     private String snCode = "2017022211";
+    private int snLengthO2 = 11;
 
     public void setBurnFlag(boolean enableSN, boolean enableHw, boolean enableBranchCode) {
         if(enableSN) {
@@ -70,4 +71,29 @@ public class FactoryConfig implements Convertible {
 
         return data;
     }
+
+    public byte[] convert2DataO2() {
+        char[] branchCodeCharArray = branchCode.toCharArray();
+        char[] snCodeCharArray = snCode.toCharArray();
+
+        byte[] data = new byte[branchCodeCharArray.length + snLengthO2 + 2];
+        data[0] = (byte) burnFlag;
+
+        for(int i = 0; i < snLengthO2; i++) {
+            if(i > snCodeCharArray.length -1) {
+                data[i + 1] = (byte) 0x00;
+            } else {
+                data[i + 1] = (byte) snCodeCharArray[i];
+            }
+
+        }
+        data[12] = (byte) hwVersion;
+
+        for(int i = 0; i < branchCodeCharArray.length; i++) {
+            data[i + 2 + snLengthO2] = (byte) branchCodeCharArray[i];
+        }
+
+        return data;
+    }
+
 }
