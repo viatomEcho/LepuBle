@@ -70,7 +70,8 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_BPW1 = "BPW1"; // 金亿帝血压手表
     public static final String BT_NAME_F4_SCALE = "MY_SCALE"; // F4体脂秤
     public static final String BT_NAME_F5_SCALE = "MY_SCALE"; // F5体脂秤
-    public static final String BT_NAME_WATCH_4G = "Le-W3"; // 4g手表
+//    public static final String BT_NAME_WATCH_4G = "Le-W3"; // 4g手表
+    public static final String BT_NAME_WATCH_4G = "W12c"; // 4g手表
 
 
     public static final int MODEL_UNRECOGNIZED = 0;
