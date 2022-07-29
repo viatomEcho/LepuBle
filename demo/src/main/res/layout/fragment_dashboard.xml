@@ -10,14 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <LinearLayout
+            android:id="@+id/dash_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="连接设备"/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -35,9 +31,18 @@
                         android:layout_marginVertical="5dp"
                         style="@style/common_card">
 
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="请先点击--开始绘制--再进行测量"
+                            android:textSize="20sp"
+                            android:textColor="@color/colorRed"/>
+
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="30dp"
                             android:padding="4dp">
 
                             <androidx.constraintlayout.widget.ConstraintLayout
@@ -85,6 +90,7 @@
                                     app:layout_constraintStart_toEndOf="@id/start_at_title"/>
 
                                 <TextView
+                                    android:visibility="gone"
                                     android:id="@+id/start_at_title"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -106,7 +112,7 @@
                                     android:id="@+id/measure_duration_title"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="duration: "
+                                    android:text="时长: "
                                     android:textColor="@color/Black"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"/>
@@ -141,7 +147,8 @@
                                         android:layout_height="wrap_content"
                                         app:layout_constraintTop_toTopOf="parent"
                                         app:layout_constraintStart_toStartOf="parent"
-                                        android:text="Start Rt"/>
+                                        android:textSize="20sp"
+                                        android:text="开始绘制"/>
 
                                     <TextView
                                         android:id="@+id/stop_rt_ecg"
@@ -149,7 +156,8 @@
                                         android:layout_height="wrap_content"
                                         app:layout_constraintTop_toTopOf="parent"
                                         app:layout_constraintStart_toStartOf="parent"
-                                        android:text="Stop Rt"
+                                        android:textSize="20sp"
+                                        android:text="停止绘制"
                                         android:layout_marginStart="20dp"/>
 
                                 </LinearLayout>
@@ -577,6 +585,12 @@
 
             </RelativeLayout>
 
+            <TextView
+                android:id="@+id/dash_tip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="(以下是数据解析日志)"
+                android:layout_marginTop="20dp"/>
             <TextView
                 android:id="@+id/temp_str"
                 android:layout_width="match_parent"

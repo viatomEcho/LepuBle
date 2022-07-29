@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,6 +14,9 @@ import android.widget.SeekBar;
 
 import androidx.annotation.Nullable;
 
+import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.SizeUtils;
+
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -22,8 +24,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-
-public class WaveEcgView extends View {
+public class FilterEcgViewBg extends View /*implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener*/ {
     public static final short NULL_VALUE = Short.MAX_VALUE;
     // Starting position of drawing
     private final float chartStartX = 0, chartStartY = 0;
@@ -71,6 +72,7 @@ public class WaveEcgView extends View {
     private int mAxisIndex;
 
     private GestureDetector detector;
+    OnPageScrolledListener mOnPageScrolledListener;
     ViewGroup parent;
     float x, y, x1, y1;
     private int currentZoomPosition = 1;
@@ -105,20 +107,20 @@ public class WaveEcgView extends View {
 
     // Delegate interface
 //    private ECGViewDelegate delegate;
-    public WaveEcgView(Context context) {
+    public FilterEcgViewBg(Context context) {
         this(context, null);
     }
 
-    public WaveEcgView(Context context, @Nullable AttributeSet attrs) {
+    public FilterEcgViewBg(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public WaveEcgView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public FilterEcgViewBg(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
 
-    public WaveEcgView(Context context, short[] Y, int ScreenW, int currentZoomPosition) {
+    public FilterEcgViewBg(Context context, short[] Y, int ScreenW, int currentZoomPosition) {
         super(context);
         this.currentZoomPosition = currentZoomPosition;
         chartY = Y;
@@ -134,16 +136,15 @@ public class WaveEcgView extends View {
         getMinAndMax();
     }
 
-    public WaveEcgView(Context context, long startTime,
+    public FilterEcgViewBg(Context context, long startTime,
                            short[] Y, int validValueLength,
                            float ScreenW, float viewHeight,
                            int currentZoomPosition, boolean enableClick
-            ,int deviceType) {
+    , int deviceType) {
         super(context);
         this.deviceType = deviceType;
         mGrid1mmLength = (float) 25.4 / getResources().getDisplayMetrics().xdpi;
         SECONDS_PER_LINE = ScreenW / (1 / mGrid1mmLength) / mSpeed;
-
         HZ = 125;
         POINTS_PER_LINE = (int)(SECONDS_PER_LINE * HZ);
         ONE_PAGE_POINTS = (int)(SECONDS_PER_LINE * ONE_PAGE_LINES * HZ);
@@ -169,7 +170,7 @@ public class WaveEcgView extends View {
         getMinAndMax();
     }
 
-    public WaveEcgView(Context context, long startTime, short[] Y, int validValueLength, int ScreenW, int currentZoomPosition, boolean enableClick) {
+    public FilterEcgViewBg(Context context, long startTime, short[] Y, int validValueLength, int ScreenW, int currentZoomPosition, boolean enableClick) {
         super(context);
         this.currentZoomPosition = currentZoomPosition;
         chartY = Y;
@@ -376,13 +377,13 @@ public class WaveEcgView extends View {
             }
 
             long time;
-            time = (startPoint + POINTS_PER_LINE * (i-1)) / 125 + TimeUnit.MILLISECONDS.toSeconds(startTime);
+            time = (startPoint + POINTS_PER_LINE * (i-1)) / HZ + TimeUnit.MILLISECONDS.toSeconds(startTime);
             if (i == 0) {
                 setFirstLineTime(time);
             }
             Date date = new Date(TimeUnit.SECONDS.toMillis(time));
-            textPaint.setTextSize(50);
-            linePaint.setTextSize(50);
+            textPaint.setTextSize(SizeUtils.dp2px(12));
+            linePaint.setTextSize(SizeUtils.dp2px(12));
             String timeStamp = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault()).format(date);
 //                canvas.drawText(timeStamp, chartStartX+5, wholeLineDis * i  + yOffSet - 20, linePaint);
             canvas.drawText(timeStamp, 50, wholeLineDis * i + yOffSet - 20, textPaint);
@@ -462,7 +463,7 @@ public class WaveEcgView extends View {
             if (index < 0 || index > Y.length-1) {
                 break;
             }
-            float yVal = (float) ((Y[index]) * (1.0035 * 1800) / (4096 * 178.74));
+            float yVal = (float) ((Y[index])/*drawPoints[i]*/ * (1.0035 * 1800) / (4096 * 178.74));
             float tempY = yOffSet + (float) (wholeLineDis / 5.0 * 3.0 + line - (1.0 * rulerStandard) * (1/mGrid1mmLength*10) * (yVal));
             if (i == 0) { // First point
                 preTempX = NULL_VALUE;
@@ -474,12 +475,12 @@ public class WaveEcgView extends View {
             if (preTempX != NULL_VALUE && Y[index] != NULL_VALUE && preChartY != NULL_VALUE) {
 //                if(preTempY>)
                 /*
-                 * */
+                * */
                 //rjz 修改，避免绘制得波形超出范围 start
 //                    int lineNumber = (int) ((i+yOffSet)/(1250));
 //                    float size = (float) (lineNumber* wholeLineDis + yOffSet);
 //                    if(preTempY>size&&preTempY<(lineNumber+1)*size&&tempY>size&&tempY<(lineNumber+1)*size){
-                canvas.drawLine(preTempX, preTempY, tempX, tempY, linePaint);
+                        canvas.drawLine(preTempX, preTempY, tempX, tempY, linePaint);
 //                    }
 //                    Log.v("drawPath======",""+i+"=====yVal==="+yOffSet);
                 //rjz 修改，避免绘制得波形超出范围 end
@@ -581,6 +582,10 @@ public class WaveEcgView extends View {
         postInvalidate();
     }
 
+    public void setOnPageScrolledListener(OnPageScrolledListener onPageScrolledListener) {
+        this.mOnPageScrolledListener = onPageScrolledListener;
+    }
+
     public void setParent(ViewGroup viewGroup) {
         this.parent = viewGroup;
     }
@@ -597,6 +602,7 @@ public class WaveEcgView extends View {
     }
 
     public void setYOffSetInPoints(float points) {
+        LogUtils.d("offset points", points);
         yOffSet = -wholeLineDis * (points / POINTS_PER_LINE);
     }
 
@@ -685,6 +691,7 @@ public class WaveEcgView extends View {
                 if(progress != seekBar.getProgress()) {
                     seekBar.setProgress(progress);
                 }
+                LogUtils.d("progress", progress, getProgressPercent());
             }
 
             invalidate();

@@ -1,6 +1,7 @@
 package com.lepu.demo.ui.home
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -36,7 +37,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
     private val binding: FragmentHomeBinding by binding()
 
     private lateinit var adapter: DeviceAdapter
-
+    var mAlertDialog: AlertDialog? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -44,6 +45,11 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         initEvent()
     }
     private fun initView(){
+
+        mAlertDialog = AlertDialog.Builder(requireContext())
+            .setCancelable(false)
+            .setMessage("正在处理，请稍等...")
+            .create()
 
         activity?.let {  activity ->
             CollectUtil.getInstance(activity.applicationContext).let { collectUtil ->
@@ -70,6 +76,9 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         }
 
         binding.disconnect.setOnClickListener{
+            LpBleUtil.disconnect(false)
+        }
+        binding.disconnect2.setOnClickListener{
             LpBleUtil.disconnect(false)
         }
 
@@ -103,11 +112,12 @@ class HomeFragment : Fragment(R.layout.fragment_home){
             (adapter.getItem(position) as Bluetooth).let {
 
                 activity?.applicationContext?.let { it1 ->
+                    LpBleUtil.disconnect(false)
                     if (singleConnect) currentModel[0] = it.model
                     LpBleUtil.setInterface(it.model, singleConnect)
                     activity?.lifecycle?.addObserver(BIOL(activity as MainActivity, Constant.BluetoothConfig.SUPPORT_MODELS))
 
-
+                    mAlertDialog?.show()
                     LpBleUtil.connect(it1, it)
                     ToastUtil.showToast(activity, "正在连接蓝牙")
                     LpBleUtil.stopScan()
@@ -121,7 +131,14 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         }
 
         mainViewModel.bleState.observe(viewLifecycleOwner, {
-            binding.bleState.text = "连接状态：$it"
+            if (it) {
+                binding.bleState.text = "连接状态：已连接"
+            } else {
+                binding.bleState.text = "连接状态：未连接"
+            }
+            if (it) {
+                mAlertDialog?.dismiss()
+            }
         })
 
         mainViewModel.curBluetooth.observe(viewLifecycleOwner, {

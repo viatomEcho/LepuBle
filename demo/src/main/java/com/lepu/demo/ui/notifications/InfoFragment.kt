@@ -1,5 +1,6 @@
 package com.lepu.demo.ui.notifications
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -7,6 +8,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
@@ -16,10 +18,13 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.ByteUtils.toSignedShort
+import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.demo.*
+import com.lepu.demo.ble.EcgAdapter
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant
+import com.lepu.demo.data.EcgData
 import com.lepu.demo.databinding.FragmentInfoBinding
 
 
@@ -41,6 +46,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
     private var pc68bList = mutableListOf<Pc68bBleResponse.Record>()
 
+    private lateinit var adapter: EcgAdapter
+    var ecgList: ArrayList<EcgData> = arrayListOf()
+
+    var mAlertDialog: AlertDialog? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
@@ -55,6 +65,29 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 binding.infoLayout.visibility = View.GONE
             }
         })
+
+        mAlertDialog = AlertDialog.Builder(requireContext())
+            .setCancelable(false)
+            .setMessage("正在处理，请稍等...")
+            .create()
+
+        LinearLayoutManager(context).apply {
+            this.orientation = LinearLayoutManager.VERTICAL
+            binding.rcv.layoutManager = this
+        }
+        adapter = EcgAdapter(R.layout.device_item, null).apply {
+            binding.rcv.adapter = this
+        }
+        adapter.setOnItemClickListener { adapter, view, position ->
+            if (adapter.data.size > 0) {
+                (adapter.getItem(position) as EcgData).let {
+                    val intent = Intent(context, WaveEcgActivity::class.java)
+                    intent.putExtra("waveData", it.data)
+                    intent.putExtra("recordingTime", it.recordingTime)
+                    startActivity(intent)
+                }
+            }
+        }
 
         if (isReceive) {
             binding.bytesSwitch.text = "原始数据显示开"
@@ -121,12 +154,18 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         binding.getInfo.setOnClickListener {
             LpBleUtil.getInfo(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])}"
+            ecgList.clear()
+            adapter.setNewInstance(ecgList)
+            adapter.notifyDataSetChanged()
         }
         // 获取文件列表
         binding.getFileList.setOnClickListener {
             fileCount = 0
             fileNames.clear()
             pc68bList.clear()
+            ecgList.clear()
+            adapter.setNewInstance(ecgList)
+            adapter.notifyDataSetChanged()
 
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
@@ -175,11 +214,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         // 读文件
         binding.readFile.setOnClickListener {
             readFileProcess = ""
+            mAlertDialog?.show()
             readFile()
         }
         // 暂停读取文件
         binding.pauseRf.setOnClickListener {
-            startActivity(Intent(context, WaveEcgActivity::class.java))
+//            startActivity(Intent(context, WaveEcgActivity::class.java))
         }
         // 继续读取文件
         binding.continueRf.setOnClickListener {
@@ -235,9 +275,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (event.data as String).let {
                     binding.info.text = it
                     for (fileName in it.split(",")) {
-                        if (fileName.contains("R")) {
+//                        if (fileName.contains("R")) {
+                        if(fileName.isNotEmpty()) {
                             fileNames.add(fileName)
                         }
+//                        }
                     }
                     Toast.makeText(context, "er1/duoek 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 }
@@ -251,14 +293,30 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileComplete)
             .observe(this, { event ->
                 (event.data as Er1BleResponse.Er1File).let {
-                    val data = Er1EcgFile(it.content)
-                    binding.info.text = "$data"
+                    if (it.fileName.contains("R")) {
+                        val data = Er1EcgFile(it.content)
+                        binding.info.text = "$data"
+                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                        val temp = EcgData()
+                        temp.recordingTime = DateUtil.getSecondTimestamp(it.fileName.replace("R", ""))
+                        temp.fileName = it.fileName
+                        temp.data = data.waveData
+                        temp.duration = data.recordingTime
+                        ecgList.add(temp)
+                        adapter.setNewInstance(ecgList)
+                        adapter.notifyDataSetChanged()
+                    } else {
+                        val data = Er2AnalysisFile(it.content)
+                        binding.info.text = "$data"
+                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                    }
                     setReceiveCmd(it.content)
-                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                     binding.process.text = readFileProcess
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
                         readFile()
+                    } else {
+                        mAlertDialog?.dismiss()
                     }
                 }
             })
@@ -288,6 +346,14 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         val data = Er1EcgFile(it.content)
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                        val temp = EcgData()
+                        temp.recordingTime = DateUtil.getSecondTimestamp(it.fileName.replace("R", ""))
+                        temp.fileName = it.fileName
+                        temp.data = data.waveData
+                        temp.duration = data.recordingTime
+                        ecgList.add(temp)
+                        adapter.setNewInstance(ecgList)
+                        adapter.notifyDataSetChanged()
                     } else {
                         val data = Er2AnalysisFile(it.content)
                         binding.info.text = "$data"
@@ -298,6 +364,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
                         readFile()
+                    } else {
+                        mAlertDialog?.dismiss()
                     }
                 }
             })
@@ -345,6 +413,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
                         readFile()
+                    } else {
+                        mAlertDialog?.dismiss()
                     }
                 }
             }
@@ -388,6 +458,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
                         readFile()
+                    } else {
+                        mAlertDialog?.dismiss()
                     }
                 }
             })
@@ -428,6 +500,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
                         readFile()
+                    } else {
+                        mAlertDialog?.dismiss()
                     }
                 }
             })
@@ -494,6 +568,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
                         readFile()
+                    } else {
+                        mAlertDialog?.dismiss()
                     }
                 }
             })
@@ -559,6 +635,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
                         readFile()
+                    } else {
+                        mAlertDialog?.dismiss()
                     }
                 }
             })
@@ -604,6 +682,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 if (binding.fileName.text.toString().isEmpty()) {
                     fileNames.removeAt(0)
                     readFile()
+                } else {
+                    mAlertDialog?.dismiss()
                 }
                 Toast.makeText(context, "pc68b 接收文件成功 已接收${pc68bList.size}个文件, 还剩${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
             })
@@ -636,6 +716,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 if (binding.fileName.text.toString().isEmpty()) {
                     fileNames.removeAt(0)
                     readFile()
+                } else {
+                    mAlertDialog?.dismiss()
                 }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadFileError)
@@ -707,6 +789,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 if (binding.fileName.text.toString().isEmpty()) {
                     fileNames.removeAt(0)
                     readFile()
+                } else {
+                    mAlertDialog?.dismiss()
                 }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadFileError)
@@ -754,7 +838,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             LpBleUtil.readFile("", binding.fileName.text.toString(), Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
         } else {
-            if (fileNames.size == 0) return
+            if (fileNames.size == 0) {
+                mAlertDialog?.dismiss()
+                return
+            }
             curFileName = fileNames[0]
             LpBleUtil.readFile("", fileNames[0], Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])

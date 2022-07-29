@@ -26,6 +26,7 @@ import com.lepu.demo.cofig.Constant
 import com.lepu.demo.data.DataController
 import com.lepu.demo.data.OxyDataController
 import com.lepu.demo.databinding.FragmentDashboardBinding
+import com.lepu.demo.util.DataConvert
 import com.lepu.demo.views.EcgBkg
 import com.lepu.demo.views.EcgView
 import com.lepu.demo.views.OxyView
@@ -188,10 +189,21 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             .observe(this, {
                 val rtData = it.data as Er1BleResponse.RtData
                 rtData.let { data ->
-                    Log.d("er1 data ", "len = ${data.wave.wave.size}")
-                    DataController.receive(data.wave.wFs)
+                    val len = data.wave.wFs.size
+                    Log.d("er1 data ", "len = $len")
+                    for (i in 0 until len) {
+                        val temp = DataConvert.filter(data.wave.wFs[i].toDouble(), false)
+                        if (temp.size > 0) {
+                            val d = FloatArray(temp.size)
+                            for (j in 0 until d.size) {
+                                d[j] = temp[j].toFloat()
+                            }
+                            DataController.receive(d)
+                        }
+                    }
                     binding.dataStr.text = data.param.toString()
                     viewModel.ecgHr.value = data.param.hr
+                    binding.measureDuration.text = " ${data.param.recordTime} s"
                 }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1FileList).observe(this, { event ->
@@ -205,9 +217,20 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val rtData = it.data as Er2RtData
                 rtData.let { data ->
                     Log.d("er2 data ", "len = ${data.waveData.size}")
-                    DataController.receive(data.waveData.datas)
+                    val len = data.waveData.datas.size
+                    for (i in 0 until len) {
+                        val temp = DataConvert.filter(data.waveData.datas[i].toDouble(), false)
+                        if (temp.size > 0) {
+                            val d = FloatArray(temp.size)
+                            for (j in 0 until d.size) {
+                                d[j] = temp[j].toFloat()
+                            }
+                            DataController.receive(d)
+                        }
+                    }
                     binding.dataStr.text = data.rtParam.toString()
                     viewModel.ecgHr.value = data.hr
+                    binding.measureDuration.text = " ${data.rtParam.recordTime} s"
                 }
             })
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FileList).observe(this, { event ->
@@ -808,15 +831,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.bleState.setImageResource(R.mipmap.bluetooth_ok)
                     binding.bpBleState.setImageResource(R.mipmap.bluetooth_ok)
                     binding.oxyBleState.setImageResource(R.mipmap.bluetooth_ok)
-                    binding.ecgView.visibility = View.VISIBLE
-                    binding.oxyView.visibility = View.VISIBLE
-
+                    binding.dashLayout.visibility = View.VISIBLE
                 } else {
                     binding.bleState.setImageResource(R.mipmap.bluetooth_error)
                     binding.bpBleState.setImageResource(R.mipmap.bluetooth_error)
                     binding.oxyBleState.setImageResource(R.mipmap.bluetooth_error)
-                    binding.ecgView.visibility = View.INVISIBLE
-                    binding.oxyView.visibility = View.INVISIBLE
+                    binding.dashLayout.visibility = View.INVISIBLE
                 }
             }
 

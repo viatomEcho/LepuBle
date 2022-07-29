@@ -12,7 +12,6 @@
             android:id="@+id/info_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorGrayBg"
             android:padding="5dp"
             android:orientation="vertical">
             <TextView
@@ -22,6 +21,7 @@
                 android:layout_margin="@dimen/dp_10"
                 android:text="公共方法测试"/>
             <Button
+                android:visibility="gone"
                 android:id="@+id/bytes_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -34,37 +34,47 @@
                     android:id="@+id/get_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Get Info"/>
+                    android:text="获取设备信息"/>
 
                 <Button
                     android:id="@+id/get_file_list"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Get File List"
+                    android:text="1.获取文件列表"
                     android:layout_marginStart="20dp"/>
 
             </LinearLayout>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_margin="@dimen/dp_10"
-                android:text="读文件(文件名为空则读完设备文件)"/>
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:textColor="@color/colorRed"
+                android:text="1.获取文件列表 2.读文件"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:textColor="@color/colorRed"
+                android:text="(文件名为空则读取列表所有文件)"/>
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
                 <Button
                     android:id="@+id/read_file"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Read File"/>
+                    android:text="2.读文件"/>
                 <EditText
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/file_name"
                     android:hint="文件名"
                     android:textSize="20sp"
-                    android:layout_marginStart="20dp"/>
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"/>
                 <Button
                     android:id="@+id/pause_rf"
                     android:layout_width="wrap_content"
@@ -81,6 +91,7 @@
                     android:layout_marginStart="20dp"/>
             </LinearLayout>
             <TextView
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -88,27 +99,50 @@
                 android:text="设置"/>
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
                 <Button
                     android:id="@+id/reset"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Reset"/>
+                    android:text="复位"/>
                 <Button
                     android:id="@+id/factory"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Factory"
+                    android:text="恢复出厂"
                     android:layout_marginStart="20dp"/>
                 <Button
                     android:id="@+id/factory_all"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Factory All"
+                    android:text="生产状态"
                     android:layout_marginStart="20dp"/>
             </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="复位：设备重启，不会删除设备数据"
+                android:textColor="@color/colorRed"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="恢复出厂：清空设备数据并重启"
+                android:textColor="@color/colorRed"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="生产状态：清空设备数据并关机，充电激活设备启动"
+                android:textColor="@color/colorRed"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"/>
 
             <LinearLayout
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp">
@@ -132,6 +166,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp">
@@ -139,48 +174,59 @@
                     android:id="@+id/upgrade"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="upgrade" />
+                    android:text="固件升级" />
                 <Button
                     android:id="@+id/scan_code"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="scan code"
+                    android:text="扫描二维码"
                     android:layout_marginLeft="20dp"/>
             </LinearLayout>
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp">
+
+            </androidx.recyclerview.widget.RecyclerView>
+
             <TextView
+                android:visibility="gone"
                 android:id="@+id/send_cmd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/dp_10"
-                android:textSize="20sp"/>
+                android:layout_margin="@dimen/dp_10"/>
 
             <TextView
+                android:visibility="gone"
                 android:id="@+id/response_cmd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/dp_10"
-                android:textSize="20sp"/>
+                android:layout_margin="@dimen/dp_10"/>
             <TextView
+                android:visibility="gone"
                 android:id="@+id/receive_cmd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/dp_10"
-                android:textSize="20sp"/>
+                android:layout_margin="@dimen/dp_10"/>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="(以下是数据解析日志)"
+                android:layout_marginTop="50dp"/>
             <TextView
                 android:id="@+id/info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/dp_10"
-                android:textSize="20sp"/>
+                android:layout_margin="@dimen/dp_10"/>
 
             <TextView
                 android:id="@+id/process"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/dp_10"
-                android:textSize="20sp"/>
+                android:layout_margin="@dimen/dp_10"/>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

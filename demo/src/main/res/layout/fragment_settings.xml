@@ -11,7 +11,6 @@
             android:id="@+id/setting_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorGrayBg"
             android:padding="5dp"
             android:orientation="vertical">
             <TextView
@@ -21,6 +20,7 @@
                 android:layout_margin="@dimen/dp_10"
                 android:text="私有方法测试"/>
             <Button
+                android:visibility="gone"
                 android:id="@+id/bytes_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -38,6 +38,62 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/er1_hr1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="阈值1"
+                        android:layout_weight="1"/>
+
+                    <EditText
+                        android:id="@+id/er1_hr2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="阈值2"
+                        android:layout_marginStart="20dp"
+                        android:layout_weight="1"/>
+                    <Button
+                        android:id="@+id/er1_set_hr"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置阈值"
+                        android:layout_marginStart="20dp"
+                        android:layout_weight="1"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/er1_set_sound"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="震动"/>
+
+                    <Button
+                        android:visibility="gone"
+                        android:id="@+id/er1_get_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取配置"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="硬件版本:" />
+                    <EditText
+                        android:id="@+id/er1_version"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="A-Z"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -46,6 +102,7 @@
                         android:id="@+id/er1_sn"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:hint="长度:10位"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <LinearLayout
@@ -59,51 +116,14 @@
                         android:id="@+id/er1_code"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:hint="长度:8位"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <Button
                     android:id="@+id/er1_factory_config"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="确认" />
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <EditText
-                        android:id="@+id/er1_hr1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:hint="阈值1"/>
-
-                    <EditText
-                        android:id="@+id/er1_hr2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:hint="阈值2"
-                        android:layout_marginStart="20dp"/>
-                    <Button
-                        android:id="@+id/er1_set_hr"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="设置阈值"
-                        android:layout_marginStart="20dp"/>
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <Button
-                        android:id="@+id/er1_set_sound"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="声音"/>
-
-                    <Button
-                        android:id="@+id/er1_get_config"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="获取配置"
-                        android:layout_marginStart="20dp"/>
-                </LinearLayout>
+                    android:text="烧录" />
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/er2_layout"
@@ -117,6 +137,36 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/er2_set_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="声音" />
+                    <Button
+                        android:visibility="gone"
+                        android:id="@+id/er2_get_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取配置"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="硬件版本:" />
+                    <EditText
+                        android:id="@+id/er2_version"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="A-Z"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -125,6 +175,7 @@
                         android:id="@+id/er2_sn"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:hint="长度:10位"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <LinearLayout
@@ -138,28 +189,14 @@
                         android:id="@+id/er2_code"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:hint="长度:8位"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <Button
                     android:id="@+id/er2_factory_config"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="确认" />
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <Button
-                        android:id="@+id/er2_set_config"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="声音" />
-                    <Button
-                        android:id="@+id/er2_get_config"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="获取配置"
-                        android:layout_marginStart="20dp"/>
-                </LinearLayout>
+                    android:text="烧录" />
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/bp2_bp2a_layout"
@@ -420,11 +457,26 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="硬件版本:" />
+                    <EditText
+                        android:id="@+id/o2_version"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="A-Z"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="sn:" />
                     <EditText
                         android:id="@+id/o2_sn"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:hint="长度:10位"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <LinearLayout
@@ -438,13 +490,14 @@
                         android:id="@+id/o2_code"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:hint="长度:8位"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <Button
                     android:id="@+id/o2_factory_config"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="确认" />
+                    android:text="烧录" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -1455,19 +1508,27 @@
                 </LinearLayout>
             </LinearLayout>
             <TextView
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/send_cmd"
                 android:layout_marginTop="20dp"/>
             <TextView
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/response_cmd"
                 android:layout_marginTop="20dp"/>
             <TextView
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/receive_cmd"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="(以下是数据解析日志)"
+                android:layout_marginTop="50dp"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

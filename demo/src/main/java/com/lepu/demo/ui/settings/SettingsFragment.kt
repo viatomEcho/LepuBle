@@ -21,6 +21,7 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.HexString.hexToBytes
+import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.demo.MainViewModel
@@ -103,8 +104,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     setViewVisible(binding.er1Layout)
                     LpBleUtil.getEr1VibrateConfig(it.modelNo)
                 }
-                Bluetooth.MODEL_ER2, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_HHM2,
-                Bluetooth.MODEL_HHM3 -> {
+                Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
+                    setViewVisible(binding.er2Layout)
+                    LpBleUtil.getEr1VibrateConfig(it.modelNo)
+                }
+                Bluetooth.MODEL_ER2 -> {
                     setViewVisible(binding.er2Layout)
                     LpBleUtil.getEr2SwitcherState(it.modelNo)
                 }
@@ -176,6 +180,28 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
             }
         })
+        mainViewModel.er1Info.observe(viewLifecycleOwner) {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1_N
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM1) {
+                binding.er1Version.setText("${it.hwV}")
+                binding.er1Sn.setText("${it.sn}")
+                binding.er1Code.setText("${it.branchCode}")
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_DUOEK
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM3) {
+                binding.er2Version.setText("${it.hwV}")
+                binding.er2Sn.setText("${it.sn}")
+                binding.er2Code.setText("${it.branchCode}")
+            }
+        }
+        mainViewModel.er2Info.observe(viewLifecycleOwner) {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER2) {
+                binding.er2Version.setText("${it.hwVersion}")
+                binding.er2Sn.setText("${it.serialNum}")
+                binding.er2Code.setText("${it.branchCode}")
+            }
+        }
         if (isReceive) {
             binding.bytesSwitch.text = "原始数据显示开"
         } else {
@@ -200,26 +226,36 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         //-------------------------er1--------------------
         binding.er1FactoryConfig.setOnClickListener {
             val config = FactoryConfig()
+            var enableVersion = true
+            if (binding.er1Version.text.isEmpty()) {
+                enableVersion = false
+            } else {
+                config.setHwVersion(binding.er1Version.text.first())
+            }
             var enableSn = true
             if (binding.er1Sn.text.isEmpty()) {
                 enableSn = false
             } else {
-                config.setSnCode(binding.er1Sn.text.toString())
+                config.setSnCode(trimStr(binding.er1Sn.text.toString()))
             }
             var enableCode = true
             if (binding.er1Code.text.isEmpty()) {
                 enableCode = false
             } else {
-                config.setBranchCode(binding.er1Code.text.toString())
+                config.setBranchCode(trimStr(binding.er1Code.text.toString()))
             }
-            config.setBurnFlag(enableSn, false, enableCode)
+            config.setBurnFlag(enableSn, enableVersion, enableCode)
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
         }
         binding.er1SetSound.setOnClickListener {
-            switchState = !switchState
-            LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, binding.er1Hr1.text.toString().toInt(), binding.er1Hr2.text.toString().toInt())
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
+            if (binding.er1Hr1.text.toString().isEmpty() || binding.er1Hr2.text.toString().isEmpty()) {
+                Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
+            } else {
+                switchState = !switchState
+                LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, trimStr(binding.er1Hr1.text.toString()).toInt(), trimStr(binding.er1Hr2.text.toString()).toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            }
         }
         binding.er1GetConfig.setOnClickListener {
             LpBleUtil.getEr1VibrateConfig(Constant.BluetoothConfig.currentModel[0])
@@ -227,24 +263,34 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         binding.er1SetHr.setOnClickListener {
-            LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, binding.er1Hr1.text.toString().toInt(), binding.er1Hr2.text.toString().toInt())
+            if (binding.er1Hr1.text.toString().isEmpty() || binding.er1Hr2.text.toString().isEmpty()) {
+                Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
+            } else {
+                LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, trimStr(binding.er1Hr1.text.toString()).toInt(), trimStr(binding.er1Hr2.text.toString()).toInt())
+            }
         }
         //-------------------------er2/duoek------------------------
         binding.er2FactoryConfig.setOnClickListener {
             val config = FactoryConfig()
+            var enableVersion = true
+            if (binding.er2Version.text.isEmpty()) {
+                enableVersion = false
+            } else {
+                config.setHwVersion(binding.er2Version.text.first())
+            }
             var enableSn = true
             if (binding.er2Sn.text.isEmpty()) {
                 enableSn = false
             } else {
-                config.setSnCode(binding.er2Sn.text.toString())
+                config.setSnCode(trimStr(binding.er2Sn.text.toString()))
             }
             var enableCode = true
             if (binding.er2Code.text.isEmpty()) {
                 enableCode = false
             } else {
-                config.setBranchCode(binding.er2Code.text.toString())
+                config.setBranchCode(trimStr(binding.er2Code.text.toString()))
             }
-            config.setBurnFlag(enableSn, false, enableCode)
+            config.setBurnFlag(enableSn, enableVersion, enableCode)
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
         }
         binding.er2GetConfig.setOnClickListener {
@@ -1625,35 +1671,53 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         //-------------------------o2-----------------------
         binding.o2FactoryConfig.setOnClickListener {
             val config = FactoryConfig()
+            var enableVersion = true
+            if (binding.o2Version.text.isEmpty()) {
+                enableVersion = false
+            } else {
+                config.setHwVersion(binding.o2Version.text.first())
+            }
             var enableSn = true
             if (binding.o2Sn.text.isEmpty()) {
                 enableSn = false
             } else {
-                config.setSnCode(binding.o2Sn.text.toString())
+                config.setSnCode(trimStr(binding.o2Sn.text.toString()))
             }
             var enableCode = true
             if (binding.o2Code.text.isEmpty()) {
                 enableCode = false
             } else {
-                config.setBranchCode(binding.o2Code.text.toString())
+                config.setBranchCode(trimStr(binding.o2Code.text.toString()))
             }
-            config.setBurnFlag(enableSn, false, enableCode)
+            config.setBurnFlag(enableSn, enableVersion, enableCode)
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
         }
         binding.o2SetOxiThr.setOnClickListener {
-            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_OXI_THR, binding.o2OxiThr.text.toString().toInt())
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
+            if (binding.o2OxiThr.text.toString().isEmpty()) {
+                Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
+            } else {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_OXI_THR, trimStr(binding.o2OxiThr.text.toString()).toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            }
         }
         binding.o2SetHrThr1.setOnClickListener {
-            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_HR_LOW_THR, binding.o2HrThr1.text.toString().toInt())
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
+            if (binding.o2HrThr1.text.toString().isEmpty()) {
+                Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
+            } else {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_HR_LOW_THR, trimStr(binding.o2HrThr1.text.toString()).toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            }
         }
         binding.o2SetHrThr2.setOnClickListener {
-            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_HR_HIGH_THR, binding.o2HrThr2.text.toString().toInt())
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
+            if (binding.o2HrThr2.text.toString().isEmpty()) {
+                Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
+            } else {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_HR_HIGH_THR, trimStr(binding.o2HrThr2.text.toString()).toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            }
         }
         binding.o2OxiSwitch.setOnClickListener {
             state++
@@ -1721,9 +1785,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         binding.o2SetMtThr.setOnClickListener {
-            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MT_THR, binding.o2MtThr.text.toString().toInt())
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
+            if (binding.o2MtThr.text.toString().isEmpty()) {
+                Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
+            } else {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MT_THR, trimStr(binding.o2MtThr.text.toString()).toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            }
         }
         binding.o2MtSwitch.setOnClickListener {
             state++
@@ -1734,9 +1802,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         binding.o2SetIvThr.setOnClickListener {
-            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_IV_THR, binding.o2IvThr.text.toString().toInt())
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
+            if (binding.o2IvThr.text.toString().isEmpty()) {
+                Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
+            } else {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_IV_THR, trimStr(binding.o2IvThr.text.toString()).toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            }
         }
         binding.o2IvSwitch.setOnClickListener {
             state++
@@ -2041,7 +2113,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     var temp = "关"
                     if (config.switcher)
                         temp = "开"
-                    binding.er1SetSound.text = "声音$temp"
+                    binding.er1SetSound.text = "震动$temp"
                     binding.er1Hr1.setText("${config.hr1}")
                     binding.er1Hr2.setText("${config.hr2}")
                     binding.content.text = "switcher : " + config.switcher + " hr1 : " + config.hr1 + " hr2 : " + config.hr2
@@ -2049,6 +2121,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
             })
         //-----------------------------er2------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2BurnFactoryInfo)
+            .observe(this) {
+                Toast.makeText(context, "烧录成功", Toast.LENGTH_SHORT).show()
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetSwitcherState)
             .observe(this, {
                 LpBleUtil.getEr2SwitcherState(it.model)
