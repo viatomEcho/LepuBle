@@ -2,6 +2,7 @@ package com.lepu.demo.cofig
 
 import android.util.SparseArray
 import com.lepu.blepro.objs.Bluetooth
+import com.lepu.demo.data.EcgData
 
 /**
  * author: wujuan
@@ -20,6 +21,7 @@ class Constant{
             const val HHM2_MODEL: Int = Bluetooth.MODEL_HHM2
             const val HHM3_MODEL: Int = Bluetooth.MODEL_HHM3
             const val ER2_MODEL: Int = Bluetooth.MODEL_ER2
+            const val LP_ER2_MODEL: Int = Bluetooth.MODEL_LP_ER2
             const val PC80B_MODEL: Int = Bluetooth.MODEL_PC80B
             const val BP2_MODEL: Int = Bluetooth.MODEL_BP2
             const val BP2A_MODEL: Int = Bluetooth.MODEL_BP2A
@@ -95,7 +97,7 @@ class Constant{
                 VTM_AD5_MODEL, VCOMIN_MODEL, CHECKME_LE_MODEL, PF_10_MODEL, PF_20_MODEL, LEM_MODEL, LES1_MODEL,
                 CHECK_ADV_MODEL, F4_SCALE_MODEL, MY_SCALE_MODEL, F5_SCALE_MODEL, F8_SCALE_MODEL, OXYRING_MODEL,
                 BBSM_S1_MODEL, BBSM_S2_MODEL, CMRING_MODEL, LPRE_MODEL, LE_B1_MODEL, OXYU_MODEL, S5W_MODEL, W12C_MODEL,
-                AI_S100_MODEL, HHM1_MODEL, HHM2_MODEL, HHM3_MODEL, HHM4_MODEL
+                AI_S100_MODEL, HHM1_MODEL, HHM2_MODEL, HHM3_MODEL, HHM4_MODEL, LP_ER2_MODEL
             )
 
             val SUPPORT_FACES = SparseArray<Int>().apply {
@@ -117,7 +119,7 @@ class Constant{
             var currentModel: IntArray = if (singleConnect) IntArray(1) else SUPPORT_MODELS
 
 
-
+            var ecgData = EcgData()
 
 
         }

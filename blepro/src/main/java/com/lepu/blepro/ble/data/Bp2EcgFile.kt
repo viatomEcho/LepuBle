@@ -49,6 +49,7 @@ class Bp2EcgFile(val bytes: ByteArray) {
         index += 2
         connectCable = byte2UInt(bytes[index]) == 1
         index++
+        index += 19
         waveData = bytes.copyOfRange(index, bytes.size)
     }
 

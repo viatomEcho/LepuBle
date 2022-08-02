@@ -613,7 +613,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 return inter is Er1BleInterface
             }
-            Bluetooth.MODEL_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
                 return inter is Er2BleInterface
             }
             Bluetooth.MODEL_BPM -> {
@@ -933,7 +933,7 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
-            Bluetooth.MODEL_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er2BleInterface).let {
                         LepuBleLog.d(tag, "it as Er2BleInterface--burnFactoryInfo")
@@ -976,7 +976,7 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
-            Bluetooth.MODEL_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er2BleInterface).let {
                         LepuBleLog.d(tag, "it as Er2BleInterface--burnLockFlash")
@@ -1015,7 +1015,7 @@ class BleServiceHelper private constructor() {
     fun setEr2SwitcherState(model: Int, hrFlag: Boolean){
         if (!checkService()) return
         when(model){
-            Bluetooth.MODEL_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er2BleInterface).let {
                         LepuBleLog.d(tag, "it as Er2BleInterface--setEr2SwitcherState")
@@ -1034,7 +1034,7 @@ class BleServiceHelper private constructor() {
     fun getEr2SwitcherState(model: Int){
         if (!checkService()) return
         when(model){
-            Bluetooth.MODEL_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er2BleInterface).let {
                         LepuBleLog.d(tag, "it as Er2BleInterface--getEr2SwitcherState")

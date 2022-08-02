@@ -173,7 +173,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * Er2BleInterface发出的通知
-     * 包含model: MODEL_ER2
+     * 包含model: MODEL_ER2, MODEL_LP_ER2
      */
     interface ER2 {
         companion object {
@@ -541,7 +541,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventPc300RtEcgWave = "com.lepu.ble.pc300.ecg.rtwave"           // 心电实时波形包 Pc300BleResponse.RtEcgWave
             const val EventPc300EcgResult = "com.lepu.ble.pc300.ecg.result"           // 心电实时结果 Pc300BleResponse.EcgResult
             const val EventPc300GluResult = "com.lepu.ble.pc300.glu.result"           // 血糖结果 Pc300BleResponse.GluResult
-            const val EventPc300TempResult = "com.lepu.ble.pc300.temp.result"         // 血糖结果 Pc300BleResponse.TempResult
+            const val EventPc300TempResult = "com.lepu.ble.pc300.temp.result"         // 温度结果 Pc300BleResponse.TempResult
         }
     }
 

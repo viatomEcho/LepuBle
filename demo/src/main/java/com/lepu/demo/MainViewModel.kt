@@ -52,6 +52,7 @@ class MainViewModel: ViewModel() {
     }
     val bleEnable: LiveData<Boolean> = _bleEnable
 
+    var readFileProcess = ""
 
     /**
      * 是否扫描中
@@ -67,6 +68,16 @@ class MainViewModel: ViewModel() {
     val bleState: LiveData<Boolean> = _bleState
 
     var runWave = false
+
+    val _battery = MutableLiveData<String>().apply {
+        value = ""
+    }
+    var battery: LiveData<String> = _battery
+
+    val _downloadTip = MutableLiveData<String>().apply {
+        value = ""
+    }
+    var downloadTip: LiveData<String> = _downloadTip
 
     /**
      * 设备信息

@@ -94,6 +94,34 @@ public class DataConvert {
         return tmpInt;
     }
 
+    public static short[] getEr1ShortArray(byte[] data) {
+        DataConvert convert = new DataConvert();
+        int invalid = 0;
+        int len = 0;
+        short[] tempData = new short[data.length];
+        for (int i=0; i<tempData.length; i++) {
+            short temp = convert.unCompressAlgECG(data[i]);
+            if (temp != -32768) {
+                tempData[len] = temp;
+                len++;
+            }
+        }
+        for (int j = len-1; j>=0; j--) {
+            if (tempData[j] == 32767) {
+                invalid++;
+            } else {
+                break;
+            }
+        }
+        short[] shortData = new short[len-invalid];
+        System.arraycopy(tempData, 0, shortData, 0, shortData.length);
+        return shortfilter(shortData);
+    }
+
+    public static short[] getBp2ShortArray(byte[] data) {
+        return shortfilter(toShortArray(data));
+    }
+
     /**
      * dp 2 px
      *

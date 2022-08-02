@@ -187,9 +187,15 @@
                 android:id="@+id/rcv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="20dp">
+                android:layout_margin="@dimen/dp_10">
 
             </androidx.recyclerview.widget.RecyclerView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/device_info"
+                android:textSize="20sp" />
 
             <TextView
                 android:visibility="gone"
@@ -212,17 +218,20 @@
                 android:layout_margin="@dimen/dp_10"/>
 
             <TextView
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="(以下是数据解析日志)"
                 android:layout_marginTop="50dp"/>
             <TextView
+                android:visibility="gone"
                 android:id="@+id/info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp_10"/>
 
             <TextView
+                android:visibility="gone"
                 android:id="@+id/process"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

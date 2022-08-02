@@ -30,6 +30,7 @@ import com.lepu.demo.ble.WifiAdapter
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.databinding.FragmentSettingsBinding
 import com.lepu.demo.util.FileUtil
+import com.lepu.demo.util.StringUtil.*
 import com.lepu.demo.util.icon.BitmapConvertor
 import java.util.*
 
@@ -91,14 +92,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun initView() {
-        mainViewModel.bleState.observe(viewLifecycleOwner, {
+        mainViewModel.bleState.observe(viewLifecycleOwner) {
             if (it) {
                 binding.settingLayout.visibility = View.VISIBLE
             } else {
                 binding.settingLayout.visibility = View.GONE
             }
-        })
-        mainViewModel.curBluetooth.observe(viewLifecycleOwner, {
+        }
+        mainViewModel.curBluetooth.observe(viewLifecycleOwner) {
             when (it!!.modelNo) {
                 Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
                     setViewVisible(binding.er1Layout)
@@ -108,11 +109,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     setViewVisible(binding.er2Layout)
                     LpBleUtil.getEr1VibrateConfig(it.modelNo)
                 }
-                Bluetooth.MODEL_ER2 -> {
+                Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
                     setViewVisible(binding.er2Layout)
                     LpBleUtil.getEr2SwitcherState(it.modelNo)
                 }
-                Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A,Bluetooth.MODEL_BP2T -> {
+                Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
                     setViewVisible(binding.bp2Bp2aLayout)
                     LpBleUtil.bp2GetConfig(it.modelNo)
                     LpBleUtil.bp2GetPhyState(it.modelNo)
@@ -179,7 +180,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     setViewVisible(null)
                 }
             }
-        })
+        }
         mainViewModel.er1Info.observe(viewLifecycleOwner) {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1_N
@@ -196,7 +197,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         }
         mainViewModel.er2Info.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER2) {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_ER2) {
                 binding.er2Version.setText("${it.hwVersion}")
                 binding.er2Sn.setText("${it.serialNum}")
                 binding.er2Code.setText("${it.branchCode}")
@@ -227,34 +229,52 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.er1FactoryConfig.setOnClickListener {
             val config = FactoryConfig()
             var enableVersion = true
-            if (binding.er1Version.text.isEmpty()) {
+            val tempVersion = binding.er1Version.text
+            if (tempVersion.isNullOrEmpty()) {
                 enableVersion = false
+            } else if (tempVersion.length == 1 && isBigLetter(tempVersion.toString())) {
+                config.setHwVersion(tempVersion.first())
             } else {
-                config.setHwVersion(binding.er1Version.text.first())
+                Toast.makeText(context, "硬件版本请输入A-Z字母", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
             var enableSn = true
-            if (binding.er1Sn.text.isEmpty()) {
+            val tempSn = trimStr(binding.er1Sn.text.toString())
+            if (tempSn.isNullOrEmpty()) {
                 enableSn = false
+            } else if (tempSn.length == 10) {
+                config.setSnCode(tempSn)
             } else {
-                config.setSnCode(trimStr(binding.er1Sn.text.toString()))
+                Toast.makeText(context, "sn请输入10位", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
             var enableCode = true
-            if (binding.er1Code.text.isEmpty()) {
+            val tempCode = trimStr(binding.er1Code.text.toString())
+            if (tempCode.isNullOrEmpty()) {
                 enableCode = false
+            } else if (tempCode.length == 8) {
+                config.setBranchCode(tempCode)
             } else {
-                config.setBranchCode(trimStr(binding.er1Code.text.toString()))
+                Toast.makeText(context, "code请输入8位", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
             config.setBurnFlag(enableSn, enableVersion, enableCode)
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
         }
         binding.er1SetSound.setOnClickListener {
-            if (binding.er1Hr1.text.toString().isEmpty() || binding.er1Hr2.text.toString().isEmpty()) {
+            if (binding.er1Hr1.text.toString().isNullOrEmpty() || binding.er1Hr2.text.toString().isNullOrEmpty()) {
                 Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
             } else {
-                switchState = !switchState
-                LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, trimStr(binding.er1Hr1.text.toString()).toInt(), trimStr(binding.er1Hr2.text.toString()).toInt())
-                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-                binding.sendCmd.text = cmdStr
+                val temp1 = trimStr(binding.er1Hr1.text.toString())
+                val temp2 = trimStr(binding.er1Hr2.text.toString())
+                if (isNumber(temp1) && isNumber(temp2)) {
+                    switchState = !switchState
+                    LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, temp1.toInt(), temp2.toInt())
+                    cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                    binding.sendCmd.text = cmdStr
+                } else {
+                    Toast.makeText(context, "请输入数字", Toast.LENGTH_SHORT).show()
+                }
             }
         }
         binding.er1GetConfig.setOnClickListener {
@@ -263,38 +283,59 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         binding.er1SetHr.setOnClickListener {
-            if (binding.er1Hr1.text.toString().isEmpty() || binding.er1Hr2.text.toString().isEmpty()) {
+            if (binding.er1Hr1.text.toString().isNullOrEmpty() || binding.er1Hr2.text.toString().isNullOrEmpty()) {
                 Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
             } else {
-                LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, trimStr(binding.er1Hr1.text.toString()).toInt(), trimStr(binding.er1Hr2.text.toString()).toInt())
+                val temp1 = trimStr(binding.er1Hr1.text.toString())
+                val temp2 = trimStr(binding.er1Hr2.text.toString())
+                if (isNumber(temp1) && isNumber(temp2)) {
+                    LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, temp1.toInt(), temp2.toInt())
+                    cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                    binding.sendCmd.text = cmdStr
+                } else {
+                    Toast.makeText(context, "请输入数字", Toast.LENGTH_SHORT).show()
+                }
             }
         }
         //-------------------------er2/duoek------------------------
         binding.er2FactoryConfig.setOnClickListener {
             val config = FactoryConfig()
             var enableVersion = true
-            if (binding.er2Version.text.isEmpty()) {
+            val tempVersion = binding.er2Version.text
+            if (tempVersion.isNullOrEmpty()) {
                 enableVersion = false
+            } else if (tempVersion.length == 1 && isBigLetter(tempVersion.toString())) {
+                config.setHwVersion(tempVersion.first())
             } else {
-                config.setHwVersion(binding.er2Version.text.first())
+                Toast.makeText(context, "硬件版本请输入A-Z字母", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
             var enableSn = true
-            if (binding.er2Sn.text.isEmpty()) {
+            val tempSn = trimStr(binding.er2Sn.text.toString())
+            if (tempSn.isNullOrEmpty()) {
                 enableSn = false
+            } else if (tempSn.length == 10) {
+                config.setSnCode(tempSn)
             } else {
-                config.setSnCode(trimStr(binding.er2Sn.text.toString()))
+                Toast.makeText(context, "sn请输入10位", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
             var enableCode = true
-            if (binding.er2Code.text.isEmpty()) {
+            val tempCode = trimStr(binding.er2Code.text.toString())
+            if (tempCode.isNullOrEmpty()) {
                 enableCode = false
+            } else if (tempCode.length == 8) {
+                config.setBranchCode(tempCode)
             } else {
-                config.setBranchCode(trimStr(binding.er2Code.text.toString()))
+                Toast.makeText(context, "code请输入8位", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
             config.setBurnFlag(enableSn, enableVersion, enableCode)
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
         }
         binding.er2GetConfig.setOnClickListener {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER2) {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_ER2) {
                 LpBleUtil.getEr2SwitcherState(Constant.BluetoothConfig.currentModel[0])
             } else {
                 LpBleUtil.getEr1VibrateConfig(Constant.BluetoothConfig.currentModel[0])
@@ -304,7 +345,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
         binding.er2SetConfig.setOnClickListener {
             switchState = !switchState
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER2) {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_ER2) {
                 LpBleUtil.setEr2SwitcherState(Constant.BluetoothConfig.currentModel[0], switchState)
             } else {
                 LpBleUtil.setDuoekVibrate(Constant.BluetoothConfig.currentModel[0], switchState, 0, 0, 0)
@@ -1672,19 +1714,19 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.o2FactoryConfig.setOnClickListener {
             val config = FactoryConfig()
             var enableVersion = true
-            if (binding.o2Version.text.isEmpty()) {
+            if (binding.o2Version.text.isNullOrEmpty()) {
                 enableVersion = false
             } else {
                 config.setHwVersion(binding.o2Version.text.first())
             }
             var enableSn = true
-            if (binding.o2Sn.text.isEmpty()) {
+            if (binding.o2Sn.text.isNullOrEmpty()) {
                 enableSn = false
             } else {
                 config.setSnCode(trimStr(binding.o2Sn.text.toString()))
             }
             var enableCode = true
-            if (binding.o2Code.text.isEmpty()) {
+            if (binding.o2Code.text.isNullOrEmpty()) {
                 enableCode = false
             } else {
                 config.setBranchCode(trimStr(binding.o2Code.text.toString()))
@@ -1693,7 +1735,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
         }
         binding.o2SetOxiThr.setOnClickListener {
-            if (binding.o2OxiThr.text.toString().isEmpty()) {
+            if (binding.o2OxiThr.text.toString().isNullOrEmpty()) {
                 Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
             } else {
                 LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_OXI_THR, trimStr(binding.o2OxiThr.text.toString()).toInt())
@@ -1702,7 +1744,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         }
         binding.o2SetHrThr1.setOnClickListener {
-            if (binding.o2HrThr1.text.toString().isEmpty()) {
+            if (binding.o2HrThr1.text.toString().isNullOrEmpty()) {
                 Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
             } else {
                 LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_HR_LOW_THR, trimStr(binding.o2HrThr1.text.toString()).toInt())
@@ -1711,7 +1753,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         }
         binding.o2SetHrThr2.setOnClickListener {
-            if (binding.o2HrThr2.text.toString().isEmpty()) {
+            if (binding.o2HrThr2.text.toString().isNullOrEmpty()) {
                 Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
             } else {
                 LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_HR_HIGH_THR, trimStr(binding.o2HrThr2.text.toString()).toInt())
@@ -1785,7 +1827,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         binding.o2SetMtThr.setOnClickListener {
-            if (binding.o2MtThr.text.toString().isEmpty()) {
+            if (binding.o2MtThr.text.toString().isNullOrEmpty()) {
                 Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
             } else {
                 LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MT_THR, trimStr(binding.o2MtThr.text.toString()).toInt())
@@ -1802,7 +1844,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         binding.o2SetIvThr.setOnClickListener {
-            if (binding.o2IvThr.text.toString().isEmpty()) {
+            if (binding.o2IvThr.text.toString().isNullOrEmpty()) {
                 Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
             } else {
                 LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_IV_THR, trimStr(binding.o2IvThr.text.toString()).toInt())
@@ -2086,29 +2128,58 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Toast.makeText(context, "烧录成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetSwitcherState)
-            .observe(this, {
+            .observe(this) {
                 LpBleUtil.getEr1VibrateConfig(it.model)
-                if (it.model == Bluetooth.MODEL_DUOEK || it.model == Bluetooth.MODEL_HHM2 || it.model == Bluetooth.MODEL_HHM3) {
-                    Toast.makeText(context, "duoek 设置参数成功", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(context, "er1 设置参数成功", Toast.LENGTH_SHORT).show()
+                when (it.model) {
+                    Bluetooth.MODEL_ER1 -> {
+                        Toast.makeText(context, "ER1 设置参数成功", Toast.LENGTH_SHORT).show()
+                    }
+                    Bluetooth.MODEL_ER1_N -> {
+                        Toast.makeText(context, "VBeat 设置参数成功", Toast.LENGTH_SHORT).show()
+                    }
+                    Bluetooth.MODEL_HHM1 -> {
+                        Toast.makeText(context, "HHM1 设置参数成功", Toast.LENGTH_SHORT).show()
+                    }
+                    Bluetooth.MODEL_DUOEK -> {
+                        Toast.makeText(context, "DuoEK 设置参数成功", Toast.LENGTH_SHORT).show()
+                    }
+                    Bluetooth.MODEL_HHM2 -> {
+                        Toast.makeText(context, "HHM2 设置参数成功", Toast.LENGTH_SHORT).show()
+                    }
+                    Bluetooth.MODEL_HHM3 -> {
+                        Toast.makeText(context, "HHM3 设置参数成功", Toast.LENGTH_SHORT).show()
+                    }
+                    else -> Toast.makeText(context, "ER1 设置参数成功", Toast.LENGTH_SHORT).show()
                 }
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1VibrateConfig)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as ByteArray
                 setReceiveCmd(data)
                 if (it.model == Bluetooth.MODEL_DUOEK || it.model == Bluetooth.MODEL_HHM2 || it.model == Bluetooth.MODEL_HHM3) {
                     val data = it.data as ByteArray
                     val config = SwitcherConfig.parse(data)
+                    switchState = config.switcher
                     var temp = "关"
                     if (config.switcher)
                         temp = "开"
                     binding.er2SetConfig.text = "声音$temp"
                     binding.content.text = "switcher : ${config.switcher} vector : ${config.vector} motionCount : ${config.motionCount} motionWindows : ${config.motionWindows}"
-                    Toast.makeText(context, "duoek 获取参数成功", Toast.LENGTH_SHORT).show()
+                    when (it.model) {
+                        Bluetooth.MODEL_DUOEK -> {
+                            Toast.makeText(context, "DuoEK 获取参数成功", Toast.LENGTH_SHORT).show()
+                        }
+                        Bluetooth.MODEL_HHM2 -> {
+                            Toast.makeText(context, "HHM2 获取参数成功", Toast.LENGTH_SHORT).show()
+                        }
+                        Bluetooth.MODEL_HHM3 -> {
+                            Toast.makeText(context, "HHM3 获取参数成功", Toast.LENGTH_SHORT).show()
+                        }
+                        else -> Toast.makeText(context, "DuoEK 获取参数成功", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
                     val config = VbVibrationSwitcherConfig.parse(data)
+                    switchState = config.switcher
                     this.config = config
                     var temp = "关"
                     if (config.switcher)
@@ -2117,35 +2188,63 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     binding.er1Hr1.setText("${config.hr1}")
                     binding.er1Hr2.setText("${config.hr2}")
                     binding.content.text = "switcher : " + config.switcher + " hr1 : " + config.hr1 + " hr2 : " + config.hr2
-                    Toast.makeText(context, "er1 获取参数成功", Toast.LENGTH_SHORT).show()
+                    when (it.model) {
+                        Bluetooth.MODEL_ER1 -> {
+                            Toast.makeText(context, "ER1 获取参数成功", Toast.LENGTH_SHORT).show()
+                        }
+                        Bluetooth.MODEL_ER1_N -> {
+                            Toast.makeText(context, "VBeat 获取参数成功", Toast.LENGTH_SHORT).show()
+                        }
+                        Bluetooth.MODEL_HHM1 -> {
+                            Toast.makeText(context, "HHM1 获取参数成功", Toast.LENGTH_SHORT).show()
+                        }
+                        else -> Toast.makeText(context, "ER1 获取参数成功", Toast.LENGTH_SHORT).show()
+                    }
                 }
-            })
+            }
         //-----------------------------er2------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2BurnFactoryInfo)
             .observe(this) {
                 Toast.makeText(context, "烧录成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetSwitcherState)
-            .observe(this, {
+            .observe(this) {
                 LpBleUtil.getEr2SwitcherState(it.model)
-                Toast.makeText(context, "er2 设置参数成功", Toast.LENGTH_SHORT).show()
-            })
+                when (it.model) {
+                    Bluetooth.MODEL_ER2 -> {
+                        Toast.makeText(context, "ER2 设置参数成功", Toast.LENGTH_SHORT).show()
+                    }
+                    Bluetooth.MODEL_LP_ER2 -> {
+                        Toast.makeText(context, "LP ER2 设置参数成功", Toast.LENGTH_SHORT).show()
+                    }
+                    else -> Toast.makeText(context, "ER2 设置参数成功", Toast.LENGTH_SHORT).show()
+                }
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SwitcherState)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as ByteArray
                 setReceiveCmd(data)
                 val config = SwitcherConfig.parse(data)
+                switchState = config.switcher
                 this.config = config
                 var temp = "关"
                 if (config.switcher)
                     temp = "开"
                 binding.er2SetConfig.text = "声音$temp"
                 binding.content.text = "switcher : " + config.switcher + " vector : " + config.vector + " motionCount : " + config.motionCount + " motionWindows : " + config.motionWindows
-                Toast.makeText(context, "er2 获取参数成功", Toast.LENGTH_SHORT).show()
-            })
+                when (it.model) {
+                    Bluetooth.MODEL_ER2 -> {
+                        Toast.makeText(context, "ER2 获取参数成功", Toast.LENGTH_SHORT).show()
+                    }
+                    Bluetooth.MODEL_LP_ER2 -> {
+                        Toast.makeText(context, "LP ER2 获取参数成功", Toast.LENGTH_SHORT).show()
+                    }
+                    else -> Toast.makeText(context, "ER2 获取参数成功", Toast.LENGTH_SHORT).show()
+                }
+            }
         //----------------------------bp2/bp2a/bp2t-----------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2GetConfigResult)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Int
                 var temp = "关"
                 switchState = false
@@ -2155,71 +2254,71 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
                 binding.bp2SetConfig.text = "声音$temp"
                 Toast.makeText(context, "bp2 获取参数成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SetConfigResult)
-            .observe(this, {
+            .observe(this) {
                 LpBleUtil.bp2GetConfig(it.model)
                 Toast.makeText(context, "bp2 设置参数成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2State)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Bp2BleRtState
                 setReceiveCmd(data.bytes)
                 binding.content.text = data.toString()
                 Toast.makeText(context, "bp2 获取设备状态成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SwitchState)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Boolean
                 binding.content.text = data.toString()
                 Toast.makeText(context, "bp2 设置设备状态$data", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2GetPhyState)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Bp2BlePhyState
                 setReceiveCmd(data.bytes)
                 config = data
                 binding.content.text = data.toString()
                 Toast.makeText(context, "bp2 获取理疗状态成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2GetPhyStateError)
-            .observe(this, {
+            .observe(this) {
                 Toast.makeText(context, "获取失败，请先进入理疗模式", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SetPhyState)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Bp2BlePhyState
                 setReceiveCmd(data.bytes)
                 config = data
                 binding.content.text = data.toString()
                 Toast.makeText(context, "bp2 设置理疗状态成功", Toast.LENGTH_SHORT).show()
-            })
+            }
 
         //------------------------------bp2w-------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wDeleteFile)
-            .observe(this, {
+            .observe(this) {
                 Toast.makeText(context, "bp2w 删除文件成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSetConfig)
-            .observe(this, {
+            .observe(this) {
                 LpBleUtil.bp2GetConfig(it.model)
                 Toast.makeText(context, "bp2w 设置参数成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSwitchState)
-            .observe(this, {
+            .observe(this) {
                 LpBleUtil.bp2GetRtState(it.model)
                 Toast.makeText(context, "bp2w 设置主机状态成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wRtState)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Bp2BleRtState
                 setReceiveCmd(data.bytes)
                 binding.bp2wGetState.text = "实时状态${data.status}"
                 binding.content.text = data.toString()
                 Toast.makeText(context, "bp2w 获取主机状态成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetConfig)
-            .observe(this, {
+            .observe(this) {
                 val config = it.data as Bp2Config
                 this.config = config
                 setReceiveCmd(config.bytes)
@@ -2232,32 +2331,32 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.bp2wSetVolume.text = "音量" + config.volume
                 binding.bp2wMode.text = "测量模式" + config.avgMeasureMode
                 Toast.makeText(context, "bp2w 获取参数成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiScanning)
-            .observe(this, {
+            .observe(this) {
                 binding.content.text = "设备正在扫描wifi"
                 handler.postDelayed({
                     LpBleUtil.bp2GetWifiDevice(it.model)
                 }, 1000)
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiDevice)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Bp2WifiDevice
                 setReceiveCmd(data.bytes)
                 bp2wAdapter.setNewInstance(data.wifiList)
                 bp2wAdapter.notifyDataSetChanged()
                 binding.content.text = data.toString()
                 Toast.makeText(context, "bp2w 获取路由成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSetWifiConfig)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Boolean
                 if (data) {
                     LpBleUtil.bp2GetWifiConfig(it.model)
                 }
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetWifiConfig)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Bp2WifiConfig
                 setReceiveCmd(data.bytes)
                 binding.content.text = data.toString()
@@ -2271,36 +2370,36 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     Toast.makeText(context, "bp2w 尚未配置WiFi", Toast.LENGTH_SHORT).show()
                 }
 
-            })
+            }
         //------------------------------lp bp2w-------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSyncUtcTime)
-            .observe(this, {
+            .observe(this) {
                 Toast.makeText(context, "le bp2w 同步 UTC 时间成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wDeleteFile)
-            .observe(this, {
+            .observe(this) {
                 Toast.makeText(context, "le bp2w 删除文件成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSetConfig)
-            .observe(this, {
+            .observe(this) {
                 LpBleUtil.bp2GetConfig(it.model)
                 Toast.makeText(context, "le bp2w 设置参数成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSwitchState)
-            .observe(this, {
+            .observe(this) {
                 LpBleUtil.bp2GetRtState(it.model)
                 Toast.makeText(context, "le bp2w 设置主机状态成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wRtState)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Bp2BleRtState
                 setReceiveCmd(data.bytes)
                 binding.leBp2wGetState.text = "实时状态${data.status}"
                 binding.content.text = data.toString()
                 Toast.makeText(context, "le bp2w 获取主机状态成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetConfig)
-            .observe(this, {
+            .observe(this) {
                 val config = it.data as Bp2Config
                 this.config = config
                 setReceiveCmd(config.bytes)
@@ -2313,30 +2412,30 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.leBp2wSetVolume.text = "音量${config.volume}"
                 binding.leBp2wMode.text = "测量模式${config.avgMeasureMode}"
                 Toast.makeText(context, "le bp2w 获取参数成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2WifiScanning)
-            .observe(this, {
+            .observe(this) {
                 binding.content.text = "设备正在扫描wifi"
                 LpBleUtil.bp2GetWifiDevice(it.model)
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2WifiDevice)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Bp2WifiDevice
                 setReceiveCmd(data.bytes)
                 leBp2wAdapter.setNewInstance(data.wifiList)
                 leBp2wAdapter.notifyDataSetChanged()
                 binding.content.text = data.toString()
                 Toast.makeText(context, "le bp2w 获取路由成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSetWifiConfig)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Boolean
                 if (data) {
                     LpBleUtil.bp2GetWifiConfig(it.model)
                 }
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetWifiConfig)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Bp2WifiConfig
                 setReceiveCmd(data.bytes)
                 binding.content.text = data.toString()
@@ -2351,39 +2450,39 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     Toast.makeText(context, "le bp2w 尚未配置WiFi", Toast.LENGTH_SHORT).show()
                 }
 
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetFileListCrc)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as FileListCrc
                 binding.content.text = data.toString()
                 Toast.makeText(context, "le bp2w 获取文件列表校验成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2WritingFileProgress)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Bp2FilePart
-                Toast.makeText(context, "le bp2w 写文件列表进度：" + (data.percent*100).toInt().toString() + "%", Toast.LENGTH_SHORT).show()
-            })
+                Toast.makeText(context, "le bp2w 写文件列表进度：" + (data.percent * 100).toInt().toString() + "%", Toast.LENGTH_SHORT).show()
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2WriteFileComplete)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as FileListCrc
                 Toast.makeText(context, "le bp2w 写文件完成 crc：" + data.crc, Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2WriteFileError)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as String
                 Toast.makeText(context, "le bp2w 写文件错误 filename：$data", Toast.LENGTH_SHORT).show()
-            })
+            }
         //------------------------------o2/babyO2-----------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBurnFactoryInfo)
             .observe(this) {
                 Toast.makeText(context, "烧录成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxySyncDeviceInfo)
-            .observe(this, {
+            .observe(this) {
                 Toast.makeText(context, "o2/babyO2 设置参数成功 ${it.data}", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as OxyBleResponse.OxyInfo
                 setReceiveCmd(data.bytes)
                 binding.o2OxiThr.setText("${data.oxiThr}")
@@ -2424,19 +2523,19 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
                 binding.content.text = data.toString()
                 Toast.makeText(context, "o2/babyO2 获取参数成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         //------------------------------ap20-------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20Battery)
-            .observe(this, {
-                var data = it.data as Int
-                binding.content.text = "电量${data.toString()}"
-            })
+            .observe(this) {
+                val data = it.data as Int
+                binding.content.text = "电量${data}"
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20ConfigInfo)
-            .observe(this, {
-                var data = it.data as Ap20BleResponse.ConfigInfo
+            .observe(this) {
+                val data = it.data as Ap20BleResponse.ConfigInfo
                 setReceiveCmd(data.bytes)
                 binding.content.text = data.toString()
-            })
+            }
         //------------------------------lew-------------------------------------
         LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseContent)
             .observe(this) {
@@ -2831,57 +2930,57 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
         //------------------------------sp20-------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20Battery)
-            .observe(this, {
-                var data = it.data as Int
+            .observe(this) {
+                val data = it.data as Int
                 binding.content.text = "电量${data.toString()}"
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20GetConfig)
-            .observe(this, {
-                var config = it.data as Sp20Config
+            .observe(this) {
+                val config = it.data as Sp20Config
                 this.config = config
                 setReceiveCmd(config.bytes)
                 binding.content.text = config.toString()
-            })
+            }
 
         //---------------------------aoj20a-------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempRtData)
-            .observe(this, {
+            .observe(this) {
                 Toast.makeText(context, "aoj20a 测量完成", Toast.LENGTH_SHORT).show()
                 val data = it.data as Aoj20aBleResponse.TempRtData
                 setReceiveCmd(data.bytes)
                 binding.content.text = data.toString()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aDeleteData)
-            .observe(this, {
+            .observe(this) {
                 Toast.makeText(context, "aoj20a 删除成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempErrorMsg)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Aoj20aBleResponse.ErrorMsg
                 binding.content.text = data.toString()
-            })
+            }
 
         //---------------------pc68b-------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bStatusInfo)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Pc68bBleResponse.StatusInfo
                 binding.content.text = data.toString()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bDeleteFile)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Boolean
                 binding.content.text = data.toString()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bConfigInfo)
-            .observe(this, {
+            .observe(this) {
                 val config = it.data as Pc68bConfig
                 this.config = config
                 binding.content.text = config.toString()
-            })
+            }
 
         // --------------------------LEM--------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemDeviceInfo)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as LemBleResponse.DeviceInfo
                 binding.content.text = data.toString()
                 binding.lemGetBattery.text = "电量${data.battery}%"
@@ -2901,21 +3000,21 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     LemBleCmd.MassageTime.MIN_5 -> "5min"
                     else -> ""
                 }
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemBattery)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Int
                 binding.lemGetBattery.text = "电量$data%"
                 Toast.makeText(context, "lem 获取电量成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetHeatMode)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Boolean
                 binding.lemHeatSwitch.text = "加热$data"
                 Toast.makeText(context, "lem 设置加热模式 $data 成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetMassageMode)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Int
                 binding.lemMassMode.text = when (data) {
                     LemBleCmd.MassageMode.VITALITY -> "活力模式"
@@ -2926,15 +3025,15 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     else -> ""
                 }
                 Toast.makeText(context, "lem 设置按摩模式 $data 成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetMassageLevel)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Int
                 binding.lemMassLevel.text = "按摩力度$data"
                 Toast.makeText(context, "lem 设置按摩力度 $data 成功", Toast.LENGTH_SHORT).show()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetMassageTime)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Int
                 binding.lemMassTime.text = when (data) {
                     LemBleCmd.MassageTime.MIN_15 -> "15min"
@@ -2943,7 +3042,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     else -> ""
                 }
                 Toast.makeText(context, "lem 设置按摩时间 $data 成功", Toast.LENGTH_SHORT).show()
-            })
+            }
 
         //------------------------bpm-------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmState)
@@ -2954,44 +3053,44 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
         //-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1SetTime)
-            .observe(this, {
+            .observe(this) {
                 binding.content.text = "device init"
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1MeasureState)
-            .observe(this, {
+            .observe(this) {
                 val state = it.data as Int
-                binding.content.text = if(state == 1) "start bp" else "stop bp"
-            })
+                binding.content.text = if (state == 1) "start bp" else "stop bp"
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1RtData)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Bpw1BleResponse.RtData
                 binding.content.text = "压力值 ：" + data.pressure.toString()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1ErrorResult)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Bpw1BleResponse.ErrorResult
                 binding.content.text = "测量出错 类型：" + data.type + " 结果：" + data.result
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1GetFileListComplete)
-            .observe(this, {
+            .observe(this) {
                 val bpw1FileList = it.data as Bpw1BleResponse.Bpw1FileList
                 binding.content.text = bpw1FileList.toString()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1MeasureResult)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Bpw1BleResponse.BpData
                 binding.content.text = data.toString()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1DeviceInfo)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Bpw1BleResponse.DeviceInfo
                 binding.content.text = data.toString()
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPW1.EventBpw1GetMeasureTime)
-            .observe(this, {
+            .observe(this) {
                 val data = it.data as Bpw1BleResponse.MeasureTime
                 binding.content.text = data.toString()
-            })
+            }
     }
 
 }

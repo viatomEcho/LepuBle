@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.SeekBar;
 
 import androidx.annotation.Nullable;
+
+import com.lepu.blepro.objs.Bluetooth;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -50,7 +51,7 @@ public class WaveEcgView extends View {
     private float rulerZeroWidth = 13;
     private final float rulerTotalWidth = rulerStandardWidth + 2 * rulerZeroWidth;
     //    private final float standard1mV = (32767 / 4033) * 12 * 8; //
-    private final double standard1mV = (float) ((1.0035 * 1800) / (4096 * 178.74));
+    private float standard1mV = (float) ((1.0035 * 1800) / (4096 * 178.74));
     //    private final double[] standardNmV = {standard1mV * 8.0, standard1mV * 4,standard1mV * 2,standard1mV};
     private final double[] standardNmV = {0.5, 1.0, 2.0};
     private double rulerStandard;
@@ -97,7 +98,7 @@ public class WaveEcgView extends View {
     public int POINTS_PER_LINE = (int)(SECONDS_PER_LINE * 125);
     public int ONE_PAGE_POINTS = (int)(SECONDS_PER_LINE * ONE_PAGE_LINES * 125);
     public int PREPARED_DRAW_POINTS = ONE_PAGE_POINTS + POINTS_PER_LINE;
-    int deviceType ;
+    int model;
     // About selection rectangle
 //    private float recWidth, recHeight;
 //    private float recX, recY, preRecX, preRecY;
@@ -138,15 +139,30 @@ public class WaveEcgView extends View {
                            short[] Y, int validValueLength,
                            float ScreenW, float viewHeight,
                            int currentZoomPosition, boolean enableClick
-            ,int deviceType) {
+            ,int model) {
         super(context);
-        this.deviceType = deviceType;
+        this.model = model;
         mGrid1mmLength = (float) 25.4 / getResources().getDisplayMetrics().xdpi;
         SECONDS_PER_LINE = ScreenW / (1 / mGrid1mmLength) / mSpeed;
 
-        HZ = 125;
-        POINTS_PER_LINE = (int)(SECONDS_PER_LINE * HZ);
-        ONE_PAGE_POINTS = (int)(SECONDS_PER_LINE * ONE_PAGE_LINES * HZ);
+        if (model == Bluetooth.MODEL_ER1
+                || model == Bluetooth.MODEL_ER1_N
+                || model == Bluetooth.MODEL_HHM1
+                || model == Bluetooth.MODEL_DUOEK
+                || model == Bluetooth.MODEL_HHM2
+                || model == Bluetooth.MODEL_HHM3
+                || model == Bluetooth.MODEL_ER2
+                || model == Bluetooth.MODEL_LP_ER2) {
+            standard1mV = (float) ((1.0035 * 1800) / (4096 * 178.74));
+        } else if (model == Bluetooth.MODEL_BP2
+                || model == Bluetooth.MODEL_BP2W
+                || model == Bluetooth.MODEL_LE_BP2W) {
+            standard1mV = 0.003089f;
+        } else {
+            standard1mV = (float) ((1.0035 * 1800) / (4096 * 178.74));
+        }
+        POINTS_PER_LINE = (int) (SECONDS_PER_LINE * HZ);
+        ONE_PAGE_POINTS = (int) (SECONDS_PER_LINE * ONE_PAGE_LINES * HZ);
         PREPARED_DRAW_POINTS = ONE_PAGE_POINTS + POINTS_PER_LINE;
 
         this.currentZoomPosition = currentZoomPosition;
@@ -376,7 +392,7 @@ public class WaveEcgView extends View {
             }
 
             long time;
-            time = (startPoint + POINTS_PER_LINE * (i-1)) / 125 + TimeUnit.MILLISECONDS.toSeconds(startTime);
+            time = (startPoint + POINTS_PER_LINE * (i-1)) / HZ + TimeUnit.MILLISECONDS.toSeconds(startTime);
             if (i == 0) {
                 setFirstLineTime(time);
             }
@@ -462,8 +478,8 @@ public class WaveEcgView extends View {
             if (index < 0 || index > Y.length-1) {
                 break;
             }
-            float yVal = (float) ((Y[index]) * (1.0035 * 1800) / (4096 * 178.74));
-            float tempY = yOffSet + (float) (wholeLineDis / 5.0 * 3.0 + line - (1.0 * rulerStandard) * (1/mGrid1mmLength*10) * (yVal));
+            float yVal = (Y[index])*standard1mV;
+            float tempY = yOffSet + (float) (wholeLineDis / 5.0 * 3.0 + line - rulerStandard * (1/mGrid1mmLength*10) * (yVal));
             if (i == 0) { // First point
                 preTempX = NULL_VALUE;
                 preTempY = NULL_VALUE;

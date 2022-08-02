@@ -14,6 +14,6 @@ import com.lepu.demo.util.DataConvert
 class EcgAdapter(layoutResId: Int, data: MutableList<EcgData>?) : BaseQuickAdapter<EcgData, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(holder: BaseViewHolder, item: EcgData) {
-        holder.setText(R.id.name, "${item.fileName} ---> 记录时长：${DataConvert.getEcgTimeStr(item.duration)}")
+        holder.setText(R.id.name, "${item.fileName} --> 记录时长：${DataConvert.getEcgTimeStr(item.duration)}")
     }
 }

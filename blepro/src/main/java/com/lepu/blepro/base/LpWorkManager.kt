@@ -165,7 +165,7 @@ object LpWorkManager {
                 }
 
             }
-            Bluetooth.MODEL_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
                 Er2BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 

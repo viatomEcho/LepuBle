@@ -8,6 +8,7 @@ public class EcgData {
     private int duration;
     private String fileName;
     private byte[] data;
+    private short[] shortData;
 
     public long getRecordingTime() {
         return recordingTime;
@@ -39,5 +40,24 @@ public class EcgData {
 
     public void setData(byte[] data) {
         this.data = data;
+    }
+
+    public short[] getShortData() {
+        return shortData;
+    }
+
+    public void setShortData(short[] shortData) {
+        this.shortData = shortData;
+    }
+
+    @Override
+    public String toString() {
+        return "EcgData{" +
+                "recordingTime=" + recordingTime +
+                ", duration=" + duration +
+                ", fileName='" + fileName + '\'' +
+                ", data=" + Arrays.toString(data) +
+                ", shortData=" + Arrays.toString(shortData) +
+                '}';
     }
 }
