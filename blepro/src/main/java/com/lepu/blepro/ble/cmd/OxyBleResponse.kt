@@ -245,12 +245,12 @@ class OxyBleResponse{
         var wByte: ByteArray
 
         init {
-            spo2 = bytes[0].toUInt().toInt()
+            spo2 = byte2UInt(bytes[0])
             pr = toUInt(bytes.copyOfRange(1, 3))
-            battery = bytes[3].toUInt().toInt()
-            batteryState = bytes[4].toUInt().toInt()
+            battery = byte2UInt(bytes[3])
+            batteryState = byte2UInt(bytes[4])
             pi = byte2UInt(bytes[5])
-            state = bytes[6].toUInt().toInt()
+            state = byte2UInt(bytes[6])
             len = toUInt(bytes.copyOfRange(10, 12))
             waveByte = bytes.copyOfRange(12, 12 + len)
             wFs = IntArray(len)
@@ -365,7 +365,7 @@ class OxyBleResponse{
             irBytes = bytes.copyOfRange(0, 4)
             red = toUInt(bytes.copyOfRange(4, 8))
             redBytes = bytes.copyOfRange(4, 8)
-            motion = bytes[8].toUInt().toInt()
+            motion = byte2UInt(bytes[8])
         }
 
     }
