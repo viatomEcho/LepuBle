@@ -384,6 +384,14 @@ object LpWorkManager {
                     return this
                 }
             }
+            Bluetooth.MODEL_LPM311 -> {
+                Lpm311BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
 
             else -> {
                 return throw Exception("BleService initInterfaces() 未配置此model:$m")

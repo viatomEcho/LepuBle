@@ -2,6 +2,7 @@ package com.lepu.blepro.ble.cmd
 
 import android.os.Parcelable
 import com.lepu.blepro.utils.*
+import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import kotlinx.android.parcel.Parcelize
 
 object Bpw1BleResponse {
@@ -104,7 +105,7 @@ object Bpw1BleResponse {
             day = (bytes[2].toUInt() and 0xFFu).toInt().toString()
             hour = (bytes[3].toUInt() and 0xFFu).toInt().toString()
             minute = (bytes[4].toUInt() and 0xFFu).toInt().toString()
-            sys = (bytes[6].toUInt().toInt() and 0xFF) or (bytes[5].toUInt().toInt() and 0xFF shl 8)
+            sys = (byte2UInt(bytes[6]) and 0xFF) or (byte2UInt(bytes[5]) and 0xFF shl 8)
             dia = (bytes[7].toUInt() and 0xFFu).toInt()
             pul = (bytes[8].toUInt() and 0xFFu).toInt()
             fg = (bytes[9].toUInt() and 0xFFu).toInt()

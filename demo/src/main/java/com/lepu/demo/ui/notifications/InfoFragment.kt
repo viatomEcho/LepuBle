@@ -691,6 +691,13 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $it \n"
                 }
             })
+        //--------------------------------LPM311-----------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LPM311.EventLpm311Data)
+            .observe(this) { event ->
+                (event.data as Lpm311Data).let {
+                    binding.info.text = "$it"
+                }
+            }
     }
 
     private fun setReceiveCmd(bytes: ByteArray) {

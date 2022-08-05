@@ -3,6 +3,7 @@ package com.lepu.blepro.ble.cmd
 import android.os.Parcelable
 import com.lepu.blepro.ble.data.Er1DataController
 import com.lepu.blepro.download.DownloadHelper
+import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
 import kotlinx.android.parcel.Parcelize
@@ -177,7 +178,7 @@ object Er1BleResponse {
         var fileList = mutableListOf<ByteArray>()
 
         init {
-            size=bytes[0].toUInt().toInt()
+            size=byte2UInt(bytes[0])
             for (i in  0 until size) {
                 fileList.add(bytes.copyOfRange(1 + i * 16, 17 + i * 16))
             }

@@ -590,4 +590,14 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * Lpm311BleInterface
+     * 包含model: MODEL_LPM311
+     */
+    interface LPM311 {
+        companion object {
+            const val EventLpm311Data = "com.lepu.ble.lpm311.data"  // 血脂数据 Lpm311Data
+        }
+    }
+
 }

@@ -38,4 +38,9 @@ public class HexString {
     public static String trimStr(String s) {
         return s.trim();
     }
+
+    public static char[] strToChars(String str) {
+        return str.toCharArray();
+    }
+
 }

@@ -263,7 +263,7 @@ object LeS1BleResponse {
         var fileList = mutableListOf<String>()
 
         init {
-            size = bytes[0].toUInt().toInt()
+            size = byte2UInt(bytes[0])
             for (i in  0 until size) {
                 fileList.add(trimStr(String(bytes.copyOfRange(1 + i * 16, 17 + i * 16))))
             }
