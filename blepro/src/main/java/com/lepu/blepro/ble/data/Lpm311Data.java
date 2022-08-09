@@ -1,7 +1,10 @@
 package com.lepu.blepro.ble.data;
 
+import java.util.Arrays;
+
 public class Lpm311Data {
 
+    private byte[] bytes;
     private int year;
     private int month;
     private int day;
@@ -13,8 +16,16 @@ public class Lpm311Data {
     private double trig;
     private double ldl;
     private double cholDivHdl;
-    private int unit;
+    private int unit;           // 0：mmol_L，1：mg_dL
     private String user;
+
+    public byte[] getBytes() {
+        return bytes;
+    }
+
+    public void setBytes(byte[] bytes) {
+        this.bytes = bytes;
+    }
 
     public int getYear() {
         return year;
@@ -123,7 +134,8 @@ public class Lpm311Data {
     @Override
     public String toString() {
         return "Lpm311Data{" +
-                "year=" + year +
+                "bytes=" + Arrays.toString(bytes) +
+                ", year=" + year +
                 ", month=" + month +
                 ", day=" + day +
                 ", hour=" + hour +

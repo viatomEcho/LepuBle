@@ -10,6 +10,7 @@ class BoDeviceInfo : Parcelable {
     var sn: String? = null
     var softwareV: String? = null
     var hardwareV: String? = null
+    var branchCode: String? = null
 
     override fun toString(): String {
         return """
@@ -17,6 +18,7 @@ class BoDeviceInfo : Parcelable {
             sn : $sn
             softwareV : $softwareV
             hardwareV : $hardwareV
+            branchCode : $branchCode
         """.trimIndent()
     }
 }
