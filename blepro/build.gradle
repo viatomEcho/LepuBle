@@ -68,9 +68,8 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.8.1'
 
     compileOnly files('libs/ICBodyFatAlgorithms.aar')
-    compileOnly files('libs/DataParser-LPM311-1.0.jar')
 //    implementation files('libs/ICBodyFatAlgorithms.aar')
-//    implementation files('libs/DataParser-LPM311-1.0.jar')
+    implementation files('libs/DataParser-LPM311-1.0.jar')
 }
 
 // 指定编码
