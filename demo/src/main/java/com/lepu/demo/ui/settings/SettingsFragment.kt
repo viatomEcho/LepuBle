@@ -87,6 +87,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.pc300Layout.visibility = View.GONE
         binding.lemLayout.visibility = View.GONE
         binding.bpmLayout.visibility = View.GONE
+        binding.pc60fwLayout.visibility = View.GONE
         if (v == null) return
         v.visibility = View.VISIBLE
     }
@@ -175,6 +176,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
                 Bluetooth.MODEL_BPM -> {
                     setViewVisible(binding.bpmLayout)
+                }
+                Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
+                Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
+                Bluetooth.MODEL_S7W -> {
+                    setViewVisible(binding.pc60fwLayout)
                 }
                 else -> {
                     setViewVisible(null)
@@ -2113,6 +2119,19 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 LpBleUtil.stopRtTask()
             }
         }
+        // ---------------------------pc60fw---------------------------
+        binding.pc60fwSetCode.setOnClickListener {
+            val code = trimStr(binding.pc60fwCode.text.toString())
+            if (code.isNullOrEmpty()) {
+                Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
+            } else if (code.length != 8) {
+                Toast.makeText(context, "code请输入8位", Toast.LENGTH_SHORT).show()
+            } else {
+                LpBleUtil.pc60fwSetBranchCode(Constant.BluetoothConfig.currentModel[0], code)
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            }
+        }
     }
 
     private fun setReceiveCmd(bytes: ByteArray) {
@@ -3049,6 +3068,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this) {
                 val data = it.data as BpmBleResponse.RtState
                 binding.content.text = "$data"
+            }
+
+        //------------------------pc60fw-------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwSetCode)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    Toast.makeText(context, "设置code成功", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "设置code失败", Toast.LENGTH_SHORT).show()
+                }
             }
 
         //-----------------------------------

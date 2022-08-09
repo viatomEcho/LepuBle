@@ -18,6 +18,7 @@ import com.lepu.blepro.utils.CrcUtil
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
+import java.nio.charset.StandardCharsets
 
 /**
  * 指甲血氧设备：
@@ -40,6 +41,8 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             Bluetooth.MODEL_OXYSMART,
             Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_S5W,
+            Bluetooth.MODEL_S6W,
+            Bluetooth.MODEL_S7W,
             Bluetooth.MODEL_PF_10,
             Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B,
@@ -126,6 +129,22 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo).post(InterfaceEvent(model, pc60FwDevice))
                     }
                 }
+                Pc60FwBleCmd.MSG_GET_CODE.toByte() -> {
+                    LepuBleLog.d(tag, "model:$model,MSG_GET_CODE => success")
+                    val data = com.lepu.blepro.utils.toString(response.content)
+                    pc60FwDevice.branchCode = data
+                    LepuBleLog.d(tag, "toString == $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwGetCode).post(InterfaceEvent(model, data))
+                }
+                Pc60FwBleCmd.MSG_SET_CODE.toByte() -> {
+                    LepuBleLog.d(tag, "model:$model,MSG_SET_CODE => success")
+                    if (toUInt(response.content) == 1) {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwSetCode).post(InterfaceEvent(model, true))
+                    } else {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwSetCode).post(InterfaceEvent(model, false))
+                    }
+                }
+
             }
         } else if (response.token == TOKEN_PO_0F){
             when (response.type) {
@@ -190,6 +209,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getInfo() {
+        getBranchCode()
         if (model == Bluetooth.MODEL_PC_60NW) {
             sendCmd(Pc60FwBleCmd.getInfo0F())
         } else {
@@ -197,6 +217,19 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             sendCmd(Pc60FwBleCmd.getInfoF0())
         }
         LepuBleLog.d(tag, "getInfo")
+    }
+
+    fun getBranchCode() {
+        sendCmd(Pc60FwBleCmd.getCode())
+        LepuBleLog.d(tag, "getBranchCode")
+    }
+    fun setBranchCode(code: String) {
+        if (code.length > 8) {
+            sendCmd(Pc60FwBleCmd.setCode(code.substring(0, 8).toByteArray(StandardCharsets.US_ASCII)))
+        } else {
+            sendCmd(Pc60FwBleCmd.setCode(code.toByteArray(StandardCharsets.US_ASCII)))
+        }
+        LepuBleLog.d(tag, "setBranchCode")
     }
 
     override fun syncTime() {

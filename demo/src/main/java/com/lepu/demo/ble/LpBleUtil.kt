@@ -883,7 +883,8 @@ class LpBleUtil {
                     }
                     Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_POD_1W,
                     Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
-                    Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_S5W -> {
+                    Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_S5W,
+                    Bluetooth.MODEL_S6W, Bluetooth.MODEL_S7W -> {
                         BleServiceHelper.pc60fwEnableRtData(model, type, enable)
                     }
                     Bluetooth.MODEL_PC_68B -> {
@@ -895,6 +896,13 @@ class LpBleUtil {
                 }
 
             }
+        }
+
+        fun pc60fwGetBranchCode(model: Int) {
+            BleServiceHelper.pc60fwGetBranchCode(model)
+        }
+        fun pc60fwSetBranchCode(model: Int, code: String) {
+            BleServiceHelper.pc60fwSetBranchCode(model, code)
         }
 
         fun pc68bDeleteFile(model: Int) {

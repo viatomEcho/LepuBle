@@ -547,6 +547,7 @@
                                     android:layout_height="wrap_content" />
 
                                 <TextView
+                                    android:visibility="gone"
                                     android:id="@+id/enable_rt_oxy"
                                     android:text="Enable Rt"
                                     android:layout_marginTop="10dp"

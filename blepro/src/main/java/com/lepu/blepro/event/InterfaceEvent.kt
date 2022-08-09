@@ -201,7 +201,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      *           MODEL_POD_1W, MODEL_POD2B, MODEL_PC_60NW_1,
      *           MODEL_PC_60B, MODEL_PF_10A, MODEL_PF_10B,
      *           MODEL_PF_20A, MODEL_PF_20B, MODEL_PC_60NW,
-     *           MODEL_S5W
+     *           MODEL_S5W, MODEL_S6W, MODEL_S7W
      */
     interface PC60Fw {
         companion object {
@@ -215,6 +215,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventPC60FwDeviceInfo = "com.lepu.ble.pc60fw.device.info"        // 设备信息 BoDeviceInfo
             const val EventPC60FwWorkingStatus = "com.lepu.ble.pc60fw.working.status"  // 工作状态 PC60FwBleResponse.WorkingStatus
             const val EventPC60FwOriginalData = "com.lepu.ble.pc60fw.original.data"    // 红外数据 PC60FwBleResponse.OriginalData
+            const val EventPC60FwSetCode = "com.lepu.ble.pc60fw.set.code"              // 设置code boolean
+            const val EventPC60FwGetCode = "com.lepu.ble.pc60fw.get.code"              // 获取code String
         }
     }
 

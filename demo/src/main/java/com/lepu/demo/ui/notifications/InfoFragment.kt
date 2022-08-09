@@ -144,7 +144,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             binding.info.text = it.toString()
         }
         mainViewModel.boInfo.observe(viewLifecycleOwner) {
-            binding.info.text = it.toString()
+            binding.info.text = "$it"
+            binding.deviceInfo.text = "硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}\n设备名称：${it.deviceName}\nsn：${it.sn}\ncode：${it.branchCode}"
         }
         mainViewModel.aoj20aInfo.observe(viewLifecycleOwner) {
             binding.info.text = it.toString()
