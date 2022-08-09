@@ -521,13 +521,14 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         fileNames.add(fileName)
                     }
                     Toast.makeText(context, "bp2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                    binding.deviceInfo.text = fileNames.toString()
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Bp2FilePart).let {
                     binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it.percent * 100).toInt().toString() + "%"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: ${it.percent.rem(100)} %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: ${it.percent.times(100)} %"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileComplete)
@@ -571,13 +572,14 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     }
                     Toast.makeText(context, "bp2w 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                     binding.info.text = it.toString()
+                    binding.deviceInfo.text = fileNames.toString()
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Bp2FilePart).let {
                     binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it.percent * 100).toInt().toString() + "%"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: ${it.percent.rem(100)} %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: ${it.percent.times(100)} %"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileComplete)
@@ -663,7 +665,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this) { event ->
                 (event.data as Bp2FilePart).let {
                     binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it.percent * 100).toInt().toString() + "%"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: ${it.percent.rem(100)} %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: ${it.percent.times(100)} %"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileComplete)

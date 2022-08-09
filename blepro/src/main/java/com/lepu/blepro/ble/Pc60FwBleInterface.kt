@@ -38,7 +38,6 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = when (model) {
             Bluetooth.MODEL_PC60FW,
-            Bluetooth.MODEL_OXYSMART,
             Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_S5W,
             Bluetooth.MODEL_S6W,
@@ -47,7 +46,8 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B,
             Bluetooth.MODEL_POD2B -> Pc60FwBleManager(context)
-            Bluetooth.MODEL_PF_20 -> Pf20BleManager(context)
+            Bluetooth.MODEL_PF_20,
+            Bluetooth.MODEL_OXYSMART -> Pf20BleManager(context)
             else -> Pc6nBleManager(context)
         }
         manager.isUpdater = isUpdater

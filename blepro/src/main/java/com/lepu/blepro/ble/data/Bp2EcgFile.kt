@@ -11,7 +11,8 @@ class Bp2EcgFile(val bytes: ByteArray) {
     var fileVersion: Int       // 文件版本 e.g.  0x01 :  V1
     var fileType: Int          // 文件类型 1：血压；2：心电
     var measureTime: Int       // 测量时间时间戳 s
-    // reserved 4
+    // reserved 3
+    var uploadTag: Boolean     // 上传标识
     var recordingTime: Int     // 记录时长 s
     // reserved 2
     var result: Int            // 诊断结果
@@ -33,7 +34,9 @@ class Bp2EcgFile(val bytes: ByteArray) {
         val defaultTime = toUInt(bytes.copyOfRange(index, index+4))
         measureTime = defaultTime - rawOffset
         index += 4
-        index += 4
+        index += 3
+        uploadTag = (byte2UInt(bytes[index]) and 0x01) == 1
+        index++
         recordingTime = toUInt(bytes.copyOfRange(index, index+4))
         index += 4
         index += 2
@@ -60,6 +63,7 @@ class Bp2EcgFile(val bytes: ByteArray) {
             fileType : $fileType
             measureTime : $measureTime
             measureTime : ${stringFromDate(Date(measureTime*1000L), "yyyy-MM-dd HH:mm:ss")}
+            uploadTag : $uploadTag
             recordingTime : $recordingTime
             result : $result
             hr : $hr

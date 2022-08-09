@@ -119,7 +119,12 @@ public class DataConvert {
     }
 
     public static short[] getBp2ShortArray(byte[] data) {
-        return shortfilter(toShortArray(data));
+        int count = data.length >> 1;
+        short[] dest = new short[count];
+        for (int i = 0; i < count; i++) {
+            dest[i] = (short) (data[i * 2 + 1] << 8 | data[2 * i] & 0xff);
+        }
+        return shortfilter(dest);
     }
 
     /**
@@ -233,6 +238,12 @@ public class DataConvert {
 
         return list;
     }
+
+    /**
+     * 大端模式
+     * @param src
+     * @return
+     */
     public static short[] toShortArray(byte[] src) {
 
         int count = src.length >> 1;

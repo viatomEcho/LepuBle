@@ -203,12 +203,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         }
         mainViewModel.er2Info.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_ER2) {
-                binding.er2Version.setText("${it.hwVersion}")
-                binding.er2Sn.setText("${it.serialNum}")
-                binding.er2Code.setText("${it.branchCode}")
-            }
+            binding.er2Version.setText("${it.hwVersion}")
+            binding.er2Sn.setText("${it.serialNum}")
+            binding.er2Code.setText("${it.branchCode}")
+        }
+        mainViewModel.boInfo.observe(viewLifecycleOwner) {
+            binding.pc60fwCode.setText("${it.branchCode}")
         }
         if (isReceive) {
             binding.bytesSwitch.text = "原始数据显示开"

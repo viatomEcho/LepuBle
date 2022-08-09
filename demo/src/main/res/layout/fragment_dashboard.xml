@@ -321,6 +321,7 @@
                                 android:text="PS"/>
 
                             <LinearLayout
+                                android:visibility="gone"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="20dp"
@@ -366,9 +367,18 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             android:id="@+id/card">
 
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="请先点击--开始绘制--再进行测量"
+                                android:textSize="20sp"
+                                android:textColor="@color/colorRed"/>
+
                             <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:layout_marginTop="30dp"
                                 android:padding="4dp">
 
                                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -525,7 +535,8 @@
 
                                 <TextView
                                     android:id="@+id/start_rt_oxy"
-                                    android:text="Start Rt"
+                                    android:textSize="20sp"
+                                    android:text="开始绘制"
                                     android:layout_marginTop="10dp"
                                     android:padding="5dp"
                                     android:textColor="@color/Black"
@@ -536,7 +547,8 @@
 
                                 <TextView
                                     android:id="@+id/stop_rt_oxy"
-                                    android:text="Stop Rt"
+                                    android:textSize="20sp"
+                                    android:text="停止绘制"
                                     android:layout_marginTop="10dp"
                                     android:padding="5dp"
                                     android:textColor="@color/Black"
