@@ -51,6 +51,7 @@ class PoctorM3102Data(val bytes: ByteArray) {
             PoctorM3102Data : 
             bytes : ${bytesToHex(bytes)}
             string : ${String(bytes)}
+            normal : $normal
             type : $type
             year : $year
             month : $month
