@@ -314,6 +314,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo).observe(this) { event ->
             (event.data as OxyBleResponse.OxyInfo).let {
                 viewModel._oxyInfo.value = it
+                viewModel._battery.value = it.batteryValue
                 Toast.makeText(this, "O2系列 获取设备信息成功", Toast.LENGTH_SHORT).show()
                 if (event.model == Bluetooth.MODEL_BABYO2N) {
                     LpBleUtil.oxyGetBoxInfo(event.model)

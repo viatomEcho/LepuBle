@@ -17,6 +17,7 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.ByteUtils
+import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.demo.MainViewModel
@@ -318,6 +319,20 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         data = Bp2DataEcgIng(bp2Rt.rtWave.waveData)
                         LepuBleLog.d("bp2 ecg hr = ${data.hr}")
                         viewModel.ecgHr.value = data.hr
+                        LepuBleLog.d("bp2 ecg waveformSize = ${bp2Rt.rtWave.waveformSize}")
+
+                        val mvs = ByteUtils.bytes2mvs(bp2Rt.rtWave.waveform)
+                        val len = mvs.size
+                        for (i in 0 until len) {
+                            val temp = DataConvert.filter(mvs[i].toDouble(), false)
+                            if (temp.isNotEmpty()) {
+                                val d = FloatArray(temp.size)
+                                for (j in d.indices) {
+                                    d[j] = temp[j].toFloat()
+                                }
+                                DataController.receive(d)
+                            }
+                        }
                     }
                     3 -> {
                         data = Bp2DataEcgResult(bp2Rt.rtWave.waveData)
@@ -326,20 +341,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     else -> data = ""
                 }
 
-                LepuBleLog.d("bp2 ecg waveformSize = ${bp2Rt.rtWave.waveformSize}")
-
-                val mvs = ByteUtils.bytes2mvs(bp2Rt.rtWave.waveform)
-                val len = mvs.size
-                for (i in 0 until len) {
-                    val temp = DataConvert.filter(mvs[i].toDouble(), false)
-                    if (temp.isNotEmpty()) {
-                        val d = FloatArray(temp.size)
-                        for (j in d.indices) {
-                            d[j] = temp[j].toFloat()
-                        }
-                        DataController.receive(d)
-                    }
-                }
                 mainViewModel._battery.value = "${bp2Rt.rtState.battery.percent} %"
                 binding.dataStr.text = "dataType: ${bp2Rt.rtWave.waveDataType} $data ----rtState-- ${bp2Rt.rtState}"
             }
@@ -531,6 +532,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 LpBleUtil.oxyGetPpgRt(it.model)
             }
         //------------------------------pc60fw------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwBattery)
+            .observe(this) {
+                val data = it.data as PC60FwBleResponse.Battery
+                val level = byte2UInt(data.batteryLevel)
+                mainViewModel._battery.value = "${level.times(25)} - ${(level+1).times(25)} %"
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataWave)
             .observe(this) {
                 val rtWave = it.data as PC60FwBleResponse.RtDataWave
@@ -858,6 +865,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         }
         mainViewModel.battery.observe(viewLifecycleOwner) {
             binding.bleBattery.text = "电量：$it"
+            binding.bpBleBattery.text = "电量：$it"
+            binding.oxyBleBattery.text = "电量：$it"
         }
 
         //------------------------------ecg------------------------------

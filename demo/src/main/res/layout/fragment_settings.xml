@@ -516,12 +516,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="烧录" />
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <EditText
                         android:id="@+id/o2_oxi_thr"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="血氧阈值" />
                     <Button
@@ -529,14 +529,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="血氧阈值设置"
-                        android:layout_marginStart="20dp"/>
-                </LinearLayout>
-                <LinearLayout
+                        android:layout_alignParentRight="true"/>
+                </RelativeLayout>
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <EditText
                         android:id="@+id/o2_hr_thr1"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="心率低阈值"/>
                     <Button
@@ -544,14 +544,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="心率低阈值设置"
-                        android:layout_marginStart="20dp"/>
-                </LinearLayout>
-                <LinearLayout
+                        android:layout_alignParentRight="true"/>
+                </RelativeLayout>
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <EditText
                         android:id="@+id/o2_hr_thr2"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="心率高阈值"/>
                     <Button
@@ -559,7 +559,55 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="心率高阈值设置"
+                        android:layout_alignParentRight="true"/>
+                </RelativeLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/o2_mt_thr"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="体动阈值"/>
+                    <Button
+                        android:id="@+id/o2_set_mt_thr"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="体动阈值设置"
                         android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/o2_mt_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="体动开关"
+                        android:layout_marginStart="20dp" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/o2_iv_thr"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="无效值阈值"/>
+                    <Button
+                        android:id="@+id/o2_set_iv_thr"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="无效值阈值设置"
+                        android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/o2_iv_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="无效值开关"
+                        android:layout_marginStart="20dp" />
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -619,48 +667,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="屏幕亮度"
-                        android:layout_marginStart="20dp" />
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <EditText
-                        android:id="@+id/o2_mt_thr"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:hint="体动阈值"/>
-                    <Button
-                        android:id="@+id/o2_set_mt_thr"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="体动阈值设置"
-                        android:layout_marginStart="20dp"/>
-                    <Button
-                        android:id="@+id/o2_mt_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="体动开关"
-                        android:layout_marginStart="20dp" />
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <EditText
-                        android:id="@+id/o2_iv_thr"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:hint="无效值阈值"/>
-                    <Button
-                        android:id="@+id/o2_set_iv_thr"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="无效值阈值设置"
-                        android:layout_marginStart="20dp"/>
-                    <Button
-                        android:id="@+id/o2_iv_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="无效值开关"
                         android:layout_marginStart="20dp" />
                 </LinearLayout>
             </LinearLayout>

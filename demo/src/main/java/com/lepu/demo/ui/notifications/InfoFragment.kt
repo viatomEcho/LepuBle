@@ -121,12 +121,22 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         }
 
         mainViewModel.er1Info.observe(viewLifecycleOwner) {
-            binding.info.text = "$it"
-            binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1_N
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM1
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_DUOEK
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM3) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
+            }
         }
         mainViewModel.er2Info.observe(viewLifecycleOwner) {
-            binding.info.text = "$it"
-            binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.fwVersion}\nsn：${it.serialNum}\ncode：${it.branchCode}"
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_ER2) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.fwVersion}\nsn：${it.serialNum}\ncode：${it.branchCode}"
+            }
         }
         mainViewModel.pc80bInfo.observe(viewLifecycleOwner) {
             binding.info.text = it.toString()
@@ -138,14 +148,47 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             binding.info.text = it.toString()
         }
         mainViewModel.oxyInfo.observe(viewLifecycleOwner) {
-            binding.info.text = it.toString()
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SNOREO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_WEARO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPU
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYLINK
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYFIT
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S1
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYU
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_AI_S100) {
+                binding.info.text = it.toString()
+                binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}\ncode：${it.branchCode}\nfileList：${it.fileList}"
+            }
         }
         mainViewModel.pc100Info.observe(viewLifecycleOwner) {
             binding.info.text = it.toString()
         }
         mainViewModel.boInfo.observe(viewLifecycleOwner) {
-            binding.info.text = "$it"
-            binding.deviceInfo.text = "硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}\n设备名称：${it.deviceName}\nsn：${it.sn}\ncode：${it.branchCode}"
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC60FW
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC66B
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYSMART
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_POD_1W
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_POD2B
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC_60NW_1
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC_60B
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_20
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC_60NW
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S5W
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S6W
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S7W) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}\n设备名称：${it.deviceName}\nsn：${it.sn}\ncode：${it.branchCode}"
+            }
         }
         mainViewModel.aoj20aInfo.observe(viewLifecycleOwner) {
             binding.info.text = it.toString()

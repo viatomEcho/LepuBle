@@ -210,6 +210,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         mainViewModel.boInfo.observe(viewLifecycleOwner) {
             binding.pc60fwCode.setText("${it.branchCode}")
         }
+        mainViewModel.oxyInfo.observe(viewLifecycleOwner) {
+            binding.o2Version.setText("${it.hwVersion}")
+            binding.o2Sn.setText("${it.sn}")
+            binding.o2Code.setText("${it.branchCode}")
+        }
         if (isReceive) {
             binding.bytesSwitch.text = "原始数据显示开"
         } else {
@@ -2264,12 +2269,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         //----------------------------bp2/bp2a/bp2t-----------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2GetConfigResult)
             .observe(this) {
-                val data = it.data as Int
+                val data = it.data as Bp2Config
                 var temp = "关"
-                switchState = false
-                if (data == 1) {
+                switchState = data.beepSwitch
+                if (data.beepSwitch) {
                     temp = "开"
-                    switchState = true
                 }
                 binding.bp2SetConfig.text = "声音$temp"
                 Toast.makeText(context, "bp2 获取参数成功", Toast.LENGTH_SHORT).show()
