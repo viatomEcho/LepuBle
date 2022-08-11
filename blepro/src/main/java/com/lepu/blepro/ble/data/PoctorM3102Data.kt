@@ -11,8 +11,8 @@ class PoctorM3102Data(val bytes: ByteArray) {
     var day = 0
     var hour = 0
     var minute = 0
-    var result: Int       // normal=false(0是低值Lo,1是高值Hi)
-    var unit: Int = 1     // 0：umol/L，1：mmol_L
+    var result: Int       // normal=false(0是低值Lo,1是高值Hi),血糖、血酮的结果四位最后一位为小数点后一位数据
+//    var unit: Int         // 尿酸：umol/L，血糖、血酮：mmol_L
 
     init {
         var index = 0
@@ -39,7 +39,7 @@ class PoctorM3102Data(val bytes: ByteArray) {
             result = String(bytes.copyOfRange(index, index + 4)).toInt()
             index += 4
             index++
-            unit = String(bytes.copyOfRange(index, index + 1)).toInt()
+//            unit = String(bytes.copyOfRange(index, index + 1)).toInt()
         } else {
             normal = false
             result = String(bytes.copyOfRange(index, index+1)).toInt()
@@ -59,7 +59,6 @@ class PoctorM3102Data(val bytes: ByteArray) {
             hour : $hour
             minute : $minute
             result : $result
-            unit : $unit
         """.trimIndent()
     }
 

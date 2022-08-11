@@ -44,31 +44,19 @@ class PoctorM3102BleInterface(model: Int): BleInterface(model) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun hasResponse(bytes: ByteArray?): ByteArray? {
 
-        if (bytes == null) {
+        if (bytes == null || bytes.size < 2) {
             return bytes
         }
 
-        if (bytes.size == 7) {
-            val len = 7
-
-            val temp: ByteArray = bytes.copyOfRange(0, len)
-            onResponseReceived(temp)
-
-            val tempBytes: ByteArray? = if (len == bytes.size) null else bytes.copyOfRange(len, bytes.size)
-
-            return hasResponse(tempBytes)
-        } else if (bytes.size < 31) {
-            return bytes
+        loop@ for (i in bytes.indices) {
+            if (bytes.last() != 0x0A.toByte() || bytes[bytes.size-2] != 0x0D.toByte()) {
+                continue@loop
+            }
+            onResponseReceived(bytes)
+            return null
         }
 
-        val len = 31
-
-        val temp: ByteArray = bytes.copyOfRange(0, len)
-        onResponseReceived(temp)
-
-        val tempBytes: ByteArray? = if (len == bytes.size) null else bytes.copyOfRange(len, bytes.size)
-
-        return hasResponse(tempBytes)
+        return bytes
 
     }
 

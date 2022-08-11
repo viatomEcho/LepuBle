@@ -604,7 +604,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * PoctorM3102BleInterface
-     * 包含model: MODEL_LPM311
+     * 包含model: MODEL_POCTOR_M3102
      */
     interface PoctorM3102 {
         companion object {
