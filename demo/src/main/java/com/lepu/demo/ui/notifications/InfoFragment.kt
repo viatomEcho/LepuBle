@@ -185,7 +185,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC_60NW
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S5W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S6W
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S7W) {
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S7W
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S7BW) {
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}\n设备名称：${it.deviceName}\nsn：${it.sn}\ncode：${it.branchCode}"
             }

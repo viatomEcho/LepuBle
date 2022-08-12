@@ -201,7 +201,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      *           MODEL_POD_1W, MODEL_POD2B, MODEL_PC_60NW_1,
      *           MODEL_PC_60B, MODEL_PF_10A, MODEL_PF_10B,
      *           MODEL_PF_20A, MODEL_PF_20B, MODEL_PC_60NW,
-     *           MODEL_S5W, MODEL_S6W, MODEL_S7W
+     *           MODEL_S5W, MODEL_S6W, MODEL_S7W, MODEL_S7BW
      */
     interface PC60Fw {
         companion object {
@@ -594,6 +594,39 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventLeS1Reset = "com.lepu.ble.les1.reset"                                // 复位 boolean
             const val EventLeS1ResetFactory = "com.lepu.ble.les1.reset.factory"                 // 恢复出厂设置 boolean
             const val EventLeS1SetTime = "com.lepu.ble.les1.set.time"                           // 同步时间 boolean
+        }
+    }
+
+    /**
+     * Lpm311BleInterface
+     * 包含model: MODEL_LPM311
+     */
+    interface LPM311 {
+        companion object {
+            const val EventLpm311Data = "com.lepu.ble.lpm311.data"  // 血脂数据 Lpm311Data
+        }
+    }
+
+    /**
+     * PoctorM3102BleInterface
+     * 包含model: MODEL_POCTOR_M3102
+     */
+    interface PoctorM3102 {
+        companion object {
+            const val EventPoctorM3102Data = "com.lepu.ble.poctor.m3102.data"  // 测量结果 PoctorM3102Data
+        }
+    }
+
+    /**
+     * BiolandBgmBleInterface
+     * 包含model: MODEL_BIOLAND_BGM
+     */
+    interface BiolandBgm {
+        companion object {
+            const val EventBiolandBgmDeviceInfo = "com.lepu.ble.bioland.bgm.device.info"       // BiolandBgmBleResponse.DeviceInfo
+            const val EventBiolandBgmCountDown = "com.lepu.ble.bioland.bgm.count.down"         // int
+            const val EventBiolandBgmGluData = "com.lepu.ble.bioland.bgm.glu.data"             // BiolandBgmBleResponse.GluData
+            const val EventBiolandBgmNoGluData = "com.lepu.ble.bioland.bgm.no.glu.data"        // true
         }
     }
 

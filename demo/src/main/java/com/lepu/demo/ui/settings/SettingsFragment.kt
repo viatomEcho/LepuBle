@@ -179,7 +179,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
                 Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
                 Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
-                Bluetooth.MODEL_S7W -> {
+                Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW -> {
                     setViewVisible(binding.pc60fwLayout)
                 }
                 else -> {

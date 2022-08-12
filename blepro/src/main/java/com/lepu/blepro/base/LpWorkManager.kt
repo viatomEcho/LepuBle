@@ -209,7 +209,7 @@ object LpWorkManager {
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
             Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
-            Bluetooth.MODEL_S7W  -> {
+            Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW  -> {
                 Pc60FwBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -380,6 +380,30 @@ object LpWorkManager {
             }
             Bluetooth.MODEL_LES1 -> {
                 LeS1BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_LPM311 -> {
+                Lpm311BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_POCTOR_M3102 -> {
+                PoctorM3102BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_BIOLAND_BGM -> {
+                BiolandBgmBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
                     vailFace.put(m, this)
