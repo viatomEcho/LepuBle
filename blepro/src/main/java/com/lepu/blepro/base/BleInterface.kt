@@ -294,18 +294,17 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
         //断开后
         LepuBleLog.d(tag, "onDeviceDisconnected=====isAutoReconnect:$isAutoReconnect")
-//        if (BleServiceHelper.canReconnectByName(model)) {
-//            device.name?.let {
-//                if (isAutoReconnect){
-//                    //重开扫描, 扫描该interface的设备
-//                    LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnect")
-//                    BleServiceHelper.reconnect(model, it)
-//                }else{
-//                    BleServiceHelper.removeReconnectName(it)
-//                }
-//                LepuBleLog.d(tag, "$it onDeviceDisconnected")
-//            }
-//        } else {
+        if (BleServiceHelper.canReconnectByName(model)) {
+            device.name?.let {
+                if (isAutoReconnect){
+                    //重开扫描, 扫描该interface的设备
+                    LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnect")
+                    BleServiceHelper.reconnect(model, it)
+                }else{
+                    BleServiceHelper.removeReconnectName(it)
+                }
+            }
+        } else {
             device.address?.let {
                 if (isAutoReconnect){
                     //重开扫描, 扫描该interface的设备
@@ -317,7 +316,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
             }
 
-//        }
+        }
 
     }
 
