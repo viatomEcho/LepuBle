@@ -33,6 +33,7 @@ import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.CHECK_BLE_REQUEST_CODE
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.SUPPORT_MODELS
+import com.lepu.demo.data.entity.DeviceEntity
 import com.lepu.demo.util.CollectUtil
 import com.permissionx.guolindev.PermissionX
 import java.util.*
@@ -553,7 +554,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
     override fun onBleStateChanged(model: Int, state: Int) {
         LepuBleLog.d("onBleStateChanged model = $model, state = $state")
         viewModel._bleState.value = state == LpBleUtil.State.CONNECTED
-
+        val device = LpBleUtil.getCurrentDevice(model)
+        if (device != null) {
+            viewModel._curBluetooth.value = DeviceEntity(device.name, device.address, model)
+        }
         when(state){
             LpBleUtil.State.CONNECTED ->{
                 //

@@ -299,6 +299,18 @@ class BleServiceHelper private constructor() {
         LepuBleLog.d(tag, "stopScan")
     }
 
+    fun getCurrentDevice(model: Int): BluetoothDevice? {
+        if (!checkService()) return null
+        val vailFace = LpWorkManager.vailFace
+        LepuBleLog.d(tag, "getCurrentDevice => currentModel：$model, vailFaceSize：${vailFace.size()}}")
+        vailFace.get(model)?.let {
+            return vailFace.get(model).device
+        }?: kotlin.run {
+            LepuBleLog.e(tag, "current model $model unsupported!!")
+            return null
+        }
+    }
+
     /**
      * 获取model的interface
      */
@@ -340,7 +352,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_AOJ20A, Bluetooth.MODEL_TV221U,
             Bluetooth.MODEL_FETAL, Bluetooth.MODEL_VTM_AD5,
             Bluetooth.MODEL_VCOMIN, Bluetooth.MODEL_PC300,
-            Bluetooth.MODEL_LEM -> false
+            Bluetooth.MODEL_LEM, Bluetooth.MODEL_LPM311,
+            Bluetooth.MODEL_POCTOR_M3102, Bluetooth.MODEL_BIOLAND_BGM -> false
             else -> true
         }
     }

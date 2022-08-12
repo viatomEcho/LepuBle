@@ -285,31 +285,25 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         publish()
 
         //断开后
-        LepuBleLog.d(tag, "onDeviceDisconnected=====isAutoReconnect:$isAutoReconnect")
-        when (model) {
-            // 因此系列设备存在地址一样，蓝牙名不一样
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1,
-            Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
-            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
-                device.name?.let {
-                    if (isAutoReconnect){
-                        //重开扫描, 扫描该interface的设备
-                        LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByName")
-                        BleServiceHelper.reconnect(model, it)
-                    }else{
-                        BleServiceHelper.removeReconnectName(it)
-                    }
+        LepuBleLog.d(tag, "onDeviceDisconnected=====isAutoReconnect:$isAutoReconnect ${device.name} ${device.address}")
+        if (BleServiceHelper.canReconnectByName(model)) {
+            device.name?.let {
+                if (isAutoReconnect){
+                    //重开扫描, 扫描该interface的设备
+                    LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByName $it")
+                    BleServiceHelper.reconnect(model, it)
+                }else{
+                    BleServiceHelper.removeReconnectName(it)
                 }
             }
-            else -> {
-                device.address?.let {
-                    if (isAutoReconnect){
-                        //重开扫描, 扫描该interface的设备
-                        LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByAddress")
-                        BleServiceHelper.reconnectByAddress(model, it)
-                    }else{
-                        BleServiceHelper.removeReconnectAddress(it)
-                    }
+        } else {
+            device.address?.let {
+                if (isAutoReconnect){
+                    //重开扫描, 扫描该interface的设备
+                    LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByAddress $it")
+                    BleServiceHelper.reconnectByAddress(model, it)
+                }else{
+                    BleServiceHelper.removeReconnectAddress(it)
                 }
             }
         }

@@ -70,9 +70,8 @@ object BiolandBgmBleResponse {
         var day: Int
         var hour: Int
         var minute: Int
-        var second: Int
-        var resultMg: Int      // 单位：mg/dl
-        var resultMmol: Float  // 单位：mmol/l
+        var resultMg: Int      // 单位：mg/dl (18-Li，707-Hi)
+        var resultMmol: Float  // 单位：mmol/l (1.0-Li，39.3-Hi)
 
         init {
             var index = 0
@@ -86,7 +85,6 @@ object BiolandBgmBleResponse {
             index++
             minute = byte2UInt(bytes[index])
             index++
-            second = byte2UInt(bytes[index])
             index++
             resultMg = toUInt(bytes.copyOfRange(index, index+2))
             resultMmol = toUInt(bytes.copyOfRange(index, index+2)).div(18f)
@@ -101,7 +99,6 @@ object BiolandBgmBleResponse {
                 day : $day
                 hour : $hour
                 minute : $minute
-                second : $second
                 resultMg : $resultMg
                 resultMmol : $resultMmol
             """.trimIndent()
