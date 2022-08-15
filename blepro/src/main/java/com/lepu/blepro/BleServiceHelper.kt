@@ -848,6 +848,9 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    /**
+     * 获取血氧状态：设备返回状态不对，暂不能使用
+     */
     fun pc100GetBoState(model: Int) {
         if (!checkService()) return
         when (model) {

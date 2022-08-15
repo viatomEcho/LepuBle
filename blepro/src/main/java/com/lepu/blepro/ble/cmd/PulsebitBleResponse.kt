@@ -5,6 +5,7 @@ import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.ByteUtils.toSignedShort
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.bytesToSignedShort
+import com.lepu.blepro.utils.getTimeString
 import com.lepu.blepro.utils.toUInt
 import org.json.JSONObject
 import java.util.*
@@ -241,36 +242,7 @@ class PulsebitBleResponse{
             hr = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
             user = byte2UInt(bytes[15])
-            recordName = getTimeString()
-        }
-
-        private fun getTimeString(): String {
-            val monthStr = if (month < 10) {
-                "0$month"
-            } else {
-                "$month"
-            }
-            val dayStr = if (day < 10) {
-                "0$day"
-            } else {
-                "$day"
-            }
-            val hourStr = if (hour < 10) {
-                "0$hour"
-            } else {
-                "$hour"
-            }
-            val minuteStr = if (minute < 10) {
-                "0$minute"
-            } else {
-                "$minute"
-            }
-            val secondStr = if (second < 10) {
-                "0$second"
-            } else {
-                "$second"
-            }
-            return "$year$monthStr$dayStr$hourStr$minuteStr$secondStr"
+            recordName = getTimeString(year, month, day, hour, minute, second)
         }
 
         override fun toString(): String {

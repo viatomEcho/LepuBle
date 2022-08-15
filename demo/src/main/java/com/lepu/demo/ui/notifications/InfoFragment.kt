@@ -19,6 +19,7 @@ import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.bytesToHex
+import com.lepu.blepro.utils.getTimeString
 import com.lepu.demo.*
 import com.lepu.demo.ble.EcgAdapter
 import com.lepu.demo.ble.LpBleUtil
@@ -88,14 +89,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             if (adapter.data.size > 0) {
                 (adapter.getItem(position) as EcgData).let {
                     val intent = Intent(context, WaveEcgActivity::class.java)
-//                    val bundle = Bundle()
-//                    bundle.putInt("model", Constant.BluetoothConfig.currentModel[0])
-//                    bundle.putByteArray("waveData", it.data)
-//                    bundle.putLong("recordingTime", it.recordingTime)
                     intent.putExtra("model", Constant.BluetoothConfig.currentModel[0])
-//                    intent.putExtra("waveData", it.data)
-//                    intent.putExtra("recordingTime", it.recordingTime)
-//                    intent.putExtra("bundle", bundle)
 
                     ecgData.recordingTime = it.recordingTime
                     ecgData.data = it.data
@@ -139,13 +133,26 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
         }
         mainViewModel.pc80bInfo.observe(viewLifecycleOwner) {
-            binding.info.text = it.toString()
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC80B) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}"
+            }
         }
         mainViewModel.bp2Info.observe(viewLifecycleOwner) {
-            binding.info.text = it.toString()
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2A
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2T
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fmV}\nsn：${it.sn}\ncode：${it.branchCode}"
+            }
         }
         mainViewModel.bpmInfo.observe(viewLifecycleOwner) {
-            binding.info.text = it.toString()
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BPM) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "版本：${it.getFwVersion()}"
+            }
         }
         mainViewModel.oxyInfo.observe(viewLifecycleOwner) {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
@@ -165,12 +172,15 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYU
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_AI_S100) {
-                binding.info.text = it.toString()
+                binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}\ncode：${it.branchCode}\nfileList：${it.fileList}"
             }
         }
         mainViewModel.pc100Info.observe(viewLifecycleOwner) {
-            binding.info.text = it.toString()
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC100) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "设备名称：${it.deviceName}\n硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}\nsn：${it.sn}"
+            }
         }
         mainViewModel.boInfo.observe(viewLifecycleOwner) {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC60FW
@@ -188,29 +198,51 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S7W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S7BW) {
                 binding.info.text = "$it"
-                binding.deviceInfo.text = "硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}\n设备名称：${it.deviceName}\nsn：${it.sn}\ncode：${it.branchCode}"
+                binding.deviceInfo.text = "设备名称：${it.deviceName}\n硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}\nsn：${it.sn}\ncode：${it.branchCode}"
             }
         }
         mainViewModel.aoj20aInfo.observe(viewLifecycleOwner) {
-            binding.info.text = it.toString()
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_AOJ20A) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "$it"
+            }
         }
         mainViewModel.checkmePodInfo.observe(viewLifecycleOwner) {
-            binding.info.text = it.toString()
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECK_POD) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}\ncode：${it.branchCode}"
+            }
         }
         mainViewModel.pulsebitInfo.observe(viewLifecycleOwner) {
-            binding.info.text = it.toString()
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PULSEBITEX) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}\ncode：${it.branchCode}"
+            }
         }
         mainViewModel.checkmeLeInfo.observe(viewLifecycleOwner) {
-            binding.info.text = it.toString()
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKME_LE) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}"
+            }
         }
         mainViewModel.pc300Info.observe(viewLifecycleOwner) {
-            binding.info.text = it.toString()
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "设备名称：${it.deviceName}\n硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}"
+            }
         }
         mainViewModel.lemInfo.observe(viewLifecycleOwner) {
-            binding.info.text = it.toString()
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LEM) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "$it"
+            }
         }
         mainViewModel.lewInfo.observe(viewLifecycleOwner) {
-            binding.info.text = it.toString()
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LEW
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_W12C) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}"
+            }
         }
 
         // 公共方法测试
@@ -275,7 +307,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             } else {
                 LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0])
             }
-            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])}"
         }
         // 读文件
         binding.readFile.setOnClickListener {
@@ -308,21 +340,21 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         // 复位
         binding.reset.setOnClickListener {
             LpBleUtil.reset(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])}"
         }
         // 恢复出厂设置
         binding.factory.setOnClickListener {
             LpBleUtil.factoryReset(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])}"
         }
         // 恢复出厂状态
         binding.factoryAll.setOnClickListener {
             LpBleUtil.factoryResetAll(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])}"
         }
 
         binding.getMtu.setOnClickListener {
-            binding.sendCmd.text = "mtu : " + LpBleUtil.getBleMtu(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = "mtu : ${LpBleUtil.getBleMtu(Constant.BluetoothConfig.currentModel[0])}"
         }
         binding.setMtu.setOnClickListener {
             var mtu = 0
@@ -433,7 +465,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FileList)
             .observe(this) { event ->
                 (event.data as Er2FileList).let {
-                    binding.info.text = it.toString()
+                    binding.info.text = "$it"
                     for (fileName in it.fileNames) {
                         if (fileName.contains("R")) {
                             fileNames.add(fileName)
@@ -454,7 +486,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Int).let {
-                    binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it / 10).toString() + "%"
+                    binding.process.text = "$readFileProcess$curFileName 读取进度: ${(it.div(10))} %"
                     mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: ${it.div(10)} %"
                 }
             }
@@ -536,7 +568,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Int).let {
-                    binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it / 10).toString() + "%"
+                    binding.process.text = "$readFileProcess$curFileName 读取进度: ${(it.div(10))} %"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete)
@@ -556,11 +588,16 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 }
             }
         //--------------------------------bp2-----------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileError)
+            .observe(this) {
+                mAlertDialog?.dismiss()
+                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList)
             .observe(this) { event ->
                 (event.data as KtBleFileList).let {
                     setReceiveCmd(it.bytes)
-                    binding.info.text = it.toString()
+                    binding.info.text = "$it"
                     for (fileName in it.fileNameList) {
                         fileNames.add(fileName)
                     }
@@ -571,7 +608,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Bp2FilePart).let {
-                    binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it.percent * 100).toInt().toString() + "%"
+                    binding.process.text = "$readFileProcess$curFileName 读取进度: ${(it.percent.times(100)).toInt()} %"
                     mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: ${it.percent.times(100)} %"
                 }
             }
@@ -607,6 +644,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 }
             }
         //--------------------------------bp2w-----------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileError)
+            .observe(this) {
+                mAlertDialog?.dismiss()
+                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wFileList)
             .observe(this) { event ->
                 (event.data as KtBleFileList).let {
@@ -615,14 +657,14 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         fileNames.add(fileName)
                     }
                     Toast.makeText(context, "bp2w 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                    binding.info.text = it.toString()
+                    binding.info.text = "$it"
                     binding.deviceInfo.text = fileNames.toString()
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Bp2FilePart).let {
-                    binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it.percent * 100).toInt().toString() + "%"
+                    binding.process.text = "$readFileProcess$curFileName 读取进度: ${(it.percent.times(100)).toInt()} %"
                     mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: ${it.percent.times(100)} %"
                 }
             }
@@ -661,8 +703,13 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wList)
             .observe(this) {
                 val data = it.data as LeBp2wBleList
-                binding.info.text = data.toString()
+                binding.info.text = "$data"
                 setReceiveCmd(data.bytes)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileError)
+            .observe(this) {
+                mAlertDialog?.dismiss()
+                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFileList)
             .observe(this) { event ->
@@ -671,7 +718,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     when (it.type) {
                         LeBp2wBleCmd.FileType.ECG_TYPE -> {
                             val data = LeBp2wEcgList(it.content)
-                            binding.info.text = data.toString()
+                            binding.info.text = "$data"
                             if (data.ecgFileList.size != 0) {
                                 for (file in data.ecgFileList) {
                                     fileNames.add(file.fileName)
@@ -683,7 +730,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         }
                         LeBp2wBleCmd.FileType.BP_TYPE -> {
                             val data = LeBp2wBpList(it.content)
-                            binding.info.text = data.toString()
+                            binding.info.text = "$data"
                             if (data.bpFileList.size != 0) {
                                 Toast.makeText(context, "le bp2w 获取血压文件列表成功 共有${data.bpFileList.size}个记录", Toast.LENGTH_SHORT).show()
                             } else {
@@ -692,7 +739,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         }
                         LeBp2wBleCmd.FileType.USER_TYPE -> {
                             val data = LeBp2wUserList(it.content)
-                            binding.info.text = data.toString()
+                            binding.info.text = "$data"
                             if (data.userList.size != 0) {
                                 Toast.makeText(context, "le bp2w 获取用户文件列表成功 共有${data.userList.size}个用户", Toast.LENGTH_SHORT).show()
                             } else {
@@ -700,15 +747,16 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             }
                         }
                         else -> {
-                            binding.info.text = it.toString()
+                            binding.info.text = "$it"
                         }
                     }
+                    binding.deviceInfo.text = fileNames.toString()
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Bp2FilePart).let {
-                    binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it.percent * 100).toInt().toString() + "%"
+                    binding.process.text = "$readFileProcess$curFileName 读取进度: ${(it.percent.times(100)).toInt()} %"
                     mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: ${it.percent.times(100)} %"
                 }
             }
@@ -741,7 +789,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (event.data as BpmBleResponse.RecordData).let {
                     setReceiveCmd(it.bytes)
                     fileCount++
-                    readFileProcess += BpmBleResponse.RecordData(it.bytes).toString() + " fileCount : $fileCount \n\n"
+                    readFileProcess += "${BpmBleResponse.RecordData(it.bytes)} fileCount : $fileCount \n\n"
                     binding.info.text = readFileProcess
                 }
             }
@@ -756,14 +804,14 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this) { event ->
                 (event.data as Pc100BleResponse.BpResult).let {
                     setReceiveCmd(it.bytes)
-                    binding.info.text = it.toString()
+                    binding.info.text = "$it"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpErrorResult)
             .observe(this) { event ->
                 (event.data as Pc100BleResponse.BpResultError).let {
                     setReceiveCmd(it.bytes)
-                    binding.info.text = it.toString()
+                    binding.info.text = "$it"
                 }
             }
         //------------------------------o2--------------------------------------
@@ -777,13 +825,13 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         }
                     }
                     Toast.makeText(context, "o2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                    binding.info.text = it.toString()
+                    binding.info.text = "$it"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Int).let {
-                    binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it / 10).toString() + "%"
+                    binding.process.text = "$readFileProcess$curFileName 读取进度: ${(it.div(10))} %"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileComplete)
@@ -806,7 +854,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempList)
             .observe(this) {
                 val data = it.data as ArrayList<Aoj20aBleResponse.TempRecord>
-                binding.info.text = data.toString()
+                binding.info.text = "$data"
                 Toast.makeText(context, "aoj20a 获取文件列表成功 共有${data.size}个文件", Toast.LENGTH_SHORT).show()
             }
         //---------------------------checkme pod--------------------------
@@ -818,13 +866,13 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListProgress)
             .observe(this) {
                 val data = it.data as Int
-                binding.process.text = "读取进度:$data%"
+                binding.process.text = "读取进度: $data %"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodFileList)
             .observe(this) {
                 val data = it.data as CheckmePodBleResponse.FileList
                 Toast.makeText(context, "checkme pod 获取文件列表成功 共有${data.size}个文件", Toast.LENGTH_SHORT).show()
-                binding.info.text = data.toString()
+                binding.info.text = "$data"
             }
         //---------------------------pc68b---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bFileList)
@@ -849,6 +897,41 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 }
                 Toast.makeText(context, "pc68b 接收文件成功 已接收${pc68bList.size}个文件, 还剩${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
             }
+        //---------------------------pc80b-----------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadFileError)
+            .observe(this) {
+                mAlertDialog?.dismiss()
+                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadingFileProgress)
+            .observe(this) {
+                if (mAlertDialog?.isShowing == false) {
+                    mAlertDialog?.show()
+                }
+                val data = it.data as Int
+                binding.process.text = "读取进度: $data %"
+                mainViewModel._downloadTip.value = "读取进度: $data %"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadFileComplete)
+            .observe(this) {
+                mAlertDialog?.dismiss()
+                val data = it.data as PC80BleResponse.ScpEcgFile
+                binding.info.text = "$data"
+                val fileName = getTimeString(data.section1.year, data.section1.month, data.section1.day, data.section1.hour, data.section1.minute, data.section1.second)
+                for (file in ecgList) {
+                    if (file.fileName == fileName)
+                        return@observe
+                }
+                val temp = EcgData()
+                temp.fileName = fileName
+                temp.recordingTime = DateUtil.getSecondTimestamp(temp.fileName)
+                temp.data = data.section6.ecgData.ecg
+                temp.shortData = DataConvert.getPc80bShortArray(data.section6.ecgData.ecg)
+                temp.duration = 30
+                ecgList.add(temp)
+                adapter.setNewInstance(ecgList)
+                adapter.notifyDataSetChanged()
+            }
         //---------------------------Pulsebit--------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileList)
             .observe(this) {
@@ -857,7 +940,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     fileNames.add(file.recordName)
                 }
                 Toast.makeText(context, "Pulsebit 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                binding.info.text = data.toString()
+                binding.info.text = "$data"
+                binding.deviceInfo.text = fileNames.toString()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileListError)
             .observe(this) {
@@ -867,7 +951,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileListProgress)
             .observe(this) {
                 val data = it.data as Int
-                binding.process.text = "读取进度:$data%"
+                binding.process.text = "读取进度: $data %"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadFileComplete)
             .observe(this) {
@@ -881,16 +965,26 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 } else {
                     mAlertDialog?.dismiss()
                 }
+                val temp = EcgData()
+                temp.recordingTime = DateUtil.getSecondTimestamp(data.fileName)
+                temp.fileName = data.fileName
+                temp.data = data.waveData
+                temp.shortData = DataConvert.getExShortArray(data.waveData)
+                temp.duration = data.recordingTime
+                ecgList.add(temp)
+                adapter.setNewInstance(ecgList)
+                adapter.notifyDataSetChanged()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadFileError)
             .observe(this) {
-                val data = it.data as Boolean
-                binding.process.text = "EventPulsebitReadFileError $data"
+                mAlertDialog?.dismiss()
+                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadingFileProgress)
             .observe(this) {
                 val data = it.data as Int
-                binding.process.text = readFileProcess + curFileName + " 读取进度:" + data.toString() + "%"
+                binding.process.text = "$readFileProcess$curFileName 读取进度: $data %"
+                mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $data %"
             }
 
         //---------------------------CheckmeLE--------------------
@@ -904,7 +998,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             fileNames.add(file.recordName)
                         }
                         Toast.makeText(context, "CheckmeLE 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                        binding.info.text = list.toString()
+                        binding.info.text = "$list"
                     }
                     CheckmeLeBleCmd.ListType.TEMP_TYPE -> {
                         val list = CheckmeLeBleResponse.TempList(data.content)
@@ -912,7 +1006,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             fileNames.add(file.recordName)
                         }
                         Toast.makeText(context, "CheckmeLE 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                        binding.info.text = list.toString()
+                        binding.info.text = "$list"
                     }
                     CheckmeLeBleCmd.ListType.ECG_TYPE -> {
                         val list = CheckmeLeBleResponse.EcgList(data.content)
@@ -920,7 +1014,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             fileNames.add(file.recordName)
                         }
                         Toast.makeText(context, "CheckmeLE 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                        binding.info.text = list.toString()
+                        binding.info.text = "$list"
                     }
                     CheckmeLeBleCmd.ListType.OXY_TYPE -> {
                         val list = CheckmeLeBleResponse.OxyList(data.content)
@@ -928,9 +1022,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             fileNames.add(file.recordName)
                         }
                         Toast.makeText(context, "CheckmeLE 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                        binding.info.text = list.toString()
+                        binding.info.text = "$list"
                     }
                 }
+                binding.deviceInfo.text = fileNames.toString()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileListError)
             .observe(this) {
@@ -940,7 +1035,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileListProgress)
             .observe(this) {
                 val data = it.data as Int
-                binding.process.text = "读取进度:$data%"
+                binding.process.text = "读取进度: $data %"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadFileComplete)
             .observe(this) {
@@ -954,16 +1049,26 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 } else {
                     mAlertDialog?.dismiss()
                 }
+                val temp = EcgData()
+                temp.recordingTime = DateUtil.getSecondTimestamp(data.fileName)
+                temp.fileName = data.fileName
+                temp.data = data.waveData
+                temp.shortData = DataConvert.getExShortArray(data.waveData)
+                temp.duration = data.recordingTime
+                ecgList.add(temp)
+                adapter.setNewInstance(ecgList)
+                adapter.notifyDataSetChanged()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadFileError)
             .observe(this) {
-                val data = it.data as Boolean
-                binding.process.text = "EventCheckmeLeReadFileError $data"
+                mAlertDialog?.dismiss()
+                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadingFileProgress)
             .observe(this) {
                 val data = it.data as Int
-                binding.process.text = readFileProcess + curFileName + " 读取进度:" + data.toString() + "%"
+                binding.process.text = "$readFileProcess$curFileName 读取进度: $data %"
+                mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $data %"
             }
 
         //--------------------------------le S1-----------------------------------
@@ -971,12 +1076,15 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this) { event ->
                 (event.data as Boolean).let {
                     binding.info.text = "没有文件 $it"
+                    mAlertDialog?.dismiss()
+                    Toast.makeText(context, "没有文件", Toast.LENGTH_SHORT).show()
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1ReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Int).let {
-                    binding.process.text = readFileProcess + curFileName + " 读取进度:" + (it / 10).toString() + "%"
+                    binding.process.text = "$readFileProcess$curFileName 读取进度: ${(it.div(10))} %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: ${(it.div(10))} %"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1ReadFileComplete)
@@ -985,13 +1093,22 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     setReceiveCmd(it.bytes)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $it \n"
                     binding.process.text = readFileProcess
+                    val temp = EcgData()
+                    temp.recordingTime = DateUtil.getSecondTimestamp("00000000000000")
+                    temp.fileName = "00000000000000"
+                    temp.data = it.ecgData
+                    temp.shortData = DataConvert.getExShortArray(it.ecgData)
+                    temp.duration = it.ecgResult?.recordingTime!!
+                    ecgList.add(temp)
+                    adapter.setNewInstance(ecgList)
+                    adapter.notifyDataSetChanged()
                 }
             }
     }
 
     private fun setReceiveCmd(bytes: ByteArray) {
         if (isReceive) {
-            binding.receiveCmd.text = "receive : " + bytesToHex(bytes)
+            binding.receiveCmd.text = "receive : ${bytesToHex(bytes)}"
         }
     }
 

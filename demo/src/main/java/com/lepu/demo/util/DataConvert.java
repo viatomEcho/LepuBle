@@ -94,6 +94,11 @@ public class DataConvert {
         return tmpInt;
     }
 
+    /**
+     * 有滤波
+     * @param data
+     * @return
+     */
     public static short[] getEr1ShortArray(byte[] data) {
         DataConvert convert = new DataConvert();
         int invalid = 0;
@@ -118,6 +123,11 @@ public class DataConvert {
         return shortfilter(shortData);
     }
 
+    /**
+     * 有滤波
+     * @param data
+     * @return
+     */
     public static short[] getBp2ShortArray(byte[] data) {
         int count = data.length >> 1;
         short[] dest = new short[count];
@@ -125,6 +135,34 @@ public class DataConvert {
             dest[i] = (short) (data[i * 2 + 1] << 8 | data[2 * i] & 0xff);
         }
         return shortfilter(dest);
+    }
+
+    /**
+     * 没有滤波
+     * @param data
+     * @return
+     */
+    public static short[] getExShortArray(byte[] data) {
+        int count = data.length >> 1;
+        short[] dest = new short[count];
+        for (int i = 0; i < count; i++) {
+            dest[i] = (short) (data[i * 2 + 1] << 8 | data[2 * i] & 0xff);
+        }
+        return dest;
+    }
+
+    /**
+     * 没有滤波
+     * @param data
+     * @return
+     */
+    public static short[] getPc80bShortArray(byte[] data) {
+        int count = data.length >> 1;
+        short[] dest = new short[count];
+        for (int i = 0; i < count; i++) {
+            dest[i] = (short) (((data[i * 2 + 1] & 0x0f) << 8 | data[2 * i] & 0xff) - 2048);
+        }
+        return dest;
     }
 
     /**

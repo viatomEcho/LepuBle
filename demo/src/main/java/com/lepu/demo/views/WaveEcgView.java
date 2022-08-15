@@ -158,6 +158,13 @@ public class WaveEcgView extends View {
                 || model == Bluetooth.MODEL_BP2W
                 || model == Bluetooth.MODEL_LE_BP2W) {
             standard1mV = 0.003089f;
+        } else if (model == Bluetooth.MODEL_PULSEBITEX
+                ||model == Bluetooth.MODEL_CHECKME_LE) {
+            standard1mV = 4033 / (32767 * 12 * 8f);
+            HZ = 250;
+        } else if (model == Bluetooth.MODEL_PC80B) {
+            standard1mV = 1 / 330f;
+            HZ = 150;
         } else {
             standard1mV = (float) ((1.0035 * 1800) / (4096 * 178.74));
         }

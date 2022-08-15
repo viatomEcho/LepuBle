@@ -13,7 +13,7 @@ import com.lepu.blepro.utils.ByteUtils.bytes2UIntBig
 import com.lepu.blepro.utils.CrcUtil
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
-import java.util.*
+import com.lepu.blepro.utils.getTimeString
 
 /**
  * pc68b指甲血氧：
@@ -132,7 +132,7 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                         if (fileName.isEmpty()) {
                             if (num != 0xFFFF) {
                                 val data = Pc68bBleResponse.DeviceTime(response.content.copyOfRange(2, 9))
-                                fileList.add(data.getTimeString())
+                                fileList.add(getTimeString(data.year, data.month, data.day, data.hour, data.minute, data.second))
                             } else {
                                 size = bytes2UIntBig(response.content[2], response.content[3])
                             }

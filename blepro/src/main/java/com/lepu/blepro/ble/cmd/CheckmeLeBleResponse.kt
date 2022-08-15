@@ -5,6 +5,7 @@ import com.lepu.blepro.utils.ByteUtils.*
 import com.lepu.blepro.utils.DateUtil.getSecondTimestamp
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.bytesToSignedShort
+import com.lepu.blepro.utils.getTimeString
 import com.lepu.blepro.utils.toUInt
 import org.json.JSONObject
 import java.util.*
@@ -151,7 +152,7 @@ object CheckmeLeBleResponse{
             index++
             oxyNormal = byte2UInt(bytes[index]) == 0
             recordName = getTimeString(year, month, day, hour, minute, second)
-            timestamp = getSecondTimestamp(getTimeString(year, month, day, hour, minute, second))
+            timestamp = getSecondTimestamp(recordName)
         }
         override fun toString(): String {
             return """
@@ -216,7 +217,7 @@ object CheckmeLeBleResponse{
             index++
             temp = bytesToFloat(bytes.copyOfRange(index, index+4))
             recordName = getTimeString(year, month, day, hour, minute, second)
-            timestamp = getSecondTimestamp(getTimeString(year, month, day, hour, minute, second))
+            timestamp = getSecondTimestamp(recordName)
         }
         override fun toString(): String {
             return """
@@ -291,7 +292,7 @@ object CheckmeLeBleResponse{
             index++
             normal = byte2UInt(bytes[index]) == 0
             recordName = getTimeString(year, month, day, hour, minute, second)
-            timestamp = getSecondTimestamp(getTimeString(year, month, day, hour, minute, second))
+            timestamp = getSecondTimestamp(recordName)
         }
         override fun toString(): String {
             return """
@@ -473,34 +474,6 @@ object CheckmeLeBleResponse{
         }
     }
 
-    fun getTimeString(year: Int, month: Int, day: Int, hour: Int, minute: Int, second: Int): String {
-        val monthStr = if (month < 10) {
-            "0$month"
-        } else {
-            "$month"
-        }
-        val dayStr = if (day < 10) {
-            "0$day"
-        } else {
-            "$day"
-        }
-        val hourStr = if (hour < 10) {
-            "0$hour"
-        } else {
-            "$hour"
-        }
-        val minuteStr = if (minute < 10) {
-            "0$minute"
-        } else {
-            "$minute"
-        }
-        val secondStr = if (second < 10) {
-            "0$second"
-        } else {
-            "$second"
-        }
-        return "$year$monthStr$dayStr$hourStr$minuteStr$secondStr"
-    }
     fun getModeMess(type: Int, mode: Int): String {
         // 0:ecg, 1:oxy
         return if (type == 1) {
