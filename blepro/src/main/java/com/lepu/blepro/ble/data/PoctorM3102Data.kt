@@ -1,6 +1,7 @@
 package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.bytesToHex
+import com.lepu.blepro.utils.isNumber
 
 class PoctorM3102Data(val bytes: ByteArray) {
 
@@ -15,34 +16,60 @@ class PoctorM3102Data(val bytes: ByteArray) {
 //    var unit: Int         // 尿酸：umol/L，血糖、血酮：mmol_L
 
     init {
+        val data = String(bytes).split(",")
         var index = 0
-        type = String(bytes.copyOfRange(index, index+1)).toInt()
+        type = if (isNumber(data[index])) {
+            data[index].toInt()
+        } else {
+            1
+        }
         index++
-        index++
-        if (bytes.size == 31) {
+        if (data.size == 9) {
             normal = true
-            year = String(bytes.copyOfRange(index, index + 4)).toInt()
-            index += 4
+            year = if (isNumber(data[index])) {
+                data[index].toInt()
+            } else {
+                0
+            }
             index++
-            month = String(bytes.copyOfRange(index, index + 2)).toInt()
-            index += 2
+            month = if (isNumber(data[index])) {
+                data[index].toInt()
+            } else {
+                0
+            }
             index++
-            day = String(bytes.copyOfRange(index, index + 2)).toInt()
-            index += 2
+            day = if (isNumber(data[index])) {
+                data[index].toInt()
+            } else {
+                0
+            }
             index++
-            hour = String(bytes.copyOfRange(index, index + 2)).toInt()
-            index += 2
+            hour = if (isNumber(data[index])) {
+                data[index].toInt()
+            } else {
+                0
+            }
             index++
-            minute = String(bytes.copyOfRange(index, index + 2)).toInt()
-            index += 2
+            minute = if (isNumber(data[index])) {
+                data[index].toInt()
+            } else {
+                0
+            }
             index++
-            result = String(bytes.copyOfRange(index, index + 4)).toInt()
-            index += 4
+            result = if (isNumber(data[index])) {
+                data[index].toInt()
+            } else {
+                1
+            }
             index++
 //            unit = String(bytes.copyOfRange(index, index + 1)).toInt()
         } else {
             normal = false
-            result = String(bytes.copyOfRange(index, index+1)).toInt()
+            result = if (isNumber(data[index])) {
+                data[index].toInt()
+            } else {
+                1
+            }
         }
     }
 
