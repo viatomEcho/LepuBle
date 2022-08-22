@@ -431,8 +431,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (event.data as String).let {
                     binding.info.text = it
                     for (fileName in it.split(",")) {
-                        if (fileName.contains("R")) {
-//                        if (fileName.isNotEmpty()) {
+//                        if (fileName.contains("R")) {
+                        if (fileName.isNotEmpty()) {
                             fileNames.add(fileName)
                         }
 //                        }
@@ -471,23 +471,29 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileComplete)
             .observe(this) { event ->
                 (event.data as Er1BleResponse.Er1File).let {
-                    if (it.fileName.contains("R")) {
-                        val data = Er1EcgFile(it.content)
+                    if (event.model == Bluetooth.MODEL_ER1_N) {
+                        val data = VBeatHrFile(it.content)
                         binding.info.text = "$data"
-                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                        val temp = EcgData()
-                        temp.recordingTime = DateUtil.getSecondTimestamp(it.fileName.replace("R", ""))
-                        temp.fileName = it.fileName
-                        temp.data = data.waveData
-                        temp.shortData = DataConvert.getEr1ShortArray(data.waveData)
-                        temp.duration = data.recordingTime
-                        ecgList.add(temp)
-                        ecgAdapter.setNewInstance(ecgList)
-                        ecgAdapter.notifyDataSetChanged()
+                        binding.deviceInfo.text = "$data"
                     } else {
-                        val data = Er2AnalysisFile(it.content)
-                        binding.info.text = "$data"
-                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                        if (it.fileName.contains("R")) {
+                            val data = Er1EcgFile(it.content)
+                            binding.info.text = "$data"
+                            readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                            val temp = EcgData()
+                            temp.recordingTime = DateUtil.getSecondTimestamp(it.fileName.replace("R", ""))
+                            temp.fileName = it.fileName
+                            temp.data = data.waveData
+                            temp.shortData = DataConvert.getEr1ShortArray(data.waveData)
+                            temp.duration = data.recordingTime
+                            ecgList.add(temp)
+                            ecgAdapter.setNewInstance(ecgList)
+                            ecgAdapter.notifyDataSetChanged()
+                        } else {
+                            val data = Er2AnalysisFile(it.content)
+                            binding.info.text = "$data"
+                            readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                        }
                     }
                     setReceiveCmd(it.content)
                     binding.process.text = readFileProcess
