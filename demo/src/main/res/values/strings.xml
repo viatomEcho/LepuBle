@@ -36,5 +36,6 @@
     <string name="version">版本</string>
     <string name="ok">确认</string>
     <string name="upgrade_unsuccessful">升级失败，请断电重启</string>
+    <string name="low">≥</string>
 
 </resources>

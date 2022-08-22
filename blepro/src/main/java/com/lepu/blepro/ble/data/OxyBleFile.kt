@@ -109,8 +109,11 @@ class OxyBleFile(val bytes: ByteArray) {
     class EachData(val bytes: ByteArray) {
         var spo2: Int
         var pr: Int
-        var vector: Int
-        // reserved 1
+        var vector: Int                  // 加速度值，体动
+        var warningSignSpo2: Boolean     // "低血氧告警"标记
+        var warningSignPr: Boolean       // "脉率告警"标记
+        var warningSignVector: Boolean   // "体动告警"标记
+        var warningSignInvalid: Boolean  // "无效值告警"标记
         init {
             var index = 0
             spo2 = byte2UInt(bytes[index])
@@ -118,6 +121,11 @@ class OxyBleFile(val bytes: ByteArray) {
             pr = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
             vector = byte2UInt(bytes[index])
+            index++
+            warningSignSpo2 = (byte2UInt(bytes[index]) and 0x80) == 1
+            warningSignPr = (byte2UInt(bytes[index]) and 0x40) == 1
+            warningSignVector = (byte2UInt(bytes[index]) and 0x20) == 1
+            warningSignInvalid = (byte2UInt(bytes[index]) and 0x10) == 1
         }
         override fun toString(): String {
             return """
@@ -126,6 +134,10 @@ class OxyBleFile(val bytes: ByteArray) {
                 spo2 : $spo2
                 pr : $pr
                 vector : $vector
+                warningSignSpo2 : $warningSignSpo2
+                warningSignPr : $warningSignPr
+                warningSignVector : $warningSignVector
+                warningSignInvalid : $warningSignInvalid
             """.trimIndent()
         }
     }

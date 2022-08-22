@@ -398,11 +398,17 @@ class BleServiceHelper private constructor() {
      * @param name String
      */
     @JvmOverloads
-    fun reconnect(scanModel: Int, name: String, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
+    fun reconnect(scanModel: Int? = null, name: String, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnect 名称重连单个model")
         if (!checkService()) return
 //        bleService.reconnect(intArrayOf(scanModel), arrayOf(name), needPair, toConnectUpdater)
-        LpWorkManager.reconnect(intArrayOf(scanModel), arrayOf(name), needPair, toConnectUpdater)
+        // 规避vihealth连接设备后回到首页扫描时，设备断开连接自动开启指定扫描覆盖首页扫描问题
+        // 因此sdk调用自动重连时不做scanModel过滤
+        if (scanModel == null) {
+            LpWorkManager.reconnect(null, arrayOf(name), needPair, toConnectUpdater)
+        } else {
+            LpWorkManager.reconnect(intArrayOf(scanModel), arrayOf(name), needPair, toConnectUpdater)
+        }
 
     }
 
@@ -428,11 +434,15 @@ class BleServiceHelper private constructor() {
      * @param macAddress String
      */
     @JvmOverloads
-    fun reconnectByAddress(scanModel: Int, macAddress: String, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
+    fun reconnectByAddress(scanModel: Int? = null, macAddress: String, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress 地址重连单个model")
         if (!checkService()) return
 //        bleService.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress), needPair, toConnectUpdater)
-        LpWorkManager.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress), needPair, toConnectUpdater)
+        if (scanModel == null) {
+            LpWorkManager.reconnectByAddress(null, arrayOf(macAddress), needPair, toConnectUpdater)
+        } else {
+            LpWorkManager.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress), needPair, toConnectUpdater)
+        }
 
     }
 

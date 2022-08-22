@@ -184,10 +184,21 @@
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rcv"
+                android:id="@+id/ecg_rcv"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/dp_10">
+                android:layout_height="wrap_content">
+
+            </androidx.recyclerview.widget.RecyclerView>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/oxy_rcv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </androidx.recyclerview.widget.RecyclerView>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/bp_rcv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
             </androidx.recyclerview.widget.RecyclerView>
 
@@ -224,7 +235,6 @@
                 android:text="(以下是数据解析日志)"
                 android:layout_marginTop="50dp"/>
             <TextView
-                android:visibility="gone"
                 android:id="@+id/info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

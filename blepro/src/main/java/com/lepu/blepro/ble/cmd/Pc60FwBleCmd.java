@@ -16,12 +16,12 @@ public class Pc60FwBleCmd {
     public static final int CMD_GET_DEVICE_SN = 0x82;
     public static final int MSG_GET_DEVICE_SN = 0x02;
     public static final int MSG_GET_BATTERY = 0x03;
-    public static final int CMD_GET_CODE = 0x84;
-    public static final int MSG_GET_CODE = 0x04;
-    public static final int CMD_SET_CODE = 0x85;
-    public static final int MSG_SET_CODE = 0x05;
     public static final int CMD_GET_DEVICE_MAC = 0xA1;
     public static final int MSG_GET_DEVICE_MAC = 0x21;
+    public static final int CMD_GET_CODE = 0xC1;
+    public static final int MSG_GET_CODE = 0x41;
+    public static final int CMD_SET_CODE = 0xC2;
+    public static final int MSG_SET_CODE = 0x42;
 
     public static final int TOKEN_0F = 0x0F;
     public static final int MSG_RT_PARAM = 0x01;

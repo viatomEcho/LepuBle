@@ -3,6 +3,7 @@ package com.lepu.demo.ui.notifications
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -21,11 +22,17 @@ import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.getTimeString
 import com.lepu.demo.*
+import com.lepu.demo.ble.BpAdapter
 import com.lepu.demo.ble.EcgAdapter
 import com.lepu.demo.ble.LpBleUtil
+import com.lepu.demo.ble.OxyAdapter
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.ecgData
+import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.oxyData
+import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.bpData
+import com.lepu.demo.data.BpData
 import com.lepu.demo.data.EcgData
+import com.lepu.demo.data.OxyData
 import com.lepu.demo.databinding.FragmentInfoBinding
 import com.lepu.demo.util.DataConvert
 
@@ -48,8 +55,14 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
     private var pc68bList = mutableListOf<Pc68bBleResponse.Record>()
 
-    private lateinit var adapter: EcgAdapter
+    private lateinit var ecgAdapter: EcgAdapter
     var ecgList: ArrayList<EcgData> = arrayListOf()
+
+    private lateinit var oxyAdapter: OxyAdapter
+    var oxyList: ArrayList<OxyData> = arrayListOf()
+
+    private lateinit var bpAdapter: BpAdapter
+    var bpList: ArrayList<BpData> = arrayListOf()
 
     var mAlertDialog: AlertDialog? = null
 
@@ -80,12 +93,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
         LinearLayoutManager(context).apply {
             this.orientation = LinearLayoutManager.VERTICAL
-            binding.rcv.layoutManager = this
+            binding.ecgRcv.layoutManager = this
         }
-        adapter = EcgAdapter(R.layout.device_item, null).apply {
-            binding.rcv.adapter = this
+        ecgAdapter = EcgAdapter(R.layout.device_item, null).apply {
+            binding.ecgRcv.adapter = this
         }
-        adapter.setOnItemClickListener { adapter, view, position ->
+        ecgAdapter.setOnItemClickListener { adapter, view, position ->
             if (adapter.data.size > 0) {
                 (adapter.getItem(position) as EcgData).let {
                     val intent = Intent(context, WaveEcgActivity::class.java)
@@ -98,6 +111,30 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     startActivity(intent)
                 }
             }
+        }
+        LinearLayoutManager(context).apply {
+            this.orientation = LinearLayoutManager.VERTICAL
+            binding.oxyRcv.layoutManager = this
+        }
+        oxyAdapter = OxyAdapter(R.layout.device_item, null).apply {
+            binding.oxyRcv.adapter = this
+        }
+        oxyAdapter.setOnItemClickListener { adapter, view, position ->
+            if (adapter.data.size > 0) {
+                (adapter.getItem(position) as OxyData).let {
+                    val intent = Intent(context, OxyDataActivity::class.java)
+                    oxyData.fileName = it.fileName
+                    oxyData.oxyBleFile = it.oxyBleFile
+                    startActivity(intent)
+                }
+            }
+        }
+        LinearLayoutManager(context).apply {
+            this.orientation = LinearLayoutManager.VERTICAL
+            binding.bpRcv.layoutManager = this
+        }
+        bpAdapter = BpAdapter(R.layout.device_item, null).apply {
+            binding.bpRcv.adapter = this
         }
 
         if (isReceive) {
@@ -253,8 +290,14 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             fileCount = 0
             fileNames.clear()
             ecgList.clear()
-            adapter.setNewInstance(ecgList)
-            adapter.notifyDataSetChanged()
+            ecgAdapter.setNewInstance(ecgList)
+            ecgAdapter.notifyDataSetChanged()
+            oxyList.clear()
+            oxyAdapter.setNewInstance(oxyList)
+            oxyAdapter.notifyDataSetChanged()
+            bpList.clear()
+            bpAdapter.setNewInstance(bpList)
+            bpAdapter.notifyDataSetChanged()
         }
         // 获取文件列表
         binding.getFileList.setOnClickListener {
@@ -262,8 +305,14 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             fileNames.clear()
             pc68bList.clear()
             ecgList.clear()
-            adapter.setNewInstance(ecgList)
-            adapter.notifyDataSetChanged()
+            ecgAdapter.setNewInstance(ecgList)
+            ecgAdapter.notifyDataSetChanged()
+            oxyList.clear()
+            oxyAdapter.setNewInstance(oxyList)
+            oxyAdapter.notifyDataSetChanged()
+            bpList.clear()
+            bpAdapter.setNewInstance(bpList)
+            bpAdapter.notifyDataSetChanged()
 
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
@@ -314,8 +363,14 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             readFileProcess = ""
             mAlertDialog?.show()
             ecgList.clear()
-            adapter.setNewInstance(ecgList)
-            adapter.notifyDataSetChanged()
+            ecgAdapter.setNewInstance(ecgList)
+            ecgAdapter.notifyDataSetChanged()
+            oxyList.clear()
+            oxyAdapter.setNewInstance(oxyList)
+            oxyAdapter.notifyDataSetChanged()
+            bpList.clear()
+            bpAdapter.setNewInstance(bpList)
+            bpAdapter.notifyDataSetChanged()
             readFile()
         }
         // 暂停读取文件
@@ -427,8 +482,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         temp.shortData = DataConvert.getEr1ShortArray(data.waveData)
                         temp.duration = data.recordingTime
                         ecgList.add(temp)
-                        adapter.setNewInstance(ecgList)
-                        adapter.notifyDataSetChanged()
+                        ecgAdapter.setNewInstance(ecgList)
+                        ecgAdapter.notifyDataSetChanged()
                     } else {
                         val data = Er2AnalysisFile(it.content)
                         binding.info.text = "$data"
@@ -504,8 +559,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         temp.shortData = DataConvert.getEr1ShortArray(data.waveData)
                         temp.duration = data.recordingTime
                         ecgList.add(temp)
-                        adapter.setNewInstance(ecgList)
-                        adapter.notifyDataSetChanged()
+                        ecgAdapter.setNewInstance(ecgList)
+                        ecgAdapter.notifyDataSetChanged()
                     } else {
                         val data = Er2AnalysisFile(it.content)
                         binding.info.text = "$data"
@@ -626,12 +681,21 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         temp.shortData = DataConvert.getBp2ShortArray(data.waveData)
                         temp.duration = data.recordingTime
                         ecgList.add(temp)
-                        adapter.setNewInstance(ecgList)
-                        adapter.notifyDataSetChanged()
+                        ecgAdapter.setNewInstance(ecgList)
+                        ecgAdapter.notifyDataSetChanged()
                     } else if (it.type == 1) {
                         val data = Bp2BpFile(it.content)
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                        val temp = BpData()
+                        temp.fileName = it.name
+                        temp.sys = data.sys
+                        temp.dia = data.dia
+                        temp.pr = data.pr
+                        temp.mean = data.mean
+                        bpList.add(temp)
+                        bpAdapter.setNewInstance(bpList)
+                        bpAdapter.notifyDataSetChanged()
                     }
                     binding.process.text = readFileProcess
                     setReceiveCmd(it.content)
@@ -682,12 +746,21 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         temp.shortData = DataConvert.getBp2ShortArray(data.waveData)
                         temp.duration = data.recordingTime
                         ecgList.add(temp)
-                        adapter.setNewInstance(ecgList)
-                        adapter.notifyDataSetChanged()
+                        ecgAdapter.setNewInstance(ecgList)
+                        ecgAdapter.notifyDataSetChanged()
                     } else if (it.type == 1) {
                         val data = Bp2BpFile(it.content)
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
+                        val temp = BpData()
+                        temp.fileName = it.name
+                        temp.sys = data.sys
+                        temp.dia = data.dia
+                        temp.pr = data.pr
+                        temp.mean = data.mean
+                        bpList.add(temp)
+                        bpAdapter.setNewInstance(bpList)
+                        bpAdapter.notifyDataSetChanged()
                     }
                     binding.process.text = readFileProcess
                     setReceiveCmd(it.content)
@@ -736,6 +809,17 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             } else {
                                 Toast.makeText(context, "le bp2w 获取血压文件列表为空", Toast.LENGTH_SHORT).show()
                             }
+                            for (file in data.bpFileList) {
+                                val temp = BpData()
+                                temp.fileName = file.fileName
+                                temp.sys = file.sys
+                                temp.dia = file.dia
+                                temp.pr = file.pr
+                                temp.mean = file.mean
+                                bpList.add(temp)
+                                bpAdapter.setNewInstance(bpList)
+                                bpAdapter.notifyDataSetChanged()
+                            }
                         }
                         LeBp2wBleCmd.FileType.USER_TYPE -> {
                             val data = LeBp2wUserList(it.content)
@@ -779,8 +863,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     temp.shortData = DataConvert.getBp2ShortArray(it.waveData)
                     temp.duration = it.waveData.size.div(2*250)
                     ecgList.add(temp)
-                    adapter.setNewInstance(ecgList)
-                    adapter.notifyDataSetChanged()
+                    ecgAdapter.setNewInstance(ecgList)
+                    ecgAdapter.notifyDataSetChanged()
                 }
             }
         //------------------------------bpm--------------------------------------
@@ -791,6 +875,14 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     fileCount++
                     readFileProcess += "${BpmBleResponse.RecordData(it.bytes)} fileCount : $fileCount \n\n"
                     binding.info.text = readFileProcess
+                    val temp = BpData()
+                    temp.fileName = getTimeString(it.year, it.month, it.day, it.hour, it.minute, 0)
+                    temp.sys = it.sys
+                    temp.dia = it.dia
+                    temp.pr = it.pr
+                    bpList.add(temp)
+                    bpAdapter.setNewInstance(bpList)
+                    bpAdapter.notifyDataSetChanged()
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordEnd)
@@ -848,6 +940,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     } else {
                         mAlertDialog?.dismiss()
                     }
+                    val temp = OxyData()
+                    temp.fileName = getTimeString(data.year, data.month, data.day, data.hour, data.minute, data.second)
+                    temp.oxyBleFile = data
+                    oxyList.add(temp)
+                    oxyAdapter.setNewInstance(oxyList)
+                    oxyAdapter.notifyDataSetChanged()
                 }
             }
         //---------------------------aoj20a-----------------------------
@@ -929,8 +1027,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 temp.shortData = DataConvert.getPc80bShortArray(data.section6.ecgData.ecg)
                 temp.duration = 30
                 ecgList.add(temp)
-                adapter.setNewInstance(ecgList)
-                adapter.notifyDataSetChanged()
+                ecgAdapter.setNewInstance(ecgList)
+                ecgAdapter.notifyDataSetChanged()
             }
         //---------------------------Pulsebit--------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileList)
@@ -972,8 +1070,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 temp.shortData = DataConvert.getExShortArray(data.waveData)
                 temp.duration = data.recordingTime
                 ecgList.add(temp)
-                adapter.setNewInstance(ecgList)
-                adapter.notifyDataSetChanged()
+                ecgAdapter.setNewInstance(ecgList)
+                ecgAdapter.notifyDataSetChanged()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadFileError)
             .observe(this) {
@@ -1056,8 +1154,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 temp.shortData = DataConvert.getExShortArray(data.waveData)
                 temp.duration = data.recordingTime
                 ecgList.add(temp)
-                adapter.setNewInstance(ecgList)
-                adapter.notifyDataSetChanged()
+                ecgAdapter.setNewInstance(ecgList)
+                ecgAdapter.notifyDataSetChanged()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadFileError)
             .observe(this) {
@@ -1100,8 +1198,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     temp.shortData = DataConvert.getExShortArray(it.ecgData)
                     temp.duration = it.ecgResult?.recordingTime!!
                     ecgList.add(temp)
-                    adapter.setNewInstance(ecgList)
-                    adapter.notifyDataSetChanged()
+                    ecgAdapter.setNewInstance(ecgList)
+                    ecgAdapter.notifyDataSetChanged()
                 }
             }
     }

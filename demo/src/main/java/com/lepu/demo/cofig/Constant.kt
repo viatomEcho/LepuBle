@@ -2,7 +2,9 @@ package com.lepu.demo.cofig
 
 import android.util.SparseArray
 import com.lepu.blepro.objs.Bluetooth
+import com.lepu.demo.data.BpData
 import com.lepu.demo.data.EcgData
+import com.lepu.demo.data.OxyData
 
 /**
  * author: wujuan
@@ -127,6 +129,8 @@ class Constant{
 
 
             var ecgData = EcgData()
+            var oxyData = OxyData()
+            var bpData = BpData()
 
 
         }

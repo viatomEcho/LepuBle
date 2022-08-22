@@ -3,6 +3,7 @@ package com.lepu.blepro.ble.data
 import com.lepu.blepro.utils.HexString.hexToBytes
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.bytesToHex
+import com.lepu.blepro.utils.isNumber
 import com.lepu.blepro.utils.toIntBig
 
 class Lpm311Data(val bytes: ByteArray) {
@@ -23,17 +24,41 @@ class Lpm311Data(val bytes: ByteArray) {
 
     init {
         var index = 0
-        year = String(bytes.copyOfRange(index, index+4)).toInt()
+        year = if (isNumber(String(bytes.copyOfRange(index, index+4)))) {
+            String(bytes.copyOfRange(index, index+4)).toInt()
+        } else {
+            0
+        }
         index += 4
-        month = String(bytes.copyOfRange(index, index+2)).toInt()
+        month = if (isNumber(String(bytes.copyOfRange(index, index+2)))) {
+            String(bytes.copyOfRange(index, index+2)).toInt()
+        } else {
+            0
+        }
         index += 2
-        day = String(bytes.copyOfRange(index, index+2)).toInt()
+        day = if (isNumber(String(bytes.copyOfRange(index, index+2)))) {
+            String(bytes.copyOfRange(index, index+2)).toInt()
+        } else {
+            0
+        }
         index += 2
-        hour = String(bytes.copyOfRange(index, index+2)).toInt()
+        hour = if (isNumber(String(bytes.copyOfRange(index, index+2)))) {
+            String(bytes.copyOfRange(index, index+2)).toInt()
+        } else {
+            0
+        }
         index += 2
-        minute = String(bytes.copyOfRange(index, index+2)).toInt()
+        minute = if (isNumber(String(bytes.copyOfRange(index, index+2)))) {
+            String(bytes.copyOfRange(index, index+2)).toInt()
+        } else {
+            0
+        }
         index += 2
-        second = String(bytes.copyOfRange(index, index+2)).toInt()
+        second = if (isNumber(String(bytes.copyOfRange(index, index+2)))) {
+            String(bytes.copyOfRange(index, index+2)).toInt()
+        } else {
+            0
+        }
         index += 2
         index++
         chol = toIntBig(hexToBytes(String(bytes.copyOfRange(index, index+8)))).toDouble()
@@ -43,7 +68,11 @@ class Lpm311Data(val bytes: ByteArray) {
         trig = toIntBig(hexToBytes(String(bytes.copyOfRange(index, index+8)))).toDouble()
         index += 8
         index++
-        unit = String(bytes.copyOfRange(index, index+1)).toInt()
+        unit = if (isNumber(String(bytes.copyOfRange(index, index+1)))) {
+            String(bytes.copyOfRange(index, index+1)).toInt()
+        } else {
+            0
+        }
         index++
         user = trimStr(String(bytes.copyOfRange(index, bytes.size)))
         if (unit == 0) {

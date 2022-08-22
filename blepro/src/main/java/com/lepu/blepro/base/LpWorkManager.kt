@@ -484,7 +484,7 @@ object LpWorkManager {
      *
      * 蓝牙名一致的设备重连不能使用蓝牙名重连方法
      */
-    fun reconnect(scanModel : IntArray,reconnectDeviceName: Array<String>, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
+    fun reconnect(scanModel : IntArray? = null,reconnectDeviceName: Array<String>, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
 
         if (vailFace.isEmpty()){
             LepuBleLog.d(tag, "reconnect vailFace.isEmpty()")
@@ -506,7 +506,7 @@ object LpWorkManager {
             setScanDefineDevice(false, false, "")
             startDiscover(scanModel, needPair, isReconnecting = true)
         }
-        LepuBleLog.d(tag, "reconnect: scanModel=> ${scanModel.joinToString()} reconnectDeviceName=> ${reconnectDeviceName.joinToString()} ReScan: $reScan")
+        LepuBleLog.d(tag, "reconnect: scanModel=> ${scanModel?.joinToString()} reconnectDeviceName=> ${reconnectDeviceName.joinToString()} ReScan: $reScan")
     }
 
 
@@ -516,7 +516,7 @@ object LpWorkManager {
      *
      * 蓝牙名一致的设备重连必须使用蓝牙地址重连方法
      */
-    fun reconnectByAddress(scanModel: IntArray, reconnectDeviceAddress: Array<String>, needPair: Boolean,  toConnectUpdater: Boolean = false) {
+    fun reconnectByAddress(scanModel: IntArray? = null, reconnectDeviceAddress: Array<String>, needPair: Boolean,  toConnectUpdater: Boolean = false) {
 
         if (vailFace.isEmpty()) {
             LepuBleLog.d(tag, "reconnectByAddress vailFace.isEmpty()")

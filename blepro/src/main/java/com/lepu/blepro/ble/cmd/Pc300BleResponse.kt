@@ -323,7 +323,7 @@ object Pc300BleResponse {
 
     @ExperimentalUnsignedTypes
     class RtEcgWave(val bytes: ByteArray, var gain: Float) {
-        var seqNo: Int
+        var seqNo: Int             // 准备阶段是0
         var digit: Int
         var tempData: Float
 //        var sign: Boolean

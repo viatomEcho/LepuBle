@@ -110,7 +110,7 @@ public class StringUtil {
 	}
 
 	public static boolean isNumber(String name) {
-		String str = "[0-9]*";
+		String str = "[0-9]+";
 		Pattern p = Pattern.compile(str);
 		Matcher m = p.matcher(name);
 		return m.matches();
