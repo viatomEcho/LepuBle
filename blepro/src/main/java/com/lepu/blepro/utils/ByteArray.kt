@@ -141,3 +141,7 @@ fun byteToPointHex(bytes: Byte): String {
     hexChars[1] = HEX_ARRAY.get(v and 0x0F)
     return hexChars[0]+"."+hexChars[1]
 }
+fun byteToPointStr(bytes: Byte): String {
+    val v: Int = bytes.toInt() and 0xFF
+    return "${(v ushr 4)}.${(v and 0x0F)}"
+}
