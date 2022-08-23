@@ -91,7 +91,7 @@ class BpmBleInterface(model: Int): BleInterface(model) {
         when(BpmBleCmd.getMsgType(bytes)) {
             BpmBleCmd.BPMCmd.MSG_TYPE_GET_INFO -> {
                 //设备信息
-                val deviceInfo = BpmDeviceInfo(bytes, device.name)
+                val deviceInfo = BpmDeviceInfo(bytes, bluetooth.name)
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmInfo).post(InterfaceEvent(model, deviceInfo))

@@ -310,6 +310,17 @@ class BleServiceHelper private constructor() {
             return null
         }
     }
+    fun getCurrentBluetooth(model: Int): Bluetooth? {
+        if (!checkService()) return null
+        val vailFace = LpWorkManager.vailFace
+        LepuBleLog.d(tag, "getCurrentBluetooth => currentModel：$model, vailFaceSize：${vailFace.size()}}")
+        vailFace.get(model)?.let {
+            return vailFace.get(model).bluetooth
+        }?: kotlin.run {
+            LepuBleLog.e(tag, "current model $model unsupported!!")
+            return null
+        }
+    }
 
     /**
      * 获取model的interface

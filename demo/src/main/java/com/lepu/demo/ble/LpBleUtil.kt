@@ -126,6 +126,9 @@ class LpBleUtil {
         fun getCurrentDevice(model: Int): BluetoothDevice? {
             return BleServiceHelper.getCurrentDevice(model)
         }
+        fun getCurrentBluetooth(model: Int): Bluetooth? {
+            return BleServiceHelper.getCurrentBluetooth(model)
+        }
 
         fun setInterface(model: Int, needClear: Boolean){
             clearInterface()

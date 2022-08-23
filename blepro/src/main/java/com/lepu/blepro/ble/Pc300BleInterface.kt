@@ -64,7 +64,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                     }
                     GET_DEVICE_NAME -> {
                         val data = trimStr(toString(response.content))
-                        pc300Device.deviceName = data
+                        pc300Device.deviceName = bluetooth.name
                         LepuBleLog.d(tag, "model:$model,GET_DEVICE_NAME 查询产品名称 => success $data")
                     }
                     DEVICE_INFO_2 -> {
