@@ -85,7 +85,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             GET_INFO -> {
                 LepuBleLog.d(tag, "model:$model,CMD_INFO => success")
 
-                val info = Bp2DeviceInfo(bleResponse.content, device.name)
+                val info = Bp2DeviceInfo(bleResponse.content, bluetooth.name)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Info)
                     .post(InterfaceEvent(model, info))
                 if (runRtImmediately) {
@@ -105,7 +105,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,CMD_FILE_LIST => success")
                 //发送实时state : byte
                 if (bleResponse.content.isNotEmpty()) {
-                    val list = KtBleFileList(bleResponse.content, device.name)
+                    val list = KtBleFileList(bleResponse.content, bluetooth.name)
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList)
                         .post(InterfaceEvent(model, list))
                 }
@@ -177,7 +177,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
                 fileContent?.let {
                     if (it.isNotEmpty()) {
-                        val file = Bp2BleFile(fileName, it, device.name)
+                        val file = Bp2BleFile(fileName, it, bluetooth.name)
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileComplete)
                             .post(InterfaceEvent(model, file))
                     }

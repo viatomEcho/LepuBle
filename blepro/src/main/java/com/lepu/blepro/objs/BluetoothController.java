@@ -1,5 +1,7 @@
 package com.lepu.blepro.objs;
 
+import android.bluetooth.BluetoothDevice;
+
 import com.lepu.blepro.utils.LepuBleLog;
 import java.util.ArrayList;
 
@@ -113,4 +115,14 @@ public class BluetoothController {
         }
         return null;
     }
+
+    synchronized public static Bluetooth getCurrentBluetooth(BluetoothDevice device) {
+        for (Bluetooth b : bleDevices) {
+            if (b.getMacAddr().equals(device.getAddress())) {
+                return b;
+            }
+        }
+        return null;
+    }
+
 }

@@ -53,7 +53,7 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                     Pc100BleCmd.HAND_SHAKE -> {
                         LepuBleLog.d(tag, "model:$model,HAND_SHAKE => success")
                         val str = toString(response.content).split(":")
-                        pc100Device.deviceName = device.name
+                        pc100Device.deviceName = bluetooth.name
                         pc100Device.sn = str[1]
                         LepuBleLog.d(tag, "model:$model,HAND_SHAKE deviceName => " + toString(response.content))
                         LepuBleLog.d(tag, "model:$model,HAND_SHAKE sn => " + pc100Device.sn)
