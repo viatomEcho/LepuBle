@@ -616,7 +616,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
             Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
-            Bluetooth.MODEL_S7W -> {
+            Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
+            Bluetooth.MODEL_S6W1 -> {
                 return inter is Pc60FwBleInterface
             }
             Bluetooth.MODEL_PC80B -> {
@@ -2275,7 +2276,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
             Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
-            Bluetooth.MODEL_S7W -> {
+            Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
+            Bluetooth.MODEL_S6W1 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc60FwBleInterface).let {
                         LepuBleLog.d(tag, "it as Pc60FwBleInterface--pc60fwGetBranchCode")
@@ -2295,7 +2297,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
             Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
-            Bluetooth.MODEL_S7W  -> {
+            Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
+            Bluetooth.MODEL_S6W1 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc60FwBleInterface).let {
                         LepuBleLog.d(tag, "it as Pc60FwBleInterface--pc60fwSetBranchCode")

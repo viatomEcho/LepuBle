@@ -37,7 +37,9 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             Bluetooth.MODEL_POD2B,
             Bluetooth.MODEL_S5W,
             Bluetooth.MODEL_S6W,
+            Bluetooth.MODEL_S6W1,
             Bluetooth.MODEL_S7W,
+            Bluetooth.MODEL_S7BW,
             Bluetooth.MODEL_OXYSMART,
             Bluetooth.MODEL_PF_20 -> Pc60FwBleManager(context)
             else -> Pc6nBleManager(context)

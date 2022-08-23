@@ -198,7 +198,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      *           MODEL_POD_1W, MODEL_POD2B, MODEL_PC_60NW_1,
      *           MODEL_PC_60B, MODEL_PF_10A, MODEL_PF_10B,
      *           MODEL_PF_20A, MODEL_PF_20B, MODEL_PC_60NW
-     *           MODEL_S5W, MODEL_S6W, MODEL_S7W
+     *           MODEL_S5W, MODEL_S6W, MODEL_S7W, MODEL_S7BW,
+     *           MODEL_S6W1
      */
     interface PC60Fw {
         companion object {
