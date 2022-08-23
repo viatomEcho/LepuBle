@@ -211,6 +211,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventPC60FwDeviceInfo = "com.lepu.ble.pc60fw.device.info"        // 设备信息 DeviceInfo
             const val EventPC60FwWorkingStatus = "com.lepu.ble.pc60fw.working.status"  // 工作状态 WorkingStatus
             const val EventPC60FwPpgData = "com.lepu.ble.pc60fw.ppg.data"              // 红外数据 PpgData
+            const val EventPC60FwSetCode = "com.lepu.ble.pc60fw.set.code"              // 设置code boolean
+            const val EventPC60FwGetCode = "com.lepu.ble.pc60fw.get.code"              // 获取code String
         }
     }
 

@@ -2554,9 +2554,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this) {
                 var data = it.data as Int
                 binding.content.text = "电量${data.toString()}"
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20GetConfigResult)
-            .observe(this, {
+            .observe(this) {
                 var data = it.data as GetConfigResult
 //                setReceiveCmd(data.bytes)
                 binding.content.text = data.toString()

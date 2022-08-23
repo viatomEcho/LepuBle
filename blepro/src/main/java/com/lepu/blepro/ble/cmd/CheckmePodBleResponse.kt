@@ -1,11 +1,8 @@
 package com.lepu.blepro.ble.cmd
 
+import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.ByteUtils.toSignedShort
-import com.lepu.blepro.utils.DateUtil
-import com.lepu.blepro.utils.LepuBleLog
-import com.lepu.blepro.utils.bytesToHex
-import com.lepu.blepro.utils.toUInt
 import org.json.JSONObject
 import java.util.*
 
@@ -277,7 +274,7 @@ class CheckmePodBleResponse{
             pi = byte2UInt(bytes[index]).div(10f)
             index++
             temp = toUInt(bytes.copyOfRange(index, index+2)).div(10f)
-            recordName = CheckmeLeBleResponse.getTimeString(year, month, day, hour, minute, second)
+            recordName = getTimeString(year, month, day, hour, minute, second)
             timestamp = DateUtil.getSecondTimestamp(recordName)
         }
 
