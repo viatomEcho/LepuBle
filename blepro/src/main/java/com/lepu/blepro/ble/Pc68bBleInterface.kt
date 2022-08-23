@@ -60,6 +60,7 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
         when (response.token) {
             Pc68bBleCmd.TOKEN_F0 -> {
                 when (response.type) {
+                    // 定制版
                     Pc68bBleCmd.MSG_GET_DEVICE_SN -> {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_DEVICE_SN => success")
                         deviceInfo.sn = com.lepu.blepro.utils.toString(response.content)
@@ -99,11 +100,13 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bRtWave).post(InterfaceEvent(model, data))
                     }
+                    // 定制版
                     Pc68bBleCmd.MSG_SET_TIME -> {
                         LepuBleLog.d(tag, "model:$model,MSG_SET_TIME => success")
                         LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bSetTime).post(InterfaceEvent(model, true))
                     }
+                    // 定制版
                     Pc68bBleCmd.MSG_GET_OR_SET_CONFIG -> {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_OR_SET_CONFIG => success")
                         val data = Pc68bConfig(response.content)
@@ -120,11 +123,13 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model, data == $data")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bStatusInfo).post(InterfaceEvent(model, data))
                     }
+                    // 定制版
                     Pc68bBleCmd.MSG_GET_TIME -> {
                         val data = Pc68bBleResponse.DeviceTime(response.content)
                         LepuBleLog.d(tag, "model:$model,MSG_GET_TIME => success $data")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bGetTime).post(InterfaceEvent(model, data))
                     }
+                    // 定制版
                     Pc68bBleCmd.MSG_GET_FILES -> {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_FILES => success")
                         LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
@@ -150,6 +155,7 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                             LepuBleLog.d(tag, "model:$model, fileContent size == $size")
                         }
                     }
+                    // 定制版
                     Pc68bBleCmd.MSG_FILE_CONTENT -> {
                         LepuBleLog.d(tag, "model:$model,MSG_FILE_CONTENT => success")
                         System.arraycopy(response.content, 0, fileContent, size, response.content.size)
@@ -160,6 +166,7 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                             LepuBleLog.d(tag, "model:$model,read file complete $fileName => $data")
                         }
                     }
+                    // 定制版
                     Pc68bBleCmd.MSG_DELETE_FILE -> {
                         LepuBleLog.d(tag, "model:$model,MSG_DELETE_FILE => success")
                         LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
