@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.lepu.blepro.ble.data.Er1DataController
 import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
 import kotlinx.android.parcel.Parcelize
@@ -187,7 +188,7 @@ object Er1BleResponse {
         override fun toString(): String {
             var str = ""
             for (bs in fileList) {
-                str += String(bs)
+                str += trimStr(String(bs))
                 str += ","
             }
             return str

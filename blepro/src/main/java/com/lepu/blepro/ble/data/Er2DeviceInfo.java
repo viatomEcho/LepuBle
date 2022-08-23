@@ -49,7 +49,7 @@ public class Er2DeviceInfo {
         protocolDataMaxLen = data[32] + ((data[31] >> 8) & 0xFF);
         snLength = data[37];
         byte[] tmpSerialNumData = Arrays.copyOfRange(data, 38, 56);
-        serialNum = new String(tmpSerialNumData);
+        serialNum = new String(tmpSerialNumData).trim();
     }
 
     public String getDeviceName() {
