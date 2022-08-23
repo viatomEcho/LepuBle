@@ -41,6 +41,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_S5W,
             Bluetooth.MODEL_S6W,
+            Bluetooth.MODEL_S6W1,
             Bluetooth.MODEL_S7W,
             Bluetooth.MODEL_S7BW,
             Bluetooth.MODEL_PF_10,
