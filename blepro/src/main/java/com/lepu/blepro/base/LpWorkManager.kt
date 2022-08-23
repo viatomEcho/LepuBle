@@ -147,14 +147,16 @@ object LpWorkManager {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100 -> {
                 OxyBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
                     return this
                 }
             }
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N -> {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
+            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 Er1BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -163,7 +165,7 @@ object LpWorkManager {
                 }
 
             }
-            Bluetooth.MODEL_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
                 Er2BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -206,7 +208,8 @@ object LpWorkManager {
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
             Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
-            Bluetooth.MODEL_S5W -> {
+            Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
+            Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW  -> {
                 Pc60FwBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -335,7 +338,7 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_PULSEBITEX -> {
+            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4 -> {
                 PulsebitBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -377,6 +380,30 @@ object LpWorkManager {
             }
             Bluetooth.MODEL_LES1 -> {
                 LeS1BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_LPM311 -> {
+                Lpm311BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_POCTOR_M3102 -> {
+                PoctorM3102BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_BIOLAND_BGM -> {
+                BiolandBgmBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
                     vailFace.put(m, this)
@@ -457,7 +484,7 @@ object LpWorkManager {
      *
      * 蓝牙名一致的设备重连不能使用蓝牙名重连方法
      */
-    fun reconnect(scanModel : IntArray,reconnectDeviceName: Array<String>, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
+    fun reconnect(scanModel : IntArray? = null,reconnectDeviceName: Array<String>, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
 
         if (vailFace.isEmpty()){
             LepuBleLog.d(tag, "reconnect vailFace.isEmpty()")
@@ -479,7 +506,7 @@ object LpWorkManager {
             setScanDefineDevice(false, false, "")
             startDiscover(scanModel, needPair, isReconnecting = true)
         }
-        LepuBleLog.d(tag, "reconnect: scanModel=> ${scanModel.joinToString()} reconnectDeviceName=> ${reconnectDeviceName.joinToString()} ReScan: $reScan")
+        LepuBleLog.d(tag, "reconnect: scanModel=> ${scanModel?.joinToString()} reconnectDeviceName=> ${reconnectDeviceName.joinToString()} ReScan: $reScan")
     }
 
 
@@ -489,7 +516,7 @@ object LpWorkManager {
      *
      * 蓝牙名一致的设备重连必须使用蓝牙地址重连方法
      */
-    fun reconnectByAddress(scanModel: IntArray, reconnectDeviceAddress: Array<String>, needPair: Boolean,  toConnectUpdater: Boolean = false) {
+    fun reconnectByAddress(scanModel: IntArray? = null, reconnectDeviceAddress: Array<String>, needPair: Boolean,  toConnectUpdater: Boolean = false) {
 
         if (vailFace.isEmpty()) {
             LepuBleLog.d(tag, "reconnectByAddress vailFace.isEmpty()")

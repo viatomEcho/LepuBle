@@ -33,9 +33,9 @@ class SosContact() {
             0
         }
         itemSize = items.size
-        val itemsTemp = ByteArray(0)
+        var itemsTemp = ByteArray(0)
         for (i in 0 until itemSize) {
-            itemsTemp.plus(items[i].getDataBytes())
+            itemsTemp = itemsTemp.plus(items[i].getDataBytes())
         }
         return byteArrayOf(on.toByte())
             .plus(itemSize.toByte())

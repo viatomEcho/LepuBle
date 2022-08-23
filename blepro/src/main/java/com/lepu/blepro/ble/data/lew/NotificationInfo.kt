@@ -15,9 +15,9 @@ class NotificationInfo {
     var info: Any? = null
 
     fun getDataBytes(): ByteArray {
-        val data = byteArrayOf(appId.toByte())
+        var data = byteArrayOf(appId.toByte())
             .plus(int4ByteArray(time))
-        when (appId) {
+        data = when (appId) {
             LewBleCmd.AppId.PHONE -> {
                 data.plus((info as NotiPhone).getDataBytes())
             }

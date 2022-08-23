@@ -401,9 +401,9 @@ class LewBleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetCards).post(InterfaceEvent(model, true))
                 } else {
-                    val data = IntArray(0)
+                    var data = IntArray(0)
                     for (i in 0 until response.content.size) {
-                        data.plus(byte2UInt(response.content[i]))
+                        data = data.plus(byte2UInt(response.content[i]))
                     }
                     LepuBleLog.d(tag, "model:$model,get => success $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetCards).post(InterfaceEvent(model, data))
@@ -488,7 +488,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 }
                 val data = RtData(response.content)
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success $data")
-
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewRtData).post(InterfaceEvent(model, data))
             }
 
             LewBleCmd.RESET -> {

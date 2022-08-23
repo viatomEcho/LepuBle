@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name">demo</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_home">首页</string>
+    <string name="title_dashboard">实时页</string>
+    <string name="title_notifications">数据页</string>
     <string name="title_history">History</string>
-    <string name="title_settings">Settings</string>
+    <string name="title_settings">设置页</string>
     <string name="title_activity_scan">ScanActivity</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -36,5 +36,6 @@
     <string name="version">版本</string>
     <string name="ok">确认</string>
     <string name="upgrade_unsuccessful">升级失败，请断电重启</string>
+    <string name="low">≥</string>
 
 </resources>

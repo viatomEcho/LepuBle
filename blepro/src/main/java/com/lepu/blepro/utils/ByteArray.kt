@@ -1,5 +1,7 @@
 package com.lepu.blepro.utils
 
+import com.lepu.blepro.utils.ByteUtils.byte2UInt
+
 val HEX_ARRAY = "0123456789ABCDEF".toCharArray()
 
 fun ByteArray.toHex() = joinToString("") {
@@ -28,7 +30,7 @@ fun add(ori: ByteArray?, add: ByteArray): ByteArray {
 }
 
 /**
- * byte数组转无符号整数（小端模式）
+ * byte数组转无符号long（小端模式）
  */
 @ExperimentalUnsignedTypes fun toULong(bytes: ByteArray): ULong {
     var result : ULong = 0u
@@ -37,6 +39,10 @@ fun add(ori: ByteArray?, add: ByteArray): ByteArray {
     }
     return result
 }
+/**
+ * byte数组转有符号long（小端模式）
+ * 八字节有符号数，小于八字节是无符号数
+ */
 @ExperimentalUnsignedTypes fun toLong(bytes: ByteArray): Long {
     var result : Long = 0
     for (i in bytes.indices) {
@@ -55,12 +61,37 @@ fun add(ori: ByteArray?, add: ByteArray): ByteArray {
 
     return result.toInt()
 }
+/**
+ * byte数组转有符号整数（小端模式）
+ * 四字节有符号数，小于四字节是无符号数
+ */
 fun toInt(bytes: ByteArray): Int {
     var result : Int = 0
     for (i in bytes.indices) {
         result = result or ((bytes[i].toInt() and 0xFF) shl 8*i)
     }
 
+    return result
+}
+
+/**
+ * byte数组转无符号整数（大端模式）
+ */
+fun toUIntBig(bytes: ByteArray): UInt {
+    var result : UInt = 0u
+    for (i in bytes.indices) {
+        result = result or ((bytes[i].toUInt() and 0xFFu) shl 8*(bytes.size-1-i))
+    }
+    return result
+}
+/**
+ * byte数组转有符号整数（大端模式）
+ */
+fun toIntBig(bytes: ByteArray): Int {
+    var result : Int = 0
+    for (i in bytes.indices) {
+        result = result or ((bytes[i].toInt() and 0xFF) shl 8*(bytes.size-1-i))
+    }
     return result
 }
 
@@ -140,4 +171,12 @@ fun byteToPointHex(bytes: Byte): String {
     hexChars[0] = HEX_ARRAY.get(v ushr 4)
     hexChars[1] = HEX_ARRAY.get(v and 0x0F)
     return hexChars[0]+"."+hexChars[1]
+}
+fun byteToPointInt(bytes: Byte): String {
+    val temp = byte2UInt(bytes).toString()
+    val intChars = CharArray(temp.length)
+    for (i in intChars.indices) {
+        intChars[i] = temp[i]
+    }
+    return intChars.joinToString(".")
 }

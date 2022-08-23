@@ -30,9 +30,9 @@ class PhoneBook() {
 
     fun getDataBytes(): ByteArray {
         currentSize = items.size
-        val itemsTemp = ByteArray(0)
+        var itemsTemp = ByteArray(0)
         for (i in 0 until currentSize) {
-            itemsTemp.plus(items[i].getDataBytes())
+            itemsTemp = itemsTemp.plus(items[i].getDataBytes())
         }
         return byteArrayOf(leftSize.toByte())
             .plus(currentSize.toByte())

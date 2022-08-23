@@ -10,14 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <LinearLayout
+            android:id="@+id/dash_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="连接设备"/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -35,9 +31,18 @@
                         android:layout_marginVertical="5dp"
                         style="@style/common_card">
 
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="请先点击--开始绘制--再进行测量"
+                            android:textSize="20sp"
+                            android:textColor="@color/colorRed"/>
+
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="30dp"
                             android:padding="4dp">
 
                             <androidx.constraintlayout.widget.ConstraintLayout
@@ -55,6 +60,15 @@
                                     android:layout_height="16dp"
                                     android:src="@mipmap/bluetooth_error"
                                     app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"/>
+                                <TextView
+                                    android:id="@+id/ble_battery"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="电量：%"
+                                    android:textColor="@color/Black"
+                                    android:layout_marginEnd="@dimen/dp_10"
+                                    app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"/>
                             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -85,6 +99,7 @@
                                     app:layout_constraintStart_toEndOf="@id/start_at_title"/>
 
                                 <TextView
+                                    android:visibility="gone"
                                     android:id="@+id/start_at_title"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -106,7 +121,7 @@
                                     android:id="@+id/measure_duration_title"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="duration: "
+                                    android:text="时长: "
                                     android:textColor="@color/Black"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"/>
@@ -141,7 +156,8 @@
                                         android:layout_height="wrap_content"
                                         app:layout_constraintTop_toTopOf="parent"
                                         app:layout_constraintStart_toStartOf="parent"
-                                        android:text="Start Rt"/>
+                                        android:textSize="20sp"
+                                        android:text="开始绘制"/>
 
                                     <TextView
                                         android:id="@+id/stop_rt_ecg"
@@ -149,7 +165,8 @@
                                         android:layout_height="wrap_content"
                                         app:layout_constraintTop_toTopOf="parent"
                                         app:layout_constraintStart_toStartOf="parent"
-                                        android:text="Stop Rt"
+                                        android:textSize="20sp"
+                                        android:text="停止绘制"
                                         android:layout_marginStart="20dp"/>
 
                                 </LinearLayout>
@@ -167,9 +184,18 @@
                         android:layout_marginVertical="5dp"
                         style="@style/common_card">
 
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="请先点击--开始实时--再进行测量"
+                            android:textSize="20sp"
+                            android:textColor="@color/colorRed"/>
+
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="30dp"
                             android:padding="4dp">
 
                             <androidx.constraintlayout.widget.ConstraintLayout
@@ -188,6 +214,15 @@
                                     android:src="@mipmap/bluetooth_error"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"/>
+                                <TextView
+                                    android:id="@+id/bp_ble_battery"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="电量：%"
+                                    android:textColor="@color/Black"
+                                    android:layout_marginEnd="@dimen/dp_10"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"/>
                             </androidx.constraintlayout.widget.ConstraintLayout>
 
                             <TextView
@@ -197,6 +232,7 @@
                                 android:textStyle="bold"
                                 android:fontFamily="@font/roboto"
                                 android:layout_marginStart="30dp"
+                                android:layout_marginTop="30dp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 app:layout_constraintTop_toTopOf="parent"
@@ -209,6 +245,7 @@
                                 android:fontFamily="@font/roboto"
                                 android:textStyle="bold"
                                 android:layout_marginStart="15dp"
+                                android:layout_marginTop="30dp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 app:layout_constraintTop_toTopOf="parent"
@@ -221,6 +258,7 @@
                                 android:textSize="32sp"
                                 android:textStyle="bold"
                                 android:layout_marginStart="15dp"
+                                android:layout_marginTop="30dp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 app:layout_constraintTop_toTopOf="parent"
@@ -231,7 +269,7 @@
                                 android:id="@+id/tv_mean"
                                 android:text="\?"
                                 android:fontFamily="@font/roboto"
-                                android:textSize="24sp"
+                                android:textSize="32sp"
                                 android:textStyle="bold"
                                 android:layout_marginEnd="30dp"
                                 android:layout_width="wrap_content"
@@ -243,7 +281,7 @@
                                 android:id="@+id/tv_pr_bp"
                                 android:text="\?"
                                 android:fontFamily="@font/roboto"
-                                android:textSize="24sp"
+                                android:textSize="32sp"
                                 android:textStyle="bold"
                                 android:layout_marginEnd="30dp"
                                 android:layout_width="wrap_content"
@@ -255,7 +293,7 @@
                                 android:id="@+id/tv_ps"
                                 android:text="\?"
                                 android:fontFamily="@font/roboto"
-                                android:textSize="24sp"
+                                android:textSize="32sp"
                                 android:textStyle="bold"
                                 android:layout_marginEnd="30dp"
                                 android:layout_width="wrap_content"
@@ -306,7 +344,7 @@
                             <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="20dp"
+                                android:layout_marginTop="50dp"
                                 app:layout_constraintTop_toBottomOf="@id/tv_sys"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -317,7 +355,8 @@
                                     android:layout_height="wrap_content"
                                     app:layout_constraintTop_toTopOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
-                                    android:text="Start Bp"/>
+                                    android:text="开始实时"
+                                    android:textSize="20sp"/>
 
                                 <TextView
                                     android:id="@+id/stop_bp"
@@ -325,7 +364,8 @@
                                     android:layout_height="wrap_content"
                                     app:layout_constraintTop_toTopOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
-                                    android:text="Stop Bp"
+                                    android:text="停止实时"
+                                    android:textSize="20sp"
                                     android:layout_marginStart="20dp"/>
 
                             </LinearLayout>
@@ -349,9 +389,18 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             android:id="@+id/card">
 
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="请先点击--开始绘制--再进行测量"
+                                android:textSize="20sp"
+                                android:textColor="@color/colorRed"/>
+
                             <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:layout_marginTop="30dp"
                                 android:padding="4dp">
 
                                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -370,7 +419,15 @@
                                         android:src="@mipmap/bluetooth_error"
                                         app:layout_constraintStart_toStartOf="parent"
                                         app:layout_constraintTop_toTopOf="parent" />
-
+                                    <TextView
+                                        android:id="@+id/oxy_ble_battery"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="电量：%"
+                                        android:textColor="@color/Black"
+                                        android:layout_marginEnd="@dimen/dp_10"
+                                        app:layout_constraintEnd_toEndOf="parent"
+                                        app:layout_constraintTop_toTopOf="parent"/>
                                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                                 <TextView
@@ -508,7 +565,8 @@
 
                                 <TextView
                                     android:id="@+id/start_rt_oxy"
-                                    android:text="Start Rt"
+                                    android:textSize="20sp"
+                                    android:text="开始绘制"
                                     android:layout_marginTop="10dp"
                                     android:padding="5dp"
                                     android:textColor="@color/Black"
@@ -519,7 +577,8 @@
 
                                 <TextView
                                     android:id="@+id/stop_rt_oxy"
-                                    android:text="Stop Rt"
+                                    android:textSize="20sp"
+                                    android:text="停止绘制"
                                     android:layout_marginTop="10dp"
                                     android:padding="5dp"
                                     android:textColor="@color/Black"
@@ -530,6 +589,7 @@
                                     android:layout_height="wrap_content" />
 
                                 <TextView
+                                    android:visibility="gone"
                                     android:id="@+id/enable_rt_oxy"
                                     android:text="Enable Rt"
                                     android:layout_marginTop="10dp"
@@ -564,6 +624,7 @@
                             android:visibility="gone"/>
 
                         <Button
+                            android:visibility="gone"
                             android:id="@+id/start_collect"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -578,10 +639,19 @@
             </RelativeLayout>
 
             <TextView
+                android:visibility="gone"
+                android:id="@+id/dash_tip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="(以下是数据解析日志)"
+                android:layout_marginTop="20dp"/>
+            <TextView
+                android:visibility="gone"
                 android:id="@+id/temp_str"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
             <TextView
+                android:visibility="gone"
                 android:id="@+id/data_str"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -17,7 +17,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      *           MODEL_SNOREO2, MODEL_WEARO2, MODEL_SLEEPU,
      *           MODEL_OXYLINK, MODEL_KIDSO2, MODEL_OXYFIT,
      *           MODEL_OXYRING, MODEL_BBSM_S1, MODEL_BBSM_S2,
-     *           MODEL_OXYU
+     *           MODEL_OXYU, MODEL_AI_S100
      *
      * MODEL_BABYO2N 接收 EventBleDeviceReady 消息为连接成功，因为需要app先同步设备信息再同步时间处理或者在3s后再发指令给设备
      */
@@ -27,6 +27,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventOxyReadFileComplete = "com.lepu.ble.oxy.read.file.complete"        // 传输文件成功 OxyBleResponse.OxyFile
             const val EventOxyReadingFileProgress = "com.lepu.ble.oxy.reading.file.progress"  // 当前文件进度 展示时：(dialogProgress / 10.0) + "%")
             const val EventOxyFactoryReset = "com.lepu.ble.oxy.factory.reset"                 // 恢复出厂设置 true
+            const val EventOxyBurnFactoryInfo = "com.lepu.ble.oxy.burn.factory.info"          // 烧录设备信息 true
             const val EventOxySyncDeviceInfo = "com.lepu.ble.oxy.sync"                        // 同步参数 true
             const val EventOxyInfo = "com.lepu.ble.oxy.info"                                  // 设备信息 OxyBleResponse.OxyInfo
             const val EventOxyBoxInfo = "com.lepu.ble.oxy.box.info"                           // 盒子信息 LepuDevice
@@ -42,6 +43,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     /**
      * Er1BleInterface发出的通知
      * 包含model: MODEL_ER1, MODEL_ER1_N, MODEL_DUOEK
+     *           MODEL_HHM1, MODEL_HHM2, MODEL_HHM3
      */
     interface ER1 {
         companion object {
@@ -171,7 +173,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * Er2BleInterface发出的通知
-     * 包含model: MODEL_ER2
+     * 包含model: MODEL_ER2, MODEL_LP_ER2
      */
     interface ER2 {
         companion object {
@@ -199,7 +201,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      *           MODEL_POD_1W, MODEL_POD2B, MODEL_PC_60NW_1,
      *           MODEL_PC_60B, MODEL_PF_10A, MODEL_PF_10B,
      *           MODEL_PF_20A, MODEL_PF_20B, MODEL_PC_60NW,
-     *           MODEL_S5W
+     *           MODEL_S5W, MODEL_S6W, MODEL_S7W, MODEL_S7BW
      */
     interface PC60Fw {
         companion object {
@@ -502,16 +504,16 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface PC68B {
         companion object {
-//            const val EventPc68bSetTime = "com.lepu.ble.pc68b.set.time"                     // 设置时间 true
-//            const val EventPc68bGetTime = "com.lepu.ble.pc68b.get.time"                     // 获取时间 Pc68bBleResponse.DeviceTime
-//            const val EventPc68bDeleteFile = "com.lepu.ble.pc68b.delete.file"               // 删除文件 true
-            const val EventPc68bDeviceInfo = "com.lepu.ble.pc68b.device.info"               // 设备信息 DeviceInfo
+//            const val EventPc68bSetTime = "com.lepu.ble.pc68b.set.time"                     // 设置时间 true（定制版）
+//            const val EventPc68bGetTime = "com.lepu.ble.pc68b.get.time"                     // 获取时间 Pc68bBleResponse.DeviceTime（定制版）
+//            const val EventPc68bDeleteFile = "com.lepu.ble.pc68b.delete.file"               // 删除文件 true（定制版）
+            const val EventPc68bDeviceInfo = "com.lepu.ble.pc68b.device.info"               // 设备信息 DeviceInfo（定制版有sn，通用版没有sn）
             const val EventPc68bRtWave = "com.lepu.ble.pc68b.rtwave"                        // 血氧波形包数据 Pc68bBleResponse.RtWave
             const val EventPc68bRtParam = "com.lepu.ble.pc68b.rtparam"                      // 血氧参数包数据 Pc68bBleResponse.RtParam
-//            const val EventPc68bStatusInfo = "com.lepu.ble.pc68b.status.info"               // 状态信息 Pc68bBleResponse.StatusInfo
-//            const val EventPc68bConfigInfo = "com.lepu.ble.pc68b.config.info"               // 获取配置信息 Pc68bConfig
-//            const val EventPc68bFileList = "com.lepu.ble.pc68b.file.list"                   // 文件列表 MutableList<String>
-//            const val EventPc68bReadFileComplete = "com.lepu.ble.pc68b.read.file.complete"  // 文件内容 Pc68bBleResponse.Record
+//            const val EventPc68bStatusInfo = "com.lepu.ble.pc68b.status.info"               // 状态信息 Pc68bBleResponse.StatusInfo（设备没有回复）
+//            const val EventPc68bConfigInfo = "com.lepu.ble.pc68b.config.info"               // 获取配置信息 Pc68bConfig（定制版）
+//            const val EventPc68bFileList = "com.lepu.ble.pc68b.file.list"                   // 文件列表 MutableList<String>（定制版）
+//            const val EventPc68bReadFileComplete = "com.lepu.ble.pc68b.read.file.complete"  // 文件内容 Pc68bBleResponse.Record（定制版）
         }
     }
 
@@ -554,7 +556,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventPc300RtEcgWave = "com.lepu.ble.pc300.ecg.rtwave"           // 心电实时波形包 Pc300BleResponse.RtEcgWave
             const val EventPc300EcgResult = "com.lepu.ble.pc300.ecg.result"           // 心电结果 Pc300BleResponse.EcgResult
             const val EventPc300GluResult = "com.lepu.ble.pc300.glu.result"           // 血糖结果 Pc300BleResponse.GluResult
-            const val EventPc300TempResult = "com.lepu.ble.pc300.temp.result"         // 血糖结果 Pc300BleResponse.TempResult
+            const val EventPc300TempResult = "com.lepu.ble.pc300.temp.result"         // 温度结果 Pc300BleResponse.TempResult
         }
     }
 
@@ -609,6 +611,39 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventLeS1Reset = "com.lepu.ble.les1.reset"                                // 复位 boolean
             const val EventLeS1ResetFactory = "com.lepu.ble.les1.reset.factory"                 // 恢复出厂设置 boolean
             const val EventLeS1SetTime = "com.lepu.ble.les1.set.time"                           // 同步时间 boolean
+        }
+    }
+
+    /**
+     * Lpm311BleInterface
+     * 包含model: MODEL_LPM311
+     */
+    interface LPM311 {
+        companion object {
+            const val EventLpm311Data = "com.lepu.ble.lpm311.data"  // 血脂数据 Lpm311Data
+        }
+    }
+
+    /**
+     * PoctorM3102BleInterface
+     * 包含model: MODEL_POCTOR_M3102
+     */
+    interface PoctorM3102 {
+        companion object {
+            const val EventPoctorM3102Data = "com.lepu.ble.poctor.m3102.data"  // 测量结果 PoctorM3102Data
+        }
+    }
+
+    /**
+     * BiolandBgmBleInterface
+     * 包含model: MODEL_BIOLAND_BGM
+     */
+    interface BiolandBgm {
+        companion object {
+            const val EventBiolandBgmDeviceInfo = "com.lepu.ble.bioland.bgm.device.info"       // BiolandBgmBleResponse.DeviceInfo
+            const val EventBiolandBgmCountDown = "com.lepu.ble.bioland.bgm.count.down"         // int
+            const val EventBiolandBgmGluData = "com.lepu.ble.bioland.bgm.glu.data"             // BiolandBgmBleResponse.GluData
+            const val EventBiolandBgmNoGluData = "com.lepu.ble.bioland.bgm.no.glu.data"        // true
         }
     }
 

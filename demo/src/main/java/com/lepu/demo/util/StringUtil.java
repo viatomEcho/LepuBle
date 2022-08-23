@@ -108,4 +108,17 @@ public class StringUtil {
 
 		return m.matches();
 	}
+
+	public static boolean isNumber(String name) {
+		String str = "[0-9]+";
+		Pattern p = Pattern.compile(str);
+		Matcher m = p.matcher(name);
+		return m.matches();
+	}
+	public static boolean isBigLetter(String name) {
+		String str = "[A-Z]";
+		Pattern p = Pattern.compile(str);
+		Matcher m = p.matcher(name);
+		return m.matches();
+	}
 }

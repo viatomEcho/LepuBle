@@ -285,14 +285,26 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         publish()
 
         //断开后
-        LepuBleLog.d(tag, "onDeviceDisconnected=====isAutoReconnect:$isAutoReconnect")
-        device.address?.let {
-            if (isAutoReconnect){
-                //重开扫描, 扫描该interface的设备
-                LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByAddress")
-                BleServiceHelper.reconnectByAddress(model, it)
-            }else{
-                BleServiceHelper.removeReconnectAddress(it)
+        LepuBleLog.d(tag, "onDeviceDisconnected=====isAutoReconnect:$isAutoReconnect ${device.name} ${device.address}")
+        if (BleServiceHelper.canReconnectByName(model)) {
+            device.name?.let {
+                if (isAutoReconnect){
+                    //重开扫描, 扫描该interface的设备
+                    LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByName $it")
+                    BleServiceHelper.reconnect(null, it)
+                }else{
+                    BleServiceHelper.removeReconnectName(it)
+                }
+            }
+        } else {
+            device.address?.let {
+                if (isAutoReconnect){
+                    //重开扫描, 扫描该interface的设备
+                    LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByAddress $it")
+                    BleServiceHelper.reconnectByAddress(null, it)
+                }else{
+                    BleServiceHelper.removeReconnectAddress(it)
+                }
             }
         }
     }
@@ -322,7 +334,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         if (isAutoReconnect){
             //重开扫描, 扫描该interface的设备
             device.name?.let {
-                BleServiceHelper.reconnect(model, it)
+                BleServiceHelper.reconnect(null, it)
                 LepuBleLog.d(tag, "onDeviceFailedToConnect....reconnect $it")
             }
         }
@@ -352,6 +364,9 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             || model == Bluetooth.MODEL_PF_20
             || model == Bluetooth.MODEL_POD_1W
             || model == Bluetooth.MODEL_S5W
+            || model == Bluetooth.MODEL_S6W
+            || model == Bluetooth.MODEL_S7W
+            || model == Bluetooth.MODEL_S7BW
             || model == Bluetooth.MODEL_PC_60NW_1
             || model == Bluetooth.MODEL_PC_60NW
             || model == Bluetooth.MODEL_POD2B
@@ -370,6 +385,9 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             || model == Bluetooth.MODEL_LEM
             || model == Bluetooth.MODEL_W12C
             || model == Bluetooth.MODEL_LEW
+            || model == Bluetooth.MODEL_LPM311
+            || model == Bluetooth.MODEL_POCTOR_M3102
+            || model == Bluetooth.MODEL_BIOLAND_BGM
             || model == Bluetooth.MODEL_PC300) { // 部分设备没有同步时间命令，发送此消息通知获取设备信息，进行绑定操作
             LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceReady).post(model)
         } else {

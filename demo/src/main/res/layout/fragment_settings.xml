@@ -11,7 +11,6 @@
             android:id="@+id/setting_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorGrayBg"
             android:padding="5dp"
             android:orientation="vertical">
             <TextView
@@ -21,6 +20,7 @@
                 android:layout_margin="@dimen/dp_10"
                 android:text="私有方法测试"/>
             <Button
+                android:visibility="gone"
                 android:id="@+id/bytes_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -32,6 +32,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <TextView
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="er1"/>
@@ -42,21 +43,40 @@
                         android:id="@+id/er1_hr1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:hint="阈值1"/>
+                        android:hint="阈值1"
+                        android:layout_weight="1"/>
 
                     <EditText
                         android:id="@+id/er1_hr2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:hint="阈值2"
-                        android:layout_marginStart="20dp"/>
+                        android:layout_marginStart="20dp"
+                        android:layout_weight="1"/>
                     <Button
                         android:id="@+id/er1_set_hr"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="设置阈值"
-                        android:layout_marginStart="20dp"/>
+                        android:layout_marginStart="20dp"
+                        android:layout_weight="1"/>
                 </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorRed"
+                    android:text="阈值1范围：80-170"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorRed"
+                    android:text="阈值2范围：120-200"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorRed"
+                    android:text="阈值1小于阈值2"
+                    android:layout_marginBottom="@dimen/dp_10"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -64,15 +84,63 @@
                         android:id="@+id/er1_set_sound"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="声音"/>
+                        android:text="震动"/>
 
                     <Button
+                        android:visibility="gone"
                         android:id="@+id/er1_get_config"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="获取配置"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="硬件版本:" />
+                    <EditText
+                        android:id="@+id/er1_version"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="A-Z"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="sn:" />
+                    <EditText
+                        android:id="@+id/er1_sn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="长度:10位"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="branch code:" />
+                    <EditText
+                        android:id="@+id/er1_code"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="长度:8位"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <Button
+                    android:id="@+id/er1_factory_config"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="烧录" />
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/er2_layout"
@@ -80,6 +148,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <TextView
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="er2/duoek"/>
@@ -92,12 +161,60 @@
                         android:layout_height="wrap_content"
                         android:text="声音" />
                     <Button
+                        android:visibility="gone"
                         android:id="@+id/er2_get_config"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="获取配置"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="硬件版本:" />
+                    <EditText
+                        android:id="@+id/er2_version"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="A-Z"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="sn:" />
+                    <EditText
+                        android:id="@+id/er2_sn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="长度:10位"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="branch code:" />
+                    <EditText
+                        android:id="@+id/er2_code"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="长度:8位"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <Button
+                    android:id="@+id/er2_factory_config"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="烧录" />
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/bp2_bp2a_layout"
@@ -355,9 +472,56 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="硬件版本:" />
+                    <EditText
+                        android:id="@+id/o2_version"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="A-Z"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="sn:" />
+                    <EditText
+                        android:id="@+id/o2_sn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="长度:10位"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="branch code:" />
+                    <EditText
+                        android:id="@+id/o2_code"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="长度:8位"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <Button
+                    android:id="@+id/o2_factory_config"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="烧录" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
                     <EditText
                         android:id="@+id/o2_oxi_thr"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="血氧阈值" />
                     <Button
@@ -365,14 +529,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="血氧阈值设置"
-                        android:layout_marginStart="20dp"/>
-                </LinearLayout>
-                <LinearLayout
+                        android:layout_alignParentRight="true"/>
+                </RelativeLayout>
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <EditText
                         android:id="@+id/o2_hr_thr1"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="心率低阈值"/>
                     <Button
@@ -380,14 +544,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="心率低阈值设置"
-                        android:layout_marginStart="20dp"/>
-                </LinearLayout>
-                <LinearLayout
+                        android:layout_alignParentRight="true"/>
+                </RelativeLayout>
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <EditText
                         android:id="@+id/o2_hr_thr2"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="心率高阈值"/>
                     <Button
@@ -395,7 +559,55 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="心率高阈值设置"
+                        android:layout_alignParentRight="true"/>
+                </RelativeLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/o2_mt_thr"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="体动阈值"/>
+                    <Button
+                        android:id="@+id/o2_set_mt_thr"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="体动阈值设置"
                         android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/o2_mt_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="体动开关"
+                        android:layout_marginStart="20dp" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/o2_iv_thr"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="无效值阈值"/>
+                    <Button
+                        android:id="@+id/o2_set_iv_thr"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="无效值阈值设置"
+                        android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/o2_iv_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="无效值开关"
+                        android:layout_marginStart="20dp" />
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -455,48 +667,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="屏幕亮度"
-                        android:layout_marginStart="20dp" />
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <EditText
-                        android:id="@+id/o2_mt_thr"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:hint="体动阈值"/>
-                    <Button
-                        android:id="@+id/o2_set_mt_thr"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="体动阈值设置"
-                        android:layout_marginStart="20dp"/>
-                    <Button
-                        android:id="@+id/o2_mt_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="体动开关"
-                        android:layout_marginStart="20dp" />
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <EditText
-                        android:id="@+id/o2_iv_thr"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:hint="无效值阈值"/>
-                    <Button
-                        android:id="@+id/o2_set_iv_thr"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="无效值阈值设置"
-                        android:layout_marginStart="20dp"/>
-                    <Button
-                        android:id="@+id/o2_iv_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="无效值开关"
                         android:layout_marginStart="20dp" />
                 </LinearLayout>
             </LinearLayout>
@@ -647,12 +817,6 @@
                         android:layout_height="wrap_content"
                         android:text="设置系统配置"
                         android:layout_marginStart="20dp"/>
-                    <Button
-                        android:id="@+id/lew_find_device"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="找手表"
-                        android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -688,6 +852,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="设置单位"
+                        android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/lew_find_device"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="找手表"
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <LinearLayout
@@ -1025,6 +1195,12 @@
                         android:layout_height="wrap_content"
                         android:text="心电数据"
                         android:layout_marginStart="20dp"/>
+                    <Button
+                        android:id="@+id/lew_get_rt_data"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="实时数据"
+                        android:layout_marginStart="20dp"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -1355,21 +1531,57 @@
                         android:text="设备状态"/>
                 </LinearLayout>
             </LinearLayout>
+            <LinearLayout
+                android:id="@+id/pc60fw_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="branch code:" />
+                    <EditText
+                        android:id="@+id/pc60fw_code"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="长度:8位"
+                        android:layout_marginStart="20dp"/>
+                </LinearLayout>
+                <Button
+                    android:id="@+id/pc60fw_set_code"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="设置"/>
+            </LinearLayout>
             <TextView
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/send_cmd"
                 android:layout_marginTop="20dp"/>
             <TextView
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/response_cmd"
                 android:layout_marginTop="20dp"/>
             <TextView
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/receive_cmd"/>
             <TextView
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="(以下是数据解析日志)"
+                android:layout_marginTop="50dp"/>
+            <TextView
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/content"/>

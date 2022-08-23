@@ -18,6 +18,10 @@ public class Pc60FwBleCmd {
     public static final int MSG_GET_BATTERY = 0x03;
     public static final int CMD_GET_DEVICE_MAC = 0xA1;
     public static final int MSG_GET_DEVICE_MAC = 0x21;
+    public static final int CMD_GET_CODE = 0xC1;
+    public static final int MSG_GET_CODE = 0x41;
+    public static final int CMD_SET_CODE = 0xC2;
+    public static final int MSG_SET_CODE = 0x42;
 
     public static final int TOKEN_0F = 0x0F;
     public static final int MSG_RT_PARAM = 0x01;
@@ -116,6 +120,29 @@ public class Pc60FwBleCmd {
         cmd[3] = (byte) 0x02;
         cmd[4] = (byte) CMD_GET_DEVICE_MAC;
         cmd[5] = CrcUtil.calCRC8Pc(cmd);
+        return cmd;
+    }
+
+    public static byte[] getCode() {
+        byte[] cmd = new byte[6];
+        cmd[0] = (byte) HEAD_0;
+        cmd[1] = (byte) HEAD_1;
+        cmd[2] = (byte) TOKEN_F0;
+        cmd[3] = (byte) 0x02;
+        cmd[4] = (byte) CMD_GET_CODE;
+        cmd[5] = CrcUtil.calCRC8Pc(cmd);
+        return cmd;
+    }
+    public static byte[] setCode(byte[] data) {
+        int len = data.length;
+        byte[] cmd = new byte[6+len];
+        cmd[0] = (byte) HEAD_0;
+        cmd[1] = (byte) HEAD_1;
+        cmd[2] = (byte) TOKEN_F0;
+        cmd[3] = (byte) (len+2);
+        cmd[4] = (byte) CMD_SET_CODE;
+        System.arraycopy(data, 0, cmd, 5, len);
+        cmd[cmd.length-1] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }
 

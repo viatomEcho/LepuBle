@@ -1,8 +1,10 @@
 package com.lepu.blepro.ble.data.lew
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
+import java.util.*
 
 class OxyList(val bytes: ByteArray) {
 
@@ -17,13 +19,13 @@ class OxyList(val bytes: ByteArray) {
         currentSize = byte2UInt(bytes[index])
         index++
         for (i in 0 until currentSize) {
-            items.add(Item(bytes.copyOfRange(index+i*7, index+(i+1)*7)))
+            items.add(Item(bytes.copyOfRange(index+i*8, index+(i+1)*8)))
         }
     }
 
     override fun toString(): String {
         return """
-            HrList : 
+            OxyList : 
             bytes : ${bytesToHex(bytes)}
             leftSize : $leftSize
             currentSize : $currentSize
@@ -35,6 +37,7 @@ class OxyList(val bytes: ByteArray) {
         var recordingTime: Int
         var pr: Int
         var spo2: Int
+        // reserved 1
         init {
             var index = 0
             recordingTime = toUInt(bytes.copyOfRange(index, index + 4))
@@ -48,6 +51,7 @@ class OxyList(val bytes: ByteArray) {
             Item : 
             bytes : ${bytesToHex(bytes)}
             recordingTime : $recordingTime
+            recordingTimeStr : ${stringFromDate(Date(recordingTime * 1000L), "yyyy-MM-dd HH:mm:ss")}
             pr : $pr
             spo2 : $spo2
         """.trimIndent()

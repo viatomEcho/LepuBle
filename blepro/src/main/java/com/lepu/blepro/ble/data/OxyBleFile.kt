@@ -3,6 +3,7 @@ package com.lepu.blepro.ble.data
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.DateUtil.getSecondTimestamp
 import com.lepu.blepro.utils.bytesToHex
+import com.lepu.blepro.utils.getTimeString
 import com.lepu.blepro.utils.toUInt
 
 class OxyBleFile(val bytes: ByteArray) {
@@ -48,7 +49,7 @@ class OxyBleFile(val bytes: ByteArray) {
         minute = byte2UInt(bytes[index])
         index++
         second = byte2UInt(bytes[index])
-        startTime = getSecondTimestamp(getTimeString()).toInt()
+        startTime = getSecondTimestamp(getTimeString(year, month, day, hour, minute, second)).toInt()
         index++
         size = toUInt(bytes.copyOfRange(index, index+4))
         index += 4
@@ -81,42 +82,13 @@ class OxyBleFile(val bytes: ByteArray) {
         }
     }
 
-    private fun getTimeString(): String {
-        val monthStr = if (month < 10) {
-            "0$month"
-        } else {
-            "$month"
-        }
-        val dayStr = if (day < 10) {
-            "0$day"
-        } else {
-            "$day"
-        }
-        val hourStr = if (hour < 10) {
-            "0$hour"
-        } else {
-            "$hour"
-        }
-        val minuteStr = if (minute < 10) {
-            "0$minute"
-        } else {
-            "$minute"
-        }
-        val secondStr = if (second < 10) {
-            "0$second"
-        } else {
-            "$second"
-        }
-        return "$year$monthStr$dayStr$hourStr$minuteStr$secondStr"
-    }
-
     override fun toString(): String {
         return """
             OxyBleFile : 
             version : $version
             operationMode : $operationMode
             startTime : $startTime
-            startTime : ${getTimeString()}
+            startTime : ${getTimeString(year, month, day, hour, minute, second)}
             size : $size
             recordingTime : $recordingTime
             asleepTime : $asleepTime
@@ -137,8 +109,11 @@ class OxyBleFile(val bytes: ByteArray) {
     class EachData(val bytes: ByteArray) {
         var spo2: Int
         var pr: Int
-        var vector: Int
-        // reserved 1
+        var vector: Int                  // 加速度值，体动
+        var warningSignSpo2: Boolean     // "低血氧告警"标记
+        var warningSignPr: Boolean       // "脉率告警"标记
+        var warningSignVector: Boolean   // "体动告警"标记
+        var warningSignInvalid: Boolean  // "无效值告警"标记
         init {
             var index = 0
             spo2 = byte2UInt(bytes[index])
@@ -146,6 +121,11 @@ class OxyBleFile(val bytes: ByteArray) {
             pr = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
             vector = byte2UInt(bytes[index])
+            index++
+            warningSignSpo2 = (byte2UInt(bytes[index]) and 0x80) == 1
+            warningSignPr = (byte2UInt(bytes[index]) and 0x40) == 1
+            warningSignVector = (byte2UInt(bytes[index]) and 0x20) == 1
+            warningSignInvalid = (byte2UInt(bytes[index]) and 0x10) == 1
         }
         override fun toString(): String {
             return """
@@ -154,6 +134,10 @@ class OxyBleFile(val bytes: ByteArray) {
                 spo2 : $spo2
                 pr : $pr
                 vector : $vector
+                warningSignSpo2 : $warningSignSpo2
+                warningSignPr : $warningSignPr
+                warningSignVector : $warningSignVector
+                warningSignInvalid : $warningSignInvalid
             """.trimIndent()
         }
     }

@@ -9,25 +9,25 @@
         android:paddingHorizontal="20dp"
         tools:context=".ui.home.HomeFragment">
 
-
         <Button
             android:id="@+id/scan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:text="扫描"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="刷新"/>
         <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/ble_split"
-            android:hint="筛选设备"
+            android:hint=" 筛选设备"
+            android:drawableStart="@mipmap/search"
             app:layout_constraintStart_toEndOf="@id/scan"
             app:layout_constraintTop_toTopOf="@id/scan"
             app:layout_constraintBottom_toBottomOf="@id/scan"
-            android:layout_marginStart="20dp"
-            android:textSize="20sp"/>
+            android:textSize="18sp"/>
         <Button
+            android:visibility="gone"
             android:id="@+id/ble_split_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -38,6 +38,7 @@
             android:text="确定"/>
 
         <Button
+            android:visibility="gone"
             android:id="@+id/disconnect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,6 +47,7 @@
             android:text="断开"/>
 
         <Button
+            android:visibility="gone"
             android:id="@+id/reconnect_by_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -56,6 +58,7 @@
             android:text="名称重连"/>
 
         <Button
+            android:visibility="gone"
             android:id="@+id/reconnect_by_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -66,6 +69,7 @@
             android:text="地址重连"/>
 
         <EditText
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/scan_name"
@@ -76,6 +80,7 @@
             android:layout_marginRight="200dp"
             android:textSize="20sp"/>
         <Button
+            android:visibility="gone"
             android:id="@+id/scan_by_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -83,9 +88,10 @@
             app:layout_constraintBottom_toBottomOf="@id/scan_name"
             app:layout_constraintStart_toEndOf="@id/scan_name"
             android:layout_marginStart="20dp"
-            android:text="扫描"/>
+            android:text="重扫"/>
 
         <EditText
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/scan_address"
@@ -96,6 +102,7 @@
             android:layout_marginRight="200dp"
             android:textSize="20sp"/>
         <Button
+            android:visibility="gone"
             android:id="@+id/scan_by_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -119,22 +126,43 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/ble_state"
-            android:text="蓝牙连接状态"
+            android:text="连接状态"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ble_device"
             android:layout_marginTop="20dp"
             android:textSize="20sp"/>
 
+        <Button
+            android:id="@+id/disconnect2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/ble_device"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="10dp"
+            android:text="断开"/>
+
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/home_tip"
+            android:text="(设备连接成功后，即可到界面二、三、四操作测试)"
+            android:textColor="@color/colorRed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ble_state"
+            android:layout_marginTop="20dp"/>
+
+        <TextView
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/duration_tag"
             android:text="采集时长(S):"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ble_state"
+            app:layout_constraintTop_toBottomOf="@id/home_tip"
             android:layout_marginTop="20dp"
             android:textSize="20sp"/>
         <TextView
+            android:visibility="gone"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:id="@+id/duration"

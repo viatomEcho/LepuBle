@@ -11,6 +11,7 @@ import com.lepu.blepro.ext.BleServiceHelper
 import com.lepu.blepro.ext.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
 import com.lepu.blepro.constants.Ble
@@ -93,10 +94,14 @@ class LpBleUtil {
 
             val RAW_FOLDERS = SparseArray<String>()
             RAW_FOLDERS.put(Bluetooth.MODEL_ER1, PathUtils.getExternalAppFilesPath() + "/demo/er1/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_HHM1, PathUtils.getExternalAppFilesPath() + "/demo/hhm1/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_HHM2, PathUtils.getExternalAppFilesPath() + "/demo/hhm2/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_HHM3, PathUtils.getExternalAppFilesPath() + "/demo/hhm3/")
             RAW_FOLDERS.put(Bluetooth.MODEL_LEW, PathUtils.getExternalAppFilesPath() + "/demo/lew/")
             RAW_FOLDERS.put(Bluetooth.MODEL_W12C, PathUtils.getExternalAppFilesPath() + "/demo/w12c/")
             RAW_FOLDERS.put(Bluetooth.MODEL_DUOEK, PathUtils.getExternalAppFilesPath() + "/demo/duoek/")
             RAW_FOLDERS.put(Bluetooth.MODEL_ER2, PathUtils.getExternalAppFilesPath() + "/demo/er2/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_LP_ER2, PathUtils.getExternalAppFilesPath() + "/demo/lper2/")
 
             getServiceHelper()
                 .initLog(BuildConfig.DEBUG)
@@ -118,6 +123,9 @@ class LpBleUtil {
             }
         }
 
+        fun getCurrentDevice(model: Int): BluetoothDevice? {
+            return BleServiceHelper.getCurrentDevice(model)
+        }
 
         fun setInterface(model: Int, needClear: Boolean){
             clearInterface()
@@ -341,6 +349,10 @@ class LpBleUtil {
                 }
                 BleServiceHelper.factoryResetAll(model)
             }
+        }
+
+        fun burnFactoryInfo(model: Int, config: FactoryConfig) {
+            BleServiceHelper.burnFactoryInfo(model, config)
         }
 
         /**
@@ -795,6 +807,9 @@ class LpBleUtil {
         fun lewSetCards(model: Int, cards: IntArray) {
             BleServiceHelper.lewSetCards(model, cards)
         }
+        fun lewGetRtData(model: Int) {
+            BleServiceHelper.lewGetRtData(model)
+        }
         fun lewGetFileList(model: Int, type: Int, startTime: Int) {
             BleServiceHelper.lewGetFileList(model, type, startTime)
         }
@@ -871,7 +886,9 @@ class LpBleUtil {
                     }
                     Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_POD_1W,
                     Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
-                    Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_S5W -> {
+                    Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_S5W,
+                    Bluetooth.MODEL_S6W, Bluetooth.MODEL_S7W,
+                    Bluetooth.MODEL_S7BW -> {
                         BleServiceHelper.pc60fwEnableRtData(model, type, enable)
                     }
                     Bluetooth.MODEL_PC_68B -> {
@@ -883,6 +900,13 @@ class LpBleUtil {
                 }
 
             }
+        }
+
+        fun pc60fwGetBranchCode(model: Int) {
+            BleServiceHelper.pc60fwGetBranchCode(model)
+        }
+        fun pc60fwSetBranchCode(model: Int, code: String) {
+            BleServiceHelper.pc60fwSetBranchCode(model, code)
         }
 
         fun pc68bDeleteFile(model: Int) {

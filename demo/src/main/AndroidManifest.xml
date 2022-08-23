@@ -29,6 +29,7 @@
         <activity android:name=".WaveEcgActivity"/>
         <activity android:name=".UpdateActivity"/>
         <activity android:name=".ScanCodeActivity"/>
+        <activity android:name=".OxyDataActivity"/>
         <service  android:name=".dfu.DfuService"
             android:exported="true">
             <intent-filter>

@@ -9,6 +9,7 @@ class MeasureSetting() {
     var targetRemind = false
     var sittingRemind = SittingRemind()
     var hrDetect = HrDetect()
+    var oxyDetect = OxyDetect()
 
     constructor(bytes: ByteArray) : this() {
         var index = 0
@@ -20,6 +21,8 @@ class MeasureSetting() {
         index += 7
 //        hrDetect = HrDetect(bytes.copyOfRange(index, bytes.size))
         hrDetect = HrDetect(bytes.copyOfRange(index, index+4))
+        index += 4
+        oxyDetect = OxyDetect(bytes.copyOfRange(index, index+4))
     }
 
     fun getDataBytes(): ByteArray {
@@ -32,6 +35,7 @@ class MeasureSetting() {
             .plus(on.toByte())
             .plus(sittingRemind.getDataBytes())
             .plus(hrDetect.getDataBytes())
+            .plus(oxyDetect.getDataBytes())
     }
 
     override fun toString(): String {
@@ -42,6 +46,7 @@ class MeasureSetting() {
             targetRemind : $targetRemind
             sittingRemind : $sittingRemind
             hrDetect : $hrDetect
+            oxyDetect : $oxyDetect
         """.trimIndent()
     }
 

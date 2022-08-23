@@ -299,6 +299,18 @@ class BleServiceHelper private constructor() {
         LepuBleLog.d(tag, "stopScan")
     }
 
+    fun getCurrentDevice(model: Int): BluetoothDevice? {
+        if (!checkService()) return null
+        val vailFace = LpWorkManager.vailFace
+        LepuBleLog.d(tag, "getCurrentDevice => currentModel：$model, vailFaceSize：${vailFace.size()}}")
+        vailFace.get(model)?.let {
+            return vailFace.get(model).device
+        }?: kotlin.run {
+            LepuBleLog.e(tag, "current model $model unsupported!!")
+            return null
+        }
+    }
+
     /**
      * 获取model的interface
      */
@@ -340,7 +352,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_AOJ20A, Bluetooth.MODEL_TV221U,
             Bluetooth.MODEL_FETAL, Bluetooth.MODEL_VTM_AD5,
             Bluetooth.MODEL_VCOMIN, Bluetooth.MODEL_PC300,
-            Bluetooth.MODEL_LEM -> false
+            Bluetooth.MODEL_LEM, Bluetooth.MODEL_LPM311,
+            Bluetooth.MODEL_POCTOR_M3102, Bluetooth.MODEL_BIOLAND_BGM -> false
             else -> true
         }
     }
@@ -385,11 +398,17 @@ class BleServiceHelper private constructor() {
      * @param name String
      */
     @JvmOverloads
-    fun reconnect(scanModel: Int, name: String, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
+    fun reconnect(scanModel: Int? = null, name: String, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnect 名称重连单个model")
         if (!checkService()) return
 //        bleService.reconnect(intArrayOf(scanModel), arrayOf(name), needPair, toConnectUpdater)
-        LpWorkManager.reconnect(intArrayOf(scanModel), arrayOf(name), needPair, toConnectUpdater)
+        // 规避vihealth连接设备后回到首页扫描时，设备断开连接自动开启指定扫描覆盖首页扫描问题
+        // 因此sdk调用自动重连时不做scanModel过滤
+        if (scanModel == null) {
+            LpWorkManager.reconnect(null, arrayOf(name), needPair, toConnectUpdater)
+        } else {
+            LpWorkManager.reconnect(intArrayOf(scanModel), arrayOf(name), needPair, toConnectUpdater)
+        }
 
     }
 
@@ -415,11 +434,15 @@ class BleServiceHelper private constructor() {
      * @param macAddress String
      */
     @JvmOverloads
-    fun reconnectByAddress(scanModel: Int, macAddress: String, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
+    fun reconnectByAddress(scanModel: Int? = null, macAddress: String, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress 地址重连单个model")
         if (!checkService()) return
 //        bleService.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress), needPair, toConnectUpdater)
-        LpWorkManager.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress), needPair, toConnectUpdater)
+        if (scanModel == null) {
+            LpWorkManager.reconnectByAddress(null, arrayOf(macAddress), needPair, toConnectUpdater)
+        } else {
+            LpWorkManager.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress), needPair, toConnectUpdater)
+        }
 
     }
 
@@ -609,10 +632,11 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return false
 
         when (model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N -> {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
+            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 return inter is Er1BleInterface
             }
-            Bluetooth.MODEL_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
                 return inter is Er2BleInterface
             }
             Bluetooth.MODEL_BPM -> {
@@ -626,7 +650,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_CMRING,
-            Bluetooth.MODEL_OXYU -> {
+            Bluetooth.MODEL_OXYU, Bluetooth.MODEL_AI_S100 -> {
                 return inter is OxyBleInterface
             }
             Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T ->{
@@ -637,7 +661,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
             Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
-            Bluetooth.MODEL_S5W -> {
+            Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
+            Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW -> {
                 return inter is Pc60FwBleInterface
             }
             Bluetooth.MODEL_PC80B -> {
@@ -990,7 +1015,8 @@ class BleServiceHelper private constructor() {
     fun burnFactoryInfo(model: Int, config: FactoryConfig) {
         if (!checkService()) return
         when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N -> {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
+            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er1BleInterface).let {
                         LepuBleLog.d(tag, "it as Er1BleInterface--burnFactoryInfo")
@@ -998,10 +1024,26 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
-            Bluetooth.MODEL_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er2BleInterface).let {
                         LepuBleLog.d(tag, "it as Er2BleInterface--burnFactoryInfo")
+                        it.burnFactoryInfo(config)
+                    }
+                }
+            }
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
+            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
+            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
+            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
+            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
+            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as OxyBleInterface).let {
+                        LepuBleLog.d(tag, "it as OxyBleInterface--burnFactoryInfo")
                         it.burnFactoryInfo(config)
                     }
                 }
@@ -1016,7 +1058,8 @@ class BleServiceHelper private constructor() {
     fun burnLockFlash(model: Int) {
         if (!checkService()) return
         when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N -> {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
+            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er1BleInterface).let {
                         LepuBleLog.d(tag, "it as Er1BleInterface--burnLockFlash")
@@ -1024,7 +1067,7 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
-            Bluetooth.MODEL_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er2BleInterface).let {
                         LepuBleLog.d(tag, "it as Er2BleInterface--burnLockFlash")
@@ -1063,7 +1106,7 @@ class BleServiceHelper private constructor() {
     fun setEr2SwitcherState(model: Int, hrFlag: Boolean){
         if (!checkService()) return
         when(model){
-            Bluetooth.MODEL_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er2BleInterface).let {
                         LepuBleLog.d(tag, "it as Er2BleInterface--setEr2SwitcherState")
@@ -1082,7 +1125,7 @@ class BleServiceHelper private constructor() {
     fun getEr2SwitcherState(model: Int){
         if (!checkService()) return
         when(model){
-            Bluetooth.MODEL_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er2BleInterface).let {
                         LepuBleLog.d(tag, "it as Er2BleInterface--getEr2SwitcherState")
@@ -1101,7 +1144,8 @@ class BleServiceHelper private constructor() {
     fun getEr1VibrateConfig(model: Int){
         if (!checkService()) return
         when(model){
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N ->{
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
+            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 ->{
                 getInterface(model)?.let { it1 ->
                     (it1 as Er1BleInterface).let {
                         LepuBleLog.d(tag, "it as Er1BleInterface--getEr1VibrateConfig")
@@ -1120,7 +1164,7 @@ class BleServiceHelper private constructor() {
     fun setEr1Vibrate(model: Int, switcher: Boolean, threshold1: Int, threshold2: Int){
         if (!checkService()) return
         when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N -> {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er1BleInterface).let {
                         LepuBleLog.d(tag, "it as Er1BleInterface--setEr1Vibrate")
@@ -1140,7 +1184,7 @@ class BleServiceHelper private constructor() {
     fun setEr1Vibrate(model: Int,switcher: Boolean, vector: Int, motionCount: Int,motionWindows: Int ){
         if (!checkService()) return
         when(model) {
-            Bluetooth.MODEL_DUOEK -> {
+            Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3  -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er1BleInterface).let {
                         LepuBleLog.d(tag, "it as Er1BleInterface--setEr1Vibrate")
@@ -1516,7 +1560,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetRtWave")
@@ -1541,7 +1586,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetRtParam")
@@ -1566,7 +1612,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetPpgRt")
@@ -1633,7 +1680,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--updateSetting")
@@ -1658,7 +1706,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--updateSetting")
@@ -2671,6 +2720,20 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "lewSetCards current model $model unsupported!!")
         }
     }
+    fun lewGetRtData(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LewBleInterface).let {
+                        LepuBleLog.d(tag, "it as LewBleInterface--lewGetRtData")
+                        it.getRtData()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lewGetRtData current model $model unsupported!!")
+        }
+    }
     /**
      * 获取手表记录数据
      * @param type LewBleCmd.ListType
@@ -2883,7 +2946,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
             Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
-            Bluetooth.MODEL_S5W -> {
+            Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
+            Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc60FwBleInterface).let {
                         LepuBleLog.d(tag, "it as Pc60FwBleInterface--pc60fwEnableRtData")
@@ -2892,6 +2956,46 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.d(tag, "pc60fwEnableRtData current model $model unsupported!!")
+        }
+    }
+    fun pc60fwGetBranchCode(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
+            Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
+            Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
+            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
+            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
+            Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Pc60FwBleInterface).let {
+                        LepuBleLog.d(tag, "it as Pc60FwBleInterface--pc60fwGetBranchCode")
+                        it.getBranchCode()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "pc60fwGetBranchCode current model $model unsupported!!")
+        }
+    }
+    fun pc60fwSetBranchCode(model: Int, code: String) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
+            Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
+            Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
+            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
+            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
+            Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW  -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Pc60FwBleInterface).let {
+                        LepuBleLog.d(tag, "it as Pc60FwBleInterface--pc60fwSetBranchCode")
+                        it.setBranchCode(code)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "pc60fwSetBranchCode current model $model unsupported!!")
         }
     }
 

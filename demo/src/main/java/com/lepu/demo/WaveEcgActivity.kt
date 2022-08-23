@@ -1,16 +1,12 @@
 package com.lepu.demo
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.os.Handler
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
-import com.jeremyliao.liveeventbus.LiveEventBus
-//import com.lepu.blepro.BleServiceHelper
-import com.lepu.blepro.ble.cmd.CheckmeLeBleResponse
-import com.lepu.blepro.ble.cmd.PulsebitBleResponse
-import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
-import com.lepu.blepro.utils.DateUtil
+import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.ecgData
 import com.lepu.demo.views.WaveEcgView
 
 class WaveEcgActivity : AppCompatActivity() {
@@ -18,28 +14,44 @@ class WaveEcgActivity : AppCompatActivity() {
     var filterEcgView: WaveEcgView? = null
     var currentZoomLevel = 1
     val handler = Handler()
+    var mAlertDialog: AlertDialog? = null
 
+    var waveData: ByteArray? = null
     var filterWaveData: ShortArray? = null
     var mills = 0L
+    var model = Bluetooth.MODEL_ER1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wave_ecg)
 
-        initLiveEvent()
-//        BleServiceHelper.BleServiceHelper.readFile("", "20220414183025", Bluetooth.MODEL_PULSEBITEX, 0)
+        mAlertDialog = AlertDialog.Builder(this)
+            .setCancelable(false)
+            .setMessage("正在处理，请稍等...")
+            .create()
+        mAlertDialog?.show()
+
+        model = intent.getIntExtra("model", Bluetooth.MODEL_ER1)
+        waveData = ecgData.data
+        filterWaveData = ecgData.shortData
+        mills = ecgData.recordingTime
+
+        handler.postDelayed({
+            ecgWave()
+        }, 1000)
     }
 
-    fun ecgWave() {
+    private fun ecgWave() {
+        mAlertDialog?.dismiss()
         if (filterEcgView != null) {
-            currentZoomLevel = filterEcgView!!.getCurrentZoomPosition()
+            currentZoomLevel = filterEcgView!!.currentZoomPosition
         }
 
         val layout: RelativeLayout = findViewById(R.id.rl_ecg_container)
-        val width = layout.getWidth()
-        val height = layout.getHeight()
+        val width = layout.width
+        val height = layout.height
         if (filterEcgView == null && filterWaveData != null) {
-            filterEcgView = WaveEcgView(this, mills*1000, filterWaveData, filterWaveData!!.size, width*1f, height*1f, currentZoomLevel, false, 0)
+            filterEcgView = WaveEcgView(this, mills*1000, filterWaveData, filterWaveData!!.size, width*1f, height*1f, currentZoomLevel, false, model)
         }
         if(filterEcgView != null) {
             layout.removeAllViews()
@@ -49,27 +61,6 @@ class WaveEcgActivity : AppCompatActivity() {
         val lineHeight = width * 2 * 4 / (7 * 5) + 20
         layoutParams.height = lineHeight * 9 + 10
         layout.layoutParams = layoutParams
-    }
-
-    fun initLiveEvent() {
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadFileComplete)
-            .observe(this, {
-                val data = it.data as PulsebitBleResponse.EcgFile
-                filterWaveData = data.waveShortData
-                mills = DateUtil.getSecondTimestamp(data.fileName)
-                handler.postDelayed({
-                    ecgWave()
-                }, 1000)
-            })
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadFileComplete)
-            .observe(this, {
-                val data = it.data as CheckmeLeBleResponse.EcgFile
-                filterWaveData = data.waveShortData
-                mills = DateUtil.getSecondTimestamp(data.fileName)
-                handler.postDelayed({
-                    ecgWave()
-                }, 1000)
-            })
     }
 
 }
