@@ -2,7 +2,7 @@ package com.lepu.blepro.ble.cmd
 
 import android.os.Parcelable
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
-import com.lepu.blepro.utils.byteToPointHex
+import com.lepu.blepro.utils.byteToPointStr
 import com.lepu.blepro.utils.toUInt
 import kotlinx.android.parcel.Parcelize
 
@@ -60,9 +60,9 @@ class PC60FwBleResponse{
 
         init {
             var index = 0
-            softwareV = byteToPointHex(bytes[index]) + "." + byteToPointHex(bytes[index+1])
+            softwareV = byteToPointStr(bytes[index]) + "." + byteToPointStr(bytes[index+1])
             index += 2
-            hardwareV = byteToPointHex(bytes[index])
+            hardwareV = byteToPointStr(bytes[index])
             index++
             deviceName = com.lepu.blepro.utils.toString(bytes.copyOfRange(index, bytes.size))
         }
@@ -84,9 +84,9 @@ class PC60FwBleResponse{
 
         init {
             var index = 0
-            softwareV = byteToPointHex(bytes[index])
+            softwareV = byteToPointStr(bytes[index])
             index++
-            hardwareV = byteToPointHex(bytes[index])
+            hardwareV = byteToPointStr(bytes[index])
             index++
             deviceName = com.lepu.blepro.utils.toString(bytes.copyOfRange(index, bytes.size))
         }
@@ -95,7 +95,7 @@ class PC60FwBleResponse{
             return """
                 softwareV : $softwareV
                 hardwareV : $hardwareV
-                deviceName : $deviceName
+                deviceName : $deviceName 
             """.trimIndent()
         }
     }
