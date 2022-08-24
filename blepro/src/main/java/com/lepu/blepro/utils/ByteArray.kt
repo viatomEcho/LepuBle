@@ -180,3 +180,7 @@ fun byteToPointInt(bytes: Byte): String {
     }
     return intChars.joinToString(".")
 }
+fun byteToPointStr(bytes: Byte): String {
+    val v: Int = bytes.toInt() and 0xFF
+    return "${(v ushr 4)}.${(v and 0x0F)}"
+}

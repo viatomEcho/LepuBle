@@ -202,15 +202,15 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                 fileContent?.let {
                     if (it.isNotEmpty()) {
                         if (fileName.endsWith(".list")) {
-                            val data = Bp2BleFile(fileName, it, device.name)
+                            val data = Bp2BleFile(fileName, it, bluetooth.name)
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFileList).post(InterfaceEvent(model, data))
                         } else {
-                            val data = LeBp2wEcgFile(fileName, it, device.name)
+                            val data = LeBp2wEcgFile(fileName, it, bluetooth.name)
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileComplete).post(InterfaceEvent(model, data))
                         }
                     } else {
                         if (fileName.endsWith(".list")) {
-                            val data = Bp2BleFile(fileName, byteArrayOf(0, fileType.toByte(), 0, 0, 0, 0, 0, 0, 0, 0), device.name)
+                            val data = Bp2BleFile(fileName, byteArrayOf(0, fileType.toByte(), 0, 0, 0, 0, 0, 0, 0, 0), bluetooth.name)
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFileList).post(InterfaceEvent(model, data))
                         } else {
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileError).post(InterfaceEvent(model, fileName))

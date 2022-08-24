@@ -86,7 +86,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
     private fun onResponseReceived(respPkg: Er2BleResponse) {
         when(respPkg.cmd) {
             Er2BleCmd.CMD_RETRIEVE_DEVICE_INFO -> {
-                val info = Er2DeviceInfo(device.name, device.address, respPkg.data)
+                val info = Er2DeviceInfo(bluetooth.name, bluetooth.macAddr, respPkg.data)
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2Info).post(InterfaceEvent(model, info))

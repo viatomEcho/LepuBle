@@ -29,7 +29,6 @@ object PC80BleResponse {
         var softwareV: String   // 软件版本
         var hardwareV: String   // 硬件版本
         var algorithmV: String  // 算法版本
-        var sn: String
 
         // 使用BCD码格式
         // 0xAB : Va.b
@@ -51,7 +50,6 @@ object PC80BleResponse {
                 hardwareV = byteToPointHex(bytes[len-2])
                 algorithmV = byteToPointHex(bytes[len-1])
             }
-            sn = "XBN00NK03553"
         }
 
         override fun toString(): String {
@@ -60,7 +58,6 @@ object PC80BleResponse {
                 softwareV: $softwareV
                 hardwareV: $hardwareV
                 algorithmV: $algorithmV
-                sn: $sn
             """.trimIndent()
         }
     }

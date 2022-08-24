@@ -77,7 +77,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                     }
                     GET_DEVICE_NAME -> {
                         val data = trimStr(toString(response.content))
-                        pc300Device.deviceName = data
+                        pc300Device.deviceName = bluetooth.name
 
                         deviceInfo.deviceName = pc300Device.deviceName
 

@@ -126,6 +126,9 @@ class LpBleUtil {
         fun getCurrentDevice(model: Int): BluetoothDevice? {
             return BleServiceHelper.getCurrentDevice(model)
         }
+        fun getCurrentBluetooth(model: Int): Bluetooth? {
+            return BleServiceHelper.getCurrentBluetooth(model)
+        }
 
         fun setInterface(model: Int, needClear: Boolean){
             clearInterface()
@@ -888,7 +891,7 @@ class LpBleUtil {
                     Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
                     Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_S5W,
                     Bluetooth.MODEL_S6W, Bluetooth.MODEL_S7W,
-                    Bluetooth.MODEL_S7BW -> {
+                    Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S6W1 -> {
                         BleServiceHelper.pc60fwEnableRtData(model, type, enable)
                     }
                     Bluetooth.MODEL_PC_68B -> {

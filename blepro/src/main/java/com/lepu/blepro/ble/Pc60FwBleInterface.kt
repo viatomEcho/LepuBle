@@ -52,6 +52,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_S5W,
             Bluetooth.MODEL_S6W,
+            Bluetooth.MODEL_S6W1,
             Bluetooth.MODEL_S7W,
             Bluetooth.MODEL_S7BW,
             Bluetooth.MODEL_PF_10,
@@ -136,7 +137,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                 TYPE_DEVICE_INFO -> {
                     LepuBleLog.d(tag, "model:$model,TYPE_DEVICE_INFO => success")
                     PC60FwBleResponse.DeviceInfo(response.content).let {
-                        pc60FwDevice.deviceName = it.deviceName
+                        pc60FwDevice.deviceName = bluetooth.name
                         pc60FwDevice.hardwareV = it.hardwareV
                         pc60FwDevice.softwareV = it.softwareV
                         LepuBleLog.d(tag, "it.deviceName == " + it.deviceName)
@@ -180,11 +181,9 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                 Pc60FwBleCmd.MSG_GET_DEVICE_INFO_0F.toByte() -> {
                     LepuBleLog.d(tag, "model:$model,MSG_GET_DEVICE_INFO_0F => success")
                     PC60FwBleResponse.DeviceInfo0F(response.content).let {
-                        pc60FwDevice.sn = device.name.substring(device.name.length-6, device.name.length)
-                        pc60FwDevice.deviceName = it.deviceName
+                        pc60FwDevice.deviceName = bluetooth.name
                         pc60FwDevice.hardwareV = it.hardwareV
                         pc60FwDevice.softwareV = it.softwareV
-                        LepuBleLog.d(tag, "pc60FwDevice.sn == " + pc60FwDevice.sn)
                         LepuBleLog.d(tag, "it.deviceName == " + it.deviceName)
                         LepuBleLog.d(tag, "it.hardwareV == " + it.hardwareV)
                         LepuBleLog.d(tag, "it.softwareV == " + it.softwareV)
