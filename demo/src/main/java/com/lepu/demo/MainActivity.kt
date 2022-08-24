@@ -2,10 +2,14 @@ package com.lepu.demo
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.bluetooth.BluetoothAdapter
+import android.content.Context
 import android.content.Intent
+import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -68,6 +72,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
         subscribeUi()
         needPermission()
+        checkServer()
         initLiveEvent()
 //        split()
 
@@ -550,6 +555,30 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
     }
 
+    private fun checkServer() {
+        var gpsEnabled = false
+        var networkEnabled = false
+        val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        try {
+            gpsEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
+            networkEnabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+        if (!gpsEnabled && !networkEnabled) {
+            val dialog: AlertDialog.Builder = AlertDialog.Builder(this)
+            dialog.setMessage("开启位置服务")
+            dialog.setPositiveButton(getString(R.string.confirm)) { _, _ ->
+                val myIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                startActivity(myIntent)
+            }
+            dialog.setNegativeButton(getString(R.string.cancel)) { _, _ ->
+                finish()
+            }
+            dialog.setCancelable(false)
+            dialog.show()
+        }
+    }
 
     override fun onBleStateChanged(model: Int, state: Int) {
         LepuBleLog.d("onBleStateChanged model = $model, state = $state")
