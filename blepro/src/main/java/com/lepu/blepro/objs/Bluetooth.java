@@ -573,7 +573,7 @@ public class Bluetooth implements Parcelable {
     public boolean equals(Object obj) {
         if (obj instanceof Bluetooth) {
             Bluetooth b = (Bluetooth) obj;
-            return (this.macAddr.equals(b.getMacAddr()));
+            return (this.name.equals(b.name) && this.macAddr.equals(b.getMacAddr()));
         }
         return false;
     }
