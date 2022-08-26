@@ -40,16 +40,17 @@ class LeBp2wEcgList(var bytes: ByteArray) {
     }
 
     class EcgRecord(val bytes: ByteArray) {
-        var time: Long          // 测量时间戳s
-        var fileName: String    // 文件名
-        var uid: Int            // 用户id
-        var mode: Int           // 测量模式
-        var recordingTime: Int  // 记录时长 单位s
-        var result: Int         // 诊断结果
-        var hr: Int             // 单位bpm
-        var qrs: Int            // 单位ms
-        var pvcs: Int           // 单位个
-        var qtc: Int            // 单位ms
+        var time: Long                  // 测量时间戳s
+        var fileName: String            // 文件名
+        var uid: Int                    // 用户id
+        var mode: Int                   // 测量模式
+        var recordingTime: Int          // 记录时长 单位s
+        var result: Int
+        var diagnosis: Bp2EcgDiagnosis  // 诊断结果
+        var hr: Int                     // 单位bpm
+        var qrs: Int                    // 单位ms
+        var pvcs: Int                   // 单位个
+        var qtc: Int                    // 单位ms
 
         init {
             var index = 0
@@ -65,6 +66,7 @@ class LeBp2wEcgList(var bytes: ByteArray) {
             recordingTime = toUInt(bytes.copyOfRange(index, index+4))
             index += 4
             result = toUInt(bytes.copyOfRange(index, index+4))
+            diagnosis = Bp2EcgDiagnosis(bytes.copyOfRange(index, index+4))
             index += 4
             hr = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
@@ -85,6 +87,7 @@ class LeBp2wEcgList(var bytes: ByteArray) {
                 mode : $mode
                 recordingTime : $recordingTime
                 result : $result
+                diagnosis : $diagnosis
                 hr : $hr
                 qrs : $qrs
                 pvcs : $pvcs

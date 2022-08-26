@@ -84,7 +84,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
 
         binding.reconnectByName.setOnClickListener {
             mainViewModel.curBluetooth.value?.let { it1 ->
-                LpBleUtil.reconnect(currentModel[0], it1.deviceName)
+                LpBleUtil.reconnect(intArrayOf(currentModel[0]), arrayOf(it1.deviceName))
             }
         }
         binding.reconnectByAddress.setOnClickListener {

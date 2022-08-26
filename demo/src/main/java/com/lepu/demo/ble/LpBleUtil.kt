@@ -131,7 +131,9 @@ class LpBleUtil {
         }
 
         fun setInterface(model: Int, needClear: Boolean){
-            clearInterface()
+            if (needClear) {
+                clearInterface()
+            }
             BleServiceHelper.setInterfaces(model)
         }
 
@@ -194,20 +196,14 @@ class LpBleUtil {
          * @param name String
          */
         @JvmOverloads
-        fun reconnect(model: Int, name: String, toConnectUpdater: Boolean = false) {
+        fun reconnect(model: IntArray, name: Array<String>, toConnectUpdater: Boolean = false) {
             Log.d(TAG, "reconnect...$model, name = $name")
             name.isNullOrEmpty().let { it1 ->
-                if (it1){
+                if (it1) {
                     Log.d(TAG, "error: name")
                     return
                 }
-                //检查必须要有interface
-                if (isDisconnected(model)) {
-                    Log.d(TAG, "去重连...")
-                    BleServiceHelper.reconnect(model, name, toConnectUpdater)
-                }else{
-                    Log.d(TAG, "蓝牙处于连接状态，reconnect 不往下进行 ")
-                }
+                BleServiceHelper.reconnect(model, name, toConnectUpdater)
             }
 
         }

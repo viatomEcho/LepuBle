@@ -32,7 +32,7 @@ object BiolandBgmBleResponse {
         var battery: Int       // 电量（0-100%）
         var deviceType: Int    // 设备类型（1：血压计，2：血糖仪）
         var deviceCode: Int    // 设备型号
-        var sn: String
+        var sn: String         // 9位
 
         init {
             var index = 0

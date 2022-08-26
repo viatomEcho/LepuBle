@@ -67,7 +67,7 @@ object Aoj20aBleResponse {
 
     @ExperimentalUnsignedTypes
     class TempRecord(val bytes: ByteArray) {
-        var num: Int     // 历史数据序号
+        var num: Int     // 历史数据序号，1-10，最大存10组数据
         var year: Int
         var month: Int
         var day: Int

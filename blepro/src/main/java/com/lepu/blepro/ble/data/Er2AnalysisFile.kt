@@ -11,7 +11,7 @@ class Er2AnalysisFile(val bytes: ByteArray) {
     // reserved 9
     var recordingTime: Int   // 记录时长 e.g. 3600 :  3600s
     // reserved 66
-    var resultList = mutableListOf<AnalysisResult>()
+    var resultList = mutableListOf<AnalysisResult>()  // 每1分钟分析结果
 
     init {
         var index = 0
@@ -38,16 +38,18 @@ class Er2AnalysisFile(val bytes: ByteArray) {
     }
 
     class AnalysisResult(val bytes: ByteArray) {
-        var result: Er2EcgDiagnosis  // 诊断结果
-        var hr: Int                  // 心率 单位：bpm
-        var qrs: Int                 // QRS 单位：ms
-        var pvcs: Int                // PVC个数
-        var qtc: Int                 // QTc 单位：ms
-        var st: Short                // ST（以ST*100存储），单位为mV
+        var result: Int
+        var diagnosis: Er2EcgDiagnosis  // 诊断结果
+        var hr: Int                     // 心率 单位：bpm
+        var qrs: Int                    // QRS 单位：ms
+        var pvcs: Int                   // PVC个数
+        var qtc: Int                    // QTc 单位：ms
+        var st: Short                   // ST（以ST*100存储），单位为mV
         // reserved 18
         init {
             var index = 0
-            result = Er2EcgDiagnosis(bytes.copyOfRange(index, index+4))
+            result = toUInt(bytes.copyOfRange(index, index+4))
+            diagnosis = Er2EcgDiagnosis(bytes.copyOfRange(index, index+4))
             index += 4
             hr = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
@@ -64,6 +66,7 @@ class Er2AnalysisFile(val bytes: ByteArray) {
                 AnalysisResult : 
                 bytes : ${bytesToHex(bytes)}
                 result : $result
+                diagnosis : $diagnosis
                 hr : $hr
                 qrs : $qrs
                 pvcs : $pvcs

@@ -39,18 +39,20 @@ class LeBp2wBpList(var bytes: ByteArray) {
     }
 
     class BpRecord(val bytes: ByteArray) {
-        var time: Long        // 测量时间戳s
-        var fileName: String  // 文件名
-        var uid: Int          // 用户id
-        var mode: Int         // 测量模式 0：单次 1：3次
-        var interval: Int     // 测量间隔 单位s 非单次测量模式有效
-        var status: Int       // 状态码
-        var sys: Int          // 收缩压
-        var dia: Int          // 舒张压
-        var mean: Int         // 平均压
-        var pr: Int           // 脉率
-        var result: Int       // 诊断结果 0：心律不齐 1：动作干扰
-        var level: Int        // 血压等级，协议没有具体数值含义
+        var time: Long            // 测量时间戳s
+        var fileName: String      // 文件名
+        var uid: Int              // 用户id
+        var mode: Int             // 测量模式 0：单次 1：3次
+        var interval: Int         // 测量间隔 单位s 非单次测量模式有效
+        var status: Int           // 状态码
+        var sys: Int              // 收缩压
+        var dia: Int              // 舒张压
+        var mean: Int             // 平均压
+        var pr: Int               // 脉率
+        var result: Int           // 诊断结果 bit0：心律不齐 bit1：动作干扰
+        var isIrregular: Boolean  // 心律不齐
+        var isMovement: Boolean   // 动作干扰
+        var level: Int            // 血压等级，协议没有具体数值含义
 
         init {
             var index = 0
@@ -76,6 +78,8 @@ class LeBp2wBpList(var bytes: ByteArray) {
             pr = (bytes[index].toUInt() and 0xFFu).toInt()
             index++
             result = (bytes[index].toUInt() and 0xFFu).toInt()
+            isIrregular = result and 0x01 == 1
+            isMovement = (result and 0x02 shr 1) == 1
             index++
             level = (bytes[index].toUInt() and 0xFFu).toInt()
         }
@@ -95,6 +99,8 @@ class LeBp2wBpList(var bytes: ByteArray) {
                 mean : $mean
                 pr : $pr
                 result : $result
+                isIrregular : $isIrregular
+                isMovement : $isMovement
                 level : $level
             """.trimIndent()
         }

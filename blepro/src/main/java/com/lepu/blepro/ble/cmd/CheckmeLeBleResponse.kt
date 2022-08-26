@@ -124,10 +124,10 @@ object CheckmeLeBleResponse{
         var minute: Int
         var second: Int
         var hr: Int
-        var ecgNormal: Boolean
+        var ecgNormal: Boolean  // true：笑脸，false：哭脸
         var spo2: Int
         var pi: Float
-        var oxyNormal: Boolean
+        var oxyNormal: Boolean  // true：笑脸，false：哭脸
         init {
             var index = 0
             year = toUInt(bytes.copyOfRange(index, index+2))
@@ -265,7 +265,7 @@ object CheckmeLeBleResponse{
         var measureModeMess: String
         var spo2: Int                // 血氧值（0-100，单位为%）
         var pr: Int                  // PR值（0-255）
-        var pi: Float                // PI值（实际为一位小数的值，单位为%，此处使用整数表示，如12.5%则用125表示）
+        var pi: Float                // PI值（实际为一位小数的值，单位为%，此处使用整数表示，如12.5%则用125表示）（0-25.5%）
         var normal: Boolean          // true：good，false：bad
         init {
             var index = 0
@@ -384,25 +384,25 @@ object CheckmeLeBleResponse{
     }
     @ExperimentalUnsignedTypes
     class EcgFile(val fileName: String, val fileSize: Int, val bytes: ByteArray) {
-        var hrsDataSize: Int               // 波形心率大小（byte）
-        var recordingTime: Int             // 记录时长 s
-        var waveDataSize: Int              // 波形数据大小（byte）
-        var hr: Int                        // 诊断结果：HR，单位为bpm
-        var st: Float                      // 诊断结果：ST（以ST/100存储），单位为mV(内部导联写0)
-        var qrs: Int                       // 诊断结果：QRS，单位为ms
-        var pvcs: Int                      // 诊断结果：PVCs(内部导联写0)
-        var qtc: Int                       // 诊断结果：QTc单位为ms
-        var re: Int
-        var result: CheckmeLeEcgDiagnosis  // 心电异常诊断结果
-        var measureMode: Int               // 测量模式 1：Hand-Hand，2：Hand-Chest，3：1-Lead，4：2-Lead
+        var hrsDataSize: Int                  // 波形心率大小（byte）
+        var recordingTime: Int                // 记录时长 s
+        var waveDataSize: Int                 // 波形数据大小（byte）
+        var hr: Int                           // HR，单位为bpm
+        var st: Float                         // ST（以ST/100存储），单位为mV(内部导联写0)
+        var qrs: Int                          // QRS，单位为ms
+        var pvcs: Int                         // PVCs(内部导联写0)
+        var qtc: Int                          // QTc单位为ms
+        var result: Int
+        var diagnosis: CheckmeLeEcgDiagnosis  // 诊断结果
+        var measureMode: Int                  // 测量模式 1：Hand-Hand，2：Hand-Chest，3：1-Lead，4：2-Lead
         var measureModeMess: String
-        var filterMode: Int                // 滤波模式（1：wide   0：normal）
-        var qt: Int                        // 诊断结果：QT单位为ms
-        var hrsData: ByteArray             // ECG心率值，从数据采样开始，采样率为1Hz，每个心率值为2byte（实际20s数据，每秒出一个心率），若出现无效心率，则心率为0
-        var hrsIntData: IntArray           // ECG心率值
-        var waveData: ByteArray            // 每个采样点2byte，原始数据
-        var waveShortData: ShortArray      // 每个采样点2byte
-        var wFs: FloatArray                // 转毫伏值(n*4033)/(32767*12*8)
+        var filterMode: Int                   // 滤波模式（1：wide   0：normal）
+        var qt: Int                           // QT单位为ms
+        var hrsData: ByteArray                // ECG心率值，从数据采样开始，采样率为1Hz，每个心率值为2byte（实际20s数据，每秒出一个心率），若出现无效心率，则心率为0
+        var hrsIntData: IntArray              // ECG心率值
+        var waveData: ByteArray               // 每个采样点2byte，原始数据
+        var waveShortData: ShortArray         // 每个采样点2byte
+        var wFs: FloatArray                   // 转毫伏值(n*4033)/(32767*12*8)
         init {
             var index = 0
             hrsDataSize = toUInt(bytes.copyOfRange(index, index+2))
@@ -420,8 +420,8 @@ object CheckmeLeBleResponse{
             index += 2
             qtc = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
-            re = byte2UInt(bytes[index])
-            result = CheckmeLeEcgDiagnosis(bytes[index])
+            result = byte2UInt(bytes[index])
+            diagnosis = CheckmeLeEcgDiagnosis(bytes[index])
             index++
             measureMode = byte2UInt(bytes[index])
             measureModeMess = getModeMess(0, measureMode)
@@ -461,8 +461,8 @@ object CheckmeLeBleResponse{
                 qrs : $qrs
                 pvcs : $pvcs
                 qtc : $qtc
-                re : $re
                 result : $result
+                diagnosis : $diagnosis
                 measureMode : $measureMode
                 measureModeMess : $measureModeMess
                 filterMode : $filterMode

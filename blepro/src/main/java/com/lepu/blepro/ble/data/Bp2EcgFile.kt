@@ -8,19 +8,20 @@ import java.util.*
 
 class Bp2EcgFile(val bytes: ByteArray) {
 
-    var fileVersion: Int       // 文件版本 e.g.  0x01 :  V1
-    var fileType: Int          // 文件类型 1：血压；2：心电
-    var measureTime: Int       // 测量时间时间戳 s
+    var fileVersion: Int            // 文件版本 e.g.  0x01 :  V1
+    var fileType: Int               // 文件类型 1：血压；2：心电
+    var measureTime: Int            // 测量时间时间戳 s
     // reserved 3
-    var uploadTag: Boolean     // 上传标识
-    var recordingTime: Int     // 记录时长 s
+    var uploadTag: Boolean          // 上传标识
+    var recordingTime: Int          // 记录时长 s
     // reserved 2
-    var result: Int            // 诊断结果
-    var hr: Int                // 心率 单位：bpm
-    var qrs: Int               // QRS 单位：ms
-    var pvcs: Int              // PVC个数
-    var qtc: Int               // QTc 单位：ms
-    var connectCable: Boolean  // 是否接入线缆
+    var result: Int
+    var diagnosis: Bp2EcgDiagnosis  // 诊断结果
+    var hr: Int                     // 心率 单位：bpm
+    var qrs: Int                    // QRS 单位：ms
+    var pvcs: Int                   // PVC个数
+    var qtc: Int                    // QTc 单位：ms
+    var connectCable: Boolean       // 是否接入线缆
     // reserved 19
     var waveData: ByteArray
 
@@ -41,6 +42,7 @@ class Bp2EcgFile(val bytes: ByteArray) {
         index += 4
         index += 2
         result = toUInt(bytes.copyOfRange(index, index+4))
+        diagnosis = Bp2EcgDiagnosis(bytes.copyOfRange(index, index+4))
         index += 4
         hr = toUInt(bytes.copyOfRange(index, index+2))
         index += 2
@@ -66,6 +68,7 @@ class Bp2EcgFile(val bytes: ByteArray) {
             uploadTag : $uploadTag
             recordingTime : $recordingTime
             result : $result
+            diagnosis : $diagnosis
             hr : $hr
             qrs : $qrs
             pvcs : $pvcs

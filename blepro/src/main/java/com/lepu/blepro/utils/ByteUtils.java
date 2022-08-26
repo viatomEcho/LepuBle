@@ -61,6 +61,13 @@ public class ByteUtils {
         return (((b1 & 0xff) << 8) + (b2 & 0xff));
     }
 
+    /**
+     * 转无符号整数（大端模式）
+     * 占满四字节为有符号数
+     * @param b1
+     * @param b2
+     * @return
+     */
     public static int bytes2UIntBig(byte b1, byte b2, byte b3, byte b4) {
         return (((b1 & 0xff) << 24) + ((b2 & 0xff) << 16) + ((b3 & 0xff) << 8) + (b4 & 0xff));
     }

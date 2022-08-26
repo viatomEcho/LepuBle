@@ -52,9 +52,9 @@ class Ap20BleResponse{
     @ExperimentalUnsignedTypes
     @Parcelize
     class RtBoParam constructor(var bytes: ByteArray) : Parcelable {
-        var spo2: Int
-        var pr: Int
-        var pi: Int
+        var spo2: Int                  // 范围为0%~100%，0代表无效值
+        var pr: Int                    // 范围为0~511bpm，0代表无效值
+        var pi: Int                    // 范围为0%~25.5%，0代表无效值
         var isProbeOff: Boolean        // 探头脱落，手指未接入
         var isPulseSearching: Boolean  // 脉搏检测
         var isCheckProbe: Boolean      // 探头故障或使用不当
@@ -100,7 +100,7 @@ class Ap20BleResponse{
     @ExperimentalUnsignedTypes
     @Parcelize
     class RtBreathParam constructor(var bytes: ByteArray) : Parcelable {
-        var rr: Int          // 呼吸率（6-60，单位bpm，0是无效值）
+        var rr: Int        // 呼吸率（6-60，单位bpm，0是无效值）
         var sign: Int      // 鼻息流脱落标记（0：呼吸信号正常 1：无呼吸信号）
         init {
             var index = 0
