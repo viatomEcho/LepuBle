@@ -176,6 +176,126 @@ public class Lpm311Data {
         this.cholDivHdlStr = cholDivHdlStr;
     }
 
+    public static final Double CHOL_MG_MIN = 100.0D;
+    public static final Double CHOL_MG_MAX = 500.0D;
+    public static final Double HDL_MG_MIN = 15.0D;
+    public static final Double HDL_MG_MAX = 100.0D;
+    public static final Double TRIG_MG_MIN = 45.0D;
+    public static final Double TRIG_MG_MAX = 650.0D;
+    public static final Double LDL_MG_MIN = 50.0D;
+    public static final Double LDL_MG_MAX = 190.0D;
+    public static final Double CHOL_MMOL_MIN = 2.59D;
+    public static final Double CHOL_MMOL_MAX = 12.93D;
+    public static final Double HDL_MMOL_MIN = 0.39D;
+    public static final Double HDL_MMOL_MAX = 2.59D;
+    public static final Double TRIG_MMOL_MIN = 0.51D;
+    public static final Double TRIG_MMOL_MAX = 7.34D;
+    public static final Double LDL_MMOL_MIN = 1.29D;
+    public static final Double LDL_MMOL_MAX = 4.91D;
+    public static final Double VALUE_0 = 0.0D;
+    public static final int CHOL = 0;
+    public static final int HDL = 1;
+    public static final int TRIG = 2;
+    public static final int LDL = 3;
+    public static final int CHOL_HDL = 4;
+    public static final int UNIT_MMOL = 0;
+    public static final int UNIT_MG = 1;
+    public static String getDataStr(int unit, int dataType, double data) {
+        if (unit == UNIT_MG) {
+            switch (dataType) {
+                case CHOL:
+                    if (data < CHOL_MG_MIN) {
+                        return "<100";
+                    } else if (data > CHOL_MG_MAX) {
+                        return ">500";
+                    } else {
+                        return ""+data;
+                    }
+                case HDL:
+                    if (data < HDL_MG_MIN) {
+                        return "<15";
+                    } else if (data > HDL_MG_MAX) {
+                        return ">100";
+                    } else {
+                        return ""+data;
+                    }
+                case TRIG:
+                    if (data < TRIG_MG_MIN) {
+                        return "<45";
+                    } else if (data > TRIG_MG_MAX) {
+                        return ">650";
+                    } else {
+                        return ""+data;
+                    }
+                case LDL:
+                    if (data < LDL_MG_MIN && data >= VALUE_0) {
+                        return "<50";
+                    } else if (data > LDL_MG_MAX) {
+                        return ">190";
+                    } else if (data < VALUE_0) {
+                        return "--";
+                    } else {
+                        return ""+data;
+                    }
+                case CHOL_HDL:
+                    if (data == Double.MIN_VALUE) {
+                        return "--";
+                    } else {
+                        return ""+data;
+                    }
+                default:
+                    return "--";
+            }
+        } else if (unit == UNIT_MMOL) {
+            switch (dataType) {
+                case CHOL:
+                    if (data < CHOL_MMOL_MIN) {
+                        return "<2.59";
+                    } else if (data > CHOL_MMOL_MAX) {
+                        return ">12.93";
+                    } else {
+                        return ""+data;
+                    }
+                case HDL:
+                    if (data < HDL_MMOL_MIN) {
+                        return "<0.39";
+                    } else if (data > HDL_MMOL_MAX) {
+                        return ">2.59";
+                    } else {
+                        return ""+data;
+                    }
+                case TRIG:
+                    if (data < TRIG_MMOL_MIN) {
+                        return "<0.51";
+                    } else if (data > TRIG_MMOL_MAX) {
+                        return ">7.34";
+                    } else {
+                        return ""+data;
+                    }
+                case LDL:
+                    if (data < LDL_MMOL_MIN && data >= VALUE_0) {
+                        return "<1.29";
+                    } else if (data > LDL_MMOL_MAX) {
+                        return ">4.91";
+                    } else if (data < VALUE_0) {
+                        return "--";
+                    } else {
+                        return ""+data;
+                    }
+                case CHOL_HDL:
+                    if (data == Double.MIN_VALUE) {
+                        return "--";
+                    } else {
+                        return ""+data;
+                    }
+                default:
+                    return "--";
+            }
+        } else {
+            return "--";
+        }
+    }
+
     @Override
     public String toString() {
         return "Lpm311Data{" +

@@ -49,15 +49,10 @@ class Lpm311BleInterface(model: Int): BleInterface(model) {
         data.minute = result.min
         data.second = result.sec
         data.chol = result.chol
-        data.cholStr = LPMRecordHelper.formatItemText(result, LPMItemType.CHOL)
         data.hdl = result.hdl
-        data.hdlStr = LPMRecordHelper.formatItemText(result, LPMItemType.HDL)
         data.trig = result.trig
-        data.trigStr = LPMRecordHelper.formatItemText(result, LPMItemType.TRIG)
         data.ldl = result.ldl
-        data.ldlStr = LPMRecordHelper.formatItemText(result, LPMItemType.LDL)
         data.cholDivHdl = result.cholDivHdl
-        data.cholDivHdlStr = LPMRecordHelper.formatItemText(result, LPMItemType.CHOL_HDL)
         data.unit = when (result.itemUnit) {
             LPMItemUnit.mmol_L -> {
                 0
@@ -67,6 +62,11 @@ class Lpm311BleInterface(model: Int): BleInterface(model) {
             }
             else -> 1
         }
+        data.cholStr = Lpm311Data.getDataStr(data.unit, Lpm311Data.CHOL, data.chol)
+        data.hdlStr = Lpm311Data.getDataStr(data.unit, Lpm311Data.HDL, data.hdl)
+        data.trigStr = Lpm311Data.getDataStr(data.unit, Lpm311Data.TRIG, data.trig)
+        data.ldlStr = Lpm311Data.getDataStr(data.unit, Lpm311Data.LDL, data.ldl)
+        data.cholDivHdlStr = Lpm311Data.getDataStr(data.unit, Lpm311Data.CHOL_HDL, data.cholDivHdl)
         data.user = trimStr(result.name)
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LPM311.EventLpm311Data).post(InterfaceEvent(model, data))
         sendCmd("disconnect".toByteArray(StandardCharsets.US_ASCII))
