@@ -238,7 +238,7 @@ public class Lpm311Data {
                         return ""+data;
                     }
                 case CHOL_HDL:
-                    if (data == Double.MIN_VALUE) {
+                    if (data == VALUE_0) {
                         return "--";
                     } else {
                         return ""+data;
@@ -283,7 +283,7 @@ public class Lpm311Data {
                         return ""+data;
                     }
                 case CHOL_HDL:
-                    if (data == Double.MIN_VALUE) {
+                    if (data == VALUE_0) {
                         return "--";
                     } else {
                         return ""+data;

@@ -32,6 +32,10 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             Bluetooth.MODEL_PC60FW,
             Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_PF_10,
+            Bluetooth.MODEL_PF_10AW,
+            Bluetooth.MODEL_PF_10AW1,
+            Bluetooth.MODEL_PF_10BW,
+            Bluetooth.MODEL_PF_10BW1,
             Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B,
             Bluetooth.MODEL_POD2B,
@@ -41,7 +45,9 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             Bluetooth.MODEL_S7W,
             Bluetooth.MODEL_S7BW,
             Bluetooth.MODEL_OXYSMART,
-            Bluetooth.MODEL_PF_20 -> Pc60FwBleManager(context)
+            Bluetooth.MODEL_PF_20,
+            Bluetooth.MODEL_PF_20AW,
+            Bluetooth.MODEL_PF_20B -> Pc60FwBleManager(context)
             else -> Pc6nBleManager(context)
         }
         manager.isUpdater = isUpdater

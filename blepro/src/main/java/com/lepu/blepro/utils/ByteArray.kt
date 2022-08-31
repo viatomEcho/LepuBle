@@ -70,7 +70,16 @@ fun toInt(bytes: ByteArray): Int {
 fun bytesToSignedShort(byte1: Byte, byte2: Byte):Short {
     return ((byte2.toInt() shl 8) or (byte1.toInt() and 0xFF)).toShort()
 }
-
+/**
+ * byte数组转有符号整数（大端模式）
+ */
+fun toIntBig(bytes: ByteArray): Int {
+    var result = 0
+    for (i in bytes.indices) {
+        result = result or ((bytes[i].toInt() and 0xFF) shl 8*(bytes.size-1-i))
+    }
+    return result
+}
 /**
  * 转两个字节byte数组（大端模式）
  */

@@ -69,7 +69,6 @@ dependencies {
 
     compileOnly files('libs/ICBodyFatAlgorithms.aar')
 //    implementation files('libs/ICBodyFatAlgorithms.aar')
-    implementation files('libs/DataParser-LPM311-1.0.jar')
 }
 
 // 指定编码

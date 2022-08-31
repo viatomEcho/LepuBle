@@ -108,6 +108,12 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_S7W = "S7W";
     public static final String BT_NAME_S7BW = "S7BW";
     public static final String BT_NAME_S6W1 = "S6W1";
+    public static final String BT_NAME_PF_10AW = "PF-10AW";
+    public static final String BT_NAME_PF_10AW1 = "PF-10AW1";
+    public static final String BT_NAME_PF_10BW = "PF-10BW";
+    public static final String BT_NAME_PF_10BW1 = "PF-10BW1";
+    public static final String BT_NAME_PF_20AW = "PF-20AW";
+    public static final String BT_NAME_PF_20B = "PF-20B";
 
     public static final int MODEL_UNRECOGNIZED = 0;
     public static final int MODEL_CHECKO2 = 1;
@@ -192,6 +198,12 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_S7W = 81;
     public static final int MODEL_S7BW = 83;
     public static final int MODEL_S6W1 = 84;
+    public static final int MODEL_PF_10AW = 85;
+    public static final int MODEL_PF_10AW1 = 86;
+    public static final int MODEL_PF_10BW = 87;
+    public static final int MODEL_PF_10BW1 = 88;
+    public static final int MODEL_PF_20AW = 89;
+    public static final int MODEL_PF_20B = 90;
 
     @IntDef({MODEL_UNRECOGNIZED, MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_OXYRING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER1_N,
             MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL, MODEL_BABYO2, MODEL_OXYSMART,
@@ -201,7 +213,7 @@ public class Bluetooth implements Parcelable {
             MODEL_F4_SCALE, MODEL_MY_SCALE, MODEL_F5_SCALE, MODEL_PC66B, MODEL_AP20, MODEL_LEW, MODEL_VETCORDER, MODEL_VTM_AD5, MODEL_SP20,
             MODEL_LE_BP2W, MODEL_F8_SCALE, MODEL_PC_68B, MODEL_PC300, MODEL_CHECKME_LE, MODEL_PF_10, MODEL_PF_20, MODEL_LES1, MODEL_CHECK_ADV,
             MODEL_BBSM_S1, MODEL_BBSM_S2, MODEL_OXYU, MODEL_S5W, MODEL_HHM1, MODEL_HHM2, MODEL_HHM3, MODEL_HHM4, MODEL_LPM311, MODEL_POCTOR_M3102,
-            MODEL_S6W, MODEL_S7W, MODEL_S7BW, MODEL_S6W1})
+            MODEL_S6W, MODEL_S7W, MODEL_S7BW, MODEL_S6W1, MODEL_PF_10AW, MODEL_PF_10AW1, MODEL_PF_10BW, MODEL_PF_10BW1, MODEL_PF_20AW, MODEL_PF_20B})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 
@@ -259,8 +271,24 @@ public class Bluetooth implements Parcelable {
         } else if (deviceName.contains(BT_NAME_CHECKME_LE)) {
             return MODEL_CHECKME_LE;
         } else if (deviceName.contains(BT_NAME_PF_10)) {
+            if (deviceName.contains(BT_NAME_PF_10AW)) {
+                if (deviceName.contains(BT_NAME_PF_10AW1)) {
+                    return MODEL_PF_10AW1;
+                }
+                return MODEL_PF_10AW;
+            } else if (deviceName.contains(BT_NAME_PF_10BW)) {
+                if (deviceName.contains(BT_NAME_PF_10BW1)) {
+                    return MODEL_PF_10BW1;
+                }
+                return MODEL_PF_10BW;
+            }
             return MODEL_PF_10;
         } else if (deviceName.contains(BT_NAME_PF_20)) {
+            if (deviceName.contains(BT_NAME_PF_20AW)) {
+                return MODEL_PF_20AW;
+            } else if (deviceName.contains(BT_NAME_PF_20B)) {
+                return MODEL_PF_20B;
+            }
             return MODEL_PF_20;
         } else if (deviceName.contains(BT_NAME_LES1)) {
             return MODEL_LES1;
@@ -387,7 +415,8 @@ public class Bluetooth implements Parcelable {
             BT_NAME_POD_1W, BT_NAME_PC_60B, BT_NAME_KCA, BT_NAME_PC80B, BT_NAME_PC66B, BT_NAME_AP20, BT_NAME_MY_SCALE, BT_NAME_F5_SCALE, BT_NAME_VTM_AD5, BT_NAME_SP20,
             BT_NAME_LE_BP2W, BT_NAME_F8_SCALE, BT_NAME_PC_68B, BT_NAME_F4_SCALE, BT_NAME_PC_300, BT_NAME_CHECKME_LE, BT_NAME_PF_10, BT_NAME_PF_20, BT_NAME_LES1,
             BT_NAME_CHECK_ADV, BT_NAME_BBSM_S1, BT_NAME_BBSM_S2, BT_NAME_OXYU, BT_NAME_S5W, BT_NAME_HHM1, BT_NAME_HHM2, BT_NAME_HHM3, BT_NAME_HHM4,
-            BT_NAME_LPM311, BT_NAME_POCTOR_M3102, BT_NAME_S6W, BT_NAME_S7W, BT_NAME_S7BW, BT_NAME_S6W1})
+            BT_NAME_LPM311, BT_NAME_POCTOR_M3102, BT_NAME_S6W, BT_NAME_S7W, BT_NAME_S7BW, BT_NAME_S6W1,
+            BT_NAME_PF_10AW, BT_NAME_PF_10AW1, BT_NAME_PF_10BW, BT_NAME_PF_10BW1, BT_NAME_PF_20AW, BT_NAME_PF_20B})
     @Retention(RetentionPolicy.SOURCE)
     public @interface DEVICE_NAME {
 
@@ -548,6 +577,18 @@ public class Bluetooth implements Parcelable {
                 return BT_NAME_S7BW;
             case MODEL_S6W1:
                 return BT_NAME_S6W1;
+            case MODEL_PF_10AW:
+                return BT_NAME_PF_10AW;
+            case MODEL_PF_10AW1:
+                return BT_NAME_PF_10AW1;
+            case MODEL_PF_10BW:
+                return BT_NAME_PF_10BW;
+            case MODEL_PF_10BW1:
+                return BT_NAME_PF_10BW1;
+            case MODEL_PF_20AW:
+                return BT_NAME_PF_20AW;
+            case MODEL_PF_20B:
+                return BT_NAME_PF_20B;
             default:
                 return "";
         }

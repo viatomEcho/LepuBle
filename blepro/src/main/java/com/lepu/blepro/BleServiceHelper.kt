@@ -614,7 +614,10 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
+            Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
+            Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
             Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
             Bluetooth.MODEL_S6W1 -> {
@@ -2274,7 +2277,10 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
+            Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
+            Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
             Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
             Bluetooth.MODEL_S6W1 -> {
@@ -2295,7 +2301,10 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
+            Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
+            Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
             Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
             Bluetooth.MODEL_S6W1 -> {

@@ -131,6 +131,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
             Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
+            Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
+            Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
+            Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC66B,
             Bluetooth.MODEL_AP20, Bluetooth.MODEL_BABYO2,
             Bluetooth.MODEL_BBSM_S1, Bluetooth.MODEL_BBSM_S2,
@@ -761,6 +764,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 }
                 Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
                 Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
+                Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
+                Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
+                Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
                 Bluetooth.MODEL_PC66B, Bluetooth.MODEL_AP20,
                 Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_SP20,
                 Bluetooth.MODEL_BBSM_S1, Bluetooth.MODEL_BBSM_S2,
@@ -971,6 +977,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     }
                     Bluetooth.MODEL_SP20, Bluetooth.MODEL_PC60FW,
                     Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
+                    Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
+                    Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
+                    Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
                     Bluetooth.MODEL_PC66B, Bluetooth.MODEL_POD_1W,
                     Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
                     Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60B,
