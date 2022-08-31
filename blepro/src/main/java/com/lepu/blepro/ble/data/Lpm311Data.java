@@ -12,10 +12,15 @@ public class Lpm311Data {
     private int minute;
     private int second;
     private double chol;
+    private String cholStr;
     private double hdl;
+    private String hdlStr;
     private double trig;
+    private String trigStr;
     private double ldl;
+    private String ldlStr;
     private double cholDivHdl;
+    private String cholDivHdlStr;
     private int unit;           // 0：mmol_L，1：mg_dL
     private String user;
 
@@ -131,6 +136,46 @@ public class Lpm311Data {
         this.user = user;
     }
 
+    public String getCholStr() {
+        return cholStr;
+    }
+
+    public void setCholStr(String cholStr) {
+        this.cholStr = cholStr;
+    }
+
+    public String getHdlStr() {
+        return hdlStr;
+    }
+
+    public void setHdlStr(String hdlStr) {
+        this.hdlStr = hdlStr;
+    }
+
+    public String getTrigStr() {
+        return trigStr;
+    }
+
+    public void setTrigStr(String trigStr) {
+        this.trigStr = trigStr;
+    }
+
+    public String getLdlStr() {
+        return ldlStr;
+    }
+
+    public void setLdlStr(String ldlStr) {
+        this.ldlStr = ldlStr;
+    }
+
+    public String getCholDivHdlStr() {
+        return cholDivHdlStr;
+    }
+
+    public void setCholDivHdlStr(String cholDivHdlStr) {
+        this.cholDivHdlStr = cholDivHdlStr;
+    }
+
     @Override
     public String toString() {
         return "Lpm311Data{" +
@@ -142,10 +187,15 @@ public class Lpm311Data {
                 ", minute=" + minute +
                 ", second=" + second +
                 ", chol=" + chol +
+                ", cholStr=" + cholStr +
                 ", hdl=" + hdl +
+                ", hdlStr=" + hdlStr +
                 ", trig=" + trig +
+                ", trigStr=" + trigStr +
                 ", ldl=" + ldl +
+                ", ldlStr=" + ldlStr +
                 ", cholDivHdl=" + cholDivHdl +
+                ", cholDivHdlStr=" + cholDivHdlStr +
                 ", unit=" + unit +
                 ", user='" + user + '\'' +
                 '}';

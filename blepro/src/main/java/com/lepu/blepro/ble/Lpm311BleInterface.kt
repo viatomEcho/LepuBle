@@ -49,10 +49,15 @@ class Lpm311BleInterface(model: Int): BleInterface(model) {
         data.minute = result.min
         data.second = result.sec
         data.chol = result.chol
+        data.cholStr = LPMRecordHelper.formatItemText(result, LPMItemType.CHOL)
         data.hdl = result.hdl
+        data.hdlStr = LPMRecordHelper.formatItemText(result, LPMItemType.HDL)
         data.trig = result.trig
+        data.trigStr = LPMRecordHelper.formatItemText(result, LPMItemType.TRIG)
         data.ldl = result.ldl
+        data.ldlStr = LPMRecordHelper.formatItemText(result, LPMItemType.LDL)
         data.cholDivHdl = result.cholDivHdl
+        data.cholDivHdlStr = LPMRecordHelper.formatItemText(result, LPMItemType.CHOL_HDL)
         data.unit = when (result.itemUnit) {
             LPMItemUnit.mmol_L -> {
                 0
