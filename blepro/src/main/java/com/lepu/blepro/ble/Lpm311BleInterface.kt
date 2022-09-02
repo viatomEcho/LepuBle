@@ -8,6 +8,9 @@ import com.lepu.blepro.ble.data.Lpm311Data
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.HexString.trimStr
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.nio.charset.StandardCharsets
 
 /**
@@ -167,7 +170,10 @@ class Lpm311BleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getFileList() {
-        sendCmd("connect".toByteArray(StandardCharsets.US_ASCII))
+        GlobalScope.launch {
+            delay(1000)
+            sendCmd("connect".toByteArray(StandardCharsets.US_ASCII))
+        }
     }
 
     override fun syncTime() {

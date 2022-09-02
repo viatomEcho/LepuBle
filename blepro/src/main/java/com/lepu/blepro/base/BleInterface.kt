@@ -10,7 +10,6 @@ import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
-import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
@@ -75,7 +74,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     lateinit var manager: LpBleManager
     // device在扫描时会动态刷新device name,可能为null
     lateinit var device: BluetoothDevice
-    lateinit var bluetooth: Bluetooth
 
     private var pool: ByteArray? = null
 
@@ -209,9 +207,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             LepuBleLog.d(tag, "try connect: $it，isAutoReconnect = $isAutoReconnect, toConnectUpdater = $toConnectUpdater")
         }
         this.device = device
-        this.bluetooth = BluetoothController.getCurrentBluetooth(device)
-
-
         this.isAutoReconnect = isAutoReconnect
         this.toConnectUpdater = toConnectUpdater
         initManager(context, device, toConnectUpdater)
@@ -413,7 +408,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             if (!manager.isUpdater) syncTime()
         }
     }
-
 
     open fun sendCmd(bs: ByteArray): Boolean {
         if (!state && !ready) {
