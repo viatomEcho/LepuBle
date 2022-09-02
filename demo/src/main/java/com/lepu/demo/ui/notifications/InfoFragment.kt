@@ -228,7 +228,13 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC_60NW_1
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC_60B
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10AW
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10AW1
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10BW
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10BW1
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_20
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_20AW
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_20B
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC_60NW
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S5W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S6W
@@ -252,7 +258,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
         }
         mainViewModel.pulsebitInfo.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PULSEBITEX) {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PULSEBITEX
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM4) {
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}\ncode：${it.branchCode}"
             }
@@ -280,6 +287,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_W12C) {
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}"
+            }
+        }
+        mainViewModel.biolandInfo.observe(viewLifecycleOwner) {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BIOLAND_BGM) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "版本：${it.version}\n电量：${it.battery} %\nsn：${it.sn}"
             }
         }
 
@@ -432,34 +445,14 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (event.data as String).let {
                     binding.info.text = it
                     for (fileName in it.split(",")) {
-//                        if (fileName.contains("R")) {
-                        if (fileName.isNotEmpty()) {
+                        if (fileName.contains("R")) {
+//                        if (fileName.isNotEmpty()) {
                             fileNames.add(fileName)
                         }
 //                        }
                     }
                     binding.deviceInfo.text = fileNames.toString()
-                    when (event.model) {
-                        Bluetooth.MODEL_ER1 -> {
-                            Toast.makeText(context, "ER1 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                        }
-                        Bluetooth.MODEL_ER1_N -> {
-                            Toast.makeText(context, "VBeat 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                        }
-                        Bluetooth.MODEL_HHM1 -> {
-                            Toast.makeText(context, "HHM1 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                        }
-                        Bluetooth.MODEL_DUOEK -> {
-                            Toast.makeText(context, "DuoEK 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                        }
-                        Bluetooth.MODEL_HHM2 -> {
-                            Toast.makeText(context, "HHM2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                        }
-                        Bluetooth.MODEL_HHM3 -> {
-                            Toast.makeText(context, "HHM3 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                        }
-                        else -> Toast.makeText(context, "ER1 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                    }
+                    Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadingFileProgress)
@@ -534,15 +527,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         }
                     }
                     binding.deviceInfo.text = fileNames.toString()
-                    when (event.model) {
-                        Bluetooth.MODEL_ER2 -> {
-                            Toast.makeText(context, "ER2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                        }
-                        Bluetooth.MODEL_LP_ER2 -> {
-                            Toast.makeText(context, "LP ER2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                        }
-                        else -> Toast.makeText(context, "ER2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                    }
+                    Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadingFileProgress)
@@ -625,7 +610,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         binding.info.text = "$list"
                     }
                 }
-                Toast.makeText(context, "lew手表 获取列表成功 ${data.type}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "获取列表成功 ${data.type}", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadingFileProgress)
             .observe(this) { event ->
@@ -640,7 +625,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     val file = EcgFile(it.content)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $file \n"
                     binding.process.text = readFileProcess
-                    Toast.makeText(context, "lew手表 获取心电文件$curFileName 成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "获取心电文件$curFileName 成功", Toast.LENGTH_SHORT).show()
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
                         readFile()
@@ -663,7 +648,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     for (fileName in it.fileNameList) {
                         fileNames.add(fileName)
                     }
-                    Toast.makeText(context, "bp2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                     binding.deviceInfo.text = fileNames.toString()
                 }
             }
@@ -727,7 +712,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     for (fileName in it.fileNameList) {
                         fileNames.add(fileName)
                     }
-                    Toast.makeText(context, "bp2w 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                     binding.info.text = "$it"
                     binding.deviceInfo.text = fileNames.toString()
                 }
@@ -803,18 +788,18 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                                 for (file in data.ecgFileList) {
                                     fileNames.add(file.fileName)
                                 }
-                                Toast.makeText(context, "le bp2w 获取心电文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "获取心电文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                             } else {
-                                Toast.makeText(context, "le bp2w 获取心电文件列表为空", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "获取心电文件列表为空", Toast.LENGTH_SHORT).show()
                             }
                         }
                         LeBp2wBleCmd.FileType.BP_TYPE -> {
                             val data = LeBp2wBpList(it.content)
                             binding.info.text = "$data"
                             if (data.bpFileList.size != 0) {
-                                Toast.makeText(context, "le bp2w 获取血压文件列表成功 共有${data.bpFileList.size}个记录", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "获取血压文件列表成功 共有${data.bpFileList.size}个记录", Toast.LENGTH_SHORT).show()
                             } else {
-                                Toast.makeText(context, "le bp2w 获取血压文件列表为空", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "获取血压文件列表为空", Toast.LENGTH_SHORT).show()
                             }
                             for (file in data.bpFileList) {
                                 val temp = BpData()
@@ -832,9 +817,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             val data = LeBp2wUserList(it.content)
                             binding.info.text = "$data"
                             if (data.userList.size != 0) {
-                                Toast.makeText(context, "le bp2w 获取用户文件列表成功 共有${data.userList.size}个用户", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "获取用户文件列表成功 共有${data.userList.size}个用户", Toast.LENGTH_SHORT).show()
                             } else {
-                                Toast.makeText(context, "le bp2w 获取用户文件列表为空", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "获取用户文件列表为空", Toast.LENGTH_SHORT).show()
                             }
                         }
                         else -> {
@@ -895,7 +880,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordEnd)
             .observe(this) { event ->
                 (event.data as Boolean).let {
-                    Toast.makeText(context, "bpm 获取用户文件列表完成", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "获取用户文件列表完成", Toast.LENGTH_SHORT).show()
                 }
             }
         //------------------------------pc100--------------------------------------
@@ -923,7 +908,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             fileNames.add(fileName)
                         }
                     }
-                    Toast.makeText(context, "o2 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                     binding.info.text = "$it"
                 }
             }
@@ -960,13 +945,19 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this) {
                 val data = it.data as ArrayList<Aoj20aBleResponse.TempRecord>
                 binding.info.text = "$data"
-                Toast.makeText(context, "aoj20a 获取文件列表成功 共有${data.size}个文件", Toast.LENGTH_SHORT).show()
+                var temp = ""
+                for (record in data) {
+                    temp += "时间 : ${getTimeString(record.year, record.month, record.day, record.hour, record.minute, 0)} ${record.temp} ℃\n\n"
+                }
+                binding.deviceInfo.text = temp
+                Toast.makeText(context, "获取文件列表成功 共有${data.size}个文件", Toast.LENGTH_SHORT).show()
             }
         //---------------------------checkme pod--------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListError)
             .observe(this) {
                 val data = it.data as Boolean
                 binding.process.text = "EventCheckmePodGetFileListError $data"
+                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListProgress)
             .observe(this) {
@@ -976,7 +967,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodFileList)
             .observe(this) {
                 val data = it.data as CheckmePodBleResponse.FileList
-                Toast.makeText(context, "checkme pod 获取文件列表成功 共有${data.size}个文件", Toast.LENGTH_SHORT).show()
+                var temp = ""
+                for (record in data.list) {
+                    temp += "时间 : ${getTimeString(record.year, record.month, record.day, record.hour, record.minute, record.second)}\nSpO2 : ${record.spo2} %\nPR : ${record.pr}\nPI : ${record.pi}\nTemp : ${record.temp} ℃\n\n"
+                }
+                binding.deviceInfo.text = temp
+                Toast.makeText(context, "获取文件列表成功 共有${data.size}个文件", Toast.LENGTH_SHORT).show()
                 binding.info.text = "$data"
             }
         //---------------------------pc68b---------------------------
@@ -986,7 +982,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 for (i in data) {
                     fileNames.add(i)
                 }
-                Toast.makeText(context, "pc68b 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 binding.info.text = fileNames.toString()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bReadFileComplete)
@@ -1000,7 +996,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 } else {
                     mAlertDialog?.dismiss()
                 }
-                Toast.makeText(context, "pc68b 接收文件成功 已接收${pc68bList.size}个文件, 还剩${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "接收文件成功 已接收${pc68bList.size}个文件, 还剩${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
             }
         //---------------------------pc80b-----------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadFileError)
@@ -1044,7 +1040,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 for (file in data.list) {
                     fileNames.add(file.recordName)
                 }
-                Toast.makeText(context, "Pulsebit 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 binding.info.text = "$data"
                 binding.deviceInfo.text = fileNames.toString()
             }
@@ -1052,6 +1048,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this) {
                 val data = it.data as Boolean
                 binding.process.text = "EventPulsebitGetFileListError $data"
+                Toast.makeText(context, "读文件列表出错", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileListProgress)
             .observe(this) {
@@ -1102,7 +1099,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         for (file in list.list) {
                             fileNames.add(file.recordName)
                         }
-                        Toast.makeText(context, "CheckmeLE 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                         binding.info.text = "$list"
                     }
                     CheckmeLeBleCmd.ListType.TEMP_TYPE -> {
@@ -1110,7 +1107,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         for (file in list.list) {
                             fileNames.add(file.recordName)
                         }
-                        Toast.makeText(context, "CheckmeLE 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                         binding.info.text = "$list"
                     }
                     CheckmeLeBleCmd.ListType.ECG_TYPE -> {
@@ -1118,7 +1115,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         for (file in list.list) {
                             fileNames.add(file.recordName)
                         }
-                        Toast.makeText(context, "CheckmeLE 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                         binding.info.text = "$list"
                     }
                     CheckmeLeBleCmd.ListType.OXY_TYPE -> {
@@ -1126,7 +1123,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         for (file in list.list) {
                             fileNames.add(file.recordName)
                         }
-                        Toast.makeText(context, "CheckmeLE 获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                         binding.info.text = "$list"
                     }
                 }
@@ -1208,6 +1205,45 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     ecgAdapter.setNewInstance(ecgList)
                     ecgAdapter.notifyDataSetChanged()
                 }
+            }
+        //--------------------------------LPM311-----------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LPM311.EventLpm311Data)
+            .observe(this) {
+                val data = it.data as Lpm311Data
+                binding.info.text = "$data"
+                binding.deviceInfo.text = "user : ${data.user}\nCHOL : ${data.chol} （${data.cholStr}）\nTRIG : ${data.trig} （${data.trigStr}）\n" +
+                        "HDL : ${data.hdl} （${data.hdlStr}）\nLDL : ${data.ldl} （${data.ldlStr}）\n" +
+                        "CHOL/HDL : ${data.cholDivHdl} （${data.cholDivHdlStr}）\nUNIT : ${if (data.unit == 0) {"mmol/L"} else {"mg/dL"}}"
+            }
+        //------------------------------PoctorM3102--------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PoctorM3102.EventPoctorM3102Data)
+            .observe(this) {
+                val data = it.data as PoctorM3102Data
+                binding.info.text = "$data"
+                binding.deviceInfo.text = when (data.type) {
+                    0 -> "血糖 : ${if (data.normal) {"${data.result} mmol/L\n时间 : ${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
+                    1 -> "尿酸 : ${if (data.normal) {"${data.result} umol/L\n时间 : ${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
+                    3 -> "血酮 : ${if (data.normal) {"${data.result} mmol/L\n时间 : ${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
+                    else -> "数据出错 : \n$data"
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmCountDown)
+            .observe(this) {
+                val data = it.data as Int
+                binding.info.text = "$data"
+                binding.deviceInfo.text = "倒计时 : $data"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmGluData)
+            .observe(this) {
+                val data = it.data as BiolandBgmBleResponse.GluData
+                binding.info.text = "$data"
+                binding.deviceInfo.text = "血糖 : ${data.resultMg} mg/dL ${data.resultMmol} mmol/L\n时间 : ${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmNoGluData)
+            .observe(this) {
+                val data = it.data as Boolean
+                binding.info.text = "$data"
+                Toast.makeText(context, "没有文件", Toast.LENGTH_SHORT).show()
             }
     }
 

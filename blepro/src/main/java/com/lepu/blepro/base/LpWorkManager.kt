@@ -38,6 +38,7 @@ object LpWorkManager {
      * 保存可用的BleInterface集合
      */
     var vailFace: SparseArray<BleInterface> = SparseArray()
+    var vailManager: SparseArray<LpBleManager> = SparseArray()
 
     /**
      *  指定扫描的Model，扫描结果根据它的值过滤
@@ -207,7 +208,10 @@ object LpWorkManager {
             Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
             Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
             Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
+            Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
+            Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
             Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
             Bluetooth.MODEL_S6W1 -> {
@@ -420,6 +424,178 @@ object LpWorkManager {
 
 
     }
+
+    fun initManagers(m: Int, context: Context): LpBleManager {
+        LepuBleLog.d(tag, "initManagers start...${vailManager.size()},$m")
+
+        vailManager.get(m)?.let { return it }
+        when(m) {
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
+            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
+            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
+            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
+            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
+            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_CHECK_POD,
+            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4,
+            Bluetooth.MODEL_CHECKME_LE, Bluetooth.MODEL_LES1 -> {
+                OxyBleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
+            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
+            Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV -> {
+                Er1BleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+
+            }
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
+                Er2BleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_BPM -> {
+                BpmBleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_BP2 , Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T,
+            Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LE_BP2W -> {
+                Bp2BleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
+            Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
+            Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
+            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
+            Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
+            Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
+            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
+            Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
+            Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
+            Bluetooth.MODEL_S6W1 -> {
+                Pc60FwBleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+
+            Bluetooth.MODEL_PC80B -> {
+                Pc80BleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_FHR -> {
+                FhrBleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_BPW1 -> {
+                Bpw1BleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE -> {
+                F4ScaleBleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_MY_SCALE, Bluetooth.MODEL_F5_SCALE -> {
+                F5ScaleBleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC300 -> {
+                Pc100BleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_PC_68B -> {
+                Ap20BleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_VCOMIN -> {
+                Sp20BleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
+                LewBleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_TV221U -> {
+                Vtm20fBleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_AOJ20A -> {
+                Aoj20aBleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_VTM_AD5, Bluetooth.MODEL_FETAL -> {
+                Ad5FhrBleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_LEM -> {
+                LemBleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_LPM311 -> {
+                Lpm311BleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_POCTOR_M3102 -> {
+                PoctorM3102BleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_BIOLAND_BGM -> {
+                BiolandBgmBleManager(context).apply {
+                    vailManager.put(m, this)
+                    return this
+                }
+            }
+
+            else -> {
+                return throw Exception("LpWorkManager initManagers() 未配置此model:$m")
+            }
+        }
+
+
+    }
+
 
     fun setScanDefineDevice(isScanDefineDevice: Boolean, isScanByName: Boolean, defineDevice: String) {
         LepuBleLog.d(tag, "setScanDefineDevice isScanDefineDevice:$isScanDefineDevice, isScanByName:$isScanByName, defineDevice:$defineDevice")
@@ -708,7 +884,7 @@ object LpWorkManager {
 
                 if (isReconnectScan && isContains){
                     stopDiscover()
-                    if (model == Bluetooth.MODEL_AOJ20A) {
+                    if (model == Bluetooth.MODEL_AOJ20A || model == Bluetooth.MODEL_LPM311) {
                         GlobalScope.launch {
                             delay(2000)
                             vailFace.get(b.model)?.connect(application!!, b.device, true, toConnectUpdater)

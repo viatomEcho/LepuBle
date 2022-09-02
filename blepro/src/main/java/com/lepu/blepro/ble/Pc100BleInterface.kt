@@ -8,6 +8,7 @@ import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.Pc100DeviceInfo
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
+import com.lepu.blepro.utils.HexString.trimStr
 import java.util.*
 
 /**
@@ -49,7 +50,10 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                     Pc100BleCmd.HAND_SHAKE -> {
                         LepuBleLog.d(tag, "model:$model,HAND_SHAKE => success")
                         val str = toString(response.content).split(":")
-                        pc100Device.deviceName = bluetooth.name
+                        pc100Device.deviceName = trimStr(toString(response.content))
+                        device.name?.let {
+                            pc100Device.deviceName = it
+                        }
                         pc100Device.sn = str[1]
                         LepuBleLog.d(tag, "model:$model,HAND_SHAKE deviceName => " + toString(response.content))
                         LepuBleLog.d(tag, "model:$model,HAND_SHAKE sn => " + pc100Device.sn)

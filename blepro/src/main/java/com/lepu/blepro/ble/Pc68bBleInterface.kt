@@ -69,7 +69,10 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                     Pc68bBleCmd.MSG_GET_DEVICE_INFO -> {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_DEVICE_INFO => success")
                         val data = Sp20BleResponse.DeviceInfo(response.content)
-                        deviceInfo.deviceName = bluetooth.name
+                        deviceInfo.deviceName = data.deviceName
+                        device.name?.let {
+                            deviceInfo.deviceName = it
+                        }
                         deviceInfo.softwareV = data.softwareV
                         deviceInfo.hardwareV = data.hardwareV
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")

@@ -123,13 +123,6 @@ class LpBleUtil {
             }
         }
 
-        fun getCurrentDevice(model: Int): BluetoothDevice? {
-            return BleServiceHelper.getCurrentDevice(model)
-        }
-        fun getCurrentBluetooth(model: Int): Bluetooth? {
-            return BleServiceHelper.getCurrentBluetooth(model)
-        }
-
         fun setInterface(model: Int, needClear: Boolean){
             if (needClear) {
                 clearInterface()
@@ -885,6 +878,9 @@ class LpBleUtil {
                     }
                     Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_POD_1W,
                     Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
+                    Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
+                    Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
+                    Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
                     Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_S5W,
                     Bluetooth.MODEL_S6W, Bluetooth.MODEL_S7W,
                     Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S6W1 -> {

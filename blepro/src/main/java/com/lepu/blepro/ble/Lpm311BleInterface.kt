@@ -7,6 +7,9 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.data.Lpm311Data
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.nio.charset.StandardCharsets
 
 /**
@@ -36,8 +39,120 @@ class Lpm311BleInterface(model: Int): BleInterface(model) {
     }
 
     @ExperimentalUnsignedTypes
-    private fun onResponseReceived(response: ByteArray) {
-        val data = Lpm311Data(response)
+    private fun onResponseReceived(bytes: ByteArray) {
+        var index = 0
+        val data = Lpm311Data()
+        data.bytes = bytes
+        data.year = if (isNumber(String(bytes.copyOfRange(index, index+4)))) {
+            String(bytes.copyOfRange(index, index+4)).toInt()
+        } else {
+            0
+        }
+        index += 4
+        data.month = if (isNumber(String(bytes.copyOfRange(index, index+2)))) {
+            String(bytes.copyOfRange(index, index+2)).toInt()
+        } else {
+            0
+        }
+        index += 2
+        data.day = if (isNumber(String(bytes.copyOfRange(index, index+2)))) {
+            String(bytes.copyOfRange(index, index+2)).toInt()
+        } else {
+            0
+        }
+        index += 2
+        data.hour = if (isNumber(String(bytes.copyOfRange(index, index+2)))) {
+            String(bytes.copyOfRange(index, index+2)).toInt()
+        } else {
+            0
+        }
+        index += 2
+        data.minute = if (isNumber(String(bytes.copyOfRange(index, index+2)))) {
+            String(bytes.copyOfRange(index, index+2)).toInt()
+        } else {
+            0
+        }
+        index += 2
+        data.second = if (isNumber(String(bytes.copyOfRange(index, index+2)))) {
+            String(bytes.copyOfRange(index, index+2)).toInt()
+        } else {
+            0
+        }
+        index += 2
+        index++
+        data.chol = if (String(bytes.copyOfRange(index, index + 8))[0] == 'f') {
+            0.0
+        } else {
+            toIntBig(HexString.hexToBytes(String(bytes.copyOfRange(index, index + 8)))).toDouble()
+        }
+        index += 8
+        data.hdl = if (String(bytes.copyOfRange(index, index + 8))[0] == 'f') {
+            0.0
+        } else {
+            toIntBig(HexString.hexToBytes(String(bytes.copyOfRange(index, index + 8)))).toDouble()
+        }
+        index += 8
+        data.trig = if (String(bytes.copyOfRange(index, index + 8))[0] == 'f') {
+            0.0
+        } else {
+            toIntBig(HexString.hexToBytes(String(bytes.copyOfRange(index, index + 8)))).toDouble()
+        }
+        index += 8
+        index++
+        data.unit = if (isNumber(String(bytes.copyOfRange(index, index+1)))) {
+            String(bytes.copyOfRange(index, index+1)).toInt()
+        } else {
+            0
+        }
+        index++
+        data.user = HexString.trimStr(String(bytes.copyOfRange(index, bytes.size)))
+        when (data.unit) {
+            Lpm311Data.UNIT_MMOL -> {
+                data.chol = data.chol.div(100)
+                data.hdl = data.hdl.div(100)
+                data.trig = data.trig.div(100)
+                data.ldl = if (data.chol == 0.0 || data.hdl == 0.0 || data.trig == 0.0) {
+                    0.0
+                } else {
+                    data.chol - data.hdl - data.trig.div(2.2)
+                }
+                data.cholDivHdl = if (data.chol == 0.0 || data.hdl == 0.0) {
+                    0.0
+                } else if (data.chol < Lpm311Data.CHOL_MMOL_MIN || data.chol > Lpm311Data.CHOL_MMOL_MAX) {
+                    0.0
+                } else if (data.hdl < Lpm311Data.HDL_MMOL_MIN || data.hdl > Lpm311Data.HDL_MMOL_MAX) {
+                    0.0
+                } else {
+                    data.chol.div(data.hdl)
+                }
+            }
+            Lpm311Data.UNIT_MG -> {
+                data.ldl = if (data.chol == 0.0 || data.hdl == 0.0 || data.trig == 0.0) {
+                    0.0
+                } else {
+                    data.chol - data.hdl - data.trig.div(5)
+                }
+                data.cholDivHdl = if (data.chol == 0.0 || data.hdl == 0.0) {
+                    0.0
+                } else if (data.chol < Lpm311Data.CHOL_MG_MIN || data.chol > Lpm311Data.CHOL_MG_MAX) {
+                    0.0
+                } else if (data.hdl < Lpm311Data.HDL_MG_MIN || data.hdl > Lpm311Data.HDL_MG_MAX) {
+                    0.0
+                } else {
+                    data.chol.div(data.hdl)
+                }
+            }
+            else -> {
+                data.ldl = 0.0
+                data.cholDivHdl = 0.0
+            }
+        }
+        data.cholStr = Lpm311Data.getDataStr(data.unit, Lpm311Data.CHOL, data.chol)
+        data.hdlStr = Lpm311Data.getDataStr(data.unit, Lpm311Data.HDL, data.hdl)
+        data.trigStr = Lpm311Data.getDataStr(data.unit, Lpm311Data.TRIG, data.trig)
+        data.ldlStr = Lpm311Data.getDataStr(data.unit, Lpm311Data.LDL, data.ldl)
+        data.cholDivHdlStr = Lpm311Data.getDataStr(data.unit, Lpm311Data.CHOL_HDL, data.cholDivHdl)
+
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LPM311.EventLpm311Data).post(InterfaceEvent(model, data))
         sendCmd("disconnect".toByteArray(StandardCharsets.US_ASCII))
         LepuBleLog.d(tag, "onResponseReceived $data")
@@ -62,7 +177,10 @@ class Lpm311BleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getFileList() {
-        sendCmd("connect".toByteArray(StandardCharsets.US_ASCII))
+        GlobalScope.launch {
+            delay(1000)
+            sendCmd("connect".toByteArray(StandardCharsets.US_ASCII))
+        }
     }
 
     override fun syncTime() {

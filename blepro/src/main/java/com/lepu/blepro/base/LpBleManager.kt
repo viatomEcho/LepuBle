@@ -36,6 +36,7 @@ abstract class LpBleManager(context: Context): BleManager(context) {
 
     var notifyListener: NotifyListener? = null
 
+    // 升级固件
     var isUpdater = false
 
 

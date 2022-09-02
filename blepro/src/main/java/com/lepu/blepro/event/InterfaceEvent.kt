@@ -198,9 +198,11 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     /**
      * PC60FwBleInterface发出的通知
      * 包含model: MODEL_PC60FW, MODEL_PC66B, MODEL_OXYSMART,
-     *           MODEL_POD_1W, MODEL_POD2B, MODEL_PC_60NW_1,
-     *           MODEL_PC_60B, MODEL_PF_10A, MODEL_PF_10B,
-     *           MODEL_PF_20A, MODEL_PF_20B, MODEL_PC_60NW,
+     *           MODEL_POD_1W, MODEL_POD2B,
+     *           MODEL_PC_60B, MODEL_PF_10, MODEL_PF_10AW,
+     *           MODEL_PF_10AW1, MODEL_PF_10BW, MODEL_PF_10BW1,
+     *           MODEL_PF_20, MODEL_PF_20AW, MODEL_PF_20B,
+     *           MODEL_PC_60NW, MODEL_PC_60NW_1,
      *           MODEL_S5W, MODEL_S6W, MODEL_S7W, MODEL_S7BW,
      *           MODEL_S6W1
      */
@@ -231,7 +233,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventPc80bDeviceInfo = "com.lepu.ble.pc80b.device.info"                     // 设备信息 PC80BleResponse.DeviceInfo
             const val EventPc80bTrackData = "com.lepu.ble.pc80b.track.data"                       // 快速实时数据 PC80BleResponse.RtTrackData
             const val EventPc80bContinuousData = "com.lepu.ble.pc80b.continuous.data"             // 连续实时数据 PC80BleResponse.RtContinuousData
-            const val EventPc80bContinuousDataEnd = "com.lepu.ble.pc80b.continuous.data.end"       // 连续实时结束 true
+            const val EventPc80bContinuousDataEnd = "com.lepu.ble.pc80b.continuous.data.end"      // 连续实时结束 true
             const val EventPc80bReadFileError = "com.lepu.ble.pc80b.file.read.error"              // 传输文件出错 true
             const val EventPc80bReadingFileProgress = "com.lepu.ble.pc80b.file.reading.progress"  // 传输文件进度 int(0-100)
             const val EventPc80bReadFileComplete = "com.lepu.ble.pc80b.file.read.complete"        // 传输文件完成 PC80BleResponse.ScpEcgFile
@@ -460,6 +462,10 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * CheckmePodBleInterface
+     * 包含model: MODEL_CHECK_POD
+     */
     interface CheckmePod {
         companion object {
             const val EventCheckmePodSetTime = "com.lepu.ble.checkme.pod.set.time"                            // 同步时间 boolean
@@ -472,6 +478,10 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * PulsebitBleInterface
+     * 包含model: MODEL_PULSEBITEX, MODEL_HHM4
+     */
     interface Pulsebit {
         companion object {
             const val EventPulsebitSetTime = "com.lepu.ble.pulsebit.set.time"                            // 同步时间 boolean

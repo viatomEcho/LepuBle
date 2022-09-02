@@ -203,6 +203,7 @@
             </androidx.recyclerview.widget.RecyclerView>
 
             <TextView
+                android:layout_margin="@dimen/dp_10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/device_info"
@@ -235,6 +236,7 @@
                 android:text="(以下是数据解析日志)"
                 android:layout_marginTop="50dp"/>
             <TextView
+                android:visibility="gone"
                 android:id="@+id/info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

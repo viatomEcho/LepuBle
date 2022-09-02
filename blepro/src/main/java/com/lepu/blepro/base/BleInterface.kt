@@ -10,7 +10,6 @@ import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
-import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
@@ -75,7 +74,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     lateinit var manager: LpBleManager
     // device在扫描时会动态刷新device name,可能为null
     lateinit var device: BluetoothDevice
-    lateinit var bluetooth: Bluetooth
 
     private var pool: ByteArray? = null
 
@@ -83,14 +81,14 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      * 获取实时波形
      */
     private val rtHandler = Handler(Looper.getMainLooper())
-    private  var rTask: RtTask = RtTask()
+    private var rTask: RtTask = RtTask()
 
 
     /**
      * 获取实时的间隔
      * 默认： 500 ms
      */
-    var  delayMillis: Long = 500
+    var delayMillis: Long = 500
 
     /**
      * 实时任务状态flag
@@ -146,7 +144,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      * 开始读取时的偏移量，用于断点续传
      * 继续读取的时候 offset = curFile.index + offset(初始赋值)
      */
-    var offset: Int = 0;
+    var offset: Int = 0
 
     abstract fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean = false)
 
@@ -204,7 +202,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             LepuBleLog.d(tag, "try connect: $it，isAutoReconnect = $isAutoReconnect, toConnectUpdater = $toConnectUpdater")
         }
         this.device = device
-        this.bluetooth = BluetoothController.getCurrentBluetooth(device)
 
         this.isAutoReconnect = isAutoReconnect
         this.toConnectUpdater = toConnectUpdater
@@ -247,7 +244,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         state = true
         ready = false
         connecting = false
-//        publish()
+        publish()
 
         if (toConnectUpdater)
             LiveEventBus.get<BluetoothDevice>(EventMsgConst.Updater.EventBleConnected).post(device)
@@ -262,6 +259,28 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             BleServiceHelper.removeReconnectAddress(it)
         }
 
+        // 多设备重连，因SDK扫描到需重连设备，去连接时并不会关闭扫描，
+        // 所以在重连此设备成功后，检查是否还有设备需要重连，再关闭扫描
+        // 暂不使用
+        /*if (BleServiceHelper.hasUnConnected()) {
+            if (LpWorkManager.isReconnectByAddress) {
+                if (LpWorkManager.reconnectDeviceAddress.size == 0) {
+                    BleServiceHelper.stopScan()
+                    LepuBleLog.d(tag, "onDeviceConnected stopScan")
+                } else {
+                    LepuBleLog.d(tag, "onDeviceConnected reconnectDeviceAddress : ${LpWorkManager.reconnectDeviceAddress}")
+                }
+            } else {
+                if (LpWorkManager.reconnectDeviceName.size == 0) {
+                    BleServiceHelper.stopScan()
+                    LepuBleLog.d(tag, "onDeviceConnected stopScan")
+                } else {
+                    LepuBleLog.d(tag, "onDeviceConnected reconnectDeviceName : ${LpWorkManager.reconnectDeviceName}")
+                }
+            }
+        } else {
+            BleServiceHelper.stopScan()
+        }*/
     }
 
 
@@ -283,8 +302,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         state = false
         ready = false
         connecting = false
-        ready = false
         stopRtTask()
+//        LpWorkManager.vailManager.remove(model)
         publish()
 
         //断开后
@@ -364,7 +383,13 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         if (model == Bluetooth.MODEL_PC80B
             || model == Bluetooth.MODEL_PC60FW
             || model == Bluetooth.MODEL_PF_10
+            || model == Bluetooth.MODEL_PF_10AW
+            || model == Bluetooth.MODEL_PF_10AW1
+            || model == Bluetooth.MODEL_PF_10BW
+            || model == Bluetooth.MODEL_PF_10BW1
             || model == Bluetooth.MODEL_PF_20
+            || model == Bluetooth.MODEL_PF_20AW
+            || model == Bluetooth.MODEL_PF_20B
             || model == Bluetooth.MODEL_POD_1W
             || model == Bluetooth.MODEL_S5W
             || model == Bluetooth.MODEL_S6W
@@ -398,7 +423,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             if (!manager.isUpdater) syncTime()
         }
     }
-
 
     open fun sendCmd(bs: ByteArray): Boolean {
         if (!state && !ready) {
