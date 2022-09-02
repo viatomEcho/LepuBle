@@ -75,7 +75,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     lateinit var manager: LpBleManager
     // device在扫描时会动态刷新device name,可能为null
     lateinit var device: BluetoothDevice
-    lateinit var bluetooth: Bluetooth
+//    lateinit var bluetooth: Bluetooth
 
     private var pool: ByteArray? = null
 
@@ -209,7 +209,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             LepuBleLog.d(tag, "try connect: $it，isAutoReconnect = $isAutoReconnect, toConnectUpdater = $toConnectUpdater")
         }
         this.device = device
-        this.bluetooth = BluetoothController.getCurrentBluetooth(device)
+//        this.bluetooth = BluetoothController.getCurrentBluetooth(device)
 
 
         this.isAutoReconnect = isAutoReconnect
@@ -366,6 +366,14 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         device.name?.let {
             LepuBleLog.d(tag, "$it onDeviceReady, state: $state")
         }
+        // 连接上设备延迟2s发送指令（连接不稳定发送指令会导致设备断开）
+        rtHandler.postDelayed({sendReady(device)}, 2000)
+    }
+
+    private fun sendReady(device: BluetoothDevice) {
+        device.name?.let {
+            LepuBleLog.d(tag, "$it sendReady, state: $state")
+        }
         state = true
         ready = true
         connecting = false
@@ -413,7 +421,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             if (!manager.isUpdater) syncTime()
         }
     }
-
 
     open fun sendCmd(bs: ByteArray): Boolean {
         if (!state && !ready) {
