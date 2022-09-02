@@ -228,11 +228,11 @@ public class Lpm311Data {
                         return ""+data;
                     }
                 case LDL:
-                    if (data < LDL_MG_MIN && data >= VALUE_0) {
+                    if (data < LDL_MG_MIN && data > VALUE_0) {
                         return "<50";
                     } else if (data > LDL_MG_MAX) {
                         return ">190";
-                    } else if (data < VALUE_0) {
+                    } else if (data <= VALUE_0) {
                         return "--";
                     } else {
                         return ""+data;
@@ -273,11 +273,11 @@ public class Lpm311Data {
                         return ""+data;
                     }
                 case LDL:
-                    if (data < LDL_MMOL_MIN && data >= VALUE_0) {
+                    if (data < LDL_MMOL_MIN && data > VALUE_0) {
                         return "<1.29";
                     } else if (data > LDL_MMOL_MAX) {
                         return ">4.91";
-                    } else if (data < VALUE_0) {
+                    } else if (data <= VALUE_0) {
                         return "--";
                     } else {
                         return ""+data;
@@ -307,14 +307,14 @@ public class Lpm311Data {
                 ", minute=" + minute +
                 ", second=" + second +
                 ", chol=" + chol +
-                ", cholStr=" + cholStr +
-                ", hdl=" + hdl +
-                ", hdlStr=" + hdlStr +
                 ", trig=" + trig +
-                ", trigStr=" + trigStr +
+                ", hdl=" + hdl +
                 ", ldl=" + ldl +
-                ", ldlStr=" + ldlStr +
                 ", cholDivHdl=" + cholDivHdl +
+                ", cholStr=" + cholStr +
+                ", trigStr=" + trigStr +
+                ", hdlStr=" + hdlStr +
+                ", ldlStr=" + ldlStr +
                 ", cholDivHdlStr=" + cholDivHdlStr +
                 ", unit=" + unit +
                 ", user='" + user + '\'' +

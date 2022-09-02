@@ -112,7 +112,11 @@ class Lpm311BleInterface(model: Int): BleInterface(model) {
                 data.chol = data.chol.div(100)
                 data.hdl = data.hdl.div(100)
                 data.trig = data.trig.div(100)
-                data.ldl = data.chol - data.hdl - data.trig.div(2.2)
+                data.ldl = if (data.chol == 0.0 || data.hdl == 0.0 || data.trig == 0.0) {
+                    0.0
+                } else {
+                    data.chol - data.hdl - data.trig.div(2.2)
+                }
                 data.cholDivHdl = if (data.chol == 0.0 || data.hdl == 0.0) {
                     0.0
                 } else if (data.chol < Lpm311Data.CHOL_MMOL_MIN || data.chol > Lpm311Data.CHOL_MMOL_MAX) {
@@ -124,7 +128,11 @@ class Lpm311BleInterface(model: Int): BleInterface(model) {
                 }
             }
             Lpm311Data.UNIT_MG -> {
-                data.ldl = data.chol - data.hdl - data.trig.div(5)
+                data.ldl = if (data.chol == 0.0 || data.hdl == 0.0 || data.trig == 0.0) {
+                    0.0
+                } else {
+                    data.chol - data.hdl - data.trig.div(5)
+                }
                 data.cholDivHdl = if (data.chol == 0.0 || data.hdl == 0.0) {
                     0.0
                 } else if (data.chol < Lpm311Data.CHOL_MG_MIN || data.chol > Lpm311Data.CHOL_MG_MAX) {

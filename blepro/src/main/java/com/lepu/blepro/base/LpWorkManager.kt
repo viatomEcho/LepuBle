@@ -708,7 +708,7 @@ object LpWorkManager {
                     stopDiscover()
 //                    if (isReconnectByAddress) {
                         // 避免体温计aoj20a在装电池开机后自动关机过程连接上设备，延迟重连
-                        if (model == Bluetooth.MODEL_AOJ20A) {
+                        if (model == Bluetooth.MODEL_AOJ20A || model == Bluetooth.MODEL_LPM311) {
                             GlobalScope.launch {
                                 delay(2000)
                                 vailFace.get(b.model)?.connect(application!!, b.device, true, toConnectUpdater)
