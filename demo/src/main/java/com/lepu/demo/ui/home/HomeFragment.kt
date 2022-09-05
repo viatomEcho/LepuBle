@@ -142,7 +142,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         }
 
         mainViewModel.curBluetooth.observe(viewLifecycleOwner) {
-            binding.bleDevice.text = "当前蓝牙设备：\n" + it!!.deviceName + " " + it!!.deviceMacAddress
+            binding.bleDevice.text = "当前蓝牙设备：\n蓝牙名：${it!!.deviceName}\n地址：${it!!.deviceMacAddress}"
         }
 
         binding.bleSplit.setText(Constant.BluetoothConfig.splitText)

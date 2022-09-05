@@ -480,7 +480,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * PulsebitBleInterface
-     * 包含model: MODEL_PULSEBITEX, MODEL_HHM4
+     * 包含model: MODEL_PULSEBITEX, MODEL_HHM4, MODEL_CHECKME
      */
     interface Pulsebit {
         companion object {

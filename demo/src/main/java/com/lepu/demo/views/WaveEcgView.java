@@ -160,7 +160,8 @@ public class WaveEcgView extends View {
             standard1mV = 0.003089f;
         } else if (model == Bluetooth.MODEL_PULSEBITEX
                 || model == Bluetooth.MODEL_HHM4
-                || model == Bluetooth.MODEL_CHECKME_LE) {
+                || model == Bluetooth.MODEL_CHECKME_LE
+                || model == Bluetooth.MODEL_CHECKME) {
             standard1mV = 4033 / (32767 * 12 * 8f);
             HZ = 250;
         } else if (model == Bluetooth.MODEL_PC80B) {

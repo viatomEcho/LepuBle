@@ -106,8 +106,7 @@ class PulsebitBleResponse{
         var qtc: Int                      // QTc单位为ms
         var result: Int
         var diagnosis: ExEcgDiagnosis     // 诊断结果
-        var measureMode: Int              // 测量模式 1、3："Lead I"，2、4、5："Lead II"，6："Chest Lead"
-        var measureModeMess: String
+        var measureMode: Int              // 测量模式 1：内部导联I，2：内部导联II，3：外部导联I，4：外部导联II
         var filterMode: Int               // 滤波模式（1：wide   0：normal）
         var qt: Int                       // QT单位为ms
         var hrsData: ByteArray            // ECG心率值，从数据采样开始，采样率为1Hz，每个心率值为2byte（实际20s数据，每秒出一个心率），若出现无效心率，则心率为0
@@ -137,7 +136,6 @@ class PulsebitBleResponse{
             diagnosis = ExEcgDiagnosis(bytes.copyOfRange(index, index+4))
             index += 4
             measureMode = byte2UInt(bytes[index])
-            measureModeMess = getMeasureMode(measureMode)
             index++
             filterMode = byte2UInt(bytes[index])
             index++
@@ -162,15 +160,6 @@ class PulsebitBleResponse{
             }
         }
 
-        fun getMeasureMode(mode: Int): String {
-            return when (mode) {
-                1, 3 -> "Lead I"
-                2, 4, 5 -> "Lead II"
-                6 -> "Chest Lead"
-                else -> ""
-            }
-        }
-
         override fun toString(): String {
             return """
                 fileSize : $fileSize
@@ -186,7 +175,6 @@ class PulsebitBleResponse{
                 result : $result
                 diagnosis : $diagnosis
                 measureMode : $measureMode
-                measureModeMess : $measureModeMess
                 filterMode : $filterMode
                 qt : $qt
                 hrsData : ${bytesToHex(hrsData)}

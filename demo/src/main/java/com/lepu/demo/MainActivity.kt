@@ -429,6 +429,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     Bluetooth.MODEL_HHM4 -> {
                         Toast.makeText(this, "HHM4 完成时间同步", Toast.LENGTH_SHORT).show()
                     }
+                    Bluetooth.MODEL_CHECKME -> {
+                        Toast.makeText(this, "Checkme 完成时间同步", Toast.LENGTH_SHORT).show()
+                        return@observe
+                    }
                     else -> {
                         Toast.makeText(this, "Pulsebit 完成时间同步", Toast.LENGTH_SHORT).show()
                     }
@@ -444,6 +448,9 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                         }
                         Bluetooth.MODEL_HHM4 -> {
                             Toast.makeText(this, "HHM4 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                        }
+                        Bluetooth.MODEL_CHECKME -> {
+                            Toast.makeText(this, "Checkme 获取设备信息成功", Toast.LENGTH_SHORT).show()
                         }
                         else -> {
                             Toast.makeText(this, "Pulsebit 获取设备信息成功", Toast.LENGTH_SHORT).show()

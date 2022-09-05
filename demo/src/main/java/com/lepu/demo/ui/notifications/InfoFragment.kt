@@ -259,7 +259,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         }
         mainViewModel.pulsebitInfo.observe(viewLifecycleOwner) {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PULSEBITEX
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM4) {
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM4
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKME) {
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}\ncode：${it.branchCode}"
             }
@@ -957,15 +958,21 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this) {
                 val data = it.data as Boolean
                 binding.process.text = "EventCheckmePodGetFileListError $data"
+                mAlertDialog?.dismiss()
                 Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListProgress)
             .observe(this) {
+                if (mAlertDialog?.isShowing == false) {
+                    mAlertDialog?.show()
+                }
                 val data = it.data as Int
                 binding.process.text = "读取进度: $data %"
+                mainViewModel._downloadTip.value = "读取进度: $data %"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodFileList)
             .observe(this) {
+                mAlertDialog?.dismiss()
                 val data = it.data as CheckmePodBleResponse.FileList
                 var temp = ""
                 for (record in data.list) {
