@@ -513,13 +513,12 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PermissionX.init(this)
                 .permissions(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.CAMERA,
-                    Manifest.permission.BLUETOOTH,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.BLUETOOTH_SCAN,
                     Manifest.permission.BLUETOOTH_CONNECT,
-                    Manifest.permission.BLUETOOTH_ADVERTISE,
-                    Manifest.permission.BLUETOOTH_ADMIN
+                    Manifest.permission.BLUETOOTH_ADVERTISE
                 )
                 .onExplainRequestReason { scope, deniedList ->
                     // 当请求被拒绝后，说明权限原因
@@ -528,8 +527,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                             R.string.open
                         ), getString(R.string.ignore)
                     )
-
-
                 }
                 .onForwardToSettings { scope, deniedList ->
                     //选择了拒绝且不再询问的权限，去设置
@@ -553,9 +550,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             PermissionX.init(this)
                 .permissions(
                     Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
                     Manifest.permission.CAMERA,
-                    Manifest.permission.BLUETOOTH,
-                    Manifest.permission.BLUETOOTH_ADMIN
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
                 )
                 .onExplainRequestReason { scope, deniedList ->
                     // 当请求被拒绝后，说明权限原因
@@ -564,8 +562,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                             R.string.open
                         ), getString(R.string.ignore)
                     )
-
-
                 }
                 .onForwardToSettings { scope, deniedList ->
                     //选择了拒绝且不再询问的权限，去设置

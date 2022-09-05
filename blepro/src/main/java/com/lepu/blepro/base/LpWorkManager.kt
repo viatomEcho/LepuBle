@@ -623,7 +623,7 @@ object LpWorkManager {
      * @param isReconnecting Boolean 本次扫描是否自来重连
      */
     fun startDiscover(scanModel: IntArray? = null, needPair: Boolean = false, isReconnecting :Boolean = false) {
-        LepuBleLog.d(tag, "start discover.....${vailFace.size()}, needPair = $needPair, isReconnecting = $isReconnecting")
+        LepuBleLog.d(tag, "start discover.....vailFace.size = ${vailFace.size()}, needPair = $needPair, isReconnecting = $isReconnecting")
         stopDiscover()
 
         if (vailFace.isEmpty() && isReconnecting) {
