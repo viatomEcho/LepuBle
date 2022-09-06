@@ -80,6 +80,47 @@ public class Bp2EcgDiagnosis {
 
     }
 
+    public Bp2EcgDiagnosis(int result) {
+        if (result == 0) {
+            isRegular = true;
+        }
+        if (result == 0xFFFFFFFF) {
+            isPoorSignal = true;
+        } else {
+            if ((result & 0xFFFFFFFE) == 0xFFFFFFFE) {
+                isLeadOff = true;
+            }
+            if ((result & 0x00000001) == 0x00000001) {
+                isFastHr = true;
+            }
+            if ((result & 0x00000002) == 0x00000002) {
+                isSlowHr = true;
+            }
+            if ((result & 0x00000004) == 0x00000004) {
+                isIrregular = true;
+            }
+            if ((result & 0x00000008) == 0x00000008) {
+                isPvcs = true;
+            }
+            if ((result & 0x00000010) == 0x00000010) {
+                isHeartPause = true;
+            }
+            if ((result & 0x00000020) == 0x00000020) {
+                isFibrillation = true;
+            }
+            if ((result & 0x00000040) == 0x00000040) {
+                isWideQrs = true;
+            }
+            if ((result & 0x00000080) == 0x00000080) {
+                isProlongedQtc = true;
+            }
+            if ((result & 0x00000100) == 0x00000100) {
+                isShortQtc = true;
+            }
+        }
+
+    }
+
     public String getResultMess() {
         String str = "";
         if (isRegular) {

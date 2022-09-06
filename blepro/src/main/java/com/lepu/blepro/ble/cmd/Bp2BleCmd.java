@@ -107,6 +107,10 @@ public class Bp2BleCmd {
         return getReq(SET_CONFIG, cmd);
     }
 
+    public static byte[] setConfig(byte[] data) {
+        return getReq(SET_CONFIG, data);
+    }
+
     public static byte[] setTime() {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(System.currentTimeMillis());

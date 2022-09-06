@@ -85,6 +85,50 @@ public class ExEcgDiagnosis {
 
     }
 
+    public ExEcgDiagnosis(int result) {
+        if (result == 0) {//(心电未见明显异常，遵循医生意见)
+            isRegular = true;
+        }
+        if (result == 0xFFFFFFFF) {
+            isPoorSignal = true;//心电信号幅度低或噪声干扰
+        } else {
+            if ((result & 0x00000001) == 0x00000001) {
+                isFastHr = true;//心率过快
+            }
+            if ((result & 0x00000002) == 0x00000002) {
+                isSlowHr = true;//心率过缓
+            }
+            if ((result & 0x00000004) == 0x00000004) {
+                isIrregular = true;//疑似窦性心律失常
+            }
+            if ((result & 0x00000008) == 0x00000008) {
+                isPvcs = true;//疑似室性早博
+            }
+            if ((result & 0x00000010) == 0x00000010) {
+                isHeartPause = true;//疑似心跳暂停
+            }
+            if ((result & 0x00000020) == 0x00000020) {
+                isFibrillation = true;//疑似房颤
+            }
+            if ((result & 0x00000040) == 0x00000040) {
+                isWideQrs = true;//QRS持续时间
+            }
+            if ((result & 0x00000080) == 0x00000080) {
+                isProlongedQtc = true;//QTc延长
+            }
+            if ((result & 0x00000100) == 0x00000100) {
+                isShortQtc = true;//QTc短暂
+            }
+            if ((result & 0x00000200) == 0x00000200) {
+                isStElevation = true;//ST段抬高
+            }
+            if ((result & 0x00000400) == 0x00000400) {
+                isStDepression = true;//ST压低
+            }
+        }
+
+    }
+
     public String getResultMess() {
         String str = "";
         if (isRegular) {

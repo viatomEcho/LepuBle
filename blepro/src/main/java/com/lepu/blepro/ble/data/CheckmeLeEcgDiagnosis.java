@@ -61,6 +61,38 @@ public class CheckmeLeEcgDiagnosis {
 
     }
 
+    public CheckmeLeEcgDiagnosis(int result) {
+        if (result == 0) {
+            isRegular = true;
+        }
+        if (result == 0xFF) {
+            isPoorSignal = true;
+        } else {
+            if ((result & 0x01) == 0x01) {
+                isHighHr = true;
+            }
+            if ((result & 0x02) == 0x02) {
+                isLowHr = true;
+            }
+            if ((result & 0x04) == 0x04) {
+                isHighQrs = true;
+            }
+            if ((result & 0x08) == 0x08) {
+                isHighSt = true;
+            }
+            if ((result & 0x10) == 0x10) {
+                isLowSt = true;
+            }
+            if ((result & 0x20) == 0x20) {
+                isIrregular = true;
+            }
+            if ((result & 0x40) == 0x40) {
+                isPrematureBeat = true;
+            }
+        }
+
+    }
+
     public String getResultMess() {
         String str = "";
         if (isRegular) {

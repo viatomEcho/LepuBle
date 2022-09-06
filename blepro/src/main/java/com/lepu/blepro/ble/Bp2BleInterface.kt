@@ -341,6 +341,11 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
         sendCmd(setPhyState(state.getDataBytes()))
     }
 
+    fun setConfig(config: Bp2Config) {
+        sendCmd(Bp2BleCmd.setConfig(config.getDataBytes()))
+        LepuBleLog.d(tag, "setConfig...config:$config")
+    }
+
     fun setConfig(switch: Boolean, volume: Int){
         sendCmd(Bp2BleCmd.setConfig(switch, volume))
         LepuBleLog.d(tag, "setConfig...switch:$switch, volume:$volume")

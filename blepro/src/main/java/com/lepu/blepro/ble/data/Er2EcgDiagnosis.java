@@ -95,6 +95,56 @@ public class Er2EcgDiagnosis {
 
     }
 
+    public Er2EcgDiagnosis(int result) {
+        if (result == 0) {
+            isRegular = true;
+        }
+        if (result == 0xFFFFFFFF) {
+            isPoorSignal = true;
+        } else {
+            if ((result & 0xFFFFFFFE) == 0xFFFFFFFE) {
+                isLessThan30s = true;
+            }
+            if ((result & 0xFFFFFFFD) == 0xFFFFFFFD) {
+                isMoving = true;
+            }
+            if ((result & 0x00000001) == 0x00000001) {
+                isFastHr = true;
+            }
+            if ((result & 0x00000002) == 0x00000002) {
+                isSlowHr = true;
+            }
+            if ((result & 0x00000004) == 0x00000004) {
+                isIrregular = true;
+            }
+            if ((result & 0x00000008) == 0x00000008) {
+                isPvcs = true;
+            }
+            if ((result & 0x00000010) == 0x00000010) {
+                isHeartPause = true;
+            }
+            if ((result & 0x00000020) == 0x00000020) {
+                isFibrillation = true;
+            }
+            if ((result & 0x00000040) == 0x00000040) {
+                isWideQrs = true;
+            }
+            if ((result & 0x00000080) == 0x00000080) {
+                isProlongedQtc = true;
+            }
+            if ((result & 0x00000100) == 0x00000100) {
+                isShortQtc = true;
+            }
+            if ((result & 0x00000200) == 0x00000200) {
+                isStElevation = true;
+            }
+            if ((result & 0x00000400) == 0x00000400) {
+                isStDepression = true;
+            }
+        }
+
+    }
+
     public String getResultMess() {
         String str = "";
         if (isRegular) {

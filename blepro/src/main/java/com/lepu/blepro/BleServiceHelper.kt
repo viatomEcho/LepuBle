@@ -1180,11 +1180,19 @@ class BleServiceHelper private constructor() {
         }
     }
     /**
-     * 配置参数（bp2w，le bp2w）
+     * 配置参数（bp2，bp2a，bp2w，le bp2w）
      */
     fun bp2SetConfig(model: Int, config: Bp2Config) {
         if (!checkService()) return
         when(model){
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2SetConfig")
+                        it.setConfig(config)
+                    }
+                }
+            }
             Bluetooth.MODEL_BP2W -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2wBleInterface).let {
@@ -1206,12 +1214,12 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * 设置提示音开关（bp2，bp2a，bp2t）
+     * 设置理疗状态（bp2t）
      */
     fun bp2SetPhyState(model: Int, state: Bp2BlePhyState){
         if (!checkService()) return
         when(model){
-            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+            Bluetooth.MODEL_BP2T -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2BleInterface).let {
                         LepuBleLog.d(tag, "it as Bp2BleInterface--bp2SetPhyState")
@@ -1223,12 +1231,12 @@ class BleServiceHelper private constructor() {
         }
     }
     /**
-     * 设置提示音开关（bp2，bp2a，bp2t）
+     * 获取理疗状态（bp2t）
      */
     fun bp2GetPhyState(model: Int){
         if (!checkService()) return
         when(model){
-            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+            Bluetooth.MODEL_BP2T -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Bp2BleInterface).let {
                         LepuBleLog.d(tag, "it as Bp2BleInterface--bp2GetPhyState")
