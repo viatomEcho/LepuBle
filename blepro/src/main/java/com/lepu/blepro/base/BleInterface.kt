@@ -244,7 +244,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         state = true
         ready = false
         connecting = false
-        publish()
 
         if (toConnectUpdater)
             LiveEventBus.get<BluetoothDevice>(EventMsgConst.Updater.EventBleConnected).post(device)
