@@ -254,6 +254,12 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorRed"
                     android:text="4：关机" />
+                <TextView
+                    android:id="@+id/bp2t_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorRed"
+                    android:text="5：进入理疗模式" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

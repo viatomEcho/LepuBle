@@ -130,7 +130,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_PC80B, Bluetooth.MODEL_LES1,
             Bluetooth.MODEL_W12C, Bluetooth.MODEL_HHM1,
             Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
-            Bluetooth.MODEL_LP_ER2 -> waveHandler.post(EcgWaveTask())
+            Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_PC80B_BLE -> waveHandler.post(EcgWaveTask())
 
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
             Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
@@ -154,10 +154,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_OXYU, Bluetooth.MODEL_S5W,
             Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1 -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_SP20_BLE -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
-            Bluetooth.MODEL_CHECK_ADV -> {
+            Bluetooth.MODEL_CHECK_ADV, Bluetooth.MODEL_PC300_BLE -> {
                 waveHandler.post(EcgWaveTask())
                 waveHandler.post(OxyWaveTask())
             }
@@ -797,7 +797,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_LEW, Bluetooth.MODEL_ER1_N,
                 Bluetooth.MODEL_LES1, Bluetooth.MODEL_W12C,
                 Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2,
-                Bluetooth.MODEL_HHM3, Bluetooth.MODEL_LP_ER2 -> {
+                Bluetooth.MODEL_HHM3, Bluetooth.MODEL_LP_ER2,
+                Bluetooth.MODEL_PC80B_BLE -> {
                     binding.ecgLayout.visibility = View.VISIBLE
                     binding.bpLayout.visibility = View.GONE
                     binding.oxyLayout.visibility = View.GONE
@@ -833,7 +834,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_CMRING, Bluetooth.MODEL_OXYU,
                 Bluetooth.MODEL_S5W, Bluetooth.MODEL_AI_S100,
                 Bluetooth.MODEL_S6W, Bluetooth.MODEL_S7W,
-                Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S6W1 -> {
+                Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S6W1,
+                Bluetooth.MODEL_SP20_BLE -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE
@@ -848,7 +850,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.bpLayout.visibility = View.GONE
                 }
-                Bluetooth.MODEL_PC300 -> {
+                Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
                     binding.ecgLayout.visibility = View.VISIBLE
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.bpLayout.visibility = View.VISIBLE
@@ -889,13 +891,15 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         }
         binding.startRtEcg.setOnClickListener {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300) {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE) {
                 LpBleUtil.startEcg(Constant.BluetoothConfig.currentModel[0])
             }
             LpBleUtil.startRtTask()
         }
         binding.stopRtEcg.setOnClickListener {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300) {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE) {
                 LpBleUtil.stopEcg(Constant.BluetoothConfig.currentModel[0])
             }
             // 停止实时任务后去获取设备列表
@@ -1041,7 +1045,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60B,
                     Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_S5W,
                     Bluetooth.MODEL_S6W, Bluetooth.MODEL_S7W,
-                    Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S6W1 -> {
+                    Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S6W1,
+                    Bluetooth.MODEL_SP20_BLE -> {
                         LpBleUtil.enableRtData(it, type, state)
                         type++
                         if (type > Sp20BleCmd.EnableType.OXY_WAVE) {

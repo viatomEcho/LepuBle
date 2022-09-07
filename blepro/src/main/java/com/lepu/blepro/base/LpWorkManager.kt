@@ -223,7 +223,7 @@ object LpWorkManager {
                 }
             }
 
-            Bluetooth.MODEL_PC80B -> {
+            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE -> {
                 Pc80BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -279,7 +279,7 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_SP20 -> {
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE -> {
                 Sp20BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -335,7 +335,7 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_PC300 -> {
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
                 Pc300BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -493,7 +493,7 @@ object LpWorkManager {
                 }
             }
 
-            Bluetooth.MODEL_PC80B -> {
+            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE -> {
                 Pc80BleManager(context).apply {
                     vailManager.put(m, this)
                     return this
@@ -523,7 +523,8 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC300 -> {
+            Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC300,
+            Bluetooth.MODEL_PC300_BLE -> {
                 Pc100BleManager(context).apply {
                     vailManager.put(m, this)
                     return this
@@ -535,7 +536,8 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_SP20, Bluetooth.MODEL_VCOMIN -> {
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_VCOMIN,
+            Bluetooth.MODEL_SP20_BLE -> {
                 Sp20BleManager(context).apply {
                     vailManager.put(m, this)
                     return this

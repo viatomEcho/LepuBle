@@ -334,14 +334,16 @@ class BleServiceHelper private constructor() {
     fun canReconnectByName(model: Int): Boolean {
         LepuBleLog.d(tag, "canReconnectByName model:$model")
         return when(model) {
-            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_FHR, Bluetooth.MODEL_BPW1,
+            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE,
+            Bluetooth.MODEL_FHR, Bluetooth.MODEL_BPW1,
             Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE,
             Bluetooth.MODEL_MY_SCALE, Bluetooth.MODEL_F5_SCALE,
             Bluetooth.MODEL_AOJ20A, Bluetooth.MODEL_TV221U,
             Bluetooth.MODEL_FETAL, Bluetooth.MODEL_VTM_AD5,
             Bluetooth.MODEL_VCOMIN, Bluetooth.MODEL_PC300,
-            Bluetooth.MODEL_LEM, Bluetooth.MODEL_LPM311,
-            Bluetooth.MODEL_POCTOR_M3102, Bluetooth.MODEL_BIOLAND_BGM -> false
+            Bluetooth.MODEL_PC300_BLE, Bluetooth.MODEL_LPM311,
+            Bluetooth.MODEL_POCTOR_M3102, Bluetooth.MODEL_BIOLAND_BGM,
+            Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_BPM -> false
             else -> true
         }
     }
@@ -657,7 +659,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_S6W1 -> {
                 return inter is Pc60FwBleInterface
             }
-            Bluetooth.MODEL_PC80B -> {
+            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE -> {
                 return inter is Pc80BleInterface
             }
             Bluetooth.MODEL_FHR -> {
@@ -1629,7 +1631,7 @@ class BleServiceHelper private constructor() {
     fun sendHeartbeat(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PC80B -> {
+            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc80BleInterface).let {
                         LepuBleLog.d(tag, "it as PC80BleInterface--sendHeartbeat")
@@ -2710,7 +2712,7 @@ class BleServiceHelper private constructor() {
     fun sp20SetConfig(model: Int, config: Sp20Config) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_SP20 -> {
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Sp20BleInterface).let {
                         LepuBleLog.d(tag, "it as Sp20BleInterface--sp20SetConfig")
@@ -2729,7 +2731,7 @@ class BleServiceHelper private constructor() {
     fun sp20GetConfig(model: Int, type: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_SP20 -> {
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Sp20BleInterface).let {
                         LepuBleLog.d(tag, "it as Sp20BleInterface--sp20GetConfig")
@@ -2749,7 +2751,7 @@ class BleServiceHelper private constructor() {
     fun sp20EnableRtData(model: Int, type: Int, enable: Boolean) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_SP20 -> {
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Sp20BleInterface).let {
                         LepuBleLog.d(tag, "it as Sp20BleInterface--sp20EnableRtData")
@@ -2767,7 +2769,7 @@ class BleServiceHelper private constructor() {
     fun sp20GetBattery(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_SP20 -> {
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Sp20BleInterface).let {
                         LepuBleLog.d(tag, "it as Sp20BleInterface--sp20GetBattery")
@@ -3005,7 +3007,7 @@ class BleServiceHelper private constructor() {
     fun startEcg(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PC300 -> {
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc300BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc300BleInterface--startEcg")
@@ -3019,7 +3021,7 @@ class BleServiceHelper private constructor() {
     fun stopEcg(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PC300 -> {
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc300BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc300BleInterface--stopEcg")
@@ -3033,7 +3035,7 @@ class BleServiceHelper private constructor() {
     fun pc300SetEcgDataDigit(model: Int, digit: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PC300 -> {
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc300BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetEcgDataDigit")
@@ -3074,7 +3076,7 @@ class BleServiceHelper private constructor() {
     fun pc300SetGlucometerType(model: Int, type: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PC300 -> {
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc300BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetGlucometerType")
@@ -3088,7 +3090,7 @@ class BleServiceHelper private constructor() {
     fun pc300GetGlucometerType(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PC300 -> {
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc300BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc300BleInterface--pc300GetGlucometerType")

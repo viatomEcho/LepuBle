@@ -25,6 +25,7 @@ class Constant{
             const val ER2_MODEL: Int = Bluetooth.MODEL_ER2
             const val LP_ER2_MODEL: Int = Bluetooth.MODEL_LP_ER2
             const val PC80B_MODEL: Int = Bluetooth.MODEL_PC80B
+            const val PC80B_BLE_MODEL: Int = Bluetooth.MODEL_PC80B_BLE
             const val BP2_MODEL: Int = Bluetooth.MODEL_BP2
             const val BP2A_MODEL: Int = Bluetooth.MODEL_BP2A
             const val BP2T_MODEL: Int = Bluetooth.MODEL_BP2T
@@ -70,6 +71,7 @@ class Constant{
             const val PC6N_MODEL: Int = Bluetooth.MODEL_PC66B
             const val AP20_MODEL: Int = Bluetooth.MODEL_AP20
             const val SP20_MODEL: Int = Bluetooth.MODEL_SP20
+            const val SP20_BLE_MODEL: Int = Bluetooth.MODEL_SP20_BLE
             const val LEW_MODEL: Int = Bluetooth.MODEL_LEW
             const val W12C_MODEL: Int = Bluetooth.MODEL_W12C
             const val VETCORDER_MODEL: Int = Bluetooth.MODEL_VETCORDER
@@ -79,6 +81,7 @@ class Constant{
             const val CHECKME_MODEL: Int = Bluetooth.MODEL_CHECKME
             const val PC_68B_MODEL: Int = Bluetooth.MODEL_PC_68B
             const val PC300_MODEL: Int = Bluetooth.MODEL_PC300
+            const val PC300_BLE_MODEL: Int = Bluetooth.MODEL_PC300_BLE
             const val PULSEBITEX_MODEL: Int = Bluetooth.MODEL_PULSEBITEX
             const val HHM4_MODEL: Int = Bluetooth.MODEL_HHM4
             const val FETAL_MODEL: Int = Bluetooth.MODEL_FETAL
@@ -115,7 +118,8 @@ class Constant{
                 BBSM_S1_MODEL, BBSM_S2_MODEL, CMRING_MODEL, LPRE_MODEL, LE_B1_MODEL, OXYU_MODEL, S5W_MODEL, W12C_MODEL,
                 AI_S100_MODEL, HHM1_MODEL, HHM2_MODEL, HHM3_MODEL, HHM4_MODEL, LP_ER2_MODEL, S6W_MODEL, S7W_MODEL,
                 LPM311_MODEL, POCTOR_M3102_MODEL, BIOLAND_BGM_MODEL, S7BW_MODEL, S6W1_MODEL,
-                PF_10AW_MODEL, PF_10AW1_MODEL, PF_10BW_MODEL, PF_10BW1_MODEL, PF_20AW_MODEL, PF_20B_MODEL, CHECKME_MODEL
+                PF_10AW_MODEL, PF_10AW1_MODEL, PF_10BW_MODEL, PF_10BW1_MODEL, PF_20AW_MODEL, PF_20B_MODEL, CHECKME_MODEL,
+                PC80B_BLE_MODEL, SP20_BLE_MODEL, PC300_BLE_MODEL
             )
 
             val SUPPORT_FACES = SparseArray<Int>().apply {

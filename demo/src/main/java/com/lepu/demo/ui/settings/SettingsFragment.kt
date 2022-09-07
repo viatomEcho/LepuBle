@@ -163,7 +163,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
                     setViewVisible(binding.lewLayout)
                 }
-                Bluetooth.MODEL_SP20 -> {
+                Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE -> {
                     setViewVisible(binding.sp20Layout)
                     LpBleUtil.sp20GetConfig(it.modelNo, state)
                 }
@@ -177,7 +177,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_VTM_AD5 -> {
                     setViewVisible(binding.ad5Layout)
                 }
-                Bluetooth.MODEL_PC300 -> {
+                Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
                     setViewVisible(binding.pc300Layout)
                 }
                 Bluetooth.MODEL_LEM -> {
@@ -364,7 +364,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        //-------------------------bp2/bp2A/bp2T--------------------
+        //-------------------------bp2/bp2a/bp2t/bp2w--------------------
         binding.bp2SetDeviceState.setOnClickListener {
             val tempState = trimStr(binding.bp2DeviceState.text.toString())
             if (isNumber(tempState) && (tempState.toInt() in 0..4)) {
@@ -411,7 +411,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        //-------------------------bp2w------------------------
+        //-------------------------------------------------
         binding.bp2wSetState.setOnClickListener {
             state++
             if (state > 4)
