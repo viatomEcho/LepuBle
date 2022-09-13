@@ -21,7 +21,7 @@ class VetcorderInfo(var data: ByteArray) {
     var pi: Int
     var pulseSound: Int
     var spo2Note: Int
-    var battery: Int
+    var battery: Int         // 0-100
 
     init {
         var index = 4
