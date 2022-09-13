@@ -22,7 +22,7 @@ object Aoj20aBleResponse {
             cmd = byte2UInt(bytes[index])
             index++
             len = byte2UInt(bytes[index])
-            if (cmd == Aoj20aBleCmd.MSG_TEMP_MEASURE) {
+            if (cmd == Aoj20aBleCmd.MSG_GET_RT_DATA) {
                 len = 3
             } else if (cmd == Aoj20aBleCmd.MSG_ERROR_CODE) {
                 len = 1
@@ -67,7 +67,7 @@ object Aoj20aBleResponse {
 
     @ExperimentalUnsignedTypes
     class TempRecord(val bytes: ByteArray) {
-        var num: Int     // 历史数据序号
+        var num: Int     // 历史数据序号，1-10，最大存10组数据
         var year: Int
         var month: Int
         var day: Int

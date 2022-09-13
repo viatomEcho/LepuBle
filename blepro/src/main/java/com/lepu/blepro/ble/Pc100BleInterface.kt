@@ -9,6 +9,7 @@ import com.lepu.blepro.ble.data.Pc100DeviceInfo
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.pc102.*
 import com.lepu.blepro.utils.*
+import com.lepu.blepro.utils.HexString.trimStr
 import java.util.*
 
 /**
@@ -54,7 +55,10 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                     Pc100BleCmd.HAND_SHAKE -> {
                         LepuBleLog.d(tag, "model:$model,HAND_SHAKE => success")
                         val str = toString(response.content).split(":")
-                        pc100Device.deviceName = bluetooth.name
+                        pc100Device.deviceName = trimStr(toString(response.content))
+                        device.name?.let {
+                            pc100Device.deviceName = it
+                        }
                         pc100Device.sn = str[1]
                         LepuBleLog.d(tag, "model:$model,HAND_SHAKE deviceName => " + toString(response.content))
                         LepuBleLog.d(tag, "model:$model,HAND_SHAKE sn => " + pc100Device.sn)
@@ -167,7 +171,7 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             }
             Pc100BleCmd.BO_RT_WAVE -> {
                 LepuBleLog.d(tag, "model:$model,BO_RT_WAVE => success")
-                val info = response.content.copyOfRange(0, response.content.size).toList().asSequence().map { (it.toInt() and 0x7f).toByte() }.toList().toByteArray()
+                val info = Pc100BleResponse.RtBoWave(response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100RtOxyWave).post(InterfaceEvent(model, info))
             }
             Pc100BleCmd.BO_RT_PARAM -> {

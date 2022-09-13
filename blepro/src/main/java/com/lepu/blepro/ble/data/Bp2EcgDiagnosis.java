@@ -3,17 +3,17 @@ package com.lepu.blepro.ble.data;
 public class Bp2EcgDiagnosis {
     // 原始bytes数据
     private byte[] bytes;
-    // 除下列异常情况之外 (正常心电图)
+    // 除下列异常情况之外 (正常心电图)，规则心电
     private boolean isRegular = false;
-    // 波形质量差，或者导联一直脱落等算法无法分析的情况 (无法分析)
+    // 波形质量差，或者导联一直脱落等算法无法分析的情况 (无法分析)，信号弱
     private boolean isPoorSignal = false;
     // 导联一直脱落 (无法分析)
     private boolean isLeadOff = false;
-    // HR>100bpm (心率过速)
+    // HR>100bpm (心率过速)，心率过高
     private boolean isFastHr = false;
-    // HR<50bpm (心率过缓)
+    // HR<50bpm (心率过缓)，心率过低
     private boolean isSlowHr = false;
-    // RR间期不规则 (不规则心律)
+    // RR间期不规则 (不规则心律)，不规则心电
     private boolean isIrregular = false;
     // PVC (心室早搏)
     private boolean isPvcs = false;
@@ -38,8 +38,49 @@ public class Bp2EcgDiagnosis {
             return;
         }
 
-        int result = (bytes[0]&0xFF) + ((bytes[1]&0xFF)<<8) + ((bytes[2]&0xFF)<<16) + ((bytes[1]&0xFF)<<24);
+        int result = (bytes[0]&0xFF) + ((bytes[1]&0xFF)<<8) + ((bytes[2]&0xFF)<<16) + ((bytes[3]&0xFF)<<24);
 
+        if (result == 0) {
+            isRegular = true;
+        }
+        if (result == 0xFFFFFFFF) {
+            isPoorSignal = true;
+        } else {
+            if ((result & 0xFFFFFFFE) == 0xFFFFFFFE) {
+                isLeadOff = true;
+            }
+            if ((result & 0x00000001) == 0x00000001) {
+                isFastHr = true;
+            }
+            if ((result & 0x00000002) == 0x00000002) {
+                isSlowHr = true;
+            }
+            if ((result & 0x00000004) == 0x00000004) {
+                isIrregular = true;
+            }
+            if ((result & 0x00000008) == 0x00000008) {
+                isPvcs = true;
+            }
+            if ((result & 0x00000010) == 0x00000010) {
+                isHeartPause = true;
+            }
+            if ((result & 0x00000020) == 0x00000020) {
+                isFibrillation = true;
+            }
+            if ((result & 0x00000040) == 0x00000040) {
+                isWideQrs = true;
+            }
+            if ((result & 0x00000080) == 0x00000080) {
+                isProlongedQtc = true;
+            }
+            if ((result & 0x00000100) == 0x00000100) {
+                isShortQtc = true;
+            }
+        }
+
+    }
+
+    public Bp2EcgDiagnosis(int result) {
         if (result == 0) {
             isRegular = true;
         }

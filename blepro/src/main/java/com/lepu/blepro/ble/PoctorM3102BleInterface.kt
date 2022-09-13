@@ -62,7 +62,7 @@ class PoctorM3102BleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getFileList() {
-        LepuBleLog.e(tag, "getFileList not yet implemented")
+//        sendCmd(byteArrayOf(0xAA.toByte()))
     }
 
     override fun syncTime() {

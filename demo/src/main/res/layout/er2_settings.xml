@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="er2/duoek"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/er2_set_config"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="心跳音" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="硬件版本:" />
+            <EditText
+                android:id="@+id/er2_version"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="A-Z"
+                android:layout_marginStart="20dp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="sn:" />
+            <EditText
+                android:id="@+id/er2_sn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="长度:10位"
+                android:layout_marginStart="20dp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="branch code:" />
+            <EditText
+                android:id="@+id/er2_code"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="长度:8位"
+                android:layout_marginStart="20dp"/>
+        </LinearLayout>
+        <Button
+            android:id="@+id/er2_factory_config"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="烧录" />
+    </LinearLayout>
+
+</layout>

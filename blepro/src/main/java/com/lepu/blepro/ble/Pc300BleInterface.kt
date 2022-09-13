@@ -77,10 +77,10 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                     }
                     GET_DEVICE_NAME -> {
                         val data = trimStr(toString(response.content))
-                        pc300Device.deviceName = bluetooth.name
-
-                        deviceInfo.deviceName = pc300Device.deviceName
-
+                        pc300Device.deviceName = data
+                        device.name?.let {
+                            pc300Device.deviceName = it
+                        }
                         LepuBleLog.d(tag, "model:$model,GET_DEVICE_NAME 查询产品名称 => success $data")
                     }
                     DEVICE_INFO_2 -> {

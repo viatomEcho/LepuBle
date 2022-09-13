@@ -124,7 +124,11 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                     return
                 }
 
-                val list = KtBleFileList(bleResponse.content, bluetooth.name)
+                val list = if (device.name == null) {
+                    KtBleFileList(bleResponse.content, "")
+                } else {
+                    KtBleFileList(bleResponse.content, device.name)
+                }
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wFileList).post(InterfaceEvent(model, list))
             }
 
@@ -203,7 +207,11 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
 
                 fileContent?.let {
                     if (it.isNotEmpty()) {
-                        val data = Bp2BleFile(fileName, it, bluetooth.name)
+                        val data = if (device.name == null) {
+                            Bp2BleFile(fileName, it, "")
+                        } else {
+                            Bp2BleFile(fileName, it, device.name)
+                        }
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileComplete).post(InterfaceEvent(model, data))
                     }
                 }

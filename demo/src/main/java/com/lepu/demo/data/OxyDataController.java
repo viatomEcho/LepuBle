@@ -47,6 +47,11 @@ public final class OxyDataController {
             return;
         }
 
+        // 波形绘制方向反了
+        for (int i=0; i<fs.length; i++) {
+            fs[i] = 127-fs[i]/2;
+        }
+
         int[] temp = new int[dataRec.length + fs.length];
         System.arraycopy(dataRec, 0, temp, 0, dataRec.length);
         System.arraycopy(fs, 0, temp, dataRec.length, fs.length);

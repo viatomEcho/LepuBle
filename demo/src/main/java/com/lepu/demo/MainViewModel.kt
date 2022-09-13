@@ -135,6 +135,9 @@ class MainViewModel: ViewModel() {
     val _lewInfo = MutableLiveData<com.lepu.blepro.ble.data.lew.DeviceInfo>()
     val lewInfo: LiveData<com.lepu.blepro.ble.data.lew.DeviceInfo> = _lewInfo
 
+    val _biolandInfo = MutableLiveData<BiolandBgmBleResponse.DeviceInfo>()
+    val biolandInfo: LiveData<BiolandBgmBleResponse.DeviceInfo> = _biolandInfo
+
     /**
      * 当前蓝牙
      */

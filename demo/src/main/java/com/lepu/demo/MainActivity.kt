@@ -115,7 +115,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             Constant.BluetoothConfig.bleSdkServiceEnable = true
             afterLpBleInit()
         })
-
         //-------------------------er1---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetTime)
             .observe(this) {
@@ -215,10 +214,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         //-------------------------pc60fw---------------------------
         //-------------------------pc80b---------------------------
         LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceReady)
-            .observe(this, {
+            .observe(this) {
                 Toast.makeText(this, "EventBleDeviceReady 连接成功 model $it", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it)
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bDeviceInfo)
             .observe(this) { event ->
                 (event.data as com.lepu.blepro.ext.pc80b.DeviceInfo).let {
@@ -307,7 +306,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._bpmInfo.value = it
                 }
             }
-
         //-------------------------o2ring---------------------------
         // o2ring 同步时间
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxySyncDeviceInfo)
@@ -316,7 +314,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 LpBleUtil.getInfo(it.model)
 
             }
-
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo)
             .observe(this) { event ->
             (event.data as OxyBleResponse.OxyInfo).let {
@@ -333,16 +330,15 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 Toast.makeText(this, "BABYO2N 获取盒子信息成功 $it", Toast.LENGTH_SHORT).show()
             }
         }
-
         //-------------------------pc100---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100DeviceInfo)
             .observe(this) { event ->
                 (event.data as com.lepu.blepro.ext.pc102.DeviceInfo).let {
                     Toast.makeText(this, "PC-100 获取设备信息成功", Toast.LENGTH_SHORT).show()
                     viewModel._pc100Info.value = it
+                    viewModel._battery.value = "${it.batLevel.times(25)} - ${(it.batLevel+1).times(25)} %"
                 }
             }
-
         //-------------------------pc60fw pc6n---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo)
             .observe(this) { event ->
@@ -364,7 +360,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._ap20Info.value = it
                 }
             }
-
         //-------------------------sp20---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20SetTime)
             .observe(this) {
@@ -378,7 +373,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._boInfo.value = it
                 }
             }
-
         //-------------------------aoj20a---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aSetTime)
             .observe(this) {
@@ -392,7 +386,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._aoj20aInfo.value = it
                 }
             }
-
         //-------------------------checkme pod-------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodSetTime)
             .observe(this) {
@@ -423,13 +416,39 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         //-------------------------pulsebit-------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitSetTime)
             .observe(this) {
-                Toast.makeText(this, "Pulsebit 完成时间同步", Toast.LENGTH_SHORT).show()
+                when (it.model) {
+                    Bluetooth.MODEL_PULSEBITEX -> {
+                        Toast.makeText(this, "Pulsebit 完成时间同步", Toast.LENGTH_SHORT).show()
+                    }
+                    Bluetooth.MODEL_HHM4 -> {
+                        Toast.makeText(this, "HHM4 完成时间同步", Toast.LENGTH_SHORT).show()
+                    }
+                    Bluetooth.MODEL_CHECKME -> {
+                        Toast.makeText(this, "Checkme 完成时间同步", Toast.LENGTH_SHORT).show()
+                    }
+                    else -> {
+                        Toast.makeText(this, "Pulsebit 完成时间同步", Toast.LENGTH_SHORT).show()
+                    }
+                }
                 LpBleUtil.getInfo(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitDeviceInfo)
             .observe(this) { event ->
                 (event.data as PulsebitBleResponse.DeviceInfo).let {
-                    Toast.makeText(this, "Pulsebit 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    when (event.model) {
+                        Bluetooth.MODEL_PULSEBITEX -> {
+                            Toast.makeText(this, "Pulsebit 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                        }
+                        Bluetooth.MODEL_HHM4 -> {
+                            Toast.makeText(this, "HHM4 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                        }
+                        Bluetooth.MODEL_CHECKME -> {
+                            Toast.makeText(this, "Checkme 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                        }
+                        else -> {
+                            Toast.makeText(this, "Pulsebit 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                     viewModel._pulsebitInfo.value = it
                 }
             }
@@ -452,6 +471,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 (event.data as Pc300DeviceInfo).let {
                     Toast.makeText(this, "PC_300SNT 获取设备信息成功", Toast.LENGTH_SHORT).show()
                     viewModel._pc300Info.value = it
+                    viewModel._battery.value = "${it.batLevel.times(25)} - ${(it.batLevel+1).times(25)} %"
                 }
             }
         //-------------------------lem---------------------------
@@ -475,18 +495,24 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._er1Info.value = it
                 }
             }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmDeviceInfo)
+            .observe(this) {
+                Toast.makeText(this, "Bioland-BGM 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                val data = it.data as BiolandBgmBleResponse.DeviceInfo
+                viewModel._biolandInfo.value = data
+                viewModel._battery.value = "${data.battery} %"
+            }
     }
     private fun needPermission(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PermissionX.init(this)
                 .permissions(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.CAMERA,
-                    Manifest.permission.BLUETOOTH,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.BLUETOOTH_SCAN,
                     Manifest.permission.BLUETOOTH_CONNECT,
-                    Manifest.permission.BLUETOOTH_ADVERTISE,
-                    Manifest.permission.BLUETOOTH_ADMIN
+                    Manifest.permission.BLUETOOTH_ADVERTISE
                 )
                 .onExplainRequestReason { scope, deniedList ->
                     // 当请求被拒绝后，说明权限原因
@@ -495,8 +521,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                             R.string.open
                         ), getString(R.string.ignore)
                     )
-
-
                 }
                 .onForwardToSettings { scope, deniedList ->
                     //选择了拒绝且不再询问的权限，去设置
@@ -520,9 +544,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             PermissionX.init(this)
                 .permissions(
                     Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
                     Manifest.permission.CAMERA,
-                    Manifest.permission.BLUETOOTH,
-                    Manifest.permission.BLUETOOTH_ADMIN
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
                 )
                 .onExplainRequestReason { scope, deniedList ->
                     // 当请求被拒绝后，说明权限原因
@@ -531,8 +556,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                             R.string.open
                         ), getString(R.string.ignore)
                     )
-
-
                 }
                 .onForwardToSettings { scope, deniedList ->
                     //选择了拒绝且不再询问的权限，去设置
@@ -584,18 +607,13 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
     override fun onBleStateChanged(model: Int, state: Int) {
         LepuBleLog.d("onBleStateChanged model = $model, state = $state")
         viewModel._bleState.value = state == LpBleUtil.State.CONNECTED
-        val device = LpBleUtil.getCurrentDevice(model)
-        if (device != null) {
-            viewModel._curBluetooth.value = DeviceEntity(device.name, device.address, model)
-        }
+
         when(state){
             LpBleUtil.State.CONNECTED ->{
                 //
             }
             LpBleUtil.State.DISCONNECTED ->{
                 LpBleUtil.stopRtTask(model)
-
-
             }
         }
     }

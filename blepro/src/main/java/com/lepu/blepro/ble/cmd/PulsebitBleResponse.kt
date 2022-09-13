@@ -34,8 +34,8 @@ class PulsebitBleResponse{
         var model: String        // 系列版本
         var hwVersion: String    // 硬件版本
         var swVersion: String    // 软件版本
-        var lgVersion: String    // 语言版本
-        var curLanguage: String  // 语言版本
+        var lgVersion: String    // 语言包版本
+        var curLanguage: String  // 当前语言版本
         var sn: String           // 序列号
         var fileVer:String       // 文件解析协议版本
         var spcpVer:String       // 蓝牙通讯协议版本
@@ -96,24 +96,24 @@ class PulsebitBleResponse{
 
     @ExperimentalUnsignedTypes
     class EcgFile(val fileName: String, val fileSize: Int, val bytes: ByteArray) {
-        var hrsDataSize: Int           // 波形心率大小（byte）
-        var recordingTime: Int         // 记录时长 s
-        var waveDataSize: Int          // 波形数据大小（byte）
-        var hr: Int                    // 诊断结果：HR，单位为bpm
-        var st: Float                  // 诊断结果：ST（以ST/100存储），单位为mV(内部导联写0)
-        var qrs: Int                   // 诊断结果：QRS，单位为ms
-        var pvcs: Int                  // 诊断结果：PVCs(内部导联写0)
-        var qtc: Int                   // 诊断结果：QTc单位为ms
-        var result: ExEcgDiagnosis     // 心电异常诊断结果
-        var measureMode: Int           // 测量模式 1、3："Lead I"，2、4、5："Lead II"，6："Chest Lead"
-        var measureModeMess: String
-        var filterMode: Int            // 滤波模式（1：wide   0：normal）
-        var qt: Int                    // 诊断结果：QT单位为ms
-        var hrsData: ByteArray         // ECG心率值，从数据采样开始，采样率为1Hz，每个心率值为2byte（实际20s数据，每秒出一个心率），若出现无效心率，则心率为0
-        var hrsIntData: IntArray       // ECG心率值
-        var waveData: ByteArray        // 每个采样点2byte，原始数据
-        var waveShortData: ShortArray  // 每个采样点2byte
-        var wFs: FloatArray            // 转毫伏值(n*4033)/(32767*12*8)
+        var hrsDataSize: Int              // 波形心率大小（byte）
+        var recordingTime: Int            // 记录时长 s
+        var waveDataSize: Int             // 波形数据大小（byte）
+        var hr: Int                       // HR，单位为bpm
+        var st: Float                     // ST（以ST/100存储），单位为mV(内部导联写0)
+        var qrs: Int                      // QRS，单位为ms
+        var pvcs: Int                     // PVCs(内部导联写0)
+        var qtc: Int                      // QTc单位为ms
+        var result: Int
+        var diagnosis: ExEcgDiagnosis     // 诊断结果
+        var measureMode: Int              // 测量模式 1：内部导联I，2：内部导联II，3：外部导联I，4：外部导联II
+        var filterMode: Int               // 滤波模式（1：wide   0：normal）
+        var qt: Int                       // QT单位为ms
+        var hrsData: ByteArray            // ECG心率值，从数据采样开始，采样率为1Hz，每个心率值为2byte（实际20s数据，每秒出一个心率），若出现无效心率，则心率为0
+        var hrsIntData: IntArray          // ECG心率值
+        var waveData: ByteArray           // 每个采样点2byte，原始数据
+        var waveShortData: ShortArray     // 每个采样点2byte
+        var wFs: FloatArray               // 转毫伏值(n*4033)/(32767*12*8)
 
         init {
             var index = 0
@@ -132,10 +132,10 @@ class PulsebitBleResponse{
             index += 2
             qtc = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
-            result = ExEcgDiagnosis(bytes.copyOfRange(index, index+4))
+            result = toUInt(bytes.copyOfRange(index, index+4))
+            diagnosis = ExEcgDiagnosis(bytes.copyOfRange(index, index+4))
             index += 4
             measureMode = byte2UInt(bytes[index])
-            measureModeMess = getMeasureMode(measureMode)
             index++
             filterMode = byte2UInt(bytes[index])
             index++
@@ -160,15 +160,6 @@ class PulsebitBleResponse{
             }
         }
 
-        fun getMeasureMode(mode: Int): String {
-            return when (mode) {
-                1, 3 -> "Lead I"
-                2, 4, 5 -> "Lead II"
-                6 -> "Chest Lead"
-                else -> ""
-            }
-        }
-
         override fun toString(): String {
             return """
                 fileSize : $fileSize
@@ -182,8 +173,8 @@ class PulsebitBleResponse{
                 pvcs : $pvcs
                 qtc : $qtc
                 result : $result
+                diagnosis : $diagnosis
                 measureMode : $measureMode
-                measureModeMess : $measureModeMess
                 filterMode : $filterMode
                 qt : $qt
                 hrsData : ${bytesToHex(hrsData)}

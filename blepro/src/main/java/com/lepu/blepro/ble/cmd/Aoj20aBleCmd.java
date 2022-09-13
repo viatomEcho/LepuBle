@@ -14,8 +14,8 @@ public class Aoj20aBleCmd {
      */
     public static final int DEVICE_TYPE = 0x01;
 
-    public static final int CMD_TEMP_MEASURE = 0xD1;
-    public static final int MSG_TEMP_MEASURE = 0xC1;
+    public static final int CMD_GET_RT_DATA = 0xD1;
+    public static final int MSG_GET_RT_DATA = 0xC1;
     public static final int CMD_SET_TIME = 0xD2;
     public static final int MSG_SET_TIME = 0xC2;
     public static final int CMD_GET_HISTORY_DATA = 0xD3;
@@ -46,8 +46,8 @@ public class Aoj20aBleCmd {
      * 测温数据同步指令（单次开始测量指令）
      * @return byte数组
      */
-    public static byte[] tempMeasure() {
-        return getReq(CMD_TEMP_MEASURE, new byte[]{0,0,0});
+    public static byte[] getRtData() {
+        return getReq(CMD_GET_RT_DATA, new byte[]{0,0,0});
     }
 
     /**

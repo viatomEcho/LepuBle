@@ -22,6 +22,7 @@
             android:id="@+id/ble_split"
             android:hint=" 筛选设备"
             android:drawableStart="@mipmap/search"
+            android:drawablePadding="@dimen/dp_10"
             app:layout_constraintStart_toEndOf="@id/scan"
             app:layout_constraintTop_toTopOf="@id/scan"
             app:layout_constraintBottom_toBottomOf="@id/scan"

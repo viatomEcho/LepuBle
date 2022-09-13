@@ -33,7 +33,7 @@ class OxyBleResponse{
         var region: String       // 地区版本
         var model: String        // 系列版本
         var hwVersion: String    // 硬件版本
-        var swVersion: String    // 软件版本
+        var swVersion: String    // 固件版本
         var btlVersion: String   // 引导版本
         var pedTar: Int          // 步数
         var sn: String           // 序列号

@@ -96,7 +96,11 @@ class BpmBleInterface(model: Int): BleInterface(model) {
         when(BpmBleCmd.getMsgType(bytes)) {
             BpmBleCmd.BPMCmd.MSG_TYPE_GET_INFO -> {
                 //设备信息
-                val data = BpmDeviceInfo(bytes, bluetooth.name)
+                val deviceInfo = if (device.name == null) {
+                    BpmDeviceInfo(bytes, "")
+                } else {
+                    BpmDeviceInfo(bytes, device.name)
+                }
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
 

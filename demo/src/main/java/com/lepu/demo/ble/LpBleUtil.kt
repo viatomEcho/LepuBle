@@ -123,15 +123,10 @@ class LpBleUtil {
             }
         }
 
-        fun getCurrentDevice(model: Int): BluetoothDevice? {
-            return BleServiceHelper.getCurrentDevice(model)
-        }
-        fun getCurrentBluetooth(model: Int): Bluetooth? {
-            return BleServiceHelper.getCurrentBluetooth(model)
-        }
-
         fun setInterface(model: Int, needClear: Boolean){
-            clearInterface()
+            if (needClear) {
+                clearInterface()
+            }
             BleServiceHelper.setInterfaces(model)
         }
 
@@ -194,20 +189,14 @@ class LpBleUtil {
          * @param name String
          */
         @JvmOverloads
-        fun reconnect(model: Int, name: String, toConnectUpdater: Boolean = false) {
+        fun reconnect(model: IntArray, name: Array<String>, toConnectUpdater: Boolean = false) {
             Log.d(TAG, "reconnect...$model, name = $name")
             name.isNullOrEmpty().let { it1 ->
-                if (it1){
+                if (it1) {
                     Log.d(TAG, "error: name")
                     return
                 }
-                //检查必须要有interface
-                if (isDisconnected(model)) {
-                    Log.d(TAG, "去重连...")
-                    BleServiceHelper.reconnect(model, name, toConnectUpdater)
-                }else{
-                    Log.d(TAG, "蓝牙处于连接状态，reconnect 不往下进行 ")
-                }
+                BleServiceHelper.reconnect(model, name, toConnectUpdater)
             }
 
         }
@@ -872,6 +861,9 @@ class LpBleUtil {
                 BleServiceHelper.aoj20aDeleteData(model)
             }
         }
+        fun aoj20aGetRtData(model: Int) {
+            BleServiceHelper.aoj20aGetRtData(model)
+        }
 
         fun enableRtData(model: Int, type: Int, enable: Boolean) {
             Log.d(TAG, "enableRtData")
@@ -884,11 +876,14 @@ class LpBleUtil {
                     Bluetooth.MODEL_AP20 -> {
                         BleServiceHelper.ap20EnableRtData(model, type, enable)
                     }
-                    Bluetooth.MODEL_SP20 -> {
+                    Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE -> {
                         BleServiceHelper.sp20EnableRtData(model, type, enable)
                     }
                     Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_POD_1W,
                     Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
+                    Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
+                    Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
+                    Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
                     Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_S5W,
                     Bluetooth.MODEL_S6W, Bluetooth.MODEL_S7W,
                     Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S6W1 -> {

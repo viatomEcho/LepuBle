@@ -84,7 +84,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
 
         binding.reconnectByName.setOnClickListener {
             mainViewModel.curBluetooth.value?.let { it1 ->
-                LpBleUtil.reconnect(currentModel[0], it1.deviceName)
+                LpBleUtil.reconnect(intArrayOf(currentModel[0]), arrayOf(it1.deviceName))
             }
         }
         binding.reconnectByAddress.setOnClickListener {
@@ -130,7 +130,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
             }
         }
 
-        mainViewModel.bleState.observe(viewLifecycleOwner, {
+        mainViewModel.bleState.observe(viewLifecycleOwner) {
             if (it) {
                 binding.bleState.text = "连接状态：已连接"
             } else {
@@ -139,11 +139,13 @@ class HomeFragment : Fragment(R.layout.fragment_home){
             if (it) {
                 mAlertDialog?.dismiss()
             }
-        })
+        }
 
-        mainViewModel.curBluetooth.observe(viewLifecycleOwner, {
-            binding.bleDevice.text = "当前蓝牙设备：\n" + it!!.deviceName + " " + it!!.deviceMacAddress
-        })
+        mainViewModel.curBluetooth.observe(viewLifecycleOwner) {
+            binding.bleDevice.text = "当前蓝牙设备：\n蓝牙名：${it!!.deviceName}\n地址：${it!!.deviceMacAddress}"
+        }
+
+        binding.bleSplit.setText(Constant.BluetoothConfig.splitText)
 
     }
 
@@ -166,12 +168,12 @@ class HomeFragment : Fragment(R.layout.fragment_home){
     private fun initEvent(){
         //扫描通知
         LiveEventBus.get<Bluetooth>(EventMsgConst.Discovery.EventDeviceFound)
-            .observe(this,  {
+            .observe(this) {
 //                adapter.setNewInstance(BluetoothController.getDevices())
 //                adapter.notifyDataSetChanged()
-                splitDevices(binding.bleSplit.text.toString())
-            })
-
+                Constant.BluetoothConfig.splitText = binding.bleSplit.text.toString()
+                splitDevices(Constant.BluetoothConfig.splitText)
+            }
 
 
     }

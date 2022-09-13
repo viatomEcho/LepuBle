@@ -3,15 +3,15 @@ package com.lepu.blepro.ble.data;
 public class CheckmeLeEcgDiagnosis {
     // 原始byte数据
     private byte data;
-    // Regular ECG Rhythm
+    // Regular ECG Rhythm，规则心电
     private boolean isRegular = false;
-    // Unable to analyze
+    // Unable to analyze，信号弱
     private boolean isPoorSignal = false;
-    // High Heart Rate
+    // High Heart Rate，心率过高
     private boolean isHighHr = false;
-    // Low Heart Rate
+    // Low Heart Rate，心率过低
     private boolean isLowHr = false;
-    // Irregular ECG Rhythm
+    // Irregular ECG Rhythm，不规则心电
     private boolean isIrregular = false;
     // High QRS Value
     private boolean isHighQrs = false;
@@ -30,6 +30,38 @@ public class CheckmeLeEcgDiagnosis {
         this.data = data;
         int result = data & 0xFF;
 
+        if (result == 0) {
+            isRegular = true;
+        }
+        if (result == 0xFF) {
+            isPoorSignal = true;
+        } else {
+            if ((result & 0x01) == 0x01) {
+                isHighHr = true;
+            }
+            if ((result & 0x02) == 0x02) {
+                isLowHr = true;
+            }
+            if ((result & 0x04) == 0x04) {
+                isHighQrs = true;
+            }
+            if ((result & 0x08) == 0x08) {
+                isHighSt = true;
+            }
+            if ((result & 0x10) == 0x10) {
+                isLowSt = true;
+            }
+            if ((result & 0x20) == 0x20) {
+                isIrregular = true;
+            }
+            if ((result & 0x40) == 0x40) {
+                isPrematureBeat = true;
+            }
+        }
+
+    }
+
+    public CheckmeLeEcgDiagnosis(int result) {
         if (result == 0) {
             isRegular = true;
         }

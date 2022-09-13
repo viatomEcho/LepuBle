@@ -8,6 +8,6 @@ import com.lepu.demo.R
 class WifiAdapter(layoutResId: Int, data: MutableList<Bp2Wifi>?) : BaseQuickAdapter<Bp2Wifi, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(holder: BaseViewHolder, item: Bp2Wifi) {
-        holder.setText(R.id.name, item.ssid + "  " + item.macAddr)
+        holder.setText(R.id.name, "name：${item.ssid}\naddress：${item.macAddr}\nrssi：${item.rssi}dBm")
     }
 }

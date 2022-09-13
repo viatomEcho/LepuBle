@@ -198,9 +198,11 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     /**
      * PC60FwBleInterface发出的通知
      * 包含model: MODEL_PC60FW, MODEL_PC66B, MODEL_OXYSMART,
-     *           MODEL_POD_1W, MODEL_POD2B, MODEL_PC_60NW_1,
-     *           MODEL_PC_60B, MODEL_PF_10A, MODEL_PF_10B,
-     *           MODEL_PF_20A, MODEL_PF_20B, MODEL_PC_60NW,
+     *           MODEL_POD_1W, MODEL_POD2B,
+     *           MODEL_PC_60B, MODEL_PF_10, MODEL_PF_10AW,
+     *           MODEL_PF_10AW1, MODEL_PF_10BW, MODEL_PF_10BW1,
+     *           MODEL_PF_20, MODEL_PF_20AW, MODEL_PF_20B,
+     *           MODEL_PC_60NW, MODEL_PC_60NW_1,
      *           MODEL_S5W, MODEL_S6W, MODEL_S7W, MODEL_S7BW,
      *           MODEL_S6W1
      */
@@ -232,7 +234,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * PC80BleInterface发出的通知
-     * 包含model: MODEL_PC80B
+     * 包含model: MODEL_PC80B, MODEL_PC80B_BLE
      */
     interface PC80B {
         companion object {
@@ -290,7 +292,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventPc100BpStop = "com.lepu.ble.pc100.bp.stop"                 // 血压停止测量 true
 //            const val EventPc100BpStatus = "com.lepu.ble.pc100.bp.status"           // 血压测量状态 Pc100BleResponse.BpStatus
             const val EventPc100RtBpData = "com.lepu.ble.pc100.rt.bp.data"            // 血压实时测量值 RtBpData
-            const val EventPc100RtOxyWave = "com.lepu.ble.pc100.rt.oxy.wave"          // 血氧实时波形包 byte数组
+            const val EventPc100RtOxyWave = "com.lepu.ble.pc100.rt.oxy.wave"          // 血氧实时波形包 RtOxyWave
             const val EventPc100RtOxyParam = "com.lepu.ble.pc100.rt.oxy.param"        // 血氧实时测量值 RtOxyParam
             const val EventPc100OxyFingerOut = "com.lepu.ble.pc100.oxy.finger.out"    // 血氧脱落未接入
         }
@@ -422,7 +424,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * Sp20BleInterface
-     * 包含model: MODEL_SP20
+     * 包含model: MODEL_SP20, MODEL_SP20_BLE
      */
     interface SP20 {
         companion object {
@@ -475,6 +477,10 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * CheckmePodBleInterface
+     * 包含model: MODEL_CHECK_POD
+     */
     interface CheckmePod {
         companion object {
             const val EventCheckmePodSetTime = "com.lepu.ble.checkme.pod.set.time"                            // 同步时间 boolean
@@ -487,6 +493,10 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * PulsebitBleInterface
+     * 包含model: MODEL_PULSEBITEX, MODEL_HHM4, MODEL_CHECKME
+     */
     interface Pulsebit {
         companion object {
             const val EventPulsebitSetTime = "com.lepu.ble.pulsebit.set.time"                            // 同步时间 boolean
@@ -542,7 +552,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * PC300BleInterface发出的通知
-     * 包含model: MODEL_PC300
+     * 包含model: MODEL_PC300, MODEL_PC300_BLE
      */
     interface PC300 {
         companion object {

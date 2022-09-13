@@ -98,18 +98,18 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initLiveEvent() {
 
-        LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStart).observeSticky(this, {
-            when(it){
+        LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStart).observeSticky(this) {
+            when (it) {
                 Bluetooth.MODEL_O2RING -> startWave()
             }
 
-        })
+        }
 
-        LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStop).observeSticky(this, {
-            when(it){
+        LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStop).observeSticky(this) {
+            when (it) {
                 Bluetooth.MODEL_O2RING -> stopWave()
             }
-        })
+        }
 
 
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtData).observeForever { event ->
@@ -136,7 +136,7 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
 
         // o2ring ppg
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
-            .observe(this, {
+            .observe(this) {
 
                 LpBleUtil.oxyGetPpgRt(it.model)
 
@@ -145,8 +145,7 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
                     Log.d("ppg", "len  = ${data.rawDataBytes.size}")
                 }
 
-            })
-
+            }
 
 
     }
@@ -180,7 +179,7 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
             initOxyView()
         }
 
-        mainViewModel.bleState.observe(viewLifecycleOwner, {
+        mainViewModel.bleState.observe(viewLifecycleOwner) {
             it?.let {
                 if (it) {
                     binding.bleState.setImageResource(R.mipmap.bluetooth_ok)
@@ -191,24 +190,24 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
                 }
             }
 
-        })
+        }
 
-        viewModel.pr.observe(viewLifecycleOwner, {
+        viewModel.pr.observe(viewLifecycleOwner) {
             if (it == 0) {
                 binding.tvPr.text = "?"
             } else {
                 binding.tvPr.text = it.toString()
             }
-        })
+        }
 
-        viewModel.spo2.observe(viewLifecycleOwner, {
+        viewModel.spo2.observe(viewLifecycleOwner) {
             if (it == 0) {
                 binding.tvOxy.text = "?"
 
             } else {
                 binding.tvOxy.text = it.toString()
             }
-        })
+        }
 
 
         binding.getRtData.setOnClickListener {
@@ -219,20 +218,20 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
         }
 
 
-        viewModel.dataSrc.observe(viewLifecycleOwner, {
+        viewModel.dataSrc.observe(viewLifecycleOwner) {
             if (this::oxyView.isInitialized) {
                 oxyView.setDataSrc(it)
                 oxyView.invalidate()
 
             }
-        })
+        }
 
 
-        mainViewModel.oxyInfo.observe(viewLifecycleOwner, {
+        mainViewModel.oxyInfo.observe(viewLifecycleOwner) {
             it?.let {
                 binding.other.text = "lowHr = ${it.hrLowThr}, highHr = ${it.hrHighThr}"
             }
-        })
+        }
     }
 
     private fun initOxyView() {

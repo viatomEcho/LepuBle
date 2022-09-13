@@ -10,10 +10,10 @@ object BpmBleResponse {
     class RecordData(val bytes: ByteArray)  {
         var sys: Int
         var dia: Int
-        var regularHrFlag: Boolean
+        var regularHrFlag: Boolean  // true：有心率不齐，false：无心率不齐
         var pr: Int
-        var deviceUserId: Int  // 用户id
-        var storeId: Int       // 数据序号
+        var deviceUserId: Int       // 用户id
+        var storeId: Int            // 数据序号
         var year: Int
         var month: Int
         var day: Int
