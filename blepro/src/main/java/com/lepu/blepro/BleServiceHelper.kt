@@ -2798,6 +2798,23 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "aoj20aDeleteData current model $model unsupported!!")
         }
     }
+    /**
+     * 获取最新测量数据（aoj20a）
+     */
+    fun aoj20aGetRtData(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_AOJ20A -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Aoj20aBleInterface).let {
+                        LepuBleLog.d(tag, "it as Aoj20aBleInterface--aoj20aGetRtData")
+                        it.getRtData()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "aoj20aGetRtData current model $model unsupported!!")
+        }
+    }
 
     /**
      * 使能实时数据发送（pc60fw，pc66b，oxysmart，pod1w）

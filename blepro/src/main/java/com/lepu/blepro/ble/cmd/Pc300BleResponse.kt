@@ -324,7 +324,7 @@ object Pc300BleResponse {
     @ExperimentalUnsignedTypes
     class RtEcgWave(val bytes: ByteArray, var gain: Float) {
         var seqNo: Int             // 准备阶段是0
-        var digit: Int
+        var digit: Int             // 0：采样点占8bit，增益为28.5；1：采样点占12bit，增益为394
         var tempData: Float
 //        var sign: Boolean
         var waveData: ByteArray

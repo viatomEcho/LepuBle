@@ -110,7 +110,7 @@ object PC80BleResponse {
 
     @ExperimentalUnsignedTypes
     class RtContinuousData(val bytes: ByteArray) {
-        var seqNo: Int
+        var seqNo: Int          // 0-255
         var ecgData: RtEcgData
         var hr: Int
         var leadOff: Boolean

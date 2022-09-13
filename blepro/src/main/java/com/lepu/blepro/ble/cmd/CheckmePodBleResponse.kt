@@ -32,8 +32,8 @@ class CheckmePodBleResponse{
         var model: String        // 系列版本
         var hwVersion: String    // 硬件版本
         var swVersion: String    // 软件版本
-        var lgVersion: String    // 语言版本
-        var curLanguage: String  // 语言版本
+        var lgVersion: String    // 语言包版本
+        var curLanguage: String  // 当前语言版本
         var sn: String           // 序列号
         var fileVer:String       // 文件解析协议版本
         var spcpVer:String       // 蓝牙通讯协议版本

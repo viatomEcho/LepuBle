@@ -448,8 +448,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (event.data as String).let {
                     binding.info.text = it
                     for (fileName in it.split(",")) {
-                        if (fileName.contains("R")) {
-//                        if (fileName.isNotEmpty()) {
+//                        if (fileName.contains("R")) {
+                        if (fileName.isNotEmpty()) {
                             fileNames.add(fileName)
                         }
 //                        }
@@ -1236,6 +1236,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     else -> "数据出错 : \n$data"
                 }
             }
+        //------------------------------Bioland-BGM--------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmCountDown)
             .observe(this) {
                 val data = it.data as Int

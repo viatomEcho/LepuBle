@@ -55,7 +55,7 @@ class Pc68bBleResponse{
         var isProbeOff: Boolean        // 探头脱落，手指未接入
         var isPulseSearching: Boolean  // 脉搏检测
         var isCheckProbe: Boolean      // 探头故障或使用不当
-        var vol: Float                 // 电量等级（0-32）0-3.2V
+        var vol: Float                 // 电压（0-32）0-3.2V
         var battery: Int               // 电量等级（0-3）
 
         init {

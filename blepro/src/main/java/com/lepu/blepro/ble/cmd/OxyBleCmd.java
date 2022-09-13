@@ -43,8 +43,8 @@ public class OxyBleCmd {
      * 设备支持声音和震动提醒：bit0:震动  bit1:声音 (int 0：震动关声音关 1：震动开声音关 2：震动关声音开 3：震动开声音开)
      * 设备只支持声音或震动提醒：bit0:震动/声音 (int 0：震动/声音关 1：震动/声音开)
      *
-     * SetHRLowThr : 设置心率震动最低阀值（30-60）
-     * SetHRHighThr : 设置心率震动最高阀值（90-180）
+     * SetHRLowThr : 设置心率震动最低阀值（30-250）
+     * SetHRHighThr : 设置心率震动最高阀值（30-250）
      * SetLightStr : 设置屏幕亮度（0：低，1：中，2：高）
      * SetSpO2SW : 设置血氧功能开关（0：关 1：开）
      * SetBuzzer : 设置声音强度（checkO2Plus：最低：20，低：40，中：60，高：80，最高：100）

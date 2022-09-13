@@ -3,15 +3,15 @@ package com.lepu.blepro.ble.data;
 public class CheckmeLeEcgDiagnosis {
     // 原始byte数据
     private byte data;
-    // Regular ECG Rhythm
+    // Regular ECG Rhythm，规则心电
     private boolean isRegular = false;
-    // Unable to analyze
+    // Unable to analyze，信号弱
     private boolean isPoorSignal = false;
-    // High Heart Rate
+    // High Heart Rate，心率过高
     private boolean isHighHr = false;
-    // Low Heart Rate
+    // Low Heart Rate，心率过低
     private boolean isLowHr = false;
-    // Irregular ECG Rhythm
+    // Irregular ECG Rhythm，不规则心电
     private boolean isIrregular = false;
     // High QRS Value
     private boolean isHighQrs = false;

@@ -32,6 +32,7 @@
                         style="@style/common_card">
 
                         <TextView
+                            android:visibility="gone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
@@ -145,6 +146,7 @@
                                     app:layout_constraintEnd_toEndOf="parent" />
 
                                 <LinearLayout
+                                    android:visibility="gone"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     app:layout_constraintBottom_toBottomOf="parent"
@@ -185,6 +187,7 @@
                         style="@style/common_card">
 
                         <TextView
+                            android:visibility="gone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
@@ -342,6 +345,7 @@
                                 android:text="PS"/>
 
                             <LinearLayout
+                                android:visibility="gone"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="50dp"
@@ -390,6 +394,7 @@
                             android:id="@+id/card">
 
                             <TextView
+                                android:visibility="gone"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:gravity="center"
@@ -564,6 +569,7 @@
                                     android:layout_height="wrap_content" />
 
                                 <TextView
+                                    android:visibility="gone"
                                     android:id="@+id/start_rt_oxy"
                                     android:textSize="20sp"
                                     android:text="开始绘制"
@@ -576,6 +582,7 @@
                                     android:layout_height="wrap_content" />
 
                                 <TextView
+                                    android:visibility="gone"
                                     android:id="@+id/stop_rt_oxy"
                                     android:textSize="20sp"
                                     android:text="停止绘制"
@@ -637,6 +644,12 @@
                 </LinearLayout>
 
             </RelativeLayout>
+            <TextView
+                android:id="@+id/device_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10"
+                android:textSize="20sp"/>
 
             <TextView
                 android:visibility="gone"
@@ -645,11 +658,6 @@
                 android:layout_height="wrap_content"
                 android:text="(以下是数据解析日志)"
                 android:layout_marginTop="20dp"/>
-            <TextView
-                android:visibility="gone"
-                android:id="@+id/temp_str"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
             <TextView
                 android:visibility="gone"
                 android:id="@+id/data_str"

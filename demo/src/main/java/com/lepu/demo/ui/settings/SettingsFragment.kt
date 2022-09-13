@@ -1,10 +1,12 @@
 package com.lepu.demo.ui.settings
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.View
-import android.widget.Toast
+import android.view.ViewGroup
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -47,7 +49,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private lateinit var measureTime: Array<String?>
 
     private lateinit var config: Any
-    private lateinit var phy: Any
+    private var phy = Bp2BlePhyState()
     private var isReceive = false
 
     private var switchState = false
@@ -60,7 +62,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private var fileType = LeBp2wBleCmd.FileType.ECG_TYPE
 
     private lateinit var bp2wAdapter: WifiAdapter
-    private lateinit var leBp2wAdapter: WifiAdapter
+    private var popupWindow: PopupWindow? = null
+    private var alertDialog: AlertDialog? = null
 
     private var handler = Handler()
 
@@ -71,16 +74,15 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun setViewVisible(v: View?) {
-        binding.er1Layout.visibility = View.GONE
-        binding.er2Layout.visibility = View.GONE
-        binding.bp2Bp2aLayout.visibility = View.GONE
-        binding.bp2wLayout.visibility = View.GONE
+        binding.er1Layout.root.visibility = View.GONE
+        binding.er2Layout.root.visibility = View.GONE
+        binding.bp2Layout.root.visibility = View.GONE
         binding.leBp2wLayout.visibility = View.GONE
-        binding.o2Layout.visibility = View.GONE
+        binding.o2Layout.root.visibility = View.GONE
         binding.scaleLayout.visibility = View.GONE
         binding.pc100Layout.visibility = View.GONE
         binding.ap20Layout.visibility = View.GONE
-        binding.lewLayout.visibility = View.GONE
+        binding.lewLayout.root.visibility = View.GONE
         binding.sp20Layout.visibility = View.GONE
         binding.aoj20aLayout.visibility = View.GONE
         binding.pc68bLayout.visibility = View.GONE
@@ -104,36 +106,63 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         mainViewModel.curBluetooth.observe(viewLifecycleOwner) {
             when (it!!.modelNo) {
                 Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
-                    setViewVisible(binding.er1Layout)
+                    setViewVisible(binding.er1Layout.root)
                     LpBleUtil.getEr1VibrateConfig(it.modelNo)
                 }
                 Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
-                    setViewVisible(binding.er2Layout)
+                    setViewVisible(binding.er2Layout.root)
                     LpBleUtil.getEr1VibrateConfig(it.modelNo)
                 }
                 Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
-                    setViewVisible(binding.er2Layout)
+                    setViewVisible(binding.er2Layout.root)
                     LpBleUtil.getEr2SwitcherState(it.modelNo)
                 }
-                Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A -> {
-                    setViewVisible(binding.bp2Bp2aLayout)
-                    binding.bp2PhyLayout.visibility = View.GONE
+                Bluetooth.MODEL_BP2 -> {
+                    setViewVisible(binding.bp2Layout.root)
+                    binding.bp2Layout.bp2VolumeLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2ModeLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2PhyLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2WifiLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2tState.visibility = View.GONE
+                    binding.bp2Layout.bp2DeleteFile.visibility = View.GONE
+                    LpBleUtil.bp2GetConfig(it.modelNo)
+                    LpBleUtil.bp2GetRtState(it.modelNo)
+                }
+                Bluetooth.MODEL_BP2A -> {
+                    setViewVisible(binding.bp2Layout.root)
+                    binding.bp2Layout.bp2SwitchLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2VolumeLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2ModeLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2PhyLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2WifiLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2tState.visibility = View.GONE
+                    binding.bp2Layout.bp2DeleteFile.visibility = View.GONE
                     LpBleUtil.bp2GetConfig(it.modelNo)
                     LpBleUtil.bp2GetRtState(it.modelNo)
                 }
                 Bluetooth.MODEL_BP2T -> {
-                    setViewVisible(binding.bp2Bp2aLayout)
+                    setViewVisible(binding.bp2Layout.root)
+                    binding.bp2Layout.bp2SwitchLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2VolumeLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2ModeLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2WifiLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2DeleteFile.visibility = View.GONE
                     LpBleUtil.bp2GetConfig(it.modelNo)
                     LpBleUtil.bp2GetRtState(it.modelNo)
                     LpBleUtil.bp2GetPhyState(it.modelNo)
                 }
                 Bluetooth.MODEL_BP2W -> {
-                    setViewVisible(binding.bp2wLayout)
+                    setViewVisible(binding.bp2Layout.root)
+                    binding.bp2Layout.bp2VolumeLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2PhyLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2tState.visibility = View.GONE
                     LpBleUtil.bp2GetConfig(it.modelNo)
                     LpBleUtil.bp2GetRtState(it.modelNo)
                 }
                 Bluetooth.MODEL_LE_BP2W -> {
-                    setViewVisible(binding.leBp2wLayout)
+                    setViewVisible(binding.bp2Layout.root)
+                    binding.bp2Layout.bp2PhyLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2tState.visibility = View.GONE
                     LpBleUtil.bp2GetConfig(it.modelNo)
                     LpBleUtil.bp2GetRtState(it.modelNo)
                 }
@@ -146,7 +175,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
                 Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_CMRING,
                 Bluetooth.MODEL_OXYU, Bluetooth.MODEL_AI_S100 -> {
-                    setViewVisible(binding.o2Layout)
+                    setViewVisible(binding.o2Layout.root)
                     LpBleUtil.getInfo(it.modelNo)
                 }
                 Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_MY_SCALE,
@@ -161,7 +190,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     LpBleUtil.ap20GetConfig(it.modelNo, state)
                 }
                 Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
-                    setViewVisible(binding.lewLayout)
+                    setViewVisible(binding.lewLayout.root)
                 }
                 Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE -> {
                     setViewVisible(binding.sp20Layout)
@@ -205,29 +234,29 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1_N
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM1) {
-                binding.er1Version.setText("${it.hwV}")
-                binding.er1Sn.setText("${it.sn}")
-                binding.er1Code.setText("${it.branchCode}")
+                binding.er1Layout.er1Version.setText("${it.hwV}")
+                binding.er1Layout.er1Sn.setText("${it.sn}")
+                binding.er1Layout.er1Code.setText("${it.branchCode}")
             } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_DUOEK
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM3) {
-                binding.er2Version.setText("${it.hwV}")
-                binding.er2Sn.setText("${it.sn}")
-                binding.er2Code.setText("${it.branchCode}")
+                binding.er2Layout.er2Version.setText("${it.hwV}")
+                binding.er2Layout.er2Sn.setText("${it.sn}")
+                binding.er2Layout.er2Code.setText("${it.branchCode}")
             }
         }
         mainViewModel.er2Info.observe(viewLifecycleOwner) {
-            binding.er2Version.setText("${it.hwVersion}")
-            binding.er2Sn.setText("${it.serialNum}")
-            binding.er2Code.setText("${it.branchCode}")
+            binding.er2Layout.er2Version.setText("${it.hwVersion}")
+            binding.er2Layout.er2Sn.setText("${it.serialNum}")
+            binding.er2Layout.er2Code.setText("${it.branchCode}")
         }
         mainViewModel.boInfo.observe(viewLifecycleOwner) {
             binding.pc60fwCode.setText("${it.branchCode}")
         }
         mainViewModel.oxyInfo.observe(viewLifecycleOwner) {
-            binding.o2Version.setText("${it.hwVersion}")
-            binding.o2Sn.setText("${it.sn}")
-            binding.o2Code.setText("${it.branchCode}")
+            binding.o2Layout.o2Version.setText("${it.hwVersion}")
+            binding.o2Layout.o2Sn.setText("${it.sn}")
+            binding.o2Layout.o2Code.setText("${it.branchCode}")
         }
         if (isReceive) {
             binding.bytesSwitch.text = "原始数据显示开"
@@ -251,10 +280,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
 
         //-------------------------er1--------------------
-        binding.er1FactoryConfig.setOnClickListener {
+        binding.er1Layout.er1FactoryConfig.setOnClickListener {
             val config = FactoryConfig()
             var enableVersion = true
-            val tempVersion = binding.er1Version.text
+            val tempVersion = binding.er1Layout.er1Version.text
             if (tempVersion.isNullOrEmpty()) {
                 enableVersion = false
             } else if (tempVersion.length == 1 && isBigLetter(tempVersion.toString())) {
@@ -264,7 +293,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 return@setOnClickListener
             }
             var enableSn = true
-            val tempSn = trimStr(binding.er1Sn.text.toString())
+            val tempSn = trimStr(binding.er1Layout.er1Sn.text.toString())
             if (tempSn.isNullOrEmpty()) {
                 enableSn = false
             } else if (tempSn.length == 10) {
@@ -274,7 +303,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 return@setOnClickListener
             }
             var enableCode = true
-            val tempCode = trimStr(binding.er1Code.text.toString())
+            val tempCode = trimStr(binding.er1Layout.er1Code.text.toString())
             if (tempCode.isNullOrEmpty()) {
                 enableCode = false
             } else if (tempCode.length == 8) {
@@ -286,12 +315,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             config.setBurnFlag(enableSn, enableVersion, enableCode)
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
         }
-        binding.er1SetSound.setOnClickListener {
-            if (binding.er1Hr1.text.toString().isNullOrEmpty() || binding.er1Hr2.text.toString().isNullOrEmpty()) {
+        binding.er1Layout.er1SetSound.setOnClickListener {
+            val temp1 = trimStr(binding.er1Layout.er1Hr1.text.toString())
+            val temp2 = trimStr(binding.er1Layout.er1Hr2.text.toString())
+            if (temp1.isNullOrEmpty() || temp2.isNullOrEmpty()) {
                 Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
             } else {
-                val temp1 = trimStr(binding.er1Hr1.text.toString())
-                val temp2 = trimStr(binding.er1Hr2.text.toString())
                 if (isNumber(temp1) && isNumber(temp2)) {
                     switchState = !switchState
                     LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, temp1.toInt(), temp2.toInt())
@@ -302,12 +331,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
             }
         }
-        binding.er1SetHr.setOnClickListener {
-            if (binding.er1Hr1.text.toString().isNullOrEmpty() || binding.er1Hr2.text.toString().isNullOrEmpty()) {
+        binding.er1Layout.er1SetHr.setOnClickListener {
+            val temp1 = trimStr(binding.er1Layout.er1Hr1.text.toString())
+            val temp2 = trimStr(binding.er1Layout.er1Hr2.text.toString())
+            if (temp1.isNullOrEmpty() || temp2.isNullOrEmpty()) {
                 Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
             } else {
-                val temp1 = trimStr(binding.er1Hr1.text.toString())
-                val temp2 = trimStr(binding.er1Hr2.text.toString())
                 if (isNumber(temp1) && isNumber(temp2)) {
                     LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, temp1.toInt(), temp2.toInt())
                     cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
@@ -318,10 +347,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         }
         //-------------------------er2/duoek------------------------
-        binding.er2FactoryConfig.setOnClickListener {
+        binding.er2Layout.er2FactoryConfig.setOnClickListener {
             val config = FactoryConfig()
             var enableVersion = true
-            val tempVersion = binding.er2Version.text
+            val tempVersion = binding.er2Layout.er2Version.text
             if (tempVersion.isNullOrEmpty()) {
                 enableVersion = false
             } else if (tempVersion.length == 1 && isBigLetter(tempVersion.toString())) {
@@ -331,7 +360,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 return@setOnClickListener
             }
             var enableSn = true
-            val tempSn = trimStr(binding.er2Sn.text.toString())
+            val tempSn = trimStr(binding.er2Layout.er2Sn.text.toString())
             if (tempSn.isNullOrEmpty()) {
                 enableSn = false
             } else if (tempSn.length == 10) {
@@ -341,7 +370,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 return@setOnClickListener
             }
             var enableCode = true
-            val tempCode = trimStr(binding.er2Code.text.toString())
+            val tempCode = trimStr(binding.er2Layout.er2Code.text.toString())
             if (tempCode.isNullOrEmpty()) {
                 enableCode = false
             } else if (tempCode.length == 8) {
@@ -353,7 +382,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             config.setBurnFlag(enableSn, enableVersion, enableCode)
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
         }
-        binding.er2SetConfig.setOnClickListener {
+        binding.er2Layout.er2SetConfig.setOnClickListener {
             switchState = !switchState
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_ER2) {
@@ -364,109 +393,99 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        //-------------------------bp2/bp2a/bp2t/bp2w--------------------
-        binding.bp2SetDeviceState.setOnClickListener {
-            val tempState = trimStr(binding.bp2DeviceState.text.toString())
-            if (isNumber(tempState) && (tempState.toInt() in 0..4)) {
+        //-------------------------bp2/bp2a/bp2t/bp2w/lp bp2w--------------------
+        binding.bp2Layout.bp2SetDeviceState.setOnClickListener {
+            val tempState = trimStr(binding.bp2Layout.bp2DeviceState.text.toString())
+            if (isNumber(tempState) && (tempState.toInt() in 0..5)) {
                 state = tempState.toInt()
                 LpBleUtil.bp2SwitchState(Constant.BluetoothConfig.currentModel[0], state)
                 cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
                 binding.sendCmd.text = cmdStr
             } else {
-                Toast.makeText(context, "请输入0-4之间的数值", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "请输入0-5之间的数值", Toast.LENGTH_SHORT).show()
             }
         }
-        binding.bp2SetConfig.setOnClickListener {
-            switchState = !switchState
-            (config as Bp2Config).beepSwitch = switchState
+        binding.bp2Layout.bp2SetSwitch.setOnClickListener {
+            (config as Bp2Config).beepSwitch = !(config as Bp2Config).beepSwitch
             LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.bp2SetPhyState.setOnClickListener {
-            val tempMode = trimStr(binding.bp2PhyMode.text.toString())
-            if (!(isNumber(tempMode) && (tempMode.toInt() in 0..6))) {
-                Toast.makeText(context, "请输入0-6之间的模式", Toast.LENGTH_SHORT).show()
+        binding.bp2Layout.bp2SetVolume.setOnClickListener {
+            val tempVolume = trimStr(binding.bp2Layout.bp2Volume.text.toString())
+            if (isNumber(tempVolume) && (tempVolume.toInt() in 0..3)) {
+                (config as Bp2Config).volume = tempVolume.toInt()
+            } else {
+                Toast.makeText(context, "请输入0-3之间的音量", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            val tempIntensy = trimStr(binding.bp2PhyIntensy.text.toString())
-            if (!(isNumber(tempIntensy) && (tempIntensy.toInt() in 0..15))) {
-                Toast.makeText(context, "请输入0-15之间的强度", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            val tempTime = trimStr(binding.bp2PhyTime.text.toString())
-            if (!(isNumber(tempTime) && (tempTime.toInt() in 0..15))) {
-                Toast.makeText(context, "请输入0-15之间的时间", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            (phy as Bp2BlePhyState).mode = tempMode.toInt()
-            (phy as Bp2BlePhyState).intensy = tempIntensy.toInt()
-            (phy as Bp2BlePhyState).remainingTime = tempTime.toInt()
-            LpBleUtil.bp2SetPhyState(Constant.BluetoothConfig.currentModel[0], (phy as Bp2BlePhyState))
+            LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.bp2GetPhyState.setOnClickListener {
+        binding.bp2Layout.bp2SetMode.setOnClickListener {
+            val tempMode = trimStr(binding.bp2Layout.bp2Mode.text.toString())
+            if (isNumber(tempMode) && (tempMode.toInt() in 0..4)) {
+                (config as Bp2Config).avgMeasureMode = tempMode.toInt()
+            } else {
+                Toast.makeText(context, "请输入0-4之间的模式", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.bp2Layout.bp2SetPhyState.setOnClickListener {
+            val tempMode = trimStr(binding.bp2Layout.bp2PhyMode.text.toString())
+            if (isNumber(tempMode) && (tempMode.toInt() in 0..6)) {
+                phy.mode = tempMode.toInt()
+            } else {
+                Toast.makeText(context, "请输入0-6之间的模式", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val tempIntensy = trimStr(binding.bp2Layout.bp2PhyIntensy.text.toString())
+            if (isNumber(tempIntensy) && (tempIntensy.toInt() in 0..15)) {
+                phy.intensy = tempIntensy.toInt()
+            } else {
+                Toast.makeText(context, "请输入0-15之间的强度", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val tempTime = trimStr(binding.bp2Layout.bp2PhyTime.text.toString())
+            if (isNumber(tempTime) && (tempTime.toInt() in 0..15)) {
+                phy.remainingTime = tempTime.toInt()
+            } else {
+                Toast.makeText(context, "请输入0-15之间的时间", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            LpBleUtil.bp2SetPhyState(Constant.BluetoothConfig.currentModel[0], phy)
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.bp2Layout.bp2GetPhyState.setOnClickListener {
             LpBleUtil.bp2GetPhyState(Constant.BluetoothConfig.currentModel[0])
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        //-------------------------------------------------
-        binding.bp2wSetState.setOnClickListener {
-            state++
-            if (state > 4)
-                state = 0
-            LpBleUtil.bp2SwitchState(Constant.BluetoothConfig.currentModel[0], state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-            binding.bp2wSetState.text = "设备状态$state"
-        }
-        binding.bp2wGetState.setOnClickListener {
-            LpBleUtil.bp2GetRtState(Constant.BluetoothConfig.currentModel[0])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.bp2wGetConfig.setOnClickListener {
-            LpBleUtil.bp2GetConfig(Constant.BluetoothConfig.currentModel[0])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.bp2wBeepSw.setOnClickListener {
-            switchState = !switchState
-            (config as Bp2Config).beepSwitch = switchState
-            LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.bp2wSetVolume.setOnClickListener {
-            volume++
-            if (volume > 3)
-                volume = 0
-            (config as Bp2Config).volume = volume
-            LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.bp2wMode.setOnClickListener {
-            state++
-            if (state > 4)
-                state = 0
-            (config as Bp2Config).avgMeasureMode = state
-            LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.bp2wGetWifiRoute.setOnClickListener {
-            LpBleUtil.bp2GetWifiDevice(Constant.BluetoothConfig.currentModel[0])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.bp2wDeleteFile.setOnClickListener {
+        binding.bp2Layout.bp2DeleteFile.setOnClickListener {
             LpBleUtil.bp2DeleteFile(Constant.BluetoothConfig.currentModel[0])
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.bp2wGetWifiConfig.setOnClickListener {
+        binding.bp2Layout.bp2GetWifiRoute.setOnClickListener {
+            if (alertDialog == null) {
+                alertDialog = AlertDialog.Builder(context)
+                    .setCancelable(false)
+                    .setMessage("正在处理，请稍等...")
+                    .create()
+            }
+            alertDialog?.show()
+            LpBleUtil.bp2GetWifiDevice(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.bp2Layout.bp2GetWifiConfig.setOnClickListener {
+            bp2wAdapter.setList(null)
+            bp2wAdapter.notifyDataSetChanged()
             LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
@@ -474,91 +493,70 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
         LinearLayoutManager(context).apply {
             this.orientation = LinearLayoutManager.VERTICAL
-            binding.bp2wRcv.layoutManager = this
+            binding.bp2Layout.bp2Rcv.layoutManager = this
         }
         bp2wAdapter = WifiAdapter(R.layout.device_item, null).apply {
-            binding.bp2wRcv.adapter = this
+            binding.bp2Layout.bp2Rcv.adapter = this
         }
         bp2wAdapter.setOnItemClickListener { adapter, view, position ->
             (adapter.getItem(position) as Bp2Wifi).let {
-                val wifiConfig = Bp2WifiConfig()
-                wifiConfig.option = 3
-                it.ssid = "VIATOM_WIFI"
-                it.pwd = "ViatomCtrl"
-                wifiConfig.wifi = it
-                val server = Bp2Server()
-//                server.addr = "34.209.148.123"
-                server.addr = "bptest.viatomtech.com"
-//                server.addr = "bp.viatomtech.com"
-//                server.addr = "ai.viatomtech.com.cn"
-                server.port = 7100
-                server.addrType = 1
-                wifiConfig.server = server
-                LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
-                binding.content.text = "$wifiConfig"
+                val popupView = View.inflate(context, R.layout.popup_window, null)
+                if (popupWindow == null) {
+                    popupWindow = PopupWindow(context)
+                }
+                popupWindow?.let { v ->
+                    v.width = ViewGroup.LayoutParams.MATCH_PARENT
+                    v.height = 650
+                    v.contentView = popupView
+                    v.isFocusable = true
+                    v.showAsDropDown(view)
+                    val attr = activity?.window?.attributes
+                    attr?.alpha = 0.5f
+                    activity?.window?.attributes = attr
+                    v.setOnDismissListener {
+                        val attr = activity?.window?.attributes
+                        attr?.alpha = 1f
+                        activity?.window?.attributes = attr
+                    }
+                }
+                val password = popupView.findViewById<EditText>(R.id.password)
+                val ssid = popupView.findViewById<TextView>(R.id.ssid)
+                val sure = popupView.findViewById<Button>(R.id.sure)
+                val cancel = popupView.findViewById<Button>(R.id.cancel)
+                ssid.text = "WiFi：${it.ssid}"
+                sure.setOnClickListener { it1 ->
+                    val pass = trimStr(password.text.toString())
+                    if (pass.isNullOrEmpty()) {
+                        Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    } else {
+                        val wifiConfig = Bp2WifiConfig()
+                        wifiConfig.option = 3
+                        it.pwd = pass
+                        wifiConfig.wifi = it
+                        val server = Bp2Server()
+//                        server.addr = "34.209.148.123"
+                        server.addr = "bptest.viatomtech.com"
+//                        server.addr = "bp.viatomtech.com"
+//                        server.addr = "ai.viatomtech.com.cn"
+                        server.port = 7100
+                        server.addrType = 1
+                        wifiConfig.server = server
+                        LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
+                        binding.content.text = "$wifiConfig"
+                        adapter.setList(null)
+                        adapter.notifyDataSetChanged()
+                        popupWindow?.dismiss()
+                        Toast.makeText(context, "点击 获取WiFi信息 查看配置情况", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                cancel.setOnClickListener {
+                    popupWindow?.dismiss()
+                }
             }
-            adapter.setList(null)
-            adapter.notifyDataSetChanged()
-        }
-        //-------------------------le bp2w------------------------
-        binding.leBp2wSetState.setOnClickListener {
-            state++
-            if (state > 4)
-                state = 0
-            LpBleUtil.bp2SwitchState(Constant.BluetoothConfig.currentModel[0], state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-            binding.leBp2wSetState.text = "设备状态$state"
-        }
-        binding.leBp2wGetState.setOnClickListener {
-            LpBleUtil.bp2GetRtState(Constant.BluetoothConfig.currentModel[0])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.leBp2wGetConfig.setOnClickListener {
-            LpBleUtil.bp2GetConfig(Constant.BluetoothConfig.currentModel[0])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.leBp2wBeepSw.setOnClickListener {
-            switchState = !switchState
-            (config as Bp2Config).beepSwitch = switchState
-            LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.leBp2wSetVolume.setOnClickListener {
-            volume++
-            if (volume > 3)
-                volume = 0
-            (config as Bp2Config).volume = volume
-            LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.leBp2wMode.setOnClickListener {
-            state++
-            if (state > 4)
-                state = 0
-            (config as Bp2Config).avgMeasureMode = state
-            LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.leBp2wGetWifiRoute.setOnClickListener {
-            LpBleUtil.bp2GetWifiDevice(Constant.BluetoothConfig.currentModel[0])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.leBp2wDeleteFile.setOnClickListener {
-            LpBleUtil.bp2DeleteFile(Constant.BluetoothConfig.currentModel[0])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
         }
         binding.leBp2wUserList.setOnClickListener {
-
             FileUtil.getBmp(context)
-
 //            val string = "0007040F0C0700040504060D070405000007040C0F0404070002020F0202020000070C0F040407000F090F090F090F000007040F0404070009090F090F09090000000102030700000000020404040603030000020404040607030000F891FE9FF70503DF56DA76D2D0DF0300F993BCF79395F3434C70FF7048444300F893FC9793F503FF203CA46521FF0100F893FE9793F701FF0CF01CF119FF0100000000FFFF0000000003070C1830F0C000000120202060D19F0E00408000C0404040C040404040C0408040800000C0404040404040404040408040800000C0404040404040404040C08040800000C04040404040404040404080000000008080000000008080808080808000000080808080800000"
             val string = "00000000000000000000001F00000000000000000000001F00000000000000000000001F00000000000000000000001F1810181030FE10FE0000001F7DFE7F107EAA7E28041E0F9F5428497E52AA52281C2391DF549A491052FE52FE2C0180DF7CAE7F107E927EAA0C0180DF54FE49FF528A52AA0C01819F5410593852FE52AA0C030F1F7CFE7F387EA27EBE0C0700DF58A2505450A250D60C0C007F1ED21A521ABA1AD20C18007F1DFB2D912D823E820C30007F2F836F912F8F2F8F0C3010DF28854801480348010C3F8F9F4FFE8FFE8FFE8FFE0000001F00000000000000000000001F00000000000000000000001F00000000000000000000001F"
             val bytes = hexToBytes(string)
@@ -638,11 +636,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.leBp2wGetWifiConfig.setOnClickListener {
-            LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
         binding.leBp2wGetFileCrc.setOnClickListener {
             fileType++
             if (fileType > 2) {
@@ -657,38 +650,161 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-
-        LinearLayoutManager(context).apply {
-            this.orientation = LinearLayoutManager.VERTICAL
-            binding.leBp2wRcv.layoutManager = this
-        }
-        leBp2wAdapter = WifiAdapter(R.layout.device_item, null).apply {
-            binding.leBp2wRcv.adapter = this
-        }
-        leBp2wAdapter.setOnItemClickListener { adapter, view, position ->
-            (adapter.getItem(position) as Bp2Wifi).let {
-                val wifiConfig = Bp2WifiConfig()
-                wifiConfig.option = 3
-                it.ssid = "VIATOM_WIFI"
-                it.pwd = "ViatomCtrl"
-                wifiConfig.wifi = it
-                val server = Bp2Server()
-//                server.addr = "34.209.148.123"
-                server.addr = "bptest.viatomtech.com"
-//                server.addr = "bp.viatomtech.com"
-//                server.addr = "ai.viatomtech.com.cn"
-                server.port = 7100
-                server.addrType = 1
-                wifiConfig.server = server
-                LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
-                binding.content.text = "$wifiConfig"
+        //-------------------------o2-----------------------
+        binding.o2Layout.o2FactoryConfig.setOnClickListener {
+            val config = FactoryConfig()
+            var enableVersion = true
+            if (binding.o2Layout.o2Version.text.isNullOrEmpty()) {
+                enableVersion = false
+            } else {
+                config.setHwVersion(binding.o2Layout.o2Version.text.first())
             }
-            adapter.setList(null)
-            adapter.notifyDataSetChanged()
+            var enableSn = true
+            if (binding.o2Layout.o2Sn.text.isNullOrEmpty()) {
+                enableSn = false
+            } else {
+                config.setSnCode(trimStr(binding.o2Layout.o2Sn.text.toString()))
+            }
+            var enableCode = true
+            if (binding.o2Layout.o2Code.text.isNullOrEmpty()) {
+                enableCode = false
+            } else {
+                config.setBranchCode(trimStr(binding.o2Layout.o2Code.text.toString()))
+            }
+            config.setBurnFlag(enableSn, enableVersion, enableCode)
+            LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
+        }
+        binding.o2Layout.o2SetOxiThr.setOnClickListener {
+            val temp = trimStr(binding.o2Layout.o2OxiThr.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_OXI_THR, temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+        }
+        binding.o2Layout.o2SetHrThr1.setOnClickListener {
+            val temp = trimStr(binding.o2Layout.o2SetHrThr1.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_HR_LOW_THR, temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+        }
+        binding.o2Layout.o2SetHrThr2.setOnClickListener {
+            val temp = trimStr(binding.o2Layout.o2HrThr2.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_HR_HIGH_THR, temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+        }
+        binding.o2Layout.o2OxiSwitch.setOnClickListener {
+            val temp = trimStr(binding.o2Layout.o2Oxi.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_OXI_SWITCH, temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+        }
+        binding.o2Layout.o2HrSwitch.setOnClickListener {
+            val temp = trimStr(binding.o2Layout.o2Hr.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_HR_SWITCH, temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+        }
+        binding.o2Layout.o2SetMotor.setOnClickListener {
+            val temp = trimStr(binding.o2Layout.o2Motor.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MOTOR, temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+        }
+        binding.o2Layout.o2SetBuzzer.setOnClickListener {
+            val temp = trimStr(binding.o2Layout.o2Buzzer.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_BUZZER, temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+        }
+        binding.o2Layout.o2SetLightMode.setOnClickListener {
+            val temp = trimStr(binding.o2Layout.o2LightMode.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_LIGHTING_MODE, temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+        }
+        binding.o2Layout.o2SetLightStr.setOnClickListener {
+            val temp = trimStr(binding.o2Layout.o2LightStr.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_LIGHT_STR, temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+        }
+        binding.o2Layout.o2SetMtThr.setOnClickListener {
+            val temp = trimStr(binding.o2Layout.o2MtThr.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MT_THR, temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+        }
+        binding.o2Layout.o2MtSwitch.setOnClickListener {
+            if (binding.o2Layout.o2MtSwitch.text == "体动提醒开") {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MT_SW, 0)
+            } else {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MT_SW, 1)
+            }
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.o2Layout.o2SetIvThr.setOnClickListener {
+            val temp = trimStr(binding.o2Layout.o2IvThr.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_IV_THR, temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+        }
+        binding.o2Layout.o2IvSwitch.setOnClickListener {
+            if (binding.o2Layout.o2MtSwitch.text == "无效值提醒开") {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_IV_SW, 0)
+            } else {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_IV_SW, 1)
+            }
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
         }
         //-------------------------lew------------------------
         // 时间
-        binding.lewGetTime.setOnClickListener {
+        binding.lewLayout.lewGetTime.setOnClickListener {
             LpBleUtil.lewGetTime(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -696,7 +812,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetTime.setOnClickListener {
+        binding.lewLayout.lewSetTime.setOnClickListener {
             state++
             if (state > LewBleCmd.TimeFormat.FORMAT_24H) {
                 state = LewBleCmd.TimeFormat.FORMAT_12H
@@ -711,7 +827,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $data"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetInfo.setOnClickListener {
+        binding.lewLayout.lewGetInfo.setOnClickListener {
             LpBleUtil.getInfo(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -720,7 +836,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         // 绑定
-        binding.lewBound.setOnClickListener {
+        binding.lewLayout.lewBound.setOnClickListener {
             LpBleUtil.lewBoundDevice(Constant.BluetoothConfig.currentModel[0], true)
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -729,7 +845,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         // 解绑
-        binding.lewUnbound.setOnClickListener {
+        binding.lewLayout.lewUnbound.setOnClickListener {
             LpBleUtil.lewBoundDevice(Constant.BluetoothConfig.currentModel[0], false)
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -738,7 +854,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         // 获取电量
-        binding.lewGetBattery.setOnClickListener {
+        binding.lewLayout.lewGetBattery.setOnClickListener {
             LpBleUtil.lewGetBattery(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -747,7 +863,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         // 系统配置（语言、单位、翻腕亮屏、左右手）
-        binding.lewGetSystemSetting.setOnClickListener {
+        binding.lewLayout.lewGetSystemSetting.setOnClickListener {
             LpBleUtil.lewGetSystemSetting(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -755,7 +871,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetSystemSetting.setOnClickListener {
+        binding.lewLayout.lewSetSystemSetting.setOnClickListener {
             val setting = SystemSetting()
             setting.language = LewBleCmd.Language.CHINESE
 
@@ -783,7 +899,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $setting"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetLanguage.setOnClickListener {
+        binding.lewLayout.lewGetLanguage.setOnClickListener {
             LpBleUtil.lewGetLanguage(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -791,7 +907,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetLanguage.setOnClickListener {
+        binding.lewLayout.lewSetLanguage.setOnClickListener {
             state++
             if (state > LewBleCmd.Language.FARSI) {
                 state = LewBleCmd.Language.ENGLISH
@@ -804,7 +920,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $state"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetNetwork.setOnClickListener {
+        binding.lewLayout.lewGetNetwork.setOnClickListener {
             LpBleUtil.lewGetDeviceNetwork(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -812,7 +928,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetUnit.setOnClickListener {
+        binding.lewLayout.lewGetUnit.setOnClickListener {
             LpBleUtil.lewGetUnit(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -820,7 +936,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetUnit.setOnClickListener {
+        binding.lewLayout.lewSetUnit.setOnClickListener {
             val unit = UnitSetting()
             state++
             if (state > LewBleCmd.Unit.LENGTH_FEET_INCH) {
@@ -845,7 +961,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $unit"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetHandRaise.setOnClickListener {
+        binding.lewLayout.lewGetHandRaise.setOnClickListener {
             LpBleUtil.lewGetHandRaise(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -853,7 +969,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetHandRaise.setOnClickListener {
+        binding.lewLayout.lewSetHandRaise.setOnClickListener {
             val handRaise = HandRaiseSetting()
             switchState = !switchState
             handRaise.switch = switchState
@@ -869,7 +985,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $handRaise"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetLrHand.setOnClickListener {
+        binding.lewLayout.lewGetLrHand.setOnClickListener {
             LpBleUtil.lewGetLrHand(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -877,7 +993,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetLrHand.setOnClickListener {
+        binding.lewLayout.lewSetLrHand.setOnClickListener {
             state++
             if (state > LewBleCmd.Hand.RIGHT) {
                 state = LewBleCmd.Hand.LEFT
@@ -891,7 +1007,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         // 寻找设备
-        binding.lewFindDevice.setOnClickListener {
+        binding.lewLayout.lewFindDevice.setOnClickListener {
             switchState = !switchState
             LpBleUtil.lewFindDevice(Constant.BluetoothConfig.currentModel[0], switchState)
             binding.responseCmd.text = ""
@@ -901,7 +1017,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         // 勿扰模式
-        binding.lewGetNoDisturb.setOnClickListener {
+        binding.lewLayout.lewGetNoDisturb.setOnClickListener {
             LpBleUtil.lewGetNoDisturbMode(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -909,7 +1025,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetNoDisturb.setOnClickListener {
+        binding.lewLayout.lewSetNoDisturb.setOnClickListener {
             switchState = !switchState
             val mode = NoDisturbMode()
             mode.switch = switchState
@@ -936,7 +1052,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         // app通知开关
-        binding.lewGetAppSwitch.setOnClickListener {
+        binding.lewLayout.lewGetAppSwitch.setOnClickListener {
             LpBleUtil.lewGetAppSwitch(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -944,7 +1060,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetAppSwitch.setOnClickListener {
+        binding.lewLayout.lewSetAppSwitch.setOnClickListener {
             switchState = !switchState
             val appSwitch = AppSwitch()
             appSwitch.all = switchState
@@ -985,7 +1101,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         // 消息通知
-        binding.lewPhoneNoti.setOnClickListener {
+        binding.lewLayout.lewPhoneNoti.setOnClickListener {
             val noti = NotificationInfo()
             noti.appId = LewBleCmd.AppId.PHONE
             noti.time = System.currentTimeMillis().div(1000).toInt()
@@ -1003,7 +1119,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $noti"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewMessageNoti.setOnClickListener {
+        binding.lewLayout.lewMessageNoti.setOnClickListener {
             val noti = NotificationInfo()
             noti.appId = LewBleCmd.AppId.MESSAGE
             noti.time = System.currentTimeMillis().div(1000).toInt()
@@ -1022,7 +1138,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $noti"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewOtherNoti.setOnClickListener {
+        binding.lewLayout.lewOtherNoti.setOnClickListener {
             val noti = NotificationInfo()
             noti.appId = LewBleCmd.AppId.OTHER
             noti.time = System.currentTimeMillis().div(1000).toInt()
@@ -1041,7 +1157,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         // 设备模式
-        binding.lewGetDeviceMode.setOnClickListener {
+        binding.lewLayout.lewGetDeviceMode.setOnClickListener {
             LpBleUtil.lewGetDeviceMode(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1049,7 +1165,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetDeviceMode.setOnClickListener {
+        binding.lewLayout.lewSetDeviceMode.setOnClickListener {
             state++
             if (state > LewBleCmd.DeviceMode.MODE_FREE) {
                 state = LewBleCmd.DeviceMode.MODE_NORMAL
@@ -1063,7 +1179,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         // 闹钟
-        binding.lewGetAlarmInfo.setOnClickListener {
+        binding.lewLayout.lewGetAlarmInfo.setOnClickListener {
             LpBleUtil.lewGetAlarmClock(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1071,7 +1187,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetAlarmInfo.setOnClickListener {
+        binding.lewLayout.lewSetAlarmInfo.setOnClickListener {
             switchState = !switchState
             val info = AlarmClockInfo()
             val item = AlarmClockInfo.Item()
@@ -1122,7 +1238,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $info"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetPhoneSwitch.setOnClickListener {
+        binding.lewLayout.lewGetPhoneSwitch.setOnClickListener {
             LpBleUtil.lewGetPhoneSwitch(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1130,7 +1246,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetPhoneSwitch.setOnClickListener {
+        binding.lewLayout.lewSetPhoneSwitch.setOnClickListener {
             val phoneSwitch = PhoneSwitch()
             switchState = !switchState
             phoneSwitch.call = switchState
@@ -1144,7 +1260,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $phoneSwitch"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetMedicineRemind.setOnClickListener {
+        binding.lewLayout.lewGetMedicineRemind.setOnClickListener {
             LpBleUtil.lewGetMedicineRemind(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1152,7 +1268,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetMedicineRemind.setOnClickListener {
+        binding.lewLayout.lewSetMedicineRemind.setOnClickListener {
             val remind = MedicineRemind()
             val item = MedicineRemind.Item()
             item.hour = 9
@@ -1204,7 +1320,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $remind"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetMeasureSetting.setOnClickListener {
+        binding.lewLayout.lewGetMeasureSetting.setOnClickListener {
             LpBleUtil.lewGetMeasureSetting(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1212,7 +1328,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetMeasureSetting.setOnClickListener {
+        binding.lewLayout.lewSetMeasureSetting.setOnClickListener {
             val setting = MeasureSetting()
 
             val sportTarget = SportTarget()
@@ -1268,7 +1384,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $setting"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetSportTarget.setOnClickListener {
+        binding.lewLayout.lewGetSportTarget.setOnClickListener {
             LpBleUtil.lewGetSportTarget(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1276,7 +1392,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetSportTarget.setOnClickListener {
+        binding.lewLayout.lewSetSportTarget.setOnClickListener {
             val sportTarget = SportTarget()
             sportTarget.step = 22
             sportTarget.distance = 5000
@@ -1291,7 +1407,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $sportTarget"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetTargetRemind.setOnClickListener {
+        binding.lewLayout.lewGetTargetRemind.setOnClickListener {
             LpBleUtil.lewGetTargetRemind(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1299,7 +1415,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetTargetRemind.setOnClickListener {
+        binding.lewLayout.lewSetTargetRemind.setOnClickListener {
             switchState = !switchState
             Log.d("test12345", "lewSetTargetRemind $switchState")
             LpBleUtil.lewSetTargetRemind(Constant.BluetoothConfig.currentModel[0], switchState)
@@ -1309,7 +1425,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $switchState"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetSittingRemind.setOnClickListener {
+        binding.lewLayout.lewGetSittingRemind.setOnClickListener {
             LpBleUtil.lewGetSittingRemind(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1317,7 +1433,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetSittingRemind.setOnClickListener {
+        binding.lewLayout.lewSetSittingRemind.setOnClickListener {
             val sittingRemind = SittingRemind()
             switchState = !switchState
             sittingRemind.switch = switchState
@@ -1348,7 +1464,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $sittingRemind"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetHrDetect.setOnClickListener {
+        binding.lewLayout.lewGetHrDetect.setOnClickListener {
             LpBleUtil.lewGetHrDetect(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1356,7 +1472,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetHrDetect.setOnClickListener {
+        binding.lewLayout.lewSetHrDetect.setOnClickListener {
             switchState = !switchState
             val detect = HrDetect()
             detect.switch = switchState
@@ -1369,7 +1485,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $detect"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetOxyDetect.setOnClickListener {
+        binding.lewLayout.lewGetOxyDetect.setOnClickListener {
             LpBleUtil.lewGetOxyDetect(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1377,7 +1493,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetOxyDetect.setOnClickListener {
+        binding.lewLayout.lewSetOxyDetect.setOnClickListener {
             switchState = !switchState
             val detect = OxyDetect()
             detect.switch = switchState
@@ -1390,7 +1506,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $detect"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetUserInfo.setOnClickListener {
+        binding.lewLayout.lewGetUserInfo.setOnClickListener {
             LpBleUtil.lewGetUserInfo(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1398,7 +1514,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetUserInfo.setOnClickListener {
+        binding.lewLayout.lewSetUserInfo.setOnClickListener {
             val info = UserInfo()
             info.aid = 12345
             info.uid = -1
@@ -1416,7 +1532,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $info"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetPhonebook.setOnClickListener {
+        binding.lewLayout.lewGetPhonebook.setOnClickListener {
             LpBleUtil.lewGetPhoneBook(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1424,7 +1540,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetPhonebook.setOnClickListener {
+        binding.lewLayout.lewSetPhonebook.setOnClickListener {
             val list = PhoneBook()
             list.leftSize = 0
             list.currentSize = 3
@@ -1453,7 +1569,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $list"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetSos.setOnClickListener {
+        binding.lewLayout.lewGetSos.setOnClickListener {
             LpBleUtil.lewGetSosContact(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1461,7 +1577,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetSos.setOnClickListener {
+        binding.lewLayout.lewSetSos.setOnClickListener {
             val sos = SosContact()
             switchState = !switchState
             sos.switch = switchState
@@ -1493,14 +1609,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $sos"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetDial.setOnClickListener {
+        binding.lewLayout.lewGetDial.setOnClickListener {
             binding.responseCmd.text = ""
             binding.content.text = ""
             binding.sendCmd.text = ""
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetDial.setOnClickListener {
+        binding.lewLayout.lewSetDial.setOnClickListener {
             // ???
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1508,7 +1624,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetSecondScreen.setOnClickListener {
+        binding.lewLayout.lewGetSecondScreen.setOnClickListener {
             LpBleUtil.lewGetSecondScreen(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1516,7 +1632,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetSecondScreen.setOnClickListener {
+        binding.lewLayout.lewSetSecondScreen.setOnClickListener {
             val screen = SecondScreen()
             switchState = !switchState
             screen.medicineRemind = switchState
@@ -1535,7 +1651,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $screen"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetCards.setOnClickListener {
+        binding.lewLayout.lewGetCards.setOnClickListener {
             LpBleUtil.lewGetCards(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1543,7 +1659,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetCards.setOnClickListener {
+        binding.lewLayout.lewSetCards.setOnClickListener {
             val cards = intArrayOf(LewBleCmd.Cards.HR, LewBleCmd.Cards.TARGET, LewBleCmd.Cards.WEATHER)
             Log.d("test12345", "lewSetCards ${Arrays.toString(cards)}")
             LpBleUtil.lewSetCards(Constant.BluetoothConfig.currentModel[0], cards)
@@ -1553,7 +1669,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n ${Arrays.toString(cards)}"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetSportData.setOnClickListener {
+        binding.lewLayout.lewGetSportData.setOnClickListener {
             LpBleUtil.lewGetFileList(Constant.BluetoothConfig.currentModel[0], LewBleCmd.ListType.SPORT, 0)
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1561,7 +1677,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetEcgData.setOnClickListener {
+        binding.lewLayout.lewGetEcgData.setOnClickListener {
             LpBleUtil.lewGetFileList(Constant.BluetoothConfig.currentModel[0], LewBleCmd.ListType.ECG, 0)
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1569,7 +1685,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetRtData.setOnClickListener {
+        binding.lewLayout.lewGetRtData.setOnClickListener {
             LpBleUtil.lewGetRtData(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1577,7 +1693,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetOxyData.setOnClickListener {
+        binding.lewLayout.lewGetOxyData.setOnClickListener {
             LpBleUtil.lewGetFileList(Constant.BluetoothConfig.currentModel[0], LewBleCmd.ListType.OXY, 0)
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1585,7 +1701,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetHrData.setOnClickListener {
+        binding.lewLayout.lewGetHrData.setOnClickListener {
             LpBleUtil.lewGetFileList(Constant.BluetoothConfig.currentModel[0], LewBleCmd.ListType.HR, 0)
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1593,7 +1709,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetSleepData.setOnClickListener {
+        binding.lewLayout.lewGetSleepData.setOnClickListener {
             LpBleUtil.lewGetFileList(Constant.BluetoothConfig.currentModel[0], LewBleCmd.ListType.SLEEP, 0)
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1601,7 +1717,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetHrThreshold.setOnClickListener {
+        binding.lewLayout.lewGetHrThreshold.setOnClickListener {
             LpBleUtil.lewGetHrThreshold(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1609,7 +1725,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetHrThreshold.setOnClickListener {
+        binding.lewLayout.lewSetHrThreshold.setOnClickListener {
             val threshold = HrThreshold()
             switchState = !switchState
             threshold.switch = switchState
@@ -1622,7 +1738,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])} \n $threshold"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewGetOxyThreshold.setOnClickListener {
+        binding.lewLayout.lewGetOxyThreshold.setOnClickListener {
             LpBleUtil.lewGetOxyThreshold(Constant.BluetoothConfig.currentModel[0])
             binding.responseCmd.text = ""
             binding.content.text = ""
@@ -1630,7 +1746,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])}"
             binding.sendCmd.text = cmdStr
         }
-        binding.lewSetOxyThreshold.setOnClickListener {
+        binding.lewLayout.lewSetOxyThreshold.setOnClickListener {
             val threshold = OxyThreshold()
             switchState = !switchState
             threshold.switch = switchState
@@ -1707,168 +1823,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
             binding.ap20SetConfig.text = "设置参数$state"
         }
-        //-------------------------o2-----------------------
-        binding.o2FactoryConfig.setOnClickListener {
-            val config = FactoryConfig()
-            var enableVersion = true
-            if (binding.o2Version.text.isNullOrEmpty()) {
-                enableVersion = false
-            } else {
-                config.setHwVersion(binding.o2Version.text.first())
-            }
-            var enableSn = true
-            if (binding.o2Sn.text.isNullOrEmpty()) {
-                enableSn = false
-            } else {
-                config.setSnCode(trimStr(binding.o2Sn.text.toString()))
-            }
-            var enableCode = true
-            if (binding.o2Code.text.isNullOrEmpty()) {
-                enableCode = false
-            } else {
-                config.setBranchCode(trimStr(binding.o2Code.text.toString()))
-            }
-            config.setBurnFlag(enableSn, enableVersion, enableCode)
-            LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
-        }
-        binding.o2SetOxiThr.setOnClickListener {
-            if (binding.o2OxiThr.text.toString().isNullOrEmpty()) {
-                Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
-            } else {
-                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_OXI_THR, trimStr(binding.o2OxiThr.text.toString()).toInt())
-                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-                binding.sendCmd.text = cmdStr
-            }
-        }
-        binding.o2SetHrThr1.setOnClickListener {
-            if (binding.o2HrThr1.text.toString().isNullOrEmpty()) {
-                Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
-            } else {
-                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_HR_LOW_THR, trimStr(binding.o2HrThr1.text.toString()).toInt())
-                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-                binding.sendCmd.text = cmdStr
-            }
-        }
-        binding.o2SetHrThr2.setOnClickListener {
-            if (binding.o2HrThr2.text.toString().isNullOrEmpty()) {
-                Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
-            } else {
-                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_HR_HIGH_THR, trimStr(binding.o2HrThr2.text.toString()).toInt())
-                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-                binding.sendCmd.text = cmdStr
-            }
-        }
-        binding.o2OxiSwitch.setOnClickListener {
-            state++
-            if (state > 3)
-                state = 0
-            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_OXI_SWITCH, state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.o2HrSwitch.setOnClickListener {
-            state++
-            if (state > 3)
-                state = 0
-            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_HR_SWITCH, state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.o2Spo2Switch.setOnClickListener {
-            state++
-            if (state > 1)
-                state = 0
-            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_SPO2SW, state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.o2Motor.setOnClickListener {
-            volume++
-            if (volume > 4)
-                volume = 0
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYLINK
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S1
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N) {
-                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MOTOR, motor2[volume])
-            } else {
-                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MOTOR, motor1[volume])
-            }
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.o2Buzzer.setOnClickListener {
-            volume++
-            if (volume > 4)
-                volume = 0
-            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_BUZZER, motor1[volume])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.o2LightMode.setOnClickListener {
-            volume++
-            if (volume > 2)
-                volume = 0
-            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_LIGHTING_MODE, volume)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.o2LightStr.setOnClickListener {
-            volume++
-            if (volume > 2)
-                volume = 0
-            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_LIGHT_STR, volume)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.o2SetMtThr.setOnClickListener {
-            if (binding.o2MtThr.text.toString().isNullOrEmpty()) {
-                Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
-            } else {
-                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MT_THR, trimStr(binding.o2MtThr.text.toString()).toInt())
-                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-                binding.sendCmd.text = cmdStr
-            }
-        }
-        binding.o2MtSwitch.setOnClickListener {
-            state++
-            if (state > 1)
-                state = 0
-            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MT_SW, state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.o2SetIvThr.setOnClickListener {
-            if (binding.o2IvThr.text.toString().isNullOrEmpty()) {
-                Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
-            } else {
-                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_IV_THR, trimStr(binding.o2IvThr.text.toString()).toInt())
-                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-                binding.sendCmd.text = cmdStr
-            }
-        }
-        binding.o2IvSwitch.setOnClickListener {
-            state++
-            if (state > 1)
-                state = 0
-            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_IV_SW, state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.o2AllSwitch.setOnClickListener {
-            state++
-            if (state > 1)
-                state = 0
-//            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_ALL_SW, state)
-            LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0],
-                arrayOf(OxyBleCmd.SYNC_TYPE_OXI_SWITCH, OxyBleCmd.SYNC_TYPE_HR_SWITCH, OxyBleCmd.SYNC_TYPE_MT_SW, OxyBleCmd.SYNC_TYPE_IV_SW),
-                intArrayOf(state, state, state, state))
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-
         //-------------------------sp20-----------------------
         binding.sp20AlarmSwitch.setOnClickListener {
             switchState = !switchState
@@ -1937,6 +1891,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         //----------------------aoj20a--------------------
         binding.aoj20aDeleteFile.setOnClickListener {
             LpBleUtil.aoj20aDeleteData(Constant.BluetoothConfig.currentModel[0])
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.aoj20aRtData.setOnClickListener {
+            LpBleUtil.aoj20aGetRtData(Constant.BluetoothConfig.currentModel[0])
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -2173,7 +2132,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     var temp = "关"
                     if (config.switcher)
                         temp = "开"
-                    binding.er2SetConfig.text = "声音$temp"
+                    binding.er2Layout.er2SetConfig.text = "心跳音$temp"
                     binding.content.text = "switcher : ${config.switcher} vector : ${config.vector} motionCount : ${config.motionCount} motionWindows : ${config.motionWindows}"
                     when (it.model) {
                         Bluetooth.MODEL_DUOEK -> {
@@ -2194,9 +2153,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     var temp = "关"
                     if (config.switcher)
                         temp = "开"
-                    binding.er1SetSound.text = "震动$temp"
-                    binding.er1Hr1.setText("${config.hr1}")
-                    binding.er1Hr2.setText("${config.hr2}")
+                    binding.er1Layout.er1SetSound.text = "震动$temp"
+                    binding.er1Layout.er1Hr1.setText("${config.hr1}")
+                    binding.er1Layout.er1Hr2.setText("${config.hr2}")
                     binding.content.text = "switcher : " + config.switcher + " hr1 : " + config.hr1 + " hr2 : " + config.hr2
                     when (it.model) {
                         Bluetooth.MODEL_ER1 -> {
@@ -2240,7 +2199,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 var temp = "关"
                 if (config.switcher)
                     temp = "开"
-                binding.er2SetConfig.text = "声音$temp"
+                binding.er2Layout.er2SetConfig.text = "心跳音$temp"
                 binding.content.text = "switcher : " + config.switcher + " vector : " + config.vector + " motionCount : " + config.motionCount + " motionWindows : " + config.motionWindows
                 when (it.model) {
                     Bluetooth.MODEL_ER2 -> {
@@ -2258,11 +2217,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 val config = it.data as Bp2Config
                 this.config = config
                 var temp = "关"
-                switchState = config.beepSwitch
-                if (config.beepSwitch) {
+                if (config.beepSwitch)
                     temp = "开"
-                }
-                binding.bp2SetConfig.text = "声音$temp"
+                binding.content.text = "$config"
+                binding.bp2Layout.bp2SetSwitch.text = "心跳音$temp"
                 Toast.makeText(context, "获取参数成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SetConfigResult)
@@ -2276,12 +2234,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 setReceiveCmd(data.bytes)
                 binding.content.text = "$data"
                 state = data.status
-                binding.bp2RtState.text = "设备当前状态：$state"
+                binding.bp2Layout.bp2RtState.text = "设备当前状态：$state"
                 Toast.makeText(context, "获取设备状态成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SwitchState)
             .observe(this) {
-                LpBleUtil.bp2GetRtState(it.model)
+                handler.postDelayed({
+                    LpBleUtil.bp2GetRtState(it.model)
+                }, 1000)
                 val data = it.data as Boolean
                 binding.content.text = "$data"
                 Toast.makeText(context, "设置设备状态$data", Toast.LENGTH_SHORT).show()
@@ -2292,10 +2252,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 this.phy = phy
                 setReceiveCmd(phy.bytes)
                 binding.content.text = "$phy"
-                binding.bp2PhyLeadStatus.text = "电极状态：${phy.leadOff}"
-                binding.bp2PhyMode.setText("${phy.mode}")
-                binding.bp2PhyIntensy.setText("${phy.intensy}")
-                binding.bp2PhyTime.setText("${phy.remainingTime}")
+                binding.bp2Layout.bp2PhyLeadStatus.text = "电极状态：${phy.leadOff}"
+                binding.bp2Layout.bp2PhyMode.setText("${phy.mode}")
+                binding.bp2Layout.bp2PhyIntensy.setText("${phy.intensy}")
+                binding.bp2Layout.bp2PhyTime.setText("${phy.remainingTime}")
                 Toast.makeText(context, "获取理疗状态成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2GetPhyStateError)
@@ -2308,50 +2268,50 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 this.phy = phy
                 setReceiveCmd(phy.bytes)
                 binding.content.text = "$phy"
-                binding.bp2PhyLeadStatus.text = "电极状态：${phy.leadOff}"
-                binding.bp2PhyMode.setText("${phy.mode}")
-                binding.bp2PhyIntensy.setText("${phy.intensy}")
-                binding.bp2PhyTime.setText("${phy.remainingTime}")
+                binding.bp2Layout.bp2PhyLeadStatus.text = "电极状态：${phy.leadOff}"
+                binding.bp2Layout.bp2PhyMode.setText("${phy.mode}")
+                binding.bp2Layout.bp2PhyIntensy.setText("${phy.intensy}")
+                binding.bp2Layout.bp2PhyTime.setText("${phy.remainingTime}")
                 Toast.makeText(context, "设置理疗状态成功", Toast.LENGTH_SHORT).show()
             }
-
         //------------------------------bp2w-------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wDeleteFile)
             .observe(this) {
-                Toast.makeText(context, "bp2w 删除文件成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "删除文件成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSetConfig)
             .observe(this) {
                 LpBleUtil.bp2GetConfig(it.model)
-                Toast.makeText(context, "bp2w 设置参数成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "设置参数成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSwitchState)
             .observe(this) {
-                LpBleUtil.bp2GetRtState(it.model)
-                Toast.makeText(context, "bp2w 设置主机状态成功", Toast.LENGTH_SHORT).show()
+                handler.postDelayed({
+                    LpBleUtil.bp2GetRtState(it.model)
+                }, 1000)
+                Toast.makeText(context, "设置主机状态成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wRtState)
             .observe(this) {
                 val data = it.data as Bp2BleRtState
                 setReceiveCmd(data.bytes)
-                binding.bp2wGetState.text = "实时状态${data.status}"
                 binding.content.text = "$data"
-                Toast.makeText(context, "bp2w 获取主机状态成功", Toast.LENGTH_SHORT).show()
+                state = data.status
+                binding.bp2Layout.bp2RtState.text = "设备当前状态：$state"
+                Toast.makeText(context, "获取设备状态成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetConfig)
             .observe(this) {
                 val config = it.data as Bp2Config
                 this.config = config
                 setReceiveCmd(config.bytes)
+                var temp = "关"
+                if (config.beepSwitch)
+                    temp = "开"
                 binding.content.text = "$config"
-                var on = "关"
-                if (config.beepSwitch) {
-                    on = "开"
-                }
-                binding.bp2wBeepSw.text = "心跳音${on}"
-                binding.bp2wSetVolume.text = "音量" + config.volume
-                binding.bp2wMode.text = "测量模式" + config.avgMeasureMode
-                Toast.makeText(context, "bp2w 获取参数成功", Toast.LENGTH_SHORT).show()
+                binding.bp2Layout.bp2SetSwitch.text = "心跳音$temp"
+                binding.bp2Layout.bp2Mode.setText("${config.avgMeasureMode}")
+                Toast.makeText(context, "获取参数成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiScanning)
             .observe(this) {
@@ -2362,12 +2322,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiDevice)
             .observe(this) {
+                alertDialog?.dismiss()
                 val data = it.data as Bp2WifiDevice
                 setReceiveCmd(data.bytes)
                 bp2wAdapter.setNewInstance(data.wifiList)
                 bp2wAdapter.notifyDataSetChanged()
                 binding.content.text = "$data"
-                Toast.makeText(context, "bp2w 获取路由成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "获取WiFi列表成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSetWifiConfig)
             .observe(this) {
@@ -2382,57 +2343,61 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 setReceiveCmd(data.bytes)
                 binding.content.text = "$data"
                 if (data.wifi.ssid.isNotEmpty()) {
-                    /*if ((data.wifi.state != 2 || data.server.state != 2) && (data.wifi.state != 255 || data.server.state != 255)) {
-                        LpBleUtil.bp2GetWifiConfig(it.model)
-                    } else {
-                        Toast.makeText(context, "bp2w WiFi连接成功", Toast.LENGTH_SHORT).show()
-                    }*/
+                    binding.deviceInfo.text = "WiFi：${data.wifi.ssid}\n" +
+                            "密码：${data.wifi.pwd}\n" +
+                            "状态：${data.wifi.state}\n" +
+                            "(0:断开 1:连接中 2:已连接 0xff:密码错误 0xfd:找不到SSID)\n" +
+                            "服务器地址：${data.server.addr}\n" +
+                            "端口号：${data.server.port}\n" +
+                            "状态：${data.server.state}\n" +
+                            "(0:断开 1:连接中 2:已连接 0xff:服务器无法连接)"
                 } else {
-                    Toast.makeText(context, "bp2w 尚未配置WiFi", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "尚未配置WiFi信息", Toast.LENGTH_SHORT).show()
                 }
-
             }
         //------------------------------lp bp2w-------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSyncUtcTime)
             .observe(this) {
-                Toast.makeText(context, "le bp2w 同步 UTC 时间成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "同步 UTC 时间成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wDeleteFile)
             .observe(this) {
-                Toast.makeText(context, "le bp2w 删除文件成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "删除文件成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSetConfig)
             .observe(this) {
                 LpBleUtil.bp2GetConfig(it.model)
-                Toast.makeText(context, "le bp2w 设置参数成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "设置参数成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSwitchState)
             .observe(this) {
-                LpBleUtil.bp2GetRtState(it.model)
-                Toast.makeText(context, "le bp2w 设置主机状态成功", Toast.LENGTH_SHORT).show()
+                handler.postDelayed({
+                    LpBleUtil.bp2GetRtState(it.model)
+                }, 1000)
+                Toast.makeText(context, "设置主机状态成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wRtState)
             .observe(this) {
                 val data = it.data as Bp2BleRtState
                 setReceiveCmd(data.bytes)
-                binding.leBp2wGetState.text = "实时状态${data.status}"
                 binding.content.text = "$data"
-                Toast.makeText(context, "le bp2w 获取主机状态成功", Toast.LENGTH_SHORT).show()
+                state = data.status
+                binding.bp2Layout.bp2RtState.text = "设备当前状态：$state"
+                Toast.makeText(context, "获取设备状态成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetConfig)
             .observe(this) {
                 val config = it.data as Bp2Config
                 this.config = config
                 setReceiveCmd(config.bytes)
+                var temp = "关"
+                if (config.beepSwitch)
+                    temp = "开"
                 binding.content.text = "$config"
-                var on = "关"
-                if (config.beepSwitch) {
-                    on = "开"
-                }
-                binding.leBp2wBeepSw.text = "心跳音$on"
-                binding.leBp2wSetVolume.text = "音量${config.volume}"
-                binding.leBp2wMode.text = "测量模式${config.avgMeasureMode}"
-                Toast.makeText(context, "le bp2w 获取参数成功", Toast.LENGTH_SHORT).show()
+                binding.bp2Layout.bp2SetSwitch.text = "心跳音$temp"
+                binding.bp2Layout.bp2Volume.setText("${config.volume}")
+                binding.bp2Layout.bp2Mode.setText("${config.avgMeasureMode}")
+                Toast.makeText(context, "获取参数成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2WifiScanning)
             .observe(this) {
@@ -2443,10 +2408,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this) {
                 val data = it.data as Bp2WifiDevice
                 setReceiveCmd(data.bytes)
-                leBp2wAdapter.setNewInstance(data.wifiList)
-                leBp2wAdapter.notifyDataSetChanged()
+                bp2wAdapter.setNewInstance(data.wifiList)
+                bp2wAdapter.notifyDataSetChanged()
                 binding.content.text = "$data"
-                Toast.makeText(context, "le bp2w 获取路由成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "获取WiFi列表成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSetWifiConfig)
             .observe(this) {
@@ -2461,16 +2426,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 setReceiveCmd(data.bytes)
                 binding.content.text = "$data"
                 if (data.wifi.ssid.isNotEmpty()) {
-                    if ((data.wifi.state != 2 || data.server.state != 2)) {
-                        LpBleUtil.bp2GetWifiConfig(it.model)
-                        Toast.makeText(context, "le bp2w WiFi未连接成功", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, "le bp2w WiFi连接成功", Toast.LENGTH_SHORT).show()
-                    }
+                    binding.deviceInfo.text = "WiFi：${data.wifi.ssid}\n" +
+                            "密码：${data.wifi.pwd}\n" +
+                            "状态：${data.wifi.state}\n" +
+                            "(0:断开 1:连接中 2:已连接 0xff:密码错误 0xfd:找不到SSID)\n" +
+                            "服务器地址：${data.server.addr}\n" +
+                            "端口号：${data.server.port}\n" +
+                            "状态：${data.server.state}\n" +
+                            "(0:断开 1:连接中 2:已连接 0xff:服务器无法连接)"
                 } else {
-                    Toast.makeText(context, "le bp2w 尚未配置WiFi", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "尚未配置WiFi信息", Toast.LENGTH_SHORT).show()
                 }
-
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetFileListCrc)
             .observe(this) {
@@ -2498,52 +2464,32 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this) {
                 Toast.makeText(context, "烧录成功", Toast.LENGTH_SHORT).show()
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxySyncDeviceInfo)
-            .observe(this) {
-                Toast.makeText(context, "o2/babyO2 设置参数成功 ${it.data}", Toast.LENGTH_SHORT).show()
-            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo)
             .observe(this) {
                 val data = it.data as OxyBleResponse.OxyInfo
                 setReceiveCmd(data.bytes)
-                binding.o2OxiThr.setText("${data.oxiThr}")
-                binding.o2HrThr1.setText("${data.hrLowThr}")
-                binding.o2HrThr2.setText("${data.hrHighThr}")
-                binding.o2OxiSwitch.text = when (data.oxiSwitch) {
-                    1 -> "血氧震动开声音关"
-                    2 -> "血氧震动关声音开"
-                    3 -> "血氧震动开声音开"
-                    else -> "血氧震动关声音关"
-                }
-                binding.o2HrSwitch.text = when (data.hrSwitch) {
-                    1 -> "心率震动开声音关"
-                    2 -> "心率震动关声音开"
-                    3 -> "心率震动开声音开"
-                    else -> "心率震动关声音关"
-                }
-                binding.o2Spo2Switch.text = if (data.spo2Switch == 1) {
-                    "血氧功能开"
+                binding.o2Layout.o2OxiThr.setText("${data.oxiThr}")
+                binding.o2Layout.o2HrThr1.setText("${data.hrLowThr}")
+                binding.o2Layout.o2HrThr2.setText("${data.hrHighThr}")
+                binding.o2Layout.o2Oxi.setText("${data.oxiSwitch}")
+                binding.o2Layout.o2Hr.setText("${data.hrSwitch}")
+                binding.o2Layout.o2Motor.setText("${data.motor}")
+                binding.o2Layout.o2Buzzer.setText("${data.buzzer}")
+                binding.o2Layout.o2LightMode.setText("${data.lightingMode}")
+                binding.o2Layout.o2LightStr.setText("${data.lightStr}")
+                binding.o2Layout.o2MtThr.setText("${data.mtThr}")
+                binding.o2Layout.o2MtSwitch.text = if (data.mtSwitch == 1) {
+                    "体动提醒开"
                 } else {
-                    "血氧功能关"
+                    "体动提醒关"
                 }
-                binding.o2Motor.text = "震动强度${data.motor}"
-                binding.o2Buzzer.text = "声音强度${data.buzzer}"
-                binding.o2LightMode.text = "亮屏模式${data.lightingMode}"
-                binding.o2LightStr.text = "屏幕亮度${data.lightStr}"
-                binding.o2MtThr.setText("${data.mtThr}")
-                binding.o2MtSwitch.text = if (data.mtSwitch == 1) {
-                    "体动开"
+                binding.o2Layout.o2IvThr.setText("${data.ivThr}")
+                binding.o2Layout.o2IvSwitch.text = if (data.ivSwitch == 1) {
+                    "无效值提醒开"
                 } else {
-                    "体动关"
-                }
-                binding.o2IvThr.setText("${data.ivThr}")
-                binding.o2IvSwitch.text = if (data.ivSwitch == 1) {
-                    "无效值开"
-                } else {
-                    "无效值关"
+                    "无效值提醒关"
                 }
                 binding.content.text = "$data"
-                Toast.makeText(context, "o2/babyO2 获取参数成功", Toast.LENGTH_SHORT).show()
             }
         //------------------------------ap20-------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20Battery)
@@ -2970,6 +2916,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 val data = it.data as Aoj20aBleResponse.TempRtData
                 setReceiveCmd(data.bytes)
                 binding.content.text = "$data"
+                binding.deviceInfo.text = "测温模式：${data.modeMsg}\n温度：${data.temp} ℃"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aDeleteData)
             .observe(this) {
@@ -2979,6 +2926,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this) {
                 val data = it.data as Aoj20aBleResponse.ErrorMsg
                 binding.content.text = "$data"
+                binding.deviceInfo.text = "错误结果：${data.codeMsg}"
             }
 
         //---------------------pc68b-------------------

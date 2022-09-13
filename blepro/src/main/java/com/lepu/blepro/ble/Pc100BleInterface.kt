@@ -156,7 +156,7 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             }
             Pc100BleCmd.BO_RT_WAVE -> {
                 LepuBleLog.d(tag, "model:$model,BO_RT_WAVE => success")
-                val info = response.content.copyOfRange(0, response.content.size).toList().asSequence().map { (it.toInt() and 0x7f).toByte() }.toList().toByteArray()
+                val info = Pc100BleResponse.RtBoWave(response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BoRtWave).post(InterfaceEvent(model, info))
             }
             Pc100BleCmd.BO_RT_PARAM -> {

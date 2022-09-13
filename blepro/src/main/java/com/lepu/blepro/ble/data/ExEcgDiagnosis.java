@@ -3,15 +3,15 @@ package com.lepu.blepro.ble.data;
 public class ExEcgDiagnosis {
     // 原始bytes数据
     private byte[] bytes;
-    // Regular ECG Rhythm (心电未见明显异常，遵循医生意见)
+    // Regular ECG Rhythm (心电未见明显异常，遵循医生意见)，规则心电
     private boolean isRegular = false;
-    // Unable to analyze (心电信号幅度低或噪声干扰)
+    // Unable to analyze (心电信号幅度低或噪声干扰)，信号弱
     private boolean isPoorSignal = false;
-    // Fast Heart Rate (心率过快)
+    // Fast Heart Rate (心率过快)，心率过高
     private boolean isFastHr = false;
-    // Slow Heart Rate (心率过缓)
+    // Slow Heart Rate (心率过缓)，心率过低
     private boolean isSlowHr = false;
-    // Irregular ECG Rhythm (疑似窦性心律失常)
+    // Irregular ECG Rhythm (疑似窦性心律失常)，不规则心电
     private boolean isIrregular = false;
     // Possible ventricular premature beats (疑似室性早博)
     private boolean isPvcs = false;
@@ -40,7 +40,7 @@ public class ExEcgDiagnosis {
             return;
         }
 
-        int result = (bytes[0]&0xFF) + ((bytes[1]&0xFF)<<8) + ((bytes[2]&0xFF)<<16) + ((bytes[1]&0xFF)<<24);
+        int result = (bytes[0]&0xFF) + ((bytes[1]&0xFF)<<8) + ((bytes[2]&0xFF)<<16) + ((bytes[3]&0xFF)<<24);
 
         if (result == 0) {//(心电未见明显异常，遵循医生意见)
             isRegular = true;

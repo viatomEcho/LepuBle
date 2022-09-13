@@ -115,7 +115,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             Constant.BluetoothConfig.bleSdkServiceEnable = true
             afterLpBleInit()
         })
-
         //-------------------------er1---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetTime)
             .observe(this) {
@@ -307,7 +306,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._bpmInfo.value = it
                 }
             }
-
         //-------------------------o2ring---------------------------
         // o2ring 同步时间
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxySyncDeviceInfo)
@@ -316,7 +314,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 LpBleUtil.getInfo(it.model)
 
             }
-
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo).observe(this) { event ->
             (event.data as OxyBleResponse.OxyInfo).let {
                 viewModel._oxyInfo.value = it
@@ -332,16 +329,15 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 Toast.makeText(this, "BABYO2N 获取盒子信息成功 $it", Toast.LENGTH_SHORT).show()
             }
         }
-
         //-------------------------pc100---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100DeviceInfo)
             .observe(this) { event ->
                 (event.data as Pc100DeviceInfo).let {
                     Toast.makeText(this, "PC-100 获取设备信息成功", Toast.LENGTH_SHORT).show()
                     viewModel._pc100Info.value = it
+                    viewModel._battery.value = "${it.batLevel.times(25)} - ${(it.batLevel+1).times(25)} %"
                 }
             }
-
         //-------------------------pc60fw pc6n---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo)
             .observe(this) { event ->
@@ -363,7 +359,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._boInfo.value = it
                 }
             }
-
         //-------------------------sp20---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20SetTime)
             .observe(this) {
@@ -377,7 +372,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._boInfo.value = it
                 }
             }
-
         //-------------------------aoj20a---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aSetTime)
             .observe(this) {
@@ -391,7 +385,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._aoj20aInfo.value = it
                 }
             }
-
         //-------------------------checkme pod-------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodSetTime)
             .observe(this) {
@@ -431,7 +424,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     }
                     Bluetooth.MODEL_CHECKME -> {
                         Toast.makeText(this, "Checkme 完成时间同步", Toast.LENGTH_SHORT).show()
-                        return@observe
                     }
                     else -> {
                         Toast.makeText(this, "Pulsebit 完成时间同步", Toast.LENGTH_SHORT).show()
@@ -478,6 +470,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 (event.data as Pc300DeviceInfo).let {
                     Toast.makeText(this, "PC_300SNT 获取设备信息成功", Toast.LENGTH_SHORT).show()
                     viewModel._pc300Info.value = it
+                    viewModel._battery.value = "${it.batLevel.times(25)} - ${(it.batLevel+1).times(25)} %"
                 }
             }
         //-------------------------lem---------------------------

@@ -51,12 +51,12 @@ class Aoj20aBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,MSG_SET_TIME => success " + bytesToHex(response.bytes))
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aSetTime).post(InterfaceEvent(model, true))
             }
-            Aoj20aBleCmd.MSG_TEMP_MEASURE -> {
+            Aoj20aBleCmd.MSG_GET_RT_DATA -> {
                 if (response.len == 0) {
-                    LepuBleLog.d(tag, "model:$model,MSG_TEMP_MEASURE => null " + bytesToHex(response.bytes))
+                    LepuBleLog.d(tag, "model:$model,MSG_GET_RT_DATA => null " + bytesToHex(response.bytes))
                     return
                 }
-                LepuBleLog.d(tag, "model:$model,MSG_TEMP_MEASURE => success " + bytesToHex(response.bytes))
+                LepuBleLog.d(tag, "model:$model,MSG_GET_RT_DATA => success " + bytesToHex(response.bytes))
                 val info = Aoj20aBleResponse.TempRtData(response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempRtData).post(InterfaceEvent(model, info))
             }
@@ -111,7 +111,7 @@ class Aoj20aBleInterface(model: Int): BleInterface(model) {
             }
             // need content length
             var len = byte2UInt(bytes[i+3])
-            if (bytes[i+2] == Aoj20aBleCmd.MSG_TEMP_MEASURE.toByte()) {
+            if (bytes[i+2] == Aoj20aBleCmd.MSG_GET_RT_DATA.toByte()) {
                 len = 3
             } else if (bytes[i+2] == Aoj20aBleCmd.MSG_ERROR_CODE.toByte()) {
                 len = 1
@@ -154,17 +154,13 @@ class Aoj20aBleInterface(model: Int): BleInterface(model) {
         LepuBleLog.e(tag, "deleteData")
     }
 
-    fun tempMeasure() {
-        sendCmd(Aoj20aBleCmd.tempMeasure())
-        LepuBleLog.e(tag, "tempMeasure")
-    }
-
     override fun dealContinueRF(userId: String, fileName: String) {
         LepuBleLog.e(tag, "dealContinueRF not yet implemented")
     }
 
     override fun getRtData() {
-        LepuBleLog.e(tag, "getRtData not yet implemented")
+        sendCmd(Aoj20aBleCmd.getRtData())
+        LepuBleLog.e(tag, "getRtData")
     }
 
     override fun dealReadFile(userId: String, fileName: String) {

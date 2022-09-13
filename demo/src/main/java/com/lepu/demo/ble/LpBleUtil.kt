@@ -861,6 +861,9 @@ class LpBleUtil {
                 BleServiceHelper.aoj20aDeleteData(model)
             }
         }
+        fun aoj20aGetRtData(model: Int) {
+            BleServiceHelper.aoj20aGetRtData(model)
+        }
 
         fun enableRtData(model: Int, type: Int, enable: Boolean) {
             Log.d(TAG, "enableRtData")

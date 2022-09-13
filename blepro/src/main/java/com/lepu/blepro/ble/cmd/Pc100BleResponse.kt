@@ -222,6 +222,17 @@ object Pc100BleResponse {
             """.trimIndent()
         }
     }
+
+    @ExperimentalUnsignedTypes
+    class RtBoWave(val bytes: ByteArray) {
+        val waveData: ByteArray
+        val waveIntData: IntArray
+        init {
+            waveData = bytes.copyOfRange(0, bytes.size).toList().asSequence().map { (it.toInt() and 0x7f).toByte() }.toList().toByteArray()
+            waveIntData =  bytes.copyOfRange(0, bytes.size).toList().asSequence().map { (it.toInt() and 0x7f)}.toList().toIntArray()
+        }
+    }
+
     @Parcelize
     @ExperimentalUnsignedTypes
     class RtBoParam constructor(var bytes: ByteArray) : Parcelable {
