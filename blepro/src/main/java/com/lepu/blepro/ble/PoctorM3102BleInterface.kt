@@ -18,6 +18,7 @@ class PoctorM3102BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "PoctorM3102BleInterface"
 
     private lateinit var context: Context
+    private var deviceData = com.lepu.blepro.ext.PoctorM3102Data()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
@@ -39,7 +40,17 @@ class PoctorM3102BleInterface(model: Int): BleInterface(model) {
     private fun onResponseReceived(response: ByteArray) {
         val data = PoctorM3102Data(response)
         LepuBleLog.d(tag, "onResponseReceived bytes : $data")
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PoctorM3102.EventPoctorM3102Data).post(InterfaceEvent(model, data))
+
+        deviceData.type = data.type
+        deviceData.isNormal = data.normal
+        deviceData.year = data.year
+        deviceData.month = data.month
+        deviceData.day = data.day
+        deviceData.hour = data.hour
+        deviceData.minute = data.minute
+        deviceData.result = data.result
+
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PoctorM3102.EventPoctorM3102Data).post(InterfaceEvent(model, deviceData))
     }
 
     @OptIn(ExperimentalUnsignedTypes::class)

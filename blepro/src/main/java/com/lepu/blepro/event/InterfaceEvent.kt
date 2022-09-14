@@ -220,19 +220,6 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * PC60FwBleInterface发出的通知
-     * 包含model: MODEL_POD_1W
-     */
-    interface POD1w {
-        companion object {
-            const val EventPOD1wRtParam = "com.lepu.ble.pod1w.rt.param"              // 血氧参数 RtParam
-            const val EventPOD1wRtWave = "com.lepu.ble.pod1w.rt.wave"                // 血氧波形 RtWave
-            const val EventPOD1wBatLevel = "com.lepu.ble.pod1w.bat.level"            // 电池电量
-            const val EventPOD1wDeviceInfo = "com.lepu.ble.pod1w.device.info"        // 设备信息 DeviceInfo
-        }
-    }
-
-    /**
      * PC80BleInterface发出的通知
      * 包含model: MODEL_PC80B, MODEL_PC80B_BLE
      */
@@ -582,7 +569,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventCheckmeLeSetTime = "com.lepu.ble.checkmele.set.time"                            // 同步时间 boolean
             const val EventCheckmeLeDeviceInfo = "com.lepu.ble.checkmele.device.info"                      // 设备信息 CheckmeLeBleResponse.DeviceInfo
             const val EventCheckmeLeGetFileListProgress = "com.lepu.ble.checkmele.get.file.list.progress"  // 获取文件列表进度 int
-            const val EventCheckmeLeGetFileList = "com.lepu.ble.checkmele.get.file.list"                   // 文件列表 CheckmeLeBleResponse.ListContent
+//            const val EventCheckmeLeGetFileList = "com.lepu.ble.checkmele.get.file.list"                   // 文件列表 CheckmeLeBleResponse.ListContent
             const val EventCheckmeLeEcgList = "com.lepu.ble.checkmele.ecg.list"                   // 文件列表
             const val EventCheckmeLeOxyList = "com.lepu.ble.checkmele.oxy.list"                   // 文件列表
             const val EventCheckmeLeDlcList = "com.lepu.ble.checkmele.dlc.list"                   // 文件列表

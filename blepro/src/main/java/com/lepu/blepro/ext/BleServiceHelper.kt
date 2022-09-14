@@ -1549,6 +1549,13 @@ class BleServiceHelper private constructor() {
             it.readFile("", fileName, 0)
         }
     }
+    fun oxyFactoryReset(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.let {
+            LepuBleLog.d(tag, "--oxyFactoryReset--")
+            it.factoryReset()
+        }
+    }
     /**
      * 获取实时波形（O2系列）
      */
@@ -3481,6 +3488,19 @@ class BleServiceHelper private constructor() {
             }
             else -> LepuBleLog.d(tag, "lemMassageTime current model $model unsupported!!")
         }
+    }
+
+    fun biolandBgmGetInfo(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.getInfo()
+    }
+    fun biolandBgmGetGluData(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.getFileList()
+    }
+    fun lpm311GetData(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.getFileList()
     }
 
 }

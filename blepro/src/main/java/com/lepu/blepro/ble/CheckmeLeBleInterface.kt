@@ -276,16 +276,16 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
                     } else {
                         val data = CheckmeLeBleResponse.EcgFile(curFileName, fileSize, it)
 
-                        result.isRegular = data.result.isRegular
-                        result.isPoorSignal = data.result.isPoorSignal
-                        result.isHighHr = data.result.isHighHr
-                        result.isLowHr = data.result.isLowHr
-                        result.isIrregular = data.result.isIrregular
-                        result.isHighQrs = data.result.isHighQrs
-                        result.isHighSt = data.result.isHighSt
-                        result.isLowSt = data.result.isLowSt
-                        result.isPrematureBeat = data.result.isPrematureBeat
-                        result.result = data.result.resultMess
+                        result.isRegular = data.diagnosis.isRegular
+                        result.isPoorSignal = data.diagnosis.isPoorSignal
+                        result.isHighHr = data.diagnosis.isHighHr
+                        result.isLowHr = data.diagnosis.isLowHr
+                        result.isIrregular = data.diagnosis.isIrregular
+                        result.isHighQrs = data.diagnosis.isHighQrs
+                        result.isHighSt = data.diagnosis.isHighSt
+                        result.isLowSt = data.diagnosis.isLowSt
+                        result.isPrematureBeat = data.diagnosis.isPrematureBeat
+                        result.result = data.diagnosis.resultMess
 
                         ecgFile.result = result
                         ecgFile.hrsDataSize = data.hrsDataSize

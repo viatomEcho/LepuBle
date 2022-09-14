@@ -38,12 +38,9 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
     private var pc60FwDevice = BoDeviceInfo()
 
     private var pc60fwDeviceInfo = com.lepu.blepro.ext.pc60fw.DeviceInfo()
-    private var pod1wDeviceInfo = com.lepu.blepro.ext.pod1w.DeviceInfo()
     private var ppgData = PpgData()
     private var pc60fwRtParam = com.lepu.blepro.ext.pc60fw.RtParam()
     private var pc60fwRtWave = com.lepu.blepro.ext.pc60fw.RtWave()
-    private var pod1wRtParam = com.lepu.blepro.ext.pod1w.RtParam()
-    private var pod1wRtWave = com.lepu.blepro.ext.pod1w.RtWave()
     private var workingStatus = WorkingStatus()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
@@ -127,11 +124,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                 TYPE_BATTERY_LEVEL -> {
                     LepuBleLog.d(tag, "model:$model,EventPC60FwBattery => success")
                     PC60FwBleResponse.Battery(response.content).let {
-                        if (model == Bluetooth.MODEL_POD_1W || model == Bluetooth.MODEL_S5W || model == Bluetooth.MODEL_POD2B) {
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.POD1w.EventPOD1wBatLevel).post(InterfaceEvent(model, it.batteryLevel.toInt()))
-                        } else {
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwBatLevel).post(InterfaceEvent(model, it.batteryLevel.toInt()))
-                        }
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwBatLevel).post(InterfaceEvent(model, it.batteryLevel.toInt()))
                         LepuBleLog.d(tag, "it.batteryLevel == " + it.batteryLevel)
                     }
                 }
@@ -153,19 +146,11 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "it.hardwareV == " + it.hardwareV)
                         LepuBleLog.d(tag, "it.softwareV == " + it.softwareV)
 
-                        if (model == Bluetooth.MODEL_POD_1W || model == Bluetooth.MODEL_S5W || model == Bluetooth.MODEL_POD2B) {
-                            pod1wDeviceInfo.deviceName = pc60FwDevice.deviceName
-                            pod1wDeviceInfo.hardwareV = pc60FwDevice.hardwareV
-                            pod1wDeviceInfo.sn = pc60FwDevice.sn
-                            pod1wDeviceInfo.softwareV = pc60FwDevice.softwareV
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.POD1w.EventPOD1wDeviceInfo).post(InterfaceEvent(model, pod1wDeviceInfo))
-                        } else {
-                            pc60fwDeviceInfo.deviceName = pc60FwDevice.deviceName
-                            pc60fwDeviceInfo.hardwareV = pc60FwDevice.hardwareV
-                            pc60fwDeviceInfo.sn = pc60FwDevice.sn
-                            pc60fwDeviceInfo.softwareV = pc60FwDevice.softwareV
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo).post(InterfaceEvent(model, pc60fwDeviceInfo))
-                        }
+                        pc60fwDeviceInfo.deviceName = pc60FwDevice.deviceName
+                        pc60fwDeviceInfo.hardwareV = pc60FwDevice.hardwareV
+                        pc60fwDeviceInfo.sn = pc60FwDevice.sn
+                        pc60fwDeviceInfo.softwareV = pc60FwDevice.softwareV
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo).post(InterfaceEvent(model, pc60fwDeviceInfo))
                     }
                 }
                 Pc60FwBleCmd.MSG_GET_CODE.toByte() -> {
@@ -199,42 +184,24 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "it.deviceName == " + it.deviceName)
                         LepuBleLog.d(tag, "it.hardwareV == " + it.hardwareV)
                         LepuBleLog.d(tag, "it.softwareV == " + it.softwareV)
-                        if (model == Bluetooth.MODEL_POD_1W || model == Bluetooth.MODEL_S5W || model == Bluetooth.MODEL_POD2B) {
-                            pod1wDeviceInfo.deviceName = pc60FwDevice.deviceName
-                            pod1wDeviceInfo.hardwareV = pc60FwDevice.hardwareV
-                            pod1wDeviceInfo.sn = pc60FwDevice.sn
-                            pod1wDeviceInfo.softwareV = pc60FwDevice.softwareV
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.POD1w.EventPOD1wDeviceInfo).post(InterfaceEvent(model, pod1wDeviceInfo))
-                        } else {
-                            pc60fwDeviceInfo.deviceName = pc60FwDevice.deviceName
-                            pc60fwDeviceInfo.hardwareV = pc60FwDevice.hardwareV
-                            pc60fwDeviceInfo.sn = pc60FwDevice.sn
-                            pc60fwDeviceInfo.softwareV = pc60FwDevice.softwareV
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo).post(InterfaceEvent(model, pc60fwDeviceInfo))
-                        }
+                        pc60fwDeviceInfo.deviceName = pc60FwDevice.deviceName
+                        pc60fwDeviceInfo.hardwareV = pc60FwDevice.hardwareV
+                        pc60fwDeviceInfo.sn = pc60FwDevice.sn
+                        pc60fwDeviceInfo.softwareV = pc60FwDevice.softwareV
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo).post(InterfaceEvent(model, pc60fwDeviceInfo))
                     }
                 }
                 TYPE_SPO2_PARAM -> {
                     LepuBleLog.d(tag, "model:$model,EventPC60FwRtDataParam => success")
                     PC60FwBleResponse.RtDataParam(response.content).let {
 
-                        if (model == Bluetooth.MODEL_POD_1W || model == Bluetooth.MODEL_S5W || model == Bluetooth.MODEL_POD2B) {
-                            pod1wRtParam.isProbeOff = it.isProbeOff
-                            pod1wRtParam.pr = it.pr
-                            pod1wRtParam.isPulseSearching = it.isPulseSearching
-                            pod1wRtParam.pi = it.pi.div(10f)
-                            pod1wRtParam.spo2 = it.spo2
+                        pc60fwRtParam.isProbeOff = it.isProbeOff
+                        pc60fwRtParam.pr = it.pr
+                        pc60fwRtParam.isPulseSearching = it.isPulseSearching
+                        pc60fwRtParam.pi = it.pi.div(10f)
+                        pc60fwRtParam.spo2 = it.spo2
 
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.POD1w.EventPOD1wRtParam).post(InterfaceEvent(model, pod1wRtParam))
-                        } else {
-                            pc60fwRtParam.isProbeOff = it.isProbeOff
-                            pc60fwRtParam.pr = it.pr
-                            pc60fwRtParam.isPulseSearching = it.isPulseSearching
-                            pc60fwRtParam.pi = it.pi.div(10f)
-                            pc60fwRtParam.spo2 = it.spo2
-
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtParam).post(InterfaceEvent(model, pc60fwRtParam))
-                        }
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtParam).post(InterfaceEvent(model, pc60fwRtParam))
                         LepuBleLog.d(tag, "it.pi == " + it.pi)
                         LepuBleLog.d(tag, "it.pr == " + it.pr)
                         LepuBleLog.d(tag, "it.spo2 == " + it.spo2)
@@ -247,17 +214,10 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model,EventPC60FwRtDataWave => success")
                     LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
                     PC60FwBleResponse.RtDataWave(response.content).let {
-                        if (model == Bluetooth.MODEL_POD_1W || model == Bluetooth.MODEL_S5W || model == Bluetooth.MODEL_POD2B) {
-                            pod1wRtWave.waveData = it.waveData
-                            pod1wRtWave.waveIntData = it.waveIntData
+                        pc60fwRtWave.waveData = it.waveData
+                        pc60fwRtWave.waveIntData = it.waveIntData
 
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.POD1w.EventPOD1wRtWave).post(InterfaceEvent(model, pod1wRtWave))
-                        } else {
-                            pc60fwRtWave.waveData = it.waveData
-                            pc60fwRtWave.waveIntData = it.waveIntData
-
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtWave).post(InterfaceEvent(model, pc60fwRtWave))
-                        }
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtWave).post(InterfaceEvent(model, pc60fwRtWave))
                     }
                 }
                 TYPE_WORKING_STATUS -> {

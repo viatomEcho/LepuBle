@@ -7,6 +7,8 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BiolandBgmBleCmd
 import com.lepu.blepro.ble.cmd.BiolandBgmBleResponse
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.bioland.DeviceInfo
+import com.lepu.blepro.ext.bioland.GluData
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 
@@ -23,6 +25,9 @@ class BiolandBgmBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "BiolandBgmBleInterface"
 
     private lateinit var context: Context
+
+    private var deviceInfo = DeviceInfo()
+    private var gluData = GluData()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
@@ -51,7 +56,15 @@ class BiolandBgmBleInterface(model: Int): BleInterface(model) {
                 if (response.content.isEmpty()) return
                 val data = BiolandBgmBleResponse.DeviceInfo(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmDeviceInfo).post(InterfaceEvent(model, data))
+
+                deviceInfo.version = data.version
+                deviceInfo.customerType = data.customerType
+                deviceInfo.battery = data.battery
+                deviceInfo.deviceType = data.deviceType
+                deviceInfo.deviceCode = data.deviceCode
+                deviceInfo.sn = data.sn
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmDeviceInfo).post(InterfaceEvent(model, deviceInfo))
             }
             BiolandBgmBleCmd.MSG_ING -> {
                 if (response.content.isEmpty()) return
@@ -63,7 +76,16 @@ class BiolandBgmBleInterface(model: Int): BleInterface(model) {
                 if (response.content.isEmpty()) return
                 val data = BiolandBgmBleResponse.GluData(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_DATA => success $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmGluData).post(InterfaceEvent(model, data))
+
+                gluData.year = data.year
+                gluData.month = data.month
+                gluData.day = data.day
+                gluData.hour = data.hour
+                gluData.minute = data.minute
+                gluData.resultMg = data.resultMg
+                gluData.resultMmol = data.resultMmol
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmGluData).post(InterfaceEvent(model, gluData))
             }
             BiolandBgmBleCmd.MSG_END -> {
                 LepuBleLog.d(tag, "model:$model,MSG_END => success")

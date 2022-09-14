@@ -21,6 +21,7 @@ class Lpm311BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Lpm311BleInterface"
 
     private lateinit var context: Context
+    private var deviceData = com.lepu.blepro.ext.Lpm311Data()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
@@ -153,7 +154,27 @@ class Lpm311BleInterface(model: Int): BleInterface(model) {
         data.ldlStr = Lpm311Data.getDataStr(data.unit, Lpm311Data.LDL, data.ldl)
         data.cholDivHdlStr = Lpm311Data.getDataStr(data.unit, Lpm311Data.CHOL_HDL, data.cholDivHdl)
 
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LPM311.EventLpm311Data).post(InterfaceEvent(model, data))
+        deviceData.bytes = data.bytes
+        deviceData.year = data.year
+        deviceData.month = data.month
+        deviceData.day = data.day
+        deviceData.hour = data.hour
+        deviceData.minute = data.minute
+        deviceData.second = data.second
+        deviceData.chol = data.chol
+        deviceData.cholStr = data.cholStr
+        deviceData.hdl = data.hdl
+        deviceData.hdlStr = data.hdlStr
+        deviceData.trig = data.trig
+        deviceData.trigStr = data.trigStr
+        deviceData.ldl = data.ldl
+        deviceData.ldlStr = data.ldlStr
+        deviceData.cholDivHdl = data.cholDivHdl
+        deviceData.cholDivHdlStr = data.cholDivHdlStr
+        deviceData.unit = data.unit
+        deviceData.user = data.user
+
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LPM311.EventLpm311Data).post(InterfaceEvent(model, deviceData))
         sendCmd("disconnect".toByteArray(StandardCharsets.US_ASCII))
         LepuBleLog.d(tag, "onResponseReceived $data")
     }

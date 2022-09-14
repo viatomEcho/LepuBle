@@ -187,20 +187,20 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
                     } else {
                         val data = PulsebitBleResponse.EcgFile(curFileName, fileSize, it)
 
-                        result.isRegular = data.result.isRegular
-                        result.isPoorSignal = data.result.isPoorSignal
-                        result.isFastHr = data.result.isFastHr
-                        result.isSlowHr = data.result.isSlowHr
-                        result.isIrregular = data.result.isIrregular
-                        result.isPvcs = data.result.isPvcs
-                        result.isHeartPause = data.result.isHeartPause
-                        result.isFibrillation = data.result.isFibrillation
-                        result.isWideQrs = data.result.isWideQrs
-                        result.isProlongedQtc = data.result.isProlongedQtc
-                        result.isShortQtc = data.result.isShortQtc
-                        result.isStElevation = data.result.isStElevation
-                        result.isStDepression = data.result.isStDepression
-                        result.result = data.result.resultMess
+                        result.isRegular = data.diagnosis.isRegular
+                        result.isPoorSignal = data.diagnosis.isPoorSignal
+                        result.isFastHr = data.diagnosis.isFastHr
+                        result.isSlowHr = data.diagnosis.isSlowHr
+                        result.isIrregular = data.diagnosis.isIrregular
+                        result.isPvcs = data.diagnosis.isPvcs
+                        result.isHeartPause = data.diagnosis.isHeartPause
+                        result.isFibrillation = data.diagnosis.isFibrillation
+                        result.isWideQrs = data.diagnosis.isWideQrs
+                        result.isProlongedQtc = data.diagnosis.isProlongedQtc
+                        result.isShortQtc = data.diagnosis.isShortQtc
+                        result.isStElevation = data.diagnosis.isStElevation
+                        result.isStDepression = data.diagnosis.isStDepression
+                        result.result = data.diagnosis.resultMess
 
                         ecgFile.result = result
                         ecgFile.hrsDataSize = data.hrsDataSize
@@ -212,7 +212,6 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
                         ecgFile.pvcs = data.pvcs
                         ecgFile.qtc = data.qtc
                         ecgFile.measureMode = data.measureMode
-                        ecgFile.measureModeMess = data.measureModeMess
                         ecgFile.filterMode = data.filterMode
                         ecgFile.qt = data.qt
                         ecgFile.hrsData = data.hrsData

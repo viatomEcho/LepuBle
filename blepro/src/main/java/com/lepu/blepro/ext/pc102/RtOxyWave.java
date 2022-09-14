@@ -1,8 +1,9 @@
-package com.lepu.blepro.ext.pod1w;
+package com.lepu.blepro.ext.pc102;
 
 import java.util.Arrays;
 
-public class RtWave {
+public class RtOxyWave {
+
     private byte[] waveData;
     private int[] waveIntData;
 
@@ -24,7 +25,7 @@ public class RtWave {
 
     @Override
     public String toString() {
-        return "RtWave{" +
+        return "RtOxyWave{" +
                 "waveData=" + Arrays.toString(waveData) +
                 ", waveIntData=" + Arrays.toString(waveIntData) +
                 '}';

@@ -664,10 +664,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         //------------------------------ap20------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtOxyWave)
-            .observe(this, {
-                val rtWave = it.data as RtOxyWave
+            .observe(this) {
+                val rtWave = it.data as com.lepu.blepro.ext.ap20.RtOxyWave
                 OxyDataController.receive(rtWave.waveIntData)
-            })
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtOxyParam)
             .observe(this) {
                 val rtData = it.data as com.lepu.blepro.ext.ap20.RtOxyParam

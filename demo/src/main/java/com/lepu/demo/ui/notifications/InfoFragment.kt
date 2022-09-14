@@ -1100,7 +1100,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
 
         //---------------------------CheckmeLE--------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileList)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileList)
             .observe(this) {
                 val data = it.data as CheckmeLeBleResponse.ListContent
                 when (data.type) {
@@ -1138,7 +1138,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     }
                 }
                 binding.deviceInfo.text = fileNames.toString()
-            }
+            }*/
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileListError)
             .observe(this) {
                 val data = it.data as Boolean
@@ -1221,9 +1221,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this) {
                 val data = it.data as Lpm311Data
                 binding.info.text = "$data"
-                binding.deviceInfo.text = "user : ${data.user}\nCHOL : ${data.chol} （${data.chol}）\nTRIG : ${data.trig} （${data.trig}）\n" +
-                        "HDL : ${data.hdl} （${data.hdl}）\nLDL : ${data.ldl} （${data.ldl}）\n" +
-                        "CHOL/HDL : ${data.cholDivHdl} （${data.cholDivHdl}）\nUNIT : ${if (data.unit == 0) {"mmol/L"} else {"mg/dL"}}"
+                binding.deviceInfo.text = "user : ${data.user}\nCHOL : ${data.chol} （${data.cholStr}）\nTRIG : ${data.trig} （${data.trigStr}）\n" +
+                        "HDL : ${data.hdl} （${data.hdlStr}）\nLDL : ${data.ldl} （${data.ldlStr}）\n" +
+                        "CHOL/HDL : ${data.cholDivHdl} （${data.cholDivHdlStr}）\nUNIT : ${if (data.unit == 0) {"mmol/L"} else {"mg/dL"}}"
             }
         //------------------------------PoctorM3102--------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PoctorM3102.EventPoctorM3102Data)

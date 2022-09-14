@@ -178,7 +178,18 @@ public class EcgFile {
     }
 
     public String getMeasureModeMess() {
-        return measureModeMess;
+        switch (measureMode) {
+            case 1:
+                return "Internal I";
+            case 2:
+                return "Internal II";
+            case 3:
+                return "Externa I";
+            case 4:
+                return "Externa II";
+            default:
+                return "";
+        }
     }
 
     public void setMeasureModeMess(String measureModeMess) {
