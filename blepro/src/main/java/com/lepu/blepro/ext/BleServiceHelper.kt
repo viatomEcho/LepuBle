@@ -3405,6 +3405,11 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    fun lemGetInfo(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.getInfo()
+    }
+
     fun lemDeviceSwitch(model: Int, on: Boolean) {
         if (!checkService()) return
         when (model) {

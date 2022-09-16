@@ -6,6 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.LemData
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 
@@ -24,6 +25,7 @@ class LemBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "LemBleInterface"
 
     private lateinit var context: Context
+    private var deviceData = LemData()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
@@ -57,7 +59,14 @@ class LemBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,MSG_DEVICE_STATE => success ${bytesToHex(response.content)}")
                 val data = LemBleResponse.DeviceInfo(response.content)
                 LepuBleLog.d(tag, "model:$model,MSG_DEVICE_STATE => LemBleResponse.DeviceInfo $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemDeviceInfo).post(InterfaceEvent(model, data))
+
+                deviceData.battery = data.battery
+                deviceData.isHeatMode = data.heatMode
+                deviceData.massageMode = data.massageMode
+                deviceData.massageLevel = data.massageLevel
+                deviceData.massageTime = data.massageTime
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemDeviceInfo).post(InterfaceEvent(model, deviceData))
             }
             LemBleCmd.HEAT_MODE -> {
                 LepuBleLog.d(tag, "model:$model,HEAT_MODE => success ${bytesToHex(response.content)}")

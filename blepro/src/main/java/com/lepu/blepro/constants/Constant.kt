@@ -173,4 +173,27 @@ object Constant {
         }
     }
 
+    /**
+     * lem按摩时间
+     */
+    interface LemMassageTime {
+        companion object {
+            const val MIN_15 = 0
+            const val MIN_10 = 1
+            const val MIN_5 = 2
+        }
+    }
+    /**
+     * lem按摩模式
+     */
+    interface LemMassageMode {
+        companion object {
+            const val VITALITY = 0
+            const val DYNAMIC = 1
+            const val HAMMERING = 2
+            const val SOOTHING = 3
+            const val AUTOMATIC = 4
+        }
+    }
+
 }
