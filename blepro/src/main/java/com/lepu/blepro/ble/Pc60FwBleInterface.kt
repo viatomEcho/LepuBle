@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets
  * 1.实时电量
  * 2.实时血氧
  * 3.实时工作状态
+ * 血氧采样率：参数1HZ，波形50HZ
  */
 class Pc60FwBleInterface(model: Int): BleInterface(model) {
     

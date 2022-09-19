@@ -18,6 +18,8 @@ import kotlin.experimental.inv
  * 3.恢复出厂设置
  * 4.获取实时心电
  * 5.获取体重数据
+ * 心电采样率：实时125HZ，存储125HZ
+ * 心电增益：n * (1.0035 * 1800) / (4096 * 178.74) = n * 0.0024672217239426-----405.3142002989537倍
  */
 
 class LeS1BleInterface(model: Int): BleInterface(model) {

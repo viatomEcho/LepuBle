@@ -67,6 +67,12 @@ public final class Er1DataController {
         dataRec = new float[0];
     }
 
+    /**
+     * er1原始数据转毫伏值
+     * @param a
+     * @param b
+     * @return
+     */
     public static float byteTomV(byte a, byte b) {
         if (a == (byte) 0xff && b == (byte) 0x7f) {
             return 0f;

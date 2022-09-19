@@ -13,6 +13,7 @@ import com.lepu.blepro.utils.ByteUtils.byte2UInt
  * vtm20f指甲血氧：
  * receive:
  * 1.实时血氧
+ * 血氧采样率：参数1HZ，波形50HZ
  */
 
 class Vtm20fBleInterface(model: Int): BleInterface(model) {

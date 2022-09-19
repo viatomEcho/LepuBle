@@ -18,9 +18,17 @@ import com.lepu.blepro.utils.HexString.trimStr
  * send:
  * 1.获取设备信息
  * 2.开始/结束心电
- * 3.
+ * 3.同步时间
+ * 4.设置位数
  * receive:
- *
+ * 1.心电数据
+ * 2.血氧数据
+ * 3.体温数据
+ * 4.血糖数据
+ * 5.血压数据
+ * 血氧采样率：参数1HZ，波形25HZ
+ * 心电采样率：实时150HZ
+ * 心电增益：n * 1 / 394 = n * 0.0025380710659898-----394倍
  */
 
 class Pc300BleInterface(model: Int): BleInterface(model) {

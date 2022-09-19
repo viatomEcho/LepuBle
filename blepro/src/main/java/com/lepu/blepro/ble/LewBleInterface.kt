@@ -17,6 +17,10 @@ import com.lepu.blepro.utils.toUInt
 import java.util.*
 import kotlin.experimental.inv
 
+/**
+ * 心电采样率：实时250HZ，存储250HZ
+ * 心电增益：n * 1 / 345 = n * 0.0028985507246377-----345倍
+ */
 class LewBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "LewBleInterface"
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {

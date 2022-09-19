@@ -26,6 +26,8 @@ import kotlin.experimental.inv
  * 4.恢复出厂设置
  * 5.下载文件内容
  * 6.配置参数
+ * 血氧采样率：实时125HZ
+ * 红光红外采样率：实时150HZ
  */
 class OxyBleInterface(model: Int): BleInterface(model) {
     

@@ -16,6 +16,8 @@ import java.util.*
  * vetcorder心电血氧设备：
  * receive:
  * 1.实时心电、血氧
+ * 血氧心电采样率：实时25HZ
+ * 心电增益：n * 4033 / (32767 * 12 * 1.05) = n * 0.0097683451362458-----102.3714852467146倍
  */
 
 class VetcorderBleInterface(model: Int): BleInterface(model) {

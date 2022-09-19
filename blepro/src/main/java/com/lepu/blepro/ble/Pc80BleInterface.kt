@@ -21,6 +21,8 @@ import java.util.*
  * receive:
  * 1.实时心电
  * 2.接收历史文件内容
+ * 心电采样率：实时150HZ，存储150HZ
+ * 心电增益：n * 1 / 330 = n * 0.003030303030303-----330倍
  */
 
 class Pc80BleInterface(model: Int): BleInterface(model) {

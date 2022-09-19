@@ -215,14 +215,17 @@ object PC80BleResponse {
     class RtEcgData constructor(var bytes: ByteArray) : Parcelable {
         var len: Int
         var ecg: ByteArray
+        var ecgInt: IntArray  // 0—4095（-2048-2048）
         var wFs : FloatArray
 
-        // ecg : 每个采样数据占两个字节，低字节在前，只有低12位是有效的ECG波形数据，采样点范围(0，4095)基线值2048，采样点对应的电压范围(0mV，3300mV)
+        // ecg : 每个采样数据占两个字节，低字节在前，只有低12位是有效的ECG波形数据，采样点范围(0，4095)基线值2048，采样点对应的电压范围(0mV，330mV)
         init {
             len = bytes.size
             ecg = bytes
+            ecgInt = IntArray(len/2)
             wFs = FloatArray(len/2)
             for (i in 0 until (len/2)) {
+                ecgInt[i] = (byte2UInt(bytes[2 * i]) + ((byte2UInt(bytes[2 * i + 1]) and 0x0F) shl 8)) - 2048
                 wFs[i] = PC80DataController.byteTomV(bytes[2 * i], bytes[2 * i + 1])
             }
         }
