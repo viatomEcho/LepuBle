@@ -11,11 +11,10 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.text.TextPaint;
 import android.util.Log;
-
 import com.lepu.blepro.ble.data.Th12BleFile;
 import com.lepu.blepro.utils.LepuBleLog;
 import com.lepu.demo.util.icon.BitmapConvertor;
-
+import org.apache.commons.io.FileUtils;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -214,12 +213,23 @@ public class FileUtil {
         }
     }
 
+    public static byte[] readFile(Context context, String fileName) {
+        File file = new File(context.getExternalFilesDir(null).getAbsolutePath());
+        file = new File(file, fileName);
+        try {
+            byte[] bytes = FileUtils.readFileToByteArray(file);
+            return bytes;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-    public static void readFile(Context context) {
+    public static void readTh12File(Context context) {
         Th12BleFile th12BleFile = new Th12BleFile();
 
         File file = new File(context.getExternalFilesDir(null).getAbsolutePath() + "/th12/");
-        file = new File(file, "HolterECGData_1.dat");
+        file = new File(file, "HolterECGData.dat");
 
         File file2 = new File(context.getExternalFilesDir(null).getAbsolutePath() + "/th12/");
         file2 = new File(file2, "HolterECGData_data.txt");

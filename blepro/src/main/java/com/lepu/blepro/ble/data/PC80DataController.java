@@ -67,6 +67,12 @@ public final class PC80DataController {
         dataRec = new float[0];
     }
 
+    /**
+     * pc80b原始数据转毫伏值
+     * @param a
+     * @param b
+     * @return
+     */
     public static float byteTomV(byte a, byte b) {
 
         int n = (a & 0xFF) + ((b & 0x0F) << 8);

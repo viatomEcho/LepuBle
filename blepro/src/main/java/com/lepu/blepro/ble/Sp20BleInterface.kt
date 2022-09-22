@@ -25,6 +25,7 @@ import java.util.*
  * 5.获取/配置参数
  * receive:
  * 1.实时血氧、体温
+ * 血氧采样率：参数1HZ，波形50HZ
  */
 
 class Sp20BleInterface(model: Int): BleInterface(model) {

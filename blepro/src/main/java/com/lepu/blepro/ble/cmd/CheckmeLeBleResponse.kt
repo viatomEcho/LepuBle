@@ -33,7 +33,7 @@ object CheckmeLeBleResponse{
         var region: String       // 地区版本
         var model: String        // 系列版本
         var hwVersion: String    // 硬件版本
-        var swVersion: String    // 软件版本
+        var swVersion: String    // 固件版本
         var lgVersion: String    // 语言版本
         var curLanguage: String  // 语言版本
         var sn: String           // 序列号

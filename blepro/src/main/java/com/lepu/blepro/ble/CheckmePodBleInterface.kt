@@ -22,6 +22,7 @@ import kotlin.experimental.inv
  * 2.获取设备信息
  * 3.获取实时血氧、体温
  * 4.获取列表数据
+ * 血氧采样率：实时125HZ
  */
 class CheckmePodBleInterface(model: Int): BleInterface(model) {
     

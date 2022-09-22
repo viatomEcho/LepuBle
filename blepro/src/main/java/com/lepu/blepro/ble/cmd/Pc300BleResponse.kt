@@ -24,7 +24,7 @@ object Pc300BleResponse {
 
     @ExperimentalUnsignedTypes
     class DeviceInfo(val bytes: ByteArray) {
-        var softwareV: String  // 软件版本
+        var softwareV: String  // 固件版本
         var hardwareV: String  // 硬件版本
         var batLevel: Int      // 电量等级 级数越高，电量越多（0-3）
 
@@ -325,10 +325,9 @@ object Pc300BleResponse {
     class RtEcgWave(val bytes: ByteArray, var gain: Float) {
         var seqNo: Int             // 准备阶段是0
         var digit: Int             // 0：采样点占8bit，增益为28.5；1：采样点占12bit，增益为394
-        var tempData: Float
 //        var sign: Boolean
         var waveData: ByteArray
-        var waveIntData: IntArray  // 0—4095
+        var waveIntData: IntArray  // 8bit：0-255（-128-128）；12bit：0—4095（-2048-2048）
         var wFs: FloatArray
         var isProbeOff: Boolean
 
@@ -338,20 +337,20 @@ object Pc300BleResponse {
             index++
             waveData = bytes.copyOfRange(index, index+25*2)
             digit = (byte2UInt(waveData[0]) and 0x80) shr 7
-            tempData = if (digit == 0) {  // 8bit
-                gain = 28.5f
-                128 * 1.div(gain)
-            } else {
-//                gain = 394f
-                2048 * 1.div(gain)
-            }
             index += 50
             val len = waveData.size/2
             waveIntData = IntArray(len)
             wFs = FloatArray(len)
-            for (i in 0 until len) {
-                waveIntData[i] = ((byte2UInt(waveData[i*2]) and 0x0F) shl 8) + byte2UInt(waveData[i*2+1])  // 12bit
-                wFs[i] = waveIntData[i] * 1.div(gain) - tempData
+            if (digit == 0) {
+                for (i in 0 until len) {
+                    waveIntData[i] = (((byte2UInt(waveData[i*2]) and 0x0F) shl 8) + byte2UInt(waveData[i*2+1])) - 128  // 8bit
+                    wFs[i] = waveIntData[i] * 1.div(28.5f)
+                }
+            } else {
+                for (i in 0 until len) {
+                    waveIntData[i] = (((byte2UInt(waveData[i*2]) and 0x0F) shl 8) + byte2UInt(waveData[i*2+1])) - 2048  // 12bit
+                    wFs[i] = waveIntData[i] * 1.div(394f)
+                }
             }
             // reserved hr
             index++

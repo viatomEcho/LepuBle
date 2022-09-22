@@ -26,7 +26,7 @@ object PC80BleResponse {
     @Parcelize
     @ExperimentalUnsignedTypes
     class DeviceInfo constructor(var bytes: ByteArray, var len: Int) : Parcelable {
-        var softwareV: String   // 软件版本
+        var softwareV: String   // 固件版本
         var hardwareV: String   // 硬件版本
         var algorithmV: String  // 算法版本
 
@@ -215,7 +215,7 @@ object PC80BleResponse {
     class RtEcgData constructor(var bytes: ByteArray) : Parcelable {
         var len: Int
         var ecg: ByteArray
-        var ecgInt: IntArray
+        var ecgInt: IntArray  // 0—4095
         var wFs : FloatArray
 
         // ecg : 每个采样数据占两个字节，低字节在前，只有低12位是有效的ECG波形数据，采样点范围(0，4095)基线值2048，采样点对应的电压范围(0mV，330mV)

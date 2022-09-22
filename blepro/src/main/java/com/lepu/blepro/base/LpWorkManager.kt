@@ -174,6 +174,14 @@ object LpWorkManager {
                     return this
                 }
             }
+            Bluetooth.MODEL_ER3 -> {
+                Er3BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
             Bluetooth.MODEL_BPM -> {
                 BpmBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately

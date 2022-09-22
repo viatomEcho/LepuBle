@@ -90,9 +90,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.pc68bLayout.visibility = View.GONE
         binding.ad5Layout.visibility = View.GONE
         binding.pc300Layout.visibility = View.GONE
-        binding.lemLayout.visibility = View.GONE
+        binding.lemLayout.root.visibility = View.GONE
         binding.bpmLayout.visibility = View.GONE
         binding.pc60fwLayout.visibility = View.GONE
+        binding.er3Layout.root.visibility = View.GONE
         if (v == null) return
         v.visibility = View.VISIBLE
     }
@@ -118,6 +119,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
                     setViewVisible(binding.er2Layout.root)
                     LpBleUtil.getEr2SwitcherState(it.modelNo)
+                }
+                Bluetooth.MODEL_ER3 -> {
+                    setViewVisible(binding.er3Layout.root)
+                    LpBleUtil.er3GetConfig(it.modelNo)
                 }
                 Bluetooth.MODEL_BP2 -> {
                     setViewVisible(binding.bp2Layout.root)
@@ -212,7 +217,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     setViewVisible(binding.pc300Layout)
                 }
                 Bluetooth.MODEL_LEM -> {
-                    setViewVisible(binding.lemLayout)
+                    setViewVisible(binding.lemLayout.root)
                     LpBleUtil.getInfo(it.modelNo)
                 }
                 Bluetooth.MODEL_BPM -> {
@@ -2019,49 +2024,55 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }*/
 
         // ---------------------------lem---------------------------
-        binding.lemDeviceSwitch.setOnClickListener {
+        binding.lemLayout.lemDeviceSwitch.setOnClickListener {
             switchState = !switchState
             LpBleUtil.lemDeviceSwitch(Constant.BluetoothConfig.currentModel[0], switchState)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lemHeatSwitch.setOnClickListener {
-            switchState = !switchState
-            LpBleUtil.lemHeatMode(Constant.BluetoothConfig.currentModel[0], switchState)
+        binding.lemLayout.lemHeatSwitch.setOnClickListener {
+            if (binding.lemLayout.lemHeatSwitch.text == "加热模式开") {
+                LpBleUtil.lemHeatMode(Constant.BluetoothConfig.currentModel[0], false)
+            } else {
+                LpBleUtil.lemHeatMode(Constant.BluetoothConfig.currentModel[0], true)
+            }
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lemGetBattery.setOnClickListener {
+        binding.lemLayout.lemGetBattery.setOnClickListener {
             LpBleUtil.lemGetBattery(Constant.BluetoothConfig.currentModel[0])
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lemMassMode.setOnClickListener {
-            state++
-            if (state > LemBleCmd.MassageMode.AUTOMATIC) {
-                state = LemBleCmd.MassageMode.VITALITY
+        binding.lemLayout.lemSetMassMode.setOnClickListener {
+            val temp = trimStr(binding.lemLayout.lemMassMode.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.lemMassMode(Constant.BluetoothConfig.currentModel[0], temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
             }
-            LpBleUtil.lemMassMode(Constant.BluetoothConfig.currentModel[0], state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
         }
-        binding.lemMassTime.setOnClickListener {
-            state++
-            if (state > LemBleCmd.MassageTime.MIN_5) {
-                state = LemBleCmd.MassageTime.MIN_15
+        binding.lemLayout.lemSetMassTime.setOnClickListener {
+            val temp = trimStr(binding.lemLayout.lemMassTime.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.lemMassTime(Constant.BluetoothConfig.currentModel[0], temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
             }
-            LpBleUtil.lemMassTime(Constant.BluetoothConfig.currentModel[0], state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
         }
-        binding.lemMassLevel.setOnClickListener {
-            state++
-            if (state > 15) {
-                state = 0
+        binding.lemLayout.lemSetMassLevel.setOnClickListener {
+            val temp = trimStr(binding.lemLayout.lemMassLevel.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.lemMassLevel(Constant.BluetoothConfig.currentModel[0], temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
             }
-            LpBleUtil.lemMassLevel(Constant.BluetoothConfig.currentModel[0], state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
         }
         // ---------------------------bpm---------------------------
         binding.bpmGetState.setOnClickListener {
@@ -2084,6 +2095,18 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.sendCmd.text = cmdStr
             }
         }
+        // ---------------------------er3---------------------------
+        binding.er3Layout.er3SetEcgMode.setOnClickListener {
+            val mode = trimStr(binding.er3Layout.er3EcgMode.text.toString())
+            if (isNumber(mode) && (mode.toInt() in 0..2)) {
+                LpBleUtil.er3SetConfig(Constant.BluetoothConfig.currentModel[0], mode.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     }
 
     private fun setReceiveCmd(bytes: ByteArray) {
@@ -2347,11 +2370,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 if (data.wifi.ssid.isNotEmpty()) {
                     binding.deviceInfo.text = "WiFi：${data.wifi.ssid}\n" +
                             "密码：${data.wifi.pwd}\n" +
-                            "状态：${data.wifi.state}\n" +
+                            "WiFi连接状态：${data.wifi.state}\n" +
                             "(0:断开 1:连接中 2:已连接 0xff:密码错误 0xfd:找不到SSID)\n" +
                             "服务器地址：${data.server.addr}\n" +
                             "端口号：${data.server.port}\n" +
-                            "状态：${data.server.state}\n" +
+                            "服务器连接状态：${data.server.state}\n" +
                             "(0:断开 1:连接中 2:已连接 0xff:服务器无法连接)"
                 } else {
                     Toast.makeText(context, "尚未配置WiFi信息", Toast.LENGTH_SHORT).show()
@@ -2408,6 +2431,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2WifiDevice)
             .observe(this) {
+                alertDialog?.dismiss()
                 val data = it.data as Bp2WifiDevice
                 setReceiveCmd(data.bytes)
                 bp2wAdapter.setNewInstance(data.wifiList)
@@ -2430,11 +2454,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 if (data.wifi.ssid.isNotEmpty()) {
                     binding.deviceInfo.text = "WiFi：${data.wifi.ssid}\n" +
                             "密码：${data.wifi.pwd}\n" +
-                            "状态：${data.wifi.state}\n" +
+                            "WiFi连接状态：${data.wifi.state}\n" +
                             "(0:断开 1:连接中 2:已连接 0xff:密码错误 0xfd:找不到SSID)\n" +
                             "服务器地址：${data.server.addr}\n" +
                             "端口号：${data.server.port}\n" +
-                            "状态：${data.server.state}\n" +
+                            "服务器连接状态：${data.server.state}\n" +
                             "(0:断开 1:连接中 2:已连接 0xff:服务器无法连接)"
                 } else {
                     Toast.makeText(context, "尚未配置WiFi信息", Toast.LENGTH_SHORT).show()
@@ -2954,65 +2978,41 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this) {
                 val data = it.data as LemBleResponse.DeviceInfo
                 binding.content.text = "$data"
-                binding.lemGetBattery.text = "电量${data.battery}%"
-                binding.lemHeatSwitch.text = "加热${data.heatMode}"
-                binding.lemMassMode.text = when (data.massageMode) {
-                    LemBleCmd.MassageMode.VITALITY -> "活力模式"
-                    LemBleCmd.MassageMode.DYNAMIC -> "动感模式"
-                    LemBleCmd.MassageMode.HAMMERING -> "捶击模式"
-                    LemBleCmd.MassageMode.SOOTHING -> "舒缓模式"
-                    LemBleCmd.MassageMode.AUTOMATIC -> "自动模式"
-                    else -> ""
-                }
-                binding.lemMassLevel.text = "按摩力度${data.massageLevel}"
-                binding.lemMassTime.text = when (data.massageTime) {
-                    LemBleCmd.MassageTime.MIN_15 -> "15min"
-                    LemBleCmd.MassageTime.MIN_10 -> "10min"
-                    LemBleCmd.MassageTime.MIN_5 -> "5min"
-                    else -> ""
-                }
+                binding.lemLayout.lemGetBattery.text = "电量${data.battery}%"
+                binding.lemLayout.lemHeatSwitch.text = "加热模式${if (data.heatMode) "开" else "关" }"
+                binding.lemLayout.lemMassMode.setText("${data.massageMode}")
+                binding.lemLayout.lemMassLevel.setText("${data.massageLevel}")
+                binding.lemLayout.lemMassTime.setText("${data.massageTime}")
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemBattery)
             .observe(this) {
                 val data = it.data as Int
-                binding.lemGetBattery.text = "电量$data%"
-                Toast.makeText(context, "lem 获取电量成功", Toast.LENGTH_SHORT).show()
+                binding.lemLayout.lemGetBattery.text = "电量$data%"
+                Toast.makeText(context, "获取电量成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetHeatMode)
             .observe(this) {
                 val data = it.data as Boolean
-                binding.lemHeatSwitch.text = "加热$data"
-                Toast.makeText(context, "lem 设置加热模式 $data 成功", Toast.LENGTH_SHORT).show()
+                binding.lemLayout.lemHeatSwitch.text = "加热模式${if (data) "开" else "关" }"
+                Toast.makeText(context, "设置加热模式成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetMassageMode)
             .observe(this) {
                 val data = it.data as Int
-                binding.lemMassMode.text = when (data) {
-                    LemBleCmd.MassageMode.VITALITY -> "活力模式"
-                    LemBleCmd.MassageMode.DYNAMIC -> "动感模式"
-                    LemBleCmd.MassageMode.HAMMERING -> "捶击模式"
-                    LemBleCmd.MassageMode.SOOTHING -> "舒缓模式"
-                    LemBleCmd.MassageMode.AUTOMATIC -> "自动模式"
-                    else -> ""
-                }
-                Toast.makeText(context, "lem 设置按摩模式 $data 成功", Toast.LENGTH_SHORT).show()
+                binding.lemLayout.lemMassMode.setText("$data")
+                Toast.makeText(context, "设置按摩模式成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetMassageLevel)
             .observe(this) {
                 val data = it.data as Int
-                binding.lemMassLevel.text = "按摩力度$data"
-                Toast.makeText(context, "lem 设置按摩力度 $data 成功", Toast.LENGTH_SHORT).show()
+                binding.lemLayout.lemMassLevel.setText("$data")
+                Toast.makeText(context, "设置按摩力度成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetMassageTime)
             .observe(this) {
                 val data = it.data as Int
-                binding.lemMassTime.text = when (data) {
-                    LemBleCmd.MassageTime.MIN_15 -> "15min"
-                    LemBleCmd.MassageTime.MIN_10 -> "10min"
-                    LemBleCmd.MassageTime.MIN_5 -> "5min"
-                    else -> ""
-                }
-                Toast.makeText(context, "lem 设置按摩时间 $data 成功", Toast.LENGTH_SHORT).show()
+                binding.lemLayout.lemMassTime.setText("$data")
+                Toast.makeText(context, "设置按摩时间成功", Toast.LENGTH_SHORT).show()
             }
 
         //------------------------bpm-------------------
@@ -3031,6 +3031,23 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 } else {
                     Toast.makeText(context, "设置code失败", Toast.LENGTH_SHORT).show()
                 }
+            }
+        //------------------------er3-------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3SetConfig)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    Toast.makeText(context, "设置mode成功", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "设置mode失败", Toast.LENGTH_SHORT).show()
+                }
+                LpBleUtil.er3GetConfig(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3GetConfig)
+            .observe(this) {
+                val data = it.data as Int
+                binding.er3Layout.er3EcgMode.setText("$data")
+                Toast.makeText(context, "获取mode成功", Toast.LENGTH_SHORT).show()
             }
 
         //-----------------------------------

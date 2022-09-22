@@ -75,28 +75,23 @@
                     android:textSize="20sp"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
                 <Button
                     android:id="@+id/pause_rf"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Pause"
-                    android:visibility="gone"
-                    android:layout_marginStart="20dp"/>
+                    android:text="暂停读文件"/>
                 <Button
                     android:id="@+id/continue_rf"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Continute"
-                    android:visibility="gone"
+                    android:text="继续读文件"
                     android:layout_marginStart="20dp"/>
             </LinearLayout>
-            <TextView
-                android:visibility="gone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_margin="@dimen/dp_10"
-                android:text="设置"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

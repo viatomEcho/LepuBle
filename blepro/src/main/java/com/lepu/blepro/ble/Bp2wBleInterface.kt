@@ -29,6 +29,9 @@ import kotlin.experimental.inv
  * 8.恢复出厂设置
  * 9.获取路由
  * 10.获取/配置WiFi
+ * 心电采样率：实时250HZ，存储125HZ
+ * 血压采样率：实时50HZ，存储50HZ
+ * 心电增益：n * 0.003098-----322.7888960619755倍
  */
 class Bp2wBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Bp2wBleInterface"

@@ -104,6 +104,7 @@ class Constant{
             const val LPM311_MODEL: Int = Bluetooth.MODEL_LPM311
             const val POCTOR_M3102_MODEL: Int = Bluetooth.MODEL_POCTOR_M3102
             const val BIOLAND_BGM_MODEL: Int = Bluetooth.MODEL_BIOLAND_BGM
+            const val ER3_MODEL: Int = Bluetooth.MODEL_ER3
             const val PATIENT_DEVICE_JSON: Int = 1004
 
             val SUPPORT_MODELS = intArrayOf(ER1_MODEL, DUOEK_MODEL, ER2_MODEL, PC80B_MODEL, BP2_MODEL,
@@ -119,7 +120,7 @@ class Constant{
                 AI_S100_MODEL, HHM1_MODEL, HHM2_MODEL, HHM3_MODEL, HHM4_MODEL, LP_ER2_MODEL, S6W_MODEL, S7W_MODEL,
                 LPM311_MODEL, POCTOR_M3102_MODEL, BIOLAND_BGM_MODEL, S7BW_MODEL, S6W1_MODEL,
                 PF_10AW_MODEL, PF_10AW1_MODEL, PF_10BW_MODEL, PF_10BW1_MODEL, PF_20AW_MODEL, PF_20B_MODEL, CHECKME_MODEL,
-                PC80B_BLE_MODEL, SP20_BLE_MODEL, PC300_BLE_MODEL
+                PC80B_BLE_MODEL, SP20_BLE_MODEL, PC300_BLE_MODEL, ER3_MODEL
             )
 
             val SUPPORT_FACES = SparseArray<Int>().apply {

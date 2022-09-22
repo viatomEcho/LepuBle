@@ -72,6 +72,11 @@ public class ByteUtils {
         return (((b1 & 0xff) << 24) + ((b2 & 0xff) << 16) + ((b3 & 0xff) << 8) + (b4 & 0xff));
     }
 
+    /**
+     * bp2波形数据转毫伏值
+     * @param bytes
+     * @return
+     */
     public static float[] bytes2mvs(byte[] bytes) {
         if (bytes == null || bytes.length <2) {
             return null;
@@ -110,5 +115,20 @@ public class ByteUtils {
         }
 
         return ints;
+    }
+
+    /**
+     * pc300原始数据转毫伏值（12bit）
+     * @param a
+     * @param b
+     * @return
+     */
+    public static float byteTomVPc300(byte a, byte b) {
+
+        int n = (a & 0xFF) + ((b & 0x0F) << 8);
+
+        float mv = (float) ((n - 2048) / (3.94 * 100));
+
+        return mv;
     }
 }

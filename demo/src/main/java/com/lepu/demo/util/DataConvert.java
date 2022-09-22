@@ -151,6 +151,14 @@ public class DataConvert {
         return dest;
     }
 
+    public static short[] getEr3ShortArray(int[] data) {
+        short[] dest = new short[data.length];
+        for (int i=0; i<dest.length; i++) {
+            dest[i] = (short) data[i];
+        }
+        return dest;
+    }
+
     /**
      * 没有滤波
      * @param data

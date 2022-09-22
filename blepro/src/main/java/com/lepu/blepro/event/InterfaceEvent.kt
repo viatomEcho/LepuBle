@@ -607,7 +607,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventLeS1NoFile = "com.lepu.ble.les1.no.file"                             // 没有文件
             const val EventLeS1ReadFileError = "com.lepu.ble.les1.read.file.error"              // 传输文件出错 true
             const val EventLeS1ReadingFileProgress = "com.lepu.ble.les1.reading.file.progress"  // 传输文件进度 int(0-100)
-            const val EventLeS1ReadFileComplete = "com.lepu.ble.les1.read.file.complete"        // 传输文件完成 LeS1BleResponse.Er1File
+            const val EventLeS1ReadFileComplete = "com.lepu.ble.les1.read.file.complete"        // 传输文件完成 LeS1BleResponse.BleFile
             const val EventLeS1Reset = "com.lepu.ble.les1.reset"                                // 复位 boolean
             const val EventLeS1ResetFactory = "com.lepu.ble.les1.reset.factory"                 // 恢复出厂设置 boolean
             const val EventLeS1SetTime = "com.lepu.ble.les1.set.time"                           // 同步时间 boolean
@@ -644,6 +644,30 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBiolandBgmCountDown = "com.lepu.ble.bioland.bgm.count.down"         // int
             const val EventBiolandBgmGluData = "com.lepu.ble.bioland.bgm.glu.data"             // BiolandBgmBleResponse.GluData
             const val EventBiolandBgmNoGluData = "com.lepu.ble.bioland.bgm.no.glu.data"        // true
+        }
+    }
+
+    /**
+     * Er3BleInterface发出的通知
+     * 包含model: MODEL_ER3
+     */
+    interface ER3 {
+        companion object {
+            const val EventEr3Info = "com.lepu.ble.er3.info"                                  // 设备信息 LepuDevice
+            const val EventEr3RtData = "com.lepu.ble.er3.rtData"                              // 实时数据 Er3BleResponse.RtData
+            const val EventEr3FileList = "com.lepu.ble.er3.fileList"                          // 文件列表 Er3BleResponse.FileList
+            const val EventEr3ReadFileError = "com.lepu.ble.er3.read.file.error"              // 传输文件出错 true
+            const val EventEr3ReadingFileProgress = "com.lepu.ble.er3.reading.file.progress"  // 传输文件进度 int(0-100)
+            const val EventEr3ReadFileComplete = "com.lepu.ble.er3.read.file.complete"        // 传输文件完成 ByteArray
+            const val EventEr3Reset = "com.lepu.ble.er3.reset"                                // 复位 boolean
+            const val EventEr3FactoryReset = "com.lepu.ble.er3.factory.reset"                 // 恢复出厂设置 boolean
+            const val EventEr3FactoryResetAll = "com.lepu.ble.er3.factory.reset.all"          // 恢复生产出厂状态 boolean
+            const val EventEr3GetConfig = "com.lepu.ble.er3.get.config"                       // 获取配置参数 int
+            const val EventEr3GetConfigError = "com.lepu.ble.er3.get.config.error"            // 获取配置参数失败 boolean
+            const val EventEr3SetConfig = "com.lepu.ble.er3.set.config"                       // 设置模式 boolean
+            const val EventEr3SetTime = "com.lepu.ble.er3.set.time"                           // 同步时间 boolean
+            const val EventEr3BurnFactoryInfo = "com.lepu.ble.er3.burn.factory.info"          // 烧录出厂信息 boolean
+            const val EventEr3BurnLockFlash = "com.lepu.ble.er3.burn.lock.flash"              // 加密Flash boolean
         }
     }
 

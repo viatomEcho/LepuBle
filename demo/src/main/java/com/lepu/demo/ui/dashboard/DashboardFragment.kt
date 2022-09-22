@@ -34,6 +34,7 @@ import com.lepu.demo.databinding.FragmentDashboardBinding
 import com.lepu.demo.util.DataConvert
 import com.lepu.demo.views.EcgBkg
 import com.lepu.demo.views.EcgView
+import com.lepu.demo.views.Er3EcgView
 import com.lepu.demo.views.OxyView
 import java.util.*
 import kotlin.math.floor
@@ -45,7 +46,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     private val viewModel: DashboardViewModel by activityViewModels()
 
     private val binding: FragmentDashboardBinding by binding()
-
+    var oxyPpgSize = 0
     var dataString = ""
 
     private var state = false
@@ -54,6 +55,32 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     // 心电产品
     private lateinit var ecgBkg: EcgBkg
     private lateinit var ecgView: EcgView
+
+    // er3
+    private lateinit var ecgBkg1: EcgBkg
+    private lateinit var ecgView1: Er3EcgView
+    private lateinit var ecgBkg2: EcgBkg
+    private lateinit var ecgView2: Er3EcgView
+    private lateinit var ecgBkg3: EcgBkg
+    private lateinit var ecgView3: Er3EcgView
+    private lateinit var ecgBkg4: EcgBkg
+    private lateinit var ecgView4: Er3EcgView
+    private lateinit var ecgBkg5: EcgBkg
+    private lateinit var ecgView5: Er3EcgView
+    private lateinit var ecgBkg6: EcgBkg
+    private lateinit var ecgView6: Er3EcgView
+    private lateinit var ecgBkg7: EcgBkg
+    private lateinit var ecgView7: Er3EcgView
+    private lateinit var ecgBkg8: EcgBkg
+    private lateinit var ecgView8: Er3EcgView
+    private lateinit var ecgBkg9: EcgBkg
+    private lateinit var ecgView9: Er3EcgView
+    private lateinit var ecgBkg10: EcgBkg
+    private lateinit var ecgView10: Er3EcgView
+    private lateinit var ecgBkg11: EcgBkg
+    private lateinit var ecgView11: Er3EcgView
+    private lateinit var ecgBkg12: EcgBkg
+    private lateinit var ecgView12: Er3EcgView
 
     // 血氧产品
     private lateinit var oxyView: OxyView
@@ -89,6 +116,47 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
             val temp = DataController.draw(5)
             viewModel.dataEcgSrc.value = DataController.feed(viewModel.dataEcgSrc.value, temp)
+        }
+    }
+    inner class Er3EcgWaveTask : Runnable {
+        override fun run() {
+            if (!mainViewModel.runWave) {
+                return
+            }
+
+            val interval: Int = when {
+                Er3DataController.dataRec.size > 250*8*2 -> {
+                    30
+                }
+                Er3DataController.dataRec.size > 150*8*2 -> {
+                    35
+                }
+                Er3DataController.dataRec.size > 75*8*2 -> {
+                    40
+                }
+                else -> {
+                    45
+                }
+            }
+
+            waveHandler.postDelayed(this, interval.toLong())
+
+            Er3DataController.draw(10)
+            /**
+             * update viewModel
+             */
+            viewModel.dataEcgSrc1.value = Er3DataController.src1
+            viewModel.dataEcgSrc2.value = Er3DataController.src2
+            viewModel.dataEcgSrc3.value = Er3DataController.src3
+            viewModel.dataEcgSrc4.value = Er3DataController.src4
+            viewModel.dataEcgSrc5.value = Er3DataController.src5
+            viewModel.dataEcgSrc6.value = Er3DataController.src6
+            viewModel.dataEcgSrc7.value = Er3DataController.src7
+            viewModel.dataEcgSrc8.value = Er3DataController.src8
+            viewModel.dataEcgSrc9.value = Er3DataController.src9
+            viewModel.dataEcgSrc10.value = Er3DataController.src10
+            viewModel.dataEcgSrc11.value = Er3DataController.src11
+            viewModel.dataEcgSrc12.value = Er3DataController.src12
         }
     }
     inner class OxyWaveTask : Runnable {
@@ -136,6 +204,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
             Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_PC80B_BLE -> waveHandler.post(EcgWaveTask())
 
+            Bluetooth.MODEL_ER3 -> waveHandler.post(Er3EcgWaveTask())
+
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
             Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
             Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
@@ -173,6 +243,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         mainViewModel.runWave = false
         DataController.clear()
         OxyDataController.clear()
+        Er3DataController.clear()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -183,6 +254,529 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         }
         initView()
         initLiveEvent()
+    }
+
+    private fun initView() {
+
+        mainViewModel.curBluetooth.observe(viewLifecycleOwner) {
+            when (it!!.modelNo) {
+                Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N,
+                Bluetooth.MODEL_HHM1, Bluetooth.MODEL_DUOEK,
+                Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
+                Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2,
+                Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C,
+                Bluetooth.MODEL_LES1 -> {
+                    binding.ecgLayout.visibility = View.VISIBLE
+                    binding.er3Layout.visibility = View.GONE
+                    binding.bpLayout.visibility = View.GONE
+                    binding.oxyLayout.visibility = View.GONE
+                    LpBleUtil.startRtTask()
+                    startWave(it.modelNo)
+                }
+                Bluetooth.MODEL_ER3 -> {
+                    binding.er3Layout.visibility = View.VISIBLE
+                    binding.ecgLayout.visibility = View.GONE
+                    binding.bpLayout.visibility = View.GONE
+                    binding.oxyLayout.visibility = View.GONE
+                    LpBleUtil.startRtTask()
+                    startWave(it.modelNo)
+                }
+                Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE -> {
+                    binding.ecgLayout.visibility = View.VISIBLE
+                    binding.er3Layout.visibility = View.GONE
+                    binding.bpLayout.visibility = View.GONE
+                    binding.oxyLayout.visibility = View.GONE
+                    startWave(it.modelNo)
+                }
+                Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LE_BP2W -> {
+                    binding.bpLayout.visibility = View.VISIBLE
+                    binding.ecgLayout.visibility = View.VISIBLE
+                    binding.er3Layout.visibility = View.GONE
+                    binding.oxyLayout.visibility = View.GONE
+                    LpBleUtil.startRtTask()
+                    startWave(it.modelNo)
+                }
+                Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+                    binding.bpLayout.visibility = View.VISIBLE
+                    binding.er3Layout.visibility = View.GONE
+                    binding.ecgLayout.visibility = View.GONE
+                    binding.oxyLayout.visibility = View.GONE
+                    LpBleUtil.startRtTask()
+                    startWave(it.modelNo)
+                }
+                Bluetooth.MODEL_BPM -> {
+                    binding.bpLayout.visibility = View.VISIBLE
+                    binding.er3Layout.visibility = View.GONE
+                    binding.ecgLayout.visibility = View.GONE
+                    binding.oxyLayout.visibility = View.GONE
+                }
+                Bluetooth.MODEL_O2RING, Bluetooth.MODEL_AI_S100,
+                Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
+                Bluetooth.MODEL_BBSM_S1, Bluetooth.MODEL_BBSM_S2,
+                Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_O2M,
+                Bluetooth.MODEL_SLEEPO2, Bluetooth.MODEL_SNOREO2,
+                Bluetooth.MODEL_WEARO2, Bluetooth.MODEL_SLEEPU,
+                Bluetooth.MODEL_OXYLINK, Bluetooth.MODEL_KIDSO2,
+                Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_OXYRING,
+                Bluetooth.MODEL_CMRING, Bluetooth.MODEL_OXYU,
+                Bluetooth.MODEL_CHECK_POD -> {
+                    binding.oxyLayout.visibility = View.VISIBLE
+                    binding.er3Layout.visibility = View.GONE
+                    binding.ecgLayout.visibility = View.GONE
+                    binding.bpLayout.visibility = View.GONE
+                    LpBleUtil.startRtTask()
+                    startWave(it.modelNo)
+                }
+                Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC_60B,
+                Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
+                Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
+                Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
+                Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
+                Bluetooth.MODEL_PC66B, Bluetooth.MODEL_AP20,
+                Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE,
+                Bluetooth.MODEL_TV221U, Bluetooth.MODEL_OXYSMART,
+                Bluetooth.MODEL_POD_1W, Bluetooth.MODEL_S5W,
+                Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
+                Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60NW,
+                Bluetooth.MODEL_S6W, Bluetooth.MODEL_S6W1,
+                Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S7W -> {
+                    binding.oxyLayout.visibility = View.VISIBLE
+                    binding.er3Layout.visibility = View.GONE
+                    binding.ecgLayout.visibility = View.GONE
+                    binding.bpLayout.visibility = View.GONE
+                    startWave(it.modelNo)
+                }
+                Bluetooth.MODEL_PC100 -> {
+                    binding.bpLayout.visibility = View.VISIBLE
+                    binding.oxyLayout.visibility = View.VISIBLE
+                    binding.er3Layout.visibility = View.GONE
+                    binding.ecgLayout.visibility = View.GONE
+                    startWave(it.modelNo)
+                }
+                Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV -> {
+                    binding.ecgLayout.visibility = View.VISIBLE
+                    binding.oxyLayout.visibility = View.VISIBLE
+                    binding.er3Layout.visibility = View.GONE
+                    binding.bpLayout.visibility = View.GONE
+                    startWave(it.modelNo)
+                }
+                Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
+                    binding.ecgLayout.visibility = View.VISIBLE
+                    binding.oxyLayout.visibility = View.VISIBLE
+                    binding.bpLayout.visibility = View.VISIBLE
+                    binding.er3Layout.visibility = View.GONE
+                    startWave(it.modelNo)
+                }
+            }
+        }
+        mainViewModel.bleState.observe(viewLifecycleOwner) {
+            it?.let {
+                if (it) {
+                    binding.bleState.setImageResource(R.mipmap.bluetooth_ok)
+                    binding.bpBleState.setImageResource(R.mipmap.bluetooth_ok)
+                    binding.oxyBleState.setImageResource(R.mipmap.bluetooth_ok)
+                    binding.er3BleState.setImageResource(R.mipmap.bluetooth_ok)
+                    binding.dashLayout.visibility = View.VISIBLE
+                } else {
+                    binding.bleState.setImageResource(R.mipmap.bluetooth_error)
+                    binding.bpBleState.setImageResource(R.mipmap.bluetooth_error)
+                    binding.oxyBleState.setImageResource(R.mipmap.bluetooth_error)
+                    binding.er3BleState.setImageResource(R.mipmap.bluetooth_error)
+                    binding.dashLayout.visibility = View.INVISIBLE
+                }
+            }
+
+        }
+        mainViewModel.battery.observe(viewLifecycleOwner) {
+            binding.bleBattery.text = "电量：$it"
+            binding.bpBleBattery.text = "电量：$it"
+            binding.oxyBleBattery.text = "电量：$it"
+            binding.er3BleBattery.text = "电量：$it"
+        }
+
+        //------------------------------ecg------------------------------
+        binding.ecgBkg.post{
+            initEcgView()
+        }
+        binding.ecgBkg12.post {
+            initEr3EcgView()
+        }
+        viewModel.ecgHr.observe(viewLifecycleOwner) {
+            if (it == 0) {
+                binding.hr.text = "?"
+            } else {
+                binding.hr.text = it.toString()
+            }
+        }
+        binding.startRtEcg.setOnClickListener {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE) {
+                LpBleUtil.startEcg(Constant.BluetoothConfig.currentModel[0])
+            }
+            LpBleUtil.startRtTask()
+        }
+        binding.stopRtEcg.setOnClickListener {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE) {
+                LpBleUtil.stopEcg(Constant.BluetoothConfig.currentModel[0])
+            }
+            LpBleUtil.stopRtTask()
+        }
+        viewModel.dataEcgSrc.observe(viewLifecycleOwner) {
+            if (this::ecgView.isInitialized) {
+                ecgView.setDataSrc(it)
+                ecgView.invalidate()
+            }
+        }
+        viewModel.dataEcgSrc1.observe(viewLifecycleOwner) {
+            if (this::ecgView1.isInitialized) {
+                ecgView1.setDataSrc(it)
+                ecgView1.invalidate()
+            }
+        }
+        viewModel.dataEcgSrc2.observe(viewLifecycleOwner) {
+            if (this::ecgView2.isInitialized) {
+                ecgView2.setDataSrc(it)
+                ecgView2.invalidate()
+            }
+        }
+        viewModel.dataEcgSrc3.observe(viewLifecycleOwner) {
+            if (this::ecgView3.isInitialized) {
+                ecgView3.setDataSrc(it)
+                ecgView3.invalidate()
+            }
+        }
+        viewModel.dataEcgSrc4.observe(viewLifecycleOwner) {
+            if (this::ecgView4.isInitialized) {
+                ecgView4.setDataSrc(it)
+                ecgView4.invalidate()
+            }
+        }
+        viewModel.dataEcgSrc5.observe(viewLifecycleOwner) {
+            if (this::ecgView5.isInitialized) {
+                ecgView5.setDataSrc(it)
+                ecgView5.invalidate()
+            }
+        }
+        viewModel.dataEcgSrc6.observe(viewLifecycleOwner) {
+            if (this::ecgView6.isInitialized) {
+                ecgView6.setDataSrc(it)
+                ecgView6.invalidate()
+            }
+        }
+        viewModel.dataEcgSrc7.observe(viewLifecycleOwner) {
+            if (this::ecgView7.isInitialized) {
+                ecgView7.setDataSrc(it)
+                ecgView7.invalidate()
+            }
+        }
+        viewModel.dataEcgSrc8.observe(viewLifecycleOwner) {
+            if (this::ecgView8.isInitialized) {
+                ecgView8.setDataSrc(it)
+                ecgView8.invalidate()
+            }
+        }
+        viewModel.dataEcgSrc9.observe(viewLifecycleOwner) {
+            if (this::ecgView9.isInitialized) {
+                ecgView9.setDataSrc(it)
+                ecgView9.invalidate()
+            }
+        }
+        viewModel.dataEcgSrc10.observe(viewLifecycleOwner) {
+            if (this::ecgView10.isInitialized) {
+                ecgView10.setDataSrc(it)
+                ecgView10.invalidate()
+            }
+        }
+        viewModel.dataEcgSrc11.observe(viewLifecycleOwner) {
+            if (this::ecgView11.isInitialized) {
+                ecgView11.setDataSrc(it)
+                ecgView11.invalidate()
+            }
+        }
+        viewModel.dataEcgSrc12.observe(viewLifecycleOwner) {
+            if (this::ecgView12.isInitialized) {
+                ecgView12.setDataSrc(it)
+                ecgView12.invalidate()
+            }
+        }
+
+        //------------------------------bp------------------------------
+        binding.startBp.setOnClickListener {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2A
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2T) {
+                LpBleUtil.startRtTask()
+            } else {
+                LpBleUtil.startBp(mainViewModel.curBluetooth.value!!.modelNo)
+            }
+        }
+        binding.stopBp.setOnClickListener {
+            LpBleUtil.stopBp(mainViewModel.curBluetooth.value!!.modelNo)
+        }
+        viewModel.ps.observe(viewLifecycleOwner) {
+            if (it == 0) {
+                binding.tvPs.text = "?"
+            } else {
+                binding.tvPs.text = it.toString()
+            }
+        }
+        viewModel.sys.observe(viewLifecycleOwner) {
+            if (it == 0) {
+                binding.tvSys.text = "?"
+            } else {
+                binding.tvSys.text = it.toString()
+            }
+        }
+        viewModel.dia.observe(viewLifecycleOwner) {
+            if (it == 0) {
+                binding.tvDia.text = "?"
+            } else {
+                binding.tvDia.text = it.toString()
+            }
+        }
+        viewModel.mean.observe(viewLifecycleOwner) {
+            if (it == 0) {
+                binding.tvMean.text = "?"
+            } else {
+                binding.tvMean.text = it.toString()
+            }
+        }
+        viewModel.bpPr.observe(viewLifecycleOwner) {
+            if (it == 0) {
+                binding.tvPrBp.text = "?"
+            } else {
+                binding.tvPrBp.text = it.toString()
+            }
+        }
+
+        //------------------------------oxy------------------------------
+        binding.oxyView.post{
+            initOxyView()
+        }
+        viewModel.oxyPr.observe(viewLifecycleOwner) {
+            if (it == 0) {
+                binding.tvPr.text = "?"
+            } else {
+                binding.tvPr.text = it.toString()
+            }
+        }
+        viewModel.spo2.observe(viewLifecycleOwner) {
+            if (it == 0) {
+                binding.tvOxy.text = "?"
+            } else {
+                binding.tvOxy.text = it.toString()
+            }
+        }
+        viewModel.pi.observe(viewLifecycleOwner) {
+            if (it == 0f) {
+                binding.tvPi.text = "?"
+            } else {
+                binding.tvPi.text = it.toString()
+            }
+        }
+        binding.startRtOxy.setOnClickListener {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CMRING
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S1
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_WEARO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPU
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SNOREO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYFIT
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYLINK
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYU
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_AI_S100
+            ) {
+                LpBleUtil.oxyGetRtParam(Constant.BluetoothConfig.currentModel[0])
+                startWave(Constant.BluetoothConfig.currentModel[0])
+            } else {
+                LpBleUtil.startRtTask()
+            }
+        }
+        binding.stopRtOxy.setOnClickListener {
+            LpBleUtil.stopRtTask()
+        }
+        viewModel.dataOxySrc.observe(viewLifecycleOwner) {
+            if (this::oxyView.isInitialized) {
+                oxyView.setDataSrc(it)
+                oxyView.invalidate()
+
+            }
+        }
+
+        binding.enableRtOxy.setOnClickListener {
+            Constant.BluetoothConfig.currentModel[0].let {
+                when (it) {
+                    Bluetooth.MODEL_AP20 -> {
+                        LpBleUtil.enableRtData(it, type, state)
+                        type++
+                        if (type > Ap20BleCmd.EnableType.BREATH_WAVE) {
+                            type = Ap20BleCmd.EnableType.OXY_PARAM
+                            state = !state
+                        }
+                    }
+                    Bluetooth.MODEL_SP20, Bluetooth.MODEL_PC60FW,
+                    Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
+                    Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
+                    Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
+                    Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
+                    Bluetooth.MODEL_PC66B, Bluetooth.MODEL_POD_1W,
+                    Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
+                    Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60B,
+                    Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_S5W,
+                    Bluetooth.MODEL_S6W, Bluetooth.MODEL_S7W,
+                    Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S6W1,
+                    Bluetooth.MODEL_SP20_BLE -> {
+                        LpBleUtil.enableRtData(it, type, state)
+                        type++
+                        if (type > Sp20BleCmd.EnableType.OXY_WAVE) {
+                            type = Sp20BleCmd.EnableType.OXY_PARAM
+                            state = !state
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun initEcgView() {
+        // cal screen
+        val dm =resources.displayMetrics
+        // 最多可以画多少点=屏幕宽度像素/每英寸像素*25.4mm/25mm/s走速*125个点/s
+        val index = floor(binding.ecgBkg.width / dm.xdpi * 25.4 / 25 * 125).toInt()
+        DataController.maxIndex = index
+
+        // 每像素占多少mm=每英寸长25.4mm/每英寸像素
+        val mm2px = 25.4f / dm.xdpi
+        DataController.mm2px = mm2px
+
+        binding.ecgBkg.measure(0, 0)
+        ecgBkg = EcgBkg(context)
+        binding.ecgBkg.addView(ecgBkg)
+        binding.ecgView.measure(0, 0)
+        ecgView = EcgView(context)
+        binding.ecgView.addView(ecgView)
+    }
+
+    private fun initEr3EcgView() {
+        // cal screen
+        val dm =resources.displayMetrics
+        // 最多可以画多少点=屏幕宽度像素/每英寸像素*25.4mm/25mm/s走速*125个点/s
+        val index = floor(binding.ecgBkg1.width / dm.xdpi * 25.4 / 25 * 250).toInt()
+        Er3DataController.maxIndex = index
+
+        // 每像素占多少mm=每英寸长25.4mm/每英寸像素
+        val mm2px = 25.4f / dm.xdpi
+        Er3DataController.mm2px = mm2px
+
+        binding.ecgBkg1.measure(0, 0)
+        ecgBkg1 = EcgBkg(context)
+        binding.ecgBkg1.addView(ecgBkg1)
+        binding.ecgView1.measure(0, 0)
+        ecgView1 = Er3EcgView(context)
+        binding.ecgView1.addView(ecgView1)
+
+        binding.ecgBkg2.measure(0, 0)
+        ecgBkg2 = EcgBkg(context)
+        binding.ecgBkg2.addView(ecgBkg2)
+        binding.ecgView2.measure(0, 0)
+        ecgView2 = Er3EcgView(context)
+        binding.ecgView2.addView(ecgView2)
+
+        binding.ecgBkg3.measure(0, 0)
+        ecgBkg3 = EcgBkg(context)
+        binding.ecgBkg3.addView(ecgBkg3)
+        binding.ecgView3.measure(0, 0)
+        ecgView3 = Er3EcgView(context)
+        binding.ecgView3.addView(ecgView3)
+
+        binding.ecgBkg4.measure(0, 0)
+        ecgBkg4 = EcgBkg(context)
+        binding.ecgBkg4.addView(ecgBkg4)
+        binding.ecgView4.measure(0, 0)
+        ecgView4 = Er3EcgView(context)
+        binding.ecgView4.addView(ecgView4)
+
+        binding.ecgBkg5.measure(0, 0)
+        ecgBkg5 = EcgBkg(context)
+        binding.ecgBkg5.addView(ecgBkg5)
+        binding.ecgView5.measure(0, 0)
+        ecgView5 = Er3EcgView(context)
+        binding.ecgView5.addView(ecgView5)
+
+        binding.ecgBkg6.measure(0, 0)
+        ecgBkg6 = EcgBkg(context)
+        binding.ecgBkg6.addView(ecgBkg6)
+        binding.ecgView6.measure(0, 0)
+        ecgView6 = Er3EcgView(context)
+        binding.ecgView6.addView(ecgView6)
+
+        binding.ecgBkg7.measure(0, 0)
+        ecgBkg7 = EcgBkg(context)
+        binding.ecgBkg7.addView(ecgBkg7)
+        binding.ecgView7.measure(0, 0)
+        ecgView7 = Er3EcgView(context)
+        binding.ecgView7.addView(ecgView7)
+
+        binding.ecgBkg8.measure(0, 0)
+        ecgBkg8 = EcgBkg(context)
+        binding.ecgBkg8.addView(ecgBkg8)
+        binding.ecgView8.measure(0, 0)
+        ecgView8 = Er3EcgView(context)
+        binding.ecgView8.addView(ecgView8)
+
+        binding.ecgBkg9.measure(0, 0)
+        ecgBkg9 = EcgBkg(context)
+        binding.ecgBkg9.addView(ecgBkg9)
+        binding.ecgView9.measure(0, 0)
+        ecgView9 = Er3EcgView(context)
+        binding.ecgView9.addView(ecgView9)
+
+        binding.ecgBkg10.measure(0, 0)
+        ecgBkg10 = EcgBkg(context)
+        binding.ecgBkg10.addView(ecgBkg10)
+        binding.ecgView10.measure(0, 0)
+        ecgView10 = Er3EcgView(context)
+        binding.ecgView10.addView(ecgView10)
+
+        binding.ecgBkg11.measure(0, 0)
+        ecgBkg11 = EcgBkg(context)
+        binding.ecgBkg11.addView(ecgBkg11)
+        binding.ecgView11.measure(0, 0)
+        ecgView11 = Er3EcgView(context)
+        binding.ecgView11.addView(ecgView11)
+
+        binding.ecgBkg12.measure(0, 0)
+        ecgBkg12 = EcgBkg(context)
+        binding.ecgBkg12.addView(ecgBkg12)
+        binding.ecgView12.measure(0, 0)
+        ecgView12 = Er3EcgView(context)
+        binding.ecgView12.addView(ecgView12)
+    }
+
+    private fun initOxyView() {
+        // cal screen
+        val dm = resources.displayMetrics
+        val index = floor(binding.oxyView.width / dm.xdpi * 25.4 / 25 * 125).toInt()
+        OxyDataController.maxIndex = index
+
+        val mm2px = 25.4f / dm.xdpi
+        OxyDataController.mm2px = mm2px
+
+//        LogUtils.d("max index: $index", "mm2px: $mm2px")
+
+        binding.oxyView.measure(0, 0)
+        oxyView = OxyView(context)
+        binding.oxyView.addView(oxyView)
+
+        viewModel.dataOxySrc.value = OxyDataController.iniDataSrc(index)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -989,343 +1583,80 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val data = it.data as Boolean
                 Toast.makeText(context, "没有文件", Toast.LENGTH_SHORT).show()
             }
-    }
-
-    var oxyPpgSize = 0
-
-    private fun initView() {
-
-        mainViewModel.curBluetooth.observe(viewLifecycleOwner) {
-            when (it!!.modelNo) {
-                Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N,
-                Bluetooth.MODEL_HHM1, Bluetooth.MODEL_DUOEK,
-                Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
-                Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2,
-                Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C,
-                Bluetooth.MODEL_LES1 -> {
-                    binding.ecgLayout.visibility = View.VISIBLE
-                    binding.bpLayout.visibility = View.GONE
-                    binding.oxyLayout.visibility = View.GONE
-                    LpBleUtil.startRtTask()
-                    startWave(it.modelNo)
-                }
-                Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE -> {
-                    binding.ecgLayout.visibility = View.VISIBLE
-                    binding.bpLayout.visibility = View.GONE
-                    binding.oxyLayout.visibility = View.GONE
-                    startWave(it.modelNo)
-                }
-                Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LE_BP2W -> {
-                    binding.bpLayout.visibility = View.VISIBLE
-                    binding.ecgLayout.visibility = View.VISIBLE
-                    binding.oxyLayout.visibility = View.GONE
-                    LpBleUtil.startRtTask()
-                    startWave(it.modelNo)
-                }
-                Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
-                    binding.bpLayout.visibility = View.VISIBLE
-                    binding.ecgLayout.visibility = View.GONE
-                    binding.oxyLayout.visibility = View.GONE
-                    LpBleUtil.startRtTask()
-                    startWave(it.modelNo)
-                }
-                Bluetooth.MODEL_BPM -> {
-                    binding.bpLayout.visibility = View.VISIBLE
-                    binding.ecgLayout.visibility = View.GONE
-                    binding.oxyLayout.visibility = View.GONE
-                }
-                Bluetooth.MODEL_O2RING, Bluetooth.MODEL_AI_S100,
-                Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
-                Bluetooth.MODEL_BBSM_S1, Bluetooth.MODEL_BBSM_S2,
-                Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_O2M,
-                Bluetooth.MODEL_SLEEPO2, Bluetooth.MODEL_SNOREO2,
-                Bluetooth.MODEL_WEARO2, Bluetooth.MODEL_SLEEPU,
-                Bluetooth.MODEL_OXYLINK, Bluetooth.MODEL_KIDSO2,
-                Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_OXYRING,
-                Bluetooth.MODEL_CMRING, Bluetooth.MODEL_OXYU,
-                Bluetooth.MODEL_CHECK_POD -> {
-                    binding.oxyLayout.visibility = View.VISIBLE
-                    binding.ecgLayout.visibility = View.GONE
-                    binding.bpLayout.visibility = View.GONE
-                    LpBleUtil.startRtTask()
-                    startWave(it.modelNo)
-                }
-                Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC_60B,
-                Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
-                Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
-                Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
-                Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
-                Bluetooth.MODEL_PC66B, Bluetooth.MODEL_AP20,
-                Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE,
-                Bluetooth.MODEL_TV221U, Bluetooth.MODEL_OXYSMART,
-                Bluetooth.MODEL_POD_1W, Bluetooth.MODEL_S5W,
-                Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
-                Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60NW,
-                Bluetooth.MODEL_S6W, Bluetooth.MODEL_S6W1,
-                Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S7W -> {
-                    binding.oxyLayout.visibility = View.VISIBLE
-                    binding.ecgLayout.visibility = View.GONE
-                    binding.bpLayout.visibility = View.GONE
-                    startWave(it.modelNo)
-                }
-                Bluetooth.MODEL_PC100 -> {
-                    binding.bpLayout.visibility = View.VISIBLE
-                    binding.oxyLayout.visibility = View.VISIBLE
-                    binding.ecgLayout.visibility = View.GONE
-                    startWave(it.modelNo)
-                }
-                Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV -> {
-                    binding.ecgLayout.visibility = View.VISIBLE
-                    binding.oxyLayout.visibility = View.VISIBLE
-                    binding.bpLayout.visibility = View.GONE
-                    startWave(it.modelNo)
-                }
-                Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
-                    binding.ecgLayout.visibility = View.VISIBLE
-                    binding.oxyLayout.visibility = View.VISIBLE
-                    binding.bpLayout.visibility = View.VISIBLE
-                    startWave(it.modelNo)
-                }
+        //------------------------------ER3--------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3RtData)
+            .observe(this) {
+                val data = it.data as Er3BleResponse.RtData
+                Er3DataController.receive(data.wave.waveMvs)
+                Log.d("Er3Test", "data.wave.waveMvs.size ${data.wave.waveMvs.size}")
+                mainViewModel._battery.value = "${data.param.battery} %"
+                binding.deviceInfo.text = "心率：${data.param.hr} bpm\n" +
+                        "体温：${data.param.temp} ℃\n" +
+                        "血氧：${data.param.spo2} %\n" +
+                        "pi：${data.param.pi} %\n" +
+                        "脉率：${data.param.pr}\n" +
+                        "呼吸率：${data.param.respRate}\n" +
+                        "电池状态${data.param.batteryStatus}：${
+                            when (data.param.batteryStatus) {
+                                0 -> "正常使用"
+                                1 -> "充电中"
+                                2 -> "充满"
+                                3 -> "低电量"
+                                else -> ""
+                            }
+                        }\n" +
+                        "心电导联线状态：${data.param.isInsertEcgLeadWire}\n" +
+                        "血氧状态${data.param.oxyStatus}：${
+                            when (data.param.oxyStatus) {
+                                0 -> "未接入血氧"
+                                1 -> "血氧状态正常"
+                                2 -> "血氧手指脱落"
+                                3 -> "探头故障"
+                                else -> ""
+                            }
+                        }\n" +
+                        "体温状态：${data.param.isInsertTemp}\n" +
+                        "测量状态${data.param.measureStatus}：${
+                            when (data.param.measureStatus) {
+                                0 -> "空闲"
+                                1 -> "准备状态"
+                                2 -> "正式测量状态"
+                                else -> ""
+                            }
+                        }\n" +
+                        "测量中是否有配置设备：${data.param.isHasDevice}\n" +
+                        "测量中是否有配置体温设备：${data.param.isHasTemp}\n" +
+                        "测量中是否有配置血氧设备：${data.param.isHasOxy}\n" +
+                        "测量中是否有配置呼吸设备：${data.param.isHasRespRate}\n" +
+                        "已记录时长：${data.param.recordTime}\n" +
+                        "开始测量时间：${data.param.year}-${data.param.month}-${data.param.day} ${data.param.hour}:${data.param.minute}:${data.param.second}\n" +
+                        "导联类型${data.param.leadType}：${
+                            when (data.param.leadType) {
+                                0 -> "LEAD_12，12导"
+                                1 -> "LEAD_6，6导"
+                                2 -> "LEAD_5，5导"
+                                3 -> "LEAD_3，3导"
+                                4 -> "LEAD_3_TEMP，3导带体温"
+                                5 -> "LEAD_3_LEG，3导胸贴"
+                                6 -> "LEAD_5_LEG，5导胸贴"
+                                else -> ""
+                            }
+                        }\n" +
+                        "一次性导联的sn：${data.param.leadSn}\n" +
+                        "I导联脱落：${data.param.isLeadOffI}\n" +
+                        "II导联脱落：${data.param.isLeadOffII}\n" +
+                        "III导联脱落：${data.param.isLeadOffIII}\n" +
+                        "aVR导联脱落：${data.param.isLeadOffaVR}\n" +
+                        "aVL导联脱落：${data.param.isLeadOffaVL}\n" +
+                        "aVF导联脱落：${data.param.isLeadOffaVF}\n" +
+                        "V1导联脱落：${data.param.isLeadOffV1}\n" +
+                        "V2导联脱落：${data.param.isLeadOffV2}\n" +
+                        "V3导联脱落：${data.param.isLeadOffV3}\n" +
+                        "V4导联脱落：${data.param.isLeadOffV4}\n" +
+                        "V5导联脱落：${data.param.isLeadOffV5}\n" +
+                        "V6导联脱落：${data.param.isLeadOffV6}\n" +
+                        "${data.param}"
             }
-        }
-        mainViewModel.bleState.observe(viewLifecycleOwner) {
-            it?.let {
-                if (it) {
-                    binding.bleState.setImageResource(R.mipmap.bluetooth_ok)
-                    binding.bpBleState.setImageResource(R.mipmap.bluetooth_ok)
-                    binding.oxyBleState.setImageResource(R.mipmap.bluetooth_ok)
-                    binding.dashLayout.visibility = View.VISIBLE
-                } else {
-                    binding.bleState.setImageResource(R.mipmap.bluetooth_error)
-                    binding.bpBleState.setImageResource(R.mipmap.bluetooth_error)
-                    binding.oxyBleState.setImageResource(R.mipmap.bluetooth_error)
-                    binding.dashLayout.visibility = View.INVISIBLE
-                }
-            }
-
-        }
-        mainViewModel.battery.observe(viewLifecycleOwner) {
-            binding.bleBattery.text = "电量：$it"
-            binding.bpBleBattery.text = "电量：$it"
-            binding.oxyBleBattery.text = "电量：$it"
-        }
-
-        //------------------------------ecg------------------------------
-        binding.ecgBkg.post{
-            initEcgView()
-        }
-        viewModel.ecgHr.observe(viewLifecycleOwner) {
-            if (it == 0) {
-                binding.hr.text = "?"
-            } else {
-                binding.hr.text = it.toString()
-            }
-        }
-        binding.startRtEcg.setOnClickListener {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE) {
-                LpBleUtil.startEcg(Constant.BluetoothConfig.currentModel[0])
-            }
-            LpBleUtil.startRtTask()
-        }
-        binding.stopRtEcg.setOnClickListener {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE) {
-                LpBleUtil.stopEcg(Constant.BluetoothConfig.currentModel[0])
-            }
-            LpBleUtil.stopRtTask()
-        }
-        viewModel.dataEcgSrc.observe(viewLifecycleOwner) {
-            if (this::ecgView.isInitialized) {
-                ecgView.setDataSrc(it)
-                ecgView.invalidate()
-            }
-        }
-
-        //------------------------------bp------------------------------
-        binding.startBp.setOnClickListener {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2A
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2T) {
-                LpBleUtil.startRtTask()
-            } else {
-                LpBleUtil.startBp(mainViewModel.curBluetooth.value!!.modelNo)
-            }
-        }
-        binding.stopBp.setOnClickListener {
-            LpBleUtil.stopBp(mainViewModel.curBluetooth.value!!.modelNo)
-        }
-        viewModel.ps.observe(viewLifecycleOwner) {
-            if (it == 0) {
-                binding.tvPs.text = "?"
-            } else {
-                binding.tvPs.text = it.toString()
-            }
-        }
-        viewModel.sys.observe(viewLifecycleOwner) {
-            if (it == 0) {
-                binding.tvSys.text = "?"
-            } else {
-                binding.tvSys.text = it.toString()
-            }
-        }
-        viewModel.dia.observe(viewLifecycleOwner) {
-            if (it == 0) {
-                binding.tvDia.text = "?"
-            } else {
-                binding.tvDia.text = it.toString()
-            }
-        }
-        viewModel.mean.observe(viewLifecycleOwner) {
-            if (it == 0) {
-                binding.tvMean.text = "?"
-            } else {
-                binding.tvMean.text = it.toString()
-            }
-        }
-        viewModel.bpPr.observe(viewLifecycleOwner) {
-            if (it == 0) {
-                binding.tvPrBp.text = "?"
-            } else {
-                binding.tvPrBp.text = it.toString()
-            }
-        }
-
-        //------------------------------oxy------------------------------
-        binding.oxyView.post{
-            initOxyView()
-        }
-        viewModel.oxyPr.observe(viewLifecycleOwner) {
-            if (it == 0) {
-                binding.tvPr.text = "?"
-            } else {
-                binding.tvPr.text = it.toString()
-            }
-        }
-        viewModel.spo2.observe(viewLifecycleOwner) {
-            if (it == 0) {
-                binding.tvOxy.text = "?"
-            } else {
-                binding.tvOxy.text = it.toString()
-            }
-        }
-        viewModel.pi.observe(viewLifecycleOwner) {
-            if (it == 0f) {
-                binding.tvPi.text = "?"
-            } else {
-                binding.tvPi.text = it.toString()
-            }
-        }
-        binding.startRtOxy.setOnClickListener {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CMRING
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S1
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKO2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_WEARO2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPU
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPO2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SNOREO2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYFIT
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYLINK
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYU
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_AI_S100
-            ) {
-                LpBleUtil.oxyGetRtParam(Constant.BluetoothConfig.currentModel[0])
-                startWave(Constant.BluetoothConfig.currentModel[0])
-            } else {
-                LpBleUtil.startRtTask()
-            }
-        }
-        binding.stopRtOxy.setOnClickListener {
-            LpBleUtil.stopRtTask()
-        }
-        viewModel.dataOxySrc.observe(viewLifecycleOwner) {
-            if (this::oxyView.isInitialized) {
-                oxyView.setDataSrc(it)
-                oxyView.invalidate()
-
-            }
-        }
-
-        binding.enableRtOxy.setOnClickListener {
-            Constant.BluetoothConfig.currentModel[0].let {
-                when (it) {
-                    Bluetooth.MODEL_AP20 -> {
-                        LpBleUtil.enableRtData(it, type, state)
-                        type++
-                        if (type > Ap20BleCmd.EnableType.BREATH_WAVE) {
-                            type = Ap20BleCmd.EnableType.OXY_PARAM
-                            state = !state
-                        }
-                    }
-                    Bluetooth.MODEL_SP20, Bluetooth.MODEL_PC60FW,
-                    Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
-                    Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
-                    Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
-                    Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
-                    Bluetooth.MODEL_PC66B, Bluetooth.MODEL_POD_1W,
-                    Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
-                    Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60B,
-                    Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_S5W,
-                    Bluetooth.MODEL_S6W, Bluetooth.MODEL_S7W,
-                    Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S6W1,
-                    Bluetooth.MODEL_SP20_BLE -> {
-                        LpBleUtil.enableRtData(it, type, state)
-                        type++
-                        if (type > Sp20BleCmd.EnableType.OXY_WAVE) {
-                            type = Sp20BleCmd.EnableType.OXY_PARAM
-                            state = !state
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun initEcgView() {
-        // cal screen
-        val dm =resources.displayMetrics
-        // 最多可以画多少点=屏幕宽度像素/每英寸像素*25.4mm/25mm/s走速*125个点/s
-        val index = floor(binding.ecgBkg.width / dm.xdpi * 25.4 / 25 * 125).toInt()
-        DataController.maxIndex = index
-
-        // 每像素占多少mm=每英寸长25.4mm/每英寸像素
-        val mm2px = 25.4f / dm.xdpi
-        DataController.mm2px = mm2px
-
-//        LepuBleLog.d("max index: $index", "mm2px: $mm2px")
-
-        binding.ecgBkg.measure(0, 0)
-        ecgBkg = EcgBkg(context)
-        binding.ecgBkg.addView(ecgBkg)
-
-        binding.ecgView.measure(0, 0)
-        ecgView = EcgView(context)
-        binding.ecgView.addView(ecgView)
-
-    }
-
-    private fun initOxyView() {
-        // cal screen
-        val dm = resources.displayMetrics
-        val index = floor(binding.oxyView.width / dm.xdpi * 25.4 / 25 * 125).toInt()
-        OxyDataController.maxIndex = index
-
-        val mm2px = 25.4f / dm.xdpi
-        OxyDataController.mm2px = mm2px
-
-//        LogUtils.d("max index: $index", "mm2px: $mm2px")
-
-        binding.oxyView.measure(0, 0)
-        oxyView = OxyView(context)
-        binding.oxyView.addView(oxyView)
-
-        viewModel.dataOxySrc.value = OxyDataController.iniDataSrc(index)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

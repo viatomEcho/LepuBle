@@ -1014,6 +1014,12 @@ class LpBleUtil {
             BleServiceHelper.lemMassageTime(model, time)
         }
 
+        fun er3SetConfig(model: Int, mode: Int) {
+            BleServiceHelper.er3SetConfig(model, mode)
+        }
+        fun er3GetConfig(model: Int) {
+            BleServiceHelper.er3GetConfig(model)
+        }
 
     }
 

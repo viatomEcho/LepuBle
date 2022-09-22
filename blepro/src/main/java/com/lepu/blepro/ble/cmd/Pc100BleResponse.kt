@@ -25,7 +25,7 @@ object Pc100BleResponse {
     @Parcelize
     @ExperimentalUnsignedTypes
     class DeviceInfo constructor(var bytes: ByteArray) : Parcelable {
-        var softwareV: String  // 软件版本
+        var softwareV: String  // 固件版本
         var hardwareV: String  // 硬件版本
         var batLevel: Int      // 电量等级
         var batStatus: Int     // 充电状态
@@ -195,7 +195,7 @@ object Pc100BleResponse {
     class BoStatus constructor(var bytes: ByteArray) : Parcelable {
         var status: Int         // 状态
         var statusMess: String  // 状态
-        var sw_ver: String      // 血氧软件版本号
+        var sw_ver: String      // 血氧固件版本号
         var hw_ver: String      // 血氧硬件版本号
 
         // status：测量状态，包括以下3种状态。
@@ -295,7 +295,7 @@ object Pc100BleResponse {
     @ExperimentalUnsignedTypes
     class BsStatus constructor(var bytes: ByteArray) : Parcelable {
         var status: Int     // 状态
-        var sw_ver: String  // 血糖软件版本号
+        var sw_ver: String  // 血糖固件版本号
         var hw_ver: String  // 血糖硬件版本号
 
         // status：测量状态，包括以下3种状态。
@@ -334,7 +334,7 @@ object Pc100BleResponse {
     @ExperimentalUnsignedTypes
     class BtStatus constructor(var bytes: ByteArray) : Parcelable {
         var status: Int     // 状态
-        var sw_ver: String  // 体温软件版本号
+        var sw_ver: String  // 体温固件版本号
         var hw_ver: String  // 体温硬件版本号
 
         // status：测量状态，包括以下3种状态。

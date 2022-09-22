@@ -28,6 +28,9 @@ import kotlin.experimental.inv
  * 7.获取文件列表
  * 8.下载文件内容
  * 9.恢复出厂设置
+ * 心电采样率：实时250HZ，存储125HZ
+ * 血压采样率：实时50HZ，存储50HZ
+ * 心电增益：n * 0.003098-----322.7888960619755倍
  */
 class Bp2BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Bp2BleInterface"

@@ -21,13 +21,13 @@ import kotlin.experimental.inv
  * 4.获取列表
  * 5.下载文件内容
  * 6.恢复出厂设置
- * 7.获取/配置参数
+ * 7.获取/配置模式
  * 8.烧录
- * 心电采样率：实时125HZ，存储125HZ
- * 心电增益：n * (1.0035 * 1800) / (4096 * 178.74) = n * 0.0024672217239426-----405.3142002989537倍
+ * 心电采样率：实时250HZ，存储250HZ
+ * 心电增益：n * 0.00244140625-----409.6倍
  */
-class Er1BleInterface(model: Int): BleInterface(model) {
-    private val tag: String = "Er1BleInterface"
+class Er3BleInterface(model: Int): BleInterface(model) {
+    private val tag: String = "Er3BleInterface"
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = Er1BleManager(context)
@@ -48,98 +48,84 @@ class Er1BleInterface(model: Int): BleInterface(model) {
      * download a file, name come from filelist
      */
     var curFileName: String? = null
-    var curFile: Er1BleResponse.Er1File? = null
-    var fileList: Er1BleResponse.Er1FileList? = null
+    var curFile: Er3BleResponse.Er3File? = null
     private var userId: String? = null
 
     @ExperimentalUnsignedTypes
-    private fun onResponseReceived(response: Er1BleResponse.Er1Response) {
+    private fun onResponseReceived(response: Er3BleResponse.BleResponse) {
         LepuBleLog.d(tag, "onResponseReceived cmd: ${response.cmd}, bytes: ${bytesToHex(response.bytes)}")
         when(response.cmd) {
-            Er1BleCmd.GET_INFO -> {
+            Er3BleCmd.GET_INFO -> {
                 val info = LepuDevice(response.content)
-
-                LepuBleLog.d(tag, "model:$model,GET_INFO => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1Info).post(InterfaceEvent(model, info))
-                // 本版本注释，测试通过后删除
-                /*if (runRtImmediately){
-                    runRtTask()
-                    runRtImmediately = false
-                }*/
-
+                LepuBleLog.d(tag, "model:$model,GET_INFO => success $info")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3Info).post(InterfaceEvent(model, info))
             }
 
-            Er1BleCmd.RT_DATA -> {
-                val rtData = Er1BleResponse.RtData(response.content)
-
-                Er1DataController.receive(rtData.wave.wFs)
+            Er3BleCmd.RT_DATA -> {
+                val rtData = Er3BleResponse.RtData(response.content)
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1RtData).post(InterfaceEvent(model, rtData))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3RtData).post(InterfaceEvent(model, rtData))
             }
 
-            Er1BleCmd.READ_FILE_LIST -> {
-                fileList = Er1BleResponse.Er1FileList(response.content)
-                LepuBleLog.d(tag, "model:$model,READ_FILE_LIST => success, ${fileList.toString()}")
-                fileList?.let {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1FileList).post(InterfaceEvent(model,it.toString()))
-                }
-
+            Er3BleCmd.READ_FILE_LIST -> {
+                val fileList = Er3BleResponse.FileList(response.content)
+                LepuBleLog.d(tag, "model:$model,READ_FILE_LIST => success, $fileList")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FileList).post(InterfaceEvent(model,fileList))
             }
 
-            Er1BleCmd.READ_FILE_START -> {
+            Er3BleCmd.READ_FILE_START -> {
                 //检查当前的下载状态
                 if (isCancelRF || isPausedRF) {
-                    sendCmd(Er1BleCmd.readFileEnd())
+                    sendCmd(Er3BleCmd.readFileEnd())
                     LepuBleLog.d(tag, "READ_FILE_START isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
                     return
                 }
 
                 if (response.pkgType == 0x01.toByte()) {
-                    curFile =  curFileName?.let {
-                        Er1BleResponse.Er1File(model, it, toUInt(response.content), userId!!, offset)
+                    curFile = curFileName?.let {
+                        Er3BleResponse.Er3File(model, it, toUInt(response.content), userId!!, offset)
                     }
-                    sendCmd( Er1BleCmd.readFileData(offset))
+                    sendCmd(Er3BleCmd.readFileData(offset))
                 } else {
                     LepuBleLog.d(tag, "read file failed：${response.pkgType}")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileError).post(InterfaceEvent(model, true))
-
                 }
             }
 
-            Er1BleCmd.READ_FILE_DATA -> {
+            Er3BleCmd.READ_FILE_DATA -> {
                 curFile?.apply {
 
-                    LepuBleLog.d(tag, "READ_FILE_DATA: paused = $isPausedRF, cancel = $isCancelRF, offset =  ${offset}, index = ${this.index}")
+                    LepuBleLog.d(tag, "READ_FILE_DATA: paused = $isPausedRF, cancel = $isCancelRF, offset = ${offset}, index = ${this.index}")
 
                     //检查当前的下载状态
                     if (isCancelRF || isPausedRF) {
-                        sendCmd(Er1BleCmd.readFileEnd())
+                        sendCmd(Er3BleCmd.readFileEnd())
                         LepuBleLog.d(tag, "READ_FILE_DATA isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
                         return
                     }
 
                     this.addContent(response.content)
-                    LepuBleLog.d(tag, "read file：${this.fileName}   => ${this.index } / ${this.fileSize}")
                     val nowSize: Long = (this.index).toLong()
-                    val size :Long= nowSize * 1000
+                    val size :Long= nowSize * 100
                     val poSize :Int= (size).div(this.fileSize).toInt()
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadingFileProgress).post(InterfaceEvent(model,poSize))
+                    LepuBleLog.d(tag, "read file：${this.fileName} => ${this.index } / ${this.fileSize} poSize : $poSize")
 
-                    if (this.index  < this.fileSize) {
-                        sendCmd(Er1BleCmd.readFileData(this.index)) // 每次读的偏移量，相对于文件总长度的
+                    if (this.index < this.fileSize) {
+                        sendCmd(Er3BleCmd.readFileData(this.index)) // 每次读的偏移量，相对于文件总长度的
                     } else {
-                        sendCmd(Er1BleCmd.readFileEnd())
+                        sendCmd(Er3BleCmd.readFileEnd())
                     }
                 }
             }
 
-            Er1BleCmd.READ_FILE_END -> {
+            Er3BleCmd.READ_FILE_END -> {
                 LepuBleLog.d(tag, "read file finished: ${curFile?.fileName} ==> ${curFile?.fileSize}")
                 LepuBleLog.d(tag, "read file finished: isCancel = $isCancelRF, isPause = $isPausedRF")
 
                 curFileName = null// 一定要放在发通知之前
                 curFile?.let {
-                    if (it.index < it.fileSize ){
+                    if (it.index < it.fileSize){
                         if ((isCancelRF || isPausedRF) ) {
                             LepuBleLog.d(tag, "READ_FILE_END isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
                             return
@@ -147,73 +133,73 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                     }else {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileComplete).post(InterfaceEvent(model, it))
                     }
-                }?: LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
+                }?: LepuBleLog.d(tag, "READ_FILE_END model:$model, curFile error!!")
                 curFile = null
             }
-            Er1BleCmd.VIBRATE_CONFIG -> {
+            Er3BleCmd.GET_CONFIG -> {
                 if (response.pkgType != 0x01.toByte()) {
-                    LepuBleLog.d(tag, "model:$model,VIBRATE_CONFIG => error")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1GetConfigError).post(InterfaceEvent(model, true))
+                    LepuBleLog.d(tag, "model:$model,GET_CONFIG => error")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3GetConfigError).post(InterfaceEvent(model, true))
                     return
                 }
-                LepuBleLog.d(tag, "model:$model,VIBRATE_CONFIG => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1VibrateConfig).post(InterfaceEvent(model, response.content))
+                LepuBleLog.d(tag, "model:$model,GET_CONFIG => success")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3GetConfig).post(InterfaceEvent(model, toUInt(response.content)))
 
             }
-            Er1BleCmd.SET_VIBRATE_STATE -> {
-                LepuBleLog.d(tag, "model:$model,SET_SWITCHER_STATE => success")
+            Er3BleCmd.SET_CONFIG -> {
+                LepuBleLog.d(tag, "model:$model,SET_CONFIG => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetSwitcherState).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3SetConfig).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetSwitcherState).post(InterfaceEvent(model, false))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3SetConfig).post(InterfaceEvent(model, false))
                 }
             }
 
-            Er1BleCmd.RESET -> {
+            Er3BleCmd.RESET -> {
                 LepuBleLog.d(tag, "model:$model,RESET => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1Reset).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3Reset).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1Reset).post(InterfaceEvent(model, false))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3Reset).post(InterfaceEvent(model, false))
                 }
             }
 
-            Er1BleCmd.FACTORY_RESET -> {
+            Er3BleCmd.FACTORY_RESET -> {
                 LepuBleLog.d(tag, "model:$model,CMD_FACTORY_RESET => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ResetFactory).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FactoryReset).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ResetFactory).post(InterfaceEvent(model, false))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FactoryReset).post(InterfaceEvent(model, false))
                 }
             }
 
-            Er1BleCmd.FACTORY_RESET_ALL -> {
+            Er3BleCmd.FACTORY_RESET_ALL -> {
                 LepuBleLog.d(tag, "model:$model,FACTORY_RESET_ALL => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ResetFactoryAll).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FactoryResetAll).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ResetFactoryAll).post(InterfaceEvent(model, false))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FactoryResetAll).post(InterfaceEvent(model, false))
                 }
             }
-            Er1BleCmd.SET_TIME -> {
+            Er3BleCmd.SET_TIME -> {
                 LepuBleLog.d(tag, "model:$model,SET_TIME => success")
 
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetTime).post(InterfaceEvent(model, true))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3SetTime).post(InterfaceEvent(model, true))
             }
-            Er1BleCmd.BURN_FACTORY_INFO -> {
+            Er3BleCmd.BURN_FACTORY_INFO -> {
                 LepuBleLog.d(tag, "model:$model,BURN_FACTORY_INFO => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnFactoryInfo).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3BurnFactoryInfo).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnFactoryInfo).post(InterfaceEvent(model, false))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3BurnFactoryInfo).post(InterfaceEvent(model, false))
                 }
             }
-            Er1BleCmd.BURN_LOCK_FLASH -> {
+            Er3BleCmd.BURN_LOCK_FLASH -> {
                 LepuBleLog.d(tag, "model:$model,BURN_LOCK_FLASH => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnLockFlash).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3BurnLockFlash).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnLockFlash).post(InterfaceEvent(model, false))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3BurnLockFlash).post(InterfaceEvent(model, false))
                 }
             }
         }
@@ -241,7 +227,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
             val temp: ByteArray = bytes.copyOfRange(i, i+8+len)
             if (temp.last() == BleCRC.calCRC8(temp)) {
-                val bleResponse = Er1BleResponse.Er1Response(temp)
+                val bleResponse = Er3BleResponse.BleResponse(temp)
 //                LepuBleLog.d(TAG, "get response: ${temp.toHex()}" )
                 onResponseReceived(bleResponse)
 
@@ -258,27 +244,27 @@ class Er1BleInterface(model: Int): BleInterface(model) {
      * get device info
      */
     override fun getInfo() {
-        sendCmd(Er1BleCmd.getInfo())
+        sendCmd(Er3BleCmd.getInfo())
         LepuBleLog.d(tag, "getInfo...")
     }
 
     override fun syncTime() {
-        sendCmd(Er1BleCmd.setTime())
+        sendCmd(Er3BleCmd.setTime())
         LepuBleLog.d(tag, "syncTime...")
     }
 
     override fun reset() {
-        sendCmd(Er1BleCmd.reset())
+        sendCmd(Er3BleCmd.reset())
         LepuBleLog.d(tag, "reset...")
     }
 
     override fun factoryReset() {
-        sendCmd(Er1BleCmd.factoryReset())
+        sendCmd(Er3BleCmd.factoryReset())
         LepuBleLog.d(tag, "factoryReset...")
     }
 
     override fun factoryResetAll() {
-        sendCmd(Er1BleCmd.factoryResetAll())
+        sendCmd(Er3BleCmd.factoryResetAll())
         LepuBleLog.d(tag, "factoryResetAll...")
     }
 
@@ -290,45 +276,37 @@ class Er1BleInterface(model: Int): BleInterface(model) {
      * get real-time data
      */
     override fun getRtData() {
-        sendCmd(Er1BleCmd.getRtData())
+        sendCmd(Er3BleCmd.getRtData())
         LepuBleLog.d(tag, "getRtData...")
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
         this.userId = userId
         this.curFileName =fileName
-        sendCmd(Er1BleCmd.readFileStart(fileName.toByteArray(), 0)) // 读开始永远是0
+        sendCmd(Er3BleCmd.readFileStart(fileName.toByteArray(), 0)) // 读开始永远是0
         LepuBleLog.d(tag, "dealReadFile:: $userId, $fileName, offset = $offset")
     }
 
-    /**
-     * get file list
-     */
     override fun getFileList() {
-        sendCmd(Er1BleCmd.getFileList())
+        sendCmd(Er3BleCmd.getFileList())
         LepuBleLog.d(tag, "getFileList...")
     }
 
-    fun getVibrateConfig(){
-        sendCmd(Er1BleCmd.getVibrateConfig())
-        LepuBleLog.d(tag, "getVibrateConfig...")
+    fun getConfig(){
+        sendCmd(Er3BleCmd.getConfig())
+        LepuBleLog.d(tag, "getConfig...")
     }
-    fun setVibrateConfig(switcher: Boolean, threshold1: Int, threshold2: Int){
-        sendCmd(Er1BleCmd.setVibrate(switcher, threshold1, threshold2))
-        LepuBleLog.d(tag, "setVibrateConfig...switcher:$switcher, threshold1:$threshold1, threshold2:$threshold2")
-    }
-
-    fun setVibrateConfig(switcher: Boolean, vector: Int, motionCount: Int, motionWindows: Int){
-        sendCmd(Er1BleCmd.setSwitcher(switcher, vector,motionCount, motionWindows))
-        LepuBleLog.d(tag, "setVibrateConfig...switcher:$switcher, vector:$vector, motionCount:$motionCount, motionWindows:$motionWindows")
+    fun setConfig(mode: Int){
+        sendCmd(Er3BleCmd.setConfig(mode))
+        LepuBleLog.d(tag, "setConfig...mode:$mode")
     }
 
     fun burnFactoryInfo(config: FactoryConfig) {
-        sendCmd(Er1BleCmd.burnFactoryInfo(config.convert2Data()))
+        sendCmd(Er3BleCmd.burnFactoryInfo(config.convert2Data()))
         LepuBleLog.d(tag, "burnFactoryInfo...config:$config")
     }
     fun burnLockFlash() {
-        sendCmd(Er1BleCmd.burnLockFlash())
+        sendCmd(Er3BleCmd.burnLockFlash())
         LepuBleLog.d(tag, "burnLockFlash...")
     }
 

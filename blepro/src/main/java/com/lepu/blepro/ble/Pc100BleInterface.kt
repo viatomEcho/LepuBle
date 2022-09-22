@@ -18,6 +18,7 @@ import java.util.*
  * 1.获取设备信息
  * receive:
  * 1.实时血氧、血压
+ * 血氧采样率：参数1HZ，波形50HZ
  */
 
 class Pc100BleInterface(model: Int): BleInterface(model) {

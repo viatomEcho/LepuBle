@@ -23,6 +23,7 @@ import com.lepu.blepro.utils.toUInt
  * 5.实时血氧使能开关
  * receive:
  * 1.实时血氧
+ * 血氧采样率：参数1HZ，波形50HZ
  */
 class Ap20BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Ap20BleInterface"

@@ -30,6 +30,7 @@ import com.lepu.blepro.utils.getTimeString
  * 7.实时血氧使能开关
  * receive:
  * 1.实时血氧
+ * 血氧采样率：参数1HZ，波形50HZ
  */
 
 class Pc68bBleInterface(model: Int): BleInterface(model) {
