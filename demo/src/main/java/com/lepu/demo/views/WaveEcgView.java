@@ -157,7 +157,7 @@ public class WaveEcgView extends View {
         } else if (model == Bluetooth.MODEL_BP2
                 || model == Bluetooth.MODEL_BP2W
                 || model == Bluetooth.MODEL_LE_BP2W) {
-            standard1mV = 0.003089f;
+            standard1mV = 0.003098f;
         } else if (model == Bluetooth.MODEL_PULSEBITEX
                 || model == Bluetooth.MODEL_HHM4
                 || model == Bluetooth.MODEL_CHECKME_LE
@@ -168,6 +168,9 @@ public class WaveEcgView extends View {
                 || model == Bluetooth.MODEL_PC80B_BLE) {
             standard1mV = 1 / 330f;
             HZ = 150;
+        } else if (model == Bluetooth.MODEL_ER3) {
+            standard1mV = 0.00244140625f;
+            HZ = 250;
         } else {
             standard1mV = (float) ((1.0035 * 1800) / (4096 * 178.74));
         }

@@ -25,7 +25,7 @@ class Pc68bBleResponse{
 
     @ExperimentalUnsignedTypes
     class DeviceInfo(var bytes: ByteArray) {
-        var softwareV: String   // 软件版本
+        var softwareV: String   // 固件版本
         var hardwareV: String   // 硬件版本
         var deviceName: String  // 设备名称
 

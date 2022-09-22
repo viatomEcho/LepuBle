@@ -27,7 +27,7 @@ class Ap20BleResponse{
     @Parcelize
     @ExperimentalUnsignedTypes
     class DeviceInfo constructor(var bytes: ByteArray) : Parcelable {
-        var softwareV: String   // 软件版本
+        var softwareV: String   // 固件版本
         var hardwareV: String   // 硬件版本
         var deviceName: String  // 设备名称
 

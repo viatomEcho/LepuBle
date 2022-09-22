@@ -24,7 +24,7 @@ object Pc300BleResponse {
 
     @ExperimentalUnsignedTypes
     class DeviceInfo(val bytes: ByteArray) {
-        var softwareV: String  // 软件版本
+        var softwareV: String  // 固件版本
         var hardwareV: String  // 硬件版本
         var batLevel: Int      // 电量等级 级数越高，电量越多（0-3）
 

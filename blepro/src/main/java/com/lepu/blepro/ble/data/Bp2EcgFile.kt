@@ -1,6 +1,7 @@
 package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.ByteUtils.toSignedShort
 import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
@@ -24,6 +25,7 @@ class Bp2EcgFile(val bytes: ByteArray) {
     var connectCable: Boolean       // 是否接入线缆
     // reserved 19
     var waveData: ByteArray
+    var waveShortData: ShortArray
 
     init {
         var index = 0
@@ -56,6 +58,10 @@ class Bp2EcgFile(val bytes: ByteArray) {
         index++
         index += 19
         waveData = bytes.copyOfRange(index, bytes.size)
+        waveShortData = ShortArray(waveData.size.div(2))
+        for (i in waveShortData.indices) {
+            waveShortData[i] = toSignedShort(waveData[2*i], waveData[2*i+1])
+        }
     }
 
     override fun toString(): String {
@@ -75,6 +81,7 @@ class Bp2EcgFile(val bytes: ByteArray) {
             qtc : $qtc
             connectCable : $connectCable
             waveData : ${bytesToHex(waveData)}
+            waveShortData : $waveShortData
         """.trimIndent()
     }
 

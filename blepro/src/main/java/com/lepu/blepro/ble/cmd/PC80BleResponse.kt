@@ -26,7 +26,7 @@ object PC80BleResponse {
     @Parcelize
     @ExperimentalUnsignedTypes
     class DeviceInfo constructor(var bytes: ByteArray, var len: Int) : Parcelable {
-        var softwareV: String   // 软件版本
+        var softwareV: String   // 固件版本
         var hardwareV: String   // 硬件版本
         var algorithmV: String  // 算法版本
 

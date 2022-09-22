@@ -91,6 +91,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.lemLayout.root.visibility = View.GONE
         binding.bpmLayout.visibility = View.GONE
         binding.pc60fwLayout.visibility = View.GONE
+        binding.er3Layout.root.visibility = View.GONE
         if (v == null) return
         v.visibility = View.VISIBLE
     }
@@ -116,6 +117,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
                     setViewVisible(binding.er2Layout.root)
                     LpBleUtil.getEr2SwitcherState(it.modelNo)
+                }
+                Bluetooth.MODEL_ER3 -> {
+                    setViewVisible(binding.er3Layout.root)
+                    LpBleUtil.er3GetConfig(it.modelNo)
                 }
                 Bluetooth.MODEL_BP2 -> {
                     setViewVisible(binding.bp2Layout.root)
@@ -2088,6 +2093,18 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.sendCmd.text = cmdStr
             }
         }
+        // ---------------------------er3---------------------------
+        binding.er3Layout.er3SetEcgMode.setOnClickListener {
+            val mode = trimStr(binding.er3Layout.er3EcgMode.text.toString())
+            if (isNumber(mode) && (mode.toInt() in 0..2)) {
+                LpBleUtil.er3SetConfig(Constant.BluetoothConfig.currentModel[0], mode.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     }
 
     private fun setReceiveCmd(bytes: ByteArray) {
@@ -3012,6 +3029,23 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 } else {
                     Toast.makeText(context, "设置code失败", Toast.LENGTH_SHORT).show()
                 }
+            }
+        //------------------------er3-------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3SetConfig)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    Toast.makeText(context, "设置mode成功", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "设置mode失败", Toast.LENGTH_SHORT).show()
+                }
+                LpBleUtil.er3GetConfig(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3GetConfig)
+            .observe(this) {
+                val data = it.data as Int
+                binding.er3Layout.er3EcgMode.setText("$data")
+                Toast.makeText(context, "获取mode成功", Toast.LENGTH_SHORT).show()
             }
 
         //-----------------------------------

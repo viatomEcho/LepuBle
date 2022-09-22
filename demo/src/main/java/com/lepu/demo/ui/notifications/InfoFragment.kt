@@ -35,6 +35,7 @@ import com.lepu.demo.data.EcgData
 import com.lepu.demo.data.OxyData
 import com.lepu.demo.databinding.FragmentInfoBinding
 import com.lepu.demo.util.DataConvert
+import com.lepu.demo.util.FileUtil
 
 
 class InfoFragment : Fragment(R.layout.fragment_info){
@@ -70,7 +71,43 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         super.onViewCreated(view, savedInstanceState)
         initView()
         initEvent()
+//        testEr3()
     }
+
+    private fun testEr3() {
+        val fileName = "W20220921154419"
+        val data = Er3WaveFile(FileUtil.readFile(context, fileName))
+        val recordingTime = DateUtil.getSecondTimestamp(fileName.replace("W", ""))
+        val temp = getEcgData(recordingTime, fileName, data.wave, DataConvert.getEr3ShortArray(data.waveInts), data.recordingTime)
+        ecgList.add(temp)
+        val tempV6 = getEcgData(recordingTime, "导联 V6", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V6", data.waveInts)), data.recordingTime)
+        ecgList.add(tempV6)
+        val tempI = getEcgData(recordingTime, "导联 I", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("I", data.waveInts)), data.recordingTime)
+        ecgList.add(tempI)
+        val tempII = getEcgData(recordingTime, "导联 II", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("II", data.waveInts)), data.recordingTime)
+        ecgList.add(tempII)
+        val tempV1 = getEcgData(recordingTime, "导联 V1", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V1", data.waveInts)), data.recordingTime)
+        ecgList.add(tempV1)
+        val tempV2 = getEcgData(recordingTime, "导联 V2", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V2", data.waveInts)), data.recordingTime)
+        ecgList.add(tempV2)
+        val tempV3 = getEcgData(recordingTime, "导联 V3", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V3", data.waveInts)), data.recordingTime)
+        ecgList.add(tempV3)
+        val tempV4 = getEcgData(recordingTime, "导联 V4", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V4", data.waveInts)), data.recordingTime)
+        ecgList.add(tempV4)
+        val tempV5 = getEcgData(recordingTime, "导联 V5", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V5", data.waveInts)), data.recordingTime)
+        ecgList.add(tempV5)
+        val tempIII = getEcgData(recordingTime, "导联 III", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("III", data.waveInts)), data.recordingTime)
+        ecgList.add(tempIII)
+        val tempaVR = getEcgData(recordingTime, "导联 aVR", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("aVR", data.waveInts)), data.recordingTime)
+        ecgList.add(tempaVR)
+        val tempaVL = getEcgData(recordingTime, "导联 aVL", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("aVL", data.waveInts)), data.recordingTime)
+        ecgList.add(tempaVL)
+        val tempaVF = getEcgData(recordingTime, "导联 aVF", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("aVF", data.waveInts)), data.recordingTime)
+        ecgList.add(tempaVF)
+        ecgAdapter.setNewInstance(ecgList)
+        ecgAdapter.notifyDataSetChanged()
+    }
+
     private fun initView(){
 
         mainViewModel.bleState.observe(viewLifecycleOwner) {
@@ -159,7 +196,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM3
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W) {
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER3) {
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
             }
@@ -392,7 +430,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         }
         // 暂停读取文件
         binding.pauseRf.setOnClickListener {
-//            startActivity(Intent(context, WaveEcgActivity::class.java))
+
         }
         // 继续读取文件
         binding.continueRf.setOnClickListener {
@@ -477,12 +515,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             val data = Er1EcgFile(it.content)
                             binding.info.text = "$data"
                             readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                            val temp = EcgData()
-                            temp.recordingTime = DateUtil.getSecondTimestamp(it.fileName.replace("R", ""))
-                            temp.fileName = it.fileName
-                            temp.data = data.waveData
-                            temp.shortData = DataConvert.getEr1ShortArray(data.waveData)
-                            temp.duration = data.recordingTime
+                            val recordingTime = DateUtil.getSecondTimestamp(it.fileName.replace("R", ""))
+                            val temp = getEcgData(recordingTime, it.fileName, data.waveData, DataConvert.getEr1ShortArray(data.waveData), data.recordingTime)
                             ecgList.add(temp)
                             ecgAdapter.setNewInstance(ecgList)
                             ecgAdapter.notifyDataSetChanged()
@@ -547,12 +581,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         val data = Er1EcgFile(it.content)
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                        val temp = EcgData()
-                        temp.recordingTime = DateUtil.getSecondTimestamp(it.fileName.replace("R", ""))
-                        temp.fileName = it.fileName
-                        temp.data = data.waveData
-                        temp.shortData = DataConvert.getEr1ShortArray(data.waveData)
-                        temp.duration = data.recordingTime
+                        val recordingTime = DateUtil.getSecondTimestamp(it.fileName.replace("R", ""))
+                        val temp = getEcgData(recordingTime, it.fileName, data.waveData, DataConvert.getEr1ShortArray(data.waveData), data.recordingTime)
                         ecgList.add(temp)
                         ecgAdapter.setNewInstance(ecgList)
                         ecgAdapter.notifyDataSetChanged()
@@ -669,12 +699,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         val data = Bp2EcgFile(it.content)
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                        val temp = EcgData()
-                        temp.recordingTime = data.measureTime.toLong()
-                        temp.fileName = it.name
-                        temp.data = data.waveData
-                        temp.shortData = DataConvert.getBp2ShortArray(data.waveData)
-                        temp.duration = data.recordingTime
+                        val temp = getEcgData(data.measureTime.toLong(), it.name, data.waveData, DataConvert.getBp2ShortArray(data.waveData), data.recordingTime)
                         ecgList.add(temp)
                         ecgAdapter.setNewInstance(ecgList)
                         ecgAdapter.notifyDataSetChanged()
@@ -734,12 +759,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         val data = Bp2EcgFile(it.content)
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                        val temp = EcgData()
-                        temp.recordingTime = data.measureTime.toLong()
-                        temp.fileName = it.name
-                        temp.data = data.waveData
-                        temp.shortData = DataConvert.getBp2ShortArray(data.waveData)
-                        temp.duration = data.recordingTime
+                        val temp = getEcgData(data.measureTime.toLong(), it.name, data.waveData, DataConvert.getBp2ShortArray(data.waveData), data.recordingTime)
                         ecgList.add(temp)
                         ecgAdapter.setNewInstance(ecgList)
                         ecgAdapter.notifyDataSetChanged()
@@ -851,12 +871,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     } else {
                         mAlertDialog?.dismiss()
                     }
-                    val temp = EcgData()
-                    temp.recordingTime = it.timestamp
-                    temp.fileName = it.fileName
-                    temp.data = it.waveData
-                    temp.shortData = DataConvert.getBp2ShortArray(it.waveData)
-                    temp.duration = it.waveData.size.div(2*250)
+                    val temp = getEcgData(it.timestamp, it.fileName, it.waveData, DataConvert.getBp2ShortArray(it.waveData), it.duration)
                     ecgList.add(temp)
                     ecgAdapter.setNewInstance(ecgList)
                     ecgAdapter.notifyDataSetChanged()
@@ -1032,12 +1047,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     if (file.fileName == fileName)
                         return@observe
                 }
-                val temp = EcgData()
-                temp.fileName = fileName
-                temp.recordingTime = DateUtil.getSecondTimestamp(temp.fileName)
-                temp.data = data.section6.ecgData.ecg
-                temp.shortData = DataConvert.getPc80bShortArray(data.section6.ecgData.ecg)
-                temp.duration = 30
+                val temp = getEcgData(DateUtil.getSecondTimestamp(fileName), fileName, data.section6.ecgData.ecg, DataConvert.getPc80bShortArray(data.section6.ecgData.ecg), 30)
                 ecgList.add(temp)
                 ecgAdapter.setNewInstance(ecgList)
                 ecgAdapter.notifyDataSetChanged()
@@ -1076,12 +1086,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 } else {
                     mAlertDialog?.dismiss()
                 }
-                val temp = EcgData()
-                temp.recordingTime = DateUtil.getSecondTimestamp(data.fileName)
-                temp.fileName = data.fileName
-                temp.data = data.waveData
-                temp.shortData = DataConvert.getExShortArray(data.waveData)
-                temp.duration = data.recordingTime
+                val temp = getEcgData(DateUtil.getSecondTimestamp(data.fileName), data.fileName, data.waveData, DataConvert.getExShortArray(data.waveData), data.recordingTime)
                 ecgList.add(temp)
                 ecgAdapter.setNewInstance(ecgList)
                 ecgAdapter.notifyDataSetChanged()
@@ -1160,12 +1165,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 } else {
                     mAlertDialog?.dismiss()
                 }
-                val temp = EcgData()
-                temp.recordingTime = DateUtil.getSecondTimestamp(data.fileName)
-                temp.fileName = data.fileName
-                temp.data = data.waveData
-                temp.shortData = DataConvert.getExShortArray(data.waveData)
-                temp.duration = data.recordingTime
+                val temp = getEcgData(DateUtil.getSecondTimestamp(data.fileName), data.fileName, data.waveData, DataConvert.getExShortArray(data.waveData), data.recordingTime)
                 ecgList.add(temp)
                 ecgAdapter.setNewInstance(ecgList)
                 ecgAdapter.notifyDataSetChanged()
@@ -1204,12 +1204,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     setReceiveCmd(it.bytes)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $it \n"
                     binding.process.text = readFileProcess
-                    val temp = EcgData()
-                    temp.recordingTime = DateUtil.getSecondTimestamp("00000000000000")
-                    temp.fileName = "00000000000000"
-                    temp.data = it.ecgData
-                    temp.shortData = DataConvert.getExShortArray(it.ecgData)
-                    temp.duration = it.ecgResult?.recordingTime!!
+                    val temp = getEcgData(DateUtil.getSecondTimestamp("00000000000000"), "00000000000000", it.ecgData!!, DataConvert.getExShortArray(it.ecgData), it.ecgResult?.recordingTime!!)
                     ecgList.add(temp)
                     ecgAdapter.setNewInstance(ecgList)
                     ecgAdapter.notifyDataSetChanged()
@@ -1255,6 +1250,100 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 binding.info.text = "$data"
                 Toast.makeText(context, "没有文件", Toast.LENGTH_SHORT).show()
             }
+        //------------------------------ER3--------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FileList)
+            .observe(this) { event ->
+                (event.data as Er3BleResponse.FileList).let {
+                    binding.info.text = it.toString()
+                    for (fileName in it.fileList) {
+                        if (fileName.isNotEmpty()) {
+                            fileNames.add(fileName)
+                        }
+                    }
+                    binding.deviceInfo.text = fileNames.toString()
+                    Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3ReadingFileProgress)
+            .observe(this) { event ->
+                (event.data as Int).let {
+                    binding.process.text = "$readFileProcess $curFileName 读取进度: $it %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $it %"
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3ReadFileComplete)
+            .observe(this) { event ->
+                (event.data as Er3BleResponse.Er3File).let {
+                    if (it.fileName.contains("T")) {
+                        val data = Er3DataFile(it.content)
+                        binding.info.text = "$data"
+                        binding.deviceInfo.text = "$data"
+                    } else if (it.fileName.contains("W")) {
+                        val data = Er3WaveFile(it.content)
+                        binding.info.text = "$data"
+                        binding.deviceInfo.text = "$data"
+                        val recordingTime = DateUtil.getSecondTimestamp(it.fileName.replace("W", ""))
+                        val temp = getEcgData(recordingTime, it.fileName, data.wave, DataConvert.getEr3ShortArray(data.waveInts), data.recordingTime)
+                        ecgList.add(temp)
+                        val tempV6 = getEcgData(recordingTime, "导联 V6", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V6", data.waveInts)), data.recordingTime)
+                        ecgList.add(tempV6)
+                        val tempI = getEcgData(recordingTime, "导联 I", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("I", data.waveInts)), data.recordingTime)
+                        ecgList.add(tempI)
+                        val tempII = getEcgData(recordingTime, "导联 II", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("II", data.waveInts)), data.recordingTime)
+                        ecgList.add(tempII)
+                        val tempV1 = getEcgData(recordingTime, "导联 V1", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V1", data.waveInts)), data.recordingTime)
+                        ecgList.add(tempV1)
+                        val tempV2 = getEcgData(recordingTime, "导联 V2", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V2", data.waveInts)), data.recordingTime)
+                        ecgList.add(tempV2)
+                        val tempV3 = getEcgData(recordingTime, "导联 V3", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V3", data.waveInts)), data.recordingTime)
+                        ecgList.add(tempV3)
+                        val tempV4 = getEcgData(recordingTime, "导联 V4", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V4", data.waveInts)), data.recordingTime)
+                        ecgList.add(tempV4)
+                        val tempV5 = getEcgData(recordingTime, "导联 V5", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V5", data.waveInts)), data.recordingTime)
+                        ecgList.add(tempV5)
+                        val tempIII = getEcgData(recordingTime, "导联 III", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("III", data.waveInts)), data.recordingTime)
+                        ecgList.add(tempIII)
+                        val tempaVR = getEcgData(recordingTime, "导联 aVR", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("aVR", data.waveInts)), data.recordingTime)
+                        ecgList.add(tempaVR)
+                        val tempaVL = getEcgData(recordingTime, "导联 aVL", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("aVL", data.waveInts)), data.recordingTime)
+                        ecgList.add(tempaVL)
+                        val tempaVF = getEcgData(recordingTime, "导联 aVF", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("aVF", data.waveInts)), data.recordingTime)
+                        ecgList.add(tempaVF)
+                        ecgAdapter.setNewInstance(ecgList)
+                        ecgAdapter.notifyDataSetChanged()
+                    }
+                    setReceiveCmd(it.content)
+                    binding.process.text = readFileProcess
+                    if (binding.fileName.text.toString().isEmpty()) {
+                        fileNames.removeAt(0)
+                        readFile()
+                    } else {
+                        mAlertDialog?.dismiss()
+                    }
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3Reset)
+            .observe(this) {
+                Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FactoryReset)
+            .observe(this) {
+                Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FactoryResetAll)
+            .observe(this) {
+                Toast.makeText(context, "恢复生产状态成功", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun getEcgData(recordingTime: Long, fileName: String, wave: ByteArray, shortData: ShortArray, duration: Int) : EcgData {
+        val data = EcgData()
+        data.recordingTime = recordingTime
+        data.fileName = fileName
+        data.data = wave
+        data.shortData = shortData
+        data.duration = duration
+        return data
     }
 
     private fun setReceiveCmd(bytes: ByteArray) {

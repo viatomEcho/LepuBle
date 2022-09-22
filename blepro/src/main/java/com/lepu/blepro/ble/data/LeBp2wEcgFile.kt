@@ -1,6 +1,7 @@
 package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.ByteUtils.toSignedShort
 import com.lepu.blepro.utils.toUInt
 
 class LeBp2wEcgFile {
@@ -10,7 +11,9 @@ class LeBp2wEcgFile {
     var fileType: Int
     var timestamp: Long
     var waveData: ByteArray
+    var waveShortData: ShortArray
     var deviceName: String
+    var duration: Int
     constructor(fileName: String, content: ByteArray, deviceName: String) {
         this.content = content
         this.deviceName = deviceName
@@ -25,6 +28,11 @@ class LeBp2wEcgFile {
         // reserved 4
         index += 4
         waveData = content.copyOfRange(index, content.size)
+        waveShortData = ShortArray(waveData.size.div(2))
+        for (i in waveShortData.indices) {
+            waveShortData[i] = toSignedShort(waveData[2 * i], waveData[2 * i + 1])
+        }
+        duration = waveData.size.div(2*250)
     }
 
     override fun toString(): String {
@@ -35,6 +43,7 @@ class LeBp2wEcgFile {
             file type: $fileType
             timestamp: $timestamp
             device name: $deviceName
+            duration: $duration
         """.trimIndent()
     }
 }

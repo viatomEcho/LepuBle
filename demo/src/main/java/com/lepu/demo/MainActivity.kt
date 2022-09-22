@@ -200,13 +200,13 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         //-------------------------lew---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetTime)
             .observe(this) {
-                Toast.makeText(this, "lew 完成时间同步", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "4G手表 完成时间同步", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewDeviceInfo)
             .observe(this) { event ->
                 (event.data as DeviceInfo).let {
-                    Toast.makeText(this, "lew 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "4G手表 获取设备信息成功", Toast.LENGTH_SHORT).show()
                     viewModel._lewInfo.value = it
                 }
             }
@@ -500,6 +500,19 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 val data = it.data as BiolandBgmBleResponse.DeviceInfo
                 viewModel._biolandInfo.value = data
                 viewModel._battery.value = "${data.battery} %"
+            }
+        //-------------------------er3---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3SetTime)
+            .observe(this) {
+                Toast.makeText(this, "ER3 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3Info)
+            .observe(this) { event ->
+                (event.data as LepuDevice).let {
+                    Toast.makeText(this, "ER3 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._er1Info.value = it
+                }
             }
     }
     private fun needPermission(){
