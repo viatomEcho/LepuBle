@@ -135,7 +135,7 @@ class BpmBleInterface(model: Int): BleInterface(model) {
 
                     recordData.sys = it.sys
                     recordData.dia = it.dia
-                    recordData.isRegularHrFlag = it.regularHrFlag
+                    recordData.isIrregularHrFlag = it.regularHrFlag
                     recordData.pr = it.pr
                     recordData.deviceUserId = it.deviceUserId
                     recordData.storeId = it.storeId
@@ -170,7 +170,7 @@ class BpmBleInterface(model: Int): BleInterface(model) {
 
                 recordData.sys = data.sys
                 recordData.dia = data.dia
-                recordData.isRegularHrFlag = data.regularHrFlag
+                recordData.isIrregularHrFlag = data.regularHrFlag
                 recordData.pr = data.pr
                 recordData.deviceUserId = data.deviceUserId
                 recordData.storeId = data.storeId

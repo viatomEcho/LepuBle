@@ -4,7 +4,7 @@ public class RecordData {
 
     private int sys;
     private int dia;
-    private boolean regularHrFlag;
+    private boolean irregularHrFlag;
     private int pr;
     private int deviceUserId;  // 用户id
     private int storeId;       // 数据序号
@@ -30,12 +30,12 @@ public class RecordData {
         this.dia = dia;
     }
 
-    public boolean isRegularHrFlag() {
-        return regularHrFlag;
+    public boolean isIrregularHrFlag() {
+        return irregularHrFlag;
     }
 
-    public void setRegularHrFlag(boolean regularHrFlag) {
-        this.regularHrFlag = regularHrFlag;
+    public void setIrregularHrFlag(boolean irregularHrFlag) {
+        this.irregularHrFlag = irregularHrFlag;
     }
 
     public int getPr() {
@@ -107,7 +107,7 @@ public class RecordData {
         return "RecordData{" +
                 "sys=" + sys +
                 ", dia=" + dia +
-                ", regularHrFlag=" + regularHrFlag +
+                ", irregularHrFlag=" + irregularHrFlag +
                 ", pr=" + pr +
                 ", deviceUserId=" + deviceUserId +
                 ", storeId=" + storeId +

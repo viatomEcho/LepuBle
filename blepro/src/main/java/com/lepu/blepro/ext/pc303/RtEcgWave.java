@@ -8,6 +8,7 @@ public class RtEcgWave {
     private int[] ecgInts;
     private float[] ecgFloats;
     private boolean isProbeOff;
+    private int digit;
 
     public int getSeqNo() {
         return seqNo;
@@ -49,6 +50,14 @@ public class RtEcgWave {
         isProbeOff = probeOff;
     }
 
+    public int getDigit() {
+        return digit;
+    }
+
+    public void setDigit(int digit) {
+        this.digit = digit;
+    }
+
     @Override
     public String toString() {
         return "RtEcgWave{" +
@@ -56,6 +65,7 @@ public class RtEcgWave {
                 ", ecgInts=" + Arrays.toString(ecgInts) +
                 ", ecgFloats=" + Arrays.toString(ecgFloats) +
                 ", isProbeOff=" + isProbeOff +
+                ", digit=" + digit +
                 '}';
     }
 }

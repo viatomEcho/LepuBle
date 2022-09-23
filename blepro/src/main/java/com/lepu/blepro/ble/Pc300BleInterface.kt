@@ -384,6 +384,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                 ecgData.ecgInts = data.waveIntData
                 ecgData.ecgFloats = data.wFs
                 ecgData.isProbeOff = data.isProbeOff
+                ecgData.digit = data.digit
 
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtEcgWave).post(InterfaceEvent(model, ecgData))
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X32 心电波形上传数据 => success $data")

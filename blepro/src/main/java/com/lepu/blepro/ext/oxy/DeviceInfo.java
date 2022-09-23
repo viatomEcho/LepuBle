@@ -3,19 +3,19 @@ package com.lepu.blepro.ext.oxy;
 public class DeviceInfo {
 
     private String region;        // 地区版本
-    private String model;        // 系列版本
-    private String hwVersion;    // 硬件版本
-    private String swVersion;    // 软件版本
-    private String btlVersion;   // 引导版本
-    private int pedTar;          // 步数
-    private String sn;           // 序列号
-    private String curTime;      // 时间
-    private int batteryState;    // 电池状态（0为正常使用，1为充电，2为充满）
+    private String model;         // 系列版本
+    private String hwVersion;     // 硬件版本
+    private String swVersion;     // 软件版本
+    private String btlVersion;    // 引导版本
+    private int pedTar;           // 步数
+    private String sn;            // 序列号
+    private String curTime;       // 时间
+    private int batteryState;     // 电池状态（0为正常使用，1为充电，2为充满）
     private String batteryValue;  // 电量（0%-100%）
-    private int oxiThr;          // 血氧阈值
-    private int motor;           // 强度（KidsO2、Oxylink：最低：5，低：10，中：17，高：22，最高：35；O2Ring：最低：20，低：40，中：60，高：80，最高：100，震动强度不随开关的改变而改变）
-    private int mode;            // 工作模式（0：sleep模式  1：monitor模式）
-    private String fileList;     // 文件列表
+    private int oxiThr;           // 血氧阈值
+    private int motor;            // 强度（KidsO2、Oxylink：最低：5，低：10，中：17，高：22，最高：35；O2Ring：最低：20，低：40，中：60，高：80，最高：100，震动强度不随开关的改变而改变）
+    private int workMode;         // 工作模式（0：sleep模式  1：monitor模式）
+    private String fileList;      // 文件列表
     private int oxiSwitch;        // 血氧开关（bit0:震动  bit1:声音）(int 0：震动关声音关 1：震动开声音关 2：震动关声音开 3：震动开声音开)
     private int hrSwitch;         // 心率开关（bit0:震动  bit1:声音）(int 0：震动关声音关 1：震动开声音关 2：震动关声音开 3：震动开声音开)
     private int hrLowThr;         // 心率震动最低阈值
@@ -26,12 +26,12 @@ public class DeviceInfo {
     private int lightingMode;     // 亮屏模式（0：Standard模式，1：Always Off模式，2：Always On模式）
     private int lightStr;         // 屏幕亮度
     private String branchCode;    // code码
-    private int spo2Switch;     // 血氧功能开关（0：关 1：开）
-    private int buzzer;          // 声音强度（checkO2Plus：最低：20，低：40，中：60，高：80，最高：100）
-    private int mtSwitch;        // 体动开关（0：关 1：开）
-    private int mtThr;           // 体动阈值
-    private int ivSwitch;        // 无效值报警开关（0：关 1：开）
-    private int ivThr;           // 无效值报警告警时间阈值
+    private boolean spo2Switch;   // 血氧功能开关（0：关 1：开）
+    private int buzzer;           // 声音强度（checkO2Plus：最低：20，低：40，中：60，高：80，最高：100）
+    private boolean mtSwitch;     // 体动开关（0：关 1：开）
+    private int mtThr;            // 体动阈值
+    private boolean ivSwitch;     // 无效值报警开关（0：关 1：开）
+    private int ivThr;            // 无效值报警告警时间阈值
 
     public String getRegion() {
         return region;
@@ -129,12 +129,12 @@ public class DeviceInfo {
         this.motor = motor;
     }
 
-    public int getMode() {
-        return mode;
+    public int getWorkMode() {
+        return workMode;
     }
 
-    public void setMode(int mode) {
-        this.mode = mode;
+    public void setWorkMode(int workMode) {
+        this.workMode = workMode;
     }
 
     public String getFileList() {
@@ -225,11 +225,11 @@ public class DeviceInfo {
         this.branchCode = branchCode;
     }
 
-    public int getSpo2Switch() {
+    public boolean isSpo2Switch() {
         return spo2Switch;
     }
 
-    public void setSpo2Switch(int spo2Switch) {
+    public void setSpo2Switch(boolean spo2Switch) {
         this.spo2Switch = spo2Switch;
     }
 
@@ -241,11 +241,11 @@ public class DeviceInfo {
         this.buzzer = buzzer;
     }
 
-    public int getMtSwitch() {
+    public boolean isMtSwitch() {
         return mtSwitch;
     }
 
-    public void setMtSwitch(int mtSwitch) {
+    public void setMtSwitch(boolean mtSwitch) {
         this.mtSwitch = mtSwitch;
     }
 
@@ -257,11 +257,11 @@ public class DeviceInfo {
         this.mtThr = mtThr;
     }
 
-    public int getIvSwitch() {
+    public boolean isIvSwitch() {
         return ivSwitch;
     }
 
-    public void setIvSwitch(int ivSwitch) {
+    public void setIvSwitch(boolean ivSwitch) {
         this.ivSwitch = ivSwitch;
     }
 
@@ -288,7 +288,7 @@ public class DeviceInfo {
                 ", batteryValue='" + batteryValue + '\'' +
                 ", oxiThr=" + oxiThr +
                 ", motor=" + motor +
-                ", mode=" + mode +
+                ", workMode=" + workMode +
                 ", fileList='" + fileList + '\'' +
                 ", oxiSwitch=" + oxiSwitch +
                 ", hrSwitch=" + hrSwitch +

@@ -175,7 +175,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 deviceInfo.batteryValue = info.batteryValue
                 deviceInfo.oxiThr = info.oxiThr
                 deviceInfo.motor = info.motor
-                deviceInfo.mode = info.mode
+                deviceInfo.workMode = info.mode
                 deviceInfo.fileList = info.fileList
                 deviceInfo.oxiSwitch = info.oxiSwitch
                 deviceInfo.hrSwitch = info.hrSwitch
@@ -187,11 +187,11 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 deviceInfo.lightingMode = info.lightingMode
                 deviceInfo.lightStr = info.lightStr
                 deviceInfo.branchCode = info.branchCode
-                deviceInfo.spo2Switch = info.spo2Switch
+                deviceInfo.isSpo2Switch = info.spo2Switch == 1
                 deviceInfo.buzzer = info.buzzer
-                deviceInfo.mtSwitch = info.mtSwitch
+                deviceInfo.isMtSwitch = info.mtSwitch == 1
                 deviceInfo.mtThr = info.mtThr
-                deviceInfo.ivSwitch = info.ivSwitch
+                deviceInfo.isIvSwitch = info.ivSwitch == 1
                 deviceInfo.ivThr = info.ivThr
 
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo).post(InterfaceEvent(model, deviceInfo))
