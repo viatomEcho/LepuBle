@@ -2,8 +2,7 @@ package com.lepu.blepro.ble.cmd
 
 import android.os.Parcelable
 import com.lepu.blepro.ble.data.Er1DataController
-import com.lepu.blepro.utils.ByteUtils.byte2UInt
-import com.lepu.blepro.utils.ByteUtils.bytes2UIntBig
+import com.lepu.blepro.utils.ByteUtils.*
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
@@ -220,8 +219,8 @@ object LeS1BleResponse {
         var hasEcg: Boolean
         var scaleData: ScaleData? = null
         var ecgResult: EcgResult? = null
-        var ecgData: ByteArray? = null
-        var ecgIntData: IntArray? = null
+        var ecgData = ByteArray(0)
+        var ecgIntData = ShortArray(0)
 
         init {
             var index = 10
@@ -236,10 +235,10 @@ object LeS1BleResponse {
                 ecgResult = EcgResult(bytes.copyOfRange(index, index + 38))
                 index += 38
                 ecgData = bytes.copyOfRange(index, bytes.size)
-                val len = ecgData!!.size.div(2)
-                ecgIntData = IntArray(len)
+                val len = ecgData.size.div(2)
+                ecgIntData = ShortArray(len)
                 for (i in 0 until len) {
-                    ecgIntData!![i] = toUInt(ecgData!!.copyOfRange(i*2, (i+1)*2))
+                    ecgIntData[i] = toSignedShort(ecgData[i*2], ecgData[(i+1)*2])
                 }
             }
         }

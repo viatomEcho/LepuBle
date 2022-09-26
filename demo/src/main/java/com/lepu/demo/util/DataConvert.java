@@ -137,20 +137,6 @@ public class DataConvert {
         return shortfilter(dest);
     }
 
-    /**
-     * 没有滤波
-     * @param data
-     * @return
-     */
-    public static short[] getExShortArray(byte[] data) {
-        int count = data.length >> 1;
-        short[] dest = new short[count];
-        for (int i = 0; i < count; i++) {
-            dest[i] = (short) (data[i * 2 + 1] << 8 | data[2 * i] & 0xff);
-        }
-        return dest;
-    }
-
     public static short[] getEr3ShortArray(int[] data) {
         short[] dest = new short[data.length];
         for (int i=0; i<dest.length; i++) {

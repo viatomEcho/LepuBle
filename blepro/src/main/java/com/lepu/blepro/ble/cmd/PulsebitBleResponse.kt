@@ -112,7 +112,7 @@ class PulsebitBleResponse{
         var hrsData: ByteArray            // ECG心率值，从数据采样开始，采样率为1Hz，每个心率值为2byte（实际20s数据，每秒出一个心率），若出现无效心率，则心率为0
         var hrsIntData: IntArray          // ECG心率值
         var waveData: ByteArray           // 每个采样点2byte，原始数据
-        var waveShortData: ShortArray     // 每个采样点2byte
+        var waveShortData: ShortArray     // 每个采样点2byte，压缩数据n1,n2,n3,n4…--->解压数据n1,(n1+n2)/2,n2,(n2+n3)/2,n3,(n3+n4)/2,n4…
         var wFs: FloatArray               // 转毫伏值(n*4033)/(32767*12*8)
 
         init {
@@ -152,10 +152,19 @@ class PulsebitBleResponse{
                 bytes.copyOfRange(44 + hrsDataSize, tempSize)
             }
             val len = waveData.size/2
-            waveShortData = ShortArray(len)
-            wFs = FloatArray(len)
+            val tempData = ShortArray(len)
+            waveShortData = ShortArray(waveData.size)
+            wFs = FloatArray(waveData.size)
             for (i in 0 until len) {
-                waveShortData[i] = toSignedShort(waveData[i*2], waveData[i*2+1])
+                tempData[i] = toSignedShort(waveData[i*2], waveData[i*2+1])
+                if (i != 0) {
+                    waveShortData[i*2-1] = (tempData[i-1] + tempData[i]).div(2).toShort()
+                    waveShortData[i*2] = tempData[i]
+                } else {
+                    waveShortData[i*2] = tempData[i]
+                }
+            }
+            for (i in waveShortData.indices) {
                 wFs[i] = (waveShortData[i] * 4033) / (32767 * 12 * 8f)
             }
         }

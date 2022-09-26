@@ -19,8 +19,8 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_OXYRING = "OxyRing";
     public static final String BT_NAME_WEARO2 = "WearO2";
     public static final String BT_NAME_SLEEPU = "SleepU";
-    public static final String BT_NAME_ER1 = "ER1";
-    public static final String BT_NAME_ER1_N = "VBeat";
+    public static final String BT_NAME_ER1 = "ER1";  // 心电
+    public static final String BT_NAME_ER1_N = "VBeat";  // 心率
     public static final String BT_NAME_DUOEK = "DuoEK";
     public static final String BT_NAME_PULSEBIT_EX = "Pulsebit";
     public static final String BT_NAME_OXY_LINK = "Oxylink";
@@ -37,7 +37,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_VCOMIN = "VCOMIN";//3 OEM
     public static final String BT_NAME_CHECK_POD = "Checkme Pod";
     public static final String BT_NAME_BP2A = "BP2A";
-    public static final String BT_NAME_BODY_FAT = "Viatom";//1 OEM
+    public static final String BT_NAME_BODY_FAT = "Viatom";//1 OEM 蓝牙体脂秤
     private static final String BABYTONE = "Babytone";
     public static final String DEVICE_NAME_BODY_FAT = "Body Fat";
     public static final String BT_NAME_O2M = "O2M"; // O2 Max
@@ -97,12 +97,12 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_PF_10 = "PF-10";
     public static final String BT_NAME_PF_20 = "PF-20";
 
-    public static final String BT_NAME_LES1 = "le S1";
+    public static final String BT_NAME_LES1 = "le S1";  // S1体脂秤，心电体脂秤
     public static final String BT_NAME_VSCALE_HR = "VScale HR";
     public static final String BT_NAME_CHECK_ADV = "CheckADV";
     public static final String BT_NAME_CMRING = "CMRing";
-    public static final String BT_NAME_LPRE = "LPRE";
-    public static final String BT_NAME_LE_B1 = "le B1";
+    public static final String BT_NAME_LPRE = "LPRE";  // S1手表
+    public static final String BT_NAME_LE_B1 = "le B1";  // B1手环
     public static final String BT_NAME_OXYU = "OxyU";
     public static final String BT_NAME_S5W = "S5W_SN";
     public static final String BT_NAME_W12C = "W12c";
