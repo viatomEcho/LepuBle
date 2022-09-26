@@ -446,10 +446,19 @@ object CheckmeLeBleResponse{
                 bytes.copyOfRange(index + hrsDataSize, tempSize)
             }
             val len = waveData.size/2
-            waveShortData = ShortArray(len)
-            wFs = FloatArray(len)
+            val tempData = ShortArray(len)
+            waveShortData = ShortArray(waveData.size)
+            wFs = FloatArray(waveData.size)
             for (i in 0 until len) {
-                waveShortData[i] = toSignedShort(waveData[i*2], waveData[i*2+1])
+                tempData[i] = toSignedShort(waveData[i*2], waveData[i*2+1])
+                if (i != 0) {
+                    waveShortData[i*2-1] = (tempData[i-1] + tempData[i]).div(2).toShort()
+                    waveShortData[i*2] = tempData[i]
+                } else {
+                    waveShortData[i*2] = tempData[i]
+                }
+            }
+            for (i in waveShortData.indices) {
                 wFs[i] = (waveShortData[i] * 4033) / (32767 * 12 * 8f)
             }
         }

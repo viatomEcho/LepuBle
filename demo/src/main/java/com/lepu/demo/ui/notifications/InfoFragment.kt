@@ -1087,7 +1087,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 } else {
                     mAlertDialog?.dismiss()
                 }
-                val temp = getEcgData(DateUtil.getSecondTimestamp(data.fileName), data.fileName, data.waveData, DataConvert.getExShortArray(data.waveData), data.recordingTime)
+                val temp = getEcgData(DateUtil.getSecondTimestamp(data.fileName), data.fileName, data.waveData, data.waveShortData, data.recordingTime)
                 ecgList.add(temp)
                 ecgAdapter.setNewInstance(ecgList)
                 ecgAdapter.notifyDataSetChanged()
@@ -1166,7 +1166,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 } else {
                     mAlertDialog?.dismiss()
                 }
-                val temp = getEcgData(DateUtil.getSecondTimestamp(data.fileName), data.fileName, data.waveData, DataConvert.getExShortArray(data.waveData), data.recordingTime)
+                val temp = getEcgData(DateUtil.getSecondTimestamp(data.fileName), data.fileName, data.waveData, data.waveShortData, data.recordingTime)
                 ecgList.add(temp)
                 ecgAdapter.setNewInstance(ecgList)
                 ecgAdapter.notifyDataSetChanged()
@@ -1205,7 +1205,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     setReceiveCmd(it.bytes)
                     readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $it \n"
                     binding.process.text = readFileProcess
-                    val temp = getEcgData(DateUtil.getSecondTimestamp("00000000000000"), "00000000000000", it.ecgData!!, DataConvert.getExShortArray(it.ecgData), it.ecgResult?.recordingTime!!)
+                    val temp = getEcgData(DateUtil.getSecondTimestamp("00000000000000"), "00000000000000", it.ecgData, it.ecgIntData, it.ecgResult?.recordingTime!!)
                     ecgList.add(temp)
                     ecgAdapter.setNewInstance(ecgList)
                     ecgAdapter.notifyDataSetChanged()

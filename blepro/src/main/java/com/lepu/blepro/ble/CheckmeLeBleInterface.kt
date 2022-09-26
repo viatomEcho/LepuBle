@@ -17,7 +17,7 @@ import kotlin.experimental.inv
  * 2.获取设备信息
  * 3.获取文件列表
  * 4.下载文件内容
- * 心电采样率：存储250HZ
+ * 心电采样率：存储250HZ，实际采样率500HZ
  * 心电增益：n * 4033 / (32767 * 12 * 8) = n * 0.0012820952991323-----779.9732209273494倍
  */
 class CheckmeLeBleInterface(model: Int): BleInterface(model) {
@@ -320,6 +320,9 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
                     }
                     LepuBleLog.d(tag, "model:$model,  curFile error!!")
                 }
+            }
+            else -> {
+                clearTimeout()
             }
         }
     }
