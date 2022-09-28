@@ -803,7 +803,7 @@ class LpBleUtil {
             BleServiceHelper.lewGetRtData(model)
         }
         fun lewGetFileList(model: Int, type: Int, startTime: Int) {
-            BleServiceHelper.lewGetFileList(model, type, startTime)
+            BleServiceHelper.getFileList(model, type, startTime)
         }
         fun lewGetHrThreshold(model: Int) {
             BleServiceHelper.lewGetHrThreshold(model)

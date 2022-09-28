@@ -6,19 +6,13 @@ import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 import java.util.*
 
-class SleepList(val bytes: ByteArray) {
+class SleepList(val listSize: Int, val bytes: ByteArray) {
 
-    var leftSize: Int
-    var currentSize: Int
     var items = mutableListOf<Item>()
 
     init {
         var index = 0
-        leftSize = byte2UInt(bytes[index])
-        index++
-        currentSize = byte2UInt(bytes[index])
-        index++
-        for (i in 0 until currentSize) {
+        for (i in 0 until listSize) {
             val len = byte2UInt(bytes[index+10])
             items.add(Item(bytes.copyOfRange(index, index+len*3+11)))
             index += len*3 + 11
@@ -29,8 +23,7 @@ class SleepList(val bytes: ByteArray) {
         return """
             SleepList : 
             bytes : ${bytesToHex(bytes)}
-            leftSize : $leftSize
-            currentSize : $currentSize
+            listSize : $listSize
             items : $items
         """.trimIndent()
     }

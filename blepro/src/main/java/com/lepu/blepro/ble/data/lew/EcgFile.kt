@@ -7,7 +7,7 @@ class EcgFile(val bytes: ByteArray) {
 
     var fileVersion: Int     // 文件版本 e.g.  0x01 :  V1
     // reserved 9
-    var waveData: ByteArray  // 125Hz原始波形压缩数据（差分压缩），0x7FFF(32767)为无效值
+    var waveData: ByteArray  // 250Hz原始波形压缩数据（差分压缩），0x7FFF(32767)为无效值
     var recordingTime: Int   // 记录时长 e.g. 3600 :  3600s
     var dataCrc: Int         // 文件头部+原始波形和校验
     // reserved 10

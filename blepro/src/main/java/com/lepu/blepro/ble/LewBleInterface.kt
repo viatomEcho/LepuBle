@@ -41,10 +41,11 @@ class LewBleInterface(model: Int): BleInterface(model) {
     /**
      * download a file, name come from filelist
      */
-    var fileListName: String? = null
     var curFileName: String? = null
     private var userId: String? = null
     var curFile: LewBleResponse.EcgFile? = null
+    var listContent = ByteArray(0)
+    var listSize = 0
 
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun hasResponse(bytes: ByteArray?): ByteArray? {
@@ -418,50 +419,71 @@ class LewBleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "GET_SPORT_LIST response.len == 0")
                     return
                 }
-                val data = SportList(response.content)
-                LepuBleLog.d(tag, "model:$model,GET_SPORT_LIST => success $data")
-                val list = LewBleResponse.FileList(LewBleCmd.ListType.SPORT, response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
+                listSize += byte2UInt(response.content[1])
+                listContent += response.content.copyOfRange(2, response.content.size)
+                if (byte2UInt(response.content[0]) == 0) {
+                    val list = LewBleResponse.FileList(LewBleCmd.ListType.SPORT, listSize, listContent)
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
+                    listContent = ByteArray(0)
+                    listSize = 0
+                }
             }
             LewBleCmd.GET_ECG_LIST -> {
                 if (response.len == 0) {
                     LepuBleLog.d(tag, "GET_ECG_LIST response.len == 0")
                     return
                 }
-                val data = EcgList(response.content)
-                LepuBleLog.d(tag, "model:$model,GET_ECG_LIST => success $data")
-                val list = LewBleResponse.FileList(LewBleCmd.ListType.ECG, response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
+                listSize += byte2UInt(response.content[1])
+                listContent += response.content.copyOfRange(2, response.content.size)
+                if (byte2UInt(response.content[0]) == 0) {
+                    val list = LewBleResponse.FileList(LewBleCmd.ListType.ECG, listSize, listContent)
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
+                    listContent = ByteArray(0)
+                    listSize = 0
+                }
             }
             LewBleCmd.GET_HR_LIST -> {
                 if (response.len == 0) {
                     LepuBleLog.d(tag, "GET_HR_LIST response.len == 0")
                     return
                 }
-                val data = HrList(response.content)
-                LepuBleLog.d(tag, "model:$model,GET_HR_LIST => success $data")
-                val list = LewBleResponse.FileList(LewBleCmd.ListType.HR, response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
+                listSize += byte2UInt(response.content[1])
+                listContent += response.content.copyOfRange(2, response.content.size)
+                if (byte2UInt(response.content[0]) == 0) {
+                    val list = LewBleResponse.FileList(LewBleCmd.ListType.HR, listSize, listContent)
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
+                    listContent = ByteArray(0)
+                    listSize = 0
+                }
             }
             LewBleCmd.GET_OXY_LIST -> {
                 if (response.len == 0) {
                     LepuBleLog.d(tag, "GET_OXY_LIST response.len == 0")
                     return
                 }
-                val data = OxyList(response.content)
-                LepuBleLog.d(tag, "model:$model,GET_OXY_LIST => success $data")
-                val list = LewBleResponse.FileList(LewBleCmd.ListType.OXY, response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
+
+                listSize += byte2UInt(response.content[1])
+                listContent += response.content.copyOfRange(2, response.content.size)
+                if (byte2UInt(response.content[0]) == 0) {
+                    val list = LewBleResponse.FileList(LewBleCmd.ListType.OXY, listSize, listContent)
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
+                    listContent = ByteArray(0)
+                    listSize = 0
+                }
             }
             LewBleCmd.GET_SLEEP_LIST -> {
                 if (response.len == 0) {
                     LepuBleLog.d(tag, "GET_SLEEP_LIST response.len == 0")
                     return
                 }
-                val data = SleepList(response.content)
-                LepuBleLog.d(tag, "model:$model,GET_SLEEP_LIST => success $data")
-                val list = LewBleResponse.FileList(LewBleCmd.ListType.SLEEP, response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
+                listSize += byte2UInt(response.content[1])
+                listContent += response.content.copyOfRange(2, response.content.size)
+                if (byte2UInt(response.content[0]) == 0) {
+                    val list = LewBleResponse.FileList(LewBleCmd.ListType.SLEEP, listSize, listContent)
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
+                    listContent = ByteArray(0)
+                    listSize = 0
+                }
             }
             LewBleCmd.HR_THRESHOLD -> {
                 LepuBleLog.d(tag, "model:$model,HR_THRESHOLD => success")
@@ -514,12 +536,10 @@ class LewBleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "GET_FILE_LIST response.len == 0")
                     return
                 }
-                fileListName = trimStr(com.lepu.blepro.utils.toString(response.content.copyOfRange(1, response.content.size)))
+                val data = trimStr(com.lepu.blepro.utils.toString(response.content.copyOfRange(1, response.content.size)))
                 LepuBleLog.d(tag, "model:$model,GET_FILE_LIST => success")
-                curFileName = fileListName
-                LepuBleLog.d(tag, "model:$model, curFileName == $curFileName")
+                LepuBleLog.d(tag, "model:$model, data == $data")
                 LepuBleLog.d(tag, "model:$model, size == " + response.content[0].toInt())
-                sendCmd(LewBleCmd.readFileStart(curFileName?.toByteArray(), 0))
             }
 
             LewBleCmd.READ_FILE_START -> {
@@ -570,38 +590,18 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "read file finished: ${curFile?.fileName} ==> ${curFile?.fileSize}")
                 LepuBleLog.d(tag, "read file finished: isCancel = $isCancelRF, isPause = $isPausedRF")
 
-                if (curFileName?.equals(fileListName) == true) {
-                    curFileName = null// 一定要放在发通知之前
-                    curFile?.let {
-                        if (it.index < it.fileSize ) {
-                            if ((isCancelRF || isPausedRF) ) {
-                                LepuBleLog.d(tag, "READ_FILE_END isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
-                                return
-                            }
-                        } else {
-                            val list =
-                                LewBleResponse.FileList(0, it.content)
-
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList).post(InterfaceEvent(model, list))
+                curFileName = null// 一定要放在发通知之前
+                curFile?.let {
+                    if (it.index < it.fileSize){
+                        if ((isCancelRF || isPausedRF)) {
+                            LepuBleLog.d(tag, "READ_FILE_END isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
+                            return
                         }
-                    }?: LepuBleLog.d(tag, "READ_FILE_END EventLewFileList  model:$model,  curFile error!!")
-                } else {
-                    curFileName = null// 一定要放在发通知之前
-                    curFile?.let {
-                        if (it.index < it.fileSize){
-                            if ((isCancelRF || isPausedRF)) {
-                                LepuBleLog.d(tag, "READ_FILE_END isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
-                                return
-                            }
-                        }else {
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete).post(InterfaceEvent(model, it))
-                        }
-                    }?: LepuBleLog.d(tag, "READ_FILE_END EventLewReadFileComplete  model:$model,  curFile error!!")
+                    }else {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete).post(InterfaceEvent(model, it))
+                    }
                 }
-                curFile = null
             }
-
-
         }
     }
 

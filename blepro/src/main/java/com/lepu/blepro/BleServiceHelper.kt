@@ -700,9 +700,11 @@ class BleServiceHelper private constructor() {
      * 获取设备文件列表
      * @param fileType LeBp2w获取文件列表类型（LeBp2wBleCmd.FileType.ECG_TYPE, BP_TYPE, USER_TYPE）
      * @param fileType CheckmeLe获取文件列表类型（CheckmeLeBleCmd.ListType.ECG_TYPE, OXY_TYPE, DLC_TYPE）
+     * @param fileType 4G手表获取文件列表类型（LewBleCmd.ListType.SPORT, ECG, HR, OXY, SLEEP）
+     * @param startTime 起始时间戳 单位秒
      */
     @JvmOverloads
-    fun getFileList(model: Int, fileType: Int? = /*LeBp2wBleCmd.FileType.ECG_TYPE*/ null){
+    fun getFileList(model: Int, fileType: Int? = null, startTime: Int = 0){
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_LE_BP2W -> {
@@ -725,6 +727,18 @@ class BleServiceHelper private constructor() {
                             it.getFileList()
                         } else {
                             it.getFileList(fileType)
+                        }
+                    }
+                }
+            }
+            Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LewBleInterface).let {
+                        LepuBleLog.d(tag, "it as LewBleInterface--lewGetFileList")
+                        if (fileType == null) {
+                            it.getFileList()
+                        } else {
+                            it.getFileList(fileType, startTime)
                         }
                     }
                 }
@@ -2621,25 +2635,6 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.d(tag, "lewGetRtData current model $model unsupported!!")
-        }
-    }
-    /**
-     * 获取手表记录数据
-     * @param type LewBleCmd.ListType
-     * @param startTime 起始时间戳 单位秒
-     */
-    fun lewGetFileList(model: Int, type: Int, startTime: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LewBleInterface).let {
-                        LepuBleLog.d(tag, "it as LewBleInterface--lewGetFileList")
-                        it.getFileList(type, startTime)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "lewGetFileList current model $model unsupported!!")
         }
     }
     /**

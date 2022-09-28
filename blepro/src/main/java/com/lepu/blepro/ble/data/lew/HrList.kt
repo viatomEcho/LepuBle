@@ -1,24 +1,17 @@
 package com.lepu.blepro.ble.data.lew
 
-import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 import java.util.*
 
-class HrList(val bytes: ByteArray) {
+class HrList(val listSize: Int, val bytes: ByteArray) {
 
-    var leftSize: Int
-    var currentSize: Int
     var items = mutableListOf<Item>()
 
     init {
         var index = 0
-        leftSize = byte2UInt(bytes[index])
-        index++
-        currentSize = byte2UInt(bytes[index])
-        index++
-        for (i in 0 until currentSize) {
+        for (i in 0 until listSize) {
             items.add(Item(bytes.copyOfRange(index+i*6, index+(i+1)*6)))
         }
     }
@@ -27,8 +20,7 @@ class HrList(val bytes: ByteArray) {
         return """
             HrList : 
             bytes : ${bytesToHex(bytes)}
-            leftSize : $leftSize
-            currentSize : $currentSize
+            listSize : $listSize
             items : $items
         """.trimIndent()
     }

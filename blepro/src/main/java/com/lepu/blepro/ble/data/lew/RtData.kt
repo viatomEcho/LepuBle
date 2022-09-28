@@ -2,11 +2,10 @@ package com.lepu.blepro.ble.data.lew
 
 import com.lepu.blepro.ble.cmd.LewBleCmd
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
-import com.lepu.blepro.utils.DateUtil.stringFromDate
+import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toLong
 import com.lepu.blepro.utils.toUInt
-import java.util.*
 
 class RtData(val bytes: ByteArray) {
 
@@ -35,12 +34,12 @@ class RtData(val bytes: ByteArray) {
     }
 
     class DeviceStatus(val bytes: ByteArray) {
-        var battery: Int
-        var rssi: Int
-        var longitude: Long
-        var latitude: Long
-        var wear: Boolean
-        var mode: Int        // LewBleCmd.DeviceMode
+        var battery: Int     // 100
+        var rssi: Int        // 4G信号强度
+        var longitude: Long  // 经度，1000000倍
+        var latitude: Long   // 纬度，1000000倍
+        var wear: Boolean    // 0：未佩戴，1：佩戴
+        var mode: Int        // 设备当前模式 LewBleCmd.DeviceMode
         // reserved 8
         init {
             var index = 0
@@ -72,7 +71,7 @@ class RtData(val bytes: ByteArray) {
 
     class SportData(val bytes: ByteArray) {
         var type: Int        // LewBleCmd.SportType
-        var data: ByteArray
+        var data: ByteArray  // 根据运动类型解析数据
         init {
             var index = 0
             type = byte2UInt(bytes[index])
@@ -88,22 +87,23 @@ class RtData(val bytes: ByteArray) {
             """.trimIndent()
         }
     }
+    // 跑步实时数据
     class RunData(val bytes: ByteArray) {
-        var startTime: Int
-        var steps: Int
-        var distance: Int
-        var calories: Int
-        var duration: Int
-        var stepFreq: Int
-        var stepStride: Int
-        var pace0: Int
+        var startTime: String  // 时间8位bcd码  20220812084048
+        var steps: Int         // 当前跑步步数
+        var distance: Int      // 跑步距离，单位m
+        var calories: Int      // 当前消耗卡路里，100倍
+        var duration: Int      // 持续时间，单位s
+        var stepFreq: Int      // 步频
+        var stepStride: Int    // 步幅
+        var pace0: Int         // 配速，单位s
         var pace1: Int
         var pace2: Int
         // reserved 7
         init {
             var index = 0
-            startTime = toUInt(bytes.copyOfRange(index, index+4))
-            index += 4
+            startTime = trimStr(String(bytes.copyOfRange(index, index+8)))
+            index += 8
             steps = toUInt(bytes.copyOfRange(index, index+4))
             index += 4
             distance = toUInt(bytes.copyOfRange(index, index+4))
@@ -127,7 +127,6 @@ class RtData(val bytes: ByteArray) {
                 RunData : 
                 bytes : ${bytesToHex(bytes)}
                 startTime : $startTime
-                startTimeStr : ${stringFromDate(Date(startTime * 1000L), "yyyy-MM-dd HH:mm:ss")}
                 steps : $steps
                 distance : $distance
                 calories : $calories
@@ -142,7 +141,7 @@ class RtData(val bytes: ByteArray) {
     }
 
     class ModuleData(val bytes: ByteArray) {
-        var cardiotConnect: Boolean
+        var cardiotConnect: Boolean  // cardiot连接状态，0：断开，1：已连接
         // reserved 4
         var moduleSize: Int
         var watchEcg: WatchEcg? = null
@@ -186,7 +185,7 @@ class RtData(val bytes: ByteArray) {
         }
     }
     class WatchEcg(val bytes: ByteArray) {
-        var type: Int  // LewBleCmd.ModuleType
+        var type: Int  // 模块类型 LewBleCmd.ModuleType
         var hr: Int
         // reserved 7
         init {
@@ -205,7 +204,7 @@ class RtData(val bytes: ByteArray) {
         }
     }
     class WatchOxy(val bytes: ByteArray) {
-        var type: Int  // LewBleCmd.ModuleType
+        var type: Int  // 模块类型 LewBleCmd.ModuleType
         var spo2: Int
         var pr: Int
         // reserved 7
@@ -228,11 +227,11 @@ class RtData(val bytes: ByteArray) {
         }
     }
     class ModuleEr1(val bytes: ByteArray) {
-        var type: Int          // LewBleCmd.ModuleType
-        var bleConnect: Boolean
-        var leadOff: Boolean
+        var type: Int            // 模块类型 LewBleCmd.ModuleType
+        var bleConnect: Boolean  // 蓝牙连接状态
+        var leadOff: Boolean     // 导联状态
         var hr: Int
-        var battery: Int
+        var battery: Int         // 100
         // reserved 4
         init {
             var index = 0

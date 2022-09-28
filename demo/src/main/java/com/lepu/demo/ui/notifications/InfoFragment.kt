@@ -327,7 +327,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LEW
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_W12C) {
                 binding.info.text = "$it"
-                binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}"
+                binding.deviceInfo.text = "设备模式：${it.deviceModeMess}\n硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}"
             }
         }
         mainViewModel.biolandInfo.observe(viewLifecycleOwner) {
@@ -624,26 +624,39 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 val data = it.data as LewBleResponse.FileList
                 when (data.type) {
                     LewBleCmd.ListType.SPORT -> {
-                        val list = SportList(data.content)
+                        val list = SportList(data.listSize, data.content)
                         binding.info.text = "$list"
+                        binding.deviceInfo.text = "$list"
+                        Toast.makeText(context, "获取运动列表成功", Toast.LENGTH_SHORT).show()
                     }
                     LewBleCmd.ListType.ECG -> {
-                        val list = EcgList(data.content)
+                        val list = EcgList(data.listSize, data.content)
                         binding.info.text = "$list"
                         for (item in list.items) {
                             fileNames.add(item.name)
                         }
+                        binding.deviceInfo.text = "$fileNames"
+                        Toast.makeText(context, "获取心电列表成功", Toast.LENGTH_SHORT).show()
                     }
                     LewBleCmd.ListType.HR -> {
-                        val list = HrList(data.content)
+                        val list = HrList(data.listSize, data.content)
                         binding.info.text = "$list"
+                        binding.deviceInfo.text = "$list"
+                        Toast.makeText(context, "获取心率列表成功", Toast.LENGTH_SHORT).show()
                     }
                     LewBleCmd.ListType.OXY -> {
-                        val list = OxyList(data.content)
+                        val list = OxyList(data.listSize, data.content)
                         binding.info.text = "$list"
+                        binding.deviceInfo.text = "$list"
+                        Toast.makeText(context, "获取血氧列表成功", Toast.LENGTH_SHORT).show()
+                    }
+                    LewBleCmd.ListType.SLEEP -> {
+                        val list = SleepList(data.listSize, data.content)
+                        binding.info.text = "$list"
+                        binding.deviceInfo.text = "$list"
+                        Toast.makeText(context, "获取睡眠列表成功", Toast.LENGTH_SHORT).show()
                     }
                 }
-                Toast.makeText(context, "获取列表成功 ${data.type}", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadingFileProgress)
             .observe(this) { event ->

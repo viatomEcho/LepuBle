@@ -135,7 +135,6 @@ object LewBleResponse {
                 return // 已下载完成
             } else {
                 System.arraycopy(bytes, 0, content, index, bytes.size)
-                DownloadHelper.writeFile(model, "test", fileName, "dat", bytes)
                 index += bytes.size
             }
             LepuBleLog.d("LeWFile,bytes size = ${bytes.size}, index = $index")
@@ -143,10 +142,11 @@ object LewBleResponse {
     }
 
     @ExperimentalUnsignedTypes
-    class FileList(val type: Int, val content: ByteArray) {
+    class FileList(val type: Int, val listSize: Int, val content: ByteArray) {
         override fun toString(): String {
             return """
                 type : $type
+                listSize : $listSize
                 content : $content
             """.trimIndent()
         }

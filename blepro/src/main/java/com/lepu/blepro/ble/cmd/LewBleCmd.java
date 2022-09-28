@@ -189,8 +189,8 @@ public class LewBleCmd {
     public static byte[] getDeviceMode() { return getReq(DEVICE_MODE, new byte[0]); }
     public static class DeviceMode {
         public static final int MODE_NORMAL = 0;   // 普通模式
-        public static final int MODE_MONITOR = 1;  // 监护模式
-        public static final int MODE_FREE = 2;     // 省心模式
+//        public static final int MODE_MONITOR = 1;  // 监护模式
+        public static final int MODE_FREE = 1;     // 省心模式
     }
     public static byte[] setDeviceMode(int mode) { return getReq(DEVICE_MODE, new byte[]{(byte)mode}); }
     public static byte[] getAlarmClock() { return getReq(ALARM_CLOCK_INFO, new byte[0]); }
