@@ -102,6 +102,9 @@ class LpBleUtil {
             RAW_FOLDERS.put(Bluetooth.MODEL_DUOEK, PathUtils.getExternalAppFilesPath() + "/demo/duoek/")
             RAW_FOLDERS.put(Bluetooth.MODEL_ER2, PathUtils.getExternalAppFilesPath() + "/demo/er2/")
             RAW_FOLDERS.put(Bluetooth.MODEL_LP_ER2, PathUtils.getExternalAppFilesPath() + "/demo/lper2/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_BP2, PathUtils.getExternalAppFilesPath() + "/demo/bp2/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_BP2A, PathUtils.getExternalAppFilesPath() + "/demo/bp2a/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_BP2T, PathUtils.getExternalAppFilesPath() + "/demo/bp2t/")
 
             getServiceHelper()
                 .initLog(BuildConfig.DEBUG)
@@ -366,7 +369,18 @@ class LpBleUtil {
         @JvmOverloads
         fun readFile(userId: String, fileName: String, model: Int, offset: Int = 0) {
             BleServiceHelper.readFile(userId, fileName, model, offset)
-
+        }
+        fun cancelReadFile(model: Int){
+            BleServiceHelper.cancelReadFile(model)
+        }
+        fun pauseReadFile(model: Int){
+            BleServiceHelper.pauseReadFile(model)
+        }
+        fun continueReadFile(model: Int, userId: String, fileName: String, offset: Int){
+            BleServiceHelper.continueReadFile(model, userId, fileName, offset)
+        }
+        fun getRawFolder(model: Int): String? {
+            return BleServiceHelper.rawFolder?.get(model)
         }
 
         /**

@@ -171,7 +171,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
 
                 LepuBleLog.d(tag, "model:$model,CMD_START_READ_FILE => success, $respPkg")
                 if (respPkg.pkgType == 0x01.toByte()) {
-                    curFile =  curFileName?.let {
+                    curFile = curFileName?.let {
                         Er2File(model, it, toUInt(respPkg.data), userId!!)
                     }
                     sendCmd(Er2BleCmd.readFileData(0))
@@ -211,8 +211,8 @@ class Er2BleInterface(model: Int): BleInterface(model) {
 
                 curFileName = null// 一定要放在发通知之前
                 curFile?.let {
-                    if (it.index < it.fileSize ){
-                        if ((isCancelRF || isPausedRF) ) {
+                    if (it.index < it.fileSize){
+                        if ((isCancelRF || isPausedRF)) {
                             LepuBleLog.d(tag, "CMD_END_READ_FILE isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
                             return
                         }

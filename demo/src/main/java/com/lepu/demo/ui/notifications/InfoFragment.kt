@@ -3,7 +3,7 @@ package com.lepu.demo.ui.notifications
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import com.blankj.utilcode.util.LogUtils
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -36,6 +36,8 @@ import com.lepu.demo.data.OxyData
 import com.lepu.demo.databinding.FragmentInfoBinding
 import com.lepu.demo.util.DataConvert
 import com.lepu.demo.util.FileUtil
+import org.apache.commons.io.FileUtils
+import java.io.File
 
 
 class InfoFragment : Fragment(R.layout.fragment_info){
@@ -48,6 +50,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
     private var curFileName = ""
     private var readFileProcess = ""
+    private var process = 0
     private var fileCount = 0
 
     private var fileType = 0
@@ -66,6 +69,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
     var bpList: ArrayList<BpData> = arrayListOf()
 
     var mAlertDialog: AlertDialog? = null
+    var mCancelDialog: AlertDialog? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -118,10 +122,26 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
         }
 
+        mCancelDialog = AlertDialog.Builder(requireContext())
+            .setCancelable(false)
+            .setMessage("是否继续读取文件?")
+            .setPositiveButton("确定") { _, _ ->
+                val offset = getOffset(Constant.BluetoothConfig.currentModel[0], "", curFileName)
+                LpBleUtil.continueReadFile(Constant.BluetoothConfig.currentModel[0], "", curFileName, offset.size)
+                mAlertDialog?.show()
+            }
+            .setNegativeButton("取消") { _, _ ->
+                LpBleUtil.cancelReadFile(Constant.BluetoothConfig.currentModel[0])
+            }
+            .create()
+
         mAlertDialog = AlertDialog.Builder(requireContext())
             .setCancelable(false)
             .setMessage("正在处理，请稍等...")
-//            .setNegativeButton("取消") { dialog, _ -> dialog.dismiss() }
+            .setNegativeButton("暂停") { _, _ ->
+                LpBleUtil.pauseReadFile(Constant.BluetoothConfig.currentModel[0])
+                mCancelDialog?.show()
+            }
             .create()
 
         mainViewModel.downloadTip.observe(viewLifecycleOwner) {
@@ -416,6 +436,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         // 读文件
         binding.readFile.setOnClickListener {
             readFileProcess = ""
+            process = 0
             mAlertDialog?.show()
             ecgList.clear()
             ecgAdapter.setNewInstance(ecgList)
@@ -434,6 +455,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         }
         // 继续读取文件
         binding.continueRf.setOnClickListener {
+
+        }
+        // 取消读取文件
+        binding.cancelRf.setOnClickListener {
 
         }
         //  dfu升级
@@ -499,20 +524,21 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Int).let {
-                    binding.process.text = "$readFileProcess $curFileName 读取进度: ${(it / 10)} %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: ${it.div(10)} %"
+                    process = it / 10
+                    binding.process.text = "$readFileProcess $curFileName 读取进度: $process %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileComplete)
             .observe(this) { event ->
                 (event.data as Er1BleResponse.Er1File).let {
                     if (event.model == Bluetooth.MODEL_ER1_N) {
-                        val data = VBeatHrFile(it.content)
+                        val data = VBeatHrFile(getOffset(it.model, "", it.fileName))
                         binding.info.text = "$data"
                         binding.deviceInfo.text = "$data"
                     } else {
                         if (it.fileName.contains("R")) {
-                            val data = Er1EcgFile(it.content)
+                            val data = Er1EcgFile(getOffset(it.model, "", it.fileName))
                             binding.info.text = "$data"
                             readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                             val recordingTime = DateUtil.getSecondTimestamp(it.fileName.replace("R", ""))
@@ -521,7 +547,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             ecgAdapter.setNewInstance(ecgList)
                             ecgAdapter.notifyDataSetChanged()
                         } else {
-                            val data = Er2AnalysisFile(it.content)
+                            val data = Er2AnalysisFile(getOffset(it.model, "", it.fileName))
                             binding.info.text = "$data"
                             readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                         }
@@ -570,15 +596,16 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Int).let {
-                    binding.process.text = "$readFileProcess$curFileName 读取进度: ${(it.div(10))} %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: ${it.div(10)} %"
+                    process = it.div(10)
+                    binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileComplete)
             .observe(this) { event ->
                 (event.data as Er2File).let {
                     if (it.fileName.contains("R")) {
-                        val data = Er1EcgFile(it.content)
+                        val data = Er1EcgFile(getOffset(it.model, "", it.fileName))
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                         val recordingTime = DateUtil.getSecondTimestamp(it.fileName.replace("R", ""))
@@ -587,7 +614,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         ecgAdapter.setNewInstance(ecgList)
                         ecgAdapter.notifyDataSetChanged()
                     } else {
-                        val data = Er2AnalysisFile(it.content)
+                        val data = Er2AnalysisFile(getOffset(it.model, "", it.fileName))
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                     }
@@ -661,7 +688,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Int).let {
-                    binding.process.text = "$readFileProcess$curFileName 读取进度: ${(it.div(10))} %"
+                    process = it.div(10)
+                    binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete)
@@ -701,23 +730,25 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Bp2FilePart).let {
-                    binding.process.text = "$readFileProcess$curFileName 读取进度: ${(it.percent.times(100)).toInt()} %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: ${it.percent.times(100)} %"
+                    process = (it.percent.times(100)).toInt()
+                    binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileComplete)
             .observe(this) { event ->
                 (event.data as Bp2BleFile).let {
-                    if (it.type == 2) {
-                        val data = Bp2EcgFile(it.content)
+                    val file = Bp2BleFile(it.name, getOffset(event.model, "", it.name), it.deviceName)
+                    if (file.type == 2) {
+                        val data = Bp2EcgFile(file.content)
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                         val temp = getEcgData(data.measureTime.toLong(), it.name, data.waveData, DataConvert.getBp2ShortArray(data.waveData), data.recordingTime)
                         ecgList.add(temp)
                         ecgAdapter.setNewInstance(ecgList)
                         ecgAdapter.notifyDataSetChanged()
-                    } else if (it.type == 1) {
-                        val data = Bp2BpFile(it.content)
+                    } else if (file.type == 1) {
+                        val data = Bp2BpFile(file.content)
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                         val temp = BpData()
@@ -761,8 +792,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Bp2FilePart).let {
-                    binding.process.text = "$readFileProcess$curFileName 读取进度: ${(it.percent.times(100)).toInt()} %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: ${it.percent.times(100)} %"
+                    process = (it.percent.times(100)).toInt()
+                    binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileComplete)
@@ -868,8 +900,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Bp2FilePart).let {
-                    binding.process.text = "$readFileProcess$curFileName 读取进度: ${(it.percent.times(100)).toInt()} %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: ${it.percent.times(100)} %"
+                    process = (it.percent.times(100)).toInt()
+                    binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileComplete)
@@ -946,7 +979,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Int).let {
-                    binding.process.text = "$readFileProcess$curFileName 读取进度: ${(it.div(10))} %"
+                    process = it.div(10)
+                    binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileComplete)
@@ -1112,8 +1147,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadingFileProgress)
             .observe(this) {
                 val data = it.data as Int
-                binding.process.text = "$readFileProcess$curFileName 读取进度: $data %"
-                mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $data %"
+                process = data
+                binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
+                mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
             }
 
         //---------------------------CheckmeLE--------------------
@@ -1191,8 +1227,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadingFileProgress)
             .observe(this) {
                 val data = it.data as Int
-                binding.process.text = "$readFileProcess$curFileName 读取进度: $data %"
-                mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $data %"
+                process = data
+                binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
+                mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
             }
 
         //--------------------------------le S1-----------------------------------
@@ -1207,8 +1244,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1ReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Int).let {
-                    binding.process.text = "$readFileProcess$curFileName 读取进度: ${(it.div(10))} %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: ${(it.div(10))} %"
+                    process = it.div(10)
+                    binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1ReadFileComplete)
@@ -1280,8 +1318,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3ReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Int).let {
-                    binding.process.text = "$readFileProcess $curFileName 读取进度: $it %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $it %"
+                    process = it
+                    binding.process.text = "$readFileProcess $curFileName 读取进度: $process %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3ReadFileComplete)
@@ -1366,18 +1405,36 @@ class InfoFragment : Fragment(R.layout.fragment_info){
     }
 
     private fun readFile() {
-        if (binding.fileName.text.toString().isNotEmpty()) {
-            LpBleUtil.readFile("", trimStr(binding.fileName.text.toString()), Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+        curFileName = if (binding.fileName.text.toString().isNotEmpty()) {
+            trimStr(binding.fileName.text.toString())
         } else {
             if (fileNames.size == 0) {
                 mAlertDialog?.dismiss()
                 return
             }
-            curFileName = fileNames[0]
-            LpBleUtil.readFile("", fileNames[0], Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            fileNames[0]
         }
+        val offset = getOffset(Constant.BluetoothConfig.currentModel[0], "", curFileName)
+        LpBleUtil.readFile("", curFileName, Constant.BluetoothConfig.currentModel[0], offset.size)
+        binding.sendCmd.text = LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+    }
+
+    private fun getOffset(model: Int, userId: String, fileName: String): ByteArray {
+        val trimStr = trimStr(fileName)
+        LpBleUtil.getRawFolder(model)?.let { s ->
+            val mFile = File(s, "$userId$trimStr.dat")
+            LogUtils.d("文件$fileName", if (mFile.exists()) "存在" else "不存在")
+            if (mFile.exists()) {
+                FileUtils.readFileToByteArray(mFile)?.let {
+                    LogUtils.d("get offset: ${it.size}")
+                    return it
+                }
+            } else {
+                LogUtils.d("get offset: 0")
+                return ByteArray(0)
+            }
+        }
+        return ByteArray(0)
     }
 
 }

@@ -1634,6 +1634,16 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "V6导联脱落：${data.param.isLeadOffV6}\n" +
                         "${data.param}"
             }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VCOMIN.EventVcominRtHr)
+            .observe(this) {
+                val data = it.data as FhrData
+                binding.deviceInfo.text = "hr1 : ${data.hr1}, hr2 : ${data.hr2}"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AD5.EventAd5RtHr)
+            .observe(this) {
+                val data = it.data as FhrData
+                binding.deviceInfo.text = "hr1 : ${data.hr1}, hr2 : ${data.hr2}"
+            }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
