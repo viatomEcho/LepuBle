@@ -124,7 +124,7 @@ object LpWorkManager {
             LepuBleLog.d(tag, "leScanner is null")
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && (Build.VERSION.SDK_INT != 33)) {
             support2MPhy = bluetoothAdapter!!.isLe2MPhySupported
         }
     }
