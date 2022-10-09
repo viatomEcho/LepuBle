@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         }
 
         subscribeUi()
-        needPermission()
+//        needPermission()
         checkServer()
         initLiveEvent()
 //        split()
@@ -613,6 +613,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             }
             dialog.setCancelable(false)
             dialog.show()
+        }
+        checkBluetooth(CHECK_BLE_REQUEST_CODE).let {
+            LepuBleLog.d(TAG, "蓝牙状态 $it")
+            viewModel._bleEnable.value = true
         }
     }
 
