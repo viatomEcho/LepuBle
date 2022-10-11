@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         }
 
         subscribeUi()
-//        needPermission()
+        needPermission()
         checkServer()
         initLiveEvent()
 //        split()
@@ -519,6 +519,8 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PermissionX.init(this)
                 .permissions(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
                     Manifest.permission.CAMERA,
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -613,10 +615,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             }
             dialog.setCancelable(false)
             dialog.show()
-        }
-        checkBluetooth(CHECK_BLE_REQUEST_CODE).let {
-            LepuBleLog.d(TAG, "蓝牙状态 $it")
-            viewModel._bleEnable.value = true
         }
     }
 
