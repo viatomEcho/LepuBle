@@ -1636,12 +1636,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VCOMIN.EventVcominRtHr)
             .observe(this) {
-                val data = it.data as FhrData
+                val data = it.data as VcominData
                 binding.deviceInfo.text = "hr1 : ${data.hr1}, hr2 : ${data.hr2}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AD5.EventAd5RtHr)
             .observe(this) {
-                val data = it.data as FhrData
+                val data = it.data as Ad5Data
                 binding.deviceInfo.text = "hr1 : ${data.hr1}, hr2 : ${data.hr2}"
             }
     }
