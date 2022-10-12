@@ -43,7 +43,7 @@ object Er3BleResponse {
         var temp: Float                   // 体温（无效值0xFFFF，e.g.2500，temp = 25.0℃）
         var spo2: Int                     // 血氧（无效值0xFF）
         var pi: Float                     // 0- 200，e.g.25 : PI = 2.5
-        var pr: Int                       // 脉率
+        var pr: Int                       // 脉率（30~250bpm）
         var respRate: Int                 // 呼吸率
         var batteryStatus: Int            // 电池状态（0：正常使用，1：充电中，2：充满，3：低电量）
         var isInsertEcgLeadWire: Boolean  // 心电导联线状态（false：未插入导联线，true：插入导联线）

@@ -30,11 +30,12 @@ object FhrBleResponse {
         var battery: Int        // 电量数据（0-6）不准确，设备问题
 
         init {
-            deviceName = toString(bytes.copyOfRange(1, 5))
-            hr = (bytes[7].toUInt() and 0xFFu).toInt()
-            volume = (bytes[8].toUInt() and 0xFFu).toInt()
-            strength = (bytes[9].toUInt() and 0xFFu).toInt()
-            battery = (bytes[10].toUInt() and 0xFFu).toInt()
+            val data = FhrResponse(bytes)
+            deviceName = toString(data.content.copyOfRange(1, 5))
+            hr = (data.content[7].toUInt() and 0xFFu).toInt()
+            volume = (data.content[8].toUInt() and 0xFFu).toInt()
+            strength = (data.content[9].toUInt() and 0xFFu).toInt()
+            battery = (data.content[10].toUInt() and 0xFFu).toInt()
         }
 
         override fun toString(): String {

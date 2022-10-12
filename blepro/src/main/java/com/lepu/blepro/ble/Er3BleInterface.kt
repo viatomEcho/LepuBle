@@ -202,6 +202,10 @@ class Er3BleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3BurnLockFlash).post(InterfaceEvent(model, false))
                 }
             }
+            Er3BleCmd.STOP_ECG -> {
+                LepuBleLog.d(tag, "model:$model,STOP_ECG => success")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3EcgStop).post(InterfaceEvent(model, true))
+            }
         }
     }
 
@@ -238,6 +242,11 @@ class Er3BleInterface(model: Int): BleInterface(model) {
         }
 
         return bytesLeft
+    }
+
+    fun stopEcg() {
+        sendCmd(Er3BleCmd.stopEcg())
+        LepuBleLog.d(tag, "stopEcg...")
     }
 
     /**

@@ -120,7 +120,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     setViewVisible(binding.er2Layout.root)
                     LpBleUtil.getEr2SwitcherState(it.modelNo)
                 }
-                Bluetooth.MODEL_ER3 -> {
+                Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> {
                     setViewVisible(binding.er3Layout.root)
                     LpBleUtil.er3GetConfig(it.modelNo)
                 }

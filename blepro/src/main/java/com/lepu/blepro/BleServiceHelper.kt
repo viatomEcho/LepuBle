@@ -3041,6 +3041,14 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
+            Bluetooth.MODEL_LEPOD -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Er3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Er3BleInterface--stopEcg")
+                        it.stopEcg()
+                    }
+                }
+            }
             else -> LepuBleLog.d(tag, "stopEcg current model $model unsupported!!")
         }
     }
@@ -3238,7 +3246,7 @@ class BleServiceHelper private constructor() {
     fun er3GetConfig(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_ER3 -> {
+            Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er3BleInterface).let {
                         LepuBleLog.d(tag, "it as Er3BleInterface--er3GetConfig")
@@ -3259,7 +3267,7 @@ class BleServiceHelper private constructor() {
     fun er3SetConfig(model: Int, mode: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_ER3 -> {
+            Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er3BleInterface).let {
                         LepuBleLog.d(tag, "it as Er3BleInterface--er3SetConfig")

@@ -79,7 +79,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
     }
 
     private fun testEr3() {
-        val fileName = "W20220921154419"
+//        val fileName = "W20220921154419"
+        val fileName = "W20221012161124"
         val data = Er3WaveFile(FileUtil.readFile(context, fileName))
         val recordingTime = DateUtil.getSecondTimestamp(fileName.replace("W", ""))
         val temp = getEcgData(recordingTime, fileName, data.wave, DataConvert.getEr3ShortArray(data.waveInts), data.recordingTime)
@@ -135,14 +136,23 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
             .create()
 
-        mAlertDialog = AlertDialog.Builder(requireContext())
-            .setCancelable(false)
-            .setMessage("正在处理，请稍等...")
-            .setNegativeButton("暂停") { _, _ ->
-                LpBleUtil.pauseReadFile(Constant.BluetoothConfig.currentModel[0])
-                mCancelDialog?.show()
-            }
-            .create()
+        if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1
+            || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1_N
+            || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM1) {
+            mAlertDialog = AlertDialog.Builder(requireContext())
+                .setCancelable(false)
+                .setMessage("正在处理，请稍等...")
+                .setNegativeButton("暂停") { _, _ ->
+                    LpBleUtil.pauseReadFile(Constant.BluetoothConfig.currentModel[0])
+                    mCancelDialog?.show()
+                }
+                .create()
+        } else {
+            mAlertDialog = AlertDialog.Builder(requireContext())
+                .setCancelable(false)
+                .setMessage("正在处理，请稍等...")
+                .create()
+        }
 
         mainViewModel.downloadTip.observe(viewLifecycleOwner) {
             mAlertDialog?.setMessage("正在处理，请稍等... $it")
@@ -217,7 +227,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM3
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER3) {
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER3
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LEPOD) {
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
             }

@@ -198,7 +198,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
             Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_PC80B_BLE -> waveHandler.post(EcgWaveTask())
 
-            Bluetooth.MODEL_ER3 -> waveHandler.post(Er3EcgWaveTask())
+            Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> waveHandler.post(Er3EcgWaveTask())
 
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
             Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
@@ -269,7 +269,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
                     LpBleUtil.startRtTask(it.modelNo, 2000)
                 }
-                Bluetooth.MODEL_ER3 -> {
+                Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> {
                     binding.er3Layout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE
@@ -639,6 +639,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     }
                 }
             }
+        }
+        binding.er3StopEcg.setOnClickListener {
+            LpBleUtil.stopEcg(Constant.BluetoothConfig.currentModel[0])
         }
     }
 
@@ -1633,6 +1636,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "V5导联脱落：${data.param.isLeadOffV5}\n" +
                         "V6导联脱落：${data.param.isLeadOffV6}\n" +
                         "${data.param}"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3EcgStop)
+            .observe(this) {
+                Toast.makeText(context, "结束测量", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VCOMIN.EventVcominRtHr)
             .observe(this) {

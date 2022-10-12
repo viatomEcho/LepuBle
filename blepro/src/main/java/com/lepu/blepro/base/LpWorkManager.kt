@@ -174,7 +174,7 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_ER3 -> {
+            Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> {
                 Er3BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
