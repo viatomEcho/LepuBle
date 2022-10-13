@@ -13,7 +13,7 @@ import com.lepu.blepro.utils.toUInt
 import kotlin.experimental.inv
 
 /**
- * er1心电贴：
+ * er3：
  * send:
  * 1.同步时间
  * 2.获取设备信息
@@ -88,7 +88,7 @@ class Er3BleInterface(model: Int): BleInterface(model) {
                     sendCmd(Er3BleCmd.readFileData(offset))
                 } else {
                     LepuBleLog.d(tag, "read file failed：${response.pkgType}")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileError).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3ReadFileError).post(InterfaceEvent(model, true))
                 }
             }
 
@@ -108,7 +108,7 @@ class Er3BleInterface(model: Int): BleInterface(model) {
                     val nowSize: Long = (this.index).toLong()
                     val size :Long= nowSize * 100
                     val poSize :Int= (size).div(this.fileSize).toInt()
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadingFileProgress).post(InterfaceEvent(model,poSize))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3ReadingFileProgress).post(InterfaceEvent(model,poSize))
                     LepuBleLog.d(tag, "read file：${this.fileName} => ${this.index } / ${this.fileSize} poSize : $poSize")
 
                     if (this.index < this.fileSize) {
@@ -126,12 +126,12 @@ class Er3BleInterface(model: Int): BleInterface(model) {
                 curFileName = null// 一定要放在发通知之前
                 curFile?.let {
                     if (it.index < it.fileSize){
-                        if ((isCancelRF || isPausedRF) ) {
+                        if ((isCancelRF || isPausedRF)) {
                             LepuBleLog.d(tag, "READ_FILE_END isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
                             return
                         }
                     }else {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileComplete).post(InterfaceEvent(model, it))
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3ReadFileComplete).post(InterfaceEvent(model, it))
                     }
                 }?: LepuBleLog.d(tag, "READ_FILE_END model:$model, curFile error!!")
                 curFile = null
@@ -202,6 +202,10 @@ class Er3BleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3BurnLockFlash).post(InterfaceEvent(model, false))
                 }
             }
+            Er3BleCmd.STOP_ECG -> {
+                LepuBleLog.d(tag, "model:$model,STOP_ECG => success")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3EcgStop).post(InterfaceEvent(model, true))
+            }
         }
     }
 
@@ -238,6 +242,11 @@ class Er3BleInterface(model: Int): BleInterface(model) {
         }
 
         return bytesLeft
+    }
+
+    fun stopEcg() {
+        sendCmd(Er3BleCmd.stopEcg())
+        LepuBleLog.d(tag, "stopEcg...")
     }
 
     /**

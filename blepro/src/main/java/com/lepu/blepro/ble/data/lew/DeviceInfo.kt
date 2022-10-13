@@ -5,6 +5,7 @@ import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.DateUtil.getSecondTimestamp
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.bytesToHex
+import com.lepu.blepro.utils.getTimeString
 import com.lepu.blepro.utils.toUInt
 
 class DeviceInfo(val bytes: ByteArray) {
@@ -61,7 +62,7 @@ class DeviceInfo(val bytes: ByteArray) {
         minute = byte2UInt(bytes[index])
         index++
         second = byte2UInt(bytes[index])
-        curTime = getSecondTimestamp(getTimeStr())
+        curTime = getSecondTimestamp(getTimeString(year, month, day, hour, minute, second))
         index++
         protocolMaxLen = toUInt(bytes.copyOfRange(index, index+2))
         index += 2
@@ -78,39 +79,10 @@ class DeviceInfo(val bytes: ByteArray) {
     private fun getModeMess(mode: Int): String {
         return when (mode) {
             LewBleCmd.DeviceMode.MODE_NORMAL -> "普通模式"
-            LewBleCmd.DeviceMode.MODE_MONITOR -> "监护模式"
+//            LewBleCmd.DeviceMode.MODE_MONITOR -> "监护模式"
             LewBleCmd.DeviceMode.MODE_FREE -> "省心模式"
             else -> ""
         }
-    }
-
-    private fun getTimeStr(): String {
-        val mon = if (month < 10) {
-            "0$month"
-        } else {
-            "$month"
-        }
-        val d = if (day < 10) {
-            "0$day"
-        } else {
-            "$day"
-        }
-        val h = if (hour < 10) {
-            "0$hour"
-        } else {
-            "$hour"
-        }
-        val min = if (minute < 10) {
-            "0$minute"
-        } else {
-            "$minute"
-        }
-        val s = if (second < 10) {
-            "0$second"
-        } else {
-            "$second"
-        }
-        return "$year$mon$d$h$min$s"
     }
 
     override fun toString(): String {

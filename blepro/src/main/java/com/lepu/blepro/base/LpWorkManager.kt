@@ -174,7 +174,7 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_ER3 -> {
+            Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> {
                 Er3BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -896,7 +896,8 @@ object LpWorkManager {
 
                 if (isReconnectScan && isContains){
                     stopDiscover()
-                    if (model == Bluetooth.MODEL_AOJ20A || model == Bluetooth.MODEL_LPM311) {
+                    if (model == Bluetooth.MODEL_AOJ20A || model == Bluetooth.MODEL_LPM311
+                        || model == Bluetooth.MODEL_LEW || model == Bluetooth.MODEL_W12C) {
                         GlobalScope.launch {
                             delay(2000)
                             vailFace.get(b.model)?.connect(application!!, b.device, true, toConnectUpdater)

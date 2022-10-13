@@ -54,9 +54,9 @@ class SosContact() {
 
     class Item() {
         var default = false  // 是否为默认拨打紧急联系人，只有一个。1：是，0：否
-        var nameLen = 0      // 姓名长度，最长45
+        var nameLen = 0      // 姓名长度，最长45 （设备定长46，协议暂时未修改）
         var name = ""
-        var phoneLen = 0     // 电话长度，最长16
+        var phoneLen = 0     // 电话长度，最长16 （设备定长16，协议暂时未修改）
         var phone = ""
         var relation = 0     // 关系 LewBleCmd.RelationShip
         constructor(bytes: ByteArray) : this() {

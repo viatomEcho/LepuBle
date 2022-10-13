@@ -8,18 +8,12 @@ import com.lepu.blepro.utils.toUInt
 import java.nio.charset.StandardCharsets
 import java.util.*
 
-class EcgList(val bytes: ByteArray) {
+class EcgList(val listSize: Int, val bytes: ByteArray) {
 
-    var leftSize: Int
-    var currentSize: Int
     var items = mutableListOf<Item>()
 
     init {
         var index = 0
-        leftSize = byte2UInt(bytes[index])
-        index++
-        currentSize = byte2UInt(bytes[index])
-        index++
         while (index != bytes.size) {
             val len = byte2UInt(bytes[index+4])
             items.add(Item(bytes.copyOfRange(index, index+4+1+len)))
@@ -31,8 +25,7 @@ class EcgList(val bytes: ByteArray) {
         return """
             EcgList : 
             bytes : ${bytesToHex(bytes)}
-            leftSize : $leftSize
-            currentSize : $currentSize
+            listSize : $listSize
             items : $items
         """.trimIndent()
     }

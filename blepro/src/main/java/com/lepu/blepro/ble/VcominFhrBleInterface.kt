@@ -4,10 +4,9 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.data.FhrData
+import com.lepu.blepro.ble.data.VcominData
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
-import com.lepu.blepro.utils.ByteUtils.byte2UInt
 
 /**
  * vcomin胎心仪：
@@ -39,19 +38,9 @@ class VcominFhrBleInterface(model: Int): BleInterface(model) {
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: ByteArray) {
         LepuBleLog.d(tag, "onResponseReceived bytes: ${bytesToHex(response)}")
-
-        val cmd = byte2UInt(response[2])
-        val hr1 = byte2UInt(response[3])
-        val hr2 = byte2UInt(response[4])
-
-        val data = FhrData()
-        data.hr1 = hr1
-        data.hr2 = hr2
-
-        LepuBleLog.d(tag, "received cmd : $cmd")
+        val data = VcominData(response)
         LepuBleLog.d(tag, "received data : $data")
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VCOMIN.EventVcominRtHr).post(InterfaceEvent(model, data))
-
     }
 
     @OptIn(ExperimentalUnsignedTypes::class)

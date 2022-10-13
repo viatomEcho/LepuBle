@@ -48,7 +48,7 @@ class FhrBleInterface(model: Int): BleInterface(model) {
 
         when (response.cmd) {
             0x04 -> {
-                val info = FhrBleResponse.DeviceInfo(response.content)
+                val info = FhrBleResponse.DeviceInfo(response.bytes)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.FHR.EventFhrDeviceInfo).post(InterfaceEvent(model, info))
             }
             0x0a -> {

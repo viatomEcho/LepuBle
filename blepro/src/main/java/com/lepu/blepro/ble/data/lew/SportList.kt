@@ -6,19 +6,13 @@ import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 import java.util.*
 
-class SportList(val bytes: ByteArray) {
+class SportList(val listSize: Int, val bytes: ByteArray) {
 
-    var leftSize: Int
-    var currentSize: Int
     var items = mutableListOf<Item>()
 
     init {
         var index = 0
-        leftSize = byte2UInt(bytes[index])
-        index++
-        currentSize = byte2UInt(bytes[index])
-        index++
-        for (i in 0 until currentSize) {
+        for (i in 0 until listSize) {
             items.add(Item(bytes.copyOfRange(index+i*27, index+(i+1)*27)))
         }
     }
@@ -27,8 +21,7 @@ class SportList(val bytes: ByteArray) {
         return """
             SportList : 
             bytes : ${bytesToHex(bytes)}
-            leftSize : $leftSize
-            currentSize : $currentSize
+            listSize : $listSize
             items : $items
         """.trimIndent()
     }

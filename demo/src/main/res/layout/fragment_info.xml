@@ -84,12 +84,18 @@
                     android:id="@+id/pause_rf"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="暂停读文件"/>
+                    android:text="暂停"/>
                 <Button
                     android:id="@+id/continue_rf"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="继续读文件"
+                    android:text="继续"
+                    android:layout_marginStart="20dp"/>
+                <Button
+                    android:id="@+id/cancel_rf"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="取消"
                     android:layout_marginStart="20dp"/>
             </LinearLayout>
             <LinearLayout

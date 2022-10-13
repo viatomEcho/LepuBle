@@ -5,29 +5,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="lew"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <Button
-                android:id="@+id/lew_get_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="获取时间"/>
-            <Button
                 android:id="@+id/lew_set_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="设置时间"
+                android:text="设置时间"/>
+            <Button
+                android:visibility="gone"
+                android:id="@+id/lew_get_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取时间"
                 android:layout_marginStart="20dp"/>
             <Button
                 android:id="@+id/lew_get_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="设备信息"
+                android:text="获取设备信息"
                 android:layout_marginStart="20dp"/>
         </LinearLayout>
         <LinearLayout
@@ -70,36 +67,38 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <Button
-                android:id="@+id/lew_get_language"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="获取语言"/>
-            <Button
                 android:id="@+id/lew_set_language"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="设置语言"
+                android:text="设置语言"/>
+            <Button
+                android:visibility="gone"
+                android:id="@+id/lew_get_language"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取语言"
                 android:layout_marginStart="20dp"/>
             <Button
                 android:id="@+id/lew_get_network"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="联网模式"
+                android:text="获取联网模式"
                 android:layout_marginStart="20dp"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <Button
-                android:id="@+id/lew_get_unit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="获取单位"/>
-            <Button
                 android:id="@+id/lew_set_unit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="设置单位"
+                android:text="设置单位"/>
+            <Button
+                android:visibility="gone"
+                android:id="@+id/lew_get_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取单位"
                 android:layout_marginStart="20dp"/>
             <Button
                 android:id="@+id/lew_find_device"
@@ -112,21 +111,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <Button
-                android:id="@+id/lew_get_hand_raise"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="获取翻腕"/>
-            <Button
                 android:id="@+id/lew_set_hand_raise"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="设置翻腕"
-                android:layout_marginStart="20dp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                android:text="设置翻腕"/>
             <Button
+                android:visibility="gone"
+                android:id="@+id/lew_get_hand_raise"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取翻腕"
+                android:layout_marginStart="20dp"/>
+            <Button
+                android:visibility="gone"
                 android:id="@+id/lew_get_lr_hand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -142,21 +139,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <Button
-                android:id="@+id/lew_get_no_disturb"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="获取勿扰"/>
-            <Button
                 android:id="@+id/lew_set_no_disturb"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="设置勿扰"
-                android:layout_marginStart="20dp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                android:text="设置勿扰"/>
             <Button
+                android:visibility="gone"
+                android:id="@+id/lew_get_no_disturb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取勿扰"
+                android:layout_marginStart="20dp"/>
+            <Button
+                android:visibility="gone"
                 android:id="@+id/lew_get_app_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -193,21 +188,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <Button
-                android:id="@+id/lew_get_device_mode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="获取模式"/>
-            <Button
                 android:id="@+id/lew_set_device_mode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="设置模式"
-                android:layout_marginStart="20dp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                android:text="设置模式"/>
             <Button
+                android:visibility="gone"
+                android:id="@+id/lew_get_device_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取模式"
+                android:layout_marginStart="20dp"/>
+            <Button
+                android:visibility="gone"
                 android:id="@+id/lew_get_alarm_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -223,21 +216,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <Button
-                android:id="@+id/lew_get_phone_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="获取手机开关"/>
-            <Button
                 android:id="@+id/lew_set_phone_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="设置手机开关"
-                android:layout_marginStart="20dp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                android:text="设置手机开关"/>
             <Button
+                android:visibility="gone"
+                android:id="@+id/lew_get_phone_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取手机开关"
+                android:layout_marginStart="20dp"/>
+            <Button
+                android:visibility="gone"
                 android:id="@+id/lew_get_medicine_remind"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -268,21 +259,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <Button
-                android:id="@+id/lew_get_sport_target"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="获取运动目标值"/>
-            <Button
                 android:id="@+id/lew_set_sport_target"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="设置运动目标值"
-                android:layout_marginStart="20dp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                android:text="设置运动目标值"/>
             <Button
+                android:visibility="gone"
+                android:id="@+id/lew_get_sport_target"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取运动目标值"
+                android:layout_marginStart="20dp"/>
+            <Button
+                android:visibility="gone"
                 android:id="@+id/lew_get_target_remind"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -298,21 +287,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <Button
-                android:id="@+id/lew_get_sitting_remind"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="获取久坐提醒"/>
-            <Button
                 android:id="@+id/lew_set_sitting_remind"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="设置久坐提醒"
-                android:layout_marginStart="20dp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                android:text="设置久坐提醒"/>
             <Button
+                android:visibility="gone"
+                android:id="@+id/lew_get_sitting_remind"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取久坐提醒"
+                android:layout_marginStart="20dp"/>
+            <Button
+                android:visibility="gone"
                 android:id="@+id/lew_get_hr_detect"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -328,21 +315,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <Button
-                android:id="@+id/lew_get_oxy_detect"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="获取自测血氧"/>
-            <Button
                 android:id="@+id/lew_set_oxy_detect"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="设置自测血氧"
-                android:layout_marginStart="20dp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                android:text="设置自测血氧"/>
             <Button
+                android:visibility="gone"
+                android:id="@+id/lew_get_oxy_detect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取自测血氧"
+                android:layout_marginStart="20dp"/>
+            <Button
+                android:visibility="gone"
                 android:id="@+id/lew_get_user_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -358,21 +343,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <Button
-                android:id="@+id/lew_get_phonebook"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="获取通讯录"/>
-            <Button
                 android:id="@+id/lew_set_phonebook"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="通讯录同步"
-                android:layout_marginStart="20dp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                android:text="通讯录同步"/>
             <Button
+                android:visibility="gone"
+                android:id="@+id/lew_get_phonebook"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取通讯录"
+                android:layout_marginStart="20dp"/>
+            <Button
+                android:visibility="gone"
                 android:id="@+id/lew_get_sos"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -381,28 +364,26 @@
                 android:id="@+id/lew_set_sos"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="设置紧急"
+                android:text="设置紧急联系人"
                 android:layout_marginStart="20dp"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <Button
-                android:id="@+id/lew_get_dial"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="获取表盘"/>
             <Button
                 android:id="@+id/lew_set_dial"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="设置表盘"
-                android:layout_marginStart="20dp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                android:text="设置表盘"/>
             <Button
+                android:visibility="gone"
+                android:id="@+id/lew_get_dial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取表盘"
+                android:layout_marginStart="20dp"/>
+            <Button
+                android:visibility="gone"
                 android:id="@+id/lew_get_second_screen"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -413,11 +394,8 @@
                 android:layout_height="wrap_content"
                 android:text="设置副屏"
                 android:layout_marginStart="20dp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
             <Button
+                android:visibility="gone"
                 android:id="@+id/lew_get_cards"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -475,21 +453,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <Button
-                android:id="@+id/lew_get_hr_threshold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="获取心率预警"/>
-            <Button
                 android:id="@+id/lew_set_hr_threshold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="设置心率预警"
-                android:layout_marginStart="20dp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                android:text="设置心率预警"/>
             <Button
+                android:visibility="gone"
+                android:id="@+id/lew_get_hr_threshold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取心率预警"
+                android:layout_marginStart="20dp"/>
+            <Button
+                android:visibility="gone"
                 android:id="@+id/lew_get_oxy_threshold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

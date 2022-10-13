@@ -25,59 +25,45 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_PULSEBIT_EX = "Pulsebit";
     public static final String BT_NAME_OXY_LINK = "Oxylink";
     public static final String BT_NAME_KIDS_O2 = "KidsO2";
-    public static final String FETAL_DEVICE_NAME = "MD1000AF4";//7 OEM
+    public static final String FETAL_DEVICE_NAME = "MD1000AF4";  // 7 OEM
     public static final String BT_NAME_BABY_O2 = "BabyO2";
     public static final String BT_NAME_OXY_SMART = "OxySmart";
-    public static final String BT_NAME_TV221U = "VTM 20F";//4 OEM
-    public static final String BT_NAME_PC100 = "PC-100";//5 OEM   小企鹅后面 5位sn
-    public static final String BT_NAME_PC60FW = "PC-60F_SN";//6 OEM
-    public static final String BT_NAME_AOJ20A = "AOJ-20A";//2 OEM
-    public static final String BT_NAME_BP2 = "BP2";
+    public static final String BT_NAME_TV221U = "VTM 20F";  // 4 OEM
+    public static final String BT_NAME_PC100 = "PC-100";  // 5 OEM   小企鹅后面 5位sn
+    public static final String BT_NAME_PC60FW = "PC-60F_SN";  // 6 OEM
+    public static final String BT_NAME_AOJ20A = "AOJ-20A";  // 2 OEM
+    public static final String BT_NAME_BP2 = "BP2";  // 心电+血压
     public static final String BT_NAME_OXYFIT = "Oxyfit";
-    public static final String BT_NAME_VCOMIN = "VCOMIN";//3 OEM
+    public static final String BT_NAME_VCOMIN = "VCOMIN";  // 3 OEM
     public static final String BT_NAME_CHECK_POD = "Checkme Pod";
-    public static final String BT_NAME_BP2A = "BP2A";
-    public static final String BT_NAME_BODY_FAT = "Viatom";//1 OEM 蓝牙体脂秤
-    private static final String BABYTONE = "Babytone";
-    public static final String DEVICE_NAME_BODY_FAT = "Body Fat";
-    public static final String BT_NAME_O2M = "O2M"; // O2 Max
-    public static final String BT_NAME_CHECKME_O2M = "Checkme O2 Max";
-    public static final String BT_NAME_BPM = "BPM-188"; // 捷美瑞血压计
-    public static final String BT_NAME_BPM_B02 = "BPM-B02";
-    //    private static final String BPM_PRODUCT_NAME = " B02T";
-    public static final String BPM_PRODUCT_NAME = " B02T/B02S";
-    public static final String BT_NAME_LEM = "LEM1";
-    public static final String BT_NAME_LEM_M1 = "M1";
-    public static final String BT_NAME_FHR = "FHR-666(BLE)";//OEM
-    public static final String BT_NAME_FHR_P600L = "Babytone";//OEM
-    public static final String BT_NAME_BABYO2N = "BabyO2N";//盒子版BabyO2
-    public static final String BT_NAME_BABYO2S2 = "BabyO2 S2";//盒子版BabyO2N S2
+    public static final String BT_NAME_BP2A = "BP2A";  // 血压
+    public static final String BT_NAME_BODY_FAT = "Viatom";  // 1 OEM 蓝牙体脂秤
+    public static final String BT_NAME_O2M = "O2M";  // O2 Max
+    public static final String BT_NAME_BPM = "BPM-188";  // 捷美瑞血压计
+    public static final String BT_NAME_LEM = "LEM1";  // 护颈仪
+    public static final String BT_NAME_FHR = "FHR-666(BLE)";  // OEM
+    public static final String BT_NAME_BABYO2N = "BabyO2N";  // 盒子版BabyO2
     public static final String BT_NAME_BBSM_S1 = "BBSM S1";
     public static final String BT_NAME_BBSM_S2 = "BBSM S2";
-    public static final String BT_NAME_PC60FW_NEW = "PC-60FW";//显示名
-    public static final String BT_NAME_BP2T = "BP2T";
-    public static final String BT_NAME_BP2W = "BP2W";
-    public static final String BT_NAME_DEVICES_ER2 = "ER2";//新增ER2【产线用】
-    public static final String BT_NAME_STATION = "Station";//BabyO2盒子升级专用
-    public static final String BT_NAME_POD2B = "POD-2B_SN";//POD-2B_SN7295【蓝牙名】
-    public static final String BT_NAME_POD2W = "POD-2W";//【显示名】
-    public static final String BT_NAME_PC_60NW = "PC-60NW_SN";//【蓝牙名】 + SN后六位
-    public static final String BT_NAME_PC_60NW_1 = "PC-60NW-1_SN";//【蓝牙名】 + SN后六位
-    public static final String BT_NAME_PC_60NW_W = "PC-60NW-1";//显示名
-    public static final String BT_NAME_POD_1W = "POD-1_SN";//【蓝牙名】 + SN后四位
-    public static final String BT_NAME_POD_1W_W = "POD-1W";//显示名
-    public static final String BT_NAME_PC_60B = "PC-60B_SN";//【蓝牙名】 + SN后六位 PC-60B_SN000007
-    public static final String BT_NAME_PC_60B_B = "PC-60B";//显示名
+    public static final String BT_NAME_BP2T = "BP2T";  // 血压+理疗
+    public static final String BT_NAME_BP2W = "BP2W";  // 国外版bp2WiFi
+    public static final String BT_NAME_DEVICES_ER2 = "ER2";  // 新增ER2【产线用】
+    public static final String BT_NAME_STATION = "Station";  // BabyO2盒子升级专用
+    public static final String BT_NAME_POD2B = "POD-2B_SN";  // POD-2B_SN7295【蓝牙名】
+    public static final String BT_NAME_PC_60NW = "PC-60NW_SN";  // 【蓝牙名】 + SN后六位
+    public static final String BT_NAME_PC_60NW_1 = "PC-60NW-1_SN";  // 【蓝牙名】 + SN后六位
+    public static final String BT_NAME_POD_1W = "POD-1_SN";  // 【蓝牙名】 + SN后四位
+    public static final String BT_NAME_PC_60B = "PC-60B_SN";  // 【蓝牙名】 + SN后六位 PC-60B_SN000007
 
     public static final String BT_NAME_RINGO2 = "O2NCI";
-    public static final String BT_NAME_KCA = "KCA"; // 康康血压计
+    public static final String BT_NAME_KCA = "KCA";  // 康康血压计
     public static final String BT_NAME_PC80B = "PC80B";
     public static final String BT_NAME_PC80B_BLE = "PC80B_BLE:";
-    public static final String BT_NAME_BPW1 = "BPW1"; // 金亿帝血压手表
-    public static final String BT_NAME_F4_SCALE = "F4"; // F4体脂秤
-    public static final String BT_NAME_MY_SCALE = "MY_SCALE"; // F5体脂秤
-    public static final String BT_NAME_F5_SCALE = "F5"; // F5体脂秤
-    public static final String BT_NAME_F8_SCALE = "F8"; // F8体脂秤
+    public static final String BT_NAME_BPW1 = "BPW1";  // 金亿帝血压手表
+    public static final String BT_NAME_F4_SCALE = "F4";  // F4体脂秤
+    public static final String BT_NAME_MY_SCALE = "MY_SCALE";  // F5体脂秤
+    public static final String BT_NAME_F5_SCALE = "F5";  // F5体脂秤
+    public static final String BT_NAME_F8_SCALE = "F8";  // F8体脂秤
 
     public static final String BT_NAME_PC66B = "PC-66B";
 
@@ -88,7 +74,7 @@ public class Bluetooth implements Parcelable {
 
     public static final String BT_NAME_VETCORDER = "Vetcorder";
     public static final String BT_NAME_VTM_AD5 = "VTM AD5";
-    public static final String BT_NAME_LE_BP2W = "LP-BP2W";
+    public static final String BT_NAME_LE_BP2W = "LP-BP2W";  // 国内版bp2WiFi
     public static final String BT_NAME_PC_68B = "PC-68B";
 
     public static final String BT_NAME_PC_300 = "PC_300SNT";
@@ -127,6 +113,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_PF_20B = "PF-20B";
     public static final String BT_NAME_CHECKME = "Checkme";
     public static final String BT_NAME_ER3 = "ER3";
+    public static final String BT_NAME_LEPOD = "Lepod";
 
     public static final int MODEL_UNRECOGNIZED = 0;
     public static final int MODEL_CHECKO2 = 1;
@@ -229,6 +216,7 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_SP20_BLE = 93;
     public static final int MODEL_PC300_BLE = 94;
     public static final int MODEL_ER3 = 95;
+    public static final int MODEL_LEPOD = 96;
 
     @IntDef({MODEL_UNRECOGNIZED, MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_OXYRING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER1_N,
             MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL, MODEL_BABYO2, MODEL_OXYSMART,
@@ -240,7 +228,7 @@ public class Bluetooth implements Parcelable {
             MODEL_BBSM_S1, MODEL_BBSM_S2, MODEL_CMRING, MODEL_LPRE, MODEL_LE_B1, MODEL_OXYU, MODEL_S5W, MODEL_W12C, MODEL_AI_S100,
             MODEL_HHM1, MODEL_HHM2, MODEL_HHM3, MODEL_HHM4, MODEL_LP_ER2, MODEL_LPM311, MODEL_POCTOR_M3102, MODEL_S6W, MODEL_S7W, MODEL_S7BW,
             MODEL_BIOLAND_BGM, MODEL_S6W1, MODEL_PF_10AW, MODEL_PF_10AW1, MODEL_PF_10BW, MODEL_PF_10BW1, MODEL_PF_20AW, MODEL_PF_20B,
-            MODEL_CHECKME, MODEL_PC80B_BLE, MODEL_SP20_BLE, MODEL_PC300_BLE, MODEL_ER3})
+            MODEL_CHECKME, MODEL_PC80B_BLE, MODEL_SP20_BLE, MODEL_PC300_BLE, MODEL_ER3, MODEL_LEPOD})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 
@@ -378,6 +366,8 @@ public class Bluetooth implements Parcelable {
             return MODEL_S7BW;
         } else if (deviceName.contains(BT_NAME_BIOLAND_BGM)) {
             return MODEL_BIOLAND_BGM;
+        } else if (deviceName.contains(BT_NAME_LEPOD)) {
+            return MODEL_LEPOD;
         }
 
         if (deviceName.split(" ").length == 0) {
@@ -472,7 +462,7 @@ public class Bluetooth implements Parcelable {
             BT_NAME_CHECK_ADV, BT_NAME_BBSM_S1, BT_NAME_BBSM_S2, BT_NAME_CMRING, BT_NAME_LPRE, BT_NAME_LE_B1, BT_NAME_OXYU, BT_NAME_S5W, BT_NAME_W12C, BT_NAME_AI_S100,
             BT_NAME_HHM1, BT_NAME_HHM2, BT_NAME_HHM3, BT_NAME_HHM4, BT_NAME_LP_ER2, BT_NAME_LPM311, BT_NAME_POCTOR_M3102, BT_NAME_S6W, BT_NAME_S7W, BT_NAME_S7BW,
             BT_NAME_BIOLAND_BGM, BT_NAME_S6W1, BT_NAME_PF_10AW, BT_NAME_PF_10AW1, BT_NAME_PF_10BW, BT_NAME_PF_10BW1, BT_NAME_PF_20AW, BT_NAME_PF_20B,
-            BT_NAME_CHECKME, BT_NAME_PC80B_BLE, BT_NAME_SP20_BLE, BT_NAME_PC_300_BLE, BT_NAME_ER3})
+            BT_NAME_CHECKME, BT_NAME_PC80B_BLE, BT_NAME_SP20_BLE, BT_NAME_PC_300_BLE, BT_NAME_ER3, BT_NAME_LEPOD})
     @Retention(RetentionPolicy.SOURCE)
     public @interface DEVICE_NAME {
 
@@ -669,6 +659,8 @@ public class Bluetooth implements Parcelable {
                 return BT_NAME_PC_300_BLE;
             case MODEL_ER3:
                 return BT_NAME_ER3;
+            case MODEL_LEPOD:
+                return BT_NAME_LEPOD;
             default:
                 return "";
         }

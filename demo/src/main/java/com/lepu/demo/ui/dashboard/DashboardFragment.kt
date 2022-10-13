@@ -13,7 +13,7 @@ import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
-import com.lepu.blepro.ble.data.lew.BatteryInfo
+import com.lepu.blepro.ble.data.lew.RtData
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.ap20.*
 import com.lepu.blepro.ext.pc102.*
@@ -47,7 +47,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
     private val binding: FragmentDashboardBinding by binding()
     var oxyPpgSize = 0
-    var dataString = ""
 
     private var state = false
     private var type = 0
@@ -189,7 +188,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     }
 
     private fun startWave(model: Int) {
-        dataString = ""
         if (mainViewModel.runWave) {
             return
         }
@@ -197,14 +195,14 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         when(model) {
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK,
             Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2,
-            Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LEW,
+            Bluetooth.MODEL_BP2W,
             Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_LE_BP2W,
             Bluetooth.MODEL_PC80B, Bluetooth.MODEL_LES1,
             Bluetooth.MODEL_W12C, Bluetooth.MODEL_HHM1,
             Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
             Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_PC80B_BLE -> waveHandler.post(EcgWaveTask())
 
-            Bluetooth.MODEL_ER3 -> waveHandler.post(Er3EcgWaveTask())
+            Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> waveHandler.post(Er3EcgWaveTask())
 
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_PC60FW,
             Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
@@ -264,7 +262,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_HHM1, Bluetooth.MODEL_DUOEK,
                 Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
                 Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2,
-                Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C,
                 Bluetooth.MODEL_LES1 -> {
                     binding.ecgLayout.visibility = View.VISIBLE
                     binding.er3Layout.visibility = View.GONE
@@ -273,7 +270,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     LpBleUtil.startRtTask()
                     startWave(it.modelNo)
                 }
-                Bluetooth.MODEL_ER3 -> {
+                Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
+                    LpBleUtil.startRtTask(it.modelNo, 2000)
+                }
+                Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> {
                     binding.er3Layout.visibility = View.VISIBLE
                     binding.ecgLayout.visibility = View.GONE
                     binding.bpLayout.visibility = View.GONE
@@ -644,6 +644,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 }
             }
         }
+        binding.er3StopEcg.setOnClickListener {
+            LpBleUtil.stopEcg(Constant.BluetoothConfig.currentModel[0])
+        }
     }
 
     private fun initEcgView() {
@@ -855,36 +858,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 }
             }
         //------------------------------lew------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewBatteryInfo)
-            .observe(this) {
-                val data = it.data as BatteryInfo
-                dataString += "\n" + data.toString()
-                binding.dataStr.text = dataString
-            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewRtData)
             .observe(this) {
-                val rtData = it.data as LewBleResponse.RtData
-                rtData.let { data ->
-                    Log.d("lew data ", "len = ${data.wave.samplingNum}")
-                    DataController.receive(data.wave.wFs)
-                    dataString = data.param.toString()
-                    binding.dataStr.text = dataString
-                    viewModel.ecgHr.value = data.param.hr
-                    binding.measureDuration.text = " ${data.param.recordTime} s"
-                    binding.deviceInfo.text = "测量状态${data.param.runStatus}：${
-                        when (data.param.runStatus) {
-                            0 -> "空闲待机(导联脱落)"
-                            1 -> "测量准备(主机丢弃前段波形阶段)"
-                            2 -> "记录中"
-                            3 -> "分析存储中"
-                            4 -> "已存储成功(满时间测量结束后一直停留此状态直到回空闲状态)"
-                            5 -> "记录小于30s(记录中状态直接切换至此状态)"
-                            6 -> "重测已达6次，进入待机"
-                            7 -> "导联断开"
-                            else -> ""
-                        }
-                    }"
-                }
+                val data = it.data as RtData
+                binding.deviceInfo.text = "$data"
             }
         //------------------------------pc80b------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bFastData)
@@ -1656,6 +1633,20 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "V5导联脱落：${data.param.isLeadOffV5}\n" +
                         "V6导联脱落：${data.param.isLeadOffV6}\n" +
                         "${data.param}"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3EcgStop)
+            .observe(this) {
+                Toast.makeText(context, "结束测量", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VCOMIN.EventVcominRtHr)
+            .observe(this) {
+                val data = it.data as VcominData
+                binding.deviceInfo.text = "hr1 : ${data.hr1}, hr2 : ${data.hr2}"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AD5.EventAd5RtHr)
+            .observe(this) {
+                val data = it.data as Ad5Data
+                binding.deviceInfo.text = "hr1 : ${data.hr1}, hr2 : ${data.hr2}"
             }
     }
 

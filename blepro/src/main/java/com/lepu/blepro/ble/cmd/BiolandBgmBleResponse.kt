@@ -70,8 +70,8 @@ object BiolandBgmBleResponse {
         var day: Int
         var hour: Int
         var minute: Int
-        var resultMg: Int      // 单位：mg/dl (18-Li，707-Hi)
-        var resultMmol: Float  // 单位：mmol/l (1.0-Li，39.3-Hi)
+        var resultMg: Int      // 单位：mg/dl (18-Lo，707-Hi)
+        var resultMmol: Float  // 单位：mmol/l (1.0-Lo，39.3-Hi)
 
         init {
             var index = 0

@@ -95,10 +95,10 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                 }
 
                 if (response.pkgType == 0x01.toByte()) {
-                    curFile =  curFileName?.let {
+                    curFile = curFileName?.let {
                         Er1BleResponse.Er1File(model, it, toUInt(response.content), userId!!, offset)
                     }
-                    sendCmd( Er1BleCmd.readFileData(offset))
+                    sendCmd(Er1BleCmd.readFileData(offset))
                 } else {
                     LepuBleLog.d(tag, "read file failed：${response.pkgType}")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileError).post(InterfaceEvent(model, true))
@@ -125,7 +125,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                     val poSize :Int= (size).div(this.fileSize).toInt()
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadingFileProgress).post(InterfaceEvent(model,poSize))
 
-                    if (this.index  < this.fileSize) {
+                    if (this.index < this.fileSize) {
                         sendCmd(Er1BleCmd.readFileData(this.index)) // 每次读的偏移量，相对于文件总长度的
                     } else {
                         sendCmd(Er1BleCmd.readFileEnd())
@@ -139,8 +139,8 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
                 curFileName = null// 一定要放在发通知之前
                 curFile?.let {
-                    if (it.index < it.fileSize ){
-                        if ((isCancelRF || isPausedRF) ) {
+                    if (it.index < it.fileSize){
+                        if ((isCancelRF || isPausedRF)) {
                             LepuBleLog.d(tag, "READ_FILE_END isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
                             return
                         }

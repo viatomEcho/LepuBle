@@ -51,7 +51,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
     }
 
     var fileSize: Int = 0
-    var fileName:String=""
+    var fileName: String = ""
     var curSize: Int = 0
     var fileContent : ByteArray? = null
 

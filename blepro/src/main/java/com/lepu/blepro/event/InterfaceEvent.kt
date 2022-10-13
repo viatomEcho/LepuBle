@@ -649,7 +649,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * Er3BleInterface发出的通知
-     * 包含model: MODEL_ER3
+     * 包含model: MODEL_ER3, MODEL_LEPOD
      */
     interface ER3 {
         companion object {
@@ -668,6 +668,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventEr3SetTime = "com.lepu.ble.er3.set.time"                           // 同步时间 boolean
             const val EventEr3BurnFactoryInfo = "com.lepu.ble.er3.burn.factory.info"          // 烧录出厂信息 boolean
             const val EventEr3BurnLockFlash = "com.lepu.ble.er3.burn.lock.flash"              // 加密Flash boolean
+            const val EventEr3EcgStop = "com.lepu.ble.er3.ecg.stop"                           // 结束测量 boolean
         }
     }
 

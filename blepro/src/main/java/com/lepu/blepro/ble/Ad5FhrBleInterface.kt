@@ -4,11 +4,10 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.data.FhrData
+import com.lepu.blepro.ble.data.Ad5Data
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.*
-import com.lepu.blepro.utils.ByteUtils.byte2UInt
-import com.lepu.blepro.utils.HexString.trimStr
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -27,7 +26,11 @@ class Ad5FhrBleInterface(model: Int): BleInterface(model) {
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
-        manager = Ad5FhrBleManager(context)
+        manager = if (model == Bluetooth.MODEL_VTM_AD5) {
+            Ad5FhrBleManager(context)
+        } else {
+            MdFhrBleManager(context)
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -45,22 +48,9 @@ class Ad5FhrBleInterface(model: Int): BleInterface(model) {
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: ByteArray) {
         LepuBleLog.d(tag, "onResponseReceived received : ${bytesToHex(response)}")
-
-        val cmd = byte2UInt(response[2])
-        val sn = trimStr(toString(response.copyOfRange(3, 10)))
-        val hr1 = byte2UInt(response[11])
-        val hr2 = byte2UInt(response[12])
-
-        val data = FhrData()
-        data.hr1 = hr1
-        data.hr2 = hr2
-
-        LepuBleLog.d(tag, "cmd : $cmd")
-        LepuBleLog.d(tag, "sn : $sn")
-        LepuBleLog.d(tag, "data : $data")
-
+        val data = Ad5Data(response)
+        LepuBleLog.d(tag, "received data : $data")
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AD5.EventAd5RtHr).post(InterfaceEvent(model, data))
-
     }
 
     @OptIn(ExperimentalUnsignedTypes::class)
