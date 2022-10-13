@@ -1042,6 +1042,21 @@ class BleServiceHelper private constructor() {
 
     }
 
+    fun getBpmRtState(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BPM -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as BpmBleInterface).let {
+                        LepuBleLog.d(tag, "it as BpmBleInterface--getBpmRtState")
+                        it.getRtState()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "getBpmRtState current model $model unsupported!!")
+        }
+    }
+
     /**
      * er2 设置hr开关状态
      * @param model Int

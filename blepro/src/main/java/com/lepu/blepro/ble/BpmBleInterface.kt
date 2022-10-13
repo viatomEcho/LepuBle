@@ -162,8 +162,6 @@ class BpmBleInterface(model: Int): BleInterface(model) {
         }
     }
 
-
-
     override fun getInfo() {
         sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_INFO))
         LepuBleLog.d(tag, "getInfo...")
@@ -191,6 +189,11 @@ class BpmBleInterface(model: Int): BleInterface(model) {
         isUserBEnd = false
         sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_RECORDS, map))
         LepuBleLog.d(tag, "getBpmFileList...")
+    }
+
+    fun getRtState() {
+        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_BP_STATE))
+        LepuBleLog.d(tag, "getRtState...device state")
     }
 
     fun startBp() {

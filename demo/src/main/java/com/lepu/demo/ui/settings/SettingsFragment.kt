@@ -2078,11 +2078,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
         // ---------------------------bpm---------------------------
         binding.bpmGetState.setOnClickListener {
-            if (LpBleUtil.isRtStop(Constant.BluetoothConfig.currentModel[0])) {
-                LpBleUtil.startRtTask()
-            } else {
-                LpBleUtil.stopRtTask()
-            }
+            LpBleUtil.bpmGetRtState(Constant.BluetoothConfig.currentModel[0])
         }
         // ---------------------------pc60fw---------------------------
         binding.pc60fwSetCode.setOnClickListener {

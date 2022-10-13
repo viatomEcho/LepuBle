@@ -1035,6 +1035,10 @@ class LpBleUtil {
             BleServiceHelper.er3GetConfig(model)
         }
 
+        fun bpmGetRtState(model: Int) {
+            BleServiceHelper.getBpmRtState(model)
+        }
+
     }
 
 
