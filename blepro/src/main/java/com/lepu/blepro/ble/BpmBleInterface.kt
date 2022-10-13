@@ -241,11 +241,6 @@ class BpmBleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "stopBp...")
     }
 
-    fun getRtState() {
-        sendCmd(BpmBleCmd.getCmd(BpmBleCmd.BPMCmd.MSG_TYPE_GET_BP_STATE))
-        LepuBleLog.d(tag, "getRtState...device state")
-    }
-
     override fun reset() {
         LepuBleLog.e(tag, "reset Not yet implemented")
     }
