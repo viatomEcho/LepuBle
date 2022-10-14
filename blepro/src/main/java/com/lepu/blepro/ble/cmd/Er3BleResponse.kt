@@ -244,7 +244,11 @@ object Er3BleResponse {
             val tmp = decompress.Decompress(b)
             if (tmp != null) {
                 for (i in tmp) {
-                    decompressData.add(i)
+                    if (i == 32767) {  // 导联脱落，基线处理
+                        decompressData.add(0)
+                    } else {
+                        decompressData.add(i)
+                    }
                 }
             }
         }

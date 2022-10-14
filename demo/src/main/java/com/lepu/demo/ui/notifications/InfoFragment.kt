@@ -80,7 +80,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
     private fun testEr3() {
 //        val fileName = "W20220921154419"
-        val fileName = "W20221012161124"
+//        val fileName = "W20221012161124"
+        val fileName = "W20221014095217"
         val data = Er3WaveFile(FileUtil.readFile(context, fileName))
         val recordingTime = DateUtil.getSecondTimestamp(fileName.replace("W", ""))
         val temp = getEcgData(recordingTime, fileName, data.wave, DataConvert.getEr3ShortArray(data.waveInts), data.recordingTime)
