@@ -136,7 +136,7 @@ object LpWorkManager {
      * @param runRtImmediately Boolean 接收主机info响应后，是否立即开启实时监测任务
      * @return BleInterface
      */
-    fun initInterfaces(m: Int, runRtImmediately: Boolean = false): BleInterface {
+    fun initInterfaces(m: Int, runRtImmediately: Boolean = false): BleInterface? {
         LepuBleLog.d(tag, "initInterfaces start...${vailFace.size()},$m")
 
         vailFace.get(m)?.let { return it }
@@ -427,14 +427,14 @@ object LpWorkManager {
 
             else -> {
 //                return throw Exception("BleService initInterfaces() 未配置此model:$m")
-                return throw Exception("LpWorkManager initInterfaces() 未配置此model:$m")
+                return null
             }
         }
 
 
     }
 
-    fun initManagers(m: Int, context: Context): LpBleManager {
+    fun initManagers(m: Int, context: Context): LpBleManager? {
         LepuBleLog.d(tag, "initManagers start...${vailManager.size()},$m")
 
         vailManager.get(m)?.let { return it }
@@ -601,7 +601,7 @@ object LpWorkManager {
             }
 
             else -> {
-                return throw Exception("LpWorkManager initManagers() 未配置此model:$m")
+                return null
             }
         }
 

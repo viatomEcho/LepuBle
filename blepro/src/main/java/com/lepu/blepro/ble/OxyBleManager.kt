@@ -3,6 +3,7 @@ package com.lepu.blepro.ble
 import android.content.Context
 import com.lepu.blepro.base.LpBleManager
 import com.lepu.blepro.utils.LepuBleLog
+import no.nordicsemi.android.ble.ConnectionPriorityRequest.CONNECTION_PRIORITY_HIGH
 import no.nordicsemi.android.ble.RequestQueue
 import java.util.*
 
@@ -20,6 +21,7 @@ class OxyBleManager(context: Context): LpBleManager(context) {
     }
 
     override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {
+        requestQueue.add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
         LepuBleLog.d("OxyBleManager dealReqQueue")
         return requestQueue
     }
