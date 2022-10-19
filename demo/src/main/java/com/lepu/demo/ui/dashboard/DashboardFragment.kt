@@ -667,7 +667,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     private fun initEr3EcgView() {
         // cal screen
         val dm =resources.displayMetrics
-        // 最多可以画多少点=屏幕宽度像素/每英寸像素*25.4mm/25mm/s走速*125个点/s
+        // 最多可以画多少点=屏幕宽度像素/每英寸像素*25.4mm/25mm/s走速*250个点/s
         val index = floor(binding.ecgBkg1.width / dm.xdpi * 25.4 / 25 * 250).toInt()
         Er3DataController.maxIndex = index
 
