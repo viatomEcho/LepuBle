@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.lepu.blepro.ble.data.Er1DataController
 import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.ByteUtils.toSignedShort
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
@@ -101,6 +102,7 @@ object Er1BleResponse {
         var content: ByteArray = bytes
         var len: Int
         var wave: ByteArray
+        var waveShorts: ShortArray
         var wFs : FloatArray
 
         init {
@@ -111,8 +113,16 @@ object Er1BleResponse {
                 len = wave.size.div(2)
             }
 
+            waveShorts = ShortArray(len)
             wFs = FloatArray(len)
+            var temp: Short
             for (i in 0 until len) {
+                temp = toSignedShort(wave[2 * i], wave[2 * i + 1])
+                waveShorts[i] = if (temp == 32767.toShort()) {
+                    0
+                } else {
+                    temp
+                }
                 wFs[i] = Er1DataController.byteTomV(wave[2 * i], wave[2 * i + 1])
             }
         }
@@ -198,11 +208,13 @@ object Er1BleResponse {
     class Er1FileList constructor(var bytes: ByteArray) : Parcelable {
         var size: Int
         var fileList = mutableListOf<ByteArray>()
+        var list = mutableListOf<String>()
 
         init {
             size=byte2UInt(bytes[0])
             for (i in  0 until size) {
                 fileList.add(bytes.copyOfRange(1 + i * 16, 17 + i * 16))
+                list.add(trimStr(String(bytes.copyOfRange(1 + i * 16, 17 + i * 16))))
             }
         }
 

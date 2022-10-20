@@ -7,6 +7,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.er1.*
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
@@ -28,6 +29,14 @@ import kotlin.experimental.inv
  */
 class Er1BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Er1BleInterface"
+
+    private var config = Er1Config()
+    private var deviceInfo = DeviceInfo()
+    private var deviceRtData = RtData()
+    private var deviceRtParam = RtParam()
+    private var deviceRtWave = RtWave()
+    private var fileNames = arrayListOf<String>()
+    private var file = Er1File()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = Er1BleManager(context)
@@ -60,7 +69,17 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                 val info = LepuDevice(response.content)
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1Info).post(InterfaceEvent(model, info))
+
+                deviceInfo.hwVersion = info.hwV
+                deviceInfo.swVersion = info.fwV
+                deviceInfo.btlVersion = info.btlV
+                deviceInfo.branchCode = info.branchCode
+                deviceInfo.fileVer = info.fileV
+                deviceInfo.spcpVer = info.protocolV
+                deviceInfo.snLen = info.snLen
+                deviceInfo.sn = info.sn
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1Info).post(InterfaceEvent(model, deviceInfo))
                 // 本版本注释，测试通过后删除
                 /*if (runRtImmediately){
                     runRtTask()
@@ -72,16 +91,35 @@ class Er1BleInterface(model: Int): BleInterface(model) {
             Er1BleCmd.RT_DATA -> {
                 val rtData = Er1BleResponse.RtData(response.content)
 
-                Er1DataController.receive(rtData.wave.wFs)
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1RtData).post(InterfaceEvent(model, rtData))
+
+                deviceRtParam.hr = rtData.param.hr
+                deviceRtParam.isRSignal = rtData.param.rFlag
+                deviceRtParam.isBadSignal = rtData.param.badSignal
+                deviceRtParam.isPoorSignal = rtData.param.poorSignal
+                deviceRtParam.batteryState = rtData.param.batteryState
+                deviceRtParam.battery = rtData.param.battery
+                deviceRtParam.recordTime = rtData.param.recordTime
+                deviceRtParam.curStatus = rtData.param.curStatus
+                deviceRtData.param = deviceRtParam
+                deviceRtWave.ecgBytes = rtData.wave.wave
+                deviceRtWave.ecgShorts = rtData.wave.waveShorts
+                deviceRtWave.ecgFloats = rtData.wave.wFs
+                deviceRtData.wave = deviceRtWave
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1RtData).post(InterfaceEvent(model, deviceRtData))
             }
 
             Er1BleCmd.READ_FILE_LIST -> {
                 fileList = Er1BleResponse.Er1FileList(response.content)
                 LepuBleLog.d(tag, "model:$model,READ_FILE_LIST => success, ${fileList.toString()}")
                 fileList?.let {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1FileList).post(InterfaceEvent(model,it.toString()))
+
+                    for (file in it.list) {
+                        fileNames.add(file)
+                    }
+
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1FileList).post(InterfaceEvent(model, fileNames))
                 }
 
             }
@@ -121,7 +159,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                     this.addContent(response.content)
                     LepuBleLog.d(tag, "read file：${this.fileName}   => ${this.index } / ${this.fileSize}")
                     val nowSize: Long = (this.index).toLong()
-                    val size :Long= nowSize * 1000
+                    val size :Long= nowSize * 100
                     val poSize :Int= (size).div(this.fileSize).toInt()
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadingFileProgress).post(InterfaceEvent(model,poSize))
 
@@ -145,7 +183,9 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                             return
                         }
                     }else {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileComplete).post(InterfaceEvent(model, it))
+                        file.fileName = it.fileName
+                        file.content = it.content
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileComplete).post(InterfaceEvent(model, file))
                     }
                 }?: LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
                 curFile = null
@@ -157,15 +197,21 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                     return
                 }
                 LepuBleLog.d(tag, "model:$model,VIBRATE_CONFIG => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1VibrateConfig).post(InterfaceEvent(model, response.content))
+
+                val data = VbVibrationSwitcherConfig.parse(response.content)
+                config.isVibration = data.switcher
+                config.threshold1 = data.hr1
+                config.threshold2 = data.hr2
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1GetConfig).post(InterfaceEvent(model, config))
 
             }
             Er1BleCmd.SET_VIBRATE_STATE -> {
                 LepuBleLog.d(tag, "model:$model,SET_SWITCHER_STATE => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetSwitcherState).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetConfig).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetSwitcherState).post(InterfaceEvent(model, false))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetConfig).post(InterfaceEvent(model, false))
                 }
             }
 
@@ -284,7 +330,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
     override fun dealContinueRF(userId: String, fileName: String) {
         dealReadFile(userId, fileName)
-        LepuBleLog.d(tag, "setVibrateConfig...userId:$userId, fileName:$fileName")
+        LepuBleLog.d(tag, "dealContinueRF...userId:$userId, fileName:$fileName")
     }
     /**
      * get real-time data
@@ -305,6 +351,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
      * get file list
      */
     override fun getFileList() {
+        fileNames.clear()
         sendCmd(Er1BleCmd.getFileList())
         LepuBleLog.d(tag, "getFileList...")
     }

@@ -1,6 +1,8 @@
 package com.lepu.blepro.ble.cmd;
 
 import com.lepu.blepro.ble.data.TimeData;
+import com.lepu.blepro.ext.er2.Er2Config;
+
 import java.util.Date;
 
 /**
@@ -47,6 +49,13 @@ public class Er2BleCmd {
         SwitcherConfig config = new SwitcherConfig(switchState, VECTOR, MOTION_COUNT, MOTION_WINDOWS);
 
         return getReq(CMD_SET_SWITCHER_STATE, (byte)seqNo, config.convert2Data());
+    }
+
+    public static byte[] setConfig(Er2Config config) {
+        addNo();
+        SwitcherConfig data = new SwitcherConfig(config.isSoundOn(), config.getVector(), config.getMotionCount(), config.getMotionWindows());
+
+        return getReq(CMD_SET_SWITCHER_STATE, (byte)seqNo, data.convert2Data());
     }
 
     public static byte[] getSwitcherState() {

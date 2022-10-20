@@ -47,7 +47,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     var isPiRt: Boolean = true
 
     private var deviceInfo = DeviceInfo()
-    private var boxInfo = BoxInfo()
+    private var boxInfo = com.lepu.blepro.ext.er1.DeviceInfo()
     private var wave = RtWave()
     private var param = RtParam()
     private var oxyFile = OxyFile()
@@ -137,17 +137,14 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 val info = LepuDevice(response.content.copyOfRange(1, response.len))
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_BOX_INFO => success $info")
 
-                boxInfo.hwVersion = info.hwV!!
-                boxInfo.swVersion = info.fwV!!
-                boxInfo.btlVersion = info.btlV!!
-                boxInfo.branchCode = info.branchCode!!
-                boxInfo.fileVer = info.fileV!!
-                boxInfo.deviceType = info.deviceType!!
-                boxInfo.spcpVer = info.protocolV!!
-                boxInfo.curTime = info.curTime!!
-                boxInfo.protocolMaxLen = info.protocolMaxLen!!
-                boxInfo.snLen = info.snLen!!
-                boxInfo.sn = info.sn!!
+                boxInfo.hwVersion = info.hwV
+                boxInfo.swVersion = info.fwV
+                boxInfo.btlVersion = info.btlV
+                boxInfo.branchCode = info.branchCode
+                boxInfo.fileVer = info.fileV
+                boxInfo.spcpVer = info.protocolV
+                boxInfo.snLen = info.snLen
+                boxInfo.sn = info.sn
 
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBoxInfo).post(InterfaceEvent(model, boxInfo))
             }
@@ -290,7 +287,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
                     this.addContent(response.content)
 
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadingFileProgress).post(InterfaceEvent(model, (curFile!!.index * 1000).div(curFile!!.fileSize)))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadingFileProgress).post(InterfaceEvent(model, (curFile!!.index * 100).div(curFile!!.fileSize)))
                     LepuBleLog.d(tag, "model:$model, 读文件中：${curFile?.fileName}   => ${curFile?.index} / ${curFile?.fileSize}")
 
                     if (this.index < this.fileSize) {

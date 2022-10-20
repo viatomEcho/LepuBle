@@ -1,16 +1,13 @@
-package com.lepu.blepro.ext.oxy;
+package com.lepu.blepro.ext.er1;
 
-public class BoxInfo {
+public class DeviceInfo {
 
     private char hwVersion;    // 硬件版本
     private String swVersion;    // 软件版本
     private String btlVersion;    // 引导版本
     private String branchCode;    // Branch编码
     private int fileVer;       // 文件解析协议版本
-    private int deviceType;        // 设备类型
     private String spcpVer;       // 蓝牙通讯协议版本
-    private String curTime;         // 时间
-    private int protocolMaxLen;    // 通信协议数据段最大长度
     private int snLen;  // SN长度(小于18)
     private String sn;           // 序列号
 
@@ -54,36 +51,12 @@ public class BoxInfo {
         this.fileVer = fileVer;
     }
 
-    public int getDeviceType() {
-        return deviceType;
-    }
-
-    public void setDeviceType(int deviceType) {
-        this.deviceType = deviceType;
-    }
-
     public String getSpcpVer() {
         return spcpVer;
     }
 
     public void setSpcpVer(String spcpVer) {
         this.spcpVer = spcpVer;
-    }
-
-    public String getCurTime() {
-        return curTime;
-    }
-
-    public void setCurTime(String curTime) {
-        this.curTime = curTime;
-    }
-
-    public int getProtocolMaxLen() {
-        return protocolMaxLen;
-    }
-
-    public void setProtocolMaxLen(int protocolMaxLen) {
-        this.protocolMaxLen = protocolMaxLen;
     }
 
     public int getSnLen() {
@@ -110,10 +83,7 @@ public class BoxInfo {
                 ", btlVersion='" + btlVersion + '\'' +
                 ", branchCode='" + branchCode + '\'' +
                 ", fileVer=" + fileVer +
-                ", deviceType=" + deviceType +
                 ", spcpVer='" + spcpVer + '\'' +
-                ", curTime='" + curTime + '\'' +
-                ", protocolMaxLen=" + protocolMaxLen +
                 ", snLen=" + snLen +
                 ", sn='" + sn + '\'' +
                 '}';

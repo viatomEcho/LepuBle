@@ -26,4 +26,5 @@
 -keep class com.lepu.blepro.constants**{*;}
 -keep class com.lepu.blepro.event**{*;}
 -keep class com.lepu.blepro.objs**{*;}
+-keep class com.lepu.blepro.utils**{*;}
 -keep class com.lepu.blepro.observer**{*;}

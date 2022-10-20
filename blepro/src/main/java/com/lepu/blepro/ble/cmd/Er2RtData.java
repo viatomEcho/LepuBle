@@ -1,6 +1,7 @@
 package com.lepu.blepro.ble.cmd;
 
-import org.apache.commons.lang3.ArrayUtils;
+import static com.lepu.blepro.utils.ByteUtils.toSignedShort;
+
 import java.util.Arrays;
 
 /**
@@ -107,13 +108,14 @@ public class Er2RtData {
         private int size;
         private float[] datas;
         private byte[] bytes;
+        private short[] dataShorts;
 
         public WaveData(byte[] bytes) {
             if (bytes == null || bytes.length < 2) {
 //            datas = null;
                 return;
             }
-            this.bytes = ArrayUtils.clone(bytes);
+            this.bytes = bytes;
 
             this.size = bytes[0] & 0xFF + ((bytes[1] & 0xFF) << 8);
 
@@ -121,10 +123,14 @@ public class Er2RtData {
                 size = (bytes.length - 2) / 2;
             }
             datas = new float[size];
+            dataShorts = new short[size];
+            short temp;
             for (int i = 0; i < size; i++) {
 //            if((2*i + 2 < bytes.length) && (2*i + 3 < bytes.length)) {
 //                datas[i] = byteTomV(bytes[2*i + 2], bytes[2*i + 3]);
 //            }
+                temp = toSignedShort(bytes[2 * i + 2], bytes[2 * i + 3]);
+                dataShorts[i] = temp == 32767 ? 0 : temp;
                 datas[i] = byteTomV(bytes[2 * i + 2], bytes[2 * i + 3]);
             }
         }
@@ -157,6 +163,10 @@ public class Er2RtData {
 
         public void setBytes(byte[] bytes) {
             this.bytes = bytes;
+        }
+
+        public short[] getDataShorts() {
+            return dataShorts;
         }
 
     }

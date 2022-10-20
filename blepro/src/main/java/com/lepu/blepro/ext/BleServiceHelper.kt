@@ -19,6 +19,8 @@ import com.lepu.blepro.ble.data.lew.TimeData
 import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
+import com.lepu.blepro.ext.er1.Er1Config
+import com.lepu.blepro.ext.er2.Er2Config
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.observer.BleServiceObserver
@@ -622,11 +624,11 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return false
 
         when (model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
-            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1  -> {
                 return inter is Er1BleInterface
             }
-            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
+            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 return inter is Er2BleInterface
             }
             Bluetooth.MODEL_BPM -> {
@@ -1023,8 +1025,7 @@ class BleServiceHelper private constructor() {
     fun burnFactoryInfo(model: Int, config: FactoryConfig) {
         if (!checkService()) return
         when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
-            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er1BleInterface).let {
                         LepuBleLog.d(tag, "it as Er1BleInterface--burnFactoryInfo")
@@ -1032,7 +1033,8 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
-            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
+            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er2BleInterface).let {
                         LepuBleLog.d(tag, "it as Er2BleInterface--burnFactoryInfo")
@@ -1066,8 +1068,7 @@ class BleServiceHelper private constructor() {
     fun burnLockFlash(model: Int) {
         if (!checkService()) return
         when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
-            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er1BleInterface).let {
                         LepuBleLog.d(tag, "it as Er1BleInterface--burnLockFlash")
@@ -1075,7 +1076,8 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
-            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
+            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er2BleInterface).let {
                         LepuBleLog.d(tag, "it as Er2BleInterface--burnLockFlash")
@@ -1126,14 +1128,16 @@ class BleServiceHelper private constructor() {
      * @param model Int
      * @param hrFlag Boolean
      */
-    fun setEr2SwitcherState(model: Int, hrFlag: Boolean){
+    fun er2SetConfig(model: Int, config: Er2Config){
         if (!checkService()) return
         when(model){
-            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
+            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er2BleInterface--setEr2SwitcherState")
-                        it.setSwitcherState(hrFlag)
+                        LepuBleLog.d(tag, "it as Er2BleInterface--er2SetConfig")
+//                        it.setSwitcherState(config.isSoundOn)
+                        it.setConfig(config)
                     }
                 }
             }
@@ -1145,38 +1149,71 @@ class BleServiceHelper private constructor() {
      * er2 获取hr开关状态
      * @param model Int
      */
-    fun getEr2SwitcherState(model: Int){
+    fun er2GetConfig(model: Int){
         if (!checkService()) return
         when(model){
-            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
+            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er2BleInterface--getEr2SwitcherState")
+                        LepuBleLog.d(tag, "it as Er2BleInterface--er2GetConfig")
                         it.getSwitcherState()
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "getEr2SwitcherState current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "er2GetConfig current model $model unsupported!!")
         }
     }
 
+    fun er2GetInfo(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.getInfo()
+    }
+    fun er2GetFileList(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.getFileList()
+    }
+    fun er2ReadFile(model: Int, fileName: String) {
+        if (!checkService()) return
+        getInterface(model)?.readFile("", fileName)
+    }
+    fun er2FactoryReset(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.factoryReset()
+    }
+
+    fun er1GetInfo(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.getInfo()
+    }
+    fun er1GetFileList(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.getFileList()
+    }
+    fun er1ReadFile(model: Int, fileName: String) {
+        if (!checkService()) return
+        getInterface(model)?.readFile("", fileName)
+    }
+    fun er1FactoryReset(model: Int) {
+        if (!checkService()) return
+        getInterface(model)?.factoryReset()
+    }
 
     /**
      * er1/duoek获取参数
      */
-    fun getEr1VibrateConfig(model: Int){
+    fun er1GetConfig(model: Int){
         if (!checkService()) return
         when(model){
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
-            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 ->{
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 ->{
                 getInterface(model)?.let { it1 ->
                     (it1 as Er1BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er1BleInterface--getEr1VibrateConfig")
+                        LepuBleLog.d(tag, "it as Er1BleInterface--er1GetConfig")
                         it.getVibrateConfig()
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "getEr1VibrateConfig current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "er1GetConfig current model $model unsupported!!")
         }
 
     }
@@ -1184,18 +1221,18 @@ class BleServiceHelper private constructor() {
     /**
      * er1设置参数
      */
-    fun setEr1Vibrate(model: Int, switcher: Boolean, threshold1: Int, threshold2: Int){
+    fun er1SetConfig(model: Int, config: Er1Config){
         if (!checkService()) return
         when(model) {
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er1BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er1BleInterface--setEr1Vibrate")
-                        it.setVibrateConfig(switcher, threshold1, threshold2)
+                        LepuBleLog.d(tag, "it as Er1BleInterface--er1SetConfig")
+                        it.setVibrateConfig(config.isVibration, config.threshold1, config.threshold2)
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "setEr1Vibrate current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "er1SetConfig current model $model unsupported!!")
 
         }
 
@@ -1204,10 +1241,10 @@ class BleServiceHelper private constructor() {
     /**
      * duoek设置参数
      */
-    fun setEr1Vibrate(model: Int,switcher: Boolean, vector: Int, motionCount: Int,motionWindows: Int ){
+    /*fun setEr1Vibrate(model: Int,switcher: Boolean, vector: Int, motionCount: Int,motionWindows: Int ){
         if (!checkService()) return
         when(model) {
-            Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3  -> {
+            Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er1BleInterface).let {
                         LepuBleLog.d(tag, "it as Er1BleInterface--setEr1Vibrate")
@@ -1218,7 +1255,7 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "setEr1Vibrate current model $model unsupported!!")
 
         }
-    }
+    }*/
 
     /**
      * 获取配置信息（bp2，bp2a，bp2t，bp2w，le bp2w）
@@ -1575,7 +1612,7 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         getInterface(model)?.let {
             LepuBleLog.d(tag, "--oxyReadFile--")
-            it.readFile("", fileName, 0)
+            it.readFile("", fileName)
         }
     }
     fun oxyFactoryReset(model: Int) {
@@ -3210,7 +3247,7 @@ class BleServiceHelper private constructor() {
     fun pulsebitExReadFile(model: Int, fileName: String) {
         if (!checkService()) return
         getInterface(model)?.let {
-            it.readFile("", fileName, 0)
+            it.readFile("", fileName)
         }
     }
 
@@ -3230,7 +3267,7 @@ class BleServiceHelper private constructor() {
     fun checkmeLeReadFile(model: Int, fileName: String) {
         if (!checkService()) return
         getInterface(model)?.let {
-            it.readFile("", fileName, 0)
+            it.readFile("", fileName)
         }
     }
     fun checkmeLeGetFileList(model: Int, fileType: Int) {

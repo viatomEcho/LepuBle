@@ -2121,7 +2121,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this) {
                 Toast.makeText(context, "烧录成功", Toast.LENGTH_SHORT).show()
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetSwitcherState)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetConfig)
             .observe(this) {
                 LpBleUtil.getEr1VibrateConfig(it.model)
                 when (it.model) {
@@ -2146,7 +2146,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     else -> Toast.makeText(context, "ER1 设置参数成功", Toast.LENGTH_SHORT).show()
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1VibrateConfig)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1GetConfig)
             .observe(this) {
                 val data = it.data as ByteArray
                 setReceiveCmd(data)
@@ -2201,7 +2201,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this) {
                 Toast.makeText(context, "烧录成功", Toast.LENGTH_SHORT).show()
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetSwitcherState)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetConfig)
             .observe(this) {
                 LpBleUtil.getEr2SwitcherState(it.model)
                 when (it.model) {
@@ -2214,7 +2214,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     else -> Toast.makeText(context, "ER2 设置参数成功", Toast.LENGTH_SHORT).show()
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SwitcherState)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2GetConfig)
             .observe(this) {
                 val data = it.data as ByteArray
                 setReceiveCmd(data)

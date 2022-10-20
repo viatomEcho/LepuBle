@@ -5,9 +5,12 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
+import com.lepu.blepro.ble.cmd.Er2File
 import com.lepu.blepro.ble.data.Er2DeviceInfo
 import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.er2.*
+import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
 import kotlin.experimental.inv
@@ -28,6 +31,14 @@ import kotlin.experimental.inv
  */
 class Er2BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Er2BleInterface"
+
+    private var deviceInfo = DeviceInfo()
+    private var config = Er2Config()
+    private var file = com.lepu.blepro.ext.er2.Er2File()
+    private var deviceRtData = RtData()
+    private var deviceRtParam = RtParam()
+    private var deviceRtWave = RtWave()
+
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = Er2BleManager(context)
         manager.isUpdater = isUpdater
@@ -95,7 +106,16 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                 }
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2Info).post(InterfaceEvent(model, info))
+
+                deviceInfo.hwVersion = info.hwVersion
+                deviceInfo.swVersion = info.fwVersion
+                deviceInfo.branchCode = info.branchCode
+                deviceInfo.spcpVer = info.protocolVersion
+                deviceInfo.btlVersion = info.blVersion
+                deviceInfo.snLen = byte2UInt(info.snLength)
+                deviceInfo.sn = info.serialNum
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2Info).post(InterfaceEvent(model, deviceInfo))
                 // 本版本注释，测试通过后删除
                 /*if (runRtImmediately){
                     runRtTask()
@@ -111,9 +131,9 @@ class Er2BleInterface(model: Int): BleInterface(model) {
 
                 LepuBleLog.d(tag, "model:$model,CMD_SET_SWITCHER_STATE => success")
                 if (respPkg.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetSwitcherState).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetConfig).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetSwitcherState).post(InterfaceEvent(model, false))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetConfig).post(InterfaceEvent(model, false))
                 }
             }
             Er2BleCmd.CMD_RETRIEVE_SWITCHER_STATE -> {
@@ -125,7 +145,14 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                 }
 
                 LepuBleLog.d(tag, "model:$model,CMD_RETRIEVE_SWITCHER_STATE => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SwitcherState).post(InterfaceEvent(model, respPkg.data))
+
+                val data = SwitcherConfig.parse(respPkg.data)
+                config.isSoundOn = data.switcher
+                config.motionCount = data.motionCount
+                config.motionWindows = data.motionWindows
+                config.vector = data.vector
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2GetConfig).post(InterfaceEvent(model, config))
             }
             Er2BleCmd.CMD_RESET -> {
 
@@ -159,13 +186,33 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                 val rtData = Er2RtData(respPkg.data)
 
                 LepuBleLog.d(tag, "model:$model,CMD_GET_REAL_TIME_DATA => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2RtData).post(InterfaceEvent(model, rtData))
+
+                deviceRtParam.hr = rtData.rtParam.hr
+                deviceRtParam.battery = byte2UInt(rtData.rtParam.percent)
+                deviceRtParam.batteryState = rtData.rtParam.batteryState
+                deviceRtParam.recordTime = rtData.rtParam.recordTime
+                deviceRtParam.curStatus = rtData.rtParam.currentState
+                deviceRtParam.isRSignal = rtData.rtParam.isrFlag()
+                deviceRtParam.isPoorSignal = rtData.rtParam.isSignalPoor
+                deviceRtData.param = deviceRtParam
+                deviceRtWave.ecgBytes = rtData.waveData.bytes
+                deviceRtWave.ecgShorts = rtData.waveData.dataShorts
+                deviceRtWave.ecgFloats = rtData.waveData.datas
+                deviceRtData.wave = deviceRtWave
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2RtData).post(InterfaceEvent(model, deviceRtData))
             }
             Er2BleCmd.CMD_LIST_FILE -> {
                 val fileArray = Er2FileList(respPkg.data)
 
                 LepuBleLog.d(tag, "model:$model,CMD_LIST_FILE => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FileList).post(InterfaceEvent(model, fileArray))
+
+                val data = arrayListOf<String>()
+                for (da in fileArray.fileNames) {
+                    data.add(da)
+                }
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FileList).post(InterfaceEvent(model, data))
             }
             Er2BleCmd.CMD_START_READ_FILE -> {
 
@@ -195,8 +242,8 @@ class Er2BleInterface(model: Int): BleInterface(model) {
 
                     this.addContent(respPkg.data)
                     LepuBleLog.d(tag, "read file：${this.fileName}   => ${this.index + offset} / ${this.fileSize}")
-                    LepuBleLog.d(tag, "read file：${((this.index+ offset) * 1000).div(this.fileSize) }")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadingFileProgress).post(InterfaceEvent(model, ((this.index+ offset) * 1000).div(this.fileSize) ))
+                    LepuBleLog.d(tag, "read file：${((this.index+ offset) * 100).div(this.fileSize) }")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadingFileProgress).post(InterfaceEvent(model, ((this.index+ offset) * 100).div(this.fileSize) ))
 
                     if (this.index < this.fileSize) {
                         sendCmd(Er2BleCmd.readFileData(this.index))
@@ -217,7 +264,9 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                             return
                         }
                     }else {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileComplete).post(InterfaceEvent(model, it))
+                        file.fileName = it.fileName
+                        file.content = it.content
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileComplete).post(InterfaceEvent(model, file))
                     }
                 }?: LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
                 curFile = null
@@ -243,6 +292,11 @@ class Er2BleInterface(model: Int): BleInterface(model) {
     fun setSwitcherState(hrFlag: Boolean) {
         sendCmd(Er2BleCmd.setSwitcherState(hrFlag))
         LepuBleLog.d(tag, "setSwitcherState...hrFlag:$hrFlag")
+    }
+
+    fun setConfig(config: Er2Config) {
+        sendCmd(Er2BleCmd.setConfig(config))
+        LepuBleLog.d(tag, "setConfig...$config")
     }
 
     fun getSwitcherState() {

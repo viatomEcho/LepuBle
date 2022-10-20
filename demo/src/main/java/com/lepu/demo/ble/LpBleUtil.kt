@@ -15,6 +15,8 @@ import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
 import com.lepu.blepro.constants.Ble
+import com.lepu.blepro.ext.er1.Er1Config
+import com.lepu.blepro.ext.er2.Er2Config
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.demo.BuildConfig
 import com.lepu.demo.cofig.Constant.BluetoothConfig
@@ -469,20 +471,34 @@ class LpBleUtil {
         }
 
         fun setEr1Vibrate(model: Int, switcher: Boolean, threshold1: Int, threshold2: Int){
-            BleServiceHelper.setEr1Vibrate(model, switcher, threshold1, threshold2)
+            val data = Er1Config()
+            data.isVibration = switcher
+            data.threshold1 = threshold1
+            data.threshold2 = threshold2
+            BleServiceHelper.er1SetConfig(model, data)
         }
         fun setDuoekVibrate(model: Int,switcher: Boolean, vector: Int, motionCount: Int,motionWindows: Int ){
-            BleServiceHelper.setEr1Vibrate(model, switcher, vector, motionCount, motionWindows)
+//            BleServiceHelper.setEr1Vibrate(model, switcher, vector, motionCount, motionWindows)
+            val config = Er2Config()
+            config.isSoundOn = switcher
+            config.vector = vector
+            config.motionCount = motionCount
+            config.motionWindows = motionWindows
+            BleServiceHelper.er2SetConfig(model, config)
         }
         fun getEr1VibrateConfig(model: Int) {
-            BleServiceHelper.getEr1VibrateConfig(model)
+            BleServiceHelper.er1GetConfig(model)
         }
 
         fun setEr2SwitcherState(model: Int, hrFlag: Boolean){
-            BleServiceHelper.setEr2SwitcherState(model, hrFlag)
+//            BleServiceHelper.setEr2SwitcherState(model, hrFlag)
+            val config = Er2Config()
+            config.isSoundOn = hrFlag
+            BleServiceHelper.er2SetConfig(model, config)
         }
         fun getEr2SwitcherState(model: Int){
-            BleServiceHelper.getEr2SwitcherState(model)
+//            BleServiceHelper.getEr2SwitcherState(model)
+            BleServiceHelper.er2GetConfig(model)
         }
 
         @JvmOverloads

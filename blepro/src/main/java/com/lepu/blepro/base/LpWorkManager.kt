@@ -156,8 +156,7 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
-            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
                 Er1BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -166,7 +165,8 @@ object LpWorkManager {
                 }
 
             }
-            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
+            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 Er2BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
