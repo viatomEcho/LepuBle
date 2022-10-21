@@ -128,7 +128,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 clearTimeout()
 
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_PARA_SYNC => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxySyncDeviceInfo).post(InterfaceEvent(model, true))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxySyncDeviceInfo).post(InterfaceEvent(model, settingType))
 
             }
 
