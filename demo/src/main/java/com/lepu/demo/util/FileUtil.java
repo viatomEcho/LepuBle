@@ -11,6 +11,9 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.text.TextPaint;
 import android.util.Log;
+import com.blankj.utilcode.util.FileIOUtils;
+import com.lepu.blepro.ble.data.Er3WaveFile;
+import com.lepu.blepro.utils.Er3Decompress;
 import com.lepu.blepro.ble.data.Th12BleFile;
 import com.lepu.blepro.utils.LepuBleLog;
 import com.lepu.demo.util.icon.BitmapConvertor;
@@ -273,6 +276,83 @@ public class FileUtil {
                 Log.d("test12345", "------------strings[i] == " + strings[i]);
             }
             fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void readEr3File(Context context) {
+        File file = new File(context.getExternalFilesDir(null).getAbsolutePath());
+        file = new File(file, "W20221025150240.txt");
+        try {
+            String content = FileIOUtils.readFile2String(file);
+            String[] temp = content.split(",");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+    public static void saveEr3File(Context context) {
+
+        File file = new File(context.getExternalFilesDir(null).getAbsolutePath());
+        file = new File(file, "W20221025150240");
+
+        Er3WaveFile waveFile = new Er3WaveFile();
+
+        File file2 = new File(context.getExternalFilesDir(null).getAbsolutePath());
+        file2 = new File(file2, "W20221025150240.txt");
+
+        try {
+            if (!file2.exists()) {
+                file2.createNewFile();
+            }
+
+            InputStream inputStream = new FileInputStream(file);
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file2));
+            byte[] headBytes = new byte[10];
+            byte[] tempBytes = new byte[1024];
+            int count;
+
+            inputStream.read(headBytes);
+            waveFile.parseHeadData(headBytes);
+            int len = (int)file.length();
+            int total = len/1024;
+            int index = 0;
+            int leadType = waveFile.getLeadType();
+            Er3Decompress decompress;
+            if (leadType == 0) {
+                decompress = new Er3Decompress(8);
+            } else {
+                decompress = new Er3Decompress(4);
+            }
+
+            while ((count = inputStream.read(tempBytes)) != -1) {
+                int[] ints = waveFile.parseIntsFromWaveBytes(tempBytes, leadType, decompress);
+                for (int i=0; i<ints.length; i++) {
+                    bufferedWriter.write(String.valueOf(ints[i]));
+                    bufferedWriter.write(",");
+                    bufferedWriter.flush();
+                }
+                index++;
+                if (index == total) {
+                    break;
+                }
+            }
+            byte[] lastBytes = new byte[len-1024*index-10-20];
+            inputStream.read(lastBytes);
+            int[] ints = waveFile.parseIntsFromWaveBytes(lastBytes, leadType, decompress);
+            for (int i=0; i<ints.length; i++) {
+                bufferedWriter.write(String.valueOf(ints[i]));
+                bufferedWriter.write(",");
+                bufferedWriter.flush();
+            }
+            byte[] endBytes = new byte[20];
+            inputStream.read(endBytes);
+            waveFile.parseEndData(endBytes);
+            bufferedWriter.close();
+            Log.d("111111111111", ""+waveFile);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }catch (IOException e){

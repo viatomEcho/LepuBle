@@ -358,49 +358,70 @@ object Er3BleResponse {
         // aVR = - (I+II)/2
         // aVL = I - II/2
         // aVF = II - I/2
-        val tempMvsV6 = mutableListOf<Float>()
-        val tempMvsI = mutableListOf<Float>()
-        val tempMvsII = mutableListOf<Float>()
-        val tempMvsV1 = mutableListOf<Float>()
-        val tempMvsV2 = mutableListOf<Float>()
-        val tempMvsV3 = mutableListOf<Float>()
-        val tempMvsV4 = mutableListOf<Float>()
-        val tempMvsV5 = mutableListOf<Float>()
-        val tempMvsIII = mutableListOf<Float>()
-        val tempMvsaVR = mutableListOf<Float>()
-        val tempMvsaVL = mutableListOf<Float>()
-        val tempMvsaVF = mutableListOf<Float>()
-        for (i in waveMvs.indices step 8) {
-            tempMvsV6.add(waveMvs[i])
-            tempMvsI.add(waveMvs[i+1])
-            tempMvsII.add(waveMvs[i+2])
-            tempMvsV1.add(waveMvs[i+3])
-            tempMvsV2.add(waveMvs[i+4])
-            tempMvsV3.add(waveMvs[i+5])
-            tempMvsV4.add(waveMvs[i+6])
-            tempMvsV5.add(waveMvs[i+7])
-        }
-        for (i in tempMvsI.indices) {
-            tempMvsIII.add(tempMvsII[i]-tempMvsI[i])
-            tempMvsaVR.add(-(tempMvsI[i]+tempMvsII[i]).div(2))
-            tempMvsaVL.add(tempMvsI[i]-tempMvsII[i].div(2))
-            tempMvsaVF.add(tempMvsII[i]-tempMvsI[i].div(2))
-        }
-        return when (leadName) {
-            "V6" -> tempMvsV6.toFloatArray()
-            "I" -> tempMvsI.toFloatArray()
-            "II" -> tempMvsII.toFloatArray()
-            "V1" -> tempMvsV1.toFloatArray()
-            "V2" -> tempMvsV2.toFloatArray()
-            "V3" -> tempMvsV3.toFloatArray()
-            "V4" -> tempMvsV4.toFloatArray()
-            "V5" -> tempMvsV5.toFloatArray()
-            "III" -> tempMvsIII.toFloatArray()
-            "aVR" -> tempMvsaVR.toFloatArray()
-            "aVL" -> tempMvsaVL.toFloatArray()
-            "aVF" -> tempMvsaVF.toFloatArray()
-            else -> FloatArray(0)
-        }
+        val tempMvs = mutableListOf<Float>()
+        when (leadName) {
+                "V6" -> {
+                    for (i in waveMvs.indices step 8) {
+                        tempMvs.add(waveMvs[i])
+                    }
+                }
+                "I" -> {
+                    for (i in waveMvs.indices step 8) {
+                        tempMvs.add(waveMvs[i + 1])
+                    }
+                }
+                "II" -> {
+                    for (i in waveMvs.indices step 8) {
+                        tempMvs.add(waveMvs[i + 2])
+                    }
+                }
+                "V1" -> {
+                    for (i in waveMvs.indices step 8) {
+                        tempMvs.add(waveMvs[i + 3])
+                    }
+                }
+                "V2" -> {
+                    for (i in waveMvs.indices step 8) {
+                        tempMvs.add(waveMvs[i + 4])
+                    }
+                }
+                "V3" -> {
+                    for (i in waveMvs.indices step 8) {
+                        tempMvs.add(waveMvs[i + 5])
+                    }
+                }
+                "V4" -> {
+                    for (i in waveMvs.indices step 8) {
+                        tempMvs.add(waveMvs[i + 6])
+                    }
+                }
+                "V5" -> {
+                    for (i in waveMvs.indices step 8) {
+                        tempMvs.add(waveMvs[i + 7])
+                    }
+                }
+                "III" -> {
+                    for (i in waveMvs.indices step 8) {
+                        tempMvs[i.div(8)] = waveMvs[i + 2] - waveMvs[i + 1]
+                    }
+                }
+                "aVR" -> {
+                    for (i in waveMvs.indices step 8) {
+                        waveMvs[i.div(8)] = -(waveMvs[i + 1] + waveMvs[i + 2]).div(2)
+                    }
+                }
+                "aVL" -> {
+                    for (i in waveMvs.indices step 8) {
+                        tempMvs[i.div(8)] = tempMvs[i + 1] - tempMvs[i + 2].div(2)
+                    }
+                }
+                "aVF" -> {
+                    for (i in tempMvs.indices step 8) {
+                        tempMvs[i.div(8)] = tempMvs[i + 2] - tempMvs[i + 1].div(2)
+                    }
+                }
+            }
+        return tempMvs.toFloatArray()
     }
 
     /**
@@ -413,49 +434,70 @@ object Er3BleResponse {
         // aVR = - (I+II)/2
         // aVL = I - II/2
         // aVF = II - I/2
-        val tempMvsV6 = mutableListOf<Int>()
-        val tempMvsI = mutableListOf<Int>()
-        val tempMvsII = mutableListOf<Int>()
-        val tempMvsV1 = mutableListOf<Int>()
-        val tempMvsV2 = mutableListOf<Int>()
-        val tempMvsV3 = mutableListOf<Int>()
-        val tempMvsV4 = mutableListOf<Int>()
-        val tempMvsV5 = mutableListOf<Int>()
-        val tempMvsIII = mutableListOf<Int>()
-        val tempMvsaVR = mutableListOf<Int>()
-        val tempMvsaVL = mutableListOf<Int>()
-        val tempMvsaVF = mutableListOf<Int>()
-        for (i in waveInts.indices step 8) {
-            tempMvsV6.add(waveInts[i])
-            tempMvsI.add(waveInts[i+1])
-            tempMvsII.add(waveInts[i+2])
-            tempMvsV1.add(waveInts[i+3])
-            tempMvsV2.add(waveInts[i+4])
-            tempMvsV3.add(waveInts[i+5])
-            tempMvsV4.add(waveInts[i+6])
-            tempMvsV5.add(waveInts[i+7])
+        val tempInts = mutableListOf<Int>()
+        when (leadName) {
+            "V6" -> {
+                for (i in waveInts.indices step 8) {
+                    tempInts.add(waveInts[i])
+                }
+            }
+            "I" -> {
+                for (i in waveInts.indices step 8) {
+                    tempInts.add(waveInts[i+1])
+                }
+            }
+            "II" -> {
+                for (i in waveInts.indices step 8) {
+                    tempInts.add(waveInts[i+2])
+                }
+            }
+            "V1" -> {
+                for (i in waveInts.indices step 8) {
+                    tempInts.add(waveInts[i+3])
+                }
+            }
+            "V2" -> {
+                for (i in waveInts.indices step 8) {
+                    tempInts.add(waveInts[i+4])
+                }
+            }
+            "V3" -> {
+                for (i in waveInts.indices step 8) {
+                    tempInts.add(waveInts[i+5])
+                }
+            }
+            "V4" -> {
+                for (i in waveInts.indices step 8) {
+                    tempInts.add(waveInts[i+6])
+                }
+            }
+            "V5" -> {
+                for (i in waveInts.indices step 8) {
+                    tempInts.add(waveInts[i+7])
+                }
+            }
+            "III" -> {
+                for (i in waveInts.indices step 8) {
+                    tempInts[i.div(8)] = waveInts[i+2] - waveInts[i+1]
+                }
+            }
+            "aVR" -> {
+                for (i in waveInts.indices step 8) {
+                    tempInts[i.div(8)] = -(waveInts[i+1] + waveInts[i+2]).div(2)
+                }
+            }
+            "aVL" -> {
+                for (i in waveInts.indices step 8) {
+                    tempInts[i.div(8)] = waveInts[i+1] - waveInts[i+2].div(2)
+                }
+            }
+            "aVF" -> {
+                for (i in waveInts.indices step 8) {
+                    tempInts[i.div(8)] = waveInts[i+2] - waveInts[i+1].div(2)
+                }
+            }
         }
-        for (i in tempMvsI.indices) {
-            tempMvsIII.add(tempMvsII[i]-tempMvsI[i])
-            tempMvsaVR.add(-(tempMvsI[i]+tempMvsII[i]).div(2))
-            tempMvsaVL.add(tempMvsI[i]-tempMvsII[i].div(2))
-            tempMvsaVF.add(tempMvsII[i]-tempMvsI[i].div(2))
-        }
-        return when (leadName) {
-            "V6" -> tempMvsV6.toIntArray()
-            "I" -> tempMvsI.toIntArray()
-            "II" -> tempMvsII.toIntArray()
-            "V1" -> tempMvsV1.toIntArray()
-            "V2" -> tempMvsV2.toIntArray()
-            "V3" -> tempMvsV3.toIntArray()
-            "V4" -> tempMvsV4.toIntArray()
-            "V5" -> tempMvsV5.toIntArray()
-            "III" -> tempMvsIII.toIntArray()
-            "aVR" -> tempMvsaVR.toIntArray()
-            "aVL" -> tempMvsaVL.toIntArray()
-            "aVF" -> tempMvsaVF.toIntArray()
-            else -> IntArray(0)
-        }
+        return tempInts.toIntArray()
     }
 
     class Er3File(val model: Int, val fileName: String, val fileSize: Int, private val userId: String, var index: Int) {
