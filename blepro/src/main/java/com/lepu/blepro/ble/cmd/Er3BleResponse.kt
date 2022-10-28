@@ -349,86 +349,10 @@ object Er3BleResponse {
     }
 
     /**
-     * 通过导联名称和解压后的浮点型采样点毫伏值顺序数组，获取每一导联解压后的浮点型采样点毫伏值
-     * V6 / I / II / V1 / V2 / V3 / V4 / V5 / III / aVR / aVL / aVF
-     */
-    fun getEachLeadDataMvs(leadName: String, waveMvs: FloatArray) : FloatArray {
-        // V6 I II V1 V2 V3 V4 V5
-        // III = II-I
-        // aVR = - (I+II)/2
-        // aVL = I - II/2
-        // aVF = II - I/2
-        val tempMvs = mutableListOf<Float>()
-        when (leadName) {
-                "V6" -> {
-                    for (i in waveMvs.indices step 8) {
-                        tempMvs.add(waveMvs[i])
-                    }
-                }
-                "I" -> {
-                    for (i in waveMvs.indices step 8) {
-                        tempMvs.add(waveMvs[i + 1])
-                    }
-                }
-                "II" -> {
-                    for (i in waveMvs.indices step 8) {
-                        tempMvs.add(waveMvs[i + 2])
-                    }
-                }
-                "V1" -> {
-                    for (i in waveMvs.indices step 8) {
-                        tempMvs.add(waveMvs[i + 3])
-                    }
-                }
-                "V2" -> {
-                    for (i in waveMvs.indices step 8) {
-                        tempMvs.add(waveMvs[i + 4])
-                    }
-                }
-                "V3" -> {
-                    for (i in waveMvs.indices step 8) {
-                        tempMvs.add(waveMvs[i + 5])
-                    }
-                }
-                "V4" -> {
-                    for (i in waveMvs.indices step 8) {
-                        tempMvs.add(waveMvs[i + 6])
-                    }
-                }
-                "V5" -> {
-                    for (i in waveMvs.indices step 8) {
-                        tempMvs.add(waveMvs[i + 7])
-                    }
-                }
-                "III" -> {
-                    for (i in waveMvs.indices step 8) {
-                        tempMvs[i.div(8)] = waveMvs[i + 2] - waveMvs[i + 1]
-                    }
-                }
-                "aVR" -> {
-                    for (i in waveMvs.indices step 8) {
-                        waveMvs[i.div(8)] = -(waveMvs[i + 1] + waveMvs[i + 2]).div(2)
-                    }
-                }
-                "aVL" -> {
-                    for (i in waveMvs.indices step 8) {
-                        tempMvs[i.div(8)] = tempMvs[i + 1] - tempMvs[i + 2].div(2)
-                    }
-                }
-                "aVF" -> {
-                    for (i in tempMvs.indices step 8) {
-                        tempMvs[i.div(8)] = tempMvs[i + 2] - tempMvs[i + 1].div(2)
-                    }
-                }
-            }
-        return tempMvs.toFloatArray()
-    }
-
-    /**
      * 通过导联名称和解压后的整型采样点顺序数组，获取每一导联解压后的整型采样点
      * V6 / I / II / V1 / V2 / V3 / V4 / V5 / III / aVR / aVL / aVF
      */
-    fun getEachLeadDataInts(leadName: String, waveInts: IntArray) : IntArray {
+    fun getEachLeadDataInts(leadName: String, waveInts: Array<String>) : MutableList<Int> {
         // V6 I II V1 V2 V3 V4 V5
         // III = II-I
         // aVR = - (I+II)/2
@@ -438,66 +362,66 @@ object Er3BleResponse {
         when (leadName) {
             "V6" -> {
                 for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i])
+                    tempInts.add(waveInts[i].toInt())
                 }
             }
             "I" -> {
                 for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i+1])
+                    tempInts.add(waveInts[i+1].toInt())
                 }
             }
             "II" -> {
                 for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i+2])
+                    tempInts.add(waveInts[i+2].toInt())
                 }
             }
             "V1" -> {
                 for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i+3])
+                    tempInts.add(waveInts[i+3].toInt())
                 }
             }
             "V2" -> {
                 for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i+4])
+                    tempInts.add(waveInts[i+4].toInt())
                 }
             }
             "V3" -> {
                 for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i+5])
+                    tempInts.add(waveInts[i+5].toInt())
                 }
             }
             "V4" -> {
                 for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i+6])
+                    tempInts.add(waveInts[i+6].toInt())
                 }
             }
             "V5" -> {
                 for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i+7])
+                    tempInts.add(waveInts[i+7].toInt())
                 }
             }
             "III" -> {
                 for (i in waveInts.indices step 8) {
-                    tempInts[i.div(8)] = waveInts[i+2] - waveInts[i+1]
+                    tempInts.add(waveInts[i+2].toInt() - waveInts[i+1].toInt())
                 }
             }
             "aVR" -> {
                 for (i in waveInts.indices step 8) {
-                    tempInts[i.div(8)] = -(waveInts[i+1] + waveInts[i+2]).div(2)
+                    tempInts.add(-(waveInts[i+1].toInt() + waveInts[i+2].toInt()).div(2))
                 }
             }
             "aVL" -> {
                 for (i in waveInts.indices step 8) {
-                    tempInts[i.div(8)] = waveInts[i+1] - waveInts[i+2].div(2)
+                    tempInts.add(waveInts[i+1].toInt() - waveInts[i+2].toInt().div(2))
                 }
             }
             "aVF" -> {
                 for (i in waveInts.indices step 8) {
-                    tempInts[i.div(8)] = waveInts[i+2] - waveInts[i+1].div(2)
+                    tempInts.add(waveInts[i+2].toInt() - waveInts[i+1].toInt().div(2))
                 }
             }
         }
-        return tempInts.toIntArray()
+        return tempInts
     }
 
     class Er3File(val model: Int, val fileName: String, val fileSize: Int, private val userId: String, var index: Int) {

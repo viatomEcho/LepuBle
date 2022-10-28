@@ -283,26 +283,15 @@ public class FileUtil {
         }
     }
 
-    public static void readEr3File(Context context) {
-        File file = new File(context.getExternalFilesDir(null).getAbsolutePath());
-        file = new File(file, "W20221025150240.txt");
-        try {
-            String content = FileIOUtils.readFile2String(file);
-            String[] temp = content.split(",");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-    public static void saveEr3File(Context context) {
+    public static int saveEr3File(Context context, String fileName) {
 
         File file = new File(context.getExternalFilesDir(null).getAbsolutePath());
-        file = new File(file, "W20221025150240");
+        file = new File(file, fileName);
 
         Er3WaveFile waveFile = new Er3WaveFile();
 
         File file2 = new File(context.getExternalFilesDir(null).getAbsolutePath());
-        file2 = new File(file2, "W20221025150240.txt");
+        file2 = new File(file2, fileName + ".txt");
 
         try {
             if (!file2.exists()) {
@@ -318,7 +307,7 @@ public class FileUtil {
             inputStream.read(headBytes);
             waveFile.parseHeadData(headBytes);
             int len = (int)file.length();
-            int total = len/1024;
+            int total = (len-10)/1024;
             int index = 0;
             int leadType = waveFile.getLeadType();
             Er3Decompress decompress;
@@ -332,9 +321,11 @@ public class FileUtil {
                 int[] ints = waveFile.parseIntsFromWaveBytes(tempBytes, leadType, decompress);
                 for (int i=0; i<ints.length; i++) {
                     bufferedWriter.write(String.valueOf(ints[i]));
-                    bufferedWriter.write(",");
-                    bufferedWriter.flush();
+                    if (i != ints.length-1) {
+                        bufferedWriter.write(",");
+                    }
                 }
+                bufferedWriter.newLine();
                 index++;
                 if (index == total) {
                     break;
@@ -345,18 +336,18 @@ public class FileUtil {
             int[] ints = waveFile.parseIntsFromWaveBytes(lastBytes, leadType, decompress);
             for (int i=0; i<ints.length; i++) {
                 bufferedWriter.write(String.valueOf(ints[i]));
-                bufferedWriter.write(",");
-                bufferedWriter.flush();
+                if (i != ints.length-1) {
+                    bufferedWriter.write(",");
+                }
             }
             byte[] endBytes = new byte[20];
             inputStream.read(endBytes);
             waveFile.parseEndData(endBytes);
             bufferedWriter.close();
-            Log.d("111111111111", ""+waveFile);
-        } catch (FileNotFoundException e) {
+            return waveFile.getRecordingTime();
+        } catch (Exception e) {
             e.printStackTrace();
-        }catch (IOException e){
-            e.printStackTrace();
+            return 0;
         }
     }
 

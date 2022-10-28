@@ -29,7 +29,6 @@ import com.lepu.demo.ble.OxyAdapter
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.ecgData
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.oxyData
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.bpData
 import com.lepu.demo.data.BpData
 import com.lepu.demo.data.EcgData
 import com.lepu.demo.data.OxyData
@@ -37,7 +36,7 @@ import com.lepu.demo.databinding.FragmentInfoBinding
 import com.lepu.demo.util.DataConvert
 import com.lepu.demo.util.FileUtil
 import org.apache.commons.io.FileUtils
-import java.io.File
+import java.io.*
 
 
 class InfoFragment : Fragment(R.layout.fragment_info){
@@ -75,12 +74,56 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         super.onViewCreated(view, savedInstanceState)
         initView()
         initEvent()
-        testEr3()
-
+//        testEr3()
     }
 
     private fun testEr3() {
-        FileUtil.saveEr3File(context)
+        val fileName = "W20221025150240"
+//        val fileName = "W20220921154419"
+        val duration = FileUtil.saveEr3File(context, fileName)
+        val recordingTime = DateUtil.getSecondTimestamp("20221025150240")
+//        val recordingTime = DateUtil.getSecondTimestamp("20220921154419")
+        val tempV6 = getEcgData(recordingTime, "导联 V6", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("V6", fileName)), duration)
+        ecgList.add(tempV6)
+        /*val tempI = getEcgData(recordingTime, "导联 I", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("I", fileName)), duration)
+        ecgList.add(tempI)
+        val tempII = getEcgData(recordingTime, "导联 II", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("II", fileName)), duration)
+        ecgList.add(tempII)
+        val tempV1 = getEcgData(recordingTime, "导联 V1", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("V1", fileName)), duration)
+        ecgList.add(tempV1)
+        val tempV2 = getEcgData(recordingTime, "导联 V2", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("V2", fileName)), duration)
+        ecgList.add(tempV2)
+        val tempV3 = getEcgData(recordingTime, "导联 V3", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("V3", fileName)), duration)
+        ecgList.add(tempV3)
+        val tempV4 = getEcgData(recordingTime, "导联 V4", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("V4", fileName)), duration)
+        ecgList.add(tempV4)
+        val tempV5 = getEcgData(recordingTime, "导联 V5", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("V5", fileName)), duration)
+        ecgList.add(tempV5)
+        val tempIII = getEcgData(recordingTime, "导联 III", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("III", fileName)), duration)
+        ecgList.add(tempIII)
+        val tempaVR = getEcgData(recordingTime, "导联 aVR", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("aVR", fileName)), duration)
+        ecgList.add(tempaVR)
+        val tempaVL = getEcgData(recordingTime, "导联 aVL", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("aVL", fileName)), duration)
+        ecgList.add(tempaVL)
+        val tempaVF = getEcgData(recordingTime, "导联 aVF", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("aVF", fileName)), duration)
+        ecgList.add(tempaVF)*/
+        ecgAdapter.setNewInstance(ecgList)
+        ecgAdapter.notifyDataSetChanged()
+    }
+    private fun testGetLeadData(leadName: String, fileName: String) : IntArray? {
+        var file = File(context?.getExternalFilesDir(null)!!.absolutePath)
+        file = File(file, "$fileName.txt")
+//        file = File(file, "W20220921154419.txt")
+        return try {
+            val data = mutableListOf<Int>()
+            file.bufferedReader().forEachLine { line ->
+                data.addAll(Er3BleResponse.getEachLeadDataInts(leadName, line.split(",").toTypedArray()))
+            }
+            data.toIntArray()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
     private fun initView(){
