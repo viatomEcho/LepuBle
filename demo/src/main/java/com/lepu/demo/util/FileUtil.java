@@ -196,9 +196,9 @@ public class FileUtil {
 
     }*/
 
-    public static void saveFile(Context context, byte[] data) {
+    public static void saveFile(Context context, byte[] data, String fileName) {
         File file = new File(context.getExternalFilesDir(null).getAbsolutePath());
-        file = new File(file, "userlist.dat");
+        file = new File(file, fileName);
         try {
             if (!file.exists()) {
                 file.createNewFile();

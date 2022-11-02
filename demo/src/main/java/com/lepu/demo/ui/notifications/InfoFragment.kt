@@ -78,12 +78,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
     }
 
     private fun testEr3() {
-        val fileName = "W20221025150240"
-//        val fileName = "W20220921154419"
+//        val fileName = "W20221025150240"
+        val fileName = "W20220921154419"
         val duration = FileUtil.saveEr3File(context, fileName)
-        val recordingTime = DateUtil.getSecondTimestamp("20221025150240")
-//        val recordingTime = DateUtil.getSecondTimestamp("20220921154419")
-        val tempV6 = getEcgData(recordingTime, "导联 V6", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("V6", fileName)), duration)
+//        val recordingTime = DateUtil.getSecondTimestamp("20221025150240")
+        val recordingTime = DateUtil.getSecondTimestamp("20220921154419")
+        val tempV6 = getEcgData(recordingTime, "导联 aVF", byteArrayOf(0), testGetLeadShortData("aVF", fileName), duration)
         ecgList.add(tempV6)
         /*val tempI = getEcgData(recordingTime, "导联 I", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("I", fileName)), duration)
         ecgList.add(tempI)
@@ -110,19 +110,18 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         ecgAdapter.setNewInstance(ecgList)
         ecgAdapter.notifyDataSetChanged()
     }
-    private fun testGetLeadData(leadName: String, fileName: String) : IntArray? {
+    private fun testGetLeadShortData(leadName: String, fileName: String) : ShortArray {
         var file = File(context?.getExternalFilesDir(null)!!.absolutePath)
         file = File(file, "$fileName.txt")
-//        file = File(file, "W20220921154419.txt")
         return try {
-            val data = mutableListOf<Int>()
+            val data = mutableListOf<Short>()
             file.bufferedReader().forEachLine { line ->
-                data.addAll(Er3BleResponse.getEachLeadDataInts(leadName, line.split(",").toTypedArray()))
+                data.addAll(Er3BleResponse.getEachLeadDataShorts(leadName, line.split(",").toTypedArray()))
             }
-            data.toIntArray()
+            data.toShortArray()
         } catch (e: Exception) {
             e.printStackTrace()
-            null
+            ShortArray(0)
         }
     }
 
@@ -319,6 +318,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_20AW
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_20B
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC_60NW
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC60NW_BLE
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S5W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S6W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S6W1

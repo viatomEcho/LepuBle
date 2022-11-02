@@ -6,6 +6,7 @@ import com.lepu.blepro.utils.toUInt
 
 /**
  * Wxxxxxxxxxxxxxx：心电波形存储文件
+ * app下载数据调用
  */
 class Er3WaveFile {
 
