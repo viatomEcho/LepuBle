@@ -2,6 +2,7 @@ package com.lepu.blepro.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.os.Handler
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
@@ -76,7 +77,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                 .retry(3, 100)
                 .done {
                     LepuBleLog.d(tag, "manager.connect done")
-                    if (model == Bluetooth.MODEL_PC_60NW) {
+                    if (model == Bluetooth.MODEL_PC_60NW || model == Bluetooth.MODEL_PC60NW_BLE) {
                         enableRtData(Pc60FwBleCmd.EnableType.OXY_PARAM, true)
                         enableRtData(Pc60FwBleCmd.EnableType.OXY_WAVE, true)
                     }
@@ -251,6 +252,12 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwPpgData).post(InterfaceEvent(model, ppgData))
                     }
                 }
+                Pc60FwBleCmd.MSG_HEARTBEAT.toByte() -> {
+                    LepuBleLog.d(tag, "model:$model,MSG_HEARTBEAT => success")
+                    Handler().postDelayed({
+                        sendHeartbeat()
+                    }, 5000)
+                }
             }
         }
     }
@@ -262,8 +269,9 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
 
     override fun getInfo() {
         getBranchCode()
-        if (model == Bluetooth.MODEL_PC_60NW) {
+        if (model == Bluetooth.MODEL_PC_60NW || model == Bluetooth.MODEL_PC60NW_BLE) {
             sendCmd(Pc60FwBleCmd.getInfo0F())
+            sendHeartbeat()
         } else {
             sendCmd(Pc60FwBleCmd.getSn())
             sendCmd(Pc60FwBleCmd.getInfoF0())
@@ -284,6 +292,9 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "setBranchCode")
     }
 
+    private fun sendHeartbeat() {
+        sendCmd(Pc60FwBleCmd.sendHeartbeat(5))
+    }
     override fun syncTime() {
         LepuBleLog.e(tag, "syncTime not yet implemented")
     }

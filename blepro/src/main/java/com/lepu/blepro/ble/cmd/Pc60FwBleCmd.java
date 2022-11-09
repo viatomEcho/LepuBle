@@ -26,6 +26,8 @@ public class Pc60FwBleCmd {
     public static final int TOKEN_0F = 0x0F;
     public static final int MSG_RT_PARAM = 0x01;
     public static final int MSG_RT_WAVE = 0x02;
+    public static final int CMD_HEARTBEAT = 0x80;
+    public static final int MSG_HEARTBEAT = 0x00;
     public static final int CMD_GET_DEVICE_INFO_0F = 0x83;
     public static final int MSG_GET_DEVICE_INFO_0F = 0x03;
     public static final int CMD_ENABLE_PARAM = 0x84;
@@ -142,6 +144,19 @@ public class Pc60FwBleCmd {
         cmd[3] = (byte) (len+2);
         cmd[4] = (byte) CMD_SET_CODE;
         System.arraycopy(data, 0, cmd, 5, len);
+        cmd[cmd.length-1] = CrcUtil.calCRC8Pc(cmd);
+        return cmd;
+    }
+
+    public static byte[] sendHeartbeat(int interval) {
+        int len = 1;
+        byte[] cmd = new byte[6+len];
+        cmd[0] = (byte) HEAD_0;
+        cmd[1] = (byte) HEAD_1;
+        cmd[2] = (byte) TOKEN_0F;
+        cmd[3] = (byte) (len+2);
+        cmd[4] = (byte) CMD_HEARTBEAT;
+        cmd[5] = (byte) interval;
         cmd[cmd.length-1] = CrcUtil.calCRC8Pc(cmd);
         return cmd;
     }

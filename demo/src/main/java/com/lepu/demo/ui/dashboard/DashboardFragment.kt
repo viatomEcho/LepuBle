@@ -175,7 +175,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     40
                 }
                 else -> {
-                    101  // 血氧波形50HZ，1s有50个点，速度大于100即可
+                    111  // 血氧波形50HZ，1s有50个点，速度大于100即可（1000ms/10包）
+                         // 有时候设备1s发不够10包，只有9包，速度要111（1000ms/9包）
                 }
             }
 
@@ -226,7 +227,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_OXYU, Bluetooth.MODEL_S5W,
             Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_SP20_BLE -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_SP20_BLE,
+            Bluetooth.MODEL_PC60NW_BLE -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_CHECK_ADV, Bluetooth.MODEL_PC300_BLE -> {
@@ -339,7 +341,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
                 Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60NW,
                 Bluetooth.MODEL_S6W, Bluetooth.MODEL_S6W1,
-                Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S7W -> {
+                Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S7W,
+                Bluetooth.MODEL_PC60NW_BLE -> {
                     binding.oxyLayout.visibility = View.VISIBLE
                     binding.er3Layout.visibility = View.GONE
                     binding.ecgLayout.visibility = View.GONE
@@ -633,7 +636,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_S5W,
                     Bluetooth.MODEL_S6W, Bluetooth.MODEL_S7W,
                     Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S6W1,
-                    Bluetooth.MODEL_SP20_BLE -> {
+                    Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_PC60NW_BLE -> {
                         LpBleUtil.enableRtData(it, type, state)
                         type++
                         if (type > Sp20BleCmd.EnableType.OXY_WAVE) {

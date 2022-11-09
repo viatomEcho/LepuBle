@@ -30,7 +30,6 @@ import com.lepu.demo.ble.OxyAdapter
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.ecgData
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.oxyData
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.bpData
 import com.lepu.demo.data.BpData
 import com.lepu.demo.data.EcgData
 import com.lepu.demo.data.OxyData
@@ -38,7 +37,7 @@ import com.lepu.demo.databinding.FragmentInfoBinding
 import com.lepu.demo.util.DataConvert
 import com.lepu.demo.util.FileUtil
 import org.apache.commons.io.FileUtils
-import java.io.File
+import java.io.*
 
 
 class InfoFragment : Fragment(R.layout.fragment_info){
@@ -80,39 +79,51 @@ class InfoFragment : Fragment(R.layout.fragment_info){
     }
 
     private fun testEr3() {
-//        val fileName = "W20220921154419"
-//        val fileName = "W20221012161124"
-        val fileName = "W20221014095217"
-        val data = Er3WaveFile(FileUtil.readFile(context, fileName))
-        val recordingTime = DateUtil.getSecondTimestamp(fileName.replace("W", ""))
-        val temp = getEcgData(recordingTime, fileName, data.wave, DataConvert.getEr3ShortArray(data.waveInts), data.recordingTime)
-        ecgList.add(temp)
-        val tempV6 = getEcgData(recordingTime, "导联 V6", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V6", data.waveInts)), data.recordingTime)
+//        val fileName = "W20221025150240"
+        val fileName = "W20220921154419"
+        val duration = FileUtil.saveEr3File(context, fileName)
+//        val recordingTime = DateUtil.getSecondTimestamp("20221025150240")
+        val recordingTime = DateUtil.getSecondTimestamp("20220921154419")
+        val tempV6 = getEcgData(recordingTime, "导联 aVF", byteArrayOf(0), testGetLeadShortData("aVF", fileName), duration)
         ecgList.add(tempV6)
-        val tempI = getEcgData(recordingTime, "导联 I", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("I", data.waveInts)), data.recordingTime)
+        /*val tempI = getEcgData(recordingTime, "导联 I", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("I", fileName)), duration)
         ecgList.add(tempI)
-        val tempII = getEcgData(recordingTime, "导联 II", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("II", data.waveInts)), data.recordingTime)
+        val tempII = getEcgData(recordingTime, "导联 II", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("II", fileName)), duration)
         ecgList.add(tempII)
-        val tempV1 = getEcgData(recordingTime, "导联 V1", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V1", data.waveInts)), data.recordingTime)
+        val tempV1 = getEcgData(recordingTime, "导联 V1", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("V1", fileName)), duration)
         ecgList.add(tempV1)
-        val tempV2 = getEcgData(recordingTime, "导联 V2", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V2", data.waveInts)), data.recordingTime)
+        val tempV2 = getEcgData(recordingTime, "导联 V2", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("V2", fileName)), duration)
         ecgList.add(tempV2)
-        val tempV3 = getEcgData(recordingTime, "导联 V3", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V3", data.waveInts)), data.recordingTime)
+        val tempV3 = getEcgData(recordingTime, "导联 V3", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("V3", fileName)), duration)
         ecgList.add(tempV3)
-        val tempV4 = getEcgData(recordingTime, "导联 V4", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V4", data.waveInts)), data.recordingTime)
+        val tempV4 = getEcgData(recordingTime, "导联 V4", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("V4", fileName)), duration)
         ecgList.add(tempV4)
-        val tempV5 = getEcgData(recordingTime, "导联 V5", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V5", data.waveInts)), data.recordingTime)
+        val tempV5 = getEcgData(recordingTime, "导联 V5", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("V5", fileName)), duration)
         ecgList.add(tempV5)
-        val tempIII = getEcgData(recordingTime, "导联 III", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("III", data.waveInts)), data.recordingTime)
+        val tempIII = getEcgData(recordingTime, "导联 III", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("III", fileName)), duration)
         ecgList.add(tempIII)
-        val tempaVR = getEcgData(recordingTime, "导联 aVR", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("aVR", data.waveInts)), data.recordingTime)
+        val tempaVR = getEcgData(recordingTime, "导联 aVR", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("aVR", fileName)), duration)
         ecgList.add(tempaVR)
-        val tempaVL = getEcgData(recordingTime, "导联 aVL", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("aVL", data.waveInts)), data.recordingTime)
+        val tempaVL = getEcgData(recordingTime, "导联 aVL", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("aVL", fileName)), duration)
         ecgList.add(tempaVL)
-        val tempaVF = getEcgData(recordingTime, "导联 aVF", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("aVF", data.waveInts)), data.recordingTime)
-        ecgList.add(tempaVF)
+        val tempaVF = getEcgData(recordingTime, "导联 aVF", byteArrayOf(0), DataConvert.getEr3ShortArray(testGetLeadData("aVF", fileName)), duration)
+        ecgList.add(tempaVF)*/
         ecgAdapter.setNewInstance(ecgList)
         ecgAdapter.notifyDataSetChanged()
+    }
+    private fun testGetLeadShortData(leadName: String, fileName: String) : ShortArray {
+        var file = File(context?.getExternalFilesDir(null)!!.absolutePath)
+        file = File(file, "$fileName.txt")
+        return try {
+            val data = mutableListOf<Short>()
+            file.bufferedReader().forEachLine { line ->
+                data.addAll(Er3BleResponse.getEachLeadDataShorts(leadName, line.split(",").toTypedArray()))
+            }
+            data.toShortArray()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ShortArray(0)
+        }
     }
 
     private fun initView(){
@@ -308,6 +319,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_20AW
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_20B
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC_60NW
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC60NW_BLE
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S5W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S6W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S6W1
@@ -1344,38 +1356,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         binding.info.text = "$data"
                         binding.deviceInfo.text = "$data"
                     } else if (it.fileName.contains("W")) {
-                        val data = Er3WaveFile(it.content)
-                        binding.info.text = "$data"
-                        binding.deviceInfo.text = "$data"
-                        val recordingTime = DateUtil.getSecondTimestamp(it.fileName.replace("W", ""))
-                        val temp = getEcgData(recordingTime, it.fileName, data.wave, DataConvert.getEr3ShortArray(data.waveInts), data.recordingTime)
-                        ecgList.add(temp)
-                        val tempV6 = getEcgData(recordingTime, "导联 V6", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V6", data.waveInts)), data.recordingTime)
-                        ecgList.add(tempV6)
-                        val tempI = getEcgData(recordingTime, "导联 I", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("I", data.waveInts)), data.recordingTime)
-                        ecgList.add(tempI)
-                        val tempII = getEcgData(recordingTime, "导联 II", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("II", data.waveInts)), data.recordingTime)
-                        ecgList.add(tempII)
-                        val tempV1 = getEcgData(recordingTime, "导联 V1", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V1", data.waveInts)), data.recordingTime)
-                        ecgList.add(tempV1)
-                        val tempV2 = getEcgData(recordingTime, "导联 V2", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V2", data.waveInts)), data.recordingTime)
-                        ecgList.add(tempV2)
-                        val tempV3 = getEcgData(recordingTime, "导联 V3", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V3", data.waveInts)), data.recordingTime)
-                        ecgList.add(tempV3)
-                        val tempV4 = getEcgData(recordingTime, "导联 V4", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V4", data.waveInts)), data.recordingTime)
-                        ecgList.add(tempV4)
-                        val tempV5 = getEcgData(recordingTime, "导联 V5", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("V5", data.waveInts)), data.recordingTime)
-                        ecgList.add(tempV5)
-                        val tempIII = getEcgData(recordingTime, "导联 III", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("III", data.waveInts)), data.recordingTime)
-                        ecgList.add(tempIII)
-                        val tempaVR = getEcgData(recordingTime, "导联 aVR", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("aVR", data.waveInts)), data.recordingTime)
-                        ecgList.add(tempaVR)
-                        val tempaVL = getEcgData(recordingTime, "导联 aVL", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("aVL", data.waveInts)), data.recordingTime)
-                        ecgList.add(tempaVL)
-                        val tempaVF = getEcgData(recordingTime, "导联 aVF", data.wave, DataConvert.getEr3ShortArray(Er3BleResponse.getEachLeadDataInts("aVF", data.waveInts)), data.recordingTime)
-                        ecgList.add(tempaVF)
-                        ecgAdapter.setNewInstance(ecgList)
-                        ecgAdapter.notifyDataSetChanged()
+
                     }
                     setReceiveCmd(it.content)
                     binding.process.text = readFileProcess

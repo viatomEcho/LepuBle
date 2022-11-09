@@ -63,7 +63,7 @@ class Er3BleInterface(model: Int): BleInterface(model) {
 
             Er3BleCmd.RT_DATA -> {
                 val rtData = Er3BleResponse.RtData(response.content)
-                LepuBleLog.d(tag, "model:$model,RT_DATA => success")
+                LepuBleLog.d(tag, "model:$model,RT_DATA => success ${rtData.wave}")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3RtData).post(InterfaceEvent(model, rtData))
             }
 

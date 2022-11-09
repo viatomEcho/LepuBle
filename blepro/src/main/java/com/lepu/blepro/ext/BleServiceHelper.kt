@@ -658,7 +658,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1 -> {
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE -> {
                 return inter is Pc60FwBleInterface
             }
             Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE -> {
@@ -3024,7 +3024,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1 -> {
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc60FwBleInterface).let {
                         LepuBleLog.d(tag, "it as Pc60FwBleInterface--pc60fwEnableRtData")
@@ -3048,7 +3048,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1 -> {
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc60FwBleInterface).let {
                         LepuBleLog.d(tag, "it as Pc60FwBleInterface--pc60fwGetBranchCode")
@@ -3072,7 +3072,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1 -> {
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc60FwBleInterface).let {
                         LepuBleLog.d(tag, "it as Pc60FwBleInterface--pc60fwSetBranchCode")

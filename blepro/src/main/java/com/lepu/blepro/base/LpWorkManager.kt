@@ -222,7 +222,7 @@ object LpWorkManager {
             Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1 -> {
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE -> {
                 Pc60FwBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -494,7 +494,7 @@ object LpWorkManager {
             Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1 -> {
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE -> {
                 Pc60FwBleManager(context).apply {
                     vailManager.put(m, this)
                     return this

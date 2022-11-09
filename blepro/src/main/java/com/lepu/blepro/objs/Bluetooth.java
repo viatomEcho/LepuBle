@@ -50,6 +50,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_DEVICES_ER2 = "ER2";  // 新增ER2【产线用】
     public static final String BT_NAME_STATION = "Station";  // BabyO2盒子升级专用
     public static final String BT_NAME_POD2B = "POD-2B_SN";  // POD-2B_SN7295【蓝牙名】
+    public static final String BT_NAME_PC_60NW_BLE = "PC-60NW_BLE";  // 【蓝牙名】 + SN后六位
     public static final String BT_NAME_PC_60NW = "PC-60NW_SN";  // 【蓝牙名】 + SN后六位
     public static final String BT_NAME_PC_60NW_1 = "PC-60NW-1_SN";  // 【蓝牙名】 + SN后六位
     public static final String BT_NAME_POD_1W = "POD-1_SN";  // 【蓝牙名】 + SN后四位
@@ -217,6 +218,7 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_PC300_BLE = 94;
     public static final int MODEL_ER3 = 95;
     public static final int MODEL_LEPOD = 96;
+    public static final int MODEL_PC60NW_BLE = 97;
 
     @IntDef({MODEL_UNRECOGNIZED, MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_OXYRING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER1_N,
             MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL, MODEL_BABYO2, MODEL_OXYSMART,
@@ -228,7 +230,7 @@ public class Bluetooth implements Parcelable {
             MODEL_BBSM_S1, MODEL_BBSM_S2, MODEL_CMRING, MODEL_LPRE, MODEL_LE_B1, MODEL_OXYU, MODEL_S5W, MODEL_W12C, MODEL_AI_S100,
             MODEL_HHM1, MODEL_HHM2, MODEL_HHM3, MODEL_HHM4, MODEL_LP_ER2, MODEL_LPM311, MODEL_POCTOR_M3102, MODEL_S6W, MODEL_S7W, MODEL_S7BW,
             MODEL_BIOLAND_BGM, MODEL_S6W1, MODEL_PF_10AW, MODEL_PF_10AW1, MODEL_PF_10BW, MODEL_PF_10BW1, MODEL_PF_20AW, MODEL_PF_20B,
-            MODEL_CHECKME, MODEL_PC80B_BLE, MODEL_SP20_BLE, MODEL_PC300_BLE, MODEL_ER3, MODEL_LEPOD})
+            MODEL_CHECKME, MODEL_PC80B_BLE, MODEL_SP20_BLE, MODEL_PC300_BLE, MODEL_ER3, MODEL_LEPOD, MODEL_PC60NW_BLE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 
@@ -266,8 +268,10 @@ public class Bluetooth implements Parcelable {
             return MODEL_POD2B;
         } else if (deviceName.contains(BT_NAME_PC_60NW_1)){
             return MODEL_PC_60NW_1;
-        } else if (deviceName.contains(BT_NAME_PC_60NW)){
+        } else if (deviceName.contains(BT_NAME_PC_60NW)) {
             return MODEL_PC_60NW;
+        } else if (deviceName.contains(BT_NAME_PC_60NW_BLE)) {
+            return MODEL_PC60NW_BLE;
         } else if (deviceName.contains(BT_NAME_POD_1W)) {
             return MODEL_POD_1W;
         } else if (deviceName.contains(BT_NAME_PC_60B)){
@@ -462,7 +466,7 @@ public class Bluetooth implements Parcelable {
             BT_NAME_CHECK_ADV, BT_NAME_BBSM_S1, BT_NAME_BBSM_S2, BT_NAME_CMRING, BT_NAME_LPRE, BT_NAME_LE_B1, BT_NAME_OXYU, BT_NAME_S5W, BT_NAME_W12C, BT_NAME_AI_S100,
             BT_NAME_HHM1, BT_NAME_HHM2, BT_NAME_HHM3, BT_NAME_HHM4, BT_NAME_LP_ER2, BT_NAME_LPM311, BT_NAME_POCTOR_M3102, BT_NAME_S6W, BT_NAME_S7W, BT_NAME_S7BW,
             BT_NAME_BIOLAND_BGM, BT_NAME_S6W1, BT_NAME_PF_10AW, BT_NAME_PF_10AW1, BT_NAME_PF_10BW, BT_NAME_PF_10BW1, BT_NAME_PF_20AW, BT_NAME_PF_20B,
-            BT_NAME_CHECKME, BT_NAME_PC80B_BLE, BT_NAME_SP20_BLE, BT_NAME_PC_300_BLE, BT_NAME_ER3, BT_NAME_LEPOD})
+            BT_NAME_CHECKME, BT_NAME_PC80B_BLE, BT_NAME_SP20_BLE, BT_NAME_PC_300_BLE, BT_NAME_ER3, BT_NAME_LEPOD, BT_NAME_PC_60NW_BLE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface DEVICE_NAME {
 
@@ -559,6 +563,8 @@ public class Bluetooth implements Parcelable {
                 return BT_NAME_PC_60NW_1;
             case MODEL_PC_60NW:
                 return BT_NAME_PC_60NW;
+            case MODEL_PC60NW_BLE:
+                return BT_NAME_PC_60NW_BLE;
             case MODEL_POD_1W:
                 return BT_NAME_POD_1W;
             case MODEL_PC_60B:

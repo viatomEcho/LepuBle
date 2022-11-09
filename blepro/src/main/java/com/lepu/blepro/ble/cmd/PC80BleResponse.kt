@@ -35,20 +35,28 @@ object PC80BleResponse {
         // 0x12 : V1.2
         // 0x5,0x6,0x3,'B',0x0,0x1 : V5.6.3.B01 len=8  V5.6.3.0 len=6
         init {
-            if (len == 8) {
-                softwareV = "" + bytes[0].toInt() +
-                        "." + bytes[1].toInt() +
-                        "." + bytes[2].toInt() +
-                        "." + toString(byteArrayOf(bytes[3])) + bytes[4].toInt() + bytes[5].toInt()
-                hardwareV = byteToPointHex(bytes[len-2])
-                algorithmV = byteToPointHex(bytes[len-1])
-            } else {
-                softwareV = "" + bytes[0].toInt() +
-                        "." + bytes[1].toInt() +
-                        "." + bytes[2].toInt() +
-                        "." + bytes[3].toInt()
-                hardwareV = byteToPointHex(bytes[len-2])
-                algorithmV = byteToPointHex(bytes[len-1])
+            when (len) {
+                8 -> {
+                    softwareV = "" + bytes[0].toInt() +
+                            "." + bytes[1].toInt() +
+                            "." + bytes[2].toInt() +
+                            "." + toString(byteArrayOf(bytes[3])) + bytes[4].toInt() + bytes[5].toInt()
+                    hardwareV = byteToPointHex(bytes[len - 2])
+                    algorithmV = byteToPointHex(bytes[len - 1])
+                }
+                6 -> {
+                    softwareV = "" + bytes[0].toInt() +
+                            "." + bytes[1].toInt() +
+                            "." + bytes[2].toInt() +
+                            "." + bytes[3].toInt()
+                    hardwareV = byteToPointHex(bytes[len - 2])
+                    algorithmV = byteToPointHex(bytes[len - 1])
+                }
+                else -> {
+                    softwareV = byteToPointHex(bytes[0])
+                    hardwareV = byteToPointHex(bytes[1])
+                    algorithmV = byteToPointHex(bytes[2])
+                }
             }
         }
 
