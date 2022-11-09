@@ -171,7 +171,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     40
                 }
                 else -> {
-                    101  // 血氧波形50HZ，1s有50个点，速度大于100即可
+                    111  // 血氧波形50HZ，1s有50个点，速度大于100即可（1000ms/10包）
+                         // 有时候设备1s发不够10包，只有9包，速度要111（1000ms/9包）
                 }
             }
 
