@@ -97,7 +97,7 @@ object Er3BleResponse {
             isInsertEcgLeadWire = ((byte2UInt(bytes[index]) and 0x04) shr 2) == 1
             oxyStatus = (byte2UInt(bytes[index]) and 0x18) shr 3
             isInsertTemp = ((byte2UInt(bytes[index]) and 0x60) shr 5) == 1
-            measureStatus = (byte2UInt(bytes[index]) and 0x80) shr 7 + (byte2UInt(bytes[index+1]) and 0x01) shl 1
+            measureStatus = ((byte2UInt(bytes[index]) and 0x80) shr 7) + ((byte2UInt(bytes[index+1]) and 0x01) shl 1)
             isHasDevice = ((byte2UInt(bytes[index+1]) and 0x0E) shr 1) != 0
             isHasTemp = ((byte2UInt(bytes[index+1]) and 0x02) shr 1) == 1
             isHasOxy = ((byte2UInt(bytes[index+1]) and 0x04) shr 2) == 1
@@ -217,7 +217,7 @@ object Er3BleResponse {
      * V6 I II V1 V2 V3 V4 V5
      */
     fun getMvsFromWaveBytes(wave: ByteArray, leadType: Int) : FloatArray {
-        val waveInts = getIntsFromWaveBytes(wave, leadType)
+        val waveInts = getShortsFromWaveBytes(wave, leadType)
         val waveMvs = mutableListOf<Float>()
         for (i in waveInts) {
             waveMvs.add(i * 0.00244140625f)
@@ -225,10 +225,10 @@ object Er3BleResponse {
         return waveMvs.toFloatArray()
     }
     /**
-     * 实时原始波形数据和导联类型，获取8导解压后的int型采样点毫伏值顺序数组
+     * 实时原始波形数据和导联类型，获取8导解压后的short型采样点毫伏值顺序数组
      * V6 I II V1 V2 V3 V4 V5
      */
-    fun getIntsFromWaveBytes(wave: ByteArray, leadType: Int) : IntArray {
+    fun getShortsFromWaveBytes(wave: ByteArray, leadType: Int) : ShortArray {
         // decompress
         val num = if (leadType == 0) {
             8
@@ -236,7 +236,7 @@ object Er3BleResponse {
             4
         }
         val decompress = Er3Decompress(num)
-        val decompressData = mutableListOf<Int>()
+        val decompressData = mutableListOf<Short>()
         for (b in wave) {
             val tmp = decompress.Decompress(b)
             if (tmp != null) {
@@ -244,68 +244,68 @@ object Er3BleResponse {
                     if (i == 32767) {  // 导联脱落，基线处理
                         decompressData.add(0)
                     } else {
-                        decompressData.add(i)
+                        decompressData.add(i.toShort())
                     }
                 }
             }
         }
 
-        val oriInts = decompressData.toIntArray()
-        var waveInts = IntArray(0)
-        val tmpFs = mutableListOf<Int>()
+        val oriShorts = decompressData.toShortArray()
+        var waveShorts = ShortArray(0)
+        val tmpFs = mutableListOf<Short>()
 
         when(leadType) {
             0 -> {  // LEAD_12
                 val lead_size = 8
-                waveInts = oriInts
+                waveShorts = oriShorts
             }
             1, 7 -> {  // LEAD_6
                 val lead_size = 4
-                for (i in oriInts.indices step lead_size) {
+                for (i in oriShorts.indices step lead_size) {
                     tmpFs.add(0)
-                    tmpFs.add(oriInts[i+1])
-                    tmpFs.add(oriInts[i+2])
-                    tmpFs.add(oriInts[i+3])
+                    tmpFs.add(oriShorts[i+1])
+                    tmpFs.add(oriShorts[i+2])
+                    tmpFs.add(oriShorts[i+3])
                     tmpFs.add(0)
                     tmpFs.add(0)
                     tmpFs.add(0)
-                    tmpFs.add(oriInts[i])
+                    tmpFs.add(oriShorts[i])
                 }
-                waveInts = tmpFs.toIntArray()
+                waveShorts = tmpFs.toShortArray()
             }
             2 -> {  // LEAD_5
                 val lead_size = 4
-                for (i in oriInts.indices step lead_size) {
+                for (i in oriShorts.indices step lead_size) {
                     tmpFs.add(0)
-                    tmpFs.add(oriInts[i+1])
-                    tmpFs.add(oriInts[i+2])
-                    tmpFs.add(oriInts[i+3])
+                    tmpFs.add(oriShorts[i+1])
+                    tmpFs.add(oriShorts[i+2])
+                    tmpFs.add(oriShorts[i+3])
                     tmpFs.add(0)
                     tmpFs.add(0)
                     tmpFs.add(0)
                     tmpFs.add(0)
                 }
-                waveInts = tmpFs.toIntArray()
+                waveShorts = tmpFs.toShortArray()
             }
             3 -> {  // LEAD_3
                 val lead_size = 4
-                for (i in oriInts.indices step lead_size) {
+                for (i in oriShorts.indices step lead_size) {
                     tmpFs.add(0)
                     tmpFs.add(0)
-                    tmpFs.add(oriInts[i+2])
+                    tmpFs.add(oriShorts[i+2])
                     tmpFs.add(0)
                     tmpFs.add(0)
                     tmpFs.add(0)
                     tmpFs.add(0)
                     tmpFs.add(0)
                 }
-                waveInts = tmpFs.toIntArray()
+                waveShorts = tmpFs.toShortArray()
             }
             4 -> {  // LEAD_3_TEMP
                 val lead_size = 4
-                for (i in oriInts.indices step lead_size) {
+                for (i in oriShorts.indices step lead_size) {
                     tmpFs.add(0)
-                    tmpFs.add(oriInts[i+1])
+                    tmpFs.add(oriShorts[i+1])
                     tmpFs.add(0)
                     tmpFs.add(0)
                     tmpFs.add(0)
@@ -313,116 +313,116 @@ object Er3BleResponse {
                     tmpFs.add(0)
                     tmpFs.add(0)
                 }
-                waveInts = tmpFs.toIntArray()
+                waveShorts = tmpFs.toShortArray()
             }
             5 -> {  // LEAD_3_LEG
                 val lead_size = 4
-                for (i in oriInts.indices step lead_size) {
+                for (i in oriShorts.indices step lead_size) {
                     tmpFs.add(0)
-                    tmpFs.add(oriInts[i+1])
-                    tmpFs.add(oriInts[i+2])
+                    tmpFs.add(oriShorts[i+1])
+                    tmpFs.add(oriShorts[i+2])
                     tmpFs.add(0)
                     tmpFs.add(0)
                     tmpFs.add(0)
                     tmpFs.add(0)
                     tmpFs.add(0)
                 }
-                waveInts = tmpFs.toIntArray()
+                waveShorts = tmpFs.toShortArray()
             }
             6 -> {  // LEAD_5_LEG
                 val lead_size = 4
-                for (i in oriInts.indices step lead_size) {
+                for (i in oriShorts.indices step lead_size) {
                     tmpFs.add(0)
-                    tmpFs.add(oriInts[i+1])
-                    tmpFs.add(oriInts[i+2])
-                    tmpFs.add(0)
-                    tmpFs.add(0)
+                    tmpFs.add(oriShorts[i+1])
+                    tmpFs.add(oriShorts[i+2])
                     tmpFs.add(0)
                     tmpFs.add(0)
-                    tmpFs.add(oriInts[i])
+                    tmpFs.add(0)
+                    tmpFs.add(0)
+                    tmpFs.add(oriShorts[i])
                 }
-                waveInts = tmpFs.toIntArray()
+                waveShorts = tmpFs.toShortArray()
             }
         }
-        return waveInts
+        return waveShorts
     }
 
     /**
-     * 采集数据处理：实时原始波形数据和导联类型，获取每导解压后的整型采样点数组
+     * 采集数据处理：实时原始波形数据和导联类型，获取每导解压后的short型采样点数组
      * V6 / I / II / V1 / V2 / V3 / V4 / V5 / III / aVR / aVL / aVF
      */
-    fun getEachLeadIntsFromWaveBytes(wave: ByteArray, leadType: Int, leadName: String) : IntArray {
-        val waveInts = getIntsFromWaveBytes(wave, leadType)
-        val tempInts = mutableListOf<Int>()
+    fun getEachLeadShortsFromWaveBytes(wave: ByteArray, leadType: Int, leadName: String) : ShortArray {
+        val waveShorts = getShortsFromWaveBytes(wave, leadType)
+        val tempShorts = mutableListOf<Short>()
         when (leadName) {
             "V6" -> {
-                for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i])
+                for (i in waveShorts.indices step 8) {
+                    tempShorts.add(waveShorts[i])
                 }
             }
             "I" -> {
-                for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i+1])
+                for (i in waveShorts.indices step 8) {
+                    tempShorts.add(waveShorts[i+1])
                 }
             }
             "II" -> {
-                for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i+2])
+                for (i in waveShorts.indices step 8) {
+                    tempShorts.add(waveShorts[i+2])
                 }
             }
             "V1" -> {
-                for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i+3])
+                for (i in waveShorts.indices step 8) {
+                    tempShorts.add(waveShorts[i+3])
                 }
             }
             "V2" -> {
-                for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i+4])
+                for (i in waveShorts.indices step 8) {
+                    tempShorts.add(waveShorts[i+4])
                 }
             }
             "V3" -> {
-                for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i+5])
+                for (i in waveShorts.indices step 8) {
+                    tempShorts.add(waveShorts[i+5])
                 }
             }
             "V4" -> {
-                for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i+6])
+                for (i in waveShorts.indices step 8) {
+                    tempShorts.add(waveShorts[i+6])
                 }
             }
             "V5" -> {
-                for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i+7])
+                for (i in waveShorts.indices step 8) {
+                    tempShorts.add(waveShorts[i+7])
                 }
             }
             "III" -> {
-                for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i+2] - waveInts[i+1])
+                for (i in waveShorts.indices step 8) {
+                    tempShorts.add((waveShorts[i+2] - waveShorts[i+1]).toShort())
                 }
             }
             "aVR" -> {
-                for (i in waveInts.indices step 8) {
-                    tempInts.add(-(waveInts[i+1] + waveInts[i+2]).div(2))
+                for (i in waveShorts.indices step 8) {
+                    tempShorts.add((-(waveShorts[i+1] + waveShorts[i+2]).div(2)).toShort())
                 }
             }
             "aVL" -> {
-                for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i+1] - waveInts[i+2].div(2))
+                for (i in waveShorts.indices step 8) {
+                    tempShorts.add((waveShorts[i+1] - waveShorts[i+2].div(2)).toShort())
                 }
             }
             "aVF" -> {
-                for (i in waveInts.indices step 8) {
-                    tempInts.add(waveInts[i+2] - waveInts[i+1].div(2))
+                for (i in waveShorts.indices step 8) {
+                    tempShorts.add((waveShorts[i+2] - waveShorts[i+1].div(2)).toShort())
                 }
             }
         }
-        return waveInts
+        return tempShorts.toShortArray()
     }
     /**
-     * 采集数据处理：实时原始波形数据和导联类型，获取12导解压后的整型采样点数组
+     * 采集数据处理：实时原始波形数据和导联类型，获取12导解压后的short型采样点数组
      * V6 I II V1 V2 V3 V4 V5 III aVR aVL aVF
      */
-    fun getAllLeadIntsFromWaveBytes(wave: ByteArray, leadType: Int) : MutableList<IntArray> {
+    fun getAllLeadShortsFromWaveBytes(wave: ByteArray, leadType: Int) : MutableList<ShortArray> {
         // decompress
         val num = if (leadType == 0) {
             8
@@ -430,7 +430,7 @@ object Er3BleResponse {
             4
         }
         val decompress = Er3Decompress(num)
-        val decompressData = mutableListOf<Int>()
+        val decompressData = mutableListOf<Short>()
         for (b in wave) {
             val tmp = decompress.Decompress(b)
             if (tmp != null) {
@@ -438,26 +438,26 @@ object Er3BleResponse {
                     if (i == 32767) {  // 导联脱落，基线处理
                         decompressData.add(0)
                     } else {
-                        decompressData.add(i)
+                        decompressData.add(i.toShort())
                     }
                 }
             }
         }
 
-        val oriInts = decompressData.toIntArray()
-        val waveInts = mutableListOf<IntArray>()
-        val tmpV6 = mutableListOf<Int>()
-        val tmpI = mutableListOf<Int>()
-        val tmpII = mutableListOf<Int>()
-        val tmpV1 = mutableListOf<Int>()
-        val tmpV2 = mutableListOf<Int>()
-        val tmpV3 = mutableListOf<Int>()
-        val tmpV4 = mutableListOf<Int>()
-        val tmpV5 = mutableListOf<Int>()
-        val tmpIII = mutableListOf<Int>()
-        val tmpaVR = mutableListOf<Int>()
-        val tmpaVL = mutableListOf<Int>()
-        val tmpaVF = mutableListOf<Int>()
+        val oriShorts = decompressData.toShortArray()
+        val waveShorts = mutableListOf<ShortArray>()
+        val tmpV6 = mutableListOf<Short>()
+        val tmpI = mutableListOf<Short>()
+        val tmpII = mutableListOf<Short>()
+        val tmpV1 = mutableListOf<Short>()
+        val tmpV2 = mutableListOf<Short>()
+        val tmpV3 = mutableListOf<Short>()
+        val tmpV4 = mutableListOf<Short>()
+        val tmpV5 = mutableListOf<Short>()
+        val tmpIII = mutableListOf<Short>()
+        val tmpaVR = mutableListOf<Short>()
+        val tmpaVL = mutableListOf<Short>()
+        val tmpaVF = mutableListOf<Short>()
         // III = II-I
         // aVR = - (I+II)/2
         // aVL = I - II/2
@@ -465,139 +465,139 @@ object Er3BleResponse {
         when(leadType) {
             0 -> {  // LEAD_12
                 val lead_size = 8
-                for (i in oriInts.indices step lead_size) {
-                    tmpV6.add(oriInts[i])
-                    tmpI.add(oriInts[i+1])
-                    tmpII.add(oriInts[i+2])
-                    tmpV1.add(oriInts[i+3])
-                    tmpV2.add(oriInts[i+4])
-                    tmpV3.add(oriInts[i+5])
-                    tmpV4.add(oriInts[i+6])
-                    tmpV5.add(oriInts[i+7])
-                    tmpIII.add(oriInts[i+2]-oriInts[i+1])
-                    tmpaVR.add(-(oriInts[i+1]+oriInts[i+2]).div(2))
-                    tmpaVL.add(oriInts[i+1]-oriInts[i+2].div(2))
-                    tmpaVF.add(oriInts[i+2]-oriInts[i+1].div(2))
+                for (i in oriShorts.indices step lead_size) {
+                    tmpV6.add(oriShorts[i])
+                    tmpI.add(oriShorts[i+1])
+                    tmpII.add(oriShorts[i+2])
+                    tmpV1.add(oriShorts[i+3])
+                    tmpV2.add(oriShorts[i+4])
+                    tmpV3.add(oriShorts[i+5])
+                    tmpV4.add(oriShorts[i+6])
+                    tmpV5.add(oriShorts[i+7])
+                    tmpIII.add((oriShorts[i+2]-oriShorts[i+1]).toShort())
+                    tmpaVR.add((-(oriShorts[i+1]+oriShorts[i+2]).div(2)).toShort())
+                    tmpaVL.add((oriShorts[i+1]-oriShorts[i+2].div(2)).toShort())
+                    tmpaVF.add((oriShorts[i+2]-oriShorts[i+1].div(2)).toShort())
                 }
             }
             1, 7 -> {  // LEAD_6
                 val lead_size = 4
-                for (i in oriInts.indices step lead_size) {
+                for (i in oriShorts.indices step lead_size) {
                     tmpV6.add(0)
-                    tmpI.add(oriInts[i+1])
-                    tmpII.add(oriInts[i+2])
-                    tmpV1.add(oriInts[i+3])
+                    tmpI.add(oriShorts[i+1])
+                    tmpII.add(oriShorts[i+2])
+                    tmpV1.add(oriShorts[i+3])
                     tmpV2.add(0)
                     tmpV3.add(0)
                     tmpV4.add(0)
-                    tmpV5.add(oriInts[i])
-                    tmpIII.add(oriInts[i+2]-oriInts[i+1])
-                    tmpaVR.add(-(oriInts[i+1]+oriInts[i+2]).div(2))
-                    tmpaVL.add(oriInts[i+1]-oriInts[i+2].div(2))
-                    tmpaVF.add(oriInts[i+2]-oriInts[i+1].div(2))
+                    tmpV5.add(oriShorts[i])
+                    tmpIII.add((oriShorts[i+2]-oriShorts[i+1]).toShort())
+                    tmpaVR.add((-(oriShorts[i+1]+oriShorts[i+2]).div(2)).toShort())
+                    tmpaVL.add((oriShorts[i+1]-oriShorts[i+2].div(2)).toShort())
+                    tmpaVF.add((oriShorts[i+2]-oriShorts[i+1].div(2)).toShort())
                 }
             }
             2 -> {  // LEAD_5
                 val lead_size = 4
-                for (i in oriInts.indices step lead_size) {
+                for (i in oriShorts.indices step lead_size) {
                     tmpV6.add(0)
-                    tmpI.add(oriInts[i+1])
-                    tmpII.add(oriInts[i+2])
-                    tmpV1.add(oriInts[i+3])
+                    tmpI.add(oriShorts[i+1])
+                    tmpII.add(oriShorts[i+2])
+                    tmpV1.add(oriShorts[i+3])
                     tmpV2.add(0)
                     tmpV3.add(0)
                     tmpV4.add(0)
                     tmpV5.add(0)
-                    tmpIII.add(oriInts[i+2]-oriInts[i+1])
-                    tmpaVR.add(-(oriInts[i+1]+oriInts[i+2]).div(2))
-                    tmpaVL.add(oriInts[i+1]-oriInts[i+2].div(2))
-                    tmpaVF.add(oriInts[i+2]-oriInts[i+1].div(2))
+                    tmpIII.add((oriShorts[i+2]-oriShorts[i+1]).toShort())
+                    tmpaVR.add((-(oriShorts[i+1]+oriShorts[i+2]).div(2)).toShort())
+                    tmpaVL.add((oriShorts[i+1]-oriShorts[i+2].div(2)).toShort())
+                    tmpaVF.add((oriShorts[i+2]-oriShorts[i+1].div(2)).toShort())
                 }
             }
             3 -> {  // LEAD_3
                 val lead_size = 4
-                for (i in oriInts.indices step lead_size) {
+                for (i in oriShorts.indices step lead_size) {
                     tmpV6.add(0)
                     tmpI.add(0)
-                    tmpII.add(oriInts[i+2])
+                    tmpII.add(oriShorts[i+2])
                     tmpV1.add(0)
                     tmpV2.add(0)
                     tmpV3.add(0)
                     tmpV4.add(0)
                     tmpV5.add(0)
-                    tmpIII.add(oriInts[i+2]-oriInts[i+1])
-                    tmpaVR.add(-(oriInts[i+1]+oriInts[i+2]).div(2))
-                    tmpaVL.add(oriInts[i+1]-oriInts[i+2].div(2))
-                    tmpaVF.add(oriInts[i+2]-oriInts[i+1].div(2))
+                    tmpIII.add((oriShorts[i+2]-oriShorts[i+1]).toShort())
+                    tmpaVR.add((-(oriShorts[i+1]+oriShorts[i+2]).div(2)).toShort())
+                    tmpaVL.add((oriShorts[i+1]-oriShorts[i+2].div(2)).toShort())
+                    tmpaVF.add((oriShorts[i+2]-oriShorts[i+1].div(2)).toShort())
                 }
             }
             4 -> {  // LEAD_3_TEMP
                 val lead_size = 4
-                for (i in oriInts.indices step lead_size) {
+                for (i in oriShorts.indices step lead_size) {
                     tmpV6.add(0)
-                    tmpI.add(oriInts[i+1])
+                    tmpI.add(oriShorts[i+1])
                     tmpII.add(0)
                     tmpV1.add(0)
                     tmpV2.add(0)
                     tmpV3.add(0)
                     tmpV4.add(0)
                     tmpV5.add(0)
-                    tmpIII.add(oriInts[i+2]-oriInts[i+1])
-                    tmpaVR.add(-(oriInts[i+1]+oriInts[i+2]).div(2))
-                    tmpaVL.add(oriInts[i+1]-oriInts[i+2].div(2))
-                    tmpaVF.add(oriInts[i+2]-oriInts[i+1].div(2))
+                    tmpIII.add((oriShorts[i+2]-oriShorts[i+1]).toShort())
+                    tmpaVR.add((-(oriShorts[i+1]+oriShorts[i+2]).div(2)).toShort())
+                    tmpaVL.add((oriShorts[i+1]-oriShorts[i+2].div(2)).toShort())
+                    tmpaVF.add((oriShorts[i+2]-oriShorts[i+1].div(2)).toShort())
                 }
             }
             5 -> {  // LEAD_3_LEG
                 val lead_size = 4
-                for (i in oriInts.indices step lead_size) {
+                for (i in oriShorts.indices step lead_size) {
                     tmpV6.add(0)
-                    tmpI.add(oriInts[i+1])
-                    tmpII.add(oriInts[i+2])
+                    tmpI.add(oriShorts[i+1])
+                    tmpII.add(oriShorts[i+2])
                     tmpV1.add(0)
                     tmpV2.add(0)
                     tmpV3.add(0)
                     tmpV4.add(0)
                     tmpV5.add(0)
-                    tmpIII.add(oriInts[i+2]-oriInts[i+1])
-                    tmpaVR.add(-(oriInts[i+1]+oriInts[i+2]).div(2))
-                    tmpaVL.add(oriInts[i+1]-oriInts[i+2].div(2))
-                    tmpaVF.add(oriInts[i+2]-oriInts[i+1].div(2))
+                    tmpIII.add((oriShorts[i+2]-oriShorts[i+1]).toShort())
+                    tmpaVR.add((-(oriShorts[i+1]+oriShorts[i+2]).div(2)).toShort())
+                    tmpaVL.add((oriShorts[i+1]-oriShorts[i+2].div(2)).toShort())
+                    tmpaVF.add((oriShorts[i+2]-oriShorts[i+1].div(2)).toShort())
                 }
             }
             6 -> {  // LEAD_5_LEG
                 val lead_size = 4
-                for (i in oriInts.indices step lead_size) {
+                for (i in oriShorts.indices step lead_size) {
                     tmpV6.add(0)
-                    tmpI.add(oriInts[i+1])
-                    tmpII.add(oriInts[i+2])
+                    tmpI.add(oriShorts[i+1])
+                    tmpII.add(oriShorts[i+2])
                     tmpV1.add(0)
                     tmpV2.add(0)
                     tmpV3.add(0)
                     tmpV4.add(0)
-                    tmpV5.add(oriInts[i])
-                    tmpIII.add(oriInts[i+2]-oriInts[i+1])
-                    tmpaVR.add(-(oriInts[i+1]+oriInts[i+2]).div(2))
-                    tmpaVL.add(oriInts[i+1]-oriInts[i+2].div(2))
-                    tmpaVF.add(oriInts[i+2]-oriInts[i+1].div(2))
+                    tmpV5.add(oriShorts[i])
+                    tmpIII.add((oriShorts[i+2]-oriShorts[i+1]).toShort())
+                    tmpaVR.add((-(oriShorts[i+1]+oriShorts[i+2]).div(2)).toShort())
+                    tmpaVL.add((oriShorts[i+1]-oriShorts[i+2].div(2)).toShort())
+                    tmpaVF.add((oriShorts[i+2]-oriShorts[i+1].div(2)).toShort())
                 }
             }
         }
 
-        waveInts.add(tmpV6.toIntArray())
-        waveInts.add(tmpI.toIntArray())
-        waveInts.add(tmpII.toIntArray())
-        waveInts.add(tmpV1.toIntArray())
-        waveInts.add(tmpV2.toIntArray())
-        waveInts.add(tmpV3.toIntArray())
-        waveInts.add(tmpV4.toIntArray())
-        waveInts.add(tmpV5.toIntArray())
-        waveInts.add(tmpIII.toIntArray())
-        waveInts.add(tmpaVR.toIntArray())
-        waveInts.add(tmpaVL.toIntArray())
-        waveInts.add(tmpaVF.toIntArray())
+        waveShorts.add(tmpV6.toShortArray())
+        waveShorts.add(tmpI.toShortArray())
+        waveShorts.add(tmpII.toShortArray())
+        waveShorts.add(tmpV1.toShortArray())
+        waveShorts.add(tmpV2.toShortArray())
+        waveShorts.add(tmpV3.toShortArray())
+        waveShorts.add(tmpV4.toShortArray())
+        waveShorts.add(tmpV5.toShortArray())
+        waveShorts.add(tmpIII.toShortArray())
+        waveShorts.add(tmpaVR.toShortArray())
+        waveShorts.add(tmpaVL.toShortArray())
+        waveShorts.add(tmpaVF.toShortArray())
 
-        return waveInts
+        return waveShorts
     }
 
     /**
