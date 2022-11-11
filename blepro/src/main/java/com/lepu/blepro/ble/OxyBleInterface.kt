@@ -207,19 +207,23 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
             OxyBleCmd.OXY_CMD_READ_CONTENT -> {
                 clearTimeout()
+                if (response.state) {
+                    curFile?.apply {
 
-                curFile?.apply {
+                        this.addContent(response.content)
 
-                    this.addContent(response.content)
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadingFileProgress).post(InterfaceEvent(model, (curFile!!.index * 1000).div(curFile!!.fileSize)))
+                        LepuBleLog.d(tag, "model:$model, 读文件中：${curFile?.fileName}   => ${curFile?.index} / ${curFile?.fileSize}")
 
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadingFileProgress).post(InterfaceEvent(model, (curFile!!.index * 1000).div(curFile!!.fileSize)))
-                    LepuBleLog.d(tag, "model:$model, 读文件中：${curFile?.fileName}   => ${curFile?.index} / ${curFile?.fileSize}")
-
-                    if (this.index < this.fileSize) {
-                        sendOxyCmd(OxyBleCmd.OXY_CMD_READ_CONTENT, OxyBleCmd.readFileContent())
-                    } else {
-                        sendOxyCmd(OxyBleCmd.OXY_CMD_READ_END, OxyBleCmd.readFileEnd())
+                        if (this.index < this.fileSize) {
+                            sendOxyCmd(OxyBleCmd.OXY_CMD_READ_CONTENT, OxyBleCmd.readFileContent())
+                        } else {
+                            sendOxyCmd(OxyBleCmd.OXY_CMD_READ_END, OxyBleCmd.readFileEnd())
+                        }
                     }
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError).post(InterfaceEvent(model, true))
+                    LepuBleLog.d(tag, "model:$model, 读文件失败：${response.content.toHex()}")
                 }
             }
             OxyBleCmd.OXY_CMD_READ_END -> {
@@ -227,10 +231,16 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model, 读文件完成: ${curFile?.fileName} ==> ${curFile?.fileSize}")
                 curFileName = null // 一定要放在发通知之前
 
-                curFile?.let {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileComplete).post(InterfaceEvent(model, it))
-                } ?: LepuBleLog.d(tag, "model:$model,  curFile error!!")
-
+                if (response.state) {
+                    curFile?.let {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileComplete).post(InterfaceEvent(model, it))
+                    } ?: run {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError).post(InterfaceEvent(model, true))
+                        LepuBleLog.d(tag, "model:$model,  curFile error!!")
+                    }
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError).post(InterfaceEvent(model, true))
+                }
                 curFile = null
 
             }
