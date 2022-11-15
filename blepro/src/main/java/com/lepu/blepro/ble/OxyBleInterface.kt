@@ -282,19 +282,23 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
             OxyBleCmd.OXY_CMD_READ_CONTENT -> {
                 clearTimeout()
+                if (response.state) {
+                    curFile?.apply {
 
-                curFile?.apply {
-
-                    this.addContent(response.content)
+                        this.addContent(response.content)
 
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadingFileProgress).post(InterfaceEvent(model, (curFile!!.index * 100).div(curFile!!.fileSize)))
                     LepuBleLog.d(tag, "model:$model, 读文件中：${curFile?.fileName}   => ${curFile?.index} / ${curFile?.fileSize}")
 
-                    if (this.index < this.fileSize) {
-                        sendOxyCmd(OxyBleCmd.OXY_CMD_READ_CONTENT, OxyBleCmd.readFileContent())
-                    } else {
-                        sendOxyCmd(OxyBleCmd.OXY_CMD_READ_END, OxyBleCmd.readFileEnd())
+                        if (this.index < this.fileSize) {
+                            sendOxyCmd(OxyBleCmd.OXY_CMD_READ_CONTENT, OxyBleCmd.readFileContent())
+                        } else {
+                            sendOxyCmd(OxyBleCmd.OXY_CMD_READ_END, OxyBleCmd.readFileEnd())
+                        }
                     }
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError).post(InterfaceEvent(model, true))
+                    LepuBleLog.d(tag, "model:$model, 读文件失败：${response.content.toHex()}")
                 }
             }
             OxyBleCmd.OXY_CMD_READ_END -> {
@@ -302,42 +306,48 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model, 读文件完成: ${curFile?.fileName} ==> ${curFile?.fileSize}")
                 curFileName = null // 一定要放在发通知之前
 
-                curFile?.let {
-                    oxyFile.data.clear()
-                    val tempFile = OxyBleFile(it.fileContent)
+                if (response.state) {
+                    curFile?.let {
+                        oxyFile.data.clear()
+                        val tempFile = OxyBleFile(it.fileContent)
 
-                    oxyFile.version = tempFile.version
-                    oxyFile.operationMode = tempFile.operationMode
-                    oxyFile.year = tempFile.year
-                    oxyFile.month = tempFile.month
-                    oxyFile.day = tempFile.day
-                    oxyFile.hour = tempFile.hour
-                    oxyFile.minute = tempFile.minute
-                    oxyFile.second = tempFile.second
-                    oxyFile.startTime = tempFile.startTime
-                    oxyFile.size = tempFile.size
-                    oxyFile.recordingTime = tempFile.recordingTime
-                    oxyFile.asleepTime = tempFile.asleepTime
-                    oxyFile.avgSpo2 = tempFile.avgSpo2
-                    oxyFile.minSpo2 = tempFile.minSpo2
-                    oxyFile.dropsTimes3Percent = tempFile.dropsTimes3Percent
-                    oxyFile.dropsTimes4Percent = tempFile.dropsTimes4Percent
-                    oxyFile.asleepTimePercent = tempFile.asleepTimePercent
-                    oxyFile.durationTime90Percent = tempFile.durationTime90Percent
-                    oxyFile.dropsTimes90Percent = tempFile.dropsTimes90Percent
-                    oxyFile.o2Score = tempFile.o2Score
-                    oxyFile.stepCounter = tempFile.stepCounter
-                    for (i in tempFile.data) {
-                        val data = oxyFile.EachData()
-                        data.spo2 = i.spo2
-                        data.pr = i.pr
-                        data.vector = i.vector
-                        oxyFile.data.add(data)
+                        oxyFile.version = tempFile.version
+                        oxyFile.operationMode = tempFile.operationMode
+                        oxyFile.year = tempFile.year
+                        oxyFile.month = tempFile.month
+                        oxyFile.day = tempFile.day
+                        oxyFile.hour = tempFile.hour
+                        oxyFile.minute = tempFile.minute
+                        oxyFile.second = tempFile.second
+                        oxyFile.startTime = tempFile.startTime
+                        oxyFile.size = tempFile.size
+                        oxyFile.recordingTime = tempFile.recordingTime
+                        oxyFile.asleepTime = tempFile.asleepTime
+                        oxyFile.avgSpo2 = tempFile.avgSpo2
+                        oxyFile.minSpo2 = tempFile.minSpo2
+                        oxyFile.dropsTimes3Percent = tempFile.dropsTimes3Percent
+                        oxyFile.dropsTimes4Percent = tempFile.dropsTimes4Percent
+                        oxyFile.asleepTimePercent = tempFile.asleepTimePercent
+                        oxyFile.durationTime90Percent = tempFile.durationTime90Percent
+                        oxyFile.dropsTimes90Percent = tempFile.dropsTimes90Percent
+                        oxyFile.o2Score = tempFile.o2Score
+                        oxyFile.stepCounter = tempFile.stepCounter
+                        for (i in tempFile.data) {
+                            val data = oxyFile.EachData()
+                            data.spo2 = i.spo2
+                            data.pr = i.pr
+                            data.vector = i.vector
+                            oxyFile.data.add(data)
+                        }
+
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileComplete).post(InterfaceEvent(model, oxyFile))
+                    } ?: run {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError).post(InterfaceEvent(model, true))
+                        LepuBleLog.d(tag, "model:$model,  curFile error!!")
                     }
-
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileComplete).post(InterfaceEvent(model, oxyFile))
-                } ?: LepuBleLog.d(tag, "model:$model,  curFile error!!")
-
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError).post(InterfaceEvent(model, true))
+                }
                 curFile = null
 
             }

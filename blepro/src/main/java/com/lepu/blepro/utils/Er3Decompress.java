@@ -36,6 +36,7 @@ public class Er3Decompress {
      * init
      */
     public Er3Decompress(int channelNum) {
+        uncompressLen = 0;
         mUncompressStep = 0;
         mChannelNum = channelNum;
 

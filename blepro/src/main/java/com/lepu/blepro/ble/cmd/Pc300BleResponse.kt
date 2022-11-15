@@ -276,7 +276,7 @@ object Pc300BleResponse {
             index++
             data = if (bytes.size > 2) {
                 if (unit == 1) {
-                    bytes2UIntBig(bytes[index], bytes[index+1]).div(10f)
+                    bytes2UIntBig(bytes[index], bytes[index+1]).div(1f)
                 } else {
                     bytesToHex(bytes.copyOfRange(index, index+2)).toInt().div(10f)
                 }

@@ -93,7 +93,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_OXYU = "OxyU";
     public static final String BT_NAME_S5W = "S5W_SN";
     public static final String BT_NAME_W12C = "W12c";
-    public static final String BT_NAME_AI_S100 = "AI S100";
+    public static final String BT_NAME_AI_S100 = "AI-S100";
     public static final String BT_NAME_HHM1 = "HHM1";
     public static final String BT_NAME_HHM2 = "HHM2";
     public static final String BT_NAME_HHM3 = "HHM3";

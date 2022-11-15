@@ -1031,6 +1031,16 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     oxyAdapter.notifyDataSetChanged()
                 }
             }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError)
+            .observe(this) {
+                Toast.makeText(context, "读文件出错 ${fileNames[0]}", Toast.LENGTH_SHORT).show()
+                if (binding.fileName.text.toString().isEmpty()) {
+                    fileNames.removeAt(0)
+                    readFile()
+                } else {
+                    mAlertDialog?.dismiss()
+                }
+            }
         //---------------------------aoj20a-----------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempList)
             .observe(this) {

@@ -30,6 +30,7 @@ import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.data.DataController
 import com.lepu.demo.data.OxyDataController
+import com.lepu.demo.data.entity.DeviceEntity
 import com.lepu.demo.databinding.FragmentDashboardBinding
 import com.lepu.demo.util.DataConvert
 import com.lepu.demo.views.EcgBkg
@@ -256,120 +257,126 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         initLiveEvent()
     }
 
+    private fun refresh(it: DeviceEntity) {
+        when (it.modelNo) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N,
+            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_DUOEK,
+            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2,
+            Bluetooth.MODEL_LES1 -> {
+                binding.ecgLayout.visibility = View.VISIBLE
+                binding.er3Layout.visibility = View.GONE
+                binding.bpLayout.visibility = View.GONE
+                binding.oxyLayout.visibility = View.GONE
+                LpBleUtil.startRtTask()
+                startWave(it.modelNo)
+            }
+            Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
+                LpBleUtil.startRtTask(it.modelNo, 2000)
+            }
+            Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> {
+                binding.er3Layout.visibility = View.VISIBLE
+                binding.ecgLayout.visibility = View.GONE
+                binding.bpLayout.visibility = View.GONE
+                binding.oxyLayout.visibility = View.GONE
+                LpBleUtil.startRtTask()
+                startWave(it.modelNo)
+            }
+            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE -> {
+                binding.ecgLayout.visibility = View.VISIBLE
+                binding.er3Layout.visibility = View.GONE
+                binding.bpLayout.visibility = View.GONE
+                binding.oxyLayout.visibility = View.GONE
+                startWave(it.modelNo)
+            }
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LE_BP2W -> {
+                binding.bpLayout.visibility = View.VISIBLE
+                binding.ecgLayout.visibility = View.VISIBLE
+                binding.er3Layout.visibility = View.GONE
+                binding.oxyLayout.visibility = View.GONE
+                LpBleUtil.startRtTask()
+                startWave(it.modelNo)
+            }
+            Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+                binding.bpLayout.visibility = View.VISIBLE
+                binding.er3Layout.visibility = View.GONE
+                binding.ecgLayout.visibility = View.GONE
+                binding.oxyLayout.visibility = View.GONE
+                LpBleUtil.startRtTask()
+                startWave(it.modelNo)
+            }
+            Bluetooth.MODEL_BPM -> {
+                binding.bpLayout.visibility = View.VISIBLE
+                binding.er3Layout.visibility = View.GONE
+                binding.ecgLayout.visibility = View.GONE
+                binding.oxyLayout.visibility = View.GONE
+            }
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_AI_S100,
+            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
+            Bluetooth.MODEL_BBSM_S1, Bluetooth.MODEL_BBSM_S2,
+            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_O2M,
+            Bluetooth.MODEL_SLEEPO2, Bluetooth.MODEL_SNOREO2,
+            Bluetooth.MODEL_WEARO2, Bluetooth.MODEL_SLEEPU,
+            Bluetooth.MODEL_OXYLINK, Bluetooth.MODEL_KIDSO2,
+            Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_OXYRING,
+            Bluetooth.MODEL_CMRING, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_CHECK_POD -> {
+                binding.oxyLayout.visibility = View.VISIBLE
+                binding.er3Layout.visibility = View.GONE
+                binding.ecgLayout.visibility = View.GONE
+                binding.bpLayout.visibility = View.GONE
+                LpBleUtil.startRtTask()
+                startWave(it.modelNo)
+            }
+            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC_60B,
+            Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
+            Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
+            Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
+            Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
+            Bluetooth.MODEL_PC66B, Bluetooth.MODEL_AP20,
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE,
+            Bluetooth.MODEL_TV221U, Bluetooth.MODEL_OXYSMART,
+            Bluetooth.MODEL_POD_1W, Bluetooth.MODEL_S5W,
+            Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
+            Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_S6W, Bluetooth.MODEL_S6W1,
+            Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S7W,
+            Bluetooth.MODEL_PC60NW_BLE -> {
+                binding.oxyLayout.visibility = View.VISIBLE
+                binding.er3Layout.visibility = View.GONE
+                binding.ecgLayout.visibility = View.GONE
+                binding.bpLayout.visibility = View.GONE
+                startWave(it.modelNo)
+            }
+            Bluetooth.MODEL_PC100 -> {
+                binding.bpLayout.visibility = View.VISIBLE
+                binding.oxyLayout.visibility = View.VISIBLE
+                binding.er3Layout.visibility = View.GONE
+                binding.ecgLayout.visibility = View.GONE
+                startWave(it.modelNo)
+            }
+            Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV -> {
+                binding.ecgLayout.visibility = View.VISIBLE
+                binding.oxyLayout.visibility = View.VISIBLE
+                binding.er3Layout.visibility = View.GONE
+                binding.bpLayout.visibility = View.GONE
+                startWave(it.modelNo)
+            }
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
+                binding.ecgLayout.visibility = View.VISIBLE
+                binding.oxyLayout.visibility = View.VISIBLE
+                binding.bpLayout.visibility = View.VISIBLE
+                binding.er3Layout.visibility = View.GONE
+                startWave(it.modelNo)
+            }
+        }
+    }
+
     private fun initView() {
 
-        mainViewModel.curBluetooth.observe(viewLifecycleOwner) {
-            when (it!!.modelNo) {
-                Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N,
-                Bluetooth.MODEL_HHM1, Bluetooth.MODEL_DUOEK,
-                Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
-                Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2,
-                Bluetooth.MODEL_LES1 -> {
-                    binding.ecgLayout.visibility = View.VISIBLE
-                    binding.er3Layout.visibility = View.GONE
-                    binding.bpLayout.visibility = View.GONE
-                    binding.oxyLayout.visibility = View.GONE
-                    LpBleUtil.startRtTask()
-                    startWave(it.modelNo)
-                }
-                Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
-                    LpBleUtil.startRtTask(it.modelNo, 2000)
-                }
-                Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> {
-                    binding.er3Layout.visibility = View.VISIBLE
-                    binding.ecgLayout.visibility = View.GONE
-                    binding.bpLayout.visibility = View.GONE
-                    binding.oxyLayout.visibility = View.GONE
-                    LpBleUtil.startRtTask()
-                    startWave(it.modelNo)
-                }
-                Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE -> {
-                    binding.ecgLayout.visibility = View.VISIBLE
-                    binding.er3Layout.visibility = View.GONE
-                    binding.bpLayout.visibility = View.GONE
-                    binding.oxyLayout.visibility = View.GONE
-                    startWave(it.modelNo)
-                }
-                Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LE_BP2W -> {
-                    binding.bpLayout.visibility = View.VISIBLE
-                    binding.ecgLayout.visibility = View.VISIBLE
-                    binding.er3Layout.visibility = View.GONE
-                    binding.oxyLayout.visibility = View.GONE
-                    LpBleUtil.startRtTask()
-                    startWave(it.modelNo)
-                }
-                Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
-                    binding.bpLayout.visibility = View.VISIBLE
-                    binding.er3Layout.visibility = View.GONE
-                    binding.ecgLayout.visibility = View.GONE
-                    binding.oxyLayout.visibility = View.GONE
-                    LpBleUtil.startRtTask()
-                    startWave(it.modelNo)
-                }
-                Bluetooth.MODEL_BPM -> {
-                    binding.bpLayout.visibility = View.VISIBLE
-                    binding.er3Layout.visibility = View.GONE
-                    binding.ecgLayout.visibility = View.GONE
-                    binding.oxyLayout.visibility = View.GONE
-                }
-                Bluetooth.MODEL_O2RING, Bluetooth.MODEL_AI_S100,
-                Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
-                Bluetooth.MODEL_BBSM_S1, Bluetooth.MODEL_BBSM_S2,
-                Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_O2M,
-                Bluetooth.MODEL_SLEEPO2, Bluetooth.MODEL_SNOREO2,
-                Bluetooth.MODEL_WEARO2, Bluetooth.MODEL_SLEEPU,
-                Bluetooth.MODEL_OXYLINK, Bluetooth.MODEL_KIDSO2,
-                Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_OXYRING,
-                Bluetooth.MODEL_CMRING, Bluetooth.MODEL_OXYU,
-                Bluetooth.MODEL_CHECK_POD -> {
-                    binding.oxyLayout.visibility = View.VISIBLE
-                    binding.er3Layout.visibility = View.GONE
-                    binding.ecgLayout.visibility = View.GONE
-                    binding.bpLayout.visibility = View.GONE
-                    LpBleUtil.startRtTask()
-                    startWave(it.modelNo)
-                }
-                Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC_60B,
-                Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_20,
-                Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
-                Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
-                Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
-                Bluetooth.MODEL_PC66B, Bluetooth.MODEL_AP20,
-                Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE,
-                Bluetooth.MODEL_TV221U, Bluetooth.MODEL_OXYSMART,
-                Bluetooth.MODEL_POD_1W, Bluetooth.MODEL_S5W,
-                Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
-                Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60NW,
-                Bluetooth.MODEL_S6W, Bluetooth.MODEL_S6W1,
-                Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S7W,
-                Bluetooth.MODEL_PC60NW_BLE -> {
-                    binding.oxyLayout.visibility = View.VISIBLE
-                    binding.er3Layout.visibility = View.GONE
-                    binding.ecgLayout.visibility = View.GONE
-                    binding.bpLayout.visibility = View.GONE
-                    startWave(it.modelNo)
-                }
-                Bluetooth.MODEL_PC100 -> {
-                    binding.bpLayout.visibility = View.VISIBLE
-                    binding.oxyLayout.visibility = View.VISIBLE
-                    binding.er3Layout.visibility = View.GONE
-                    binding.ecgLayout.visibility = View.GONE
-                    startWave(it.modelNo)
-                }
-                Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV -> {
-                    binding.ecgLayout.visibility = View.VISIBLE
-                    binding.oxyLayout.visibility = View.VISIBLE
-                    binding.er3Layout.visibility = View.GONE
-                    binding.bpLayout.visibility = View.GONE
-                    startWave(it.modelNo)
-                }
-                Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
-                    binding.ecgLayout.visibility = View.VISIBLE
-                    binding.oxyLayout.visibility = View.VISIBLE
-                    binding.bpLayout.visibility = View.VISIBLE
-                    binding.er3Layout.visibility = View.GONE
-                    startWave(it.modelNo)
-                }
+        mainViewModel.curBluetooth.observe(viewLifecycleOwner) { device ->
+            device?.let {
+                refresh(it)
             }
         }
         mainViewModel.bleState.observe(viewLifecycleOwner) {
@@ -380,6 +387,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.oxyBleState.setImageResource(R.mipmap.bluetooth_ok)
                     binding.er3BleState.setImageResource(R.mipmap.bluetooth_ok)
                     binding.dashLayout.visibility = View.VISIBLE
+                    refresh(mainViewModel.curBluetooth.value!!)
                 } else {
                     binding.bleState.setImageResource(R.mipmap.bluetooth_error)
                     binding.bpBleState.setImageResource(R.mipmap.bluetooth_error)
