@@ -174,8 +174,16 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> {
+            Bluetooth.MODEL_ER3 -> {
                 Er3BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_LEPOD -> {
+                LepodBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
                     vailFace.put(m, this)

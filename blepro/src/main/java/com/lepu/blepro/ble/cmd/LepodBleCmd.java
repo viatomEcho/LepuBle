@@ -5,7 +5,7 @@ import com.lepu.blepro.utils.ByteArrayKt;
 import com.lepu.blepro.utils.LepuBleLog;
 import java.util.Date;
 
-public class Er3BleCmd {
+public class LepodBleCmd {
 
     public static final int GET_INFO = 0xE1;
     public static final int RESET = 0xE2;
@@ -13,9 +13,12 @@ public class Er3BleCmd {
     public static final int FACTORY_RESET_ALL = 0xEE;
     public static final int BURN_FACTORY_INFO = 0xEA;
     public static final int BURN_LOCK_FLASH = 0xEB;
-    public static final int RT_DATA = 0x06;
+    public static final int RT_PARAM = 0x02;
+    public static final int RT_DATA = 0x03;
     public static final int GET_CONFIG = 0x00;
     public static final int SET_CONFIG = 0x04;
+    public static final int STOP_ECG = 0x07;
+    public static final int START_ECG = 0x08;
     public static final int READ_FILE_LIST = 0xF1;
     public static final int READ_FILE_START = 0xF2;
     public static final int READ_FILE_DATA = 0xF3;
@@ -54,11 +57,62 @@ public class Er3BleCmd {
         return cmd;
     }
 
+    public static byte[] startEcg() {
+        byte[] cmd = new byte[8];
+        cmd[0] = (byte) 0xA5;
+        cmd[1] = (byte) START_ECG;
+        cmd[2] = (byte) ~START_ECG;
+        cmd[3] = (byte) 0x00;
+        cmd[4] = (byte) seqNo;
+        cmd[5] = (byte) 0x00;
+        cmd[6] = (byte) 0x00;
+        cmd[7] = BleCRC.calCRC8(cmd);
+
+        addNo();
+        return cmd;
+    }
+    public static byte[] stopEcg() {
+        byte[] cmd = new byte[8];
+        cmd[0] = (byte) 0xA5;
+        cmd[1] = (byte) STOP_ECG;
+        cmd[2] = (byte) ~STOP_ECG;
+        cmd[3] = (byte) 0x00;
+        cmd[4] = (byte) seqNo;
+        cmd[5] = (byte) 0x00;
+        cmd[6] = (byte) 0x00;
+        cmd[7] = BleCRC.calCRC8(cmd);
+
+        addNo();
+        return cmd;
+    }
+
+    /**
+     * len不为0时：第一个字节：bit0~bit3:采样率0::250Hz 1:125Hz 2:62.5Hz
+     *                      bit4~bit7: 压缩类型 0:未压缩 1:Viatom差分压缩
+     *            预留三个字节
+     *            四个字节：采样点偏移，用于预留协议补点上传，目前设备端不支持
+     * @return
+     */
     public static byte[] getRtData() {
         byte[] cmd = new byte[8];
         cmd[0] = (byte) 0xA5;
         cmd[1] = (byte) RT_DATA;
         cmd[2] = (byte) ~RT_DATA;
+        cmd[3] = (byte) 0x00;
+        cmd[4] = (byte) seqNo;
+        cmd[5] = (byte) 0x00;
+        cmd[6] = (byte) 0x00;
+        cmd[7] = BleCRC.calCRC8(cmd);
+
+        addNo();
+        return cmd;
+    }
+
+    public static byte[] getRtParam() {
+        byte[] cmd = new byte[8];
+        cmd[0] = (byte) 0xA5;
+        cmd[1] = (byte) RT_PARAM;
+        cmd[2] = (byte) ~RT_PARAM;
         cmd[3] = (byte) 0x00;
         cmd[4] = (byte) seqNo;
         cmd[5] = (byte) 0x00;

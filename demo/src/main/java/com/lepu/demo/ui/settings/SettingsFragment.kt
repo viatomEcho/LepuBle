@@ -120,9 +120,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     setViewVisible(binding.er2Layout.root)
                     LpBleUtil.getEr2SwitcherState(it.modelNo)
                 }
-                Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> {
+                Bluetooth.MODEL_ER3 -> {
                     setViewVisible(binding.er3Layout.root)
                     LpBleUtil.er3GetConfig(it.modelNo)
+                }
+                Bluetooth.MODEL_LEPOD -> {
+                    setViewVisible(binding.lepodLayout.root)
+                    LpBleUtil.lepodGetConfig(it.modelNo)
                 }
                 Bluetooth.MODEL_BP2 -> {
                     setViewVisible(binding.bp2Layout.root)
@@ -2104,6 +2108,20 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
             }
         }
+        // ---------------------------lepod---------------------------
+        binding.lepodLayout.setEcgMode.setOnClickListener {
+            val mode = trimStr(binding.lepodLayout.ecgMode.text.toString())
+            if (isNumber(mode) && (mode.toInt() in 0..2)) {
+                LpBleUtil.lepodSetConfig(Constant.BluetoothConfig.currentModel[0], mode.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+        }
+        binding.lepodLayout.getRtParam.setOnClickListener {
+            LpBleUtil.lepodGetRtParam(Constant.BluetoothConfig.currentModel[0])
+        }
 
     }
 
@@ -3050,6 +3068,29 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 val data = it.data as Int
                 binding.er3Layout.er3EcgMode.setText("$data")
                 Toast.makeText(context, "获取mode成功", Toast.LENGTH_SHORT).show()
+            }
+        //------------------------lepod-------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodSetConfig)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    Toast.makeText(context, "设置mode成功", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "设置mode失败", Toast.LENGTH_SHORT).show()
+                }
+                LpBleUtil.lepodGetConfig(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodGetConfig)
+            .observe(this) {
+                val data = it.data as Int
+                binding.lepodLayout.ecgMode.setText("$data")
+                Toast.makeText(context, "获取mode成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodRtParam)
+            .observe(this) {
+                val data = it.data as LepodBleResponse.RtParam
+                binding.lepodLayout.deviceInfo.text = "$data"
+                Toast.makeText(context, "获取实时参数成功", Toast.LENGTH_SHORT).show()
             }
 
         //-----------------------------------

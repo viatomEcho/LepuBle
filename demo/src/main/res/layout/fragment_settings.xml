@@ -409,6 +409,9 @@
             <include
                 android:id="@+id/er3_layout"
                 layout="@layout/er3_settings"/>
+            <include
+                android:id="@+id/lepod_layout"
+                layout="@layout/lepod_settings"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

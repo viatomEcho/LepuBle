@@ -7,7 +7,7 @@ import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
 
-object Er3BleResponse {
+object LepodBleResponse {
 
     class BleResponse(val bytes: ByteArray) {
         var cmd: Int
@@ -30,80 +30,53 @@ object Er3BleResponse {
         var wave: RtWave
 
         init {
-            param = RtParam(bytes.copyOfRange(0, 48))
-            wave = RtWave(param.leadType, bytes.copyOfRange(48, bytes.size))
+            param = RtParam(bytes.copyOfRange(0, 40))
+            wave = RtWave(param.leadType, bytes.copyOfRange(40, bytes.size))
         }
     }
 
     class RtParam(val bytes: ByteArray) {
-        var hr: Int                       // 当前主机实时心率（bpm）
-        var temp: Float                   // 体温（无效值0xFFFF，e.g.2500，temp = 25.0℃）
-        var spo2: Int                     // 血氧（无效值0xFF）
-        var pi: Float                     // 0- 200，e.g.25 : PI = 2.5
-        var pr: Int                       // 脉率（30~250bpm）
-        var respRate: Int                 // 呼吸率
-        var batteryStatus: Int            // 电池状态（0：正常使用，1：充电中，2：充满，3：低电量）
-        var isInsertEcgLeadWire: Boolean  // 心电导联线状态（false：未插入导联线，true：插入导联线）
-        var oxyStatus: Int                // 血氧状态（0：未接入血氧，1：血氧状态正常，2：血氧手指脱落，3：探头故障）
-        var isInsertTemp: Boolean         // 体温状态（0：未接入体温，1：体温状态正常）
         var measureStatus: Int            // 测量状态（0：空闲，1：准备状态，2：正式测量状态）
-        var isHasDevice: Boolean          // 正式测量状态中配置的设备类型是否有设备，暂无效
-        var isHasTemp: Boolean            // 正式测量状态中配置的设备类型是否有体温，暂无效
-        var isHasOxy: Boolean             // 正式测量状态中配置的设备类型是否有血氧，暂无效
-        var isHasRespRate: Boolean        // 正式测量状态中配置的设备类型是否有呼吸率，暂无效
-        var battery: Int                  // 电池电量（e.g.100:100%）
-        var recordTime: Int               // 已记录时长（单位:second）
         var year: Int
         var month: Int
         var day: Int
         var hour: Int
         var minute: Int
         var second: Int
+        var recordTime: Int               // 已记录时长（单位:second）
+        var batteryStatus: Int            // 电池状态（0：正常使用，1：充电中，2：充满，3：低电量）
+        var battery: Int                  // 电池电量（e.g.100:100%）
+        // reserved 6 byte
+        var isInsertEcgLeadWire: Boolean  // 心电导联线状态（false：未插入导联线，true：插入导联线）
         var leadType: Int                 // 导联类型（0：LEAD_12，12导，1：LEAD_6，6导，2：LEAD_5，5导，3：LEAD_3，3导，4：LEAD_3_TEMP，3导带体温，
                                           // 5：LEAD_3_LEG，3导胸贴，6：LEAD_5_LEG，5导胸贴，7：LEAD_6_LEG，6导胸贴，0XFF：LEAD_NONSUP，不支持的导联）
-        var leadSn: String                // 一次性导联的sn
-        var isLeadOffI: Boolean
-        var isLeadOffII: Boolean
-        var isLeadOffIII: Boolean         // 暂无效
-        var isLeadOffaVR: Boolean         // 暂无效
-        var isLeadOffaVL: Boolean         // 暂无效
-        var isLeadOffaVF: Boolean         // 暂无效
+        var isLeadOffRA: Boolean
+        var isLeadOffLA: Boolean
+        var isLeadOffLL: Boolean
+        var isLeadOffRL: Boolean
         var isLeadOffV1: Boolean
         var isLeadOffV2: Boolean
         var isLeadOffV3: Boolean
         var isLeadOffV4: Boolean
         var isLeadOffV5: Boolean
         var isLeadOffV6: Boolean
-        // reserved 6 byte
+        var hr: Int                       // 当前主机实时心率（bpm）
+        var ecgRFlag: Boolean             // 实时运行标记 bit0:R波标记
+        var respRate: Int                 // 呼吸率
+        var oxyStatus: Int                // 血氧状态（0：未接入血氧，1：血氧状态正常，2：血氧手指脱落，3：探头故障）
+        var spo2: Int                     // 血氧（无效值0xFF）
+        var pr: Int                       // 脉率（30~250bpm）
+        var pi: Float                     // 0- 200，e.g.25 : PI = 2.5
+        var oxyRFlag: Boolean             // 实时运行标记 bit0:R波标记
+        // reserved 2 byte
+        var isInsertTemp: Boolean         // 体温状态（0：未接入体温，1：体温状态正常）
+        var temp: Float                   // 体温（无效值0xFFFF，e.g.2500，temp = 25.0℃）
+        // reserved 1 byte
 
         init {
             var index = 0
-            hr = toUInt(bytes.copyOfRange(index, index+2))
-            index += 2
-            temp = toUInt(bytes.copyOfRange(index, index+2)) / 100.toFloat()
-            index += 2
-            spo2 = byte2UInt(bytes[index])
+            measureStatus = byte2UInt(bytes[index])
             index++
-            pi = byte2UInt(bytes[index]).div(10f)
-            index++
-            pr = toUInt(bytes.copyOfRange(index, index+2))
-            index += 2
-            respRate = toUInt(bytes.copyOfRange(index, index+2))
-            index += 2
-            batteryStatus = byte2UInt(bytes[index]) and 0x03
-            isInsertEcgLeadWire = ((byte2UInt(bytes[index]) and 0x04) shr 2) == 1
-            oxyStatus = (byte2UInt(bytes[index]) and 0x18) shr 3
-            isInsertTemp = ((byte2UInt(bytes[index]) and 0x60) shr 5) == 1
-            measureStatus = ((byte2UInt(bytes[index]) and 0x80) shr 7) + ((byte2UInt(bytes[index+1]) and 0x01) shl 1)
-            isHasDevice = ((byte2UInt(bytes[index+1]) and 0x0E) shr 1) != 0
-            isHasTemp = ((byte2UInt(bytes[index+1]) and 0x02) shr 1) == 1
-            isHasOxy = ((byte2UInt(bytes[index+1]) and 0x04) shr 2) == 1
-            isHasRespRate = ((byte2UInt(bytes[index+1]) and 0x08) shr 3) == 1
-            index += 2
-            battery = byte2UInt(bytes[index])
-            index++
-            recordTime = toUInt(bytes.copyOfRange(index, index+4))
-            index += 4
             year = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
             month = byte2UInt(bytes[index])
@@ -116,71 +89,94 @@ object Er3BleResponse {
             index++
             second = byte2UInt(bytes[index])
             index++
+            recordTime = toUInt(bytes.copyOfRange(index, index+4))
+            index += 4
+            batteryStatus = byte2UInt(bytes[index])
+            index++
+            battery = byte2UInt(bytes[index])
+            index++
+            index += 6
+            isInsertEcgLeadWire = byte2UInt(bytes[index]) == 1
+            index++
             leadType = byte2UInt(bytes[index])
             index++
-            leadSn = String(bytes.copyOfRange(index, index+15))
-            index += 15
-            isLeadOffI = (byte2UInt(bytes[index]) and 0x01) == 1
-            isLeadOffII = ((byte2UInt(bytes[index]) and 0x02) shr 1) == 1
-            isLeadOffIII = ((byte2UInt(bytes[index]) and 0x04) shr 2) == 1
-            isLeadOffaVR = ((byte2UInt(bytes[index]) and 0x08) shr 3) == 1
-            isLeadOffaVL = ((byte2UInt(bytes[index]) and 0x10) shr 4) == 1
-            isLeadOffaVF = ((byte2UInt(bytes[index]) and 0x20) shr 5) == 1
-            isLeadOffV1 = ((byte2UInt(bytes[index]) and 0x40) shr 6) == 1
-            isLeadOffV2 = ((byte2UInt(bytes[index]) and 0x80) shr 7) == 1
-            isLeadOffV3 = (byte2UInt(bytes[index+1]) and 0x01) == 1
-            isLeadOffV4 = ((byte2UInt(bytes[index+1]) and 0x02) shr 1) == 1
-            isLeadOffV5 = ((byte2UInt(bytes[index+1]) and 0x04) shr 2) == 1
-            isLeadOffV6 = ((byte2UInt(bytes[index+1]) and 0x08) shr 3) == 1
+            isLeadOffRA = (byte2UInt(bytes[index]) and 0x01) == 1
+            isLeadOffLA = ((byte2UInt(bytes[index]) and 0x02) shr 1) == 1
+            isLeadOffLL = ((byte2UInt(bytes[index]) and 0x04) shr 2) == 1
+            isLeadOffRL = ((byte2UInt(bytes[index]) and 0x08) shr 3) == 1
+            isLeadOffV1 = ((byte2UInt(bytes[index]) and 0x10) shr 4) == 1
+            isLeadOffV2 = ((byte2UInt(bytes[index]) and 0x20) shr 5) == 1
+            isLeadOffV3 = ((byte2UInt(bytes[index]) and 0x40) shr 6) == 1
+            isLeadOffV4 = ((byte2UInt(bytes[index]) and 0x80) shr 7) == 1
+            index++
+            isLeadOffV5 = (byte2UInt(bytes[index]) and 0x01) == 1
+            isLeadOffV6 = ((byte2UInt(bytes[index]) and 0x02) shr 1) == 1
+            index++
+            hr = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
-            index += 6
+            ecgRFlag = (byte2UInt(bytes[index]) and 0x01) == 1
+            index++
+            respRate = byte2UInt(bytes[index])
+            index++
+            oxyStatus = byte2UInt(bytes[index])
+            index++
+            spo2 = byte2UInt(bytes[index])
+            index++
+            pr = toUInt(bytes.copyOfRange(index, index+2))
+            index += 2
+            pi = byte2UInt(bytes[index]).div(10f)
+            index++
+            oxyRFlag = (byte2UInt(bytes[index]) and 0x01) == 1
+            index++
+            index += 2
+            isInsertTemp = byte2UInt(bytes[index]) == 1
+            index++
+            temp = toUInt(bytes.copyOfRange(index, index+2)) / 100.toFloat()
         }
 
         override fun toString(): String {
             return """
                 RtParam : 
-                hr : $hr
-                temp : $temp
-                spo2 : $spo2
-                pi : $pi
-                pr : $pr
-                respRate : $respRate
-                batteryStatus : $batteryStatus
-                isInsertEcgLeadWire : $isInsertEcgLeadWire
-                oxyStatus : $oxyStatus
-                isInsertTemp : $isInsertTemp
                 measureStatus : $measureStatus
-                isHasDevice : $isHasDevice
-                isHasTemp : $isHasTemp
-                isHasOxy : $isHasOxy
-                isHasRespRate : $isHasRespRate
-                battery : $battery
-                recordTime : $recordTime
                 year : $year
                 month : $month
                 day : $day
                 hour : $hour
                 minute : $minute
                 second : $second
+                recordTime : $recordTime
+                batteryStatus : $batteryStatus
+                battery : $battery
+                isInsertEcgLeadWire : $isInsertEcgLeadWire
                 leadType : $leadType
-                leadSn : $leadSn
-                isLeadOffI : $isLeadOffI
-                isLeadOffII : $isLeadOffII
-                isLeadOffIII : $isLeadOffIII
-                isLeadOffaVR : $isLeadOffaVR
-                isLeadOffaVL : $isLeadOffaVL
-                isLeadOffaVF : $isLeadOffaVF
+                isLeadOffRA : $isLeadOffRA
+                isLeadOffLA : $isLeadOffLA
+                isLeadOffLL : $isLeadOffLL
+                isLeadOffRL : $isLeadOffRL
                 isLeadOffV1 : $isLeadOffV1
                 isLeadOffV2 : $isLeadOffV2
                 isLeadOffV3 : $isLeadOffV3
                 isLeadOffV4 : $isLeadOffV4
                 isLeadOffV5 : $isLeadOffV5
                 isLeadOffV6 : $isLeadOffV6
+                hr : $hr
+                ecgRFlag : $ecgRFlag
+                respRate : $respRate
+                oxyStatus : $oxyStatus
+                spo2 : $spo2
+                pr : $pr
+                pi : $pi
+                oxyRFlag : $oxyRFlag
+                isInsertTemp : $isInsertTemp
+                temp : $temp
             """.trimIndent()
         }
     }
 
-    class RtWave(leadType: Int, val bytes: ByteArray) {
+    class RtWave(val leadType: Int, val bytes: ByteArray) {
+        var samplingRate: Int             // bit0~bit3:采样率0::250Hz 1:125Hz 2:62.5Hz
+        var compressType: Int             // bit4~bit7: 压缩类型 0:未压缩 1:Viatom差分压缩
+        // reserved 3 byte
         var firstIndex: Int               // 数据的第一个点
         var len: Int                      // 采样点数
         var wave = ByteArray(0)      // 压缩原始数据
@@ -188,11 +184,14 @@ object Er3BleResponse {
 
         init {
             var index = 0
+            samplingRate = byte2UInt(bytes[index]) and 0x0f
+            compressType = (byte2UInt(bytes[index]) and 0xf0) shr 4
+            index++
+            index += 3
             firstIndex = toUInt(bytes.copyOfRange(index, index+4))
             index += 4
             len = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
-
             if (len > 0) {
                 wave = bytes.copyOfRange(index, bytes.size)
                 waveMvs = getMvsFromWaveBytes(wave, leadType)
@@ -202,6 +201,7 @@ object Er3BleResponse {
         override fun toString(): String {
             return """
                 RtWave : 
+                compressType : $compressType
                 firstIndex : $firstIndex
                 len : $len
             """.trimIndent()
@@ -672,7 +672,7 @@ object Er3BleResponse {
         return tempInts
     }
 
-    class Er3File(val model: Int, val fileName: String, val fileSize: Int, private val userId: String, var index: Int) {
+    class BleFile(val model: Int, val fileName: String, val fileSize: Int, private val userId: String, var index: Int) {
         var content: ByteArray
 
         init {

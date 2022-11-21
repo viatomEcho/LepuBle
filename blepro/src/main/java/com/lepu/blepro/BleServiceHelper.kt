@@ -3042,6 +3042,14 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
+            Bluetooth.MODEL_LEPOD -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LepodBleInterface).let {
+                        LepuBleLog.d(tag, "it as LepodBleInterface--startEcg")
+                        it.startEcg()
+                    }
+                }
+            }
             else -> LepuBleLog.d(tag, "startEcg current model $model unsupported!!")
         }
     }
@@ -3058,8 +3066,8 @@ class BleServiceHelper private constructor() {
             }
             Bluetooth.MODEL_LEPOD -> {
                 getInterface(model)?.let { it1 ->
-                    (it1 as Er3BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er3BleInterface--stopEcg")
+                    (it1 as LepodBleInterface).let {
+                        LepuBleLog.d(tag, "it as LepodBleInterface--stopEcg")
                         it.stopEcg()
                     }
                 }
@@ -3261,7 +3269,7 @@ class BleServiceHelper private constructor() {
     fun er3GetConfig(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> {
+            Bluetooth.MODEL_ER3 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er3BleInterface).let {
                         LepuBleLog.d(tag, "it as Er3BleInterface--er3GetConfig")
@@ -3272,7 +3280,6 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "er3GetConfig current model $model unsupported!!")
         }
     }
-
     /**
      * mode：心电测量模式
      * 0：监护模式（带宽0.5HZ-40HZ）
@@ -3282,7 +3289,7 @@ class BleServiceHelper private constructor() {
     fun er3SetConfig(model: Int, mode: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> {
+            Bluetooth.MODEL_ER3 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Er3BleInterface).let {
                         LepuBleLog.d(tag, "it as Er3BleInterface--er3SetConfig")
@@ -3291,6 +3298,55 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.d(tag, "er3SetConfig current model $model unsupported!!")
+        }
+    }
+
+    fun lepodGetRtParam(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEPOD -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LepodBleInterface).let {
+                        LepuBleLog.d(tag, "it as LepodBleInterface--lepodGetRtParam")
+                        it.getRtParam()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lepodGetRtParam current model $model unsupported!!")
+        }
+    }
+    fun lepodGetConfig(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEPOD -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LepodBleInterface).let {
+                        LepuBleLog.d(tag, "it as LepodBleInterface--lepodGetConfig")
+                        it.getConfig()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lepodGetConfig current model $model unsupported!!")
+        }
+    }
+    /**
+     * mode：心电测量模式
+     * 0：监护模式（带宽0.5HZ-40HZ）
+     * 1：手术模式（带宽1HZ-20HZ）
+     * 2：ST模式（带宽0.05HZ-40HZ）
+     */
+    fun lepodSetConfig(model: Int, mode: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEPOD -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LepodBleInterface).let {
+                        LepuBleLog.d(tag, "it as LepodBleInterface--lepodSetConfig")
+                        it.setConfig(mode)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lepodSetConfig current model $model unsupported!!")
         }
     }
 

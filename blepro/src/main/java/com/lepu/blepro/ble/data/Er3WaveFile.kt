@@ -49,7 +49,7 @@ class Er3WaveFile {
                 val lead_size = 8
                 waveInts = oriInts
             }
-            1, 7 -> {  // LEAD_6
+            1, 7 -> {  // LEAD_6, LEAD_6_LEG
                 val lead_size = 4
                 for (i in oriInts.indices step lead_size) {
                     tmpFs.add(0)

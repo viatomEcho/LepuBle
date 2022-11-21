@@ -651,6 +651,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 }
             }
         }
+        binding.er3StartEcg.setOnClickListener {
+            LpBleUtil.startEcg(Constant.BluetoothConfig.currentModel[0])
+        }
         binding.er3StopEcg.setOnClickListener {
             LpBleUtil.stopEcg(Constant.BluetoothConfig.currentModel[0])
         }
@@ -1630,7 +1633,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                                 4 -> "LEAD_3_TEMP，3导带体温"
                                 5 -> "LEAD_3_LEG，3导胸贴"
                                 6 -> "LEAD_5_LEG，5导胸贴"
-                                else -> ""
+                                7 -> "LEAD_6_LEG，6导胸贴"
+                                0xFF -> "LEAD_NONSUP，不支持的导联"
+                                else -> "UNKNOWN，未知导联"
                             }
                         }\n" +
                         "一次性导联的sn：${data.param.leadSn}\n" +
@@ -1648,7 +1653,80 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "V6导联脱落：${data.param.isLeadOffV6}\n" +
                         "${data.param}"
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3EcgStop)
+        //------------------------------Lepod--------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodRtData)
+            .observe(this) {
+                val data = it.data as LepodBleResponse.RtData
+                Er3DataController.receive(data.wave.waveMvs)
+                Log.d("LepodTest", "data.wave.waveMvs.size ${data.wave.waveMvs.size}")
+                mainViewModel._battery.value = "${data.param.battery} %"
+                binding.deviceInfo.text = "心率：${data.param.hr} bpm\n" +
+                        "体温：${data.param.temp} ℃\n" +
+                        "血氧：${data.param.spo2} %\n" +
+                        "pi：${data.param.pi} %\n" +
+                        "脉率：${data.param.pr}\n" +
+                        "呼吸率：${data.param.respRate}\n" +
+                        "电池状态${data.param.batteryStatus}：${
+                            when (data.param.batteryStatus) {
+                                0 -> "正常使用"
+                                1 -> "充电中"
+                                2 -> "充满"
+                                3 -> "低电量"
+                                else -> ""
+                            }
+                        }\n" +
+                        "心电导联线状态：${data.param.isInsertEcgLeadWire}\n" +
+                        "血氧状态${data.param.oxyStatus}：${
+                            when (data.param.oxyStatus) {
+                                0 -> "未接入血氧"
+                                1 -> "血氧状态正常"
+                                2 -> "血氧手指脱落"
+                                3 -> "探头故障"
+                                else -> ""
+                            }
+                        }\n" +
+                        "体温状态：${data.param.isInsertTemp}\n" +
+                        "测量状态${data.param.measureStatus}：${
+                            when (data.param.measureStatus) {
+                                0 -> "空闲"
+                                1 -> "准备状态"
+                                2 -> "正式测量状态"
+                                else -> ""
+                            }
+                        }\n" +
+                        "已记录时长：${data.param.recordTime}\n" +
+                        "开始测量时间：${data.param.year}-${data.param.month}-${data.param.day} ${data.param.hour}:${data.param.minute}:${data.param.second}\n" +
+                        "导联类型${data.param.leadType}：${
+                            when (data.param.leadType) {
+                                0 -> "LEAD_12，12导"
+                                1 -> "LEAD_6，6导"
+                                2 -> "LEAD_5，5导"
+                                3 -> "LEAD_3，3导"
+                                4 -> "LEAD_3_TEMP，3导带体温"
+                                5 -> "LEAD_3_LEG，3导胸贴"
+                                6 -> "LEAD_5_LEG，5导胸贴"
+                                7 -> "LEAD_6_LEG，6导胸贴"
+                                0xFF -> "LEAD_NONSUP，不支持的导联"
+                                else -> "UNKNOWN，未知导联"
+                            }
+                        }\n" +
+                        "RA导联脱落：${data.param.isLeadOffRA}\n" +
+                        "RL导联脱落：${data.param.isLeadOffRL}\n" +
+                        "LA导联脱落：${data.param.isLeadOffLA}\n" +
+                        "LL导联脱落：${data.param.isLeadOffLL}\n" +
+                        "V1导联脱落：${data.param.isLeadOffV1}\n" +
+                        "V2导联脱落：${data.param.isLeadOffV2}\n" +
+                        "V3导联脱落：${data.param.isLeadOffV3}\n" +
+                        "V4导联脱落：${data.param.isLeadOffV4}\n" +
+                        "V5导联脱落：${data.param.isLeadOffV5}\n" +
+                        "V6导联脱落：${data.param.isLeadOffV6}\n" +
+                        "${data.param}"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodEcgStart)
+            .observe(this) {
+                Toast.makeText(context, "开始测量", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodEcgStop)
             .observe(this) {
                 Toast.makeText(context, "结束测量", Toast.LENGTH_SHORT).show()
             }

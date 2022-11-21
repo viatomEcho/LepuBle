@@ -514,6 +514,19 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._er1Info.value = it
                 }
             }
+        //-------------------------lepod---------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodSetTime)
+            .observe(this) {
+                Toast.makeText(this, "Lepod 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodInfo)
+            .observe(this) { event ->
+                (event.data as LepuDevice).let {
+                    Toast.makeText(this, "Lepod 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    viewModel._er1Info.value = it
+                }
+            }
     }
     private fun needPermission(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
