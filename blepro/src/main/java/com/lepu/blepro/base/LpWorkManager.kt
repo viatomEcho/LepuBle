@@ -19,7 +19,6 @@ import com.lepu.blepro.ble.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
-import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.HexString
 import com.lepu.blepro.utils.LepuBleLog
 import kotlinx.coroutines.GlobalScope
@@ -32,7 +31,6 @@ object LpWorkManager {
     val tag: String = "LpWorkManager"
 
     var application: Application? = null
-    var observer: BleServiceObserver? = null
 
     /**
      * 保存可用的BleInterface集合
@@ -426,7 +424,6 @@ object LpWorkManager {
             }
 
             else -> {
-//                return throw Exception("BleService initInterfaces() 未配置此model:$m")
                 return null
             }
         }

@@ -42,7 +42,6 @@ import com.lepu.demo.util.CollectUtil
 import com.permissionx.guolindev.PermissionX
 import java.util.*
 
-
 class MainActivity : AppCompatActivity() , BleChangeObserver {
     private val TAG: String = "MainActivity"
 
