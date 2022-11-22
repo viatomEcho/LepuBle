@@ -204,7 +204,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      *           MODEL_PF_20, MODEL_PF_20AW, MODEL_PF_20B,
      *           MODEL_PC_60NW, MODEL_PC_60NW_1,
      *           MODEL_S5W, MODEL_S6W, MODEL_S7W, MODEL_S7BW,
-     *           MODEL_S6W1, MODEL_PC60NW_BLE
+     *           MODEL_S6W1, MODEL_PC60NW_BLE, MODEL_PC60NW_WPS
      */
     interface PC60Fw {
         companion object {
@@ -291,7 +291,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * Ap10BleInterface
-     * 包含model: MODEL_AP20
+     * 包含model: MODEL_AP20, MODEL_AP20_WPS
      */
     interface AP20 {
         companion object {
@@ -409,7 +409,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * Sp20BleInterface
-     * 包含model: MODEL_SP20, MODEL_SP20_BLE
+     * 包含model: MODEL_SP20, MODEL_SP20_BLE, MODEL_SP20_WPS
      */
     interface SP20 {
         companion object {

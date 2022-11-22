@@ -209,6 +209,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC66B,
             Bluetooth.MODEL_AP20, Bluetooth.MODEL_BABYO2,
+            Bluetooth.MODEL_AP20_WPS, Bluetooth.MODEL_SP20_WPS,
             Bluetooth.MODEL_BBSM_S1, Bluetooth.MODEL_BBSM_S2,
             Bluetooth.MODEL_SP20, Bluetooth.MODEL_TV221U,
             Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_CHECKO2,
@@ -225,7 +226,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
             Bluetooth.MODEL_S6W1, Bluetooth.MODEL_SP20_BLE,
-            Bluetooth.MODEL_PC60NW_BLE -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_PC60NW_BLE, Bluetooth.MODEL_PC60NW_WPS -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_CHECK_ADV, Bluetooth.MODEL_PC300_BLE -> {
@@ -331,13 +332,14 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_PC66B, Bluetooth.MODEL_AP20,
             Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE,
+            Bluetooth.MODEL_SP20_WPS, Bluetooth.MODEL_AP20_WPS,
             Bluetooth.MODEL_TV221U, Bluetooth.MODEL_OXYSMART,
             Bluetooth.MODEL_POD_1W, Bluetooth.MODEL_S5W,
             Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_POD2B,
             Bluetooth.MODEL_PC_60NW_1, Bluetooth.MODEL_PC_60NW,
             Bluetooth.MODEL_S6W, Bluetooth.MODEL_S6W1,
             Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S7W,
-            Bluetooth.MODEL_PC60NW_BLE -> {
+            Bluetooth.MODEL_PC60NW_BLE, Bluetooth.MODEL_PC60NW_WPS -> {
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.ecgLayout.visibility = View.GONE
@@ -621,7 +623,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         binding.enableRtOxy.setOnClickListener {
             Constant.BluetoothConfig.currentModel[0].let {
                 when (it) {
-                    Bluetooth.MODEL_AP20 -> {
+                    Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
                         LpBleUtil.enableRtData(it, type, state)
                         type++
                         if (type > Ap20BleCmd.EnableType.BREATH_WAVE) {
@@ -640,6 +642,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_S5W,
                     Bluetooth.MODEL_S6W, Bluetooth.MODEL_S7W,
                     Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S6W1,
+                    Bluetooth.MODEL_SP20_WPS, Bluetooth.MODEL_PC60NW_WPS,
                     Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_PC60NW_BLE -> {
                         LpBleUtil.enableRtData(it, type, state)
                         type++
@@ -1630,7 +1633,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                                 4 -> "LEAD_3_TEMP，3导带体温"
                                 5 -> "LEAD_3_LEG，3导胸贴"
                                 6 -> "LEAD_5_LEG，5导胸贴"
-                                else -> ""
+                                7 -> "LEAD_6_LEG，6导胸贴"
+                                0xFF -> "LEAD_NONSUP，不支持的导联"
+                                else -> "UNKNOWN，未知导联"
                             }
                         }\n" +
                         "一次性导联的sn：${data.param.leadSn}\n" +

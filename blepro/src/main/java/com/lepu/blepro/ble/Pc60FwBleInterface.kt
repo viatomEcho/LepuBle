@@ -69,7 +69,9 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                 .retry(3, 100)
                 .done {
                     LepuBleLog.d(tag, "manager.connect done")
-                    if (model == Bluetooth.MODEL_PC_60NW || model == Bluetooth.MODEL_PC60NW_BLE) {
+                    if (model == Bluetooth.MODEL_PC_60NW
+                        || model == Bluetooth.MODEL_PC60NW_BLE
+                        || model == Bluetooth.MODEL_PC60NW_WPS) {
                         enableRtData(Pc60FwBleCmd.EnableType.OXY_PARAM, true)
                         enableRtData(Pc60FwBleCmd.EnableType.OXY_WAVE, true)
                     }
@@ -230,7 +232,9 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
 
     override fun getInfo() {
         getBranchCode()
-        if (model == Bluetooth.MODEL_PC_60NW || model == Bluetooth.MODEL_PC60NW_BLE) {
+        if (model == Bluetooth.MODEL_PC_60NW
+            || model == Bluetooth.MODEL_PC60NW_BLE
+            || model == Bluetooth.MODEL_PC60NW_WPS) {
             sendCmd(Pc60FwBleCmd.getInfo0F())
             sendHeartbeat()
         } else {

@@ -319,6 +319,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_20B
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC_60NW
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC60NW_BLE
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC60NW_WPS
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S5W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S6W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S6W1

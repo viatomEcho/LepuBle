@@ -222,7 +222,8 @@ object LpWorkManager {
             Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE -> {
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
+            Bluetooth.MODEL_PC60NW_WPS -> {
                 Pc60FwBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -279,7 +280,7 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_AP20 -> {
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
                 Ap20BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -287,7 +288,7 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE -> {
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS -> {
                 Sp20BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -494,7 +495,8 @@ object LpWorkManager {
             Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE -> {
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
+            Bluetooth.MODEL_PC60NW_WPS -> {
                 Pc60FwBleManager(context).apply {
                     vailManager.put(m, this)
                     return this
@@ -538,14 +540,15 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_AP20, Bluetooth.MODEL_PC_68B -> {
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_PC_68B,
+            Bluetooth.MODEL_AP20_WPS -> {
                 Ap20BleManager(context).apply {
                     vailManager.put(m, this)
                     return this
                 }
             }
             Bluetooth.MODEL_SP20, Bluetooth.MODEL_VCOMIN,
-            Bluetooth.MODEL_SP20_BLE -> {
+            Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS -> {
                 Sp20BleManager(context).apply {
                     vailManager.put(m, this)
                     return this
@@ -777,10 +780,10 @@ object LpWorkManager {
                     leScanner = bluetoothAdapter?.bluetoothLeScanner
                 }
                 leScanner?.stopScan(leScanCallback)
-                isDiscovery = false
-                isWaitingScanResult = false
-                LepuBleLog.d(tag, "scanDevice isWaitingScanResult = false")
             }
+            isDiscovery = false
+            isWaitingScanResult = false
+            LepuBleLog.d(tag, "scanDevice isWaitingScanResult = false")
         }
 
     }

@@ -192,7 +192,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_PC100 -> {
                     setViewVisible(binding.pc100Layout)
                 }
-                Bluetooth.MODEL_AP20 -> {
+                Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
                     setViewVisible(binding.ap20Layout)
                     LpBleUtil.ap20GetConfig(it.modelNo, state)
                 }
@@ -201,7 +201,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     binding.sendCmd.visibility = View.VISIBLE
                     binding.content.visibility = View.VISIBLE
                 }
-                Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE -> {
+                Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS -> {
                     setViewVisible(binding.sp20Layout)
                     LpBleUtil.sp20GetConfig(it.modelNo, state)
                 }
