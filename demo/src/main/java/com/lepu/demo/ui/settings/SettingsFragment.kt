@@ -81,7 +81,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.o2Layout.root.visibility = View.GONE
         binding.scaleLayout.visibility = View.GONE
         binding.pc100Layout.visibility = View.GONE
-        binding.ap20Layout.visibility = View.GONE
+        binding.ap20Layout.root.visibility = View.GONE
         binding.lewLayout.root.visibility = View.GONE
         binding.sp20Layout.visibility = View.GONE
         binding.aoj20aLayout.visibility = View.GONE
@@ -194,8 +194,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     setViewVisible(binding.pc100Layout)
                 }
                 Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
-                    setViewVisible(binding.ap20Layout)
-                    LpBleUtil.ap20GetConfig(it.modelNo, state)
+                    setViewVisible(binding.ap20Layout.root)
+                    LpBleUtil.ap20GetBattery(Constant.BluetoothConfig.currentModel[0])
+                    LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], 0)
+                    LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], 1)
+                    LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], 2)
+                    LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], 3)
+                    LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], 4)
                 }
                 Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
                     setViewVisible(binding.lewLayout.root)
@@ -1789,7 +1794,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
 
         //-------------------------ap20-----------------------
-        binding.ap20Switch.setOnClickListener {
+        binding.ap20Layout.setSwitch.setOnClickListener {
             switchState = !switchState
             var temp = "关"
             if (switchState) {
@@ -1800,38 +1805,47 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
-            binding.ap20Switch.text = "警报$temp"
+            binding.ap20Layout.setSwitch.text = "警报$temp"
         }
-        binding.ap20GetConfig.setOnClickListener {
-            state++
-            if (state > 5)
-                state = 0
-            if (state == 5) {
-                LpBleUtil.ap20GetBattery(Constant.BluetoothConfig.currentModel[0])
+        binding.ap20Layout.setLightLevel.setOnClickListener {
+            val temp = trimStr(binding.ap20Layout.lightLevel.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.ap20SetConfig(Constant.BluetoothConfig.currentModel[0], 0, temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
             } else {
-                LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], state)
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
             }
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-            binding.ap20GetConfig.text = "获取参数$state"
         }
-        binding.ap20SetConfig.setOnClickListener {
-            state++
-            if (state > 4)
-                state = 0
-            if (state == 2 || state == 3) {
-                LpBleUtil.ap20SetConfig(Constant.BluetoothConfig.currentModel[0], state, 90)
-            } else if (state == 4) {
-                LpBleUtil.ap20SetConfig(Constant.BluetoothConfig.currentModel[0], state, 125)
-            } else if (state == 0) {
-                volume++
-                if (volume > 6)
-                    volume = 0
-                LpBleUtil.ap20SetConfig(Constant.BluetoothConfig.currentModel[0], state, volume)
+        binding.ap20Layout.setLowSpo2.setOnClickListener {
+            val temp = trimStr(binding.ap20Layout.lowSpo2.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.ap20SetConfig(Constant.BluetoothConfig.currentModel[0], 2, temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
             }
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-            binding.ap20SetConfig.text = "设置参数$state"
+        }
+        binding.ap20Layout.setLowHr.setOnClickListener {
+            val temp = trimStr(binding.ap20Layout.lowHr.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.ap20SetConfig(Constant.BluetoothConfig.currentModel[0], 3, temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+        }
+        binding.ap20Layout.setHighHr.setOnClickListener {
+            val temp = trimStr(binding.ap20Layout.highHr.text.toString())
+            if (isNumber(temp)) {
+                LpBleUtil.ap20SetConfig(Constant.BluetoothConfig.currentModel[0], 4, temp.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
         }
         //-------------------------sp20-----------------------
         binding.sp20AlarmSwitch.setOnClickListener {
@@ -2522,11 +2536,65 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 val data = it.data as Int
                 binding.content.text = "电量${data}"
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20ConfigInfo)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20SetConfig)
             .observe(this) {
                 val data = it.data as Ap20BleResponse.ConfigInfo
-                setReceiveCmd(data.bytes)
-                binding.content.text = "$data"
+                when (data.type) {
+                    0 -> {
+                        if (data.data == 1) {
+                            Toast.makeText(context, "设置背光等级成功", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "设置背光等级失败", Toast.LENGTH_SHORT).show()
+                        }
+                        LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], 0)
+                    }
+                    1 -> {
+                        if (data.data == 1) {
+                            Toast.makeText(context, "设置警报成功", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "设置警报失败", Toast.LENGTH_SHORT).show()
+                        }
+                        LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], 1)
+                    }
+                    2 -> {
+                        if (data.data == 1) {
+                            Toast.makeText(context, "设置血氧过低阈值成功", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "设置血氧过低阈值失败", Toast.LENGTH_SHORT).show()
+                        }
+                        LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], 2)
+                    }
+                    3 -> {
+                        if (data.data == 1) {
+                            Toast.makeText(context, "设置脉率过低阈值成功", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "设置脉率过低阈值失败", Toast.LENGTH_SHORT).show()
+                        }
+                        LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], 3)
+                    }
+                    4 -> {
+                        if (data.data == 1) {
+                            Toast.makeText(context, "设置脉率过高阈值成功", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "设置脉率过高阈值失败", Toast.LENGTH_SHORT).show()
+                        }
+                        LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], 4)
+                    }
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20GetConfig)
+            .observe(this) {
+                val data = it.data as Ap20BleResponse.ConfigInfo
+                when (data.type) {
+                    0 -> binding.ap20Layout.lightLevel.setText("${data.data}")
+                    1 -> {
+                        binding.ap20Layout.setSwitch.text = "警报${if (data.data == 1) "开" else "关" }"
+                        switchState = data.data == 1
+                    }
+                    2 -> binding.ap20Layout.lowSpo2.setText("${data.data}")
+                    3 -> binding.ap20Layout.lowHr.setText("${data.data}")
+                    4 -> binding.ap20Layout.highHr.setText("${data.data}")
+                }
             }
         //------------------------------lew-------------------------------------
         LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseContent)

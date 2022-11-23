@@ -115,37 +115,9 @@
                         android:layout_marginStart="20dp"/>
                 </LinearLayout>
             </LinearLayout>
-            <LinearLayout
+            <include
                 android:id="@+id/ap20_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="ap20"/>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <Button
-                        android:id="@+id/ap20_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="警报开关"/>
-                    <Button
-                        android:id="@+id/ap20_get_config"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="获取参数"
-                        android:layout_marginStart="20dp"/>
-                    <Button
-                        android:id="@+id/ap20_set_config"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="设置参数"
-                        android:layout_marginStart="20dp"/>
-                </LinearLayout>
-            </LinearLayout>
+                layout="@layout/ap20_settings"/>
             <include
                 android:id="@+id/lew_layout"
                 layout="@layout/lew_settings"/>

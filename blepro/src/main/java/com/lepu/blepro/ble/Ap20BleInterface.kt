@@ -83,11 +83,14 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
                         val data = Ap20BleResponse.ConfigInfo(byteArrayOf(0, response.content[0]))
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20ConfigInfo).post(InterfaceEvent(model, data))
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20GetConfig).post(InterfaceEvent(model, data))
                     }
                     Ap20BleCmd.MSG_SET_BACKLIGHT -> {
                         LepuBleLog.d(tag, "model:$model,MSG_SET_BACKLIGHT => success")
                         LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
+                        val data = Ap20BleResponse.ConfigInfo(byteArrayOf(0, response.content[0]))
+                        LepuBleLog.d(tag, "model:$model, data.toString() == $data")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20SetConfig).post(InterfaceEvent(model, data))
                     }
                 }
             }
@@ -122,11 +125,13 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_CONFIG => success")
                         val data = Ap20BleResponse.ConfigInfo(response.content)
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20ConfigInfo).post(InterfaceEvent(model, data))
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20GetConfig).post(InterfaceEvent(model, data))
                     }
                     Ap20BleCmd.MSG_SET_CONFIG -> {
                         LepuBleLog.d(tag, "model:$model,MSG_SET_CONFIG => success")
-                        LepuBleLog.d(tag, "model:$model, bytesToHex(response.content) == " + bytesToHex(response.content))
+                        val data = Ap20BleResponse.ConfigInfo(response.content)
+                        LepuBleLog.d(tag, "model:$model, data.toString() == $data")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20SetConfig).post(InterfaceEvent(model, data))
                     }
                 }
             }

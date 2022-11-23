@@ -310,7 +310,12 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
              *        3 脉率过低阈值（30-99）
              *        4 脉率过高阈值（100-250）
              */
-            const val EventAp20ConfigInfo = "com.lepu.ble.ap20.config.info"   // 获取配置信息 Ap20BleResponse.ConfigInfo
+            const val EventAp20GetConfig = "com.lepu.ble.ap20.get.config"          // 获取配置信息 Ap20BleResponse.ConfigInfo
+            /**
+             * value : 0 失败
+             *         1 成功
+             */
+            const val EventAp20SetConfig = "com.lepu.ble.ap20.set.config.success"  // 设置配置信息 Ap20BleResponse.ConfigInfo
         }
     }
 
