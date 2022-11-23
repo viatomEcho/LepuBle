@@ -4,10 +4,12 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.icomon.icbodyfatalgorithms.ICBodyFatAlgorithms
 import com.icomon.icbodyfatalgorithms.ICBodyFatAlgorithmsParams
+import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.FscaleUserInfo
 import com.lepu.blepro.ble.data.FscaleWeightData
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.utils.*
 
 /**
@@ -34,6 +36,10 @@ class F5ScaleBleInterface(model: Int): BleInterface(model) {
             .useAutoConnect(false)
             .timeout(10000)
             .retry(3, 100)
+            .fail { device, status ->
+                LepuBleLog.d(tag, "manager.connect fail, device : ${device.name} ${device.address} status : $status")
+                LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceConnectFailedStatus).post(status)
+            }
             .done {
                 LepuBleLog.d(tag, "Device Init")
             }

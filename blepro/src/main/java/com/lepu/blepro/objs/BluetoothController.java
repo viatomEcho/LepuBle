@@ -55,6 +55,7 @@ public class BluetoothController {
                 || model == Bluetooth.MODEL_OXYRING
                 || model == Bluetooth.MODEL_CMRING
                 || model == Bluetooth.MODEL_O2M
+                || model == Bluetooth.MODEL_O2M_WPS
                 || model == Bluetooth.MODEL_OXYLINK
                 || model == Bluetooth.MODEL_BABYO2
                 || model == Bluetooth.MODEL_BABYO2N

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,6 +27,7 @@ import com.lepu.demo.databinding.FragmentHomeBinding
 import com.lepu.demo.util.CollectUtil
 import com.lepu.demo.util.DialogUtil
 import com.lepu.demo.util.ToastUtil
+import no.nordicsemi.android.ble.callback.FailCallback
 
 
 class HomeFragment : Fragment(R.layout.fragment_home){
@@ -174,7 +176,22 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                 Constant.BluetoothConfig.splitText = binding.bleSplit.text.toString()
                 splitDevices(Constant.BluetoothConfig.splitText)
             }
-
+        LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceConnectFailedStatus)
+            .observe(this) {
+                mAlertDialog?.dismiss()
+                val status = when (it) {
+                    FailCallback.REASON_DEVICE_DISCONNECTED -> "连接失败 REASON_DEVICE_DISCONNECTED"
+                    FailCallback.REASON_DEVICE_NOT_SUPPORTED -> "连接失败 REASON_DEVICE_NOT_SUPPORTED"
+                    FailCallback.REASON_NULL_ATTRIBUTE -> "连接失败 REASON_NULL_ATTRIBUTE"
+                    FailCallback.REASON_REQUEST_FAILED -> "连接失败 REASON_REQUEST_FAILED"
+                    FailCallback.REASON_TIMEOUT -> "连接失败 REASON_TIMEOUT"
+                    FailCallback.REASON_VALIDATION -> "连接失败 REASON_VALIDATION"
+                    FailCallback.REASON_CANCELLED -> "连接失败 REASON_CANCELLED"
+                    FailCallback.REASON_BLUETOOTH_DISABLED -> "连接失败 REASON_BLUETOOTH_DISABLED"
+                    else -> "连接失败"
+                }
+                Toast.makeText(context, status, Toast.LENGTH_SHORT).show()
+            }
 
     }
 

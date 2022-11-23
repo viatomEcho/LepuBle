@@ -7,6 +7,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.BoDeviceInfo
 import com.lepu.blepro.ble.data.Pc68bConfig
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.ByteUtils.bytes2UIntBig
@@ -47,6 +48,10 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
             .useAutoConnect(false)
             .timeout(10000)
             .retry(3, 100)
+            .fail { device, status ->
+                LepuBleLog.d(tag, "manager.connect fail, device : ${device.name} ${device.address} status : $status")
+                LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceConnectFailedStatus).post(status)
+            }
             .done {
                 LepuBleLog.d(tag, "manager.connect done")
                 enableRtData(Pc68bBleCmd.EnableType.RT_PARAM, true)

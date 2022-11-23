@@ -226,7 +226,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
             Bluetooth.MODEL_S6W1, Bluetooth.MODEL_SP20_BLE,
-            Bluetooth.MODEL_PC60NW_BLE, Bluetooth.MODEL_PC60NW_WPS -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_PC60NW_BLE, Bluetooth.MODEL_PC60NW_WPS,
+            Bluetooth.MODEL_O2M_WPS -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_CHECK_ADV, Bluetooth.MODEL_PC300_BLE -> {
@@ -317,7 +318,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_OXYLINK, Bluetooth.MODEL_KIDSO2,
             Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_OXYRING,
             Bluetooth.MODEL_CMRING, Bluetooth.MODEL_OXYU,
-            Bluetooth.MODEL_CHECK_POD -> {
+            Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_O2M_WPS -> {
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.ecgLayout.visibility = View.GONE
@@ -592,6 +593,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S1
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M_WPS
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_WEARO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPU

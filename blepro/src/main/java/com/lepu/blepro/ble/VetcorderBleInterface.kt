@@ -6,6 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.VetcorderInfo
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
@@ -32,6 +33,10 @@ class VetcorderBleInterface(model: Int): BleInterface(model) {
             .useAutoConnect(false)
             .timeout(10000)
             .retry(3, 100)
+            .fail { device, status ->
+                LepuBleLog.d(tag, "manager.connect fail, device : ${device.name} ${device.address} status : $status")
+                LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceConnectFailedStatus).post(status)
+            }
             .done {
                 LepuBleLog.d(tag, "manager.connect done")
                 getInfo()

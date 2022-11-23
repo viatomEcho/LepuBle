@@ -9,6 +9,7 @@ import com.lepu.blepro.ble.cmd.Bp2BleCmd
 import com.lepu.blepro.ble.cmd.Bp2BleCmd.*
 import com.lepu.blepro.ble.cmd.Bp2BleResponse
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.CrcUtil.calCRC8
 import com.lepu.blepro.utils.LepuBleLog
@@ -41,13 +42,17 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
         manager.setConnectionObserver(this)
         manager.notifyListener = this
         manager.connect(device)
-                .useAutoConnect(false)
-                .timeout(10000)
-                .retry(3, 100)
-                .done {
-                    LepuBleLog.d(tag, "manager.connect done")
-                }
-                .enqueue()
+            .useAutoConnect(false)
+            .timeout(10000)
+            .retry(3, 100)
+            .fail { device, status ->
+                LepuBleLog.d(tag, "manager.connect fail, device : ${device.name} ${device.address} status : $status")
+                LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceConnectFailedStatus).post(status)
+            }
+            .done {
+                LepuBleLog.d(tag, "manager.connect done")
+            }
+            .enqueue()
     }
 
     var fileSize: Int = 0

@@ -7,6 +7,18 @@ object EventMsgConst {
 
     interface Ble{
         companion object{
+            /**
+             * FailCallback
+             * REASON_DEVICE_DISCONNECTED = -1;
+             * REASON_DEVICE_NOT_SUPPORTED = -2;
+             * REASON_NULL_ATTRIBUTE = -3;
+             * REASON_REQUEST_FAILED = -4;
+             * REASON_TIMEOUT = -5;
+             * REASON_VALIDATION = -6;
+             * REASON_CANCELLED = -7;
+             * REASON_BLUETOOTH_DISABLED = -100;
+             */
+            const val EventBleDeviceConnectFailedStatus = "com.lepu.ble.device.connect.failed.status"  // 连接失败原因
             const val EventServiceConnectedAndInterfaceInit = "com.lepu.ble.service.interface.init"  // 服务连接后初始化interface成功会发送 true
             const val EventBleDeviceReady = "com.lepu.ble.device.ready"  // 没有同步时间的设备连接成功后会发送 model
         }

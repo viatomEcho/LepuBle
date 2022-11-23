@@ -5,6 +5,7 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.data.VcominData
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 
@@ -29,6 +30,10 @@ class VcominFhrBleInterface(model: Int): BleInterface(model) {
             .useAutoConnect(false)
             .timeout(10000)
             .retry(3, 100)
+            .fail { device, status ->
+                LepuBleLog.d(tag, "manager.connect fail, device : ${device.name} ${device.address} status : $status")
+                LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceConnectFailedStatus).post(status)
+            }
             .done {
                 LepuBleLog.d(tag, "manager.connect done")
             }

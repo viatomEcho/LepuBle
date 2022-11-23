@@ -152,7 +152,7 @@ public class Ap20BleCmd {
      */
     public static byte[] setTime() {
         TimeData timeData = new TimeData(new Date());
-        byte[] data = timeData.convert2Data();
+        byte[] data = timeData.convert2DataBig();
         return getReq(TOKEN_0F, CMD_SET_TIME, data);
     }
 
