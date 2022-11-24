@@ -1324,17 +1324,18 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20TempData)
             .observe(this) {
                 val data = it.data as Sp20BleResponse.TempData
-                if (data.result == 1) {
-                    binding.deviceInfo.text = "体温过低"
+                val result = if (data.result == 1) {
+                    "体温过低"
                 } else if (data.result == 2) {
-                    binding.deviceInfo.text = "体温过高"
+                    "体温过高"
                 } else {
                     if (data.unit == 1) {
-                        binding.deviceInfo.text = "体温 ：${data.value} ℉"
+                        "体温 ：${data.value} ℉"
                     } else {
-                        binding.deviceInfo.text = "体温 ：${data.value} ℃"
+                        "体温 ：${data.value} ℃"
                     }
                 }
+                Toast.makeText(context, result, Toast.LENGTH_SHORT).show()
             }
         //------------------------------PC68B------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bRtWave)
