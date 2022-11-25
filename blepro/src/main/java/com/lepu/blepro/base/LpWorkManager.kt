@@ -288,7 +288,8 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS -> {
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
+            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
                 Sp20BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -548,7 +549,8 @@ object LpWorkManager {
                 }
             }
             Bluetooth.MODEL_SP20, Bluetooth.MODEL_VCOMIN,
-            Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS -> {
+            Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
+            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
                 Sp20BleManager(context).apply {
                     vailManager.put(m, this)
                     return this

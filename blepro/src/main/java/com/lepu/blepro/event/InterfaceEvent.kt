@@ -415,6 +415,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     /**
      * Sp20BleInterface
      * 包含model: MODEL_SP20, MODEL_SP20_BLE, MODEL_SP20_WPS
+     *           MODEL_SP20_NO_SN, MODEL_SP20_WPS_NO_SN
      */
     interface SP20 {
         companion object {
