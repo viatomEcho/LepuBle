@@ -17,7 +17,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      *           MODEL_SNOREO2, MODEL_WEARO2, MODEL_SLEEPU,
      *           MODEL_OXYLINK, MODEL_KIDSO2, MODEL_OXYFIT,
      *           MODEL_OXYRING, MODEL_BBSM_S1, MODEL_BBSM_S2,
-     *           MODEL_OXYU, MODEL_AI_S100, MODEL_O2M_WPS
+     *           MODEL_OXYU, MODEL_AI_S100, MODEL_O2M_WPS,
+     *           MODEL_CMRING
      *
      * MODEL_BABYO2N 接收 EventBleDeviceReady 消息为连接成功，因为需要app先同步设备信息再同步时间处理或者在3s后再发指令给设备
      */
@@ -404,7 +405,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * VetcorderBleInterface发出的通知
-     * 包含model: MODEL_VETCORDER
+     * 包含model: MODEL_VETCORDER, MODEL_CHECK_ADV
      */
     interface Vetcorder {
         companion object {
@@ -527,7 +528,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface VCOMIN {
         companion object {
-            const val EventVcominRtHr = "com.lepu.ble.vcomin.rt.hr"  // 实时心率 FhrData
+            const val EventVcominRtHr = "com.lepu.ble.vcomin.rt.hr"  // 实时心率 VcominData
         }
     }
 
@@ -537,7 +538,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface AD5 {
         companion object {
-            const val EventAd5RtHr = "com.lepu.ble.ad5.rt.hr"  // 实时心率 FhrData
+            const val EventAd5RtHr = "com.lepu.ble.ad5.rt.hr"  // 实时心率 Ad5Data
         }
     }
 

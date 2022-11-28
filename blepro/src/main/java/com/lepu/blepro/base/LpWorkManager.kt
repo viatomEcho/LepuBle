@@ -452,7 +452,8 @@ object LpWorkManager {
             Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_CHECK_POD,
             Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4,
             Bluetooth.MODEL_CHECKME_LE, Bluetooth.MODEL_LES1,
-            Bluetooth.MODEL_CHECKME, Bluetooth.MODEL_O2M_WPS -> {
+            Bluetooth.MODEL_CHECKME, Bluetooth.MODEL_O2M_WPS,
+            Bluetooth.MODEL_CMRING -> {
                 OxyBleManager(context).apply {
                     vailManager.put(m, this)
                     return this
