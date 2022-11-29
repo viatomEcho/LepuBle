@@ -30,10 +30,6 @@ class PoctorM3102BleInterface(model: Int): BleInterface(model) {
             .useAutoConnect(false)
             .timeout(10000)
             .retry(3, 100)
-            .fail { device, status ->
-                LepuBleLog.d(tag, "manager.connect fail, device : ${device.name} ${device.address} status : $status")
-                LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceConnectFailedStatus).post(status)
-            }
             .done {
                 LepuBleLog.d(tag, "manager.connect done")
             }

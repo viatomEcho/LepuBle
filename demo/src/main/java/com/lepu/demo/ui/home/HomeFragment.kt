@@ -27,7 +27,7 @@ import com.lepu.demo.databinding.FragmentHomeBinding
 import com.lepu.demo.util.CollectUtil
 import com.lepu.demo.util.DialogUtil
 import com.lepu.demo.util.ToastUtil
-import no.nordicsemi.android.ble.callback.FailCallback
+import no.nordicsemi.android.ble.observer.ConnectionObserver
 
 
 class HomeFragment : Fragment(R.layout.fragment_home){
@@ -176,23 +176,21 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                 Constant.BluetoothConfig.splitText = binding.bleSplit.text.toString()
                 splitDevices(Constant.BluetoothConfig.splitText)
             }
-        LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceConnectFailedStatus)
+        LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceDisconnectReason)
             .observe(this) {
                 mAlertDialog?.dismiss()
                 val status = when (it) {
-                    FailCallback.REASON_DEVICE_DISCONNECTED -> "连接失败 REASON_DEVICE_DISCONNECTED"
-                    FailCallback.REASON_DEVICE_NOT_SUPPORTED -> "连接失败 REASON_DEVICE_NOT_SUPPORTED"
-                    FailCallback.REASON_NULL_ATTRIBUTE -> "连接失败 REASON_NULL_ATTRIBUTE"
-                    FailCallback.REASON_REQUEST_FAILED -> "连接失败 REASON_REQUEST_FAILED"
-                    FailCallback.REASON_TIMEOUT -> "连接失败 REASON_TIMEOUT"
-                    FailCallback.REASON_VALIDATION -> "连接失败 REASON_VALIDATION"
-                    FailCallback.REASON_CANCELLED -> "连接失败 REASON_CANCELLED"
-                    FailCallback.REASON_BLUETOOTH_DISABLED -> "连接失败 REASON_BLUETOOTH_DISABLED"
+                    ConnectionObserver.REASON_UNKNOWN -> "连接失败 REASON_UNKNOWN"
+                    ConnectionObserver.REASON_SUCCESS -> "连接失败 REASON_SUCCESS"
+                    ConnectionObserver.REASON_TERMINATE_LOCAL_HOST -> "连接失败 REASON_TERMINATE_LOCAL_HOST"
+                    ConnectionObserver.REASON_TERMINATE_PEER_USER -> "连接失败 REASON_TERMINATE_PEER_USER"
+                    ConnectionObserver.REASON_LINK_LOSS -> "连接失败 REASON_LINK_LOSS"
+                    ConnectionObserver.REASON_NOT_SUPPORTED -> "连接失败 REASON_NOT_SUPPORTED"
+                    ConnectionObserver.REASON_TIMEOUT -> "连接失败 REASON_TIMEOUT"
                     else -> "连接失败"
                 }
                 Toast.makeText(context, status, Toast.LENGTH_SHORT).show()
             }
-
     }
 
     private fun showDialog(activity: Activity){

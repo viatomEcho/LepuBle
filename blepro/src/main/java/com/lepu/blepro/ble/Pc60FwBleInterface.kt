@@ -68,10 +68,6 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             .useAutoConnect(false) // true:可能自动重连， 程序代码还在执行扫描
             .timeout(10000)
             .retry(3, 100)
-            .fail { device, status ->
-                LepuBleLog.d(tag, "manager.connect fail, device : ${device.name} ${device.address} status : $status")
-                LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceConnectFailedStatus).post(status)
-            }
             .done {
                 LepuBleLog.d(tag, "manager.connect done")
                 if (model == Bluetooth.MODEL_PC_60NW
