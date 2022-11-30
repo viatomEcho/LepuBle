@@ -19,45 +19,42 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      *           MODEL_OXYRING, MODEL_BBSM_S1, MODEL_BBSM_S2,
      *           MODEL_OXYU, MODEL_AI_S100, MODEL_O2M_WPS,
      *           MODEL_CMRING
-     *
-     * MODEL_BABYO2N 接收 EventBleDeviceReady 消息为连接成功，因为需要app先同步设备信息再同步时间处理或者在3s后再发指令给设备
      */
     interface Oxy {
         companion object {
-            const val EventOxyReadFileError = "com.lepu.ble.oxy.read.file.error"              // 传输文件失败 true
-            const val EventOxyReadFileComplete = "com.lepu.ble.oxy.read.file.complete"        // 传输文件成功 OxyBleResponse.OxyFile
-            const val EventOxyReadingFileProgress = "com.lepu.ble.oxy.reading.file.progress"  // 当前文件进度 展示时：(dialogProgress / 10.0) + "%")
-            const val EventOxyFactoryReset = "com.lepu.ble.oxy.factory.reset"                 // 恢复出厂设置 true
-            const val EventOxyBurnFactoryInfo = "com.lepu.ble.oxy.burn.factory.info"          // 烧录设备信息 true
-            const val EventOxySyncDeviceInfo = "com.lepu.ble.oxy.sync"                        // 同步参数 true
-            const val EventOxyInfo = "com.lepu.ble.oxy.info"                                  // 设备信息 OxyBleResponse.OxyInfo
-            const val EventOxyBoxInfo = "com.lepu.ble.oxy.box.info"                           // 盒子信息 LepuDevice
-            const val EventOxyRtData = "com.lepu.ble.oxy.rtData"                              // 实时波形 OxyBleResponse.RtWave
-            const val EventOxyRtWaveRes = "com.lepu.ble.oxy.rt.wave.res"                      // 实时波形失败 true
-            const val EventOxyRtParamData = "com.lepu.ble.oxy.rt.param.Data"                  // 实时参数 OxyBleResponse.RtParam
-            const val EventOxyRtParamRes = "com.lepu.ble.oxy.rt.param.res"                    // 实时参数失败 true
+            const val EventOxyReadFileError = "com.lepu.ble.oxy.read.file.error"              // 传输文件失败 boolean
+            const val EventOxyReadFileComplete = "com.lepu.ble.oxy.read.file.complete"        // 传输文件成功 com.lepu.blepro.ext.oxy.OxyFile
+            const val EventOxyReadingFileProgress = "com.lepu.ble.oxy.reading.file.progress"  // 当前文件进度 int(0-100)
+            const val EventOxyFactoryReset = "com.lepu.ble.oxy.factory.reset"                 // 恢复出厂设置 boolean
+            const val EventOxyBurnFactoryInfo = "com.lepu.ble.oxy.burn.factory.info"          // 烧录设备信息 boolean
+            const val EventOxySyncDeviceInfo = "com.lepu.ble.oxy.sync"                        // 同步参数 String[]
+            const val EventOxyInfo = "com.lepu.ble.oxy.info"                                  // 设备信息 com.lepu.blepro.ext.oxy.DeviceInfo
+            const val EventOxyBoxInfo = "com.lepu.ble.oxy.box.info"                           // 盒子信息 com.lepu.blepro.ext.er1.DeviceInfo
+            const val EventOxyRtData = "com.lepu.ble.oxy.rtData"                              // 实时波形 com.lepu.blepro.ext.oxy.RtWave
+            const val EventOxyRtWaveRes = "com.lepu.ble.oxy.rt.wave.res"                      // 实时波形失败 boolean
+            const val EventOxyRtParamData = "com.lepu.ble.oxy.rt.param.Data"                  // 实时参数 com.lepu.blepro.ext.oxy.RtParam
+            const val EventOxyRtParamRes = "com.lepu.ble.oxy.rt.param.res"                    // 实时参数失败 boolean
             const val EventOxyPpgData = "com.lepu.ble.oxy.ppg.data"                           // PPG数据成功 OxyBleResponse.PPGData
-            const val EventOxyPpgRes = "com.lepu.ble.oxy.ppg.res"                             // PPG数据失败 true
+            const val EventOxyPpgRes = "com.lepu.ble.oxy.ppg.res"                             // PPG数据失败 boolean
         }
     }
 
     /**
      * Er1BleInterface发出的通知
-     * 包含model: MODEL_ER1, MODEL_ER1_N, MODEL_DUOEK
-     *           MODEL_HHM1, MODEL_HHM2, MODEL_HHM3
+     * 包含model: MODEL_ER1, MODEL_ER1_N, MODEL_HHM1
      */
     interface ER1 {
         companion object {
-            const val EventEr1Info = "com.lepu.ble.er1.info"                                  // 设备信息 LepuDevice
-            const val EventEr1RtData = "com.lepu.ble.er1.rtData"                              // 实时数据 Er1BleResponse.RtData
-            const val EventEr1FileList = "com.lepu.ble.er1.fileList"                          // 文件列表 String
-            const val EventEr1ReadFileError = "com.lepu.ble.er1.read.file.error"              // 传输文件出错 true
+            const val EventEr1Info = "com.lepu.ble.er1.info"                                  // 设备信息 com.lepu.blepro.ext.er1.DeviceInfo
+            const val EventEr1RtData = "com.lepu.ble.er1.rtData"                              // 实时数据 com.lepu.blepro.ext.er1.RtData
+            const val EventEr1FileList = "com.lepu.ble.er1.fileList"                          // 文件列表 ArrayList<String>
+            const val EventEr1ReadFileError = "com.lepu.ble.er1.read.file.error"              // 传输文件出错 boolean
             const val EventEr1ReadingFileProgress = "com.lepu.ble.er1.reading.file.progress"  // 传输文件进度 int(0-100)
-            const val EventEr1ReadFileComplete = "com.lepu.ble.er1.read.file.complete"        // 传输文件完成 Er1BleResponse.Er1File
+            const val EventEr1ReadFileComplete = "com.lepu.ble.er1.read.file.complete"        // 传输文件完成 com.lepu.blepro.ext.er1.Er1File
             const val EventEr1Reset = "com.lepu.ble.er1.reset"                                // 复位 boolean
             const val EventEr1ResetFactory = "com.lepu.ble.er1.reset.factory"                 // 恢复出厂设置 boolean
             const val EventEr1ResetFactoryAll = "com.lepu.ble.er1.reset.factory.all"          // 恢复生产出厂状态 boolean
-            const val EventEr1GetConfig = "com.lepu.ble.er1.get.config"                       // 获取配置参数 Er1Config
+            const val EventEr1GetConfig = "com.lepu.ble.er1.get.config"                       // 获取配置参数 com.lepu.blepro.ext.er1.Er1Config
             const val EventEr1GetConfigError = "com.lepu.ble.er1.get.config.error"            // 获取配置参数失败 boolean
             const val EventEr1SetConfig = "com.lepu.ble.er1.set.config"                       // 设置配置 boolean
             const val EventEr1SetTime = "com.lepu.ble.er1.set.time"                           // 同步时间 boolean
@@ -72,14 +69,14 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface BPM {
         companion object {
-            const val EventBpmInfo = "com.lepu.ble.bpm.info"                     // 设备信息 BpmDeviceInfo
-            const val EventBpmRtData = "com.lepu.ble.bpm.rtData"                 // 实时压力值 BpmBleResponse.RtData
-            const val EventBpmState = "com.lepu.ble.bpm.state"                   // 实时状态 BpmBleResponse.RtState
+            const val EventBpmInfo = "com.lepu.ble.bpm.info"                     // 设备信息 com.lepu.blepro.ext.bpm.DeviceInfo
+            const val EventBpmRtData = "com.lepu.ble.bpm.rtData"                 // 实时压力值 int
+            const val EventBpmState = "com.lepu.ble.bpm.state"                   // 实时状态 int
             const val EventBpmSyncTime = "com.lepu.ble.bpm.sync.time"            // 同步时间 true
-            const val EventBpmRecordData = "com.lepu.ble.bpm.record.data"        // 记录数据 BpmBleResponse.RecordData
+            const val EventBpmRecordData = "com.lepu.ble.bpm.record.data"        // 记录数据 com.lepu.blepro.ext.bpm.RecordData
             const val EventBpmRecordEnd = "com.lepu.ble.bpm.record.end"          // 传输完成 true
-            const val EventBpmMeasureResult = "com.lepu.ble.bpm.measure.result"  // 测量结果 BpmBleResponse.RecordData
-            const val EventBpmMeasureErrorResult = "com.lepu.ble.bpm.measure.error.result"  // 测量错误结果 BpmBleResponse.ErrorResult
+            const val EventBpmMeasureResult = "com.lepu.ble.bpm.measure.result"  // 测量结果 com.lepu.blepro.ext.bpm.RecordData
+            const val EventBpmMeasureErrorResult = "com.lepu.ble.bpm.measure.error.result"  // 测量错误结果 int
         }
     }
 
@@ -175,22 +172,23 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     /**
      * Er2BleInterface发出的通知
      * 包含model: MODEL_ER2, MODEL_LP_ER2
+     * MODEL_DUOEK, MODEL_HHM2, MODEL_HHM3
      */
     interface ER2 {
         companion object {
-            const val EventEr2Info = "com.lepu.ble.er2.info"                                  // 设备信息 Er2DeviceInfo
-            const val EventEr2SetTime = "com.lepu.ble.er2.set.time"                           // 同步时间 true
+            const val EventEr2Info = "com.lepu.ble.er2.info"                                  // 设备信息 com.lepu.blepro.ext.er2.DeviceInfo
+            const val EventEr2SetTime = "com.lepu.ble.er2.set.time"                           // 同步时间 boolean
             const val EventEr2SetConfig = "com.lepu.ble.er2.set.config"                       // 设置心跳音 boolean
-            const val EventEr2GetConfig = "com.lepu.ble.er2.get.config"                       // 获取配置参数 Er2Config
+            const val EventEr2GetConfig = "com.lepu.ble.er2.get.config"                       // 获取配置参数 com.lepu.blepro.ext.er2.Er2Config
             const val EventEr2GetConfigError = "com.lepu.ble.er2.get.config.error"            // 获取配置参数失败 boolean
             const val EventEr2Reset = "com.lepu.ble.er2.reset"                                // 复位 boolean
             const val EventEr2FactoryReset = "com.lepu.ble.er2.factory.reset"                 // 恢复出厂设置 boolean
             const val EventEr2FactoryResetAll = "com.lepu.ble.er2.factory.reset.all"          // 恢复生产出厂状态 boolean
-            const val EventEr2RtData = "com.lepu.ble.er2.realtime.data"                       // 实时数据 Er2RtData
-            const val EventEr2FileList = "com.lepu.ble.er2.file.list"                         // 文件列表 Er2FileList
-            const val EventEr2ReadFileError = "com.lepu.ble.er2.file.read.error"              // 传输文件出错 true
+            const val EventEr2RtData = "com.lepu.ble.er2.realtime.data"                       // 实时数据 com.lepu.blepro.ext.er2.RtData
+            const val EventEr2FileList = "com.lepu.ble.er2.file.list"                         // 文件列表 ArrayList<String>
+            const val EventEr2ReadFileError = "com.lepu.ble.er2.file.read.error"              // 传输文件出错 boolean
             const val EventEr2ReadingFileProgress = "com.lepu.ble.er2.file.reading.progress"  // 传输文件进度 int(0-100)
-            const val EventEr2ReadFileComplete = "com.lepu.ble.er2.file.read.complete"        // 传输文件完成 Er2File
+            const val EventEr2ReadFileComplete = "com.lepu.ble.er2.file.read.complete"        // 传输文件完成 com.lepu.blepro.ext.er2.Er2File
             const val EventEr2BurnFactoryInfo = "com.lepu.ble.er2.burn.factory.info"          // 烧录出厂信息 boolean
             const val EventEr2BurnLockFlash = "com.lepu.ble.er2.burn.lock.flash"              // 加密Flash boolean
         }
@@ -209,12 +207,12 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface PC60Fw {
         companion object {
-            const val EventPC60FwRtParam = "com.lepu.ble.pc60fw.rt.param"              // 血氧参数 RtParam
-            const val EventPC60FwRtWave = "com.lepu.ble.pc60fw.rt.wave"                // 血氧波形 RtWave
-            const val EventPC60FwBatLevel = "com.lepu.ble.pc60fw.bat.level"            // 电池电量
-            const val EventPC60FwDeviceInfo = "com.lepu.ble.pc60fw.device.info"        // 设备信息 DeviceInfo
-            const val EventPC60FwWorkingStatus = "com.lepu.ble.pc60fw.working.status"  // 工作状态 WorkingStatus
-            const val EventPC60FwPpgData = "com.lepu.ble.pc60fw.ppg.data"              // 红外数据 PpgData
+            const val EventPC60FwRtParam = "com.lepu.ble.pc60fw.rt.param"              // 血氧参数 com.lepu.blepro.ext.pc60fw.RtParam
+            const val EventPC60FwRtWave = "com.lepu.ble.pc60fw.rt.wave"                // 血氧波形 com.lepu.blepro.ext.pc60fw.RtWave
+            const val EventPC60FwBatLevel = "com.lepu.ble.pc60fw.bat.level"            // 电池电量 int(0-3)
+            const val EventPC60FwDeviceInfo = "com.lepu.ble.pc60fw.device.info"        // 设备信息 com.lepu.blepro.ext.pc60fw.DeviceInfo
+            const val EventPC60FwWorkingStatus = "com.lepu.ble.pc60fw.working.status"  // 工作状态 com.lepu.blepro.ext.pc60fw.WorkingStatus
+            const val EventPC60FwPpgData = "com.lepu.ble.pc60fw.ppg.data"              // 红外数据 com.lepu.blepro.ext.pc60fw.PpgData
             const val EventPC60FwSetCode = "com.lepu.ble.pc60fw.set.code"              // 设置code boolean
             const val EventPC60FwGetCode = "com.lepu.ble.pc60fw.get.code"              // 获取code String
         }
@@ -227,13 +225,13 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     interface PC80B {
         companion object {
             const val EventPc80bBatLevel = "com.lepu.ble.pc80b.bat.level"                         // 电池电量 int(0-3)
-            const val EventPc80bDeviceInfo = "com.lepu.ble.pc80b.device.info"                     // 设备信息 DeviceInfo
-            const val EventPc80bFastData = "com.lepu.ble.pc80b.fast.data"                         // 实时数据 RtFastData
-            const val EventPc80bContinuousData = "com.lepu.ble.pc80b.continuous.data"             // 连续实时数据 RtContinuousData
-            const val EventPc80bContinuousDataEnd = "com.lepu.ble.pc80b.continuous.data.end"      // 连续实时结束 true
-            const val EventPc80bReadFileError = "com.lepu.ble.pc80b.file.read.error"              // 传输文件出错 true
+            const val EventPc80bDeviceInfo = "com.lepu.ble.pc80b.device.info"                     // 设备信息 com.lepu.blepro.ext.pc80b.DeviceInfo
+            const val EventPc80bFastData = "com.lepu.ble.pc80b.fast.data"                         // 实时数据 com.lepu.blepro.ext.pc80b.RtFastData
+            const val EventPc80bContinuousData = "com.lepu.ble.pc80b.continuous.data"             // 连续实时数据 com.lepu.blepro.ext.pc80b.RtContinuousData
+            const val EventPc80bContinuousDataEnd = "com.lepu.ble.pc80b.continuous.data.end"      // 连续实时结束 boolean
+            const val EventPc80bReadFileError = "com.lepu.ble.pc80b.file.read.error"              // 传输文件出错 boolean
             const val EventPc80bReadingFileProgress = "com.lepu.ble.pc80b.file.reading.progress"  // 传输文件进度 int(0-100)
-            const val EventPc80bReadFileComplete = "com.lepu.ble.pc80b.file.read.complete"        // 传输文件完成 EcgFile
+            const val EventPc80bReadFileComplete = "com.lepu.ble.pc80b.file.read.complete"        // 传输文件完成 com.lepu.blepro.ext.pc80b.EcgFile
         }
     }
 
@@ -273,16 +271,16 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface PC100 {
         companion object {
-            const val EventPc100DeviceInfo = "com.lepu.ble.pc100.device.info"         // 设备信息 DeviceInfo
-            const val EventPc100BpResult = "com.lepu.ble.pc100.bp.result"             // 血压测量结果 BpResult
-            const val EventPc100BpErrorResult = "com.lepu.ble.pc100.bp.error.result"  // 血压测量错误结果 BpResultError
-            const val EventPc100BpStart = "com.lepu.ble.pc100.bp.start"               // 血压开始测量 true
-            const val EventPc100BpStop = "com.lepu.ble.pc100.bp.stop"                 // 血压停止测量 true
+            const val EventPc100DeviceInfo = "com.lepu.ble.pc100.device.info"         // 设备信息 com.lepu.blepro.ext.pc102.DeviceInfo
+            const val EventPc100BpResult = "com.lepu.ble.pc100.bp.result"             // 血压测量结果 com.lepu.blepro.ext.pc102.BpResult
+            const val EventPc100BpErrorResult = "com.lepu.ble.pc100.bp.error.result"  // 血压测量错误结果 com.lepu.blepro.ext.pc102.BpResultError
+            const val EventPc100BpStart = "com.lepu.ble.pc100.bp.start"               // 血压开始测量 boolean
+            const val EventPc100BpStop = "com.lepu.ble.pc100.bp.stop"                 // 血压停止测量 boolean
 //            const val EventPc100BpStatus = "com.lepu.ble.pc100.bp.status"           // 血压测量状态 Pc100BleResponse.BpStatus
-            const val EventPc100RtBpData = "com.lepu.ble.pc100.rt.bp.data"            // 血压实时测量值 RtBpData
-            const val EventPc100RtOxyWave = "com.lepu.ble.pc100.rt.oxy.wave"          // 血氧实时波形包 RtOxyWave
-            const val EventPc100RtOxyParam = "com.lepu.ble.pc100.rt.oxy.param"        // 血氧实时测量值 RtOxyParam
-            const val EventPc100OxyFingerOut = "com.lepu.ble.pc100.oxy.finger.out"    // 血氧脱落未接入
+            const val EventPc100RtBpData = "com.lepu.ble.pc100.rt.bp.data"            // 血压实时测量值 com.lepu.blepro.ext.pc102.RtBpData
+            const val EventPc100RtOxyWave = "com.lepu.ble.pc100.rt.oxy.wave"          // 血氧实时波形包 com.lepu.blepro.ext.pc102.RtOxyWave
+            const val EventPc100RtOxyParam = "com.lepu.ble.pc100.rt.oxy.param"        // 血氧实时测量值 com.lepu.blepro.ext.pc102.RtOxyParam
+            const val EventPc100OxyFingerOut = "com.lepu.ble.pc100.oxy.finger.out"    // 血氧脱落未接入 boolean
         }
     }
 
@@ -292,13 +290,13 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface AP20 {
         companion object {
-            const val EventAp20SetTime = "com.lepu.ble.ap20.set.time"               // 设置时间 true
-            const val EventAp20DeviceInfo = "com.lepu.ble.ap20.device.info"         // 设备信息 DeviceInfo
+            const val EventAp20SetTime = "com.lepu.ble.ap20.set.time"               // 设置时间 boolean
+            const val EventAp20DeviceInfo = "com.lepu.ble.ap20.device.info"         // 设备信息 com.lepu.blepro.ext.ap20.DeviceInfo
             const val EventAp20BatLevel = "com.lepu.ble.ap20.bat.level"             // 电池电量 int（0-3）
-            const val EventAp20RtOxyWave = "com.lepu.ble.ap20.rt.oxy.wave"          // 血氧波形包数据 RtOxyWave
-            const val EventAp20RtOxyParam = "com.lepu.ble.ap20.rt.oxy.param"        // 血氧参数包数据 RtOxyParam
-            const val EventAp20RtBreathWave = "com.lepu.ble.ap20.rt.breath.wave"    // 鼻息流波形包数据 RtBreathWave
-            const val EventAp20RtBreathParam = "com.lepu.ble.ap20.rt.breath.param"  // 鼻息流参数包数据 RtBreathParam
+            const val EventAp20RtOxyWave = "com.lepu.ble.ap20.rt.oxy.wave"          // 血氧波形包数据 com.lepu.blepro.ext.ap20.RtOxyWave
+            const val EventAp20RtOxyParam = "com.lepu.ble.ap20.rt.oxy.param"        // 血氧参数包数据 com.lepu.blepro.ext.ap20.RtOxyParam
+            const val EventAp20RtBreathWave = "com.lepu.ble.ap20.rt.breath.wave"    // 鼻息流波形包数据 com.lepu.blepro.ext.ap20.RtBreathWave
+            const val EventAp20RtBreathParam = "com.lepu.ble.ap20.rt.breath.param"  // 鼻息流参数包数据 com.lepu.blepro.ext.ap20.RtBreathParam
 
             /**
              * type : 0 背光等级（0-5）
@@ -307,8 +305,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
              *        3 脉率过低阈值（30-99）
              *        4 脉率过高阈值（100-250）
              */
-            const val EventAp20GetConfigResult = "com.lepu.ble.ap20.get.config.result"   // 获取参数 GetConfigResult
-            const val EventAp20SetConfigResult = "com.lepu.ble.ap20.set.config.result"   // 配置参数 SetConfigResult
+            const val EventAp20GetConfigResult = "com.lepu.ble.ap20.get.config.result"   // 获取参数 com.lepu.blepro.ext.ap20.GetConfigResult
+            const val EventAp20SetConfigResult = "com.lepu.ble.ap20.set.config.result"   // 配置参数 com.lepu.blepro.ext.ap20.SetConfigResult
         }
     }
 
@@ -406,23 +404,23 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
     interface CheckmeMonitor {
         companion object {
-            const val EventCheckmeMonitorRtData = "com.lepu.ble.checkme.monitor.rtdata"  // RtData
+            const val EventCheckmeMonitorRtData = "com.lepu.ble.checkme.monitor.rtdata"  // com.lepu.blepro.ext.checkmemonitor.RtData
         }
     }
 
     /**
      * Sp20BleInterface
-     * 包含model: MODEL_SP20, MODEL_SP20_BLE, MODEL_SP20_WPS
+     * 包含model: MODEL_SP20, MODEL_SP20_BLE, MODEL_SP20_WPS,
      *           MODEL_SP20_NO_SN, MODEL_SP20_WPS_NO_SN
      */
     interface SP20 {
         companion object {
-            const val EventSp20SetTime = "com.lepu.ble.sp20.set.time"        // 设置时间 true
-            const val EventSp20DeviceInfo = "com.lepu.ble.sp20.device.info"  // 设备信息 BoDeviceInfo
-            const val EventSp20Battery = "com.lepu.ble.sp20.battery"         // 电池电量 int（0-3）
-            const val EventSp20RtWave = "com.lepu.ble.sp20.rtwave"           // 血氧波形包数据 Sp20BleResponse.RtWave
-            const val EventSp20RtParam = "com.lepu.ble.sp20.rtparam"         // 血氧参数包数据 Sp20BleResponse.RtParam
-            const val EventSp20TempData = "com.lepu.ble.sp20.temp.data"      // 体温数据 Sp20BleResponse.TempData
+            const val EventSp20SetTime = "com.lepu.ble.sp20.set.time"        // 设置时间 boolean
+            const val EventSp20DeviceInfo = "com.lepu.ble.sp20.device.info"  // 设备信息 com.lepu.blepro.ext.sp20.DeviceInfo
+            const val EventSp20Battery = "com.lepu.ble.sp20.battery"         // 电池电量 int(0-3)
+            const val EventSp20RtWave = "com.lepu.ble.sp20.rtwave"           // 血氧波形包数据 com.lepu.blepro.ext.sp20.RtWave
+            const val EventSp20RtParam = "com.lepu.ble.sp20.rtparam"         // 血氧参数包数据 com.lepu.blepro.ext.sp20.RtParam
+            const val EventSp20TempData = "com.lepu.ble.sp20.temp.data"      // 体温数据 com.lepu.blepro.ext.sp20.TempResult
 
             /**
              * type :
@@ -431,12 +429,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
              *        4 脉率过高阈值（value：100-250）
              *        5 搏动音开关（value：0 off，1 on）
              */
-            const val EventSp20GetConfig = "com.lepu.ble.sp20.get.config"          // 获取配置信息 Sp20Config
-            /**
-             * value : 0 失败
-             *         1 成功
-             */
-            const val EventSp20SetConfig = "com.lepu.ble.sp20.set.config.success"  // 配置信息 Sp20Config
+            const val EventSp20GetConfig = "com.lepu.ble.sp20.get.config"          // 获取配置信息 com.lepu.blepro.ext.sp20.GetConfigResult
+            const val EventSp20SetConfig = "com.lepu.ble.sp20.set.config.success"  // 配置信息 com.lepu.blepro.ext.sp20.SetConfigResult
         }
     }
 
@@ -446,8 +440,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface VTM20f {
         companion object {
-            const val EventVTM20fRtWave = "com.lepu.ble.vtm20f.rtwave"           // 血氧波形包数据 Vtm20fBleResponse.RtWave
-            const val EventVTM20fRtParam = "com.lepu.ble.vtm20f.rtparam"         // 血氧参数包数据 Vtm20fBleResponse.RtParam
+            const val EventVTM20fRtWave = "com.lepu.ble.vtm20f.rtwave"           // 血氧波形包数据 com.lepu.blepro.ext.vtm20f.RtWave
+            const val EventVTM20fRtParam = "com.lepu.ble.vtm20f.rtparam"         // 血氧参数包数据 com.lepu.blepro.ext.vtm20f.RtParam
         }
     }
 
@@ -457,11 +451,11 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface AOJ20a {
         companion object {
-            const val EventAOJ20aTempRtData = "com.lepu.ble.aoj20a.temp.rtdata"         // 实时测温数据 Aoj20aBleResponse.TempRtData
+            const val EventAOJ20aTempRtData = "com.lepu.ble.aoj20a.temp.rtdata"         // 实时测温数据 com.lepu.blepro.ext.aoj20a.TempResult
             const val EventAOJ20aSetTime = "com.lepu.ble.aoj20a.set.time"               // 同步时间 boolean
-            const val EventAOJ20aTempList = "com.lepu.ble.aoj20a.temp.list"             // 历史测量数据 ArrayList<Aoj20aBleResponse.TempRecord>
-            const val EventAOJ20aDeviceData = "com.lepu.ble.aoj20a.device.data"         // 设备数据 Aoj20aBleResponse.DeviceData
-            const val EventAOJ20aTempErrorMsg = "com.lepu.ble.aoj20a.temp.error.msg"    // 错误码数据 Aoj20aBleResponse.ErrorMsg
+            const val EventAOJ20aTempList = "com.lepu.ble.aoj20a.temp.list"             // 历史测量数据 ArrayList<Record>
+            const val EventAOJ20aDeviceData = "com.lepu.ble.aoj20a.device.data"         // 设备数据 com.lepu.blepro.ext.aoj20a.DeviceInfo
+            const val EventAOJ20aTempErrorMsg = "com.lepu.ble.aoj20a.temp.error.msg"    // 错误码数据 com.lepu.blepro.ext.aoj20a.ErrorResult
             const val EventAOJ20aDeleteData = "com.lepu.ble.aoj20a.delete.data"         // 删除历史数据 boolean
         }
     }
@@ -473,12 +467,12 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     interface CheckmePod {
         companion object {
             const val EventCheckmePodSetTime = "com.lepu.ble.checkme.pod.set.time"                            // 同步时间 boolean
-            const val EventCheckmePodDeviceInfo = "com.lepu.ble.checkme.pod.device.info"                      // 设备信息 CheckmePodBleResponse.DeviceInfo
-            const val EventCheckmePodRtData = "com.lepu.ble.checkme.pod.realtime.data"                        // 实时数据 CheckmePodBleResponse.RtData
+            const val EventCheckmePodDeviceInfo = "com.lepu.ble.checkme.pod.device.info"                      // 设备信息 DeviceInfo
+            const val EventCheckmePodRtData = "com.lepu.ble.checkme.pod.realtime.data"                        // 实时数据 RtData
             const val EventCheckmePodRtDataError = "com.lepu.ble.checkme.pod.realtime.data.error"             // 实时数据出错 boolean
-            const val EventCheckmePodFileList = "com.lepu.ble.checkme.pod.file.list"                          // 文件列表 CheckmePodBleResponse.FileList
+            const val EventCheckmePodFileList = "com.lepu.ble.checkme.pod.file.list"                          // 文件列表 ArrayList<Record>
             const val EventCheckmePodGetFileListError = "com.lepu.ble.checkme.pod.get.file.list.error"        // 获取文件列表出错 boolean
-            const val EventCheckmePodGetFileListProgress = "com.lepu.ble.checkme.pod.get.file.list.progress"  // 获取文件列表进度 int
+            const val EventCheckmePodGetFileListProgress = "com.lepu.ble.checkme.pod.get.file.list.progress"  // 获取文件列表进度 int(0-100)
         }
     }
 
@@ -489,12 +483,12 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     interface Pulsebit {
         companion object {
             const val EventPulsebitSetTime = "com.lepu.ble.pulsebit.set.time"                            // 同步时间 boolean
-            const val EventPulsebitDeviceInfo = "com.lepu.ble.pulsebit.device.info"                      // 设备信息 PulsebitBleResponse.DeviceInfo
-            const val EventPulsebitGetFileListProgress = "com.lepu.ble.pulsebit.get.file.list.progress"  // 获取文件列表进度 int
-            const val EventPulsebitGetFileList = "com.lepu.ble.pulsebit.get.file.list"                   // 文件列表 PulsebitBleResponse.FileList
+            const val EventPulsebitDeviceInfo = "com.lepu.ble.pulsebit.device.info"                      // 设备信息 com.lepu.blepro.ext.pulsebit.DeviceInfo
+            const val EventPulsebitGetFileListProgress = "com.lepu.ble.pulsebit.get.file.list.progress"  // 获取文件列表进度 int(0-100)
+            const val EventPulsebitGetFileList = "com.lepu.ble.pulsebit.get.file.list"                   // 文件列表 ArrayList<String>
             const val EventPulsebitGetFileListError = "com.lepu.ble.pulsebit.get.file.list.error"        // 获取文件列表出错 boolean
-            const val EventPulsebitReadingFileProgress = "com.lepu.ble.pulsebit.reading.file.progress"   // 获取文件进度 int
-            const val EventPulsebitReadFileComplete = "com.lepu.ble.pulsebit.read.file.complete"         // 获取文件完成 PulsebitBleResponse.EcgFile
+            const val EventPulsebitReadingFileProgress = "com.lepu.ble.pulsebit.reading.file.progress"   // 获取文件进度 int(0-100)
+            const val EventPulsebitReadFileComplete = "com.lepu.ble.pulsebit.read.file.complete"         // 获取文件完成 com.lepu.blepro.ext.pulsebit.EcgFile
             const val EventPulsebitReadFileError = "com.lepu.ble.pulsebit.read.file.error"               // 获取文件出错 boolean
         }
     }
@@ -509,9 +503,9 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 //            const val EventPc68bSetTime = "com.lepu.ble.pc68b.set.time"                     // 设置时间 true（定制版）
 //            const val EventPc68bGetTime = "com.lepu.ble.pc68b.get.time"                     // 获取时间 Pc68bBleResponse.DeviceTime（定制版）
 //            const val EventPc68bDeleteFile = "com.lepu.ble.pc68b.delete.file"               // 删除文件 true（定制版）
-            const val EventPc68bDeviceInfo = "com.lepu.ble.pc68b.device.info"               // 设备信息 DeviceInfo（定制版有sn，通用版没有sn）
-            const val EventPc68bRtWave = "com.lepu.ble.pc68b.rtwave"                        // 血氧波形包数据 Pc68bBleResponse.RtWave
-            const val EventPc68bRtParam = "com.lepu.ble.pc68b.rtparam"                      // 血氧参数包数据 Pc68bBleResponse.RtParam
+            const val EventPc68bDeviceInfo = "com.lepu.ble.pc68b.device.info"               // 设备信息 com.lepu.blepro.ext.pc68b.DeviceInfo（定制版有sn，通用版没有sn）
+            const val EventPc68bRtWave = "com.lepu.ble.pc68b.rtwave"                        // 血氧波形包数据 com.lepu.blepro.ext.pc68b.RtWave
+            const val EventPc68bRtParam = "com.lepu.ble.pc68b.rtparam"                      // 血氧参数包数据 com.lepu.blepro.ext.pc68b.RtParam
 //            const val EventPc68bStatusInfo = "com.lepu.ble.pc68b.status.info"               // 状态信息 Pc68bBleResponse.StatusInfo（设备没有回复）
 //            const val EventPc68bConfigInfo = "com.lepu.ble.pc68b.config.info"               // 获取配置信息 Pc68bConfig（定制版）
 //            const val EventPc68bFileList = "com.lepu.ble.pc68b.file.list"                   // 文件列表 MutableList<String>（定制版）
@@ -545,20 +539,20 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface PC300 {
         companion object {
-            const val EventPc300DeviceInfo = "com.lepu.ble.pc300.device.info"         // 设备信息 Pc300DeviceInfo
-            const val EventPc300BpStart = "com.lepu.ble.pc300.bp.start"               // 血压开始测量 true
-            const val EventPc300BpStop = "com.lepu.ble.pc300.bp.stop"                 // 血压停止测量 true
-            const val EventPc300BpResult = "com.lepu.ble.pc300.bp.result"             // 血压测量结果 Pc300BleResponse.BpResult
-            const val EventPc300BpErrorResult = "com.lepu.ble.pc300.bp.error.result"  // 血压测量错误结果 Pc300BleResponse.BpResultError
+            const val EventPc300DeviceInfo = "com.lepu.ble.pc300.device.info"         // 设备信息 com.lepu.blepro.ext.pc303.DeviceInfo
+            const val EventPc300BpStart = "com.lepu.ble.pc300.bp.start"               // 血压开始测量 boolean
+            const val EventPc300BpStop = "com.lepu.ble.pc300.bp.stop"                 // 血压停止测量 boolean
+            const val EventPc300BpResult = "com.lepu.ble.pc300.bp.result"             // 血压测量结果 com.lepu.blepro.ext.pc303.BpResult
+            const val EventPc300BpErrorResult = "com.lepu.ble.pc300.bp.error.result"  // 血压测量错误结果 com.lepu.blepro.ext.pc303.BpResultError
             const val EventPc300RtBpData = "com.lepu.ble.pc300.bp.rtdata"             // 血压实时测量值 int
-            const val EventPc300RtOxyWave = "com.lepu.ble.pc300.oxy.rtwave"           // 血氧实时波形包 Pc300BleResponse.RtOxyWave
-            const val EventPc300RtOxyParam = "com.lepu.ble.pc300.oxy.rtparam"         // 血氧实时参数包 Pc300BleResponse.RtOxyParam
-            const val EventPc300EcgStart = "com.lepu.ble.pc300.ecg.start"             // 心电开始测量 true
-            const val EventPc300EcgStop = "com.lepu.ble.pc300.ecg.stop"               // 心电停止测量 true
-            const val EventPc300RtEcgWave = "com.lepu.ble.pc300.ecg.rtwave"           // 心电实时波形包 Pc300BleResponse.RtEcgWave
-            const val EventPc300EcgResult = "com.lepu.ble.pc300.ecg.result"           // 心电结果 Pc300BleResponse.EcgResult
-            const val EventPc300GluResult = "com.lepu.ble.pc300.glu.result"           // 血糖结果 Pc300BleResponse.GluResult
-            const val EventPc300TempResult = "com.lepu.ble.pc300.temp.result"         // 温度结果 Pc300BleResponse.TempResult
+            const val EventPc300RtOxyWave = "com.lepu.ble.pc300.oxy.rtwave"           // 血氧实时波形包 com.lepu.blepro.ext.pc303.RtOxyWave
+            const val EventPc300RtOxyParam = "com.lepu.ble.pc300.oxy.rtparam"         // 血氧实时参数包 com.lepu.blepro.ext.pc303.RtOxyParam
+            const val EventPc300EcgStart = "com.lepu.ble.pc300.ecg.start"             // 心电开始测量 boolean
+            const val EventPc300EcgStop = "com.lepu.ble.pc300.ecg.stop"               // 心电停止测量 boolean
+            const val EventPc300RtEcgWave = "com.lepu.ble.pc300.ecg.rtwave"           // 心电实时波形包 com.lepu.blepro.ext.pc303.RtEcgWave
+            const val EventPc300EcgResult = "com.lepu.ble.pc300.ecg.result"           // 心电结果 com.lepu.blepro.ext.pc303.EcgResult
+            const val EventPc300GluResult = "com.lepu.ble.pc300.glu.result"           // 血糖结果 com.lepu.blepro.ext.pc303.GluResult
+            const val EventPc300TempResult = "com.lepu.ble.pc300.temp.result"         // 温度结果 float
         }
     }
 
@@ -569,16 +563,16 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     interface CheckmeLE {
         companion object {
             const val EventCheckmeLeSetTime = "com.lepu.ble.checkmele.set.time"                            // 同步时间 boolean
-            const val EventCheckmeLeDeviceInfo = "com.lepu.ble.checkmele.device.info"                      // 设备信息 CheckmeLeBleResponse.DeviceInfo
-            const val EventCheckmeLeGetFileListProgress = "com.lepu.ble.checkmele.get.file.list.progress"  // 获取文件列表进度 int
+            const val EventCheckmeLeDeviceInfo = "com.lepu.ble.checkmele.device.info"                      // 设备信息 com.lepu.blepro.ext.checkmele.DeviceInfo
+            const val EventCheckmeLeGetFileListProgress = "com.lepu.ble.checkmele.get.file.list.progress"  // 获取文件列表进度 int(0-100)
 //            const val EventCheckmeLeGetFileList = "com.lepu.ble.checkmele.get.file.list"                   // 文件列表 CheckmeLeBleResponse.ListContent
-            const val EventCheckmeLeEcgList = "com.lepu.ble.checkmele.ecg.list"                   // 文件列表
-            const val EventCheckmeLeOxyList = "com.lepu.ble.checkmele.oxy.list"                   // 文件列表
-            const val EventCheckmeLeDlcList = "com.lepu.ble.checkmele.dlc.list"                   // 文件列表
-            const val EventCheckmeLeTempList = "com.lepu.ble.checkmele.temp.list"                   // 文件列表
+            const val EventCheckmeLeEcgList = "com.lepu.ble.checkmele.ecg.list"                   // 文件列表 ArrayList<EcgRecord>
+            const val EventCheckmeLeOxyList = "com.lepu.ble.checkmele.oxy.list"                   // 文件列表 ArrayList<OxyRecord>
+            const val EventCheckmeLeDlcList = "com.lepu.ble.checkmele.dlc.list"                   // 文件列表 ArrayList<DlcRecord>
+            const val EventCheckmeLeTempList = "com.lepu.ble.checkmele.temp.list"                   // 文件列表 ArrayList<TempRecord>
             const val EventCheckmeLeGetFileListError = "com.lepu.ble.checkmele.get.file.list.error"        // 获取文件列表出错 boolean
-            const val EventCheckmeLeReadingFileProgress = "com.lepu.ble.checkmele.reading.file.progress"   // 获取文件进度 int
-            const val EventCheckmeLeReadFileComplete = "com.lepu.ble.checkmele.read.file.complete"         // 获取文件完成 CheckmeLeBleResponse.EcgFile
+            const val EventCheckmeLeReadingFileProgress = "com.lepu.ble.checkmele.reading.file.progress"   // 获取文件进度 int(0-100)
+            const val EventCheckmeLeReadFileComplete = "com.lepu.ble.checkmele.read.file.complete"         // 获取文件完成 com.lepu.blepro.ext.checkmele..EcgFile
             const val EventCheckmeLeReadFileError = "com.lepu.ble.checkmele.read.file.error"               // 获取文件出错 boolean
         }
     }
@@ -589,7 +583,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface LEM {
         companion object {
-            const val EventLemDeviceInfo = "com.lepu.ble.lem.device.info"             // LemBleResponse.DeviceInfo
+            const val EventLemDeviceInfo = "com.lepu.ble.lem.device.info"             // com.lepu.blepro.ext.LemData
             const val EventLemBattery = "com.lepu.ble.lem.battery"                    // int 1-100%
             const val EventLemSetHeatMode = "com.lepu.ble.lem.set.heat.mode"          // boolean (true设置开成功，false设置关成功)
             const val EventLemSetMassageMode = "com.lepu.ble.lem.set.massage.mode"    // int (LemBleCmd.MassageMode) 设置成功
@@ -622,7 +616,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface LPM311 {
         companion object {
-            const val EventLpm311Data = "com.lepu.ble.lpm311.data"  // 血脂数据 Lpm311Data
+            const val EventLpm311Data = "com.lepu.ble.lpm311.data"  // 血脂数据 com.lepu.blepro.ext.Lpm311Data
         }
     }
 
@@ -632,7 +626,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface PoctorM3102 {
         companion object {
-            const val EventPoctorM3102Data = "com.lepu.ble.poctor.m3102.data"  // 测量结果 PoctorM3102Data
+            const val EventPoctorM3102Data = "com.lepu.ble.poctor.m3102.data"  // 测量结果 com.lepu.blepro.ext.PoctorM3102Data
         }
     }
 
@@ -642,10 +636,10 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface BiolandBgm {
         companion object {
-            const val EventBiolandBgmDeviceInfo = "com.lepu.ble.bioland.bgm.device.info"       // BiolandBgmBleResponse.DeviceInfo
+            const val EventBiolandBgmDeviceInfo = "com.lepu.ble.bioland.bgm.device.info"       // com.lepu.blepro.ext.bioland.DeviceInfo
             const val EventBiolandBgmCountDown = "com.lepu.ble.bioland.bgm.count.down"         // int
-            const val EventBiolandBgmGluData = "com.lepu.ble.bioland.bgm.glu.data"             // BiolandBgmBleResponse.GluData
-            const val EventBiolandBgmNoGluData = "com.lepu.ble.bioland.bgm.no.glu.data"        // true
+            const val EventBiolandBgmGluData = "com.lepu.ble.bioland.bgm.glu.data"             // com.lepu.blepro.ext.bioland.GluData
+            const val EventBiolandBgmNoGluData = "com.lepu.ble.bioland.bgm.no.glu.data"        // boolean
         }
     }
 

@@ -31,6 +31,7 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
     private var bpResultError = BpResultError()
     private var rtBpData = RtBpData()
     private var oxyParam = RtOxyParam()
+    private var oxyWave = RtOxyWave()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
@@ -174,7 +175,11 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             Pc100BleCmd.BO_RT_WAVE -> {
                 LepuBleLog.d(tag, "model:$model,BO_RT_WAVE => success")
                 val info = Pc100BleResponse.RtBoWave(response.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100RtOxyWave).post(InterfaceEvent(model, info))
+
+                oxyWave.waveData = info.waveData
+                oxyWave.waveIntData = info.waveIntData
+
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100RtOxyWave).post(InterfaceEvent(model, oxyWave))
             }
             Pc100BleCmd.BO_RT_PARAM -> {
                 LepuBleLog.d(tag, "model:$model,BO_RT_PARAM => success")
