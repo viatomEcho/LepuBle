@@ -2526,10 +2526,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20SetConfigResult)
             .observe(this) {
-                val data = it.data as GetConfigResult
+                val data = it.data as SetConfigResult
                 when (data.type) {
                     0 -> {
-                        if (data.data == 1) {
+                        if (data.success) {
                             Toast.makeText(context, "设置背光等级成功", Toast.LENGTH_SHORT).show()
                         } else {
                             Toast.makeText(context, "设置背光等级失败", Toast.LENGTH_SHORT).show()
@@ -2537,7 +2537,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                         LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], 0)
                     }
                     1 -> {
-                        if (data.data == 1) {
+                        if (data.success) {
                             Toast.makeText(context, "设置警报成功", Toast.LENGTH_SHORT).show()
                         } else {
                             Toast.makeText(context, "设置警报失败", Toast.LENGTH_SHORT).show()
@@ -2545,7 +2545,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                         LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], 1)
                     }
                     2 -> {
-                        if (data.data == 1) {
+                        if (data.success) {
                             Toast.makeText(context, "设置血氧过低阈值成功", Toast.LENGTH_SHORT).show()
                         } else {
                             Toast.makeText(context, "设置血氧过低阈值失败", Toast.LENGTH_SHORT).show()
@@ -2553,7 +2553,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                         LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], 2)
                     }
                     3 -> {
-                        if (data.data == 1) {
+                        if (data.success) {
                             Toast.makeText(context, "设置脉率过低阈值成功", Toast.LENGTH_SHORT).show()
                         } else {
                             Toast.makeText(context, "设置脉率过低阈值失败", Toast.LENGTH_SHORT).show()
@@ -2561,7 +2561,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                         LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], 3)
                     }
                     4 -> {
-                        if (data.data == 1) {
+                        if (data.success) {
                             Toast.makeText(context, "设置脉率过高阈值成功", Toast.LENGTH_SHORT).show()
                         } else {
                             Toast.makeText(context, "设置脉率过高阈值失败", Toast.LENGTH_SHORT).show()
