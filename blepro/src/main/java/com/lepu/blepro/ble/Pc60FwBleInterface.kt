@@ -13,6 +13,7 @@ import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_S
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_SPO2_WAVE
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_WORKING_STATUS
 import com.lepu.blepro.ble.data.BoDeviceInfo
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.pc60fw.PpgData
 import com.lepu.blepro.ext.pc60fw.WorkingStatus
@@ -72,17 +73,19 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
         manager.setConnectionObserver(this)
         manager.notifyListener = this
         manager.connect(device)
-                .useAutoConnect(false) // true:可能自动重连， 程序代码还在执行扫描
-                .timeout(10000)
-                .retry(3, 100)
-                .done {
-                    LepuBleLog.d(tag, "manager.connect done")
-                    if (model == Bluetooth.MODEL_PC_60NW || model == Bluetooth.MODEL_PC60NW_BLE) {
-                        enableRtData(Pc60FwBleCmd.EnableType.OXY_PARAM, true)
-                        enableRtData(Pc60FwBleCmd.EnableType.OXY_WAVE, true)
-                    }
+            .useAutoConnect(false) // true:可能自动重连， 程序代码还在执行扫描
+            .timeout(10000)
+            .retry(3, 100)
+            .done {
+                LepuBleLog.d(tag, "manager.connect done")
+                if (model == Bluetooth.MODEL_PC_60NW
+                    || model == Bluetooth.MODEL_PC60NW_BLE
+                    || model == Bluetooth.MODEL_PC60NW_WPS) {
+                    enableRtData(Pc60FwBleCmd.EnableType.OXY_PARAM, true)
+                    enableRtData(Pc60FwBleCmd.EnableType.OXY_WAVE, true)
                 }
-                .enqueue()
+            }
+            .enqueue()
     }
 
     override fun hasResponse(bytes: ByteArray?): ByteArray? {
@@ -269,7 +272,9 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
 
     override fun getInfo() {
         getBranchCode()
-        if (model == Bluetooth.MODEL_PC_60NW || model == Bluetooth.MODEL_PC60NW_BLE) {
+        if (model == Bluetooth.MODEL_PC_60NW
+            || model == Bluetooth.MODEL_PC60NW_BLE
+            || model == Bluetooth.MODEL_PC60NW_WPS) {
             sendCmd(Pc60FwBleCmd.getInfo0F())
             sendHeartbeat()
         } else {

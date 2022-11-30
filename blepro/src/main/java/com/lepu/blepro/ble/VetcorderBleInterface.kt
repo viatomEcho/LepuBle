@@ -5,6 +5,7 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.data.VetcorderInfo
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.checkmemonitor.RtData
 import com.lepu.blepro.utils.LepuBleLog

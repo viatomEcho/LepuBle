@@ -304,27 +304,29 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         stopRtTask()
 //        LpWorkManager.vailManager.remove(model)
         publish()
-
+        LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceDisconnectReason).post(reason)
         //断开后
-        LepuBleLog.d(tag, "onDeviceDisconnected=====isAutoReconnect:$isAutoReconnect ${device.name} ${device.address}")
-        if (BleServiceHelper.canReconnectByName(model)) {
-            device.name?.let {
-                if (isAutoReconnect){
-                    //重开扫描, 扫描该interface的设备
-                    LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByName $it")
-                    BleServiceHelper.reconnect(model, it)
-                }else{
-                    BleServiceHelper.removeReconnectName(it)
+        LepuBleLog.d(tag, "onDeviceDisconnected==reason:${reason}===isAutoReconnect:$isAutoReconnect ${device.name} ${device.address}")
+        if (reason != ConnectionObserver.REASON_NOT_SUPPORTED) {
+            if (BleServiceHelper.canReconnectByName(model)) {
+                device.name?.let {
+                    if (isAutoReconnect) {
+                        //重开扫描, 扫描该interface的设备
+                        LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByName $it")
+                        BleServiceHelper.reconnect(model, it)
+                    } else {
+                        BleServiceHelper.removeReconnectName(it)
+                    }
                 }
-            }
-        } else {
-            device.address?.let {
-                if (isAutoReconnect){
-                    //重开扫描, 扫描该interface的设备
-                    LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByAddress $it")
-                    BleServiceHelper.reconnectByAddress(model, it)
-                }else{
-                    BleServiceHelper.removeReconnectAddress(it)
+            } else {
+                device.address?.let {
+                    if (isAutoReconnect) {
+                        //重开扫描, 扫描该interface的设备
+                        LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByAddress $it")
+                        BleServiceHelper.reconnectByAddress(model, it)
+                    } else {
+                        BleServiceHelper.removeReconnectAddress(it)
+                    }
                 }
             }
         }
@@ -399,6 +401,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             || model == Bluetooth.MODEL_PC_60NW_1
             || model == Bluetooth.MODEL_PC_60NW
             || model == Bluetooth.MODEL_PC60NW_BLE
+            || model == Bluetooth.MODEL_PC60NW_WPS
             || model == Bluetooth.MODEL_POD2B
             || model == Bluetooth.MODEL_PC_60B
             || model == Bluetooth.MODEL_OXYSMART

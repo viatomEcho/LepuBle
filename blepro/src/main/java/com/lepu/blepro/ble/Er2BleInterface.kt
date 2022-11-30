@@ -8,6 +8,7 @@ import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.cmd.Er2File
 import com.lepu.blepro.ble.data.Er2DeviceInfo
 import com.lepu.blepro.ble.data.FactoryConfig
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.er2.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt

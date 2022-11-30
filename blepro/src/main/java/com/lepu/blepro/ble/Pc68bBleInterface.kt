@@ -7,6 +7,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.BoDeviceInfo
 import com.lepu.blepro.ble.data.Pc68bConfig
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.pc68b.DeviceInfo
 import com.lepu.blepro.ext.pc68b.RtParam

@@ -110,10 +110,11 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
     private fun initLiveEvent(){
         // 当BleService onServiceConnected执行后发出通知 蓝牙sdk 初始化完成
-        LiveEventBus.get<Boolean>(EventMsgConst.Ble.EventServiceConnectedAndInterfaceInit).observe(this, Observer {
-            Constant.BluetoothConfig.bleSdkServiceEnable = true
-            afterLpBleInit()
-        })
+        LiveEventBus.get<Boolean>(EventMsgConst.Ble.EventServiceConnectedAndInterfaceInit)
+            .observe(this) {
+                Constant.BluetoothConfig.bleSdkServiceEnable = true
+                afterLpBleInit()
+            }
         //-------------------------er1---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetTime)
             .observe(this) {

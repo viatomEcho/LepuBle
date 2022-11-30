@@ -10,7 +10,6 @@ import com.lepu.blepro.utils.toUInt
 object Er3BleResponse {
 
     class BleResponse(val bytes: ByteArray) {
-
         var cmd: Int
         var pkgType: Byte
         var pkgNo: Int
@@ -27,7 +26,6 @@ object Er3BleResponse {
     }
 
     class RtData(val bytes: ByteArray) {
-
         var param: RtParam
         var wave: RtWave
 
@@ -38,7 +36,6 @@ object Er3BleResponse {
     }
 
     class RtParam(val bytes: ByteArray) {
-
         var hr: Int                       // 当前主机实时心率（bpm）
         var temp: Float                   // 体温（无效值0xFFFF，e.g.2500，temp = 25.0℃）
         var spo2: Int                     // 血氧（无效值0xFF）
@@ -184,7 +181,6 @@ object Er3BleResponse {
     }
 
     class RtWave(leadType: Int, val bytes: ByteArray) {
-
         var firstIndex: Int               // 数据的第一个点
         var len: Int                      // 采样点数
         var wave = ByteArray(0)      // 压缩原始数据
@@ -259,7 +255,7 @@ object Er3BleResponse {
                 val lead_size = 8
                 waveShorts = oriShorts
             }
-            1, 7 -> {  // LEAD_6
+            1, 7 -> {  // LEAD_6, LEAD_6_LEG
                 val lead_size = 4
                 for (i in oriShorts.indices step lead_size) {
                     tmpFs.add(0)
@@ -480,7 +476,7 @@ object Er3BleResponse {
                     tmpaVF.add((oriShorts[i+2]-oriShorts[i+1].div(2)).toShort())
                 }
             }
-            1, 7 -> {  // LEAD_6
+            1, 7 -> {  // LEAD_6, LEAD_6_LEG
                 val lead_size = 4
                 for (i in oriShorts.indices step lead_size) {
                     tmpV6.add(0)
@@ -677,7 +673,6 @@ object Er3BleResponse {
     }
 
     class Er3File(val model: Int, val fileName: String, val fileSize: Int, private val userId: String, var index: Int) {
-
         var content: ByteArray
 
         init {
@@ -699,7 +694,6 @@ object Er3BleResponse {
     }
 
     class FileList(val bytes: ByteArray) {
-
         var size: Int
         // Txxxxxxxxxxxxxx：心率、体温、血氧等数据的存储文件
         // Wxxxxxxxxxxxxxx：心电波形存储文件

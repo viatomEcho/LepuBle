@@ -6,6 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BiolandBgmBleCmd
 import com.lepu.blepro.ble.cmd.BiolandBgmBleResponse
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.bioland.DeviceInfo
 import com.lepu.blepro.ext.bioland.GluData

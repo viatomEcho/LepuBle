@@ -530,7 +530,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_CMRING,
-            Bluetooth.MODEL_OXYU, Bluetooth.MODEL_AI_S100 -> {
+            Bluetooth.MODEL_OXYU, Bluetooth.MODEL_AI_S100,
+            Bluetooth.MODEL_O2M_WPS -> {
                 return inter is OxyBleInterface
             }
             Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T ->{
@@ -546,7 +547,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE -> {
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
+            Bluetooth.MODEL_PC60NW_WPS -> {
                 return inter is Pc60FwBleInterface
             }
             Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE -> {
@@ -564,7 +566,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_MY_SCALE, Bluetooth.MODEL_F5_SCALE -> {
                 return inter is F5ScaleBleInterface
             }
-            Bluetooth.MODEL_AP20 -> {
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
                 return inter is Ap20BleInterface
             }
             Bluetooth.MODEL_PC_68B -> {
@@ -935,7 +937,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
-            Bluetooth.MODEL_AI_S100 -> {
+            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let {
                         LepuBleLog.d(tag, "it as OxyBleInterface--burnFactoryInfo")
@@ -1515,7 +1517,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
-            Bluetooth.MODEL_AI_S100 -> {
+            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetRtWave")
@@ -1541,7 +1543,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
-            Bluetooth.MODEL_AI_S100 -> {
+            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetRtParam")
@@ -1567,7 +1569,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
-            Bluetooth.MODEL_AI_S100 -> {
+            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetPpgRt")
@@ -1635,7 +1637,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
-            Bluetooth.MODEL_AI_S100 -> {
+            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--updateSetting")
@@ -1661,7 +1663,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
-            Bluetooth.MODEL_AI_S100 -> {
+            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--updateSetting")
@@ -1826,7 +1828,7 @@ class BleServiceHelper private constructor() {
     fun ap20SetConfig(model: Int, type: Int, config: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_AP20 -> {
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Ap20BleInterface).let {
                         LepuBleLog.d(tag, "it as Ap20BleInterface--ap20SetConfig")
@@ -1845,7 +1847,7 @@ class BleServiceHelper private constructor() {
     fun ap20GetConfig(model: Int, type: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_AP20 -> {
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Ap20BleInterface).let {
                         LepuBleLog.d(tag, "it as Ap20BleInterface--ap20GetConfig")
@@ -1865,7 +1867,7 @@ class BleServiceHelper private constructor() {
     fun ap20EnableRtData(model: Int, type: Int, enable: Boolean) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_AP20 -> {
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Ap20BleInterface).let {
                         LepuBleLog.d(tag, "it as Ap20BleInterface--ap20EnableRtData")
@@ -1883,7 +1885,7 @@ class BleServiceHelper private constructor() {
     fun ap20GetBattery(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_AP20 -> {
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Ap20BleInterface).let {
                         LepuBleLog.d(tag, "it as Ap20BleInterface--ap20GetBattery")
@@ -2773,7 +2775,8 @@ class BleServiceHelper private constructor() {
     fun sp20SetConfig(model: Int, config: Sp20Config) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE -> {
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
+            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Sp20BleInterface).let {
                         LepuBleLog.d(tag, "it as Sp20BleInterface--sp20SetConfig")
@@ -2792,7 +2795,8 @@ class BleServiceHelper private constructor() {
     fun sp20GetConfig(model: Int, type: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE -> {
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
+            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Sp20BleInterface).let {
                         LepuBleLog.d(tag, "it as Sp20BleInterface--sp20GetConfig")
@@ -2812,7 +2816,8 @@ class BleServiceHelper private constructor() {
     fun sp20EnableRtData(model: Int, type: Int, enable: Boolean) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE -> {
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
+            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Sp20BleInterface).let {
                         LepuBleLog.d(tag, "it as Sp20BleInterface--sp20EnableRtData")
@@ -2830,7 +2835,8 @@ class BleServiceHelper private constructor() {
     fun sp20GetBattery(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE -> {
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
+            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Sp20BleInterface).let {
                         LepuBleLog.d(tag, "it as Sp20BleInterface--sp20GetBattery")
@@ -2903,7 +2909,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE -> {
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
+            Bluetooth.MODEL_PC60NW_WPS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc60FwBleInterface).let {
                         LepuBleLog.d(tag, "it as Pc60FwBleInterface--pc60fwEnableRtData")
@@ -2927,7 +2934,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE -> {
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
+            Bluetooth.MODEL_PC60NW_WPS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc60FwBleInterface).let {
                         LepuBleLog.d(tag, "it as Pc60FwBleInterface--pc60fwGetBranchCode")
@@ -2951,7 +2959,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE -> {
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
+            Bluetooth.MODEL_PC60NW_WPS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc60FwBleInterface).let {
                         LepuBleLog.d(tag, "it as Pc60FwBleInterface--pc60fwSetBranchCode")

@@ -277,6 +277,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         mainViewModel.oxyInfo.observe(viewLifecycleOwner) {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M_WPS
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKO2
@@ -320,6 +321,15 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_20B
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC_60NW
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC60NW_BLE
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC60NW_WPS
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC_68B
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_AP20
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_AP20_WPS
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SP20
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SP20_NO_SN
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SP20_BLE
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SP20_WPS
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SP20_WPS_NO_SN
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S5W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S6W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S6W1
@@ -423,6 +433,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M_WPS
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SNOREO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_WEARO2

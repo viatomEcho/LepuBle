@@ -5,6 +5,7 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.checkmele.*
 import com.lepu.blepro.utils.*
@@ -44,13 +45,13 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
         manager.setConnectionObserver(this)
         manager.notifyListener = this
         manager.connect(device)
-                .useAutoConnect(false) // true:可能自动重连， 程序代码还在执行扫描
-                .timeout(10000)
-                .retry(3, 100)
-                .done {
-                    LepuBleLog.d(tag, "manager.connect done")
-                }
-                .enqueue()
+            .useAutoConnect(false) // true:可能自动重连， 程序代码还在执行扫描
+            .timeout(10000)
+            .retry(3, 100)
+            .done {
+                LepuBleLog.d(tag, "manager.connect done")
+            }
+            .enqueue()
     }
 
     private fun sendOxyCmd(cmd: Int, bs: ByteArray){

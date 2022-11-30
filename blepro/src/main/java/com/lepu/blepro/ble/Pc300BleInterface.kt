@@ -7,6 +7,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.Pc300BleCmd.*
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.Pc300DeviceInfo
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.pc303.*
 import com.lepu.blepro.utils.*

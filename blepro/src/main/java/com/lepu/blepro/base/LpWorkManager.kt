@@ -147,7 +147,7 @@ object LpWorkManager {
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
-            Bluetooth.MODEL_AI_S100 -> {
+            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
                 OxyBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
@@ -220,7 +220,8 @@ object LpWorkManager {
             Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE -> {
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
+            Bluetooth.MODEL_PC60NW_WPS -> {
                 Pc60FwBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -277,7 +278,7 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_AP20 -> {
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
                 Ap20BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -285,7 +286,8 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE -> {
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
+            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
                 Sp20BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -447,7 +449,8 @@ object LpWorkManager {
             Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_CHECK_POD,
             Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4,
             Bluetooth.MODEL_CHECKME_LE, Bluetooth.MODEL_LES1,
-            Bluetooth.MODEL_CHECKME -> {
+            Bluetooth.MODEL_CHECKME, Bluetooth.MODEL_O2M_WPS,
+            Bluetooth.MODEL_CMRING -> {
                 OxyBleManager(context).apply {
                     vailManager.put(m, this)
                     return this
@@ -491,7 +494,8 @@ object LpWorkManager {
             Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE -> {
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
+            Bluetooth.MODEL_PC60NW_WPS -> {
                 Pc60FwBleManager(context).apply {
                     vailManager.put(m, this)
                     return this
@@ -535,14 +539,16 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_AP20, Bluetooth.MODEL_PC_68B -> {
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_PC_68B,
+            Bluetooth.MODEL_AP20_WPS -> {
                 Ap20BleManager(context).apply {
                     vailManager.put(m, this)
                     return this
                 }
             }
             Bluetooth.MODEL_SP20, Bluetooth.MODEL_VCOMIN,
-            Bluetooth.MODEL_SP20_BLE -> {
+            Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
+            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
                 Sp20BleManager(context).apply {
                     vailManager.put(m, this)
                     return this
@@ -774,10 +780,10 @@ object LpWorkManager {
                     leScanner = bluetoothAdapter?.bluetoothLeScanner
                 }
                 leScanner?.stopScan(leScanCallback)
-                isDiscovery = false
-                isWaitingScanResult = false
-                LepuBleLog.d(tag, "scanDevice isWaitingScanResult = false")
             }
+            isDiscovery = false
+            isWaitingScanResult = false
+            LepuBleLog.d(tag, "scanDevice isWaitingScanResult = false")
         }
 
     }
