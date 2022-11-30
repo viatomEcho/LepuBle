@@ -343,7 +343,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_VCOMIN, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_PC300_BLE, Bluetooth.MODEL_LPM311,
             Bluetooth.MODEL_POCTOR_M3102, Bluetooth.MODEL_BIOLAND_BGM,
-            Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_BPM -> false
+            Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_BPM,
+            Bluetooth.MODEL_PC80B_BLE2 -> false
             else -> true
         }
     }
@@ -661,7 +662,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PC60NW_WPS -> {
                 return inter is Pc60FwBleInterface
             }
-            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE -> {
+            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE,
+            Bluetooth.MODEL_PC80B_BLE2 -> {
                 return inter is Pc80BleInterface
             }
             Bluetooth.MODEL_FHR -> {
@@ -1662,7 +1664,8 @@ class BleServiceHelper private constructor() {
     fun sendHeartbeat(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE -> {
+            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE,
+            Bluetooth.MODEL_PC80B_BLE2 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc80BleInterface).let {
                         LepuBleLog.d(tag, "it as PC80BleInterface--sendHeartbeat")

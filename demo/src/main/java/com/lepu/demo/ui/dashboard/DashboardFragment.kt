@@ -198,7 +198,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_PC80B, Bluetooth.MODEL_LES1,
             Bluetooth.MODEL_W12C, Bluetooth.MODEL_HHM1,
             Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
-            Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_PC80B_BLE -> waveHandler.post(EcgWaveTask())
+            Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_PC80B_BLE,
+            Bluetooth.MODEL_PC80B_BLE2 -> waveHandler.post(EcgWaveTask())
 
             Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> waveHandler.post(Er3EcgWaveTask())
 
@@ -281,7 +282,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 LpBleUtil.startRtTask()
                 startWave(it.modelNo)
             }
-            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE -> {
+            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE,
+            Bluetooth.MODEL_PC80B_BLE2 -> {
                 binding.ecgLayout.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.bpLayout.visibility = View.GONE

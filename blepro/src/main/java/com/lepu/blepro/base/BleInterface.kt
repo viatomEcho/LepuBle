@@ -399,6 +399,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
         if (model == Bluetooth.MODEL_PC80B
             || model == Bluetooth.MODEL_PC80B_BLE
+            || model == Bluetooth.MODEL_PC80B_BLE2
             || model == Bluetooth.MODEL_PC60FW
             || model == Bluetooth.MODEL_PF_10
             || model == Bluetooth.MODEL_PF_10AW
