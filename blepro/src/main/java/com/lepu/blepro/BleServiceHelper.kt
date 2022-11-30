@@ -2739,7 +2739,7 @@ class BleServiceHelper private constructor() {
 
     /**
      * 获取参数（sp20）
-     * @param type Ap20BleCmd.ConfigType
+     * @param type Sp20BleCmd.ConfigType
      */
     fun sp20GetConfig(model: Int, type: Int) {
         if (!checkService()) return
