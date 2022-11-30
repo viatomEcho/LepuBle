@@ -255,7 +255,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         }
         mainViewModel.pc80bInfo.observe(viewLifecycleOwner) {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC80B
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC80B_BLE) {
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC80B_BLE
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC80B_BLE2) {
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}"
             }
