@@ -352,13 +352,29 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         ready = false
         connecting = false
         publish()
-        LepuBleLog.d(tag, "onDeviceFailedToConnect=====isAutoReconnect:$isAutoReconnect")
-
-        if (isAutoReconnect){
-            //重开扫描, 扫描该interface的设备
-            device.name?.let {
-                BleServiceHelper.reconnect(null, it)
-                LepuBleLog.d(tag, "onDeviceFailedToConnect....reconnect $it")
+        LepuBleLog.d(tag, "onDeviceFailedToConnect==reason:${reason}===isAutoReconnect:$isAutoReconnect")
+        LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceDisconnectReason).post(reason)
+        if (reason != ConnectionObserver.REASON_NOT_SUPPORTED) {
+            if (BleServiceHelper.canReconnectByName(model)) {
+                device.name?.let {
+                    if (isAutoReconnect) {
+                        //重开扫描, 扫描该interface的设备
+                        LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByName $it")
+                        BleServiceHelper.reconnect(null, it)
+                    } else {
+                        BleServiceHelper.removeReconnectName(it)
+                    }
+                }
+            } else {
+                device.address?.let {
+                    if (isAutoReconnect) {
+                        //重开扫描, 扫描该interface的设备
+                        LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByAddress $it")
+                        BleServiceHelper.reconnectByAddress(null, it)
+                    } else {
+                        BleServiceHelper.removeReconnectAddress(it)
+                    }
+                }
             }
         }
 
