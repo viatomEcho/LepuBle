@@ -311,7 +311,7 @@ public class Bluetooth implements Parcelable {
             return MODEL_AP20;
         } else if (deviceName.contains(BT_NAME_VTM_AD5)) {
             return MODEL_VTM_AD5;
-        } else if (deviceName.contains(BT_NAME_SP20)) {
+        } else if (deviceName.contains(BT_NAME_SP20_NO_SN)) {
             if (deviceName.contains(BT_NAME_SP20_BLE)) {
                 return MODEL_SP20_BLE;
             } else if (deviceName.contains(BT_NAME_SP20_WPS_NO_SN)) {
@@ -319,7 +319,7 @@ public class Bluetooth implements Parcelable {
                     return MODEL_SP20_WPS;
                 }
                 return MODEL_SP20_WPS_NO_SN;
-            } else if (deviceName.contains(BT_NAME_SPO2)) {
+            } else if (deviceName.contains(BT_NAME_SP20)) {
                 return MODEL_SP20;
             }
             return MODEL_SP20_NO_SN;
