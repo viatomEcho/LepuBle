@@ -673,4 +673,17 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    interface VTM01 {
+        companion object {
+            const val EventVtm01Info = "com.lepu.ble.vtm01.info"
+            const val EventVtm01RtData = "com.lepu.ble.vtm01.rtData"
+            const val EventVtm01RtParam = "com.lepu.ble.vtm01.rtParam"
+            const val EventVtm01OriginalData = "com.lepu.ble.vtm01.original.data"
+            const val EventVtm01Reset = "com.lepu.ble.vtm01.reset"
+            const val EventVtm01FactoryReset = "com.lepu.ble.vtm01.factory.reset"
+            const val EventVtm01GetConfig = "com.lepu.ble.vtm01.get.config"
+            const val EventVtm01SleepMode = "com.lepu.ble.vtm01.sleep.mode"
+        }
+    }
+
 }

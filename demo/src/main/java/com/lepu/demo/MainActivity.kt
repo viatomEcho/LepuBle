@@ -515,6 +515,12 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._er1Info.value = it
                 }
             }
+        //--------------------------vtm01--------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01Info)
+            .observe(this) {
+                Toast.makeText(this, "VTM01 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                viewModel._er1Info.value = it.data as LepuDevice
+            }
     }
     private fun needPermission(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

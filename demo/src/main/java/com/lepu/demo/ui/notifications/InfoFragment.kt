@@ -240,6 +240,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER3
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_VTM01
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LEPOD) {
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
@@ -1400,6 +1401,15 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FactoryResetAll)
             .observe(this) {
                 Toast.makeText(context, "恢复生产状态成功", Toast.LENGTH_SHORT).show()
+            }
+        //-----------------------vtm01-----------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01Reset)
+            .observe(this) {
+                Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01FactoryReset)
+            .observe(this) {
+                Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
             }
     }
 

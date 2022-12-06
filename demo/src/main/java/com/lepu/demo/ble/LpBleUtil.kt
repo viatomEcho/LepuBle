@@ -1037,6 +1037,15 @@ class LpBleUtil {
             BleServiceHelper.getBpmRtState(model)
         }
 
+        fun vtm01GetOriginalData(model: Int) {
+            BleServiceHelper.vtm01GetOriginalData(model)
+        }
+        fun vtm01GetRtParam(model: Int) {
+            BleServiceHelper.vtm01GetRtParam(model)
+        }
+        fun vtm01SleepMode(model: Int, on: Boolean) {
+            BleServiceHelper.vtm01SleepMode(model, on)
+        }
     }
 
 

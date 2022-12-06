@@ -3306,4 +3306,47 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    fun vtm01GetOriginalData(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_VTM01 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Vtm01BleInterface).let {
+                        LepuBleLog.d(tag, "it as Vtm01BleInterface--vtm01GetOriginalData")
+                        it.getOriginalData()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "vtm01GetOriginalData current model $model unsupported!!")
+        }
+    }
+    fun vtm01GetRtParam(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_VTM01 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Vtm01BleInterface).let {
+                        LepuBleLog.d(tag, "it as Vtm01BleInterface--vtm01GetRtParam")
+                        it.getRtParam()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "vtm01GetRtParam current model $model unsupported!!")
+        }
+    }
+    fun vtm01SleepMode(model: Int, on: Boolean) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_VTM01 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Vtm01BleInterface).let {
+                        LepuBleLog.d(tag, "it as Vtm01BleInterface--vtm01SleepMode")
+                        it.sleepMode(on)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "vtm01SleepMode current model $model unsupported!!")
+        }
+    }
+
 }

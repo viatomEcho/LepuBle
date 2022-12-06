@@ -229,7 +229,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_S6W1, Bluetooth.MODEL_SP20_BLE,
             Bluetooth.MODEL_PC60NW_BLE, Bluetooth.MODEL_PC60NW_WPS,
             Bluetooth.MODEL_O2M_WPS, Bluetooth.MODEL_SP20_NO_SN,
-            Bluetooth.MODEL_SP20_WPS_NO_SN -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_SP20_WPS_NO_SN, Bluetooth.MODEL_VTM01 -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_CHECK_ADV, Bluetooth.MODEL_PC300_BLE -> {
@@ -321,7 +321,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_OXYLINK, Bluetooth.MODEL_KIDSO2,
             Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_OXYRING,
             Bluetooth.MODEL_CMRING, Bluetooth.MODEL_OXYU,
-            Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_O2M_WPS -> {
+            Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_O2M_WPS,
+            Bluetooth.MODEL_VTM01 -> {
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.ecgLayout.visibility = View.GONE
@@ -1674,6 +1675,23 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             .observe(this) {
                 val data = it.data as Ad5Data
                 binding.deviceInfo.text = "hr1 : ${data.hr1}, hr2 : ${data.hr2}"
+            }
+        //------------------------vtm01----------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01RtData)
+            .observe(this) {
+                val data = it.data as Vtm01BleResponse.RtData
+                OxyDataController.receive(data.waveInt)
+                viewModel.oxyPr.value = data.param.pr
+                viewModel.spo2.value = data.param.spo2
+                viewModel.pi.value = data.param.pi
+                binding.deviceInfo.text = "探头状态${data.param.probeState}：${
+                    when (data.param.probeState) {
+                        0 -> "未检测到手指"
+                        1 -> "正常测量"
+                        2 -> "探头故障"
+                        else -> ""
+                    }
+                }"
             }
     }
 
