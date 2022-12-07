@@ -1402,6 +1402,60 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this) {
                 Toast.makeText(context, "恢复生产状态成功", Toast.LENGTH_SHORT).show()
             }
+        //------------------------------Lepod--------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodFileList)
+            .observe(this) { event ->
+                (event.data as LepodBleResponse.FileList).let {
+                    binding.info.text = it.toString()
+                    for (fileName in it.fileList) {
+                        if (fileName.isNotEmpty()) {
+                            fileNames.add(fileName)
+                        }
+                    }
+                    binding.deviceInfo.text = fileNames.toString()
+                    Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodReadingFileProgress)
+            .observe(this) { event ->
+                (event.data as Int).let {
+                    process = it
+                    binding.process.text = "$readFileProcess $curFileName 读取进度: $process %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodReadFileComplete)
+            .observe(this) { event ->
+                (event.data as LepodBleResponse.BleFile).let {
+                    if (it.fileName.contains("T")) {
+                        val data = Er3DataFile(it.content)
+                        binding.info.text = "$data"
+                        binding.deviceInfo.text = "$data"
+                    } else if (it.fileName.contains("W")) {
+
+                    }
+                    setReceiveCmd(it.content)
+                    binding.process.text = readFileProcess
+                    if (binding.fileName.text.toString().isEmpty()) {
+                        fileNames.removeAt(0)
+                        readFile()
+                    } else {
+                        mAlertDialog?.dismiss()
+                    }
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodReset)
+            .observe(this) {
+                Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodFactoryReset)
+            .observe(this) {
+                Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodFactoryResetAll)
+            .observe(this) {
+                Toast.makeText(context, "恢复生产状态成功", Toast.LENGTH_SHORT).show()
+            }
         //-----------------------vtm01-----------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01Reset)
             .observe(this) {

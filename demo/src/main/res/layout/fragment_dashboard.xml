@@ -673,16 +673,28 @@
                                     android:src="@mipmap/bluetooth_error"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"/>
-                                <TextView
-                                    android:id="@+id/er3_stop_ecg"
+                                <LinearLayout
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="结束测量"
-                                    android:textSize="20sp"
-                                    android:textColor="@color/Black"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
-                                    app:layout_constraintTop_toTopOf="parent"/>
+                                    app:layout_constraintTop_toTopOf="parent">
+                                    <TextView
+                                        android:id="@+id/er3_start_ecg"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="开始测量"
+                                        android:textSize="20sp"
+                                        android:textColor="@color/Black"/>
+                                    <TextView
+                                        android:id="@+id/er3_stop_ecg"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="20dp"
+                                        android:text="结束测量"
+                                        android:textSize="20sp"
+                                        android:textColor="@color/Black"/>
+                                </LinearLayout>
                                 <TextView
                                     android:id="@+id/er3_ble_battery"
                                     android:layout_width="wrap_content"
