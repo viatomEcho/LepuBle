@@ -74,14 +74,18 @@ class DeviceFactoryDataActivity : AppCompatActivity() {
         totalTextView = findViewById(R.id.total_count)
         exportButton = findViewById(R.id.export)
         exportButton.setOnClickListener {
-            exportData()
+            if (records.size == 0) {
+                Toast.makeText(this, "暂无记录需要导出！", Toast.LENGTH_SHORT).show()
+            } else {
+                exportData()
+            }
         }
     }
 
     private fun exportData() {
         val filePath = "/sdcard/Documents/"
         val fileName = "设备烧录信息" + DateUtil.stringFromDate(Date(System.currentTimeMillis()), "yyyyMMdd") + ".xls"
-        val title = arrayOf("序号", "蓝牙名", "蓝牙地址", "sn", "code")
+        val title = arrayOf("序号", "烧录时间", "蓝牙名", "蓝牙地址", "sn", "code")
         val sheetName = "设备烧录信息"
         val initResult = ExcelUtil.initExcel(filePath+fileName, sheetName, title)
         if (initResult) {
@@ -106,6 +110,7 @@ class DeviceFactoryDataActivity : AppCompatActivity() {
             if (str.isEmpty()) continue
             val temp = JSONObject(str)
             val da = DeviceFactoryData()
+            da.time = infoStrGetString(temp, "time")
             da.name = infoStrGetString(temp, "name")
             da.address = infoStrGetString(temp, "address")
             da.sn = infoStrGetString(temp, "sn")

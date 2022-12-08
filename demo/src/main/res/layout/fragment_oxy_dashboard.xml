@@ -163,6 +163,7 @@
                 <TextView
                     android:id="@+id/speed"
                     android:text=""
+                    android:textColor="@color/black"
                     android:layout_marginTop="10dp"
                     android:padding="5dp"
                     app:layout_constraintStart_toEndOf="@id/download_file"
@@ -200,6 +201,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/other"
+            android:textColor="@color/black"
             app:layout_constraintTop_toBottomOf="@id/card"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="10dp"

@@ -25,6 +25,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:text="Average SpO2："
+                android:textColor="@color/black"
                 android:textSize="14sp" />
 
             <TextView
@@ -33,6 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="5dp"
+                android:textColor="@color/black"
                 android:textSize="14sp"/>
 
             <TextView
@@ -42,6 +44,7 @@
                 android:layout_below="@id/avg_spo2"
                 android:layout_marginTop="5dp"
                 android:text="Drops over 3%："
+                android:textColor="@color/black"
                 android:textSize="14sp" />
 
             <TextView
@@ -51,6 +54,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_below="@id/avg_spo2_val"
                 android:layout_marginTop="5dp"
+                android:textColor="@color/black"
                 android:textSize="14sp"/>
 
             <TextView
@@ -60,6 +64,7 @@
                 android:layout_below="@id/drops_3"
                 android:layout_marginTop="5dp"
                 android:text="Below 90% Duration："
+                android:textColor="@color/black"
                 android:textSize="14sp" />
 
             <TextView
@@ -69,6 +74,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_below="@id/drops_3_val"
                 android:layout_marginTop="5dp"
+                android:textColor="@color/black"
                 android:textSize="14sp"/>
 
             <TextView
@@ -78,6 +84,7 @@
                 android:layout_below="@id/below_90_duration"
                 android:layout_marginTop="5dp"
                 android:text="Asleep Percent："
+                android:textColor="@color/black"
                 android:textSize="14sp" />
 
             <TextView
@@ -87,6 +94,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_below="@id/below_90_duration_val"
                 android:layout_marginTop="5dp"
+                android:textColor="@color/black"
                 android:textSize="14sp"/>
 
             <TextView
@@ -96,6 +104,7 @@
                 android:layout_below="@id/asleep_percent"
                 android:layout_marginTop="5dp"
                 android:text="O2 Score："
+                android:textColor="@color/black"
                 android:textSize="14sp" />
 
             <TextView
@@ -105,6 +114,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_below="@id/asleep_percent_val"
                 android:layout_marginTop="5dp"
+                android:textColor="@color/black"
                 android:textSize="14sp"/>
         </RelativeLayout>
 
@@ -121,6 +131,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:text="Min SpO2："
+                android:textColor="@color/black"
                 android:textSize="14sp" />
 
             <TextView
@@ -129,6 +140,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="5dp"
+                android:textColor="@color/black"
                 android:textSize="14sp"/>
 
             <TextView
@@ -138,6 +150,7 @@
                 android:layout_below="@id/min_spo2"
                 android:layout_marginTop="5dp"
                 android:text="Drops over 4%："
+                android:textColor="@color/black"
                 android:textSize="14sp" />
 
             <TextView
@@ -147,6 +160,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_below="@id/min_spo2_val"
                 android:layout_marginTop="5dp"
+                android:textColor="@color/black"
                 android:textSize="14sp"/>
 
             <TextView
@@ -156,6 +170,7 @@
                 android:layout_below="@id/drops_4"
                 android:layout_marginTop="5dp"
                 android:text="Below 90% Time："
+                android:textColor="@color/black"
                 android:textSize="14sp" />
 
             <TextView
@@ -165,6 +180,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_below="@id/drops_4_val"
                 android:layout_marginTop="5dp"
+                android:textColor="@color/black"
                 android:textSize="14sp"/>
 
             <TextView
@@ -174,6 +190,7 @@
                 android:layout_below="@id/below_90_time"
                 android:layout_marginTop="5dp"
                 android:text="Asleep Time："
+                android:textColor="@color/black"
                 android:textSize="14sp" />
 
             <TextView
@@ -183,6 +200,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_below="@id/below_90_time_val"
                 android:layout_marginTop="5dp"
+                android:textColor="@color/black"
                 android:textSize="14sp"/>
 
             <TextView
@@ -192,6 +210,7 @@
                 android:layout_below="@id/asleep_time"
                 android:layout_marginTop="5dp"
                 android:text="Recording Time："
+                android:textColor="@color/black"
                 android:textSize="14sp" />
 
             <TextView
@@ -201,6 +220,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_below="@id/asleep_time_val"
                 android:layout_marginTop="5dp"
+                android:textColor="@color/black"
                 android:textSize="14sp"/>
         </RelativeLayout>
     </LinearLayout>

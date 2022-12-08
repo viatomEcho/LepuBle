@@ -77,7 +77,6 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         binding.scan.setOnClickListener {
             mainViewModel._scanning.value = !mainViewModel._scanning.value!!
             binding.rcv.visibility = View.VISIBLE
-            context?.startActivity(Intent(context, DeviceFactoryDataActivity::class.java))
         }
 
         binding.disconnect.setOnClickListener{
@@ -147,7 +146,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         }
 
         mainViewModel.curBluetooth.observe(viewLifecycleOwner) {
-            binding.bleDevice.text = "当前蓝牙设备：\n蓝牙名：${it!!.deviceName}\n地址：${it!!.deviceMacAddress}"
+            binding.bleDevice.text = "当前蓝牙设备：\n蓝牙名：${it!!.deviceName}\n蓝牙地址：${it!!.deviceMacAddress}"
         }
 
         binding.bleSplit.setText(Constant.BluetoothConfig.splitText)

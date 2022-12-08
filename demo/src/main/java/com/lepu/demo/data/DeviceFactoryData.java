@@ -2,6 +2,9 @@ package com.lepu.demo.data;
 
 public class DeviceFactoryData {
 
+    // 数据保存时间
+    private String time;
+    
     // 蓝牙名
     private String name;
 
@@ -13,6 +16,14 @@ public class DeviceFactoryData {
 
     // code
     private String code;
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
 
     public String getName() {
         return name;
@@ -49,7 +60,8 @@ public class DeviceFactoryData {
     @Override
     public String toString() {
         return "DeviceFactoryData{" +
-                "\"name\":" + "\"" + name + "\"" +
+                "\"time\":" + "\"" + time + "\"" +
+                ",\"name\":" + "\"" + name + "\"" +
                 ",\"address\":" + "\"" + address + "\"" +
                 ",\"sn\":" + "\"" + sn + "\"" +
                 ",\"code\":" + "\"" + code + "\"" +

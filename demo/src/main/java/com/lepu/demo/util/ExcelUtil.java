@@ -128,6 +128,7 @@ public class ExcelUtil {
                     DeviceFactoryData demoBean = (DeviceFactoryData) objList.get(j);
                     List<String> list = new ArrayList<>();
                     list.add(""+(j+1));
+                    list.add(demoBean.getTime());
                     list.add(demoBean.getName());
                     list.add(demoBean.getAddress());
                     list.add(demoBean.getSn());

@@ -32,6 +32,7 @@ import com.lepu.demo.ble.WifiAdapter
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.data.DeviceFactoryData
 import com.lepu.demo.databinding.FragmentSettingsBinding
+import com.lepu.demo.util.DateUtil
 import com.lepu.demo.util.FileUtil
 import com.lepu.demo.util.StringUtil.*
 import com.lepu.demo.util.icon.BitmapConvertor
@@ -95,6 +96,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.bpmLayout.visibility = View.GONE
         binding.pc60fwLayout.visibility = View.GONE
         binding.er3Layout.root.visibility = View.GONE
+        binding.lepodLayout.root.visibility = View.GONE
         binding.sendCmd.visibility = View.GONE
         binding.content.visibility = View.GONE
         if (v == null) return
@@ -344,6 +346,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
             deviceFactoryData.sn = tempSn
             deviceFactoryData.code = tempCode
+            deviceFactoryData.time = DateUtil.stringFromDate(Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL)
             FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
         }
         binding.er1Layout.er1SetSound.setOnClickListener {
@@ -414,6 +417,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
             deviceFactoryData.sn = tempSn
             deviceFactoryData.code = tempCode
+            deviceFactoryData.time = DateUtil.stringFromDate(Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL)
             FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
         }
         binding.er2Layout.er2SetConfig.setOnClickListener {
@@ -712,6 +716,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
             deviceFactoryData.sn = tempSn
             deviceFactoryData.code = tempCode
+            deviceFactoryData.time = DateUtil.stringFromDate(Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL)
             FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
         }
         binding.o2Layout.o2SetOxiThr.setOnClickListener {
@@ -2104,6 +2109,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Toast.makeText(context, "code请输入8位", Toast.LENGTH_SHORT).show()
             } else {
                 LpBleUtil.pc60fwSetBranchCode(Constant.BluetoothConfig.currentModel[0], code)
+                deviceFactoryData.sn = mainViewModel._boInfo.value?.sn
+                deviceFactoryData.code = code
+                deviceFactoryData.time = DateUtil.stringFromDate(Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL)
+                FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
                 cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
                 binding.sendCmd.text = cmdStr
             }

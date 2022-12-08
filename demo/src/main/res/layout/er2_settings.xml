@@ -5,11 +5,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        <TextView
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="er2/duoek"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -25,6 +20,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="硬件版本:" />
             <EditText
                 android:id="@+id/er2_version"
@@ -39,6 +36,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="sn:" />
             <EditText
                 android:id="@+id/er2_sn"
@@ -53,6 +52,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="branch code:" />
             <EditText
                 android:id="@+id/er2_code"
