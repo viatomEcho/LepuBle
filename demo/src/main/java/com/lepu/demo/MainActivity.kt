@@ -11,6 +11,8 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -76,6 +78,22 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         initLiveEvent()
 //        split()
 
+    }
+
+    //创建菜单
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.right_menu, menu)
+        return true
+    }
+
+    //菜单点击事件
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_factory_data -> {
+                startActivity(Intent(this, DeviceFactoryDataActivity::class.java))
+            }
+        }
+        return true
     }
 
     /**

@@ -30,6 +30,7 @@ import com.lepu.demo.MainViewModel
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.ble.WifiAdapter
 import com.lepu.demo.cofig.Constant
+import com.lepu.demo.data.DeviceFactoryData
 import com.lepu.demo.databinding.FragmentSettingsBinding
 import com.lepu.demo.util.FileUtil
 import com.lepu.demo.util.StringUtil.*
@@ -47,6 +48,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private val binding: FragmentSettingsBinding by binding()
     private val mainViewModel: MainViewModel by activityViewModels()
     private lateinit var measureTime: Array<String?>
+
+    private var deviceFactoryData = DeviceFactoryData()
 
     private lateinit var config: Any
     private var phy = Bp2BlePhyState()
@@ -107,6 +110,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         }
         mainViewModel.curBluetooth.observe(viewLifecycleOwner) {
+            deviceFactoryData.name = it?.deviceName
+            deviceFactoryData.address = it?.deviceMacAddress
             when (it!!.modelNo) {
                 Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
                     setViewVisible(binding.er1Layout.root)
@@ -337,6 +342,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
             config.setBurnFlag(enableSn, enableVersion, enableCode)
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
+            deviceFactoryData.sn = tempSn
+            deviceFactoryData.code = tempCode
+            FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
         }
         binding.er1Layout.er1SetSound.setOnClickListener {
             val temp1 = trimStr(binding.er1Layout.er1Hr1.text.toString())
@@ -404,6 +412,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
             config.setBurnFlag(enableSn, enableVersion, enableCode)
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
+            deviceFactoryData.sn = tempSn
+            deviceFactoryData.code = tempCode
+            FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
         }
         binding.er2Layout.er2SetConfig.setOnClickListener {
             switchState = !switchState
@@ -677,25 +688,31 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.o2Layout.o2FactoryConfig.setOnClickListener {
             val config = FactoryConfig()
             var enableVersion = true
-            if (binding.o2Layout.o2Version.text.isNullOrEmpty()) {
+            val tempVersion = binding.o2Layout.o2Version.text
+            if (tempVersion.isNullOrEmpty()) {
                 enableVersion = false
             } else {
-                config.setHwVersion(binding.o2Layout.o2Version.text.first())
+                config.setHwVersion(tempVersion.first())
             }
             var enableSn = true
-            if (binding.o2Layout.o2Sn.text.isNullOrEmpty()) {
+            val tempSn = trimStr(binding.o2Layout.o2Sn.text.toString())
+            if (tempSn.isNullOrEmpty()) {
                 enableSn = false
             } else {
-                config.setSnCode(trimStr(binding.o2Layout.o2Sn.text.toString()))
+                config.setSnCode(tempSn)
             }
             var enableCode = true
-            if (binding.o2Layout.o2Code.text.isNullOrEmpty()) {
+            val tempCode = trimStr(binding.o2Layout.o2Code.text.toString())
+            if (tempCode.isNullOrEmpty()) {
                 enableCode = false
             } else {
-                config.setBranchCode(trimStr(binding.o2Layout.o2Code.text.toString()))
+                config.setBranchCode(tempCode)
             }
             config.setBurnFlag(enableSn, enableVersion, enableCode)
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
+            deviceFactoryData.sn = tempSn
+            deviceFactoryData.code = tempCode
+            FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
         }
         binding.o2Layout.o2SetOxiThr.setOnClickListener {
             val temp = trimStr(binding.o2Layout.o2OxiThr.text.toString())

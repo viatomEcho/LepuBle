@@ -1701,8 +1701,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "测量状态${data.param.measureStatus}：${
                             when (data.param.measureStatus) {
                                 0 -> "空闲"
-                                1 -> "准备状态"
-                                2 -> "正式测量状态"
+                                1 -> "检测导联"
+                                2 -> "准备状态"
+                                3 -> "正式测量"
                                 else -> ""
                             }
                         }\n" +

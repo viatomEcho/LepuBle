@@ -2,6 +2,7 @@ package com.lepu.demo.ui.home
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -14,6 +15,7 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BIOL
+import com.lepu.demo.DeviceFactoryDataActivity
 import com.lepu.demo.MainActivity
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
@@ -75,6 +77,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         binding.scan.setOnClickListener {
             mainViewModel._scanning.value = !mainViewModel._scanning.value!!
             binding.rcv.visibility = View.VISIBLE
+            context?.startActivity(Intent(context, DeviceFactoryDataActivity::class.java))
         }
 
         binding.disconnect.setOnClickListener{

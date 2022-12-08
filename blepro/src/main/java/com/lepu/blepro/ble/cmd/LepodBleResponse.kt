@@ -36,7 +36,7 @@ object LepodBleResponse {
     }
 
     class RtParam(val bytes: ByteArray) {
-        var measureStatus: Int            // 测量状态（0：空闲，1：准备状态，2：正式测量状态）
+        var measureStatus: Int            // 测量状态（0：空闲，1：检测导联，2：准备状态，3：正式测量）
         var year: Int
         var month: Int
         var day: Int
