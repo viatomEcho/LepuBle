@@ -297,7 +297,12 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
-
+        if (!this::manager.isInitialized) {
+            LepuBleLog.d(tag, "manager unInitialized")
+        } else {
+            manager.close()
+            LepuBleLog.d(tag, "onDeviceDisconnected manager.close()")
+        }
         state = false
         ready = false
         connecting = false
