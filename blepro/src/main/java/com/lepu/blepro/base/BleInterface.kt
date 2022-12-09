@@ -71,7 +71,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      */
     var isAutoReconnect: Boolean = false
 
-    lateinit var manager: LpBleManager
+    var manager: LpBleManager? = null
     // device在扫描时会动态刷新device name,可能为null
     lateinit var device: BluetoothDevice
 
@@ -217,14 +217,19 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     fun disconnect(isAutoConnect: Boolean) {
         LepuBleLog.d(tag, "into disconnect ")
 
-        if (!this::manager.isInitialized) {
-            LepuBleLog.d(tag, "manager unInitialized")
+        if (manager == null) {
+            LepuBleLog.d(tag, "disconnect manager == null")
             return
         }
         this.isAutoReconnect = isAutoConnect
         LepuBleLog.d(tag,"try disconnect..., isAutoReconnect = $isAutoConnect" )
-        manager.disconnect()/*.enqueue()*/ // 此方式华为手机只走了disconnecting，没有走disconnected
-        manager.close()
+        manager?.let {
+            it.disconnect()/*.enqueue()*/ // 此方式华为手机只走了disconnecting，没有走disconnected回调
+            it.close()
+        } ?: kotlin.run {
+            LepuBleLog.d(tag, "disconnect manager == null")
+        }
+        manager = null
         if (!this::device.isInitialized){
             LepuBleLog.d(tag, "device unInitialized")
             return
@@ -297,7 +302,12 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
-
+        manager?.let {
+            it.close()
+        } ?: kotlin.run {
+            LepuBleLog.d(tag, "onDeviceDisconnected manager == null")
+        }
+        manager = null
         state = false
         ready = false
         connecting = false
@@ -443,7 +453,15 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             || model == Bluetooth.MODEL_VTM01) { // 部分设备没有同步时间命令，发送此消息通知获取设备信息，进行绑定操作
             LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceReady).post(model)
         } else {
-            if (!manager.isUpdater) syncTime()
+            manager?.let {
+                if (!it.isUpdater) {
+                    syncTime()
+                } else {
+                    LepuBleLog.d(tag, "onDeviceReady isUpdater")
+                }
+            } ?: kotlin.run {
+                LepuBleLog.d(tag, "onDeviceReady manager == null")
+            }
         }
     }
 
@@ -452,7 +470,11 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             LepuBleLog.d(tag, "send cmd fail， state = false")
             return false
         }
-        manager.sendCmd(bs)
+        manager?.let {
+            it.sendCmd(bs)
+        } ?: kotlin.run {
+            LepuBleLog.d(tag, "sendCmd manager == null")
+        }
 
         sendCmdString = bytesToHex(bs)
 
@@ -464,11 +486,16 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     }
 
     fun setBleMtu(mtu: Int) {
-        manager.setBleMtu(mtu)
+        manager?.setBleMtu(mtu)
     }
 
     fun getBleMtu(): Int {
-        return manager.getBleMtu()
+        val mtu = manager?.let {
+            it.getBleMtu()
+        } ?: kotlin.run {
+            0
+        }
+        return mtu
     }
 
     fun clearCmdTimeout() {

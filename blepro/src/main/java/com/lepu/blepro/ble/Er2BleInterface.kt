@@ -7,7 +7,6 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.Er2DeviceInfo
 import com.lepu.blepro.ble.data.FactoryConfig
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
@@ -31,17 +30,21 @@ class Er2BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Er2BleInterface"
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = Er2BleManager(context)
-        manager.isUpdater = isUpdater
-        manager.setConnectionObserver(this)
-        manager.notifyListener = this
-        manager.connect(device)
-            .useAutoConnect(false)
-            .timeout(10000)
-            .retry(3, 100)
-            .done {
-                LepuBleLog.d(tag, "manager.connect done")
-            }
-            .enqueue()
+        manager?.let {
+            it.isUpdater = isUpdater
+            it.setConnectionObserver(this)
+            it.notifyListener = this
+            it.connect(device)
+                .useAutoConnect(false)
+                .timeout(10000)
+                .retry(3, 100)
+                .done {
+                    LepuBleLog.d(tag, "manager.connect done")
+                }
+                .enqueue()
+        } ?: kotlin.run {
+            LepuBleLog.d(tag, "manager == null")
+        }
     }
 
     /**

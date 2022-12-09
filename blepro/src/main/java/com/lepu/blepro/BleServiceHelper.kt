@@ -327,6 +327,16 @@ class BleServiceHelper private constructor() {
         return LpWorkManager.vailFace
     }
 
+    fun removeInterface(model: Int): Int {
+        if (!checkService()) return 0
+        LpWorkManager.vailFace.remove(model)
+        return LpWorkManager.vailFace.size()
+    }
+    fun clearInterfaces() {
+        if (!checkService()) return
+        LpWorkManager.vailFace.clear()
+    }
+
     /**
      * 判断设备名重连是否符合标准：过滤pc80b,fhr,bpw1
      * 有app控制，sdk不做处理

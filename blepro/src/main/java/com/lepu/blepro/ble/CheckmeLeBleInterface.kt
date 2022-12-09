@@ -5,7 +5,6 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import kotlin.experimental.inv
@@ -31,17 +30,21 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = OxyBleManager(context)
-        manager.isUpdater = isUpdater
-        manager.setConnectionObserver(this)
-        manager.notifyListener = this
-        manager.connect(device)
-            .useAutoConnect(false) // true:可能自动重连， 程序代码还在执行扫描
-            .timeout(10000)
-            .retry(3, 100)
-            .done {
-                LepuBleLog.d(tag, "manager.connect done")
-            }
-            .enqueue()
+        manager?.let {
+            it.isUpdater = isUpdater
+            it.setConnectionObserver(this)
+            it.notifyListener = this
+            it.connect(device)
+                .useAutoConnect(false)
+                .timeout(10000)
+                .retry(3, 100)
+                .done {
+                    LepuBleLog.d(tag, "manager.connect done")
+                }
+                .enqueue()
+        } ?: kotlin.run {
+            LepuBleLog.d(tag, "manager == null")
+        }
     }
 
     private fun sendOxyCmd(cmd: Int, bs: ByteArray){

@@ -7,13 +7,11 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.BoDeviceInfo
 import com.lepu.blepro.ble.data.Sp20Config
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.CrcUtil
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
-import java.util.*
 
 /**
  * sp20血氧体温设备：
@@ -34,19 +32,23 @@ class Sp20BleInterface(model: Int): BleInterface(model) {
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = Sp20BleManager(context)
-        manager.isUpdater = isUpdater
-        manager.setConnectionObserver(this)
-        manager.notifyListener = this
-        manager.connect(device)
-            .useAutoConnect(false)
-            .timeout(10000)
-            .retry(3, 100)
-            .done {
-                LepuBleLog.d(tag, "manager.connect done")
-                enableRtData(Sp20BleCmd.EnableType.OXY_PARAM, true)
-                enableRtData(Sp20BleCmd.EnableType.OXY_WAVE, true)
-            }
-            .enqueue()
+        manager?.let {
+            it.isUpdater = isUpdater
+            it.setConnectionObserver(this)
+            it.notifyListener = this
+            it.connect(device)
+                .useAutoConnect(false)
+                .timeout(10000)
+                .retry(3, 100)
+                .done {
+                    LepuBleLog.d(tag, "manager.connect done")
+                    enableRtData(Sp20BleCmd.EnableType.OXY_PARAM, true)
+                    enableRtData(Sp20BleCmd.EnableType.OXY_WAVE, true)
+                }
+                .enqueue()
+        } ?: kotlin.run {
+            LepuBleLog.d(tag, "manager == null")
+        }
     }
 
     @ExperimentalUnsignedTypes

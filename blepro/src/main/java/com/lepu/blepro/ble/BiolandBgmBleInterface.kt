@@ -6,7 +6,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BiolandBgmBleCmd
 import com.lepu.blepro.ble.cmd.BiolandBgmBleResponse
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
@@ -23,22 +22,23 @@ import com.lepu.blepro.utils.ByteUtils.byte2UInt
 class BiolandBgmBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "BiolandBgmBleInterface"
 
-    private lateinit var context: Context
-
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
         manager = BiolandBgmBleManager(context)
-        manager.isUpdater = isUpdater
-        manager.setConnectionObserver(this)
-        manager.notifyListener = this
-        manager.connect(device)
-            .useAutoConnect(false)
-            .timeout(10000)
-            .retry(3, 100)
-            .done {
-                LepuBleLog.d(tag, "manager.connect done")
-            }
-            .enqueue()
+        manager?.let {
+            it.isUpdater = isUpdater
+            it.setConnectionObserver(this)
+            it.notifyListener = this
+            it.connect(device)
+                .useAutoConnect(false)
+                .timeout(10000)
+                .retry(3, 100)
+                .done {
+                    LepuBleLog.d(tag, "manager.connect done")
+                }
+                .enqueue()
+        } ?: kotlin.run {
+            LepuBleLog.d(tag, "manager == null")
+        }
     }
 
     @ExperimentalUnsignedTypes

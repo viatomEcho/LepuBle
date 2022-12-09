@@ -31,17 +31,21 @@ class LepodBleInterface(model: Int): BleInterface(model) {
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         manager = Er1BleManager(context)
-        manager.isUpdater = isUpdater
-        manager.setConnectionObserver(this)
-        manager.notifyListener = this
-        manager.connect(device)
-            .useAutoConnect(false)
-            .timeout(10000)
-            .retry(3, 100)
-            .done {
-                LepuBleLog.d(tag, "manager.connect done")
-            }
-            .enqueue()
+        manager?.let {
+            it.isUpdater = isUpdater
+            it.setConnectionObserver(this)
+            it.notifyListener = this
+            it.connect(device)
+                .useAutoConnect(false)
+                .timeout(10000)
+                .retry(3, 100)
+                .done {
+                    LepuBleLog.d(tag, "manager.connect done")
+                }
+                .enqueue()
+        } ?: kotlin.run {
+            LepuBleLog.d(tag, "manager == null")
+        }
     }
 
     /**

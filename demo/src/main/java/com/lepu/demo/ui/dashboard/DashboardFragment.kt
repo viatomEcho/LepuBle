@@ -1736,11 +1736,13 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodEcgStart)
             .observe(this) {
-                Toast.makeText(context, "开始测量", Toast.LENGTH_SHORT).show()
+                val data = it.data as Boolean
+                Toast.makeText(context, "开始测量 $data", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodEcgStop)
             .observe(this) {
-                Toast.makeText(context, "结束测量", Toast.LENGTH_SHORT).show()
+                val data = it.data as Boolean
+                Toast.makeText(context, "结束测量 $data", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VCOMIN.EventVcominRtHr)
             .observe(this) {

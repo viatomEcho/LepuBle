@@ -13,31 +13,31 @@ import kotlin.experimental.inv
 /**
  * vtm01指甲血氧：
  * send:
- *
+ * 获取设备信息
+ * 获取实时数据
  * receive:
- * 1.实时血氧
- * 血氧采样率：参数1HZ，波形50HZ
+ * 血氧采样率：125HZ
  */
-
 class Vtm01BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Vtm01BleInterface"
 
-    private lateinit var context: Context
-
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
         manager = OxyBleManager(context)
-        manager.isUpdater = isUpdater
-        manager.setConnectionObserver(this)
-        manager.notifyListener = this
-        manager.connect(device)
-            .useAutoConnect(false)
-            .timeout(10000)
-            .retry(3, 100)
-            .done {
-                LepuBleLog.d(tag, "manager.connect done")
-            }
-            .enqueue()
+        manager?.let {
+            it.isUpdater = isUpdater
+            it.setConnectionObserver(this)
+            it.notifyListener = this
+            it.connect(device)
+                .useAutoConnect(false)
+                .timeout(10000)
+                .retry(3, 100)
+                .done {
+                    LepuBleLog.d(tag, "manager.connect done")
+                }
+                .enqueue()
+        } ?: kotlin.run {
+            LepuBleLog.d(tag, "manager == null")
+        }
     }
 
     @ExperimentalUnsignedTypes

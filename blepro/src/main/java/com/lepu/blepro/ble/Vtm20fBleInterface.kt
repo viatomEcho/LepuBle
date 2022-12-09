@@ -16,7 +16,6 @@ import com.lepu.blepro.utils.ByteUtils.byte2UInt
  * 1.实时血氧
  * 血氧采样率：参数1HZ，波形50HZ
  */
-
 class Vtm20fBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Vtm20fBleInterface"
 
@@ -25,17 +24,21 @@ class Vtm20fBleInterface(model: Int): BleInterface(model) {
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         this.context = context
         manager = Vtm20fBleManager(context)
-        manager.isUpdater = isUpdater
-        manager.setConnectionObserver(this)
-        manager.notifyListener = this
-        manager.connect(device)
-            .useAutoConnect(false)
-            .timeout(10000)
-            .retry(3, 100)
-            .done {
-                LepuBleLog.d(tag, "manager.connect done")
-            }
-            .enqueue()
+        manager?.let {
+            it.isUpdater = isUpdater
+            it.setConnectionObserver(this)
+            it.notifyListener = this
+            it.connect(device)
+                .useAutoConnect(false)
+                .timeout(10000)
+                .retry(3, 100)
+                .done {
+                    LepuBleLog.d(tag, "manager.connect done")
+                }
+                .enqueue()
+        } ?: kotlin.run {
+            LepuBleLog.d(tag, "manager == null")
+        }
     }
 
     @ExperimentalUnsignedTypes
