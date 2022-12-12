@@ -30,6 +30,7 @@ import com.lepu.demo.util.CollectUtil
 import com.lepu.demo.util.DialogUtil
 import com.lepu.demo.util.ToastUtil
 import no.nordicsemi.android.ble.observer.ConnectionObserver
+import kotlin.collections.ArrayList
 
 
 class HomeFragment : Fragment(R.layout.fragment_home){
@@ -162,7 +163,13 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                 splitDevice.add(b)
             }
         }
-
+        splitDevice.sortWith { o1, o2 ->
+            if (o2.rssi > o1.rssi) {
+                return@sortWith 1
+            } else {
+                return@sortWith -1
+            }
+        }
         adapter.setNewInstance(splitDevice)
         adapter.notifyDataSetChanged()
 
@@ -173,8 +180,6 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         //扫描通知
         LiveEventBus.get<Bluetooth>(EventMsgConst.Discovery.EventDeviceFound)
             .observe(this) {
-//                adapter.setNewInstance(BluetoothController.getDevices())
-//                adapter.notifyDataSetChanged()
                 Constant.BluetoothConfig.splitText = binding.bleSplit.text.toString()
                 splitDevices(Constant.BluetoothConfig.splitText)
             }
