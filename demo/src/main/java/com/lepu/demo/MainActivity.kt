@@ -107,6 +107,13 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         LpBleUtil.startScan(SUPPORT_MODELS)
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (!LpBleUtil.isScanning()) {
+            LpBleUtil.startScan(SUPPORT_MODELS)
+        }
+    }
+
     private fun subscribeUi() {
 
         //手机ble状态,
@@ -234,8 +241,12 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         //-------------------------pc80b---------------------------
         LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceReady)
             .observe(this) {
-                Toast.makeText(this, "EventBleDeviceReady 连接成功", Toast.LENGTH_SHORT).show()
-                LpBleUtil.getInfo(it)
+//                Toast.makeText(this, "EventBleDeviceReady 连接成功", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, UpdateActivity::class.java)
+                intent.putExtra("macAddr", viewModel._curBluetooth.value?.deviceMacAddress)
+                intent.putExtra("bleName", viewModel._curBluetooth.value?.deviceName)
+                startActivity(intent)
+//                LpBleUtil.getInfo(it)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bDeviceInfo)
             .observe(this) { event ->

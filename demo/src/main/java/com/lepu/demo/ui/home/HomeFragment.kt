@@ -122,11 +122,11 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     activity?.lifecycle?.addObserver(BIOL(activity as MainActivity, Constant.BluetoothConfig.SUPPORT_MODELS))
 
                     mAlertDialog?.show()
-                    LpBleUtil.connect(it1, it)
+                    LpBleUtil.connect(it1, it, false)
                     ToastUtil.showToast(activity, "正在连接蓝牙")
                     LpBleUtil.stopScan()
-                    binding.rcv.visibility = View.GONE
-
+                    BluetoothController.clear()
+                    splitDevices(Constant.BluetoothConfig.splitText)
                     mainViewModel._curBluetooth.value = DeviceEntity(it.name, it.macAddr, it.model)
 
                 }
@@ -191,7 +191,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     ConnectionObserver.REASON_TIMEOUT -> "连接失败 REASON_TIMEOUT"
                     else -> "连接失败"
                 }
-                Toast.makeText(context, status, Toast.LENGTH_SHORT).show()
+//                Toast.makeText(context, status, Toast.LENGTH_SHORT).show()
             }
     }
 

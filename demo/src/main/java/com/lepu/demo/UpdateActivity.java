@@ -41,7 +41,8 @@ public class UpdateActivity extends Activity {
             finish();
         });
 
-        getUpgradeZip();
+//        getUpgradeZip();
+        startUpdate(R.raw.pc_60nw_1_6621_v3007_iap);
 
     }
 
@@ -70,13 +71,12 @@ public class UpdateActivity extends Activity {
 
             }
             File file = new File(path);
-            startUpdate(uri);
-
+//            startUpdate(uri);
         }
     }
 
 //    private void startUpdate(int raw) {
-    private void startUpdate(Uri raw) {
+    private void startUpdate(int raw) {
         final DfuServiceInitiator starter = new DfuServiceInitiator(dfu_macAddress)//mac地址
                 .setDeviceName(mBluetoothServiceName)//名字
                 .setKeepBond(true);
@@ -159,6 +159,7 @@ public class UpdateActivity extends Activity {
                     + speed + ",avgSpeed " + avgSpeed + ",currentPart " + currentPart
                     + ",partTotal " + partsTotal);
             duringUpgradeTv.setVisibility(View.VISIBLE);
+            duringUpgradeTv.setText("升级中..." + percent + "%");
 //            Toast.makeText(MainActivity.this,"升级进度：" + percent + "%",Toast.LENGTH_SHORT).show();
         }
 

@@ -163,6 +163,10 @@ class LpBleUtil {
             BleServiceHelper.stopScan()
         }
 
+        fun isScanning(): Boolean {
+            return BleServiceHelper.isScanning()
+        }
+
         /**
          * 连接蓝牙
          * @param context Context

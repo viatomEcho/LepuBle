@@ -665,7 +665,8 @@ object LpWorkManager {
 
         BluetoothController.clear()
         this.needPair = needPair
-        this.scanModel = scanModel
+//        this.scanModel = scanModel
+        this.scanModel = intArrayOf(Bluetooth.MODEL_PC60FW)
         this.isReconnectScan = isReconnecting
 
         startScan?.cancel()
