@@ -78,6 +78,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         binding.scan.setOnClickListener {
             mainViewModel._scanning.value = !mainViewModel._scanning.value!!
             binding.rcv.visibility = View.VISIBLE
+            splitDevices(binding.bleSplit.text.toString())
         }
 
         binding.disconnect.setOnClickListener{
