@@ -183,7 +183,6 @@ public class UpdateActivity extends Activity {
             Log.i("TEST", "onDfuCompleted: " + deviceAddress);
             duringUpgradeTv.setVisibility(View.GONE);
             updateSuccessLl.setVisibility(View.VISIBLE);
-            finish();
         }
 
         @Override
