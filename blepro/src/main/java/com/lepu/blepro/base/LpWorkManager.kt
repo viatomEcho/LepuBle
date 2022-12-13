@@ -908,12 +908,10 @@ object LpWorkManager {
                     }
 
                 }
-
+            LiveEventBus.get<Bluetooth>(EventMsgConst.Discovery.EventDeviceFound).post(b)
             if (BluetoothController.addDevice(b)) {
                 LepuBleLog.d(tag, "model = ${b.model}, isReconnecting::$isReconnectScan, b= ${b.name}, recName = ${reconnectDeviceName.joinToString()}, " +
                         "toConnectUpdater = $toConnectUpdater,  isReconnectByAddress = $isReconnectByAddress ,  recAddress:${reconnectDeviceAddress.joinToString()}")
-
-                LiveEventBus.get<Bluetooth>(EventMsgConst.Discovery.EventDeviceFound).post(b)
 
                 val isContains: Boolean = if(isReconnectByAddress) reconnectDeviceAddress.contains(b.device.address) else reconnectDeviceName.contains(b.name)
 

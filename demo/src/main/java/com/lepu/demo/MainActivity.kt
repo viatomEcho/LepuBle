@@ -107,13 +107,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         LpBleUtil.startScan(SUPPORT_MODELS)
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (!LpBleUtil.isScanning()) {
-            LpBleUtil.startScan(SUPPORT_MODELS)
-        }
-    }
-
     private fun subscribeUi() {
 
         //手机ble状态,

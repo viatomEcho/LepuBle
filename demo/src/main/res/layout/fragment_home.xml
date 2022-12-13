@@ -114,6 +114,7 @@
             android:text="扫描"/>
 
         <TextView
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/ble_device"
@@ -125,6 +126,7 @@
             android:textSize="18sp"/>
 
         <TextView
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/ble_state"
@@ -136,6 +138,7 @@
             android:textSize="18sp"/>
 
         <Button
+            android:visibility="gone"
             android:id="@+id/disconnect2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -179,6 +182,35 @@
             android:inputType="number"
             android:imeOptions="actionDone"/>
 
+        <TextView
+            android:id="@+id/rssi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="RSSI"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ble_split" />
+
+        <TextView
+            android:id="@+id/rssi_filter_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ble_split"
+            android:text="-100 dBm" />
+
+        <SeekBar
+            android:id="@+id/filter_rssi"
+            android:layout_width="0dp"
+            android:layout_height="25dp"
+            app:layout_constraintEnd_toStartOf="@id/rssi_filter_value"
+            app:layout_constraintStart_toEndOf="@+id/rssi"
+            app:layout_constraintTop_toBottomOf="@+id/ble_split" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcv"

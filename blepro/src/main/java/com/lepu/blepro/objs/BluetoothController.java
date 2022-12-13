@@ -33,13 +33,14 @@ public class BluetoothController {
         if (!bleDevices.contains(b)) {
             bleDevices.add(b);
             needNotify = true;
+        } else {
+            bleDevices.get(bleDevices.indexOf(b)).setRssi(b.getRssi());
         }
         if (!modelList.contains(b.getModel())) {
             modelList.add(b.getModel());
             needNotify = true;
         }
         LepuBleLog.d("addDevice => " + b.getName() + " macAddr:" + b.getMacAddr() + " needNotify:" + needNotify);
-
 
         return needNotify;
     }
@@ -79,6 +80,16 @@ public class BluetoothController {
         bleDevices = new ArrayList<Bluetooth>();
         connectedDevices = new ArrayList<Bluetooth>();
         modelList = new ArrayList<Integer>();
+    }
+    synchronized public static ArrayList<Bluetooth> getDevicesByRssi(int rssi) {
+        ArrayList<Bluetooth> list = new ArrayList<>();
+        for (Bluetooth b : bleDevices) {
+            if (b.getRssi() > rssi) {
+                list.add(b);
+            }
+        }
+        LepuBleLog.d("get device: " + rssi + " -> " + list.size());
+        return list;
     }
 
     synchronized public static ArrayList<Bluetooth> getDevices() {
