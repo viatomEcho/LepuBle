@@ -9,7 +9,7 @@ import java.util.ArrayList;
  */
 public class BluetoothController {
 
-
+    private static final String TAG = "BluetoothController";
     public static ArrayList<Integer> getModelList() {
         return modelList;
     }
@@ -38,9 +38,7 @@ public class BluetoothController {
             modelList.add(b.getModel());
             needNotify = true;
         }
-        LepuBleLog.d("addDevice => " + b.getName() + " macAddr:" + b.getMacAddr() + " needNotify:" + needNotify);
-
-
+        LepuBleLog.d(TAG, "addDevice, name:" + b.getName() + ", macAddr:" + b.getMacAddr() + ", needNotify:" + needNotify);
         return needNotify;
     }
 
@@ -74,7 +72,6 @@ public class BluetoothController {
         return isO2;
     }
 
-
     synchronized static public void clear() {
         bleDevices = new ArrayList<Bluetooth>();
         connectedDevices = new ArrayList<Bluetooth>();
@@ -92,7 +89,7 @@ public class BluetoothController {
                 list.add(b);
             }
         }
-        LepuBleLog.d("get device: " + model + " -> " + list.size());
+        LepuBleLog.d(TAG, "getDevices, model:" + model + ", devices.size" + list.size());
         return list;
     }
 

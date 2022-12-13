@@ -1,6 +1,5 @@
 package com.lepu.demo.util;
 
-
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -12,11 +11,8 @@ public class PrefUtils {
     public static final String APP_SHARE_PREF = "app_share_pref";
     public static final String COLLECT_DURATION_SETTING = "collect_duration_setting";
 
-
-
     /**
      * 保存本地Long设置
-     *
      * @param key
      * @param value
      */
@@ -33,10 +29,8 @@ public class PrefUtils {
         editor.commit();
     }
 
-
     /**
      * 保存本地Int设置
-     *
      * @param key
      * @param value
      */
@@ -55,7 +49,6 @@ public class PrefUtils {
 
     /**
      * 保存本地String设置
-     *
      * @param key
      * @param value
      */
@@ -74,7 +67,6 @@ public class PrefUtils {
 
     /**
      * 保存本地bool设置
-     *
      * @param key
      * @param value
      */
@@ -93,7 +85,6 @@ public class PrefUtils {
 
     /**
      * 读取本地long设置
-     *
      * @param key
      * @return
      */
@@ -106,13 +97,11 @@ public class PrefUtils {
         preferences = context.getSharedPreferences(APP_SHARE_PREF
                 , Context.MODE_PRIVATE);
         long value = preferences.getLong(key, 0);
-
         return value;
     }
 
     /**
      * 读取本地long设置
-     *
      * @param key
      * @return
      */
@@ -125,13 +114,11 @@ public class PrefUtils {
         preferences = context.getSharedPreferences(APP_SHARE_PREF
                 , Context.MODE_PRIVATE);
         long value = preferences.getLong(key, defaultValue);
-
         return value;
     }
 
     /**
      * 读取本地Int设置
-     *
      * @param key
      * @return
      */
@@ -144,13 +131,11 @@ public class PrefUtils {
         preferences = context.getSharedPreferences(APP_SHARE_PREF
                 , Context.MODE_PRIVATE);
         int value = preferences.getInt(key, 0);
-
         return value;
     }
 
     /**
      * 读取本地Bool设置
-     *
      * @param key
      * @return
      */
@@ -163,13 +148,11 @@ public class PrefUtils {
         preferences = context.getSharedPreferences(APP_SHARE_PREF
                 , Context.MODE_PRIVATE);
         boolean value = preferences.getBoolean(key, false);
-
         return value;
     }
 
     /**
      * 读取本地Bool设置
-     *
      * @param key
      * @return
      */
@@ -182,13 +165,11 @@ public class PrefUtils {
         preferences = context.getSharedPreferences(APP_SHARE_PREF
                 , Context.MODE_PRIVATE);
         boolean value = preferences.getBoolean(key, defaultValue);
-
         return value;
     }
 
     /**
      * 读取本地String设置
-     *
      * @param key
      * @return
      */
@@ -201,13 +182,11 @@ public class PrefUtils {
         preferences = context.getSharedPreferences(APP_SHARE_PREF
                 , Context.MODE_PRIVATE);
         String value = preferences.getString(key, null);
-
         return value;
     }
 
     /**
      * 读取本地String设置
-     *
      * @param key
      * @return
      */
@@ -220,7 +199,6 @@ public class PrefUtils {
         preferences = context.getSharedPreferences(APP_SHARE_PREF
                 , Context.MODE_PRIVATE);
         String value = preferences.getString(key, defaultValue);
-
         return value;
     }
 

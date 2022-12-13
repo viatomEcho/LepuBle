@@ -150,21 +150,17 @@ class MainViewModel: ViewModel() {
     }
     val preingCollect: LiveData<Boolean> = _preingCollect
 
-
     /**
      * 当前采集用户
      */
     val _curPatient = MutableLiveData<PatientEntity?>().apply { value = null }
     var curPatient: LiveData<PatientEntity?> = _curPatient
 
-
     val _successShowing = MutableLiveData<Boolean>().apply { value = false }
     var successShowing: LiveData<Boolean> = _successShowing
 
-
     val _countDown = MutableLiveData<Long>()
     val countDown: LiveData<Long> = _countDown
-
 
     fun getCurPatient(context: Context) {
         viewModelScope.launch {
@@ -176,86 +172,64 @@ class MainViewModel: ViewModel() {
                         _curPatient.value = it
                     }
                     res.doFailure {
-
                     }
-
                 }
         }
     }
     @Synchronized
     fun collectO2ring(context: Context, data: ByteArray) {
-
         if (!_preingCollect.value!!) {
             LepuBleLog.e(tag, "采集未开启，不保存实时数据")
             return
         }
-
         CollectUtil.getInstance(context).collectO2RtData(data)
     }
     /**
      * 开启采集准备状态
      */
     fun startPreCollect(context: Context) {
-
         if (!collectEnvironmentOk(context, true)) {
             return
         }
-
         if (CollectUtil.getInstance(context).isTasking || CollectUtil.getInstance(context).isSaving) {
             LepuBleLog.d(tag, "上次采集过程还未结束, 无法采集")
             Toast.makeText(context, "上次采集过程还未结束，无法开始采集", Toast.LENGTH_SHORT).show()
             return
         }
-
         _preingCollect.value = true
-
         Toast.makeText(context, "开始采集", Toast.LENGTH_SHORT).show()
-
-
     }
 
-
-
-    @Synchronized fun checkStartCollect(activity: Activity, wave: ByteArray?){
+    @Synchronized fun checkStartCollect(activity: Activity, wave: ByteArray?) {
         if (preingCollect.value == true ){
-
             if (wave != null) {
-
                 //可以采集数据了
-
                 CollectUtil.getInstance(activity.applicationContext).let { util ->
-
                     if (!util.isTasking && !util.isSaving){
                         LepuBleLog.d(tag,"即将进入采集 isTasking = ${util.isTasking}, isSaving = ${util.isSaving}")
                         util.startCollectData()
                        startCountDown(activity.applicationContext)
                     }
-
-
                     if (util.isTasking) {
                         collectO2ring(activity.applicationContext, wave)
                     }
                 }
-
-            }else{
+            } else {
                 ToastUtil.showToast(activity,"wave.isEmpty")
             }
-        }else{
+        } else {
 //            ToastUtil.showToast(activity,"preingCollect  false")
         }
     }
 
-    fun startCountDown(context: Context){
-
+    fun startCountDown(context: Context) {
         viewModelScope.launch {
             CollectUtil.getInstance(context).autoCountDown()
                 .onStart {
                     LepuBleLog.d("collect countdown onStart")
-
                 }
                 .onCompletion {
                     LepuBleLog.d("collect countdown onCompletion")
-
                     _countDown.postValue(0L)
                 }
                 .catch {  }
@@ -265,19 +239,16 @@ class MainViewModel: ViewModel() {
                     }
                     result.doSuccess {
                         _countDown.postValue(it)
-                        if(it == 0L){
-                            if (_preingCollect.value == true && CollectUtil.getInstance(context).isTasking){
+                        if(it == 0L) {
+                            if (_preingCollect.value == true && CollectUtil.getInstance(context).isTasking) {
                                 //采集完成 停止采集并保存数据
                                 LepuBleLog.d("countdown  保存数据")
                                 stopAndSave(context)
                             }
                         }
-
                     }
                 }
-
         }
-
     }
 
     /**
@@ -298,7 +269,6 @@ class MainViewModel: ViewModel() {
                     )
                     return false
                 }
-
                 if (LpBleUtil.isRtStop(it)) {
                     if (isShowToast) ToastUtil.showToast(
                         context,
@@ -307,11 +277,8 @@ class MainViewModel: ViewModel() {
                     return false
                 }
             }
-
-
         return true
     }
-
 
     /**
      * 中断采集
@@ -328,25 +295,19 @@ class MainViewModel: ViewModel() {
      */
     fun stopAndSave(context: Context) {
         _countDown.value = 0L
-
-
         LepuBleLog.e("stopAndSave", "start")
-
         _curPatient.value?.let { p ->
             CollectUtil.getInstance(context).let { collect ->
                 if (!collect.isTasking || collect.isSaving) {
                     LepuBleLog.e("stopAndSave", "!it.isTasking || it.isSaving ")
-
                     breakCollecting(context)
                     return
                 }
-
                 if (_o2ringCurBluetooth.value == null) {
                     LepuBleLog.e( tag, "buildJson => o2ring == null")
                     breakCollecting(context)
                     return
                 }
-
                 viewModelScope.launch(Dispatchers.Main) {
                         if (singleConnect) {
                             collect.saveLocalData(
@@ -360,7 +321,6 @@ class MainViewModel: ViewModel() {
 
                                     Toast.makeText(context, "正在保存数据...", Toast.LENGTH_SHORT).show()
                                 }
-
                                 .catch {
                                     breakCollecting(context)
                                 }
@@ -371,21 +331,14 @@ class MainViewModel: ViewModel() {
                                         breakCollecting(context)
                                         Toast.makeText(context, "数据保存失败", Toast.LENGTH_SHORT).show()
                                     }
-
                                 }
                         }
-
                     }
-
-
             }
         } ?: kotlin.run {
             LepuBleLog.e("stopAndSave", "患者信息丢失")
         }
-
-
     }
-
 
     fun saveRtSucess(context: Context, collectUtil: CollectUtil, patientEntity: PatientEntity) {
         //保存流水
@@ -402,17 +355,12 @@ class MainViewModel: ViewModel() {
                     .onCompletion {
                         collectUtil.releaseAll(false)
                         _preingCollect.value = false
-
-
                         //再次采集提示
                         _successShowing.value = true
-
                     }
                     .catch {
-
                     }
                     .collect {
-
                         it.doSuccess {
                             LepuBleLog.e("collect", "流水保存成功")
                             Toast.makeText(context, "流水保存成功", Toast.LENGTH_SHORT).show()
@@ -421,16 +369,10 @@ class MainViewModel: ViewModel() {
                             LepuBleLog.e("collect", "流水保存失败，忽略不处理")
                             Toast.makeText(context, "数据保存失败", Toast.LENGTH_SHORT).show()
                         }
-
                     }
-
             }
-
         }
-
-
     }
-
 
     /**
      * 响应点击采集
@@ -438,8 +380,6 @@ class MainViewModel: ViewModel() {
     fun actionCollect(context: Context) {
         _preingCollect.value?.let {
             LepuBleLog.d("actionCollect", it.toString())
-
-
             if (it) {
                 CollectUtil.getInstance(context).let { c ->
                     if (c.isSaving) {
@@ -449,12 +389,10 @@ class MainViewModel: ViewModel() {
                         breakCollecting(context)
                     }
                 }
-
-            } else
+            } else {
                 startPreCollect(context)
+            }
         }
-
-
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -462,11 +400,10 @@ class MainViewModel: ViewModel() {
         LepuBleLog.d("alarm...")
         context?.let {
             val vibrator = it.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-
             vibrator.vibrate(VibrationEffect.createWaveform(longArrayOf(0L, 2000L, 200L,  3000L), -1))
-
         }
     }
+
 //
 //    /**
 //     * 获取当前设备，即所有设备
@@ -535,6 +472,5 @@ class MainViewModel: ViewModel() {
 //
 //        }
 //    }
-
 
 }

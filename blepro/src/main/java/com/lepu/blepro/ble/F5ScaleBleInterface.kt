@@ -4,12 +4,10 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.icomon.icbodyfatalgorithms.ICBodyFatAlgorithms
 import com.icomon.icbodyfatalgorithms.ICBodyFatAlgorithmsParams
-import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.FscaleUserInfo
 import com.lepu.blepro.ble.data.FscaleWeightData
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.utils.*
 
 /**
@@ -20,14 +18,12 @@ import com.lepu.blepro.utils.*
 class F5ScaleBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "F5ScaleBleInterface"
 
-    private lateinit var context: Context
     private var userInfo = FscaleUserInfo()
     private var weightData = FscaleWeightData()
 
     private var receivedCount = 0
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
         manager = F5ScaleBleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)

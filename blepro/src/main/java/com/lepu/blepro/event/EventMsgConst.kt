@@ -18,7 +18,7 @@ object EventMsgConst {
              * REASON_TIMEOUT = 10;
              */
             const val EventBleDeviceDisconnectReason = "com.lepu.ble.device.disconnect.reason"  // 断开连接原因
-            const val EventServiceConnectedAndInterfaceInit = "com.lepu.ble.service.interface.init"  // 服务连接后初始化interface成功会发送 true
+            const val EventServiceConnectedAndInterfaceInit = "com.lepu.ble.service.interface.init"  // 服务连接后初始化interface成功会发送 boolean
             const val EventBleDeviceReady = "com.lepu.ble.device.ready"  // 没有同步时间的设备连接成功后会发送 model
         }
     }
@@ -72,7 +72,5 @@ object EventMsgConst {
             const val EventCmdResponseContent = "com.lepu.ble.cmd.response.content"  // 指令响应
         }
     }
-
-
 
 }

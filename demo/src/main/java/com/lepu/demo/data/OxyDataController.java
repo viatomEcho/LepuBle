@@ -16,7 +16,6 @@ public final class OxyDataController {
         for (int i = 0; i < size; i++) {
             ints[i] = 121;
         }
-
         return ints;
     }
 
@@ -57,7 +56,6 @@ public final class OxyDataController {
         System.arraycopy(fs, 0, temp, dataRec.length, fs.length);
 
         dataRec = temp;
-
     }
 
     synchronized public static int[] draw(int n) {

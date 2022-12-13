@@ -10,11 +10,12 @@ import com.lepu.blepro.utils.LepuBleLog
  */
 class BIOL(val observer: BleChangeObserver, private var model: IntArray): BleInterfaceLifecycle {
 
+    private val tag = "BIOL"
     /**
      *  当lifecycleOwner OnCreate时候调用
      */
     override fun subscribeBI() {
-        LepuBleLog.d("BIOL 开始订阅蓝牙 model${model.joinToString()}")
+        LepuBleLog.d(tag, "subscribeBI, 开始订阅蓝牙 model:${model.joinToString()}")
         model.let {
             for (m in model) BleServiceHelper.BleServiceHelper.subscribeBI(m, observer)
         }
@@ -29,11 +30,10 @@ class BIOL(val observer: BleChangeObserver, private var model: IntArray): BleInt
         model.let {
             for (m in model) BleServiceHelper.BleServiceHelper.detachBI(m, observer)
         }
-        LepuBleLog.d("BIOL 已取消订阅蓝牙 model${model?.joinToString()}")
+        LepuBleLog.d(tag, "detachBI, 已取消订阅蓝牙 model:${model.joinToString()}")
     }
 
     fun update(newModels: IntArray){
-
         model = newModels
         subscribeBI()
     }

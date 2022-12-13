@@ -2,9 +2,7 @@ package com.lepu.blepro.ble.cmd;
 
 import com.lepu.blepro.ble.data.TimeData;
 import com.lepu.blepro.utils.CrcUtil;
-
 import java.util.Date;
-
 import static com.lepu.blepro.utils.ByteArrayKt.int2ByteArray;
 
 /**

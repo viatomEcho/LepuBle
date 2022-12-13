@@ -6,8 +6,6 @@ open class SingletonHolder<out T, in A>(creator: (A) -> T) {
     @Volatile
     private var instance: T? = null
 
-
-    
     //对上述方法的一种更简洁的写法
     fun getInstance(arg: A): T =
         instance ?: synchronized(this) {
@@ -15,5 +13,4 @@ open class SingletonHolder<out T, in A>(creator: (A) -> T) {
                 instance = this 
             }
         }
-
 }

@@ -1,7 +1,6 @@
 package com.lepu.demo.data.entity
 
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "records")
@@ -14,5 +13,4 @@ data class RecordEntity(
         val age: String,
         val gender: String,
         val patientId: Long,
-
 )

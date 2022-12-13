@@ -21,14 +21,12 @@ import jxl.write.WriteException;
 public class ExcelUtil {
 
     private static WritableFont arial14font = null;
-
     private static WritableCellFormat arial14format = null;
     private static WritableFont arial10font = null;
     private static WritableCellFormat arial10format = null;
     private static WritableFont arial12font = null;
     private static WritableCellFormat arial12format = null;
     private final static String UTF8_ENCODING = "UTF-8";
-
 
     /**
      * 单元格的格式设置 字体大小 颜色 对齐方式、背景颜色等...
@@ -60,10 +58,8 @@ public class ExcelUtil {
         }
     }
 
-
     /**
      * 初始化Excel表格
-     *
      * @param filePath  存放excel文件的路径（path/demo.xls）
      * @param sheetName Excel表格的表名
      * @param colName   excel中包含的列名（可以有多个）
@@ -103,7 +99,6 @@ public class ExcelUtil {
 
     /**
      * 将制定类型的List写入Excel中
-     *
      * @param objList  待写入的list
      * @param fileName
      * @param <T>
@@ -148,7 +143,6 @@ public class ExcelUtil {
                     //设置行高
                     sheet.setRowView(j + 1, 350);
                 }
-
                 writebook.write();
                 workbook.close();
                 result = true;
@@ -161,7 +155,6 @@ public class ExcelUtil {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
                 }
                 if (in != null) {
                     try {
@@ -174,6 +167,5 @@ public class ExcelUtil {
         }
         return result;
     }
-
 
 }

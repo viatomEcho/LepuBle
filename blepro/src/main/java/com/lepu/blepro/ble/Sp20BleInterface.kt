@@ -7,13 +7,11 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.BoDeviceInfo
 import com.lepu.blepro.ble.data.Sp20Config
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.CrcUtil
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
-import java.util.*
 
 /**
  * sp20血氧体温设备：
@@ -27,7 +25,6 @@ import java.util.*
  * 1.实时血氧、体温
  * 血氧采样率：参数1HZ，波形50HZ
  */
-
 class Sp20BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Sp20BleInterface"
     private var sp20Device = BoDeviceInfo()

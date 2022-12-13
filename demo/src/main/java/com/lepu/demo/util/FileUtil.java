@@ -11,7 +11,6 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.text.TextPaint;
 import android.util.Log;
-import com.blankj.utilcode.util.FileIOUtils;
 import com.lepu.blepro.ble.data.Er3WaveFile;
 import com.lepu.blepro.utils.Er3Decompress;
 import com.lepu.blepro.ble.data.Th12BleFile;
@@ -45,7 +44,6 @@ public class FileUtil {
         return true;
     }
 
-
     public static void saveFile(String filePath, byte[] data, boolean isAppend) {
         File file = new File(filePath);
 
@@ -56,7 +54,6 @@ public class FileUtil {
                 e.printStackTrace();
             }
         }
-
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(filePath, isAppend);
@@ -81,7 +78,6 @@ public class FileUtil {
 
     public static void saveTextFile(String filePath, String data, boolean isAppend) {
         File file = new File(filePath);
-
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -89,7 +85,6 @@ public class FileUtil {
                 LepuBleLog.e(Log.getStackTraceString(e));
             }
         }
-
         BufferedWriter out=null;
         try {
             out = new BufferedWriter(
@@ -150,7 +145,6 @@ public class FileUtil {
                     LepuBleLog.e(Log.getStackTraceString(e));
                 }
             }
-
             scanFile(context, file);//通知pc
         }
     }
@@ -193,7 +187,6 @@ public class FileUtil {
         }catch (IOException e){
             e.printStackTrace();
         }
-
     }*/
 
     public static void saveFile(Context context, byte[] data, String filename) {
@@ -203,14 +196,9 @@ public class FileUtil {
             if (!file.exists()) {
                 file.createNewFile();
             }
-
             FileOutputStream fos = new FileOutputStream(file);
-
             fos.write(data);
-
             fos.close();
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -311,7 +299,7 @@ public class FileUtil {
             fos.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

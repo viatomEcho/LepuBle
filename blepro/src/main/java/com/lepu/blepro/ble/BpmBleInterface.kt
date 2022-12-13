@@ -7,7 +7,6 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BpmBleCmd
 import com.lepu.blepro.ble.cmd.BpmBleResponse
 import com.lepu.blepro.ble.data.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex

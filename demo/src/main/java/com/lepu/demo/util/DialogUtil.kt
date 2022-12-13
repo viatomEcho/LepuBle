@@ -41,7 +41,6 @@ object DialogUtil {
             dialog.dismiss()
             setBackgroundAlpha(activity, false)
         }
-
     }
 
     fun getScreen(context: Context, boolean: Boolean): Int {

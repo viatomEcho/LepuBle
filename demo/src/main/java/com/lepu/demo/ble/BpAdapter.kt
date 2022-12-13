@@ -4,7 +4,6 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.lepu.demo.R
 import com.lepu.demo.data.BpData
-import com.lepu.demo.util.DataConvert
 
 class BpAdapter(layoutResId: Int, data: MutableList<BpData>?) : BaseQuickAdapter<BpData, BaseViewHolder>(layoutResId, data) {
 

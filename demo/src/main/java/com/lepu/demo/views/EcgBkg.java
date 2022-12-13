@@ -8,10 +8,7 @@ import android.graphics.Path;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
-
-
 import androidx.annotation.ColorRes;
-
 import com.lepu.demo.R;
 import com.lepu.demo.data.DataController;
 
@@ -59,7 +56,6 @@ public class EcgBkg extends View {
         super(context, attrs, defStyle);
         init(attrs, defStyle);
     }
-
 
     private void init(AttributeSet attrs, int defStyle) {
         // Load attributes

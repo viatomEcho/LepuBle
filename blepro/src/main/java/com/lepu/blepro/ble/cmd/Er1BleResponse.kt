@@ -11,7 +11,6 @@ import kotlinx.android.parcel.Parcelize
 
 object Er1BleResponse {
 
-    
     @Parcelize
     class Er1Response constructor(var bytes: ByteArray) : Parcelable {
         var cmd: Int

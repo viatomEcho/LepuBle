@@ -2,8 +2,6 @@ package com.lepu.demo.util;
 
 import android.content.Context;
 import android.text.TextUtils;
-
-
 import java.io.File;
 
 public class SdLocal {
@@ -13,7 +11,6 @@ public class SdLocal {
 
     /**
      * 外置存储
-     *
      * @param context
      * @return
      */
@@ -35,7 +32,6 @@ public class SdLocal {
     // ==================================================================================
     /**
      * 内置app存储
-     *
      * @param context
      * @return
      */
@@ -57,7 +53,6 @@ public class SdLocal {
 //        }
 //        return LEPU_PATH;
 //    }
-
 
     public static String getTempFolder(Context context) {
         String folder = StringUtil.combinePath(
@@ -113,7 +108,6 @@ public class SdLocal {
         }
         return folder;
     }
-
 
     public static String getCacheImgFoler(){
         return StringUtil.combinePath("/cache","update.zip");
@@ -273,7 +267,6 @@ public class SdLocal {
     public static String getTestResultXmlHl7resultPath(Context context, String fileName) {
         return StringUtil.combinePath(getTestResultFolder(context), String.format("%s_result.xml",fileName));
     }
-
 
     public static String getSignatureFolder(Context context){
         return getLepuRootPathSD(context)+"/Signature";

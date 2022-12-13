@@ -9,12 +9,9 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.View;
-
-import com.lepu.blepro.utils.LepuBleLog;
 import com.lepu.demo.R;
 import com.lepu.demo.data.DataController;
 import static com.lepu.demo.data.DataController.ampKey;
-
 
 /**
  * normal ecg view, use DataController

@@ -19,8 +19,6 @@ open class LocalTypeConverter {
     fun PatientEntity2Json(data: PatientEntity): String =
             GsonBuilder().create().typeToJson(data)
 
-
-
     @TypeConverter
     fun json2ListString(src: String): List<String>? =
             GsonBuilder().create().fromJson(src)
@@ -28,8 +26,5 @@ open class LocalTypeConverter {
     @TypeConverter
     fun listString2Json(data: List<String>?): String =
             GsonBuilder().create().typeToJson(data)
-
-
-
 
 }

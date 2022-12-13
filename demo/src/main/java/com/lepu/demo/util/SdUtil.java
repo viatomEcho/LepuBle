@@ -3,10 +3,8 @@ package com.lepu.demo.util;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Environment;
-import android.os.StatFs;
 import android.os.storage.StorageManager;
 import android.util.Log;
-
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -98,8 +96,5 @@ public class SdUtil {
 
 		return path;
 	}
-
-
-
 
 }

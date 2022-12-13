@@ -36,11 +36,9 @@ public class DateUtil {
         }
     };
 
-
     public enum FormatType {
         yyyy, yyyyMM, yyyyMMdd, yyyyMMddHHmm, yyyyMMddHHmmss, MMdd, HHmm,MM,dd,MMddHHmm,ddMMyyyy,HHmmss;
     }
-
 
     public static String stringFromDate(Date date, String formatString) {
         DateFormat df = new SimpleDateFormat(formatString);

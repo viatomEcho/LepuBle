@@ -5,13 +5,11 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.CrcUtil
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
-import java.util.*
 
 /**
  * pc80b心电设备：
@@ -25,17 +23,13 @@ import java.util.*
  * 心电采样率：实时150HZ，存储150HZ
  * 心电增益：n * 1 / 330 = n * 0.003030303030303-----330倍
  */
-
 class Pc80BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "PC80BleInterface"
-
-    private lateinit var context: Context
 
     private var curFile: PC80BleResponse.RtRecordData? = null
     private var transType = 0
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
         manager = Pc80BleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)

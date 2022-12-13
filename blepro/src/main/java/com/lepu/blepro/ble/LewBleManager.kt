@@ -25,20 +25,7 @@ class LewBleManager(context: Context): LpBleManager(context) {
     }
 
     override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {
-//        if (BleServiceHelper.BleServiceHelper.bleService.support2MPhy) {
-//        if (LpWorkManager.support2MPhy) {
-//            requestQueue.add(requestMtu(247)
-//                .with { device: BluetoothDevice?, mtu: Int ->
-//                    log(Log.INFO, "LewBleManager MTU set to $mtu")
-//                }
-//                .fail { device: BluetoothDevice?, status: Int ->
-//                    log(Log.WARN, "LewBleManager Requested MTU not supported: $status")
-//                })
-//                .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
-//                    .fail { device: BluetoothDevice?, status: Int ->
-//                        log(Log.WARN, "LewBleManager Requested PHY not supported: $status")
-//                    })
-//        } else {
+        if (LpWorkManager.support2MPhy) {
             requestQueue.add(requestMtu(247)
                 .with { device: BluetoothDevice?, mtu: Int ->
                     log(Log.INFO, "LewBleManager MTU set to $mtu")
@@ -46,7 +33,19 @@ class LewBleManager(context: Context): LpBleManager(context) {
                 .fail { device: BluetoothDevice?, status: Int ->
                     log(Log.WARN, "LewBleManager Requested MTU not supported: $status")
                 })
-//        }
+                .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
+                    .fail { device: BluetoothDevice?, status: Int ->
+                        log(Log.WARN, "LewBleManager Requested PHY not supported: $status")
+                    })
+        } else {
+            requestQueue.add(requestMtu(247)
+                .with { device: BluetoothDevice?, mtu: Int ->
+                    log(Log.INFO, "LewBleManager MTU set to $mtu")
+                }
+                .fail { device: BluetoothDevice?, status: Int ->
+                    log(Log.ERROR, "LewBleManager Requested MTU not supported: $status")
+                })
+        }
         LepuBleLog.d("LewBleManager dealReqQueue")
         return requestQueue
     }

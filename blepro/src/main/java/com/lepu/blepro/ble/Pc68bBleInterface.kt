@@ -7,7 +7,6 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.BoDeviceInfo
 import com.lepu.blepro.ble.data.Pc68bConfig
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.ByteUtils.bytes2UIntBig
@@ -30,7 +29,6 @@ import com.lepu.blepro.utils.getTimeString
  * 1.实时血氧
  * 血氧采样率：参数1HZ，波形50HZ
  */
-
 class Pc68bBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Pc68bBleInterface"
     private var deviceInfo = BoDeviceInfo()

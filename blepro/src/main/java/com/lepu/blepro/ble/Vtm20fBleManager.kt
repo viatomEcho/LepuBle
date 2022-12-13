@@ -33,7 +33,6 @@ class Vtm20fBleManager(context: Context): LpBleManager(context) {
             override fun isRequiredServiceSupported(gatt: BluetoothGatt): Boolean {
                 LepuBleLog.d(MANAGER_TAG, "service_uuid = $service_uuid,write_uuid = $write_uuid,notify_uuid = $notify_uuid,isUpdater = $isUpdater")
 
-
                 val service = gatt.getService(service_uuid)
                 LepuBleLog.d(MANAGER_TAG, "service ==  $service")
 
@@ -57,7 +56,6 @@ class Vtm20fBleManager(context: Context): LpBleManager(context) {
                     LepuBleLog.d(MANAGER_TAG, "notifyChar notify ==  $notify")
                 }
 
-
                 var writeRequest = false
                 write_char?.let {
                     val properties = it.properties
@@ -73,20 +71,15 @@ class Vtm20fBleManager(context: Context): LpBleManager(context) {
                         properties and BluetoothGattCharacteristic.PROPERTY_WRITE != 0 || properties and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE != 0
                     LepuBleLog.d(MANAGER_TAG, "writeChar writeRequest ==  $writeRequest")
                 }
-
-
                 // Return true if all required services have been found
                 return notify_char != null && notify
             }
 
             override fun initialize() {
                 super.initialize()
-
                 LepuBleLog.d(MANAGER_TAG, "initialize")
-
                 buildRequestQueue()
                 setNotify()
-
             }
 
             override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int) {
@@ -94,12 +87,10 @@ class Vtm20fBleManager(context: Context): LpBleManager(context) {
                 log(Log.INFO, "onMtuChanged mtu == $mtu")
             }
 
-
             override fun onDeviceDisconnected() {
                 write_char = null
                 notify_char = null
             }
-
         }
     }
 

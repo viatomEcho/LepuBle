@@ -6,7 +6,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.LepuDevice
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import kotlin.experimental.inv
@@ -22,7 +21,6 @@ import kotlin.experimental.inv
  * 心电采样率：实时125HZ，存储125HZ
  * 心电增益：n * (1.0035 * 1800) / (4096 * 178.74) = n * 0.0024672217239426-----405.3142002989537倍
  */
-
 class LeS1BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "LeS1BleInterface"
 

@@ -1,6 +1,5 @@
 package com.lepu.blepro.vals
 
-
 /**
  * relay info
  */
@@ -85,8 +84,6 @@ var wifiState = false
 var wifiRssi = 100
 var wifiSsid = ""
 //var hostState = false
-
-
 
 //var socketState = false
 var socketToken: ByteArray? = null

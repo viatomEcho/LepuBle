@@ -153,7 +153,6 @@ class Constant{
 
             var currentModel: IntArray = if (singleConnect) IntArray(1) else SUPPORT_MODELS
 
-
             var ecgData = EcgData()
             var oxyData = OxyData()
             var bpData = BpData()

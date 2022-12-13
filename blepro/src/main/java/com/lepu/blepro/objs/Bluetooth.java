@@ -3,10 +3,8 @@ package com.lepu.blepro.objs;
 import android.bluetooth.BluetoothDevice;
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import androidx.annotation.IntDef;
 import androidx.annotation.StringDef;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 

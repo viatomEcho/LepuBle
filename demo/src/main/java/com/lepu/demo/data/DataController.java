@@ -44,7 +44,6 @@ public class DataController {
         System.arraycopy(fs, 0, temp, dataRec.length, fs.length);
 
         dataRec = temp;
-
     }
 
     synchronized public static float[] draw(int n) {

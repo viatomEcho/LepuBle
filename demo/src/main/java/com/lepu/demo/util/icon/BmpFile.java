@@ -1,7 +1,6 @@
 package com.lepu.demo.util.icon;
 
 import android.util.Log;
-
 import java.io.FileOutputStream;
 
 public class BmpFile {
@@ -40,7 +39,6 @@ public class BmpFile {
     private byte colorPalette[] = { 0, 0, 0, (byte) 255, (byte) 255,
             (byte) 255, (byte) 255, (byte) 255 };
 
-
     // --- Default constructor
     public BmpFile() {
 
@@ -48,13 +46,11 @@ public class BmpFile {
 
     public void saveBitmap(FileOutputStream fos, byte[] imagePix, int parWidth,
                            int parHeight) {
-
         try {
             save(fos, imagePix, parWidth, parHeight);
         } catch (Exception saveEx) {
             saveEx.printStackTrace();
         }
-
     }
 
     /**
@@ -66,7 +62,6 @@ public class BmpFile {
      */
     private void save(FileOutputStream fos, byte[] imagePix, int parWidth,
                       int parHeight) {
-
         try {
             convertImage(imagePix, parWidth, parHeight);
             writeBitmapFileHeader(fos);
@@ -82,7 +77,6 @@ public class BmpFile {
      * also computes some information for the bitmap info header.
      */
     private boolean convertImage(byte[] imagePix, int parWidth, int parHeight) {
-
         bitmap = imagePix;
         bfSize = 62 + (((parWidth + 31) / 32) * 4 * parHeight);
         biWidth = parWidth;
@@ -97,12 +91,10 @@ public class BmpFile {
      *
      * Each scan line must be padded to an even 4-byte boundary.
      */
-
     /**
      * writeBitmapFileHeader writes the bitmap file header to the file.
      */
     private void writeBitmapFileHeader(FileOutputStream fos) {
-
         try {
             fos.write(bfType);
             fos.write(intToDWord(bfSize));
@@ -113,14 +105,12 @@ public class BmpFile {
         } catch (Exception wbfh) {
             wbfh.printStackTrace();
         }
-
     }
 
     /**
      *
      * writeBitmapInfoHeader writes the bitmap information header to the file.
      */
-
     private void writeBitmapInfoHeader(FileOutputStream fos) {
         try {
             fos.write(intToDWord(biSize));
@@ -159,12 +149,10 @@ public class BmpFile {
      * a 2-byte array.
      */
     private byte[] intToWord(int parValue) {
-
         byte retValue[] = new byte[2];
         retValue[0] = (byte) (parValue & 0x00FF);
         retValue[1] = (byte) ((parValue >> 8) & 0x00FF);
         return (retValue);
-
     }
 
     /**
@@ -173,13 +161,11 @@ public class BmpFile {
      * stored in a 4-byte array.
      */
     private byte[] intToDWord(int parValue) {
-
         byte retValue[] = new byte[4];
         retValue[0] = (byte) (parValue & 0x00FF);
         retValue[1] = (byte) ((parValue >> 8) & 0x000000FF);
         retValue[2] = (byte) ((parValue >> 16) & 0x000000FF);
         retValue[3] = (byte) ((parValue >> 24) & 0x000000FF);
         return (retValue);
-
     }
 }

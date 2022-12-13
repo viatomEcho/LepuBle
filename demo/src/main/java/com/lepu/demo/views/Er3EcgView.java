@@ -11,7 +11,6 @@ import android.view.View;
 import com.lepu.blepro.ble.data.Er3DataController;
 import com.lepu.demo.R;
 
-
 /**
  * normal ecg view, use Er3DataController
  * use in 12 lead

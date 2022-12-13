@@ -7,7 +7,6 @@ import android.os.Looper
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 
@@ -19,7 +18,6 @@ import com.lepu.blepro.utils.*
 class Bpw1BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Bpw1BleInterface"
 
-    private lateinit var context: Context
     private var timingSwitch: Boolean = false
     private lateinit var measureTime: Array<String?>
 
@@ -31,7 +29,6 @@ class Bpw1BleInterface(model: Int): BleInterface(model) {
     private var measureTimeIndex = 0 // 设置定时测量时间完成标志
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
         manager = Bpw1BleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)

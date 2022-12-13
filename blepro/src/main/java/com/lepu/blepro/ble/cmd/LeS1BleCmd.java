@@ -3,7 +3,6 @@ package com.lepu.blepro.ble.cmd;
 import com.lepu.blepro.ble.data.TimeData;
 import com.lepu.blepro.utils.ByteArrayKt;
 import com.lepu.blepro.utils.LepuBleLog;
-
 import java.util.Date;
 
 /**

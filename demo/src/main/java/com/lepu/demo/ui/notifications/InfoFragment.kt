@@ -38,7 +38,6 @@ import com.lepu.demo.util.FileUtil
 import org.apache.commons.io.FileUtils
 import java.io.*
 
-
 class InfoFragment : Fragment(R.layout.fragment_info){
 
     private val mainViewModel: MainViewModel by activityViewModels()

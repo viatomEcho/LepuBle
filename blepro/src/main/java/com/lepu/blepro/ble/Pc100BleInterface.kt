@@ -6,11 +6,9 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.Pc100DeviceInfo
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.HexString.trimStr
-import java.util.*
 
 /**
  * pc100血压血氧体温设备：
@@ -20,15 +18,12 @@ import java.util.*
  * 1.实时血氧、血压
  * 血氧采样率：参数1HZ，波形50HZ
  */
-
 class Pc100BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "PC100BleInterface"
 
-    private lateinit var context: Context
     private var pc100Device = Pc100DeviceInfo()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
         manager = Pc100BleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)

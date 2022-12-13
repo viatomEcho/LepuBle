@@ -19,18 +19,14 @@ import kotlinx.coroutines.flow.flowOn
 import java.io.File
 import java.util.*
 
-
 /**
  * author: wujuan
  * description:
  */
-
-
 class CollectUtil private constructor(val context: Context) {
     val TAG: String = "CollectUtil"
 
     companion object : SingletonHolder<CollectUtil, Context>(::CollectUtil)
-
 
     var o2ringCrtData: ByteArray = ByteArray(0)
 
@@ -59,29 +55,21 @@ class CollectUtil private constructor(val context: Context) {
 
     var currentCollectDuration: Long = DEFAULT_DURATION //当前的采集时长
 
-
-
     fun initCurrentCollectDuration(){
         PrefUtils.readLongPreferences(context, PrefUtils.COLLECT_DURATION_SETTING).let {
             setCollectDurationAndType(if (it == 0L) currentCollectDuration else it)
         }
     }
 
-
     /**
      * 设置时长和采集类型
      */
     fun setCollectDurationAndType(duration: Long){
-
         currentCollectDuration = if (duration in LEAST_DURATION..MAX_DURATION) duration else if (duration <= LEAST_DURATION ) LEAST_DURATION else MAX_DURATION//设置当前采集时长
         PrefUtils.savePreferences(context, PrefUtils.COLLECT_DURATION_SETTING, currentCollectDuration)
-
-
         LepuBleLog.d("collect setting: duration = $currentCollectDuration")
-
     }
-
-   @Synchronized fun collectO2RtData(rtData: ByteArray) {
+    @Synchronized fun collectO2RtData(rtData: ByteArray) {
         if (!isTasking || isSaving) {
             LepuBleLog.d(TAG, "collectO2RtData isTasking:$isTasking, isSaving:$isSaving")
             return
@@ -91,7 +79,6 @@ class CollectUtil private constructor(val context: Context) {
     }
 
     @Synchronized private fun addByteArrayData(oldData: ByteArray, feed: ByteArray): ByteArray {
-
         return ByteArray(oldData.size + feed.size).apply {
             oldData.copyInto(this)
             feed.copyInto(this, oldData.size)
@@ -107,8 +94,6 @@ class CollectUtil private constructor(val context: Context) {
         LepuBleLog.d(TAG, "采集开始了 isCollect = $isTasking, startTime = $collectStartTime")
     }
 
-
-
     /**
      * 中断
      */
@@ -116,9 +101,7 @@ class CollectUtil private constructor(val context: Context) {
         isTasking = false
         LepuBleLog.d(TAG, "采集中断")
         releaseAll(true)
-
     }
-
 
     /**
      * 将实时数据数组写入文件
@@ -130,7 +113,6 @@ class CollectUtil private constructor(val context: Context) {
 
     ): kotlinx.coroutines.flow.Flow<Boolean> {
         return flow<Boolean> {
-
             try {
                 collectEndTime = System.currentTimeMillis()
 
@@ -138,32 +120,20 @@ class CollectUtil private constructor(val context: Context) {
                     TAG,
                     "采集完成去保存...startTime = ${collectStartTime}, endTime = $collectEndTime, ${o2ringCrtData.size} "
                 )
-
-
                 if (o2ringCrtData.isEmpty()) {
                     LepuBleLog.d(
                         TAG,
                         "采集数据有误 无法保存 ${o2ringCrtData.size}"
                     )
                     emit(false)
-
                 }
-
                 if (!initExportFilePath(model)) emit(false)
-
-
                 // 保存蓝牙设备数据
-
                 FileUtil.saveFile(rtExportPath.get(O2RING_MODEL), o2ringCrtData, false)
-
-
                 //保存患者信息及设备信息
                 buildJson(patientEntity, o2ringName)?.let {
                     savePatientAndDeviceInfo(it)
                 }
-
-
-
                 emit(true)
             } catch (e: java.lang.Exception) {
                 e.printStackTrace()
@@ -171,8 +141,6 @@ class CollectUtil private constructor(val context: Context) {
             } finally {
                 isSaving = false
             }
-
-
         }.flowOn(Dispatchers.IO)
     }
 
@@ -180,13 +148,10 @@ class CollectUtil private constructor(val context: Context) {
         patientEntity: PatientEntity,
         o2ringName: String,
     ): PatientAndDevice? {
-
         if (collectStartTime == 0L || collectEndTime == 0L) {
-
             LepuBleLog.e(TAG, "参数有误")
             return null
         }
-
         return PatientAndDevice(
             patientEntity,
             arrayListOf<BleDevice>(
@@ -199,20 +164,15 @@ class CollectUtil private constructor(val context: Context) {
             collectEndTime,
             BuildConfig.VERSION_NAME
         )
-
     }
 
     fun savePatientAndDeviceInfo(patientAndDevice: PatientAndDevice) {
         patientAndDevice.toJson().let {
             LepuBleLog.d(TAG, "patientAndDevice Json::: $it")
-
             FileUtil.saveTextFile(rtExportPath.get(PATIENT_DEVICE_JSON), it, false)
             LepuBleLog.d(TAG, "患者信息及设备信息已写入文件")
-
         }
-
     }
-
 
     /**
      * 初始化本地文件地址
@@ -249,18 +209,12 @@ class CollectUtil private constructor(val context: Context) {
             e.printStackTrace()
             return false
         }
-
         return true
-
-
     }
-
 
     fun releaseAll(isBreak: Boolean) {
         Log.d(TAG, "releaseAll, isBreak = $isBreak")
-
         o2ringCrtData = ByteArray(0)
-
         if (isBreak) {
             //删除文件
             rtExportPath[O2RING_MODEL]?.let {
@@ -275,9 +229,7 @@ class CollectUtil private constructor(val context: Context) {
         isTasking = false
     }
 
-
     /**
-     *
      * 自动采集
      * @return Flow<LpResult<Int>>
      */
@@ -293,17 +245,13 @@ class CollectUtil private constructor(val context: Context) {
                         return@flow
                     }
                     emit(LpResult.Success(index))
-
-
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 emit(LpResult.Failure(e.cause))
             }
         }.flowOn(Dispatchers.IO)
-
     }
-
 
 }
 

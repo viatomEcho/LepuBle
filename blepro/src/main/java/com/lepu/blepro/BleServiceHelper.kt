@@ -2,11 +2,7 @@ package com.lepu.blepro
 
 import android.app.Application
 import android.bluetooth.BluetoothDevice
-import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.os.IBinder
 import android.util.SparseArray
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
@@ -16,24 +12,18 @@ import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
-import com.lepu.blepro.ble.service.BleService
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
-import com.lepu.blepro.observer.BleServiceObserver
 import com.lepu.blepro.utils.LepuBleLog
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-
 /**
  * 单例的蓝牙服务帮助类，原则上只通过此类开放API
- *
  * 1. 在Application onCreate()中初始化，完成必须配置(modelConfig、runRtConfig)后通过initService()开启服务#BleService。
- *
- *
  */
 class BleServiceHelper private constructor() {
 
@@ -49,93 +39,39 @@ class BleServiceHelper private constructor() {
      */
     var modelConfig: SparseArray<Int> = SparseArray()
 
-    /**
-     * 服务onServiceConnected()时，应该初始化的model配置。必须在initService()之前完成
-     * key为model
-     */
-    var runRtConfig: SparseArray<Boolean> = SparseArray()
-
-
     companion object {
         const val tag: String = "BleServiceHelper"
-
         val BleServiceHelper: BleServiceHelper by lazy {
             BleServiceHelper()
         }
-
     }
 
-    lateinit var bleService: BleService
-    private val bleConn = object : ServiceConnection {
-        override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-            LepuBleLog.d("BleServiceHelper onServiceConnected")
-            if (p1 is BleService.BleBinder) {
-                BleServiceHelper.bleService = p1.getService()
-                LepuBleLog.d("bleService inited")
-                initCurrentFace()
-
-            }
-        }
-
-        override fun onServiceDisconnected(p0: ComponentName?) {
-            LepuBleLog.d("BleServiceHelper onServiceDisconnected")
-        }
-    }
-    //===========================================================
-
     /**
-     * 停止服务
+     * 在Application onCreate中初始化本单列
      */
-    /*fun stopService(application: Application) {
-        if (!this::bleService.isInitialized) {
-            LepuBleLog.d(tag, "stopService !this::bleService.isInitialized")
-            return
-        }
-        application.unbindService(bleConn)
-        BleService.stopService(application)
-        LepuBleLog.d(tag, "stopService")
-    }*/
-
-    /**
-     * 在Application onCreate中初始化本单列,
-     *
-     */
-    fun initService(application: Application, observer: BleServiceObserver?): BleServiceHelper {
-
-        LepuBleLog.d(tag, "initService  start")
-        /*BleService.observer = observer
-        BleService.startService(application)
-
-        Intent(application, BleService::class.java).also { intent ->
-            application.bindService(intent, bleConn, Context.BIND_AUTO_CREATE)
-        }*/
-        LpWorkManager.observer = observer
+    fun initService(application: Application): BleServiceHelper {
+        LepuBleLog.d(tag, "into initService")
         LpWorkManager.application = application
         LpWorkManager.reInitBle()
         initCurrentFace()
         return this
     }
 
-    fun initLog(log: Boolean): BleServiceHelper{
+    fun initLog(log: Boolean): BleServiceHelper {
         LepuBleLog.setDebug(log)
         LepuBleLog.d(log.toString())
         return this
     }
 
-
-    fun initRawFolder(folders: SparseArray<String>): BleServiceHelper{
+    fun initRawFolder(folders: SparseArray<String>): BleServiceHelper {
         this.rawFolder = folders
         LepuBleLog.d(folders.toString())
         return this
     }
-    fun initModelConfig(modelConfig: SparseArray<Int>): BleServiceHelper{
+
+    fun initModelConfig(modelConfig: SparseArray<Int>): BleServiceHelper {
         LepuBleLog.d(tag, "initModelConfig")
         this.modelConfig = modelConfig
-        return this
-    }
-    fun initRtConfig(runRtConfig: SparseArray<Boolean>): BleServiceHelper{
-        LepuBleLog.d(tag, "initRtConfig")
-        this.runRtConfig = runRtConfig
         return this
     }
 
@@ -143,39 +79,31 @@ class BleServiceHelper private constructor() {
      * 服务连接成功时初始化vailFace
      * @return BleServiceHelper
      */
-    private fun initCurrentFace(): BleServiceHelper{
-//        if (this::bleService.isInitialized) {
-        if (LpWorkManager.application != null) {
-
-            LepuBleLog.d(tag, "initVailFace ${modelConfig.size()}")
-            for (i in 0 until modelConfig.size()) {
-
-                val model = modelConfig.get(modelConfig.keyAt(i))
-                runRtConfig.get(model)?.let {
-                    LepuBleLog.d(tag, "setInterfaces ===== $it")
-                    setInterfaces(model, it)
-                } ?: setInterfaces(model)
-            }
-            LiveEventBus.get<Boolean>(EventMsgConst.Ble.EventServiceConnectedAndInterfaceInit).post(true)
-
-        }else{
-            LepuBleLog.d(tag, "initVailFace failed!!!")
+    private fun initCurrentFace(): BleServiceHelper {
+        if (!checkService()) {
+            LepuBleLog.e(tag, "initCurrentFace failed")
+            LiveEventBus.get<Boolean>(EventMsgConst.Ble.EventServiceConnectedAndInterfaceInit).post(false)
+            return this
         }
+        LepuBleLog.d(tag, "initCurrentFace, modelConfig.size:${modelConfig.size()}")
+        for (i in 0 until modelConfig.size()) {
+            val model = modelConfig.get(modelConfig.keyAt(i))
+            setInterfaces(model)
+        }
+        LiveEventBus.get<Boolean>(EventMsgConst.Ble.EventServiceConnectedAndInterfaceInit).post(true)
         return this
     }
 
-
     /**
-     * 当前要设置的设备Model, 必须在initService 之后调用
+     * 当前要设置的设备Model, 必须在initService之后调用
      */
-    @JvmOverloads
-    fun setInterfaces(model: Int, runRtImmediately: Boolean = false) {
+    fun setInterfaces(model: Int) {
         if (!checkService()) return
-        LepuBleLog.d(tag, "setInterfaces")
-//        if (getInterface(model) == null) bleService.initInterfaces(model, runRtImmediately)
-        if (getInterface(model) == null) LpWorkManager.initInterfaces(model, runRtImmediately)
+        LepuBleLog.d(tag, "setInterfaces, model:$model")
+        if (getInterface(model) == null) {
+            LpWorkManager.initInterfaces(model)
+        }
     }
-
 
     /**
      * 重新初始化蓝牙
@@ -183,48 +111,36 @@ class BleServiceHelper private constructor() {
      */
     fun reInitBle(): BleServiceHelper {
         if (!checkService()) return this
-//        BleServiceHelper.bleService.reInitBle()
         LepuBleLog.d(tag, "reInitBle")
         LpWorkManager.reInitBle()
         return this
     }
 
-
     /**
      * 注册蓝牙状态改变的监听
      */
     internal fun subscribeBI(model: Int, observer: BleChangeObserver) {
-        if (!checkService()){
-            LepuBleLog.d(tag, "subscribeBI bleService.isInitialized  = false")
-            return
-        }
+        if (!checkService()) return
         getInterface(model)?.onSubscribe(observer)
     }
-
 
     /**
      * 注销蓝牙状态改变的监听
      */
     internal fun detachBI(model: Int, observer: BleChangeObserver) {
-        if (checkService()) getInterface(model)?.detach(observer)
+        if (!checkService()) return
+        getInterface(model)?.detach(observer)
     }
 
-
     /**
-     * 开始扫描 单model设备
+     * 开始扫描 单个model设备，model为空时扫描周边所有设备，包括SDK未识别蓝牙名的设备
      * @param scanModel Int
      * @param needPair Boolean
      */
     @JvmOverloads
     fun startScan(scanModel: Int? = null, needPair: Boolean = false) {
         if (!checkService()) return
-        /*bleService.setScanDefineDevice(false, false, "")
-        if (scanModel != null) {
-            bleService.startDiscover(intArrayOf(scanModel), needPair)
-        } else {
-            bleService.startDiscover(null, needPair)
-        }*/
-        LepuBleLog.d(tag, "into startScan 扫描单个model")
+        LepuBleLog.d(tag, "into startScan, 指定扫描单个model:$scanModel, needPair:$needPair")
         LpWorkManager.setScanDefineDevice(false, false, "")
         if (scanModel != null) {
             LpWorkManager.startDiscover(intArrayOf(scanModel), needPair)
@@ -239,9 +155,7 @@ class BleServiceHelper private constructor() {
     @JvmOverloads
     fun startScan(scanModel: IntArray, needPair: Boolean = false) {
         if (!checkService()) return
-        /*bleService.setScanDefineDevice(false, false, "")
-        bleService.startDiscover(scanModel, needPair)*/
-        LepuBleLog.d(tag, "into startScan 扫描多个model")
+        LepuBleLog.d(tag, "into startScan, 指定扫描多个model:${scanModel.joinToString()}, needPair:$needPair")
         LpWorkManager.setScanDefineDevice(false, false, "")
         LpWorkManager.startDiscover(scanModel, needPair)
     }
@@ -252,13 +166,7 @@ class BleServiceHelper private constructor() {
     @JvmOverloads
     fun startScanByName(deviceName: String, scanModel: Int? = null, needPair: Boolean = false) {
         if (!checkService()) return
-        /*bleService.setScanDefineDevice(true, true, deviceName)
-        if (scanModel != null) {
-            bleService.startDiscover(intArrayOf(scanModel), needPair)
-        } else {
-            bleService.startDiscover(null, needPair)
-        }*/
-        LepuBleLog.d(tag, "into startScanByName deviceName:$deviceName")
+        LepuBleLog.d(tag, "into startScanByName, deviceName:$deviceName, scanModel:$scanModel, needPair:$needPair")
         LpWorkManager.setScanDefineDevice(true, true, deviceName)
         if (scanModel != null) {
             LpWorkManager.startDiscover(intArrayOf(scanModel), needPair)
@@ -273,13 +181,7 @@ class BleServiceHelper private constructor() {
     @JvmOverloads
     fun startScanByAddress(address: String, scanModel: Int? = null, needPair: Boolean = false) {
         if (!checkService()) return
-        /*bleService.setScanDefineDevice(true, false, address)
-        if (scanModel != null) {
-            bleService.startDiscover(intArrayOf(scanModel), needPair)
-        } else {
-            bleService.startDiscover(null, needPair)
-        }*/
-        LepuBleLog.d(tag, "into startScanByAddress address:$address")
+        LepuBleLog.d(tag, "into startScanByAddress, address:$address, scanModel:$scanModel, needPair:$needPair")
         LpWorkManager.setScanDefineDevice(true, false, address)
         if (scanModel != null) {
             LpWorkManager.startDiscover(intArrayOf(scanModel), needPair)
@@ -294,24 +196,22 @@ class BleServiceHelper private constructor() {
      * 组合套装时,targetModel 会被重置为末尾添加的model
      */
     fun stopScan() {
-//        if (checkService()) bleService.stopDiscover()
-        if (checkService()) LpWorkManager.stopDiscover()
+        if (!checkService()) return
         LepuBleLog.d(tag, "stopScan")
+        LpWorkManager.stopDiscover()
     }
 
     /**
-     * 获取model的interface
+     * 获取指定model的interface
      */
     fun getInterface(model: Int): BleInterface? {
         if (!checkService()) return null
-
-//        val vailFace = bleService.vailFace
         val vailFace = LpWorkManager.vailFace
-        LepuBleLog.d(tag, "getInterface: getInterface => currentModel：$model, vailFaceSize：${vailFace.size()}}")
+        LepuBleLog.d(tag, "getInterface, model:$model, vailFace.size:${vailFace.size()}")
         vailFace.get(model)?.let {
             return vailFace.get(model)
-        }?: kotlin.run {
-            LepuBleLog.e(tag, "current model $model unsupported!!")
+        } ?: kotlin.run {
+            LepuBleLog.e(tag, "getInterface, model:$model unsupported!!")
             return null
         }
 
@@ -323,7 +223,7 @@ class BleServiceHelper private constructor() {
      */
     fun getInterfaces(): SparseArray<BleInterface>? {
         if (!checkService()) return null
-//        return bleService.vailFace
+        LepuBleLog.d(tag, "getInterfaces, vailFace.size:${LpWorkManager.vailFace.size()}")
         return LpWorkManager.vailFace
     }
 
@@ -332,7 +232,7 @@ class BleServiceHelper private constructor() {
      * 有app控制，sdk不做处理
      */
     fun canReconnectByName(model: Int): Boolean {
-        LepuBleLog.d(tag, "canReconnectByName model:$model")
+        LepuBleLog.d(tag, "canReconnectByName, model:$model")
         return when(model) {
             Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE,
             Bluetooth.MODEL_FHR, Bluetooth.MODEL_BPW1,
@@ -355,44 +255,37 @@ class BleServiceHelper private constructor() {
      * @param model Int
      * @param b BluetoothDevice
      * @param isAutoReconnect Boolean
-     * @param toConnectUpdater Boolean 检查是否是连接升级失败的设备（Er1设备升级失败，蓝牙名是Er1 updater）
-     *
-     * 连接成功后自动同步时间（pc80b,pc60fw,胎心仪设备没有同步时间设置，发送EventMsgConst.Ble.EventBleDeviceReady）
+     * @param toConnectUpdater Boolean 检查是否是连接升级失败的设备
+     * Er1设备升级失败，蓝牙名是ER1 Updater，此时连接ER1设备不需要同步时间
      */
      @JvmOverloads
      fun connect(context: Context, model: Int, b: BluetoothDevice, isAutoReconnect: Boolean = true, toConnectUpdater: Boolean = false) {
-        LepuBleLog.d(tag, "into connect")
         if (!checkService()) return
-
-        getInterface(model)?.let {
-            it.connect(context, b, isAutoReconnect, toConnectUpdater)
-        }
+        LepuBleLog.d(tag, "into connect, 指定连接单个model:$model, b.name:${b.name}, b.address:${b.address}, " +
+                "isAutoReconnect:$isAutoReconnect, toConnectUpdater:$toConnectUpdater")
+        getInterface(model)?.connect(context, b, isAutoReconnect, toConnectUpdater)
     }
 
-
     /**
-     *  发起重连 允许扫描多个设备
+     * 发起名称重连多个model设备（SDK启动扫描，搜索到指定蓝牙名设备后进行连接）
      */
     @JvmOverloads
     fun reconnect(scanModel: IntArray, name: Array<String>, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
-        LepuBleLog.d(tag, "into reconnect 名称重连多个model")
         if (!checkService()) return
-
-//        bleService.reconnect(scanModel, name, needPair, toConnectUpdater)
+        LepuBleLog.d(tag, "into reconnect, 名称重连多个model:${scanModel.joinToString()}, name:${name.joinToString()}, " +
+                "needPair:$needPair, toConnectUpdater:$toConnectUpdater")
         LpWorkManager.reconnect(scanModel, name, needPair, toConnectUpdater)
-
     }
 
     /**
-     * 发起重连 一次只连一个
+     * 发起名称重连单个model设备（SDK启动扫描，搜索到指定蓝牙名设备后进行连接）
      * @param scanModel Int
      * @param name String
      */
     @JvmOverloads
     fun reconnect(scanModel: Int? = null, name: String, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
-        LepuBleLog.d(tag, "into reconnect 名称重连单个model")
         if (!checkService()) return
-//        bleService.reconnect(intArrayOf(scanModel), arrayOf(name), needPair, toConnectUpdater)
+        LepuBleLog.d(tag, "into reconnect, 名称重连单个model:$scanModel, name:$name, needPair:$needPair, toConnectUpdater:$toConnectUpdater")
         // 规避vihealth连接设备后回到首页扫描时，设备断开连接自动开启指定扫描覆盖首页扫描问题
         // 因此sdk调用自动重连时不做scanModel过滤
         if (scanModel == null) {
@@ -400,58 +293,47 @@ class BleServiceHelper private constructor() {
         } else {
             LpWorkManager.reconnect(intArrayOf(scanModel), arrayOf(name), needPair, toConnectUpdater)
         }
-
     }
 
-
     /**
-     * madAddress 重连
+     * 发起地址重连多个model设备（SDK启动扫描，搜索到指定蓝牙地址设备后进行连接）
      * @param scanModel IntArray
      * @param macAddress Array<String>
      */
     @JvmOverloads
     fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, needPair: Boolean, toConnectUpdater: Boolean = false) {
-        LepuBleLog.d(tag, "into reconnectByAddress 地址重连多个model")
         if (!checkService()) return
-
-//        bleService.reconnectByAddress(scanModel, macAddress, needPair, toConnectUpdater)
+        LepuBleLog.d(tag, "into reconnectByAddress, 地址重连多个model:${scanModel.joinToString()}, " +
+                "macAddress:$macAddress, needPair:$needPair, toConnectUpdater:$toConnectUpdater")
         LpWorkManager.reconnectByAddress(scanModel, macAddress, needPair, toConnectUpdater)
-
     }
 
     /**
-     * 通过MacAddress重连
+     * 发起地址重连单个model设备（SDK启动扫描，搜索到指定蓝牙地址设备后进行连接）
      * @param scanModel Int
      * @param macAddress String
      */
     @JvmOverloads
     fun reconnectByAddress(scanModel: Int? = null, macAddress: String, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
-        LepuBleLog.d(tag, "into reconnectByAddress 地址重连单个model")
         if (!checkService()) return
-//        bleService.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress), needPair, toConnectUpdater)
+        LepuBleLog.d(tag, "into reconnectByAddress, 地址重连单个model:$scanModel, " +
+                "macAddress:$macAddress, needPair:$needPair, toConnectUpdater:$toConnectUpdater")
         if (scanModel == null) {
             LpWorkManager.reconnectByAddress(null, arrayOf(macAddress), needPair, toConnectUpdater)
         } else {
             LpWorkManager.reconnectByAddress(intArrayOf(scanModel), arrayOf(macAddress), needPair, toConnectUpdater)
         }
-
     }
 
     /**
      * 全部断开连接
      */
     fun disconnect(autoReconnect: Boolean) {
-        LepuBleLog.d(tag, "into disconnect autoReconnect:$autoReconnect")
-
         if (!checkService()) return
-//        val vailFace = bleService.vailFace
         val vailFace = LpWorkManager.vailFace
+        LepuBleLog.d(tag, "into disconnect, autoReconnect:$autoReconnect, vailFace.size:${vailFace.size()}")
         for (i in 0 until vailFace.size()) {
-            getInterface(vailFace.keyAt(i))?.let { it ->
-//                if (bleService.isDiscovery)stopScan()
-                if (LpWorkManager.isDiscovery)stopScan()
-                it.disconnect(autoReconnect)
-            }
+            getInterface(vailFace.keyAt(i))?.disconnect(autoReconnect)
         }
     }
 
@@ -459,13 +341,9 @@ class BleServiceHelper private constructor() {
      * 断开指定model
      */
     fun disconnect(model: Int, autoReconnect: Boolean) {
-        LepuBleLog.d(tag, "into disconnect model:$model, autoReconnect:$autoReconnect")
         if (!checkService()) return
-        getInterface(model)?.let {
-            stopScan()
-            it.disconnect(autoReconnect)
-        }
-
+        LepuBleLog.d(tag, "into disconnect, model:$model, autoReconnect:$autoReconnect")
+        getInterface(model)?.disconnect(autoReconnect)
     }
 
     /**
@@ -486,26 +364,25 @@ class BleServiceHelper private constructor() {
     fun getConnectState(model: Int): Int {
         if (!checkService()) return Ble.State.UNKNOWN
         getInterface(model)?.let {
-            LepuBleLog.d(tag, "getConnectState:${it.calBleState()}")
-            return it.calBleState()
+            val state = it.calBleState()
+            LepuBleLog.d(tag, "getConnectState, state:$state")
+            return state
         }?: return Ble.State.UNKNOWN
-
     }
 
     /**
      * 获取扫描状态
      */
-    fun isScanning(): Boolean{
+    fun isScanning(): Boolean {
         if (!checkService()) return false
-        LepuBleLog.d(tag, "isScanning:${LpWorkManager.isDiscovery}")
-//        return bleService.isDiscovery
+        LepuBleLog.d(tag, "isScanning, isDiscovery:${LpWorkManager.isDiscovery}")
         return LpWorkManager.isDiscovery
     }
 
     /**
      * 获取实时任务停止状态
      */
-    fun isRtStop(model: Int): Boolean{
+    fun isRtStop(model: Int): Boolean {
         if (!checkService()) return false
         return getInterface(model)?.isRtStop ?: true
     }
@@ -532,40 +409,34 @@ class BleServiceHelper private constructor() {
      * 设置匹配状态
      */
     fun setNeedPair(needPair : Boolean){
-//        BleServiceHelper.bleService.needPair = needPair
         LpWorkManager.needPair = needPair
     }
 
     fun removeReconnectName(name: String) {
-//        val iterator = bleService.reconnectDeviceName.iterator()
+        LepuBleLog.d(tag, "removeReconnectName, name:$name")
         val iterator = LpWorkManager.reconnectDeviceName.iterator()
         while (iterator.hasNext()) {
             val i = iterator.next()
             if (i == name) {
                 iterator.remove()
-//                LepuBleLog.d(tag, "从重连名单中移除 $name,  list = ${bleService.reconnectDeviceName.joinToString()}")
-                LepuBleLog.d(tag, "从重连名单中移除 $name,  list = ${LpWorkManager.reconnectDeviceName.joinToString()}")
+                LepuBleLog.d(tag, "removeReconnectName, 从重连名单中移除name:$name, 剩余需重连名单:${LpWorkManager.reconnectDeviceName.joinToString()}")
             }
         }
-        LepuBleLog.d(tag, "removeReconnectName:$name")
     }
 
     fun removeReconnectAddress(address: String) {
-//        val iterator = bleService.reconnectDeviceAddress.iterator()
+        LepuBleLog.d(tag, "removeReconnectAddress, address:$address")
         val iterator = LpWorkManager.reconnectDeviceAddress.iterator()
         while (iterator.hasNext()) {
             val i = iterator.next()
             if (i == address) {
                 iterator.remove()
-//                LepuBleLog.d(tag, "从重连名单中移除 $address,  list = ${bleService.reconnectDeviceAddress.joinToString()}")
-                LepuBleLog.d(tag, "从重连名单中移除 $address,  list = ${LpWorkManager.reconnectDeviceAddress.joinToString()}")
+                LepuBleLog.d(tag, "removeReconnectAddress, 从重连名单中移除address:$address, 剩余重连地址:${LpWorkManager.reconnectDeviceAddress.joinToString()}")
             }
         }
-        LepuBleLog.d(tag, "removeReconnectAddress:$address")
     }
 
     fun getReconnectDeviceName(): ArrayList<String>{
-//        return bleService.reconnectDeviceName
         return LpWorkManager.reconnectDeviceName
     }
 
@@ -575,31 +446,30 @@ class BleServiceHelper private constructor() {
      * @return Boolean
      */
     fun hasUnConnected(model: IntArray): Boolean{
-        LepuBleLog.d(tag, "into hasUnConnected...")
         if (!checkService()) return false
+        LepuBleLog.d(tag, "into hasUnConnected, model:${model.joinToString()}")
         for (m in model){
             getInterface(m)?.let {
                 if (!it.state && !it.connecting) return true
             }
         }
-        LepuBleLog.d(tag, "没有未连接和已连接中的设备")
+        LepuBleLog.d(tag, "hasUnConnected, 没有未连接和已连接中的设备")
         return false
     }
 
     fun hasUnConnected(): Boolean {
-        LepuBleLog.d(tag, "into hasUnConnected...")
         if (!checkService()) return false
+        LepuBleLog.d(tag, "into hasUnConnected")
         for (x in 0 until LpWorkManager.vailFace.size()) {
             LpWorkManager.vailFace[LpWorkManager.vailFace.keyAt(x)]?.let {
                 it.let {
-                    LepuBleLog.d(tag, "hasUnConnected  已初始化interface的设备: model = ${it.model}")
-
+                    LepuBleLog.d(tag, "hasUnConnected, 已初始化interface的设备model:${it.model}")
                     if (!it.state && !it.connecting) return true
                 }
             }
 
         }
-        LepuBleLog.d(tag, "hasUnConnected 没有未连接的设备 ")
+        LepuBleLog.d(tag, "hasUnConnected 没有未连接的设备")
         return false
     }
 
@@ -607,13 +477,8 @@ class BleServiceHelper private constructor() {
      * BleService初始化判断
      */
     fun checkService(): Boolean{
-        /*if (!this::bleService.isInitialized){
-            LepuBleLog.d("Error: bleService unInitialized")
-            return false
-        }
-        return true*/
         if (LpWorkManager.application == null){
-            LepuBleLog.d("Error: LpWorkManager application == null")
+            LepuBleLog.e("checkService, LpWorkManager.application is null")
             return false
         }
         return true
@@ -623,6 +488,17 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return false
 
         when (model) {
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
+            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
+            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
+            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
+            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
+            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
+                return inter is OxyBleInterface
+            }
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
             Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
                 return inter is Er1BleInterface
@@ -630,23 +506,23 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
                 return inter is Er2BleInterface
             }
+            Bluetooth.MODEL_ER3 -> {
+                return inter is Er3BleInterface
+            }
+            Bluetooth.MODEL_LEPOD -> {
+                return inter is LepodBleInterface
+            }
             Bluetooth.MODEL_BPM -> {
                 return inter is BpmBleInterface
             }
-            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_BABYO2,
-            Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_CHECKO2,
-            Bluetooth.MODEL_O2M, Bluetooth.MODEL_SLEEPO2,
-            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
-            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
-            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
-            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_CMRING,
-            Bluetooth.MODEL_OXYU, Bluetooth.MODEL_AI_S100,
-            Bluetooth.MODEL_O2M_WPS -> {
-                return inter is OxyBleInterface
-            }
             Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T ->{
                 return inter is Bp2BleInterface
+            }
+            Bluetooth.MODEL_BP2W -> {
+                return inter is Bp2wBleInterface
+            }
+            Bluetooth.MODEL_LE_BP2W -> {
+                return inter is LeBp2wBleInterface
             }
             Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
             Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
@@ -678,14 +554,70 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_MY_SCALE, Bluetooth.MODEL_F5_SCALE -> {
                 return inter is F5ScaleBleInterface
             }
+            Bluetooth.MODEL_PC100 -> {
+                return inter is Pc100BleInterface
+            }
             Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
                 return inter is Ap20BleInterface
+            }
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
+            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
+                return inter is Sp20BleInterface
+            }
+            Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
+                return inter is LewBleInterface
+            }
+            Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV -> {
+                return inter is VetcorderBleInterface
+            }
+            Bluetooth.MODEL_TV221U -> {
+                return inter is Vtm20fBleInterface
+            }
+            Bluetooth.MODEL_AOJ20A -> {
+                return inter is Aoj20aBleInterface
+            }
+            Bluetooth.MODEL_CHECK_POD -> {
+                return inter is CheckmePodBleInterface
             }
             Bluetooth.MODEL_PC_68B -> {
                 return inter is Pc68bBleInterface
             }
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
+                return inter is Pc300BleInterface
+            }
+            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4,
+            Bluetooth.MODEL_CHECKME -> {
+                return inter is PulsebitBleInterface
+            }
+            Bluetooth.MODEL_CHECKME_LE -> {
+                return inter is CheckmeLeBleInterface
+            }
+            Bluetooth.MODEL_VTM_AD5, Bluetooth.MODEL_FETAL -> {
+                return inter is Ad5FhrBleInterface
+            }
+            Bluetooth.MODEL_VCOMIN -> {
+                return inter is VcominFhrBleInterface
+            }
+            Bluetooth.MODEL_LEM -> {
+                return inter is LemBleInterface
+            }
+            Bluetooth.MODEL_LES1 -> {
+                return inter is LeS1BleInterface
+            }
+            Bluetooth.MODEL_LPM311 -> {
+                return inter is Lpm311BleInterface
+            }
+            Bluetooth.MODEL_POCTOR_M3102 -> {
+                return inter is PoctorM3102BleInterface
+            }
+            Bluetooth.MODEL_BIOLAND_BGM -> {
+                return inter is BiolandBgmBleInterface
+            }
+            Bluetooth.MODEL_VTM01 -> {
+                return inter is Vtm01BleInterface
+            }
             else -> {
-                LepuBleLog.d(tag, "checkModel, 无效model：$model,${inter.javaClass}")
+                LepuBleLog.e(tag, "checkInterfaceType, 未识别此model:$model, interface:${inter.javaClass}")
                 return false
             }
         }
@@ -697,7 +629,6 @@ class BleServiceHelper private constructor() {
     fun getInfo(model: Int) {
         if (!checkService()) return
         getInterface(model)?.getInfo()
-
     }
 
     /**
@@ -763,10 +694,7 @@ class BleServiceHelper private constructor() {
     @JvmOverloads
     fun readFile(userId: String, fileName: String, model: Int, offset: Int = 0) {
         if (!checkService()) return
-        getInterface(model)?.let {
-            it.readFile(userId, fileName, offset)
-        }
-
+        getInterface(model)?.readFile(userId, fileName, offset)
     }
 
     /**
@@ -852,9 +780,7 @@ class BleServiceHelper private constructor() {
      */
     fun startRtTask(model: Int){
         if (!checkService()) return
-        getInterface(model)?.let {
-            it.runRtTask()
-        }
+        getInterface(model)?.runRtTask()
     }
 
     /**
@@ -920,7 +846,6 @@ class BleServiceHelper private constructor() {
             }
             else -> LepuBleLog.d(tag, "startBp current model $model unsupported!!")
         }
-
     }
 
     /**
@@ -1043,7 +968,6 @@ class BleServiceHelper private constructor() {
             }
             else -> LepuBleLog.d(tag, "getBpmFileList current model $model unsupported!!")
         }
-
     }
 
     fun getBpmRtState(model: Int) {
@@ -1118,7 +1042,6 @@ class BleServiceHelper private constructor() {
             }
             else -> LepuBleLog.d(tag, "getEr1VibrateConfig current model $model unsupported!!")
         }
-
     }
 
     /**
@@ -1136,9 +1059,7 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.d(tag, "setEr1Vibrate current model $model unsupported!!")
-
         }
-
     }
 
     /**
@@ -1156,7 +1077,6 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.d(tag, "setEr1Vibrate current model $model unsupported!!")
-
         }
     }
 
@@ -1191,9 +1111,7 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.d(tag, "bp2GetConfig current model $model unsupported!!")
-
         }
-
     }
 
     /**

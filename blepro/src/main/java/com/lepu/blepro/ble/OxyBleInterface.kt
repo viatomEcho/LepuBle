@@ -9,7 +9,6 @@ import com.lepu.blepro.ble.cmd.OxyBleCmd
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.LepuDevice
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex

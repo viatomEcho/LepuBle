@@ -2,7 +2,6 @@ package com.lepu.demo.dfu;
 
 import android.app.Activity;
 import android.os.Bundle;
-
 import androidx.annotation.Nullable;
 
 public class NotificationActivity extends Activity {
@@ -21,7 +20,5 @@ public class NotificationActivity extends Activity {
 
         // Now finish, which will drop you to the activity at which you were at the top of the task stack
         finish();
-
-
     }
 }

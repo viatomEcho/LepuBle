@@ -89,7 +89,9 @@ public class PickUtils {
         // MediaStore (and general)
         else if ("content".equalsIgnoreCase(uri.getScheme())) {
             String path = getDataColumn(context, uri, null, null);
-            if (path != null && !path.equals("")) return path;
+            if (path != null && !path.equals("")) {
+                return path;
+            }
             // path could not be retrieved using ContentResolver, therefore copy file to accessible cache using streams
             String fileName = getFileName(context, uri);
             File cacheDir = getDocumentCacheDir(context);
@@ -149,8 +151,9 @@ public class PickUtils {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (cursor != null)
+            if (cursor != null) {
                 cursor.close();
+            }
         }
         return path;
     }
@@ -243,8 +246,12 @@ public class PickUtils {
             e.printStackTrace();
         } finally {
             try {
-                if (is != null) is.close();
-                if (bos != null) bos.close();
+                if (is != null) {
+                    is.close();
+                }
+                if (bos != null) {
+                    bos.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

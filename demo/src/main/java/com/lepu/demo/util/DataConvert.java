@@ -178,7 +178,6 @@ public class DataConvert {
     public static int sp2px(Context context, int spVal) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
                 spVal, context.getResources().getDisplayMetrics());
-
     }
 
     public static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
@@ -247,7 +246,6 @@ public class DataConvert {
             }
             index += length;
         }
-
         return ret;
     }
 
@@ -267,7 +265,6 @@ public class DataConvert {
         for (int i = min; i <= max; i++) {
             list.add(i);
         }
-
         return list;
     }
 
@@ -277,7 +274,6 @@ public class DataConvert {
      * @return
      */
     public static short[] toShortArray(byte[] src) {
-
         int count = src.length >> 1;
         short[] dest = new short[count];
         for (int i = 0; i < count; i++) {
@@ -304,13 +300,11 @@ public class DataConvert {
 
             recordSecondStr = "0".concat(recordSecondStr);
         }
-
         String recordTime = "";
         recordTime = recordHourStr.concat(":").concat(recordMinuteStr).concat(":").concat(recordSecondStr);
 
         return recordTime;
     }
-
 
     // 滤波
     static {

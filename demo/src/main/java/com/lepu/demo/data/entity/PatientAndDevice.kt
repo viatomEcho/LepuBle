@@ -3,7 +3,6 @@ package com.lepu.demo.data.entity
 import com.google.gson.GsonBuilder
 import com.lepu.demo.util.ext.typeToJson
 
-
 class PatientAndDevice(
     var patientEntity: PatientEntity,
     var bleDeviceList:List<BleDevice>,

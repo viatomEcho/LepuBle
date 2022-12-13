@@ -11,18 +11,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
-
 import androidx.annotation.Nullable;
-
 import com.lepu.blepro.objs.Bluetooth;
-
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-
 
 public class WaveEcgView extends View {
     public static final short NULL_VALUE = Short.MAX_VALUE;

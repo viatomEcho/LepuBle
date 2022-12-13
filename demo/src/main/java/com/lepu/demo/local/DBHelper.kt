@@ -35,27 +35,21 @@ class DBHelper private constructor(application: Context) {
                 emit(LpResult.Failure(e.cause))
             }
         }.flowOn(Dispatchers.IO)
-
     }
 
-
-    fun insertOrUpdateDevice(deviceEntity: DeviceEntity){
-       db.deviceDao().insertDevice(deviceEntity)
+    fun insertOrUpdateDevice(deviceEntity: DeviceEntity) {
+        db.deviceDao().insertDevice(deviceEntity)
     }
 
-
-     fun deleteDevice(deviceEntity: DeviceEntity){
-         db.deviceDao().deleteDevice(deviceEntity)
+    fun deleteDevice(deviceEntity: DeviceEntity) {
+        db.deviceDao().deleteDevice(deviceEntity)
     }
 
-
-    fun deleteDevice(model: Int){
-                db.deviceDao().deleteDevice(model)
+    fun deleteDevice(model: Int) {
+        db.deviceDao().deleteDevice(model)
     }
 
-
-
-    suspend fun insertRecord(recordEntity: RecordEntity):Flow<LpResult<Boolean>>{
+    suspend fun insertRecord(recordEntity: RecordEntity):Flow<LpResult<Boolean>> {
         return flow{
             try {
                 db.recordDao().insertRecord(recordEntity).let {
@@ -69,7 +63,7 @@ class DBHelper private constructor(application: Context) {
         }.flowOn(Dispatchers.IO)
     }
 
-    suspend fun insertPatient(patientEntity: PatientEntity):Flow<LpResult<Long>>{
+    suspend fun insertPatient(patientEntity: PatientEntity):Flow<LpResult<Long>> {
         return flow{
             try {
                 db.patientDao().insertPatient(patientEntity).let {
@@ -83,7 +77,6 @@ class DBHelper private constructor(application: Context) {
         }.flowOn(Dispatchers.IO)
     }
 
-
     suspend fun getCurrentPatient(): Flow<LpResult<PatientEntity>> {
         return flow<LpResult<PatientEntity>>{
             try {
@@ -95,7 +88,6 @@ class DBHelper private constructor(application: Context) {
                 emit(LpResult.Failure(e.cause))
             }
         }.flowOn(Dispatchers.IO)
-
     }
     suspend fun getRecordEntityList(offset: Long, pageSize: Int): Flow<LpResult<List<RecordEntity>?>> {
         return flow<LpResult<List<RecordEntity>?>>{
@@ -109,7 +101,6 @@ class DBHelper private constructor(application: Context) {
                 emit(LpResult.Failure(e.cause))
             }
         }.flowOn(Dispatchers.IO)
-
     }
 
     suspend fun getRecordCount(): Flow<LpResult<Long>> {
@@ -123,8 +114,6 @@ class DBHelper private constructor(application: Context) {
                 emit(LpResult.Failure(e.cause))
             }
         }.flowOn(Dispatchers.IO)
-
     }
-
 
 }

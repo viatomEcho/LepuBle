@@ -60,16 +60,9 @@ class LpBleUtil {
         }
     }
 
-
-
-
-
     companion object {
 
         const val TAG : String = "LpBleUtil"
-
-
-
 
         fun convertState(state: Int): String {
             return when (state) {
@@ -78,13 +71,11 @@ class LpBleUtil {
                 State.CONNECTING -> StateStr.CONNECTING
                 else -> return StateStr.UNKNOWN
             }
-
         }
 
         fun getServiceHelper(): BleServiceHelper {
             return BleServiceHelper
         }
-
 
         /**
          * 初始化蓝牙服务
@@ -110,10 +101,7 @@ class LpBleUtil {
                 .initLog(BuildConfig.DEBUG)
 //                .initModelConfig(Constant.BluetoothConfig.SUPPORT_FACES) // 配置要支持的设备
                 .initRawFolder(RAW_FOLDERS)
-                .initService(
-                    application,
-                    BleSO.getInstance(application)
-                ) //必须在initModelConfig initRawFolder之后调用
+                .initService(application) //必须在initModelConfig initRawFolder之后调用
         }
 
         fun clearInterface(){
@@ -130,7 +118,6 @@ class LpBleUtil {
         }
 
         fun  getInterface(model: Int): BleInterface?{
-
            return BleServiceHelper.getInterface(model)
         }
 
@@ -180,7 +167,6 @@ class LpBleUtil {
             BleServiceHelper.connect(context, model, b, isAutoConnect, toConnectUpdater)
         }
 
-
         /**
          * 发起重连，通过蓝牙名发起请求连接 必须已绑定
          * 应用场景：1.进入设备首页，如果已经绑定立即发起重连 2.某个model被切换至当前时立即发起重连
@@ -197,10 +183,7 @@ class LpBleUtil {
                 }
                 BleServiceHelper.reconnect(model, name, toConnectUpdater)
             }
-
         }
-
-
 
         /**
          * 应用场景： 切换设备时，如果设备已经绑定可根据保存的设备mac地址自动连接设备
@@ -215,7 +198,6 @@ class LpBleUtil {
                     if (it == State.DISCONNECTED)
                         BleServiceHelper.reconnectByAddress(model, macAddress)
                 }
-
             }
         }
 
@@ -226,8 +208,6 @@ class LpBleUtil {
             }
         }
 
-
-
         /**
          * 断开所有model
          * @param autoReconnect Boolean
@@ -237,8 +217,6 @@ class LpBleUtil {
             BleServiceHelper.disconnect(autoReconnect)
         }
 
-
-
         /**
          * 应用场景：切换设备时调用此方法，并且应该指定autoReconnect = false
          * @param model Int 要断开的model
@@ -247,8 +225,6 @@ class LpBleUtil {
         fun disconnect(model: Int, autoReconnect: Boolean) {
             BleServiceHelper.disconnect(model, autoReconnect)
         }
-
-
 
         /**
          * 设备蓝牙的连接状态：  未连接时不能代表绑定状态
@@ -273,7 +249,6 @@ class LpBleUtil {
         }
 
         /**
-         *
          * @param model Int
          */
         fun getInfo(model: Int) {
@@ -285,7 +260,6 @@ class LpBleUtil {
                 }
                 BleServiceHelper.getInfo(model)
             }
-
         }
         fun oxyGetBoxInfo(model: Int) {
             Log.d(TAG, "getBoxInfo")
@@ -296,7 +270,6 @@ class LpBleUtil {
                 }
                 BleServiceHelper.oxyGetBoxInfo(model)
             }
-
         }
         fun updateSetting(model: Int, type: Array<String>, value: IntArray) {
             BleServiceHelper.updateSetting(model, type, value)
@@ -352,7 +325,6 @@ class LpBleUtil {
         @JvmOverloads
         fun getFileList(model: Int, fileType: Int? = null){
             BleServiceHelper.getFileList(model, fileType)
-
         }
 
         /**
@@ -380,7 +352,6 @@ class LpBleUtil {
         }
 
         /**
-         *
          * @param model Int
          */
         @JvmOverloads
@@ -403,21 +374,17 @@ class LpBleUtil {
                     stopRtTask(BluetoothConfig.currentModel[0]){
                         sendCmd.invoke()
                     }
-
             }
         }
 
         fun startRtTask(delayMillis: Long = 200){
             if(BluetoothConfig.singleConnect && BluetoothConfig.currentModel.isNotEmpty()){
                     startRtTask(BluetoothConfig.currentModel[0], delayMillis)
-
             }
         }
 
         @JvmOverloads
         fun startRtTask(model: Int, delayMillis: Long = 200) {
-
-
             BleServiceHelper.setRTDelayTime(model, delayMillis)
             BleServiceHelper.startRtTask(model)
         }
@@ -427,7 +394,6 @@ class LpBleUtil {
         }
 
         /**
-         *
          * @param model Int
          * @return Boolean
          */
@@ -450,11 +416,9 @@ class LpBleUtil {
             }
         }
 
-
         fun isDisconnected(model: Int): Boolean{
             return getBleState(model) == State.DISCONNECTED
         }
-
 
         fun isAutoConnect(model: Int): Boolean{
            return getInterface(model)?.isAutoReconnect ?: false
@@ -556,7 +520,6 @@ class LpBleUtil {
                 }
                 BleServiceHelper.stopBp(model)
             }
-
         }
         fun bpw1SetMeasureTime(model: Int, measureTime: Array<String?>) {
             Log.d(TAG, "setMeasureTime")
@@ -828,8 +791,6 @@ class LpBleUtil {
             BleServiceHelper.lewSetOxyThreshold(model, threshold)
         }
 
-
-
         fun sp20GetBattery(model: Int) {
             Log.d(TAG, "sp20GetBattery")
             BleServiceHelper.getInterface(model)?.let {
@@ -908,7 +869,6 @@ class LpBleUtil {
                         BleServiceHelper.ad5EnableRtData(model, enable)
                     }
                 }
-
             }
         }
 
@@ -1057,8 +1017,5 @@ class LpBleUtil {
             BleServiceHelper.vtm01SleepMode(model, on)
         }
     }
-
-
-
 
 }

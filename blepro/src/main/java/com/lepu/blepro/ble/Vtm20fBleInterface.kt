@@ -5,7 +5,6 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
@@ -16,14 +15,10 @@ import com.lepu.blepro.utils.ByteUtils.byte2UInt
  * 1.实时血氧
  * 血氧采样率：参数1HZ，波形50HZ
  */
-
 class Vtm20fBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Vtm20fBleInterface"
 
-    private lateinit var context: Context
-
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
         manager = Vtm20fBleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)

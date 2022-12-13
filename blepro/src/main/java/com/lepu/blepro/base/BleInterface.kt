@@ -31,13 +31,11 @@ import kotlin.collections.ArrayList
  *
  *  1.每次发起连接将默认将isAutoReconnect赋值为true，即在断开连接回调中会重新开启扫描，重连设备。可根据需要设置
  *
- *  2.如果进入到多设备重连{BleServiceHelper #isReconnectingMulti = true}则在其中一个设备连接之后再次开启扫描
+ *  2.通过runRtTask(),stopRtTask()控制实时任务的开关，并将发送相应的EventMsgConst.RealTime...通知
  *
- *  3.通过runRtTask(),stopRtTask()控制实时任务的开关，并将发送相应的EventMsgConst.RealTime...通知
+ *  3.通过自定义InterfaceEvent，发送携带model的业务通知
  *
- *  4.通过自定义InterfaceEvent，发送携带model的业务通知
- *
- *  5.断开连接时可重置isAutoReconnect，根据需要决定是否断开后是否重连
+ *  4.断开连接时可重置isAutoReconnect，根据需要决定是否断开后是否重连
  *
  */
 abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
@@ -61,7 +59,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      */
     var connecting = false
 
-
     /**
      *  断开连接后是否重新开启扫描操作重连
      *  interface实例此参数默认false
@@ -83,7 +80,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     private val rtHandler = Handler(Looper.getMainLooper())
     private var rTask: RtTask = RtTask()
 
-
     /**
      * 获取实时的间隔
      * 默认： 500 ms
@@ -94,14 +90,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      * 实时任务状态flag
      */
     var isRtStop: Boolean = true
-
-
-    /**
-     * 初始化后是否在第一次获取设备信息后立即执行实时任务
-     * 默认：false
-     */
-    var runRtImmediately: Boolean = false
-
 
     /**
      * 记录本次连接是否来自Updater
@@ -115,20 +103,21 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
     var curCmd = -1
 
-
     inner class RtTask : Runnable {
         override fun run() {
-            LepuBleLog.d(tag, "rtTask running...")
+            LepuBleLog.d(tag, "RtTask run, state:$state, isRtStop:$isRtStop, delayMillis:$delayMillis")
             if (state) {
                 rtHandler.postDelayed(rTask, delayMillis)
-                if (!isRtStop) getRtData() else LepuBleLog.d(tag, "isRtStop = $isRtStop")
-            }else {
-                LepuBleLog.d(tag, "ble state = false !!!!")
+                if (!isRtStop) {
+                    getRtData()
+                } else {
+                    LepuBleLog.d(tag, "RtTask isRtStop")
+                }
+            } else {
+                LepuBleLog.e(tag, "RtTask ble state is false !!!")
             }
-
         }
     }
-
 
     /**
      * 是否暂停读文件
@@ -148,7 +137,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
     abstract fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean = false)
 
-
     /**
      * 订阅者集合
      * 用于监听蓝牙状态的改变
@@ -160,17 +148,23 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      */
     internal fun onSubscribe(observer: BleChangeObserver) {
         stateSubscriber.add(observer)
-        LepuBleLog.d(tag, "model=>${model}, 总数${stateSubscriber.size}成功添加了一个订阅者")
-
+        LepuBleLog.d(tag, "onSubscribe model:${model}, 成功添加一个订阅者:${observer.javaClass.name}, 添加后总数:${stateSubscriber.size}")
+        for (i in stateSubscriber) {
+            LepuBleLog.d(tag, "onSubscribe 有订阅者:${i.javaClass.name}")
+        }
     }
-
 
     /**
      * 移除订阅者, 订阅者销毁时自动移除
      */
     internal fun detach(observer: BleChangeObserver) {
-        if (stateSubscriber.isNotEmpty()) stateSubscriber.remove(observer)
-        LepuBleLog.d(tag, "model=>${model}, 总数${stateSubscriber.size}成功将要移除一个订阅者")
+        if (stateSubscriber.isNotEmpty()) {
+            stateSubscriber.remove(observer)
+            LepuBleLog.d(tag, "detach, model:${model}, 成功移除一个订阅者:${observer.javaClass.name}, 移除后总数:${stateSubscriber.size}")
+            for (state in stateSubscriber) {
+                LepuBleLog.d(tag, "detach, 剩余订阅者:${state.javaClass.name}")
+            }
+        }
     }
 
     override fun onNotify(device: BluetoothDevice?, data: Data?) {
@@ -189,75 +183,60 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      * @param isAutoReconnect Boolean 默认参数值为true，目的：当设备自然断开后会重新开启扫描并尝试连接。
      */
     fun connect(context: Context, @NonNull device: BluetoothDevice, isAutoReconnect: Boolean = true, toConnectUpdater: Boolean = false) {
-        LepuBleLog.d(tag, "into connect ")
         if (connecting || state) {
-            LepuBleLog.d(tag, "connect connecting:$connecting, state:$state")
+            LepuBleLog.d(tag, "try to connect failed, connecting or ble state is false")
             return
         }
+        LepuBleLog.d(tag, "into connect, device.name:${device.name}, isAutoReconnect:$isAutoReconnect, " +
+                "toConnectUpdater:$toConnectUpdater, connecting:$connecting, state:$state, isRtStop:$isRtStop")
         if (!isRtStop){
             stopRtTask()
         }
-
-        device.name?.let {
-            LepuBleLog.d(tag, "try connect: $it，isAutoReconnect = $isAutoReconnect, toConnectUpdater = $toConnectUpdater")
-        }
         this.device = device
-
         this.isAutoReconnect = isAutoReconnect
         this.toConnectUpdater = toConnectUpdater
         initManager(context, device, toConnectUpdater)
-
     }
-
 
     /**
      * 断开连接
      * @param isAutoConnect Boolean APP主动断开连接后是否再发起扫描重连
      */
     fun disconnect(isAutoConnect: Boolean) {
-        LepuBleLog.d(tag, "into disconnect ")
-
+        LepuBleLog.d(tag, "into disconnect, isAutoConnect:$isAutoConnect")
         if (!this::manager.isInitialized) {
-            LepuBleLog.d(tag, "manager unInitialized")
+            LepuBleLog.d(tag, "try to disconnect failed, manager unInitialized")
             return
         }
         this.isAutoReconnect = isAutoConnect
-        LepuBleLog.d(tag,"try disconnect..., isAutoReconnect = $isAutoConnect" )
         manager.disconnect()/*.enqueue()*/ // 此方式华为手机只走了disconnecting，没有走disconnected
         manager.close()
+        LepuBleLog.d(tag, "try to disconnect, manager.disconnect, manager.close")
         if (!this::device.isInitialized){
-            LepuBleLog.d(tag, "device unInitialized")
+            LepuBleLog.d(tag, "try to onDeviceDisconnected failed, device unInitialized")
             return
         }
         this.onDeviceDisconnected(device, ConnectionObserver.REASON_SUCCESS)
-
     }
-
-
 
     @OptIn(ExperimentalUnsignedTypes::class)
     abstract fun hasResponse(bytes: ByteArray?): ByteArray?
 
     override fun onDeviceConnected(device: BluetoothDevice) {
-        LepuBleLog.d(tag, "into onDeviceConnected ")
-        if (BleServiceHelper.isScanning()) BleServiceHelper.stopScan()
+        LepuBleLog.d(tag, "into onDeviceConnected, device.name:${device.name}, device.address:${device.address}")
+        if (BleServiceHelper.isScanning()) {
+            BleServiceHelper.stopScan()
+        }
         state = true
         ready = false
         connecting = false
-
-        if (toConnectUpdater)
-            LiveEventBus.get<BluetoothDevice>(EventMsgConst.Updater.EventBleConnected).post(device)
-
         // 广播名有可能为null
         device.name?.let {
             BleServiceHelper.removeReconnectName(it)
-            LepuBleLog.d(tag, "onDeviceConnected $it connected, ready: $ready")
         }
-
         device.address?.let {
             BleServiceHelper.removeReconnectAddress(it)
         }
-
         // 多设备重连，因SDK扫描到需重连设备，去连接时并不会关闭扫描，
         // 所以在重连此设备成功后，检查是否还有设备需要重连，再关闭扫描
         // 暂不使用
@@ -282,26 +261,20 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         }*/
     }
 
-
     override fun onDeviceConnecting(device: BluetoothDevice) {
-        LepuBleLog.d(tag, "into onDeviceConnecting ")
+        LepuBleLog.d(tag, "into onDeviceConnecting, device.name:${device.name}, device.address:${device.address}")
         state = false
         ready = false
         connecting = true
         publish()
-
-        device.name?.let {
-            LepuBleLog.d(tag, "$it Connecting")
-        }
-
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
         if (!this::manager.isInitialized) {
-            LepuBleLog.d(tag, "manager unInitialized")
+            LepuBleLog.d(tag, "onDeviceDisconnected, manager unInitialized")
         } else {
             manager.close()
-            LepuBleLog.d(tag, "onDeviceDisconnected manager.close()")
+            LepuBleLog.d(tag, "onDeviceDisconnected, manager.close")
         }
         state = false
         ready = false
@@ -311,13 +284,14 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         publish()
         LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceDisconnectReason).post(reason)
         //断开后
-        LepuBleLog.d(tag, "onDeviceDisconnected==reason:${reason}===isAutoReconnect:$isAutoReconnect ${device.name} ${device.address}")
+        LepuBleLog.d(tag, "onDeviceDisconnected, disconnect reason:${reason}, isAutoReconnect:$isAutoReconnect, " +
+                "device.name:${device.name}, device.address:${device.address}")
         if (reason != ConnectionObserver.REASON_NOT_SUPPORTED) {
             if (BleServiceHelper.canReconnectByName(model)) {
                 device.name?.let {
                     if (isAutoReconnect) {
                         //重开扫描, 扫描该interface的设备
-                        LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByName $it")
+                        LepuBleLog.d(tag, "onDeviceDisconnected, to do reconnectByName $it")
                         BleServiceHelper.reconnect(null, it)
                     } else {
                         BleServiceHelper.removeReconnectName(it)
@@ -327,44 +301,46 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
                 device.address?.let {
                     if (isAutoReconnect) {
                         //重开扫描, 扫描该interface的设备
-                        LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByAddress $it")
+                        LepuBleLog.d(tag, "onDeviceDisconnected, to do reconnectByAddress $it")
                         BleServiceHelper.reconnectByAddress(null, it)
                     } else {
                         BleServiceHelper.removeReconnectAddress(it)
                     }
                 }
             }
+        } else {
+            LepuBleLog.d(tag, "onDeviceDisconnected, the device does not hav required services")
         }
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {
-        LepuBleLog.d(tag, "into onDeviceDisconnecting ")
+        LepuBleLog.d(tag, "into onDeviceDisconnecting, device.name:${device.name}, device.address:${device.address}")
         state = false
         ready = false
         connecting = false
-
-        publish()
-
-        device.name?.let {
-            LepuBleLog.d(tag, "$it onDeviceDisconnecting")
-        }
-
     }
 
     override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
-
+        if (!this::manager.isInitialized) {
+            LepuBleLog.d(tag, "onDeviceFailedToConnect, manager unInitialized")
+        } else {
+            manager.close()
+            LepuBleLog.d(tag, "onDeviceFailedToConnect, manager.close")
+        }
         state = false
         ready = false
         connecting = false
+        stopRtTask()
         publish()
-        LepuBleLog.d(tag, "onDeviceFailedToConnect==reason:${reason}===isAutoReconnect:$isAutoReconnect")
+        LepuBleLog.d(tag, "onDeviceFailedToConnect, failed to connect reason:${reason}, isAutoReconnect:$isAutoReconnect, " +
+                "device.name:${device.name}, device.address:${device.address}")
         LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceDisconnectReason).post(reason)
         if (reason != ConnectionObserver.REASON_NOT_SUPPORTED) {
             if (BleServiceHelper.canReconnectByName(model)) {
                 device.name?.let {
                     if (isAutoReconnect) {
                         //重开扫描, 扫描该interface的设备
-                        LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByName $it")
+                        LepuBleLog.d(tag, "onDeviceFailedToConnect, to do reconnectByName $it")
                         BleServiceHelper.reconnect(null, it)
                     } else {
                         BleServiceHelper.removeReconnectName(it)
@@ -374,93 +350,89 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
                 device.address?.let {
                     if (isAutoReconnect) {
                         //重开扫描, 扫描该interface的设备
-                        LepuBleLog.d(tag, "onDeviceDisconnected....to do reconnectByAddress $it")
+                        LepuBleLog.d(tag, "onDeviceFailedToConnect, to do reconnectByAddress $it")
                         BleServiceHelper.reconnectByAddress(null, it)
                     } else {
                         BleServiceHelper.removeReconnectAddress(it)
                     }
                 }
             }
+        } else {
+            LepuBleLog.d(tag, "onDeviceFailedToConnect, the device does not hav required services")
         }
-
-        device.name?.let {
-            LepuBleLog.d(tag, "$it onDeviceFailedToConnect")
-        }
-
     }
 
-
-
     override fun onDeviceReady(device: BluetoothDevice) {
-        LepuBleLog.d(tag, "into onDeviceReady ")
-        device.name?.let {
-            LepuBleLog.d(tag, "$it onDeviceReady, state: $state")
-        }
+        LepuBleLog.d(tag, "into onDeviceReady, device.name:${device.name}, device.address:${device.address}")
         state = true
         ready = true
         connecting = false
         clearCmdTimeout()
         publish()
-
-        if (model == Bluetooth.MODEL_PC80B
-            || model == Bluetooth.MODEL_PC80B_BLE
-            || model == Bluetooth.MODEL_PC80B_BLE2
-            || model == Bluetooth.MODEL_PC60FW
-            || model == Bluetooth.MODEL_PF_10
-            || model == Bluetooth.MODEL_PF_10AW
-            || model == Bluetooth.MODEL_PF_10AW1
-            || model == Bluetooth.MODEL_PF_10BW
-            || model == Bluetooth.MODEL_PF_10BW1
-            || model == Bluetooth.MODEL_PF_20
-            || model == Bluetooth.MODEL_PF_20AW
-            || model == Bluetooth.MODEL_PF_20B
-            || model == Bluetooth.MODEL_POD_1W
-            || model == Bluetooth.MODEL_S5W
-            || model == Bluetooth.MODEL_S6W
-            || model == Bluetooth.MODEL_S6W1
-            || model == Bluetooth.MODEL_S7W
-            || model == Bluetooth.MODEL_S7BW
-            || model == Bluetooth.MODEL_PC_60NW_1
-            || model == Bluetooth.MODEL_PC_60NW
-            || model == Bluetooth.MODEL_PC60NW_BLE
-            || model == Bluetooth.MODEL_PC60NW_WPS
-            || model == Bluetooth.MODEL_POD2B
-            || model == Bluetooth.MODEL_PC_60B
-            || model == Bluetooth.MODEL_OXYSMART
-            || model == Bluetooth.MODEL_TV221U
-            || model == Bluetooth.MODEL_PC100
-            || model == Bluetooth.MODEL_PC66B
-            || model == Bluetooth.MODEL_PC_68B
-            || model == Bluetooth.MODEL_VETCORDER
-            || model == Bluetooth.MODEL_CHECK_ADV
-            || model == Bluetooth.MODEL_FHR
-            || model == Bluetooth.MODEL_FETAL
-            || model == Bluetooth.MODEL_VTM_AD5
-            || model == Bluetooth.MODEL_VCOMIN
-            || model == Bluetooth.MODEL_LEM
-            || model == Bluetooth.MODEL_W12C
-            || model == Bluetooth.MODEL_LEW
-            || model == Bluetooth.MODEL_LPM311
-            || model == Bluetooth.MODEL_POCTOR_M3102
-            || model == Bluetooth.MODEL_BIOLAND_BGM
-            || model == Bluetooth.MODEL_PC300
-            || model == Bluetooth.MODEL_PC300_BLE
-            || model == Bluetooth.MODEL_VTM01) { // 部分设备没有同步时间命令，发送此消息通知获取设备信息，进行绑定操作
-            LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceReady).post(model)
+        if (toConnectUpdater) {
+            LiveEventBus.get<BluetoothDevice>(EventMsgConst.Updater.EventBleConnected).post(device)
+            LepuBleLog.d(tag, "onDeviceReady, 设备连接成功后接着通知升级固件")
         } else {
-            if (!manager.isUpdater) syncTime()
+            if (model == Bluetooth.MODEL_PC80B
+                || model == Bluetooth.MODEL_PC80B_BLE
+                || model == Bluetooth.MODEL_PC80B_BLE2
+                || model == Bluetooth.MODEL_PC60FW
+                || model == Bluetooth.MODEL_PF_10
+                || model == Bluetooth.MODEL_PF_10AW
+                || model == Bluetooth.MODEL_PF_10AW1
+                || model == Bluetooth.MODEL_PF_10BW
+                || model == Bluetooth.MODEL_PF_10BW1
+                || model == Bluetooth.MODEL_PF_20
+                || model == Bluetooth.MODEL_PF_20AW
+                || model == Bluetooth.MODEL_PF_20B
+                || model == Bluetooth.MODEL_POD_1W
+                || model == Bluetooth.MODEL_S5W
+                || model == Bluetooth.MODEL_S6W
+                || model == Bluetooth.MODEL_S6W1
+                || model == Bluetooth.MODEL_S7W
+                || model == Bluetooth.MODEL_S7BW
+                || model == Bluetooth.MODEL_PC_60NW_1
+                || model == Bluetooth.MODEL_PC_60NW
+                || model == Bluetooth.MODEL_PC60NW_BLE
+                || model == Bluetooth.MODEL_PC60NW_WPS
+                || model == Bluetooth.MODEL_POD2B
+                || model == Bluetooth.MODEL_PC_60B
+                || model == Bluetooth.MODEL_OXYSMART
+                || model == Bluetooth.MODEL_TV221U
+                || model == Bluetooth.MODEL_PC100
+                || model == Bluetooth.MODEL_PC66B
+                || model == Bluetooth.MODEL_PC_68B
+                || model == Bluetooth.MODEL_VETCORDER
+                || model == Bluetooth.MODEL_CHECK_ADV
+                || model == Bluetooth.MODEL_FHR
+                || model == Bluetooth.MODEL_FETAL
+                || model == Bluetooth.MODEL_VTM_AD5
+                || model == Bluetooth.MODEL_VCOMIN
+                || model == Bluetooth.MODEL_LEM
+                || model == Bluetooth.MODEL_W12C
+                || model == Bluetooth.MODEL_LEW
+                || model == Bluetooth.MODEL_LPM311
+                || model == Bluetooth.MODEL_POCTOR_M3102
+                || model == Bluetooth.MODEL_BIOLAND_BGM
+                || model == Bluetooth.MODEL_PC300
+                || model == Bluetooth.MODEL_PC300_BLE
+                || model == Bluetooth.MODEL_VTM01
+            ) { // 部分设备没有同步时间命令，发送此消息通知获取设备信息，进行绑定操作
+                LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceReady).post(model)
+            } else {
+                syncTime()
+            }
         }
     }
 
     open fun sendCmd(bs: ByteArray): Boolean {
-        if (!state && !ready) {
-            LepuBleLog.d(tag, "send cmd fail， state = false")
+        LepuBleLog.d(tag, "into sendCmd, state:$state, ready:$ready")
+        if (!ready) {
+            LepuBleLog.d(tag, "sendCmd failed, ready is false")
             return false
         }
         manager.sendCmd(bs)
-
         sendCmdString = bytesToHex(bs)
-
         return true
     }
 
@@ -483,27 +455,24 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         LepuBleLog.d("clearCmdTimeout")
     }
 
-
     /**
      * 发布蓝牙状态改变通知
      * 外部要监听蓝牙实现过程
-     * 1.注册 @see O2BleObserverLifeImpl
-     * 2.实现 @see O2BleObserver
      */
     private fun publish() {
-        LepuBleLog.d(tag, "publish=>${stateSubscriber.size}")
+        LepuBleLog.d(tag, "publish, 发布蓝牙状态改变通知, 订阅者总数:${stateSubscriber.size}")
         for (i in stateSubscriber) {
-            i.onBleStateChanged(model, calBleState())
-            LepuBleLog.d(tag, "calBleState() : ${calBleState()}")
+            val state = calBleState()
+            i.onBleStateChanged(model, state)
+            LepuBleLog.d(tag, "publish, 蓝牙状态:$state, 订阅者:${i.javaClass.name}")
         }
     }
 
     /**
      * 蓝牙状态
-     * {@link BleConst}
      */
     internal fun calBleState(): Int {
-        LepuBleLog.d(tag, "calBleState ---model: $model, state::::$state, ready::::$ready, connecting::::$connecting")
+        LepuBleLog.d(tag, "calBleState, model:$model, state:$state, ready:$ready, connecting:$connecting")
         return if (state && ready) Ble.State.CONNECTED else if (connecting) Ble.State.CONNECTING else Ble.State.DISCONNECTED
     }
 
@@ -515,18 +484,17 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStart).post(model)
     }
 
-    fun stopRtTask(sendCmd:() -> Unit = {}){
-        LepuBleLog.d(tag, "stopRtTask start...")
+    fun stopRtTask(sendCmd:() -> Unit = {}) {
+        LepuBleLog.d(tag, "stopRtTask")
         isRtStop = true
         rtHandler.removeCallbacks(rTask)
         GlobalScope.launch {
             delay(500)
             sendCmd.invoke()
-            LepuBleLog.d(tag, "stopRtTask invoke start...")
+            LepuBleLog.d(tag, "stopRtTask invoke")
             LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStop).post(model)
         }
     }
-
 
     /**
      * 获取设置信息
@@ -546,9 +514,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      * 获取文件列表
      */
     abstract fun getFileList()
-
-
-
 
     /**
      * 读文件
@@ -582,13 +547,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     fun continueRf(userId: String, fileName: String, offset: Int){
         this.offset = offset
         dealContinueRF(userId, fileName)
-
     }
 
     abstract fun dealContinueRF(userId: String, fileName: String)
-
-
-
-
 
 }

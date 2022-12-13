@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 
 class OxyDashboardViewModel : ViewModel() {
 
-
     val dataSrc: MutableLiveData<IntArray> by lazy {
         MutableLiveData<IntArray>()
     }
@@ -17,6 +16,5 @@ class OxyDashboardViewModel : ViewModel() {
     val spo2: MutableLiveData<Int> by lazy {
         MutableLiveData<Int>()
     }
-
 
 }

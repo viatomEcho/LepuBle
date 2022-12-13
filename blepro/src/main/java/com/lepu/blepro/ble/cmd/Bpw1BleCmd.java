@@ -1,7 +1,6 @@
 package com.lepu.blepro.ble.cmd;
 
 import com.lepu.blepro.utils.CrcUtil;
-
 import java.util.Calendar;
 
 /**

@@ -22,7 +22,6 @@ import kotlin.math.floor
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 
-
 class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
 
     private val mainViewModel: MainViewModel by activityViewModels()
@@ -30,11 +29,7 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
 
     private val binding: FragmentOxyDashboardBinding by binding()
 
-
     private lateinit var oxyView: OxyView
-
-
-
 
     /**
      * rt ecg wave
@@ -91,8 +86,6 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
         initView()
         initClickListener()
         initLiveEvent()
-
-
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -102,7 +95,6 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
             when (it) {
                 Bluetooth.MODEL_O2RING -> startWave()
             }
-
         }
 
         LiveEventBus.get<Int>(EventMsgConst.RealTime.EventRealTimeStop).observeSticky(this) {
@@ -110,7 +102,6 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
                 Bluetooth.MODEL_O2RING -> stopWave()
             }
         }
-
 
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtData).observeForever { event ->
             (event.data as OxyBleResponse.RtWave).let { rtWave ->
@@ -126,10 +117,6 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
 
                     OxyDataController.receive(rtWave.wFs)
                 }
-
-
-
-
             }
         }
 
@@ -144,12 +131,8 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
                 ppgData.let { data ->
                     Log.d("ppg", "len  = ${data.rawDataBytes.size}")
                 }
-
             }
-
-
     }
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun toPlayAlarm(newPr: Int){
@@ -189,7 +172,6 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
                     binding.oxiView.visibility = View.INVISIBLE
                 }
             }
-
         }
 
         viewModel.pr.observe(viewLifecycleOwner) {
@@ -209,14 +191,12 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
             }
         }
 
-
         binding.getRtData.setOnClickListener {
             LpBleUtil.startRtTask()
         }
         binding.stopRtData.setOnClickListener {
             LpBleUtil.stopRtTask()
         }
-
 
         viewModel.dataSrc.observe(viewLifecycleOwner) {
             if (this::oxyView.isInitialized) {
@@ -225,7 +205,6 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
 
             }
         }
-
 
         mainViewModel.oxyInfo.observe(viewLifecycleOwner) {
             it?.let {

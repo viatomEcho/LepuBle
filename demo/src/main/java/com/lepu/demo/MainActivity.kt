@@ -44,7 +44,6 @@ import com.lepu.demo.util.CollectUtil
 import com.permissionx.guolindev.PermissionX
 import java.util.*
 
-
 class MainActivity : AppCompatActivity() , BleChangeObserver {
     private val TAG: String = "MainActivity"
 
@@ -117,7 +116,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 if (Constant.BluetoothConfig.bleSdkServiceEnable) afterLpBleInit()
                 else LpBleUtil.initBle(application)
             }
-
         })
 
         // 开启/关闭扫描
@@ -628,7 +626,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                         }
                 }
         }
-
     }
 
     private fun checkServer() {
@@ -678,7 +675,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             viewModel._bleEnable.value = true
         }
     }
-
 }
 
 fun Activity.checkBluetooth(requestCode: Int, finishOnCancel: Boolean = false): Boolean =

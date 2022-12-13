@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.View;
-
 import com.lepu.demo.data.OxyDataController;
 import com.lepu.demo.R;
 

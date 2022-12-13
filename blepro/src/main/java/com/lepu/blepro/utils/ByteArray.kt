@@ -8,9 +8,7 @@ fun ByteArray.toHex() = joinToString("") {
     String.format("%02X", (it.toInt() and 0xff))
 }
 
-
 fun byteArrayOfInts(vararg ints: Int) = ByteArray(ints.size) { pos -> ints[pos].toByte() }
-
 
 fun add(ori: ByteArray?, add: ByteArray): ByteArray {
     if (ori == null) {

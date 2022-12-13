@@ -11,12 +11,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
-
 import androidx.annotation.Nullable;
-
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.SizeUtils;
-
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;

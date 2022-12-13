@@ -11,7 +11,6 @@ import androidx.lifecycle.OnLifecycleEvent
  */
 internal interface BleInterfaceLifecycle: LifecycleObserver{
 
-
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun subscribeBI()
 

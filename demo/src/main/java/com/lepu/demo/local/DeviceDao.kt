@@ -22,6 +22,4 @@ interface DeviceDao {
     @Query("DELETE FROM devices WHERE modelNo=:model")
     fun deleteDevice(model: Int)
 
-
-
 }

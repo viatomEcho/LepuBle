@@ -40,9 +40,7 @@ public class UpdateActivity extends Activity {
         backMainBtn.setOnClickListener(v -> {
             finish();
         });
-
         getUpgradeZip();
-
     }
 
     private void getUpgradeZip() {
@@ -67,11 +65,9 @@ public class UpdateActivity extends Activity {
 
             } else if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {//4.4以后
                 path = PickUtils.getPath(this, uri);
-
             }
             File file = new File(path);
             startUpdate(uri);
-
         }
     }
 
@@ -80,7 +76,6 @@ public class UpdateActivity extends Activity {
         final DfuServiceInitiator starter = new DfuServiceInitiator(dfu_macAddress)//mac地址
                 .setDeviceName(mBluetoothServiceName)//名字
                 .setKeepBond(true);
-
 
 // If you want to have experimental buttonless DFU feature supported call additionally:
         starter.setUnsafeExperimentalButtonlessServiceInSecureDfuEnabled(true);
@@ -94,19 +89,14 @@ public class UpdateActivity extends Activity {
 //            else {
 //                starter.setBinOrHex(mFileType, mFileStreamUri, mFilePath).setInitFile(mInitFileStreamUri, mInitFilePath);
 //            }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             starter.setForeground(false);
             starter.setDisableNotification(true);
         }
-
         final DfuServiceController controller = starter.start(this, DfuService.class);
 // You may use the controller to pause, resume or abort the DFU process.
-
-
 //            DfuServiceInitiator.createDfuNotificationChannel(this);
     }
-
 
     @Override
     protected void onResume() {
@@ -139,8 +129,6 @@ public class UpdateActivity extends Activity {
 //          progressBar.setIndeterminate(true);
 //          mTextPercentage.setText(R.string.dfu_status_starting);
             Log.i("TEST", "onDfuProcessStarting: " + deviceAddress);
-
-
         }
 
         @Override
@@ -188,7 +176,6 @@ public class UpdateActivity extends Activity {
         @Override
         public void onDfuAborted(String deviceAddress) {
             Log.i("TEST", "onDfuAborted: " + deviceAddress);
-
         }
 
         @Override

@@ -36,8 +36,6 @@ object Ble {
              * 断开中 4
              */
             const val DISCONNECTING = 4
-
-
         }
     }
 

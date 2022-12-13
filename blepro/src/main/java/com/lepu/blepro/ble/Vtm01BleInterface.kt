@@ -18,14 +18,10 @@ import kotlin.experimental.inv
  * 1.实时血氧
  * 血氧采样率：参数1HZ，波形50HZ
  */
-
 class Vtm01BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Vtm01BleInterface"
 
-    private lateinit var context: Context
-
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
         manager = OxyBleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)

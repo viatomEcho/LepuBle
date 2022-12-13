@@ -19,5 +19,4 @@ interface RecordDao {
     @Query("SELECT COUNT(id) from records")
     fun getCount(): Long
 
-
 }

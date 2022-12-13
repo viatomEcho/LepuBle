@@ -35,14 +35,11 @@ public class StringUtil {
 		return stringIsEmpty(result) ? "" : result;
 	}
 
-
-
 	// "GB2312"
 	public static String bytesToString(byte[] buffer) {
 		if (buffer == null) {
 			return null;
 		}
-
 		String result = "";
 		try {
 			result = new String(buffer, 0, buffer.length, CHARSETNAME_UTF_8);
@@ -52,13 +49,10 @@ public class StringUtil {
 		return result;
 	}
 
-
-
 	public static boolean isEnglish(String name) {
 		String str = "^[a-zA-Z\\s]*$";
 		Pattern p = Pattern.compile(str);
 		Matcher m = p.matcher(name);
-
 		return m.matches();
 	}
 
@@ -66,7 +60,6 @@ public class StringUtil {
 		String str = "^[\u4e00-\u9fa5]*$";
 		Pattern p = Pattern.compile(str);
 		Matcher m = p.matcher(name);
-
 		return m.matches();
 	}
 
@@ -74,7 +67,6 @@ public class StringUtil {
 		String regex = "^1(3[0-9]|4[0-9]|5[0-9]|7[0-9]|8[0-9]|9[0-9])\\d{8}$";
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(mobile);
-
 		return m.find();
 	}
 
@@ -97,7 +89,6 @@ public class StringUtil {
 		String str = "^[a-z0-9A-Z\\s]*$";
 		Pattern p = Pattern.compile(str);
 		Matcher m = p.matcher(name);
-
 		return m.matches();
 	}
 
@@ -105,7 +96,6 @@ public class StringUtil {
 		String str = "^[\u4e00-\u9fa5]*$";
 		Pattern p = Pattern.compile(str);
 		Matcher m = p.matcher(name);
-
 		return m.matches();
 	}
 

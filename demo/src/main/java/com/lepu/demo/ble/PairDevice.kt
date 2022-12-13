@@ -14,17 +14,12 @@ class PairDevice {
 
         fun pairO2(record: ScanRecord): Boolean {
             val parseRecord = record.bytes?.let { parseRecord(it) } ?: return false
-
             return parseRecord[-1].equals("4EF301")
-
         }
 
         private fun parseRecord(scanRecord: ByteArray): Map<Int, String>? {
-
-
             val ret: MutableMap<Int, String> = HashMap()
             var index = 0
-
             while (index < scanRecord.size) {
                 val length = scanRecord[index++].toInt()
                 //Zero value indicates that we are done with the record now

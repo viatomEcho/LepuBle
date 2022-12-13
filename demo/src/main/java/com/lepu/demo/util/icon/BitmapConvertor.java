@@ -13,9 +13,7 @@ import android.os.Environment;
 import android.text.TextPaint;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.lepu.blepro.ble.data.LeBp2wUserInfo;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,7 +29,6 @@ public class BitmapConvertor {
     private int mWidth, mHeight;
     private String mStatus;
     private String mFileName;
-
 
     public BitmapConvertor(Context context) {
         // TODO Auto-generated constructor stub
@@ -55,7 +52,6 @@ public class BitmapConvertor {
         ConvertInBackground convert = new ConvertInBackground();
         convert.execute(inputBitmap);
         return mStatus;
-
     }
 
     /**
@@ -65,7 +61,6 @@ public class BitmapConvertor {
      * @return :  Returns a String. Success when the file is saved on memory card or error.
      */
     public byte[] convertBitmapSync(Bitmap inputBitmap){
-
         mWidth = inputBitmap.getWidth();
         mHeight = inputBitmap.getHeight();
         mDataWidth=((mWidth+31)/32)*4*8;
@@ -75,7 +70,6 @@ public class BitmapConvertor {
         convertArgbToGrayscale(inputBitmap, mWidth, mHeight);
         createRawMonochromeData();
         return mRawBitmapData;
-
     }
 
     public static byte[] hexToBytes(String hexRepresentation) {
@@ -90,7 +84,6 @@ public class BitmapConvertor {
             data[i / 2] = (byte) ((Character.digit(hexRepresentation.charAt(i), 16) << 4)
                     + Character.digit(hexRepresentation.charAt(i + 1), 16));
         }
-
         return data;
     }
 
@@ -168,7 +161,6 @@ public class BitmapConvertor {
             return null;
         }
 
-
         @Override
         protected void onPostExecute(Void result) {
             // TODO Auto-generated method stub
@@ -176,17 +168,12 @@ public class BitmapConvertor {
             Toast.makeText(mContext, "Monochrome bitmap created successfully. Please check in sdcard", Toast.LENGTH_LONG).show();
         }
 
-
         @Override
         protected void onPreExecute() {
             // TODO Auto-generated method stub
             mPd= ProgressDialog.show(mContext, "Converting Image", "Please Wait", true, false, null);
         }
-
-
-
     }
-
 
     public Bitmap generateBitmap(String text){
         Typeface typeface = Typeface.createFromAsset(mContext.getAssets(),"msyh.ttf");
@@ -212,9 +199,7 @@ public class BitmapConvertor {
         icon.setHeight(inputBitmap.getHeight());
         Bitmap resizedBitmap = Bitmap.createBitmap(inputBitmap, 0, 0, icon.getWidth(), icon.getHeight());
         icon.setIcon(convertBitmapSync(resizedBitmap));
-
         saveImage(name, inputBitmap.getWidth(), inputBitmap.getHeight());
-
         return icon;
     }
 
