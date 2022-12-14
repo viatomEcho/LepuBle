@@ -181,13 +181,13 @@ abstract class LpBleManager(context: Context): BleManager(context) {
         LepuBleLog.d(MANAGER_TAG, "buildRequestQueue...")
 
         val queue = beginAtomicRequestQueue()
-            .add(requestMtu(23) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
-                .with { device: BluetoothDevice?, mtu: Int ->
-                    log(Log.INFO, "MTU set to $mtu")
-                }
-                .fail { device: BluetoothDevice?, status: Int ->
-                    log(Log.WARN, "Requested MTU not supported: $status")
-                })
+//            .add(requestMtu(23) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
+//                .with { device: BluetoothDevice?, mtu: Int ->
+//                    log(Log.INFO, "MTU set to $mtu")
+//                }
+//                .fail { device: BluetoothDevice?, status: Int ->
+//                    log(Log.WARN, "Requested MTU not supported: $status")
+//                })
             //                    .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
             //                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
             //                    .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))

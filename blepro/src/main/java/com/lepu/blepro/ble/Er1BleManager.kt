@@ -25,21 +25,20 @@ class Er1BleManager(context: Context): LpBleManager(context) {
     }
 
     override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {
-//        if (BleServiceHelper.BleServiceHelper.bleService.support2MPhy) {
-//        if (LpWorkManager.support2MPhy) {
-//            requestQueue.add(requestMtu(247)
-//                .with { device: BluetoothDevice?, mtu: Int ->
-//                    log(Log.INFO, "Er1BleManager MTU set to $mtu")
-//                }
-//                .fail { device: BluetoothDevice?, status: Int ->
-//                    log(Log.WARN, "Er1BleManager Requested MTU not supported: $status")
-//                })
-//                .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
-//                    .fail { device: BluetoothDevice?, status: Int ->
-//                        log(Log.WARN, "Er1BleManager Requested PHY not supported: $status")
-//                    })
-//                .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
-//        } else {
+        if (LpWorkManager.support2MPhy) {
+            requestQueue.add(requestMtu(247)
+                .with { device: BluetoothDevice?, mtu: Int ->
+                    log(Log.INFO, "Er1BleManager MTU set to $mtu")
+                }
+                .fail { device: BluetoothDevice?, status: Int ->
+                    log(Log.WARN, "Er1BleManager Requested MTU not supported: $status")
+                })
+                .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
+                    .fail { device: BluetoothDevice?, status: Int ->
+                        log(Log.WARN, "Er1BleManager Requested PHY not supported: $status")
+                    })
+                .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
+        } else {
             requestQueue.add(requestMtu(247)
                 .with { device: BluetoothDevice?, mtu: Int ->
                     log(Log.INFO, "Er1BleManager MTU set to $mtu")
@@ -48,7 +47,7 @@ class Er1BleManager(context: Context): LpBleManager(context) {
                     log(Log.WARN, "Er1BleManager Requested MTU not supported: $status")
                 })
                 .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
-//        }
+        }
         LepuBleLog.d("Er1BleManager dealReqQueue")
         return requestQueue
     }
