@@ -86,7 +86,8 @@ var wifiRssi = 100
 var wifiSsid = ""
 //var hostState = false
 
-var bleRssi = -100
+var bleRssi = -70
+var autoScan = false
 
 //var socketState = false
 var socketToken: ByteArray? = null

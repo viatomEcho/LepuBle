@@ -1,6 +1,7 @@
 package com.lepu.demo.util;
 
 import com.lepu.demo.data.DeviceFactoryData;
+import com.lepu.demo.data.DeviceUpgradeData;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -175,5 +176,69 @@ public class ExcelUtil {
         return result;
     }
 
+    public static <T> boolean writeObjListToExcelUpgrade(List<T> objList, String fileName) {
+        boolean result = false;
+        if (objList != null && !objList.isEmpty()) {
+            WritableWorkbook writebook = null;
+            InputStream in = null;
+            int length = 0;
+            try {
+                WorkbookSettings setEncode = new WorkbookSettings();
+                setEncode.setEncoding(UTF8_ENCODING);
+
+                in = new FileInputStream(fileName);
+                Workbook workbook = Workbook.getWorkbook(in);
+                writebook = Workbook.createWorkbook(new File(fileName), workbook);
+                WritableSheet sheet = writebook.getSheet(0);
+
+                for (int j = 0; j < objList.size(); j++) {
+                    DeviceUpgradeData demoBean = (DeviceUpgradeData) objList.get(j);
+                    List<String> list = new ArrayList<>();
+                    list.add(""+(j+1));
+                    list.add(demoBean.getTime());
+                    list.add(demoBean.getName());
+                    list.add(demoBean.getAddress());
+                    list.add(demoBean.getSn());
+
+                    for (int i = 0; i < list.size(); i++) {
+                        length = list.get(i).length();
+                        sheet.addCell(new Label(i, j + 1, list.get(i), arial12format));
+                        if (length <= 4) {
+                            //设置列宽
+                            sheet.setColumnView(i, length + 8);
+                        } else {
+                            //设置列宽
+                            sheet.setColumnView(i, length + 5);
+                        }
+                    }
+                    //设置行高
+                    sheet.setRowView(j + 1, 350);
+                }
+
+                writebook.write();
+                workbook.close();
+                result = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (writebook != null) {
+                    try {
+                        writebook.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return result;
+    }
 
 }

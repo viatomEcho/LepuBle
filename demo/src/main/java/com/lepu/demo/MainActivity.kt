@@ -35,6 +35,7 @@ import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.HexString
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.vals.autoScan
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.CHECK_BLE_REQUEST_CODE
@@ -80,6 +81,13 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (!LpBleUtil.isScanning() && autoScan) {
+            LpBleUtil.startScan(SUPPORT_MODELS)
+        }
+    }
+
     //创建菜单
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.right_menu, menu)
@@ -91,6 +99,9 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         when (item.itemId) {
             R.id.menu_factory_data -> {
                 startActivity(Intent(this, DeviceFactoryDataActivity::class.java))
+            }
+            R.id.menu_upgrade_data -> {
+                startActivity(Intent(this, DeviceUpgradeDataActivity::class.java))
             }
         }
         return true
@@ -122,7 +133,11 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
         // 开启/关闭扫描
         viewModel.scanning.observe(this) {
-            LpBleUtil.startScan(SUPPORT_MODELS)
+            if (it) {
+                LpBleUtil.stopScan()
+            } else {
+                LpBleUtil.startScan(SUPPORT_MODELS)
+            }
         }
 
     }

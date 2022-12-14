@@ -11,9 +11,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.lepu.demo.data.DeviceUpgradeData;
 import com.lepu.demo.dfu.DfuService;
 import com.lepu.demo.dfu.PickUtils;
+import com.lepu.demo.util.DateUtil;
+import com.lepu.demo.util.FileUtil;
 import java.io.File;
+import java.util.Date;
 import no.nordicsemi.android.dfu.DfuProgressListener;
 import no.nordicsemi.android.dfu.DfuServiceController;
 import no.nordicsemi.android.dfu.DfuServiceInitiator;
@@ -183,6 +187,12 @@ public class UpdateActivity extends Activity {
             Log.i("TEST", "onDfuCompleted: " + deviceAddress);
             duringUpgradeTv.setVisibility(View.GONE);
             updateSuccessLl.setVisibility(View.VISIBLE);
+            DeviceUpgradeData data = new DeviceUpgradeData();
+            data.setAddress(dfu_macAddress);
+            data.setName(mBluetoothServiceName);
+            data.setSn(mBluetoothServiceName.substring(mBluetoothServiceName.length()-6));
+            data.setTime(DateUtil.stringFromDate(new Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL));
+            FileUtil.saveTextFile(getExternalFilesDir(null).getAbsolutePath() + "/device_upgrade_data.txt", data.toString(), true);
         }
 
         @Override

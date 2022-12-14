@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
@@ -15,6 +16,7 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BIOL
+import com.lepu.blepro.vals.autoScan
 import com.lepu.blepro.vals.bleRssi
 import com.lepu.demo.MainActivity
 import com.lepu.demo.MainViewModel
@@ -48,7 +50,11 @@ class HomeFragment : Fragment(R.layout.fragment_home), SeekBar.OnSeekBarChangeLi
         initView()
         initEvent()
     }
-    private fun initView(){
+    private fun initView() {
+        binding.autoScan.isChecked = autoScan
+        binding.autoScan.setOnCheckedChangeListener { buttonView, isChecked ->
+            autoScan = isChecked
+        }
 
         mAlertDialog = AlertDialog.Builder(requireContext())
             .setCancelable(false)
@@ -75,9 +81,14 @@ class HomeFragment : Fragment(R.layout.fragment_home), SeekBar.OnSeekBarChangeLi
         }
 
         binding.scan.setOnClickListener {
-            mainViewModel._scanning.value = !mainViewModel._scanning.value!!
+            mainViewModel._scanning.value = LpBleUtil.isScanning()
             binding.rcv.visibility = View.VISIBLE
             splitDevices(binding.bleSplit.text.toString())
+            if (binding.scan.text.equals("开始扫描")) {
+                binding.scan.text = "正在扫描"
+            } else {
+                binding.scan.text = "开始扫描"
+            }
         }
 
         binding.disconnect.setOnClickListener{
@@ -126,6 +137,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), SeekBar.OnSeekBarChangeLi
                     LpBleUtil.connect(it1, it, false)
                     ToastUtil.showToast(activity, "正在连接蓝牙")
                     LpBleUtil.stopScan()
+                    binding.scan.text = "开始扫描"
                     BluetoothController.clear()
                     splitDevices(Constant.BluetoothConfig.splitText)
                     mainViewModel._curBluetooth.value = DeviceEntity(it.name, it.macAddr, it.model)
@@ -175,11 +187,15 @@ class HomeFragment : Fragment(R.layout.fragment_home), SeekBar.OnSeekBarChangeLi
         adapter.notifyDataSetChanged()
     }
 
-
     private fun initEvent(){
         //扫描通知
         LiveEventBus.get<Bluetooth>(EventMsgConst.Discovery.EventDeviceFound)
             .observe(this) {
+                binding.scan.text = if (LpBleUtil.isScanning()) {
+                    "正在扫描"
+                } else {
+                    "开始扫描"
+                }
                 Constant.BluetoothConfig.splitText = binding.bleSplit.text.toString()
                 splitDevices(Constant.BluetoothConfig.splitText)
             }
