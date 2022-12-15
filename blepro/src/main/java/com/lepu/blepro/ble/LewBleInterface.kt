@@ -545,8 +545,13 @@ class LewBleInterface(model: Int): BleInterface(model) {
             LewBleCmd.READ_FILE_START -> {
                 LepuBleLog.d(tag, "model:$model,READ_FILE_START => success")
                 if (response.pkgType == 0x01.toByte()) {
+                    val fileSize = toUInt(response.content)
+                    if (fileSize == 0) {
+                        sendCmd(LewBleCmd.readFileEnd())
+                        return
+                    }
                     curFile =  curFileName?.let {
-                        LewBleResponse.EcgFile(model, it, toUInt(response.content))
+                        LewBleResponse.EcgFile(model, it, fileSize)
                     }
                     sendCmd(LewBleCmd.readFileData(0))
                 } else {
@@ -583,6 +588,8 @@ class LewBleInterface(model: Int): BleInterface(model) {
                     } else {
                         sendCmd(LewBleCmd.readFileEnd())
                     }
+                } ?: kotlin.run {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileError).post(InterfaceEvent(model, true))
                 }
             }
             LewBleCmd.READ_FILE_END -> {
@@ -600,6 +607,8 @@ class LewBleInterface(model: Int): BleInterface(model) {
                     }else {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete).post(InterfaceEvent(model, it))
                     }
+                } ?: kotlin.run {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileError).post(InterfaceEvent(model, true))
                 }
             }
         }

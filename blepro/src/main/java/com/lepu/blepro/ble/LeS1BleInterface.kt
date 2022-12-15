@@ -149,6 +149,8 @@ class LeS1BleInterface(model: Int): BleInterface(model) {
                     } else {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1ReadFileError).post(InterfaceEvent(model, true))
                     }
+                } ?: kotlin.run {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1ReadFileError).post(InterfaceEvent(model, true))
                 }
             }
 

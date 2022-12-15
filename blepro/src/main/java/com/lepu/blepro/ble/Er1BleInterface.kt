@@ -96,8 +96,13 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                 }
 
                 if (response.pkgType == 0x01.toByte()) {
+                    val fileSize = toUInt(response.content)
+                    if (fileSize == 0) {
+                        sendCmd(Er1BleCmd.readFileEnd())
+                        return
+                    }
                     curFile = curFileName?.let {
-                        Er1BleResponse.Er1File(model, it, toUInt(response.content), userId!!, offset)
+                        Er1BleResponse.Er1File(model, it, fileSize, userId!!, offset)
                     }
                     sendCmd(Er1BleCmd.readFileData(offset))
                 } else {
@@ -131,6 +136,9 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                     } else {
                         sendCmd(Er1BleCmd.readFileEnd())
                     }
+                }?: kotlin.run {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileError).post(InterfaceEvent(model, true))
+                    LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
                 }
             }
 
@@ -145,10 +153,13 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                             LepuBleLog.d(tag, "READ_FILE_END isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
                             return
                         }
-                    }else {
+                    } else {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileComplete).post(InterfaceEvent(model, it))
                     }
-                }?: LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
+                }?: kotlin.run {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileError).post(InterfaceEvent(model, true))
+                    LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
+                }
                 curFile = null
             }
             Er1BleCmd.VIBRATE_CONFIG -> {

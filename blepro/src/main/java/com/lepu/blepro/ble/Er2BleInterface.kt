@@ -172,8 +172,13 @@ class Er2BleInterface(model: Int): BleInterface(model) {
 
                 LepuBleLog.d(tag, "model:$model,CMD_START_READ_FILE => success, $respPkg")
                 if (respPkg.pkgType == 0x01.toByte()) {
+                    val fileSize = toUInt(respPkg.data)
+                    if (fileSize == 0) {
+                        sendCmd(Er2BleCmd.readFileEnd())
+                        return
+                    }
                     curFile = curFileName?.let {
-                        Er2File(model, it, toUInt(respPkg.data), userId!!)
+                        Er2File(model, it, fileSize, userId!!)
                     }
                     sendCmd(Er2BleCmd.readFileData(0))
                 } else {
@@ -204,6 +209,9 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                     } else {
                         sendCmd(Er2BleCmd.readFileEnd())
                     }
+                }?: kotlin.run {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileError).post(InterfaceEvent(model, true))
+                    LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
                 }
             }
             Er2BleCmd.CMD_END_READ_FILE -> {
@@ -220,7 +228,10 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                     }else {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileComplete).post(InterfaceEvent(model, it))
                     }
-                }?: LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
+                }?: kotlin.run {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileError).post(InterfaceEvent(model, true))
+                    LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
+                }
                 curFile = null
             }
             Er2BleCmd.CMD_BURN_SN_CODE -> {

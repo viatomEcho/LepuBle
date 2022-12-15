@@ -183,6 +183,10 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                     val fileSize = toUInt(response.content)
 
                     LepuBleLog.d(tag, "model:$model, 文件大小：${fileSize}  文件名：$curFileName")
+                    if (fileSize == 0) {
+                        sendOxyCmd(OxyBleCmd.OXY_CMD_READ_END, OxyBleCmd.readFileEnd())
+                        return
+                    }
                     curFileName?.let {
 
                         curFile = userId?.let { it1 -> OxyBleResponse.OxyFile(model, curFileName!!, fileSize, it1) }
@@ -221,6 +225,9 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                         } else {
                             sendOxyCmd(OxyBleCmd.OXY_CMD_READ_END, OxyBleCmd.readFileEnd())
                         }
+                    } ?: kotlin.run {
+                        LepuBleLog.d(tag, "model:$model,  curFile error!!")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError).post(InterfaceEvent(model, true))
                     }
                 } else {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError).post(InterfaceEvent(model, true))
