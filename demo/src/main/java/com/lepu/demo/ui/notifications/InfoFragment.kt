@@ -642,7 +642,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this) { event ->
                 (event.data as Er2File).let {
                     if (it.fileName.contains("R")) {
-                        val data = Er1EcgFile(getOffset(it.model, "", it.fileName))
+                        val content = getOffset(it.model, "", it.fileName)
+                        val data = if (content.isEmpty()) {
+                            Er1EcgFile(it.content)
+                        } else {
+                            Er1EcgFile(content)
+                        }
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                         val recordingTime = DateUtil.getSecondTimestamp(it.fileName.replace("R", ""))
@@ -651,7 +656,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         ecgAdapter.setNewInstance(ecgList)
                         ecgAdapter.notifyDataSetChanged()
                     } else {
-                        val data = Er2AnalysisFile(getOffset(it.model, "", it.fileName))
+                        val content = getOffset(it.model, "", it.fileName)
+                        val data = if (content.isEmpty()) {
+                            Er2AnalysisFile(it.content)
+                        } else {
+                            Er2AnalysisFile(content)
+                        }
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                     }
