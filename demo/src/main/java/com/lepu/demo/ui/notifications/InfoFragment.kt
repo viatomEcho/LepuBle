@@ -775,7 +775,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileComplete)
             .observe(this) { event ->
                 (event.data as Bp2BleFile).let {
-                    val file = Bp2BleFile(it.name, getOffset(event.model, "", it.name), it.deviceName)
+                    val content = getOffset(event.model, "", it.name)
+                    val file = if (content.isEmpty()) {
+                        it
+                    } else {
+                        Bp2BleFile(it.name, content, it.deviceName)
+                    }
                     if (file.type == 2) {
                         val data = Bp2EcgFile(file.content)
                         binding.info.text = "$data"
