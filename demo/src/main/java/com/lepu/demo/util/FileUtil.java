@@ -216,6 +216,20 @@ public class FileUtil {
         }
     }
 
+    public static boolean deleteFile(Context context, String fileName) {
+        File file = new File(context.getExternalFilesDir(null).getAbsolutePath());
+        file = new File(file, fileName);
+        try {
+            if (file.exists()) {
+                file.delete();
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public static String readFileToString(Context context, String fileName) {
         File file = new File(context.getExternalFilesDir(null).getAbsolutePath());
         file = new File(file, fileName);

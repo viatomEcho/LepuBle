@@ -32,19 +32,19 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
-import com.lepu.blepro.utils.ByteUtils
-import com.lepu.blepro.utils.HexString
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.vals.autoFinish
 import com.lepu.blepro.vals.autoScan
+import com.lepu.blepro.vals.upgradeDevices
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.CHECK_BLE_REQUEST_CODE
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.SUPPORT_MODELS
-import com.lepu.demo.data.entity.DeviceEntity
+import com.lepu.demo.data.DeviceUpgradeData
 import com.lepu.demo.util.CollectUtil
+import com.lepu.demo.util.FileUtil
 import com.permissionx.guolindev.PermissionX
-import java.util.*
-
+import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() , BleChangeObserver {
     private val TAG: String = "MainActivity"
@@ -83,8 +83,34 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
     override fun onResume() {
         super.onResume()
+        upgradeDevices.clear()
+        getUpgradeDevices()
+        Log.d("1111111111", "upgradeDevices.size : ${upgradeDevices.size}")
         if (!LpBleUtil.isScanning() && autoScan) {
             LpBleUtil.startScan(SUPPORT_MODELS)
+        }
+    }
+
+    private fun getUpgradeDevices() {
+        val data = FileUtil.readFileToString(this, "device_upgrade_data.txt")
+        val strs = data.split("DeviceUpgradeData")
+        if (strs.isEmpty()) return
+        for (str in strs) {
+            if (str.isEmpty()) continue
+            val temp = JSONObject(str)
+            val da = DeviceUpgradeData()
+            da.time = infoStrGetString(temp, "time")
+            da.name = infoStrGetString(temp, "name")
+            da.address = infoStrGetString(temp, "address")
+            da.sn = infoStrGetString(temp, "sn")
+            upgradeDevices.add(da)
+        }
+    }
+    private fun infoStrGetString(infoStr: JSONObject, key: String): String {
+        return if (infoStr.has(key)) {
+            infoStr.getString(key)
+        } else {
+            ""
         }
     }
 
@@ -253,6 +279,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 val intent = Intent(this, UpdateActivity::class.java)
                 intent.putExtra("macAddr", viewModel._curBluetooth.value?.deviceMacAddress)
                 intent.putExtra("bleName", viewModel._curBluetooth.value?.deviceName)
+                intent.putExtra("autoFinish", autoFinish)
                 startActivity(intent)
 //                LpBleUtil.getInfo(it)
             }

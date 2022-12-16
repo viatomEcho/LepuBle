@@ -3,7 +3,6 @@ package com.lepu.demo.ui.home
 import android.app.Activity
 import android.app.AlertDialog
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.util.Log
 import android.view.View
 import android.widget.SeekBar
@@ -16,8 +15,7 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BIOL
-import com.lepu.blepro.vals.autoScan
-import com.lepu.blepro.vals.bleRssi
+import com.lepu.blepro.vals.*
 import com.lepu.demo.MainActivity
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
@@ -55,10 +53,18 @@ class HomeFragment : Fragment(R.layout.fragment_home), SeekBar.OnSeekBarChangeLi
         binding.autoScan.setOnCheckedChangeListener { buttonView, isChecked ->
             autoScan = isChecked
         }
+        binding.autoFinish.isChecked = autoFinish
+        binding.autoFinish.setOnCheckedChangeListener { buttonView, isChecked ->
+            autoFinish = isChecked
+        }
+        binding.autoUpgrade.isChecked = autoUpgrade
+        binding.autoUpgrade.setOnCheckedChangeListener { buttonView, isChecked ->
+            autoUpgrade = isChecked
+        }
 
         mAlertDialog = AlertDialog.Builder(requireContext())
             .setCancelable(false)
-            .setMessage("正在处理，请稍等...")
+            .setMessage("正在连接，请稍等...")
             .create()
 
         activity?.let {  activity ->
@@ -168,12 +174,35 @@ class HomeFragment : Fragment(R.layout.fragment_home), SeekBar.OnSeekBarChangeLi
     }
 
     var splitDevice: ArrayList<Bluetooth> = arrayListOf()
+    var currentBluetooth: Bluetooth? = null
 
     private fun splitDevices(name: String) {
         splitDevice.clear()
         for (b in BluetoothController.getDevicesByRssi(bleRssi)) {
             if (b.name.contains(name, true)) {
                 splitDevice.add(b)
+                if (autoUpgrade && currentBluetooth?.rssi!! > bleRssi) {
+                    var diff = true
+                    for (device in upgradeDevices) {
+                        if (device.name.equals(currentBluetooth?.name)) {
+                            diff = false
+                        }
+                    }
+                    Log.d("1111111111", "diff : $diff")
+                    if (diff) {
+                        LpBleUtil.setInterface(Bluetooth.MODEL_PC60FW, singleConnect)
+                        activity?.lifecycle?.addObserver(BIOL(activity as MainActivity, Constant.BluetoothConfig.SUPPORT_MODELS))
+                        mAlertDialog?.show()
+                        LpBleUtil.connect(activity?.applicationContext!!, currentBluetooth!!, false)
+                        LpBleUtil.stopScan()
+                        ToastUtil.showToast(activity, "正在连接蓝牙")
+                        binding.scan.text = "开始扫描"
+                        BluetoothController.clear()
+                        splitDevices(Constant.BluetoothConfig.splitText)
+                        mainViewModel._curBluetooth.value = DeviceEntity(currentBluetooth?.name!!, currentBluetooth?.macAddr!!, Bluetooth.MODEL_PC60FW)
+                        break
+                    }
+                }
             }
         }
         splitDevice.sortWith { o1, o2 ->
@@ -196,6 +225,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), SeekBar.OnSeekBarChangeLi
                 } else {
                     "开始扫描"
                 }
+                currentBluetooth = it
                 Constant.BluetoothConfig.splitText = binding.bleSplit.text.toString()
                 splitDevices(Constant.BluetoothConfig.splitText)
             }

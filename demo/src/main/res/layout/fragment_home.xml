@@ -51,15 +51,35 @@
             app:layout_constraintStart_toEndOf="@+id/rssi"
             app:layout_constraintTop_toBottomOf="@+id/scan" />
         <Switch
-            android:id="@+id/auto_scan"
+            android:id="@+id/auto_upgrade"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="50dp"
             android:switchMinWidth="@dimen/dp_40"
             app:layout_constraintTop_toBottomOf="@+id/rssi"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="5dp"
             android:textSize="18sp"
-            android:text="升级完成后自动扫描开关"/>
+            android:text="搜索最近设备自动升级"/>
+        <Switch
+            android:id="@+id/auto_scan"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:switchMinWidth="@dimen/dp_40"
+            app:layout_constraintTop_toBottomOf="@+id/auto_upgrade"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="5dp"
+            android:textSize="18sp"
+            android:text="升级完成后自动扫描"/>
+        <Switch
+            android:id="@+id/auto_finish"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:switchMinWidth="@dimen/dp_40"
+            app:layout_constraintTop_toBottomOf="@+id/auto_scan"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="5dp"
+            android:textSize="18sp"
+            android:text="升级完成后自动返回首页"/>
         <EditText
             android:visibility="gone"
             android:layout_width="match_parent"
@@ -232,7 +252,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/auto_scan"
+            app:layout_constraintTop_toBottomOf="@id/auto_finish"
             app:layout_constraintBottom_toBottomOf="parent">
 
         </androidx.recyclerview.widget.RecyclerView>

@@ -21,6 +21,7 @@ class DeviceUpgradeDataActivity : AppCompatActivity() {
 
     private lateinit var totalTextView: TextView
     private lateinit var exportButton: Button
+    private lateinit var deleteButton: Button
     private lateinit var recordList: RecyclerView
     private lateinit var recordAdapter: DeviceUpgradeDataAdapter
     private var records = mutableListOf<DeviceUpgradeData>()
@@ -78,6 +79,19 @@ class DeviceUpgradeDataActivity : AppCompatActivity() {
                 Toast.makeText(this, "暂无记录需要导出！", Toast.LENGTH_SHORT).show()
             } else {
                 exportData()
+            }
+        }
+        deleteButton = findViewById(R.id.delete)
+        deleteButton.setOnClickListener {
+            val r = FileUtil.deleteFile(this, "device_upgrade_data.txt")
+            if (r) {
+                records.clear()
+                recordAdapter.setNewInstance(records.asReversed())
+                recordAdapter.notifyDataSetChanged()
+                totalTextView.text = "共${records.size}条"
+                Toast.makeText(this, "清空成功", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "清空失败(无数据/存储未授权)", Toast.LENGTH_SHORT).show()
             }
         }
     }

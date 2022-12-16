@@ -30,6 +30,7 @@ public class UpdateActivity extends Activity {
     LinearLayout updateSuccessLl;
     TextView duringUpgradeTv;
     TextView versionTv;
+    boolean autoFinish = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,7 @@ public class UpdateActivity extends Activity {
         setContentView(R.layout.activity_update);
         dfu_macAddress = getIntent().getStringExtra("macAddr");
         mBluetoothServiceName = getIntent().getStringExtra("bleName");
+        autoFinish = getIntent().getBooleanExtra("autoFinish", true);
         updateSuccessLl = findViewById(R.id.update_success_ll);
         duringUpgradeTv = findViewById(R.id.during_upgrade_tv);
         versionTv = findViewById(R.id.version_tv);
@@ -193,6 +195,9 @@ public class UpdateActivity extends Activity {
             data.setSn(mBluetoothServiceName.substring(mBluetoothServiceName.length()-6));
             data.setTime(DateUtil.stringFromDate(new Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL));
             FileUtil.saveTextFile(getExternalFilesDir(null).getAbsolutePath() + "/device_upgrade_data.txt", data.toString(), true);
+            if (autoFinish) {
+                finish();
+            }
         }
 
         @Override

@@ -14,22 +14,33 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        android:layout_margin="@dimen/dp_10">
+        android:layout_marginStart="@dimen/dp_10"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginEnd="@dimen/dp_10"
+        android:layout_marginBottom="@dimen/dp_10">
+
         <TextView
             android:id="@+id/total_count"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:text="共xx条"
             android:textColor="@color/black"
-            android:textSize="20sp"
-            android:text="共xx条"/>
+            android:textSize="20sp" />
+
         <Button
-            android:visibility="gone"
             android:id="@+id/export"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:text="导出"/>
+            android:text="导出"
+            android:visibility="gone" />
+        <Button
+            android:id="@+id/delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="清空数据"/>
     </RelativeLayout>
 
 </RelativeLayout>

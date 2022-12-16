@@ -1,5 +1,7 @@
 package com.lepu.blepro.vals
 
+import com.lepu.demo.data.DeviceUpgradeData
+
 
 /**
  * relay info
@@ -86,8 +88,11 @@ var wifiRssi = 100
 var wifiSsid = ""
 //var hostState = false
 
-var bleRssi = -70
-var autoScan = false
+var bleRssi = -50
+var autoScan = true
+var autoFinish = true
+var autoUpgrade = false
+var upgradeDevices = mutableListOf<DeviceUpgradeData>()
 
 //var socketState = false
 var socketToken: ByteArray? = null
