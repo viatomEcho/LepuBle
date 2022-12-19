@@ -9,7 +9,6 @@ import com.lepu.blepro.ble.cmd.OxyBleCmd
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.LepuDevice
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
@@ -46,6 +45,10 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     var isPiRt: Boolean = true
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
+        if (isManagerInitialized()) {
+            LepuBleLog.e(tag, "manager is initialized")
+            return
+        }
         manager = OxyBleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
@@ -127,6 +130,10 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
             OxyBleCmd.OXY_CMD_BOX_INFO -> {
                 clearTimeout()
+                if (response.content.size < 38) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val boxInfo = LepuDevice(response.content.copyOfRange(1, response.len))
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_BOX_INFO => success $boxInfo")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBoxInfo).post(InterfaceEvent(model, boxInfo))
@@ -136,11 +143,6 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
                 clearTimeout()
                 val info = OxyBleResponse.OxyInfo(response.content)
-                // 本版本注释，测试通过后删除
-                /*if (runRtImmediately) {
-                    runRtTask()
-                    runRtImmediately = false
-                }*/
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success $info")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo).post(InterfaceEvent(model, info))
 
@@ -150,7 +152,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             OxyBleCmd.OXY_CMD_RT_WAVE -> {
                 clearTimeout()
 
-                if (response.content.size < 13) {
+                if (response.content.size < 12) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtWaveRes).post(InterfaceEvent(model, true))
                     LepuBleLog.d(tag, "OXY_CMD_RT_WAVE response.content.size:${response.content.size}")
                     return

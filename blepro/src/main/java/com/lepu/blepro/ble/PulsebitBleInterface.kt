@@ -5,7 +5,6 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import kotlin.experimental.inv
@@ -30,6 +29,10 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
     var fileContent : ByteArray? = null
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
+        if (isManagerInitialized()) {
+            LepuBleLog.e(tag, "manager is initialized")
+            return
+        }
         manager = OxyBleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)

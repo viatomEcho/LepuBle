@@ -796,7 +796,7 @@ object LpWorkManager {
                 LepuBleLog.d(tag, "scanDevice scanTimer.start()")
             }
         } else {
-            if (bluetoothAdapter?.isEnabled!! && leScanCallback != null) {
+            bluetoothAdapter?.isEnabled?.let {
                 if (leScanner == null) {
                     leScanner = bluetoothAdapter?.bluetoothLeScanner
                 }

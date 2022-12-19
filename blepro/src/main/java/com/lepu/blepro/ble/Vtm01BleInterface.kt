@@ -18,14 +18,14 @@ import kotlin.experimental.inv
  * 1.实时血氧
  * 血氧采样率：参数1HZ，波形50HZ
  */
-
 class Vtm01BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Vtm01BleInterface"
 
-    private lateinit var context: Context
-
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
+        if (isManagerInitialized()) {
+            LepuBleLog.e(tag, "manager is initialized")
+            return
+        }
         manager = OxyBleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
@@ -45,6 +45,10 @@ class Vtm01BleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "onResponseReceived bytes: ${bytesToHex(response.bytes)}")
         when (response.cmd) {
             Vtm01BleCmd.GET_INFO -> {
+                if (response.content.size < 38) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val data = LepuDevice(response.content)
                 LepuBleLog.d(tag, "model:$model,CMD_INFO => success $data")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01Info).post(InterfaceEvent(model, data))
@@ -71,6 +75,10 @@ class Vtm01BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,GET_CONFIG => success")
             }
             Vtm01BleCmd.RT_PARAM -> {
+                if (response.content.size < 5) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val data = Vtm01BleResponse.RtParam(response.content)
                 LepuBleLog.d(tag, "model:$model,RT_PARAM => success $data")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01RtParam).post(
@@ -78,11 +86,19 @@ class Vtm01BleInterface(model: Int): BleInterface(model) {
                 )
             }
             Vtm01BleCmd.RT_DATA -> {
+                if (response.content.size < 12) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val data = Vtm01BleResponse.RtData(response.content)
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success $data")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01RtData).post(InterfaceEvent(model, data))
             }
             Vtm01BleCmd.GET_ORIGINAL_DATA -> {
+                if (response.content.size < 2) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val data = Vtm01BleResponse.OriginalData(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_ORIGINAL_DATA => success $data")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01OriginalData).post(InterfaceEvent(model, data))

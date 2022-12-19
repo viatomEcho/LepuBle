@@ -7,7 +7,6 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BleCRC
 import com.lepu.blepro.ble.cmd.CheckmePodBleCmd
 import com.lepu.blepro.ble.cmd.CheckmePodBleResponse
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
@@ -32,6 +31,10 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
     var curFile: CheckmePodBleResponse.OxiTFile? = null
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
+        if (isManagerInitialized()) {
+            LepuBleLog.e(tag, "manager is initialized")
+            return
+        }
         manager = OxyBleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
@@ -139,7 +142,7 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
             }
             CheckmePodBleCmd.OXY_CMD_RT_DATA -> {
                 clearTimeout()
-                if (response.len < 22) {
+                if (response.len < 20) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodRtDataError).post(InterfaceEvent(model, true))
                     LepuBleLog.d(tag, "OXY_CMD_RT_DATA response.len:${response.len}")
                     return

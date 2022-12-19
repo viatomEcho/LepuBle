@@ -6,7 +6,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
@@ -31,6 +30,10 @@ class Er1BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Er1BleInterface"
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
+        if (isManagerInitialized()) {
+            LepuBleLog.e(tag, "manager is initialized")
+            return
+        }
         manager = Er1BleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
@@ -58,19 +61,22 @@ class Er1BleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "onResponseReceived cmd: ${response.cmd}, bytes: ${bytesToHex(response.bytes)}")
         when(response.cmd) {
             Er1BleCmd.GET_INFO -> {
+                if (response.content.size < 38) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = LepuDevice(response.content)
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1Info).post(InterfaceEvent(model, info))
-                // 本版本注释，测试通过后删除
-                /*if (runRtImmediately){
-                    runRtTask()
-                    runRtImmediately = false
-                }*/
 
             }
 
             Er1BleCmd.RT_DATA -> {
+                if (response.content.size < 20) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val rtData = Er1BleResponse.RtData(response.content)
 
                 Er1DataController.receive(rtData.wave.wFs)
@@ -79,6 +85,10 @@ class Er1BleInterface(model: Int): BleInterface(model) {
             }
 
             Er1BleCmd.READ_FILE_LIST -> {
+                if (response.content.isEmpty()) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 fileList = Er1BleResponse.Er1FileList(response.content)
                 LepuBleLog.d(tag, "model:$model,READ_FILE_LIST => success, ${fileList.toString()}")
                 fileList?.let {

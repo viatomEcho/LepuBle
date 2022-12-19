@@ -7,7 +7,6 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.Pc300BleCmd.*
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.Pc300DeviceInfo
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
@@ -31,16 +30,17 @@ import com.lepu.blepro.utils.HexString.trimStr
  * 心电采样率：实时150HZ
  * 心电增益：n * 1 / 394 = n * 0.0025380710659898-----394倍
  */
-
 class Pc300BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Pc300BleInterface"
 
-    private lateinit var context: Context
     private var gain = 394f
     private var pc300Device = Pc300DeviceInfo()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
+        if (isManagerInitialized()) {
+            LepuBleLog.e(tag, "manager is initialized")
+            return
+        }
         manager = Pc100BleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)

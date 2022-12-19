@@ -30,6 +30,10 @@ class LepodBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "LepodBleInterface"
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
+        if (isManagerInitialized()) {
+            LepuBleLog.e(tag, "manager is initialized")
+            return
+        }
         manager = Er1BleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
@@ -56,24 +60,40 @@ class LepodBleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "onResponseReceived cmd: ${response.cmd}, bytes: ${bytesToHex(response.bytes)}")
         when(response.cmd) {
             LepodBleCmd.GET_INFO -> {
+                if (response.content.size < 38) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = LepuDevice(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success $info")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodInfo).post(InterfaceEvent(model, info))
             }
 
             LepodBleCmd.RT_PARAM -> {
+                if (response.content.size < 40) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val rtParam = LepodBleResponse.RtParam(response.content)
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success ${rtParam}")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodRtData).post(InterfaceEvent(model, rtParam))
             }
 
             LepodBleCmd.RT_DATA -> {
+                if (response.content.size < 40) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val rtData = LepodBleResponse.RtData(response.content)
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success ${rtData.wave}")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodRtData).post(InterfaceEvent(model, rtData))
             }
 
             LepodBleCmd.READ_FILE_LIST -> {
+                if (response.content.isEmpty()) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val fileList = LepodBleResponse.FileList(response.content)
                 LepuBleLog.d(tag, "model:$model,READ_FILE_LIST => success, $fileList")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodFileList).post(InterfaceEvent(model,fileList))

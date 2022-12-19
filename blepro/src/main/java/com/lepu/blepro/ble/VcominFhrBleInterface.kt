@@ -5,7 +5,6 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.data.VcominData
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 
@@ -14,14 +13,14 @@ import com.lepu.blepro.utils.*
  * receive:
  * 1.实时心率
  */
-
 class VcominFhrBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "VcominFhrBleInterface"
 
-    private lateinit var context: Context
-
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
+        if (isManagerInitialized()) {
+            LepuBleLog.e(tag, "manager is initialized")
+            return
+        }
         manager = Sp20BleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
@@ -39,6 +38,10 @@ class VcominFhrBleInterface(model: Int): BleInterface(model) {
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: ByteArray) {
         LepuBleLog.d(tag, "onResponseReceived bytes: ${bytesToHex(response)}")
+        if (response.size < 5) {
+            LepuBleLog.e(tag, "response.size:${response.size} error")
+            return
+        }
         val data = VcominData(response)
         LepuBleLog.d(tag, "received data : $data")
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VCOMIN.EventVcominRtHr).post(InterfaceEvent(model, data))
