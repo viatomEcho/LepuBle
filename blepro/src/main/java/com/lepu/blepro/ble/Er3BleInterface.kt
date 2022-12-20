@@ -6,7 +6,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
@@ -31,7 +30,10 @@ class Er3BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Er3BleInterface"
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = Er1BleManager(context)
+        if (!isManagerInitialized()) {
+            LepuBleLog.e(tag, "manager is not initialized")
+            manager = Er1BleManager(context)
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -57,18 +59,30 @@ class Er3BleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "onResponseReceived cmd: ${response.cmd}, bytes: ${bytesToHex(response.bytes)}")
         when(response.cmd) {
             Er3BleCmd.GET_INFO -> {
+                if (response.content.size < 38) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = LepuDevice(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success $info")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3Info).post(InterfaceEvent(model, info))
             }
 
             Er3BleCmd.RT_DATA -> {
+                if (response.content.size < 48) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val rtData = Er3BleResponse.RtData(response.content)
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success ${rtData.wave}")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3RtData).post(InterfaceEvent(model, rtData))
             }
 
             Er3BleCmd.READ_FILE_LIST -> {
+                if (response.content.isEmpty()) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val fileList = Er3BleResponse.FileList(response.content)
                 LepuBleLog.d(tag, "model:$model,READ_FILE_LIST => success, $fileList")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FileList).post(InterfaceEvent(model,fileList))

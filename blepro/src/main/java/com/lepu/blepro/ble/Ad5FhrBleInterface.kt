@@ -5,7 +5,6 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.data.Ad5Data
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.*
@@ -23,14 +22,14 @@ import kotlinx.coroutines.launch
 class Ad5FhrBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Ad5FhrBleInterface"
 
-    private lateinit var context: Context
-
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
-        manager = if (model == Bluetooth.MODEL_VTM_AD5) {
-            Ad5FhrBleManager(context)
-        } else {
-            MdFhrBleManager(context)
+        if (!isManagerInitialized()) {
+            LepuBleLog.e(tag, "manager is not initialized")
+            manager = if (model == Bluetooth.MODEL_VTM_AD5) {
+                Ad5FhrBleManager(context)
+            } else {
+                MdFhrBleManager(context)
+            }
         }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
@@ -49,6 +48,10 @@ class Ad5FhrBleInterface(model: Int): BleInterface(model) {
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: ByteArray) {
         LepuBleLog.d(tag, "onResponseReceived received : ${bytesToHex(response)}")
+        if (response.size < 13) {
+            LepuBleLog.e(tag, "response.size:${response.size} error")
+            return
+        }
         val data = Ad5Data(response)
         LepuBleLog.d(tag, "received data : $data")
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AD5.EventAd5RtHr).post(InterfaceEvent(model, data))

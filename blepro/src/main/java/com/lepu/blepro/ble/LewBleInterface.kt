@@ -24,7 +24,10 @@ import kotlin.experimental.inv
 class LewBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "LewBleInterface"
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = LewBleManager(context)
+        if (!isManagerInitialized()) {
+            LepuBleLog.e(tag, "manager is not initialized")
+            manager = LewBleManager(context)
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this

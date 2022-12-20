@@ -4,14 +4,11 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.VetcorderInfo
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
-import java.util.*
 
 /**
  * vetcorder心电血氧设备：
@@ -20,12 +17,14 @@ import java.util.*
  * 血氧心电采样率：实时25HZ
  * 心电增益：n * 4033 / (32767 * 12 * 1.05) = n * 0.0097683451362458-----102.3714852467146倍
  */
-
 class VetcorderBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "VetcorderBleInterface"
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = Er1BleManager(context)
+        if (!isManagerInitialized()) {
+            LepuBleLog.e(tag, "manager is not initialized")
+            manager = Er1BleManager(context)
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this

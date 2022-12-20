@@ -9,7 +9,6 @@ import com.lepu.blepro.ble.cmd.Bp2BleCmd
 import com.lepu.blepro.ble.cmd.Bp2BleCmd.*
 import com.lepu.blepro.ble.cmd.Bp2BleResponse
 import com.lepu.blepro.ble.data.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.CrcUtil.calCRC8
 import com.lepu.blepro.utils.LepuBleLog
@@ -37,7 +36,10 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Bp2BleInterface"
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = Bp2BleManager(context)
+        if (!isManagerInitialized()) {
+            LepuBleLog.e(tag, "manager is not initialized")
+            manager = Bp2BleManager(context)
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -94,19 +96,16 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
         when (bleResponse.cmd) {
             GET_INFO -> {
                 LepuBleLog.d(tag, "model:$model,CMD_INFO => success")
-
+                if (bleResponse.content.size < 38) {
+                    LepuBleLog.e(tag, "response.size:${bleResponse.content.size} error")
+                    return
+                }
                 val info = if (device.name == null) {
                     Bp2DeviceInfo(bleResponse.content, "")
                 } else {
                     Bp2DeviceInfo(bleResponse.content, device.name)
                 }
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Info).post(InterfaceEvent(model, info))
-                // 本版本注释，测试通过后删除
-                /*if (runRtImmediately) {
-                    runRtTask()
-                    runRtImmediately = false
-                }*/
-
             }
             SET_TIME -> {
                 //同步时间
@@ -212,14 +211,17 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 if (bleResponse.content.size > 31) {
                     val rtData = Bp2BleRtData(bleResponse.content)
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData).post(InterfaceEvent(model, rtData))
-                }else{
+                } else {
                     Log.d(tag, "bytes.content.size < 31")
                 }
             }
             //实时状态
             RT_STATE -> {
                 LepuBleLog.d(tag, "model:$model,CMD_BP2_RT_STATE => success")
-
+                if (bleResponse.content.size < 7) {
+                    LepuBleLog.e(tag, "response.size:${bleResponse.content.size} error")
+                    return
+                }
                 val rtState = Bp2BleRtState(bleResponse.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2State).post(InterfaceEvent(model, rtState))
 
@@ -298,6 +300,10 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 if (bleResponse.type != 0x01.toByte()) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2GetPhyStateError).post(InterfaceEvent(model, false))
                 } else {
+                    if (bleResponse.content.size < 4) {
+                        LepuBleLog.e(tag, "response.size:${bleResponse.content.size} error")
+                        return
+                    }
                     val data = Bp2BlePhyState(bleResponse.content)
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2GetPhyState).post(InterfaceEvent(model, data))
                 }
@@ -305,6 +311,10 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
             SET_PHY_STATE -> {
                 LepuBleLog.d(tag, "model:$model,CMD_BP2_SET_PHY_STATE => success")
+                if (bleResponse.content.size < 4) {
+                    LepuBleLog.e(tag, "response.size:${bleResponse.content.size} error")
+                    return
+                }
                 val data = Bp2BlePhyState(bleResponse.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SetPhyState).post(InterfaceEvent(model, data))
             }

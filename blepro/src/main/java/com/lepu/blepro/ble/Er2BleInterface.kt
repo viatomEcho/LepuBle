@@ -7,7 +7,6 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.Er2DeviceInfo
 import com.lepu.blepro.ble.data.FactoryConfig
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
@@ -30,7 +29,10 @@ import kotlin.experimental.inv
 class Er2BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Er2BleInterface"
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = Er2BleManager(context)
+        if (!isManagerInitialized()) {
+            LepuBleLog.e(tag, "manager is not initialized")
+            manager = Er2BleManager(context)
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -89,6 +91,10 @@ class Er2BleInterface(model: Int): BleInterface(model) {
     private fun onResponseReceived(respPkg: Er2BleResponse) {
         when(respPkg.cmd) {
             Er2BleCmd.CMD_RETRIEVE_DEVICE_INFO -> {
+                if (respPkg.data.size < 38) {
+                    LepuBleLog.e(tag, "response.size:${respPkg.data.size} error")
+                    return
+                }
                 val info = if (device.name == null) {
                     Er2DeviceInfo("", device.address, respPkg.data)
                 } else {
@@ -97,11 +103,6 @@ class Er2BleInterface(model: Int): BleInterface(model) {
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2Info).post(InterfaceEvent(model, info))
-                // 本版本注释，测试通过后删除
-                /*if (runRtImmediately){
-                    runRtTask()
-                    runRtImmediately = false
-                }*/
             }
             Er2BleCmd.CMD_SET_TIME -> {
 
@@ -156,13 +157,20 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                 }
             }
             Er2BleCmd.CMD_GET_REAL_TIME_DATA -> {
-
+                if (respPkg.data.size < 20) {
+                    LepuBleLog.e(tag, "response.size:${respPkg.data.size} error")
+                    return
+                }
                 val rtData = Er2RtData(respPkg.data)
 
                 LepuBleLog.d(tag, "model:$model,CMD_GET_REAL_TIME_DATA => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2RtData).post(InterfaceEvent(model, rtData))
             }
             Er2BleCmd.CMD_LIST_FILE -> {
+                if (respPkg.data.isEmpty()) {
+                    LepuBleLog.e(tag, "response.size:${respPkg.data.size} error")
+                    return
+                }
                 val fileArray = Er2FileList(respPkg.data)
 
                 LepuBleLog.d(tag, "model:$model,CMD_LIST_FILE => success")

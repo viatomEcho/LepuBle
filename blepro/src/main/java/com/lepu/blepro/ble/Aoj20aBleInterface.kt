@@ -5,7 +5,6 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
@@ -24,13 +23,13 @@ import com.lepu.blepro.utils.ByteUtils.byte2UInt
 class Aoj20aBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Aoj20aBleInterface"
 
-    private lateinit var context: Context
-
     private var tempList = arrayListOf<Aoj20aBleResponse.TempRecord>()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
-        manager = Aoj20aBleManager(context)
+        if (!isManagerInitialized()) {
+            LepuBleLog.e(tag, "manager is not initialized")
+            manager = Aoj20aBleManager(context)
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this

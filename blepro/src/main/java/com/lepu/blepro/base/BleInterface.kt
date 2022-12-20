@@ -233,7 +233,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
     }
 
-
+    fun isManagerInitialized() = this::manager.isInitialized
 
     @OptIn(ExperimentalUnsignedTypes::class)
     abstract fun hasResponse(bytes: ByteArray?): ByteArray?
