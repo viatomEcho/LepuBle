@@ -7,7 +7,6 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.BoDeviceInfo
 import com.lepu.blepro.ble.data.Pc68bConfig
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.ByteUtils.bytes2UIntBig
@@ -30,7 +29,6 @@ import com.lepu.blepro.utils.getTimeString
  * 1.实时血氧
  * 血氧采样率：参数1HZ，波形50HZ
  */
-
 class Pc68bBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Pc68bBleInterface"
     private var deviceInfo = BoDeviceInfo()
@@ -70,6 +68,10 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                     }
                     Pc68bBleCmd.MSG_GET_DEVICE_INFO -> {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_DEVICE_INFO => success")
+                        if (response.content.size < 3) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Pc68bBleResponse.DeviceInfo(response.content)
                         deviceInfo.deviceName = data.deviceName
                         device.name?.let {
@@ -95,12 +97,20 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                     }
                     Pc68bBleCmd.MSG_RT_PARAM -> {
                         LepuBleLog.d(tag, "model:$model,MSG_RT_PARAM => success")
+                        if (response.content.size < 6) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Pc68bBleResponse.RtParam(response.content)
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bRtParam).post(InterfaceEvent(model, data))
                     }
                     Pc68bBleCmd.MSG_RT_WAVE -> {
                         LepuBleLog.d(tag, "model:$model,MSG_RT_WAVE => success")
+                        if (response.content.size < 5) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Pc68bBleResponse.RtWave(response.content)
                         LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bRtWave).post(InterfaceEvent(model, data))
@@ -114,6 +124,10 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                     // 定制版
                     Pc68bBleCmd.MSG_GET_OR_SET_CONFIG -> {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_OR_SET_CONFIG => success")
+                        if (response.content.size < 6) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Pc68bConfig(response.content)
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bConfigInfo).post(InterfaceEvent(model, data))
@@ -130,6 +144,10 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                     }
                     // 定制版
                     Pc68bBleCmd.MSG_GET_TIME -> {
+                        if (response.content.size < 7) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Pc68bBleResponse.DeviceTime(response.content)
                         LepuBleLog.d(tag, "model:$model,MSG_GET_TIME => success $data")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bGetTime).post(InterfaceEvent(model, data))
@@ -138,6 +156,10 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                     Pc68bBleCmd.MSG_GET_FILES -> {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_FILES => success")
                         LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
+                        if (response.content.size < 2) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val num = bytes2UIntBig(response.content[0], response.content[1])
                         if (fileName.isEmpty()) {
                             if (num != 0xFFFF) {

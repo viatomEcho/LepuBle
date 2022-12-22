@@ -5,7 +5,6 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
@@ -20,14 +19,10 @@ import com.lepu.blepro.utils.ByteUtils.byte2UInt
  * 5.设置按摩时间
  * 6.获取设备信息
  */
-
 class LemBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "LemBleInterface"
 
-    private lateinit var context: Context
-
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
         manager = LemBleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
@@ -51,17 +46,29 @@ class LemBleInterface(model: Int): BleInterface(model) {
             }
             LemBleCmd.DEVICE_BATTERY -> {
                 LepuBleLog.d(tag, "model:$model,DEVICE_BATTERY => success ${bytesToHex(response.content)}")
+                if (response.content.isEmpty()) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val data = byte2UInt(response.content[0])
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemBattery).post(InterfaceEvent(model, data))
             }
             LemBleCmd.MSG_DEVICE_STATE -> {
                 LepuBleLog.d(tag, "model:$model,MSG_DEVICE_STATE => success ${bytesToHex(response.content)}")
+                if (response.content.size < 5) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val data = LemBleResponse.DeviceInfo(response.content)
                 LepuBleLog.d(tag, "model:$model,MSG_DEVICE_STATE => LemBleResponse.DeviceInfo $data")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemDeviceInfo).post(InterfaceEvent(model, data))
             }
             LemBleCmd.HEAT_MODE -> {
                 LepuBleLog.d(tag, "model:$model,HEAT_MODE => success ${bytesToHex(response.content)}")
+                if (response.content.isEmpty()) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val data = byte2UInt(response.content[0])
                 if (data == 1) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetHeatMode).post(InterfaceEvent(model, true))
@@ -71,16 +78,28 @@ class LemBleInterface(model: Int): BleInterface(model) {
             }
             LemBleCmd.MASSAGE_MODE -> {
                 LepuBleLog.d(tag, "model:$model,MASSAGE_MODE => success ${bytesToHex(response.content)}")
+                if (response.content.isEmpty()) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val data = byte2UInt(response.content[0])
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetMassageMode).post(InterfaceEvent(model, data))
             }
             LemBleCmd.MASSAGE_TIME -> {
                 LepuBleLog.d(tag, "model:$model,MASSAGE_TIME => success ${bytesToHex(response.content)}")
+                if (response.content.isEmpty()) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val data = byte2UInt(response.content[0])
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetMassageTime).post(InterfaceEvent(model, data))
             }
             LemBleCmd.MASSAGE_LEVEL -> {
                 LepuBleLog.d(tag, "model:$model,MASSAGE_LEVEL => success ${bytesToHex(response.content)}")
+                if (response.content.isEmpty()) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val data = byte2UInt(response.content[0])
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetMassageLevel).post(InterfaceEvent(model, data))
             }

@@ -796,11 +796,13 @@ object LpWorkManager {
                 LepuBleLog.d(tag, "scanDevice scanTimer.start()")
             }
         } else {
-            if (bluetoothAdapter?.isEnabled!! && leScanCallback != null) {
-                if (leScanner == null) {
-                    leScanner = bluetoothAdapter?.bluetoothLeScanner
+            bluetoothAdapter?.isEnabled?.let {
+                if (it) {
+                    if (leScanner == null) {
+                        leScanner = bluetoothAdapter?.bluetoothLeScanner
+                    }
+                    leScanner?.stopScan(leScanCallback)
                 }
-                leScanner?.stopScan(leScanCallback)
             }
             isDiscovery = false
             isWaitingScanResult = false

@@ -6,7 +6,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.BoDeviceInfo
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.CrcUtil
 import com.lepu.blepro.utils.LepuBleLog
@@ -57,6 +56,10 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
                     }
                     Ap20BleCmd.MSG_GET_DEVICE_INFO -> {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_DEVICE_INFO => success")
+                        if (response.content.size < 3) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Ap20BleResponse.DeviceInfo(response.content)
                         ap20Device.deviceName = data.deviceName
                         device.name?.let {
@@ -77,6 +80,10 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
                     Ap20BleCmd.MSG_GET_BACKLIGHT -> {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_BACKLIGHT => success")
                         LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
+                        if (response.content.isEmpty()) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Ap20BleResponse.ConfigInfo(byteArrayOf(0, response.content[0]))
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20GetConfig).post(InterfaceEvent(model, data))
@@ -84,6 +91,10 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
                     Ap20BleCmd.MSG_SET_BACKLIGHT -> {
                         LepuBleLog.d(tag, "model:$model,MSG_SET_BACKLIGHT => success")
                         LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
+                        if (response.content.isEmpty()) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Ap20BleResponse.ConfigInfo(byteArrayOf(0, response.content[0]))
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20SetConfig).post(InterfaceEvent(model, data))
@@ -102,12 +113,20 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
                     }
                     Ap20BleCmd.MSG_RT_OXY_PARAM -> {
                         LepuBleLog.d(tag, "model:$model,MSG_RT_BO_PARAM => success")
+                        if (response.content.size < 6) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Ap20BleResponse.RtBoParam(response.content)
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBoParam).post(InterfaceEvent(model, data))
                     }
                     Ap20BleCmd.MSG_RT_OXY_WAVE -> {
                         LepuBleLog.d(tag, "model:$model,MSG_RT_BO_WAVE => success")
+                        if (response.content.size < 5) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Ap20BleResponse.RtBoWave(response.content)
                         LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBoWave).post(InterfaceEvent(model, data))
@@ -119,12 +138,20 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
                     }
                     Ap20BleCmd.MSG_GET_CONFIG -> {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_CONFIG => success")
+                        if (response.content.size < 2) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Ap20BleResponse.ConfigInfo(response.content)
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20GetConfig).post(InterfaceEvent(model, data))
                     }
                     Ap20BleCmd.MSG_SET_CONFIG -> {
                         LepuBleLog.d(tag, "model:$model,MSG_SET_CONFIG => success")
+                        if (response.content.size < 2) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Ap20BleResponse.ConfigInfo(response.content)
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20SetConfig).post(InterfaceEvent(model, data))
@@ -144,6 +171,10 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
                     Ap20BleCmd.MSG_RT_BREATH_PARAM -> {
                         LepuBleLog.d(tag, "model:$model,MSG_RT_BREATH_PARAM => success")
                         LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
+                        if (response.content.size < 2) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Ap20BleResponse.RtBreathParam(response.content)
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBreathParam).post(InterfaceEvent(model, data))
@@ -151,6 +182,10 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
                     Ap20BleCmd.MSG_RT_BREATH_WAVE -> {
                         LepuBleLog.d(tag, "model:$model,MSG_RT_BREATH_WAVE => success")
                         LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
+                        if (response.content.size < 4) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Ap20BleResponse.RtBreathWave(response.content)
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBreathWave).post(InterfaceEvent(model, data))

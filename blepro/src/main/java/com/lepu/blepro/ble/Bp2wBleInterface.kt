@@ -8,7 +8,6 @@ import com.lepu.blepro.ble.cmd.Bp2wBleCmd
 import com.lepu.blepro.ble.cmd.Bp2wBleCmd.*
 import com.lepu.blepro.ble.cmd.LepuBleResponse
 import com.lepu.blepro.ble.data.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.CrcUtil.calCRC8
 import com.lepu.blepro.utils.LepuBleLog

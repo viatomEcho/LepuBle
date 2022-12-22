@@ -5,7 +5,6 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
@@ -16,14 +15,10 @@ import com.lepu.blepro.utils.ByteUtils.byte2UInt
  * 1.实时血氧
  * 血氧采样率：参数1HZ，波形50HZ
  */
-
 class Vtm20fBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Vtm20fBleInterface"
 
-    private lateinit var context: Context
-
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
         manager = Vtm20fBleManager(context)
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
@@ -44,11 +39,19 @@ class Vtm20fBleInterface(model: Int): BleInterface(model) {
         when (response.cmd) {
             Vtm20fBleResponse.RT_PARAM -> {
                 LepuBleLog.d(tag, "model:$model,RT_PARAM => success " + bytesToHex(response.bytes))
+                if (response.content.size < 6) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = Vtm20fBleResponse.RtParam(response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM20f.EventVTM20fRtParam).post(InterfaceEvent(model, info))
             }
             Vtm20fBleResponse.RT_WAVE -> {
                 LepuBleLog.d(tag, "model:$model,RT_WAVE => success " + bytesToHex(response.bytes))
+                if (response.content.size < 4) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = Vtm20fBleResponse.RtWave(response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM20f.EventVTM20fRtWave).post(InterfaceEvent(model, info))
             }

@@ -9,7 +9,6 @@ import com.lepu.blepro.ble.cmd.OxyBleCmd
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.LepuDevice
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
@@ -127,6 +126,10 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
             OxyBleCmd.OXY_CMD_BOX_INFO -> {
                 clearTimeout()
+                if (response.content.size < 38) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val boxInfo = LepuDevice(response.content.copyOfRange(1, response.len))
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_BOX_INFO => success $boxInfo")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBoxInfo).post(InterfaceEvent(model, boxInfo))
@@ -136,11 +139,6 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
                 clearTimeout()
                 val info = OxyBleResponse.OxyInfo(response.content)
-                // 本版本注释，测试通过后删除
-                /*if (runRtImmediately) {
-                    runRtTask()
-                    runRtImmediately = false
-                }*/
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success $info")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo).post(InterfaceEvent(model, info))
 
