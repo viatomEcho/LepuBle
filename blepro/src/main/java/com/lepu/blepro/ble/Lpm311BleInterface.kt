@@ -47,6 +47,10 @@ class Lpm311BleInterface(model: Int): BleInterface(model) {
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(bytes: ByteArray) {
+        if (bytes.size < 41) {
+            LepuBleLog.d(tag, "bytes.size < 41")
+            return
+        }
         var index = 0
         val data = Lpm311Data()
         data.bytes = bytes

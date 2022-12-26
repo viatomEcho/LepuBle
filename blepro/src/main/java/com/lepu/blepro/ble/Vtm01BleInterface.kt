@@ -93,7 +93,7 @@ class Vtm01BleInterface(model: Int): BleInterface(model) {
                 )
             }
             Vtm01BleCmd.RT_DATA -> {
-                if (response.content.size < 12) {
+                if (response.content.size < 14) {
                     LepuBleLog.e(tag, "response.size:${response.content.size} error")
                     return
                 }

@@ -105,7 +105,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
 
         when (bleResponse.cmd) {
             GET_INFO -> {
-                if (bleResponse.len == 0) {
+                if (bleResponse.len == 0 || bleResponse.content.size < 38) {
                     LepuBleLog.d(tag, "GET_INFO bleResponse.len == 0")
                     return
                 }
@@ -121,7 +121,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             RT_STATE -> {
-                if (bleResponse.len == 0) {
+                if (bleResponse.len == 0 || bleResponse.content.size < 7) {
                     LepuBleLog.d(tag, "RT_STATE bleResponse.len == 0")
                     return
                 }
@@ -133,7 +133,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
 
             GET_FILE_LIST -> {
                 LepuBleLog.d(tag, "model:$model,GET_FILE_LIST => success")
-                if (bleResponse.len == 0) {
+                if (bleResponse.len == 0 || bleResponse.content.isEmpty()) {
                     LepuBleLog.d(tag, "GET_FILE_LIST bleResponse.len == 0")
                     return
                 }
@@ -233,7 +233,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
 
             //实时波形
             RT_DATA -> {
-                if (bleResponse.len == 0) {
+                if (bleResponse.len == 0 || bleResponse.content.size < 32) {
                     LepuBleLog.d(tag, "RT_DATA bleResponse.len == 0")
                     return
                 }
@@ -256,7 +256,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             GET_CONFIG -> {
-                if (bleResponse.len == 0) {
+                if (bleResponse.len == 0 || bleResponse.content.size < 27) {
                     LepuBleLog.d(tag, "GET_CONFIG bleResponse.len == 0")
                     return
                 }

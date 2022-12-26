@@ -77,7 +77,7 @@ class LeS1BleInterface(model: Int): BleInterface(model) {
             }
 
             LeS1BleCmd.RT_DATA -> {
-                if (response.content.size < 16) {
+                if (response.content.size < 27) {
                     LepuBleLog.e(tag, "response.size:${response.content.size} error")
                     return
                 }
@@ -88,7 +88,7 @@ class LeS1BleInterface(model: Int): BleInterface(model) {
 
             LeS1BleCmd.READ_FILE_LIST -> {
                 LepuBleLog.d(tag, "model:$model,READ_FILE_LIST => success")
-                if (response.len == 0) {
+                if (response.len == 0 || response.content.isEmpty()) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1NoFile).post(InterfaceEvent(model, true))
                     LepuBleLog.d(tag, "READ_FILE_LIST bleResponse.len == 0")
                     return
