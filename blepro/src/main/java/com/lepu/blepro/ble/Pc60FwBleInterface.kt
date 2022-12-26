@@ -38,27 +38,59 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
     private var pc60FwDevice = BoDeviceInfo()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = when (model) {
-            Bluetooth.MODEL_PC60FW,
-            Bluetooth.MODEL_POD_1W,
-            Bluetooth.MODEL_S5W,
-            Bluetooth.MODEL_S6W,
-            Bluetooth.MODEL_S6W1,
-            Bluetooth.MODEL_S7W,
-            Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_PF_10,
-            Bluetooth.MODEL_PF_10AW,
-            Bluetooth.MODEL_PF_10AW1,
-            Bluetooth.MODEL_PF_10BW,
-            Bluetooth.MODEL_PF_10BW1,
-            Bluetooth.MODEL_PC_60NW_1,
-            Bluetooth.MODEL_PC_60B,
-            Bluetooth.MODEL_POD2B,
-            Bluetooth.MODEL_PF_20,
-            Bluetooth.MODEL_PF_20AW,
-            Bluetooth.MODEL_PF_20B,
-            Bluetooth.MODEL_OXYSMART -> Pc60FwBleManager(context)
-            else -> Pc6nBleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = when (model) {
+                    Bluetooth.MODEL_PC60FW,
+                    Bluetooth.MODEL_POD_1W,
+                    Bluetooth.MODEL_S5W,
+                    Bluetooth.MODEL_S6W,
+                    Bluetooth.MODEL_S6W1,
+                    Bluetooth.MODEL_S7W,
+                    Bluetooth.MODEL_S7BW,
+                    Bluetooth.MODEL_PF_10,
+                    Bluetooth.MODEL_PF_10AW,
+                    Bluetooth.MODEL_PF_10AW1,
+                    Bluetooth.MODEL_PF_10BW,
+                    Bluetooth.MODEL_PF_10BW1,
+                    Bluetooth.MODEL_PC_60NW_1,
+                    Bluetooth.MODEL_PC_60B,
+                    Bluetooth.MODEL_POD2B,
+                    Bluetooth.MODEL_PF_20,
+                    Bluetooth.MODEL_PF_20AW,
+                    Bluetooth.MODEL_PF_20B,
+                    Bluetooth.MODEL_OXYSMART -> Pc60FwBleManager(context)
+                    else -> Pc6nBleManager(context)
+                }
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = when (model) {
+                Bluetooth.MODEL_PC60FW,
+                Bluetooth.MODEL_POD_1W,
+                Bluetooth.MODEL_S5W,
+                Bluetooth.MODEL_S6W,
+                Bluetooth.MODEL_S6W1,
+                Bluetooth.MODEL_S7W,
+                Bluetooth.MODEL_S7BW,
+                Bluetooth.MODEL_PF_10,
+                Bluetooth.MODEL_PF_10AW,
+                Bluetooth.MODEL_PF_10AW1,
+                Bluetooth.MODEL_PF_10BW,
+                Bluetooth.MODEL_PF_10BW1,
+                Bluetooth.MODEL_PC_60NW_1,
+                Bluetooth.MODEL_PC_60B,
+                Bluetooth.MODEL_POD2B,
+                Bluetooth.MODEL_PF_20,
+                Bluetooth.MODEL_PF_20AW,
+                Bluetooth.MODEL_PF_20B,
+                Bluetooth.MODEL_OXYSMART -> Pc60FwBleManager(context)
+                else -> Pc6nBleManager(context)
+            }
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
         }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)

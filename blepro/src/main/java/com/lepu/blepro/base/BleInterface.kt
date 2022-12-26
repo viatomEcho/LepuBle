@@ -148,6 +148,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
     abstract fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean = false)
 
+    fun isManagerInitialized(): Boolean = this::manager.isInitialized
 
     /**
      * 订阅者集合

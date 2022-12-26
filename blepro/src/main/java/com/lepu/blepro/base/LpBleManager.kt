@@ -141,7 +141,7 @@ abstract class LpBleManager(context: Context): BleManager(context) {
             .with { device: BluetoothDevice, data: Data ->
 
                 data.value?.let {
-                    LepuBleLog.d(MANAGER_TAG, device.name + " NotificationCallback received==" + bytesToHex(it) + " size=" + bytesToHex(data.value!!).length)
+                    LepuBleLog.d(MANAGER_TAG, device.name + " NotificationCallback received==" + bytesToHex(it) + " size=" + bytesToHex(it).length)
 
                 }?: kotlin.run {
                     log(Log.WARN, "NotificationCallback data.value == null")
@@ -160,7 +160,7 @@ abstract class LpBleManager(context: Context): BleManager(context) {
                     LepuBleLog.d(
                         MANAGER_TAG,
                         device.name + " IndicationCallback received==" + bytesToHex(it) + " size=" + bytesToHex(
-                            data.value!!
+                            it
                         ).length
                     )
 

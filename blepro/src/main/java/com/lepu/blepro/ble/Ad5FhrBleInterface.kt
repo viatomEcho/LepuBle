@@ -23,10 +23,25 @@ class Ad5FhrBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Ad5FhrBleInterface"
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = if (model == Bluetooth.MODEL_VTM_AD5) {
-            Ad5FhrBleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = if (model == Bluetooth.MODEL_VTM_AD5) {
+                    Ad5FhrBleManager(context)
+                } else {
+                    MdFhrBleManager(context)
+                }
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
         } else {
-            MdFhrBleManager(context)
+            manager = if (model == Bluetooth.MODEL_VTM_AD5) {
+                Ad5FhrBleManager(context)
+            } else {
+                MdFhrBleManager(context)
+            }
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
         }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)

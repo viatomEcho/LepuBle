@@ -45,7 +45,18 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     var isPiRt: Boolean = true
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = OxyBleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = OxyBleManager(context)
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = OxyBleManager(context)
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -187,7 +198,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                     }
                     curFileName?.let {
 
-                        curFile = userId?.let { it1 -> OxyBleResponse.OxyFile(model, curFileName!!, fileSize, it1) }
+                        curFile = userId?.let { it1 -> OxyBleResponse.OxyFile(model, it, fileSize, it1) }
                         sendOxyCmd(OxyBleCmd.OXY_CMD_READ_CONTENT, OxyBleCmd.readFileContent())
                     }
 
@@ -215,8 +226,8 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
                         this.addContent(response.content)
 
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadingFileProgress).post(InterfaceEvent(model, (curFile!!.index * 1000).div(curFile!!.fileSize)))
-                        LepuBleLog.d(tag, "model:$model, 读文件中：${curFile?.fileName}   => ${curFile?.index} / ${curFile?.fileSize}")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadingFileProgress).post(InterfaceEvent(model, (this.index * 1000).div(this.fileSize)))
+                        LepuBleLog.d(tag, "model:$model, 读文件中：${this.fileName}   => ${this.index} / ${this.fileSize}")
 
                         if (this.index < this.fileSize) {
                             sendOxyCmd(OxyBleCmd.OXY_CMD_READ_CONTENT, OxyBleCmd.readFileContent())
