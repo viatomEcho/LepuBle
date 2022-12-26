@@ -116,7 +116,7 @@ object LpWorkManager {
 
     private fun initBle() {
         val bluetoothManager =
-            application!!.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+            application?.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager.adapter
         leScanner = bluetoothAdapter?.bluetoothLeScanner
         LepuBleLog.d(tag, "initBle success")
@@ -772,28 +772,30 @@ object LpWorkManager {
         LepuBleLog.d(tag, "scanDevice scanTimer.cancel()")
 
         if (enable) {
-            if (bluetoothAdapter?.isEnabled!!) {
-                val settings: ScanSettings = if (Build.VERSION.SDK_INT >= 23) {
-                    ScanSettings.Builder()
-                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                        .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
-                        .build()
-                }else {
-                    ScanSettings.Builder()
-                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                        .build()
+            bluetoothAdapter?.isEnabled?.let {
+                if (it) {
+                    val settings: ScanSettings = if (Build.VERSION.SDK_INT >= 23) {
+                        ScanSettings.Builder()
+                            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                            .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
+                            .build()
+                    } else {
+                        ScanSettings.Builder()
+                            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                            .build()
+                    }
+                    //                    List<ScanFilter> filters = new ArrayList<ScanFilter>();
+                    //                    filters.add(new ScanFilter.Builder().build());
+                    if (leScanner == null) {
+                        leScanner = bluetoothAdapter?.bluetoothLeScanner
+                    }
+                    isWaitingScanResult = true
+                    LepuBleLog.d(tag, "scanDevice isWaitingScanResult = true")
+                    leScanner?.startScan(null, settings, leScanCallback)
+                    isDiscovery = true
+                    scanTimer.start()
+                    LepuBleLog.d(tag, "scanDevice scanTimer.start()")
                 }
-                //                    List<ScanFilter> filters = new ArrayList<ScanFilter>();
-                //                    filters.add(new ScanFilter.Builder().build());
-                if (leScanner == null) {
-                    leScanner = bluetoothAdapter?.bluetoothLeScanner
-                }
-                isWaitingScanResult = true
-                LepuBleLog.d(tag, "scanDevice isWaitingScanResult = true")
-                leScanner?.startScan(null, settings, leScanCallback)
-                isDiscovery = true
-                scanTimer.start()
-                LepuBleLog.d(tag, "scanDevice scanTimer.start()")
             }
         } else {
             bluetoothAdapter?.isEnabled?.let {

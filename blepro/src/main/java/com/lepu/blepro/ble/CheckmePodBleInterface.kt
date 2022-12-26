@@ -127,7 +127,7 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
                     }
                     curFileName?.let {
 
-                        curFile = CheckmePodBleResponse.OxiTFile(curFileName!!, fileSize)
+                        curFile = CheckmePodBleResponse.OxiTFile(it, fileSize)
                         sendOxyCmd(CheckmePodBleCmd.OXY_CMD_READ_CONTENT, CheckmePodBleCmd.readFileContent())
                     }
 
@@ -154,8 +154,8 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
                 curFile?.apply {
 
                     this.addContent(response.content)
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListProgress).post(InterfaceEvent(model, (curFile!!.index * 100).div(curFile!!.fileSize)))
-                    LepuBleLog.d(tag, "model:$model, 读文件中：${curFile?.fileName}   => ${curFile?.index} / ${curFile?.fileSize}")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListProgress).post(InterfaceEvent(model, (this.index * 100).div(this.fileSize)))
+                    LepuBleLog.d(tag, "model:$model, 读文件中：${this.fileName}   => ${this.index} / ${this.fileSize}")
 
                     if (this.index < this.fileSize) {
                         sendOxyCmd(CheckmePodBleCmd.OXY_CMD_READ_CONTENT, CheckmePodBleCmd.readFileContent())
