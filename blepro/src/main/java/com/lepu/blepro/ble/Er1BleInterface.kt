@@ -30,7 +30,15 @@ class Er1BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Er1BleInterface"
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = Er1BleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = Er1BleManager(context)
+                LepuBleLog.d(tag, "manager.create done")
+            }
+        } else {
+            manager = Er1BleManager(context)
+            LepuBleLog.d(tag, "manager.create done")
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
