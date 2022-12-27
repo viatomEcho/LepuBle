@@ -6,7 +6,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.LepuDevice
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import kotlin.experimental.inv
@@ -22,12 +21,22 @@ import kotlin.experimental.inv
  * 心电采样率：实时125HZ，存储125HZ
  * 心电增益：n * (1.0035 * 1800) / (4096 * 178.74) = n * 0.0024672217239426-----405.3142002989537倍
  */
-
 class LeS1BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "LeS1BleInterface"
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = OxyBleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = OxyBleManager(context)
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = OxyBleManager(context)
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -56,6 +65,10 @@ class LeS1BleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "onResponseReceived cmd: ${response.cmd}, bytes: ${bytesToHex(response.bytes)}")
         when(response.cmd) {
             LeS1BleCmd.GET_INFO -> {
+                if (response.content.size < 38) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = LepuDevice(response.content)
 
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success $info")
@@ -64,6 +77,10 @@ class LeS1BleInterface(model: Int): BleInterface(model) {
             }
 
             LeS1BleCmd.RT_DATA -> {
+                if (response.content.size < 27) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val rtData = LeS1BleResponse.RtData(response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1RtData).post(InterfaceEvent(model, rtData))
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success $rtData")
@@ -71,7 +88,7 @@ class LeS1BleInterface(model: Int): BleInterface(model) {
 
             LeS1BleCmd.READ_FILE_LIST -> {
                 LepuBleLog.d(tag, "model:$model,READ_FILE_LIST => success")
-                if (response.len == 0) {
+                if (response.len == 0 || response.content.isEmpty()) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1NoFile).post(InterfaceEvent(model, true))
                     LepuBleLog.d(tag, "READ_FILE_LIST bleResponse.len == 0")
                     return
@@ -149,6 +166,8 @@ class LeS1BleInterface(model: Int): BleInterface(model) {
                     } else {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1ReadFileError).post(InterfaceEvent(model, true))
                     }
+                } ?: kotlin.run {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1ReadFileError).post(InterfaceEvent(model, true))
                 }
             }
 

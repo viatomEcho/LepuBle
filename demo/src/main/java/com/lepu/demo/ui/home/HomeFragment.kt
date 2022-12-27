@@ -2,6 +2,7 @@ package com.lepu.demo.ui.home
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -14,6 +15,7 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BIOL
+import com.lepu.demo.DeviceFactoryDataActivity
 import com.lepu.demo.MainActivity
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
@@ -144,7 +146,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         }
 
         mainViewModel.curBluetooth.observe(viewLifecycleOwner) {
-            binding.bleDevice.text = "当前蓝牙设备：\n蓝牙名：${it!!.deviceName}\n地址：${it!!.deviceMacAddress}"
+            binding.bleDevice.text = "当前蓝牙设备：\n蓝牙名：${it!!.deviceName}\n蓝牙地址：${it!!.deviceMacAddress}"
         }
 
         binding.bleSplit.setText(Constant.BluetoothConfig.splitText)

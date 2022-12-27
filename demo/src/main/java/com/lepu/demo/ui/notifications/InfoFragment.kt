@@ -241,6 +241,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER3
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_VTM01
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LEPOD) {
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
@@ -642,7 +643,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this) { event ->
                 (event.data as Er2File).let {
                     if (it.fileName.contains("R")) {
-                        val data = Er1EcgFile(getOffset(it.model, "", it.fileName))
+                        val content = getOffset(it.model, "", it.fileName)
+                        val data = if (content.isEmpty()) {
+                            Er1EcgFile(it.content)
+                        } else {
+                            Er1EcgFile(content)
+                        }
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                         val recordingTime = DateUtil.getSecondTimestamp(it.fileName.replace("R", ""))
@@ -651,7 +657,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         ecgAdapter.setNewInstance(ecgList)
                         ecgAdapter.notifyDataSetChanged()
                     } else {
-                        val data = Er2AnalysisFile(getOffset(it.model, "", it.fileName))
+                        val content = getOffset(it.model, "", it.fileName)
+                        val data = if (content.isEmpty()) {
+                            Er2AnalysisFile(it.content)
+                        } else {
+                            Er2AnalysisFile(content)
+                        }
                         binding.info.text = "$data"
                         readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                     }
@@ -775,7 +786,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileComplete)
             .observe(this) { event ->
                 (event.data as Bp2BleFile).let {
-                    val file = Bp2BleFile(it.name, getOffset(event.model, "", it.name), it.deviceName)
+                    val content = getOffset(event.model, "", it.name)
+                    val file = if (content.isEmpty()) {
+                        it
+                    } else {
+                        Bp2BleFile(it.name, content, it.deviceName)
+                    }
                     if (file.type == 2) {
                         val data = Bp2EcgFile(file.content)
                         binding.info.text = "$data"
@@ -1401,6 +1417,69 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FactoryResetAll)
             .observe(this) {
                 Toast.makeText(context, "恢复生产状态成功", Toast.LENGTH_SHORT).show()
+            }
+        //------------------------------Lepod--------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodFileList)
+            .observe(this) { event ->
+                (event.data as LepodBleResponse.FileList).let {
+                    binding.info.text = it.toString()
+                    for (fileName in it.fileList) {
+                        if (fileName.isNotEmpty()) {
+                            fileNames.add(fileName)
+                        }
+                    }
+                    binding.deviceInfo.text = fileNames.toString()
+                    Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodReadingFileProgress)
+            .observe(this) { event ->
+                (event.data as Int).let {
+                    process = it
+                    binding.process.text = "$readFileProcess $curFileName 读取进度: $process %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodReadFileComplete)
+            .observe(this) { event ->
+                (event.data as LepodBleResponse.BleFile).let {
+                    if (it.fileName.contains("T")) {
+                        val data = Er3DataFile(it.content)
+                        binding.info.text = "$data"
+                        binding.deviceInfo.text = "$data"
+                    } else if (it.fileName.contains("W")) {
+
+                    }
+                    setReceiveCmd(it.content)
+                    binding.process.text = readFileProcess
+                    if (binding.fileName.text.toString().isEmpty()) {
+                        fileNames.removeAt(0)
+                        readFile()
+                    } else {
+                        mAlertDialog?.dismiss()
+                    }
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodReset)
+            .observe(this) {
+                Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodFactoryReset)
+            .observe(this) {
+                Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodFactoryResetAll)
+            .observe(this) {
+                Toast.makeText(context, "恢复生产状态成功", Toast.LENGTH_SHORT).show()
+            }
+        //-----------------------vtm01-----------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01Reset)
+            .observe(this) {
+                Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01FactoryReset)
+            .observe(this) {
+                Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
             }
     }
 

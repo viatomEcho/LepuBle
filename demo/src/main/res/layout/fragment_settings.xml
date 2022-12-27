@@ -13,12 +13,6 @@
             android:layout_height="wrap_content"
             android:padding="5dp"
             android:orientation="vertical">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_margin="@dimen/dp_10"
-                android:text="私有方法测试"/>
             <Button
                 android:visibility="gone"
                 android:id="@+id/bytes_switch"
@@ -73,10 +67,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="scale"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -129,10 +119,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="aoj20a"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -154,10 +140,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="pc68b"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -194,10 +176,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="ad5"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -213,10 +191,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="pc300"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -301,10 +275,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="bpm"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -327,6 +297,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="18sp"
                         android:text="branch code:" />
                     <EditText
                         android:id="@+id/pc60fw_code"
@@ -344,39 +316,48 @@
             <include
                 android:id="@+id/er3_layout"
                 layout="@layout/er3_settings"/>
+            <include
+                android:id="@+id/lepod_layout"
+                layout="@layout/lepod_settings"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/device_info"
-                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:layout_marginTop="20dp"/>
             <TextView
                 android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/send_cmd"
+                android:textColor="@color/black"
                 android:layout_marginTop="20dp"/>
             <TextView
                 android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/response_cmd"
+                android:textColor="@color/black"
                 android:layout_marginTop="20dp"/>
             <TextView
                 android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
                 android:id="@+id/receive_cmd"/>
             <TextView
                 android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="(以下是数据解析日志)"
+                android:textColor="@color/black"
                 android:layout_marginTop="50dp"/>
             <TextView
                 android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
                 android:id="@+id/content"/>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

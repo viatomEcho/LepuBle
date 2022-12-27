@@ -5,7 +5,6 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.data.PoctorM3102Data
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 
@@ -14,16 +13,24 @@ import com.lepu.blepro.utils.*
  * receive：
  * 1.测量数据自动上发
  */
-
 class PoctorM3102BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "PoctorM3102BleInterface"
 
-    private lateinit var context: Context
     private var deviceData = com.lepu.blepro.ext.PoctorM3102Data()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
-        manager = PoctorM3102BleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = PoctorM3102BleManager(context)
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = PoctorM3102BleManager(context)
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this

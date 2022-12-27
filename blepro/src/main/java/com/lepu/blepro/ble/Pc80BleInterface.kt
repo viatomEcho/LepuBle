@@ -5,14 +5,12 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.pc80b.*
 import com.lepu.blepro.utils.CrcUtil
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
-import java.util.*
 
 /**
  * pc80b心电设备：
@@ -26,11 +24,8 @@ import java.util.*
  * 心电采样率：实时150HZ，存储150HZ
  * 心电增益：n * 1 / 330 = n * 0.003030303030303-----330倍
  */
-
 class Pc80BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "PC80BleInterface"
-
-    private lateinit var context: Context
 
     private var curFile: PC80BleResponse.RtRecordData? = null
     private var transType = 0
@@ -43,8 +38,18 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
     private var rtEcgResult = RtEcgResult()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
-        manager = Pc80BleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = Pc80BleManager(context)
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = Pc80BleManager(context)
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -64,6 +69,10 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
         when(response.cmd) {
             Pc80BleCmd.HEARTBEAT -> {
                 LepuBleLog.d(tag, "model:$model,HEARTBEAT => success")
+                if (response.content.isEmpty()) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val batLevel = (response.content[0].toUInt() and 0xFFu).toInt()
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bBatLevel).post(InterfaceEvent(model, batLevel))
             }
@@ -76,6 +85,10 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
             Pc80BleCmd.GET_INFO -> {
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 LepuBleLog.d(tag, "model:$model,GET_INFO response.len => " + response.len)
+                if (response.content.size < 3) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = PC80BleResponse.DeviceInfo(response.content, response.len)
 
                 deviceInfo.algorithmV = info.algorithmV
@@ -180,6 +193,10 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
             }
 
             Pc80BleCmd.TRACK_DATA_MESS -> {
+                if (response.content.size < 6) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 LepuBleLog.d(tag, "model:$model,TRACK_DATA_MESS => success")
                 val info = PC80BleResponse.RtTrackData(response.content)
 

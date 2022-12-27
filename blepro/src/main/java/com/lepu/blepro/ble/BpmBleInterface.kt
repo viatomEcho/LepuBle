@@ -7,7 +7,6 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BpmBleCmd
 import com.lepu.blepro.ble.cmd.BpmBleResponse
 import com.lepu.blepro.ble.data.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.bpm.DeviceInfo
 import com.lepu.blepro.ext.bpm.RecordData
@@ -33,7 +32,18 @@ class BpmBleInterface(model: Int): BleInterface(model) {
     private var recordData = RecordData()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = BpmBleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = BpmBleManager(context)
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = BpmBleManager(context)
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -96,6 +106,10 @@ class BpmBleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, " onResponseReceived : " + bytesToHex(bytes))
         when(BpmBleCmd.getMsgType(bytes)) {
             BpmBleCmd.BPMCmd.MSG_TYPE_GET_INFO -> {
+                if (bytes.size < 10) {
+                    LepuBleLog.e(tag, "response.size:${bytes.size} error")
+                    return
+                }
                 //设备信息
                 val data = if (device.name == null) {
                     BpmDeviceInfo(bytes, "")
@@ -109,12 +123,6 @@ class BpmBleInterface(model: Int): BleInterface(model) {
                 deviceInfo.secondVersion = data.secondVersion
 
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmInfo).post(InterfaceEvent(model, deviceInfo))
-                // 本版本注释，测试通过后删除
-                /*if (runRtImmediately){
-                    runRtTask()
-                    runRtImmediately = false
-                }*/
-
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_SET_TIME -> {
                 //同步时间
@@ -122,7 +130,10 @@ class BpmBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmSyncTime).post(InterfaceEvent(model, true))
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_GET_BP_STATE -> {
-
+                if (bytes.size < 5) {
+                    LepuBleLog.e(tag, "response.size:${bytes.size} error")
+                    return
+                }
                 //发送实时state : byte
                 val data = BpmBleResponse.RtState(bytes)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmState).post(InterfaceEvent(model, data.state))
@@ -130,7 +141,10 @@ class BpmBleInterface(model: Int): BleInterface(model) {
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_GET_RECORDS -> {
                 //获取留存记录
-
+                if (bytes.size < 5) {
+                    LepuBleLog.e(tag, "response.size:${bytes.size} error")
+                    return
+                }
                 val data = BpmCmd(bytes)
                 BpmBleResponse.RecordData(bytes).let {
 
@@ -165,6 +179,10 @@ class BpmBleInterface(model: Int): BleInterface(model) {
 
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_GET_RESULT -> {
+                if (bytes.size < 5) {
+                    LepuBleLog.e(tag, "response.size:${bytes.size} error")
+                    return
+                }
                 // 返回测量数据
                 val data = BpmBleResponse.RecordData(bytes)
                 LepuBleLog.d(tag, "model:$model,MSG_TYPE_GET_RESULT => success $data")
@@ -184,12 +202,20 @@ class BpmBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmMeasureResult).post(InterfaceEvent(model, recordData))
             }
             BpmBleCmd.BPMCmd.MSG_TYPE_ERROR_RESULT -> {
+                if (bytes.size < 5) {
+                    LepuBleLog.e(tag, "response.size:${bytes.size} error")
+                    return
+                }
                 // 返回测量数据错误
                 val data = BpmBleResponse.ErrorResult(bytes)
                 LepuBleLog.d(tag, "model:$model,MSG_TYPE_ERROR_RESULT => success $data")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmMeasureErrorResult).post(InterfaceEvent(model, data.result))
             }
             else -> {
+                if (bytes.size < 5) {
+                    LepuBleLog.e(tag, "response.size:${bytes.size} error")
+                    return
+                }
                 //实时指标
                 val data = BpmBleResponse.RtData(bytes)
                 LepuBleLog.d(tag, "model:$model,EventBpmRtData => success $data")

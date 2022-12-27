@@ -13,7 +13,6 @@ import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_S
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_SPO2_WAVE
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_WORKING_STATUS
 import com.lepu.blepro.ble.data.BoDeviceInfo
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.pc60fw.PpgData
 import com.lepu.blepro.ext.pc60fw.WorkingStatus
@@ -47,27 +46,59 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
     private var workingStatus = WorkingStatus()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = when (model) {
-            Bluetooth.MODEL_PC60FW,
-            Bluetooth.MODEL_POD_1W,
-            Bluetooth.MODEL_S5W,
-            Bluetooth.MODEL_S6W,
-            Bluetooth.MODEL_S6W1,
-            Bluetooth.MODEL_S7W,
-            Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_PF_10,
-            Bluetooth.MODEL_PF_10AW,
-            Bluetooth.MODEL_PF_10AW1,
-            Bluetooth.MODEL_PF_10BW,
-            Bluetooth.MODEL_PF_10BW1,
-            Bluetooth.MODEL_PC_60NW_1,
-            Bluetooth.MODEL_PC_60B,
-            Bluetooth.MODEL_POD2B,
-            Bluetooth.MODEL_PF_20,
-            Bluetooth.MODEL_PF_20AW,
-            Bluetooth.MODEL_PF_20B,
-            Bluetooth.MODEL_OXYSMART -> Pc60FwBleManager(context)
-            else -> Pc6nBleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = when (model) {
+                    Bluetooth.MODEL_PC60FW,
+                    Bluetooth.MODEL_POD_1W,
+                    Bluetooth.MODEL_S5W,
+                    Bluetooth.MODEL_S6W,
+                    Bluetooth.MODEL_S6W1,
+                    Bluetooth.MODEL_S7W,
+                    Bluetooth.MODEL_S7BW,
+                    Bluetooth.MODEL_PF_10,
+                    Bluetooth.MODEL_PF_10AW,
+                    Bluetooth.MODEL_PF_10AW1,
+                    Bluetooth.MODEL_PF_10BW,
+                    Bluetooth.MODEL_PF_10BW1,
+                    Bluetooth.MODEL_PC_60NW_1,
+                    Bluetooth.MODEL_PC_60B,
+                    Bluetooth.MODEL_POD2B,
+                    Bluetooth.MODEL_PF_20,
+                    Bluetooth.MODEL_PF_20AW,
+                    Bluetooth.MODEL_PF_20B,
+                    Bluetooth.MODEL_OXYSMART -> Pc60FwBleManager(context)
+                    else -> Pc6nBleManager(context)
+                }
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = when (model) {
+                Bluetooth.MODEL_PC60FW,
+                Bluetooth.MODEL_POD_1W,
+                Bluetooth.MODEL_S5W,
+                Bluetooth.MODEL_S6W,
+                Bluetooth.MODEL_S6W1,
+                Bluetooth.MODEL_S7W,
+                Bluetooth.MODEL_S7BW,
+                Bluetooth.MODEL_PF_10,
+                Bluetooth.MODEL_PF_10AW,
+                Bluetooth.MODEL_PF_10AW1,
+                Bluetooth.MODEL_PF_10BW,
+                Bluetooth.MODEL_PF_10BW1,
+                Bluetooth.MODEL_PC_60NW_1,
+                Bluetooth.MODEL_PC_60B,
+                Bluetooth.MODEL_POD2B,
+                Bluetooth.MODEL_PF_20,
+                Bluetooth.MODEL_PF_20AW,
+                Bluetooth.MODEL_PF_20B,
+                Bluetooth.MODEL_OXYSMART -> Pc60FwBleManager(context)
+                else -> Pc6nBleManager(context)
+            }
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
         }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
@@ -128,6 +159,10 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             when (response.type) {
                 TYPE_BATTERY_LEVEL -> {
                     LepuBleLog.d(tag, "model:$model,EventPC60FwBattery => success")
+                    if (response.content.isEmpty()) {
+                        LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                        return
+                    }
                     PC60FwBleResponse.Battery(response.content).let {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwBatLevel).post(InterfaceEvent(model, it.batteryLevel.toInt()))
                         LepuBleLog.d(tag, "it.batteryLevel == " + it.batteryLevel)
@@ -140,6 +175,10 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                 }
                 TYPE_DEVICE_INFO -> {
                     LepuBleLog.d(tag, "model:$model,TYPE_DEVICE_INFO => success")
+                    if (response.content.size < 3) {
+                        LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                        return
+                    }
                     PC60FwBleResponse.DeviceInfo(response.content).let {
                         pc60FwDevice.deviceName = it.deviceName
                         device.name?.let { it1 ->
@@ -179,6 +218,10 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             when (response.type) {
                 Pc60FwBleCmd.MSG_GET_DEVICE_INFO_0F.toByte() -> {
                     LepuBleLog.d(tag, "model:$model,MSG_GET_DEVICE_INFO_0F => success")
+                    if (response.content.size < 2) {
+                        LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                        return
+                    }
                     PC60FwBleResponse.DeviceInfo0F(response.content).let {
                         pc60FwDevice.deviceName = it.deviceName
                         device.name?.let { it1 ->
@@ -198,6 +241,10 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                 }
                 TYPE_SPO2_PARAM -> {
                     LepuBleLog.d(tag, "model:$model,EventPC60FwRtDataParam => success")
+                    if (response.content.size < 6) {
+                        LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                        return
+                    }
                     PC60FwBleResponse.RtDataParam(response.content).let {
 
                         pc60fwRtParam.isProbeOff = it.isProbeOff
@@ -218,6 +265,10 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                 TYPE_SPO2_WAVE -> {
                     LepuBleLog.d(tag, "model:$model,EventPC60FwRtDataWave => success")
                     LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
+                    if (response.content.size < 5) {
+                        LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                        return
+                    }
                     PC60FwBleResponse.RtDataWave(response.content).let {
                         pc60fwRtWave.waveData = it.waveData
                         pc60fwRtWave.waveIntData = it.waveIntData
@@ -226,6 +277,10 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                     }
                 }
                 TYPE_WORKING_STATUS -> {
+                    if (response.content.size < 4) {
+                        LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                        return
+                    }
                     PC60FwBleResponse.WorkingStatus(response.content).let {
                         LepuBleLog.d(tag, "model:$model,WORK_STATUS_DATA => success")
 
@@ -244,6 +299,10 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model,MSG_ENABLE_WAVE => success ${bytesToHex(response.content)}")
                 }
                 Pc60FwBleCmd.MSG_IR_RED_FREQ.toByte() -> {
+                    if (response.content.size < 4) {
+                        LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                        return
+                    }
                     PC60FwBleResponse.OriginalData(response.content).let {
                         LepuBleLog.d(tag, "model:$model,MSG_IR_RED_FREQ => success $it")
 

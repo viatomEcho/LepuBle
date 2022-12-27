@@ -53,7 +53,18 @@ class OxyBleInterface(model: Int): BleInterface(model) {
     private var oxyFile = OxyFile()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = OxyBleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = OxyBleManager(context)
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = OxyBleManager(context)
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -134,6 +145,10 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
             OxyBleCmd.OXY_CMD_BOX_INFO -> {
                 clearTimeout()
+                if (response.content.size < 38) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = LepuDevice(response.content.copyOfRange(1, response.len))
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_BOX_INFO => success $info")
 
@@ -153,11 +168,6 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
                 clearTimeout()
                 val info = OxyBleResponse.OxyInfo(response.content)
-                // 本版本注释，测试通过后删除
-                /*if (runRtImmediately) {
-                    runRtTask()
-                    runRtImmediately = false
-                }*/
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success $info")
 
                 deviceInfo.region = info.region
@@ -257,9 +267,13 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                     val fileSize = toUInt(response.content)
 
                     LepuBleLog.d(tag, "model:$model, 文件大小：${fileSize}  文件名：$curFileName")
+                    if (fileSize == 0) {
+                        sendOxyCmd(OxyBleCmd.OXY_CMD_READ_END, OxyBleCmd.readFileEnd())
+                        return
+                    }
                     curFileName?.let {
 
-                        curFile = userId?.let { it1 -> OxyBleResponse.OxyFile(model, curFileName!!, fileSize, it1) }
+                        curFile = userId?.let { it1 -> OxyBleResponse.OxyFile(model, it, fileSize, it1) }
                         sendOxyCmd(OxyBleCmd.OXY_CMD_READ_CONTENT, OxyBleCmd.readFileContent())
                     }
 
@@ -287,14 +301,17 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
                         this.addContent(response.content)
 
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadingFileProgress).post(InterfaceEvent(model, (curFile!!.index * 100).div(curFile!!.fileSize)))
-                        LepuBleLog.d(tag, "model:$model, 读文件中：${curFile?.fileName}   => ${curFile?.index} / ${curFile?.fileSize}")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadingFileProgress).post(InterfaceEvent(model, (this.index * 100).div(this.fileSize)))
+                        LepuBleLog.d(tag, "model:$model, 读文件中：${this.fileName}   => ${this.index} / ${this.fileSize}")
 
                         if (this.index < this.fileSize) {
                             sendOxyCmd(OxyBleCmd.OXY_CMD_READ_CONTENT, OxyBleCmd.readFileContent())
                         } else {
                             sendOxyCmd(OxyBleCmd.OXY_CMD_READ_END, OxyBleCmd.readFileEnd())
                         }
+                    } ?: kotlin.run {
+                        LepuBleLog.d(tag, "model:$model,  curFile error!!")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError).post(InterfaceEvent(model, true))
                     }
                 } else {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError).post(InterfaceEvent(model, true))

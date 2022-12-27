@@ -196,9 +196,9 @@ public class FileUtil {
 
     }*/
 
-    public static void saveFile(Context context, byte[] data, String fileName) {
+    public static void saveFile(Context context, byte[] data, String filename) {
         File file = new File(context.getExternalFilesDir(null).getAbsolutePath());
-        file = new File(file, fileName);
+        file = new File(file, filename);
         try {
             if (!file.exists()) {
                 file.createNewFile();
@@ -216,7 +216,22 @@ public class FileUtil {
         }
     }
 
-    public static byte[] readFile(Context context, String fileName) {
+    public static String readFileToString(Context context, String fileName) {
+        File file = new File(context.getExternalFilesDir(null).getAbsolutePath());
+        file = new File(file, fileName);
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            String data = FileUtils.readFileToString(file);
+            return data;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public static byte[] readFileToByteArray(Context context, String fileName) {
         File file = new File(context.getExternalFilesDir(null).getAbsolutePath());
         file = new File(file, fileName);
         try {
@@ -226,6 +241,24 @@ public class FileUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void saveFile(Context context, int[] data, String filename) {
+        File file = new File(context.getExternalFilesDir(null).getAbsolutePath());
+        file = new File(file, filename);
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
+            for (int i=0; i<data.length; i++) {
+                bufferedWriter.write(String.valueOf(data[i]));
+                bufferedWriter.write(",");
+            }
+            bufferedWriter.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void readTh12File(Context context) {

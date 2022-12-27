@@ -6,7 +6,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BiolandBgmBleCmd
 import com.lepu.blepro.ble.cmd.BiolandBgmBleResponse
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.bioland.DeviceInfo
 import com.lepu.blepro.ext.bioland.GluData
@@ -25,14 +24,22 @@ import com.lepu.blepro.utils.ByteUtils.byte2UInt
 class BiolandBgmBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "BiolandBgmBleInterface"
 
-    private lateinit var context: Context
-
     private var deviceInfo = DeviceInfo()
     private var gluData = GluData()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
-        manager = BiolandBgmBleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = BiolandBgmBleManager(context)
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = BiolandBgmBleManager(context)
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -54,7 +61,10 @@ class BiolandBgmBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,HAND_SHAKE => success")
             }
             BiolandBgmBleCmd.GET_INFO -> {
-                if (response.content.isEmpty()) return
+                if (response.content.size < 5) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val data = BiolandBgmBleResponse.DeviceInfo(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success $data")
 
@@ -68,13 +78,19 @@ class BiolandBgmBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmDeviceInfo).post(InterfaceEvent(model, deviceInfo))
             }
             BiolandBgmBleCmd.MSG_ING -> {
-                if (response.content.isEmpty()) return
+                if (response.content.size < 2) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val data = byte2UInt(response.content[1])
                 LepuBleLog.d(tag, "model:$model,MSG_ING => success $data")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmCountDown).post(InterfaceEvent(model, data))
             }
             BiolandBgmBleCmd.GET_DATA -> {
-                if (response.content.isEmpty()) return
+                if (response.content.size < 8) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val data = BiolandBgmBleResponse.GluData(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_DATA => success $data")
 

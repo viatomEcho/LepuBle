@@ -2,27 +2,33 @@ package com.lepu.blepro.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
-import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.FscaleUserInfo
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.utils.*
 
 /**
  *
  * 蓝牙操作
  */
-
 class F4ScaleBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "F4ScaleBleInterface"
 
-    private lateinit var context: Context
     private var userInfo = FscaleUserInfo()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
-        manager = F4ScaleBleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = F4ScaleBleManager(context)
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = F4ScaleBleManager(context)
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this

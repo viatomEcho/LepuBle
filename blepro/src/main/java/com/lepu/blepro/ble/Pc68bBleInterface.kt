@@ -7,7 +7,6 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.BoDeviceInfo
 import com.lepu.blepro.ble.data.Pc68bConfig
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.pc68b.DeviceInfo
 import com.lepu.blepro.ext.pc68b.RtParam
@@ -33,7 +32,6 @@ import com.lepu.blepro.utils.getTimeString
  * 1.实时血氧
  * 血氧采样率：参数1HZ，波形50HZ
  */
-
 class Pc68bBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Pc68bBleInterface"
     private var deviceInfo = BoDeviceInfo()
@@ -47,7 +45,18 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
     private var wave = RtWave()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = Ap20BleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = Ap20BleManager(context)
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = Ap20BleManager(context)
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -77,6 +86,10 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                     }
                     Pc68bBleCmd.MSG_GET_DEVICE_INFO -> {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_DEVICE_INFO => success")
+                        if (response.content.size < 3) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Pc68bBleResponse.DeviceInfo(response.content)
                         deviceInfo.deviceName = data.deviceName
                         device.name?.let {
@@ -107,6 +120,10 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                     }
                     Pc68bBleCmd.MSG_RT_PARAM -> {
                         LepuBleLog.d(tag, "model:$model,MSG_RT_PARAM => success")
+                        if (response.content.size < 6) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Pc68bBleResponse.RtParam(response.content)
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
 
@@ -123,6 +140,10 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                     }
                     Pc68bBleCmd.MSG_RT_WAVE -> {
                         LepuBleLog.d(tag, "model:$model,MSG_RT_WAVE => success")
+                        if (response.content.size < 5) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Pc68bBleResponse.RtWave(response.content)
                         LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
 
@@ -140,6 +161,10 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                     // 定制版
                     Pc68bBleCmd.MSG_GET_OR_SET_CONFIG -> {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_OR_SET_CONFIG => success")
+                        if (response.content.size < 6) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Pc68bConfig(response.content)
                         LepuBleLog.d(tag, "model:$model, data.toString() == $data")
 
@@ -162,6 +187,10 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                     }
                     // 定制版
                     Pc68bBleCmd.MSG_GET_TIME -> {
+                        if (response.content.size < 7) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val data = Pc68bBleResponse.DeviceTime(response.content)
                         LepuBleLog.d(tag, "model:$model,MSG_GET_TIME => success $data")
 
@@ -173,6 +202,10 @@ class Pc68bBleInterface(model: Int): BleInterface(model) {
                     Pc68bBleCmd.MSG_GET_FILES -> {
                         LepuBleLog.d(tag, "model:$model,MSG_GET_FILES => success")
                         LepuBleLog.d(tag, "model:$model, bytesToHex(response.content)) == " + bytesToHex(response.content))
+                        if (response.content.size < 2) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val num = bytes2UIntBig(response.content[0], response.content[1])
                         if (fileName.isEmpty()) {
                             if (num != 0xFFFF) {

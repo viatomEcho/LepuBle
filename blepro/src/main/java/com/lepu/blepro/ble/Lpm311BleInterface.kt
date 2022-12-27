@@ -5,7 +5,6 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.data.Lpm311Data
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import kotlinx.coroutines.GlobalScope
@@ -17,16 +16,24 @@ import java.nio.charset.StandardCharsets
  *
  * 蓝牙操作
  */
-
 class Lpm311BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Lpm311BleInterface"
 
-    private lateinit var context: Context
     private var deviceData = com.lepu.blepro.ext.Lpm311Data()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
-        manager = Lpm311BleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = Lpm311BleManager(context)
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = Lpm311BleManager(context)
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -42,6 +49,10 @@ class Lpm311BleInterface(model: Int): BleInterface(model) {
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(bytes: ByteArray) {
+        if (bytes.size < 41) {
+            LepuBleLog.d(tag, "bytes.size < 41")
+            return
+        }
         var index = 0
         val data = Lpm311Data()
         data.bytes = bytes

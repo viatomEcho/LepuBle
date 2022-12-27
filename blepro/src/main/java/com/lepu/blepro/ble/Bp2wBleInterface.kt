@@ -8,7 +8,6 @@ import com.lepu.blepro.ble.cmd.Bp2wBleCmd
 import com.lepu.blepro.ble.cmd.Bp2wBleCmd.*
 import com.lepu.blepro.ble.cmd.LepuBleResponse
 import com.lepu.blepro.ble.data.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.CrcUtil.calCRC8
 import com.lepu.blepro.utils.LepuBleLog
@@ -38,7 +37,18 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Bp2wBleInterface"
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = Bp2BleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = Bp2BleManager(context)
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = Bp2BleManager(context)
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -95,7 +105,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
 
         when (bleResponse.cmd) {
             GET_INFO -> {
-                if (bleResponse.len == 0) {
+                if (bleResponse.len == 0 || bleResponse.content.size < 38) {
                     LepuBleLog.d(tag, "GET_INFO bleResponse.len == 0")
                     return
                 }
@@ -111,7 +121,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             RT_STATE -> {
-                if (bleResponse.len == 0) {
+                if (bleResponse.len == 0 || bleResponse.content.size < 7) {
                     LepuBleLog.d(tag, "RT_STATE bleResponse.len == 0")
                     return
                 }
@@ -123,7 +133,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
 
             GET_FILE_LIST -> {
                 LepuBleLog.d(tag, "model:$model,GET_FILE_LIST => success")
-                if (bleResponse.len == 0) {
+                if (bleResponse.len == 0 || bleResponse.content.isEmpty()) {
                     LepuBleLog.d(tag, "GET_FILE_LIST bleResponse.len == 0")
                     return
                 }
@@ -223,7 +233,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
 
             //实时波形
             RT_DATA -> {
-                if (bleResponse.len == 0) {
+                if (bleResponse.len == 0 || bleResponse.content.size < 32) {
                     LepuBleLog.d(tag, "RT_DATA bleResponse.len == 0")
                     return
                 }
@@ -246,7 +256,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             GET_CONFIG -> {
-                if (bleResponse.len == 0) {
+                if (bleResponse.len == 0 || bleResponse.content.size < 27) {
                     LepuBleLog.d(tag, "GET_CONFIG bleResponse.len == 0")
                     return
                 }

@@ -11,6 +11,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="血氧过低阈值："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -34,6 +36,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="脉率过低阈值："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -57,6 +61,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="脉率过高阈值："/>
             <RelativeLayout
                 android:layout_width="match_parent"

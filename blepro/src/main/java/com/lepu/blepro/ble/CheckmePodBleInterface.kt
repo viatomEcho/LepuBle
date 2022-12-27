@@ -7,7 +7,6 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.BleCRC
 import com.lepu.blepro.ble.cmd.CheckmePodBleCmd
 import com.lepu.blepro.ble.cmd.CheckmePodBleResponse
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.checkmepod.*
 import com.lepu.blepro.utils.LepuBleLog
@@ -39,7 +38,18 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
     private var fileList = arrayListOf<Record>()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = OxyBleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = OxyBleManager(context)
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = OxyBleManager(context)
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -141,11 +151,14 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
 
                 if (response.state) {
                     val fileSize = toUInt(response.content)
-
                     LepuBleLog.d(tag, "model:$model, 文件大小：${fileSize}  文件名：$curFileName")
+                    if (fileSize == 0) {
+                        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_READ_END, CheckmePodBleCmd.readFileEnd())
+                        return
+                    }
                     curFileName?.let {
 
-                        curFile = CheckmePodBleResponse.OxiTFile(curFileName!!, fileSize)
+                        curFile = CheckmePodBleResponse.OxiTFile(it, fileSize)
                         sendOxyCmd(CheckmePodBleCmd.OXY_CMD_READ_CONTENT, CheckmePodBleCmd.readFileContent())
                     }
 
@@ -156,7 +169,7 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
             }
             CheckmePodBleCmd.OXY_CMD_RT_DATA -> {
                 clearTimeout()
-                if (response.len < 22) {
+                if (response.len < 20) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodRtDataError).post(InterfaceEvent(model, true))
                     LepuBleLog.d(tag, "OXY_CMD_RT_DATA response.len:${response.len}")
                     return
@@ -189,14 +202,17 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
                 curFile?.apply {
 
                     this.addContent(response.content)
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListProgress).post(InterfaceEvent(model, (curFile!!.index * 100).div(curFile!!.fileSize)))
-                    LepuBleLog.d(tag, "model:$model, 读文件中：${curFile?.fileName}   => ${curFile?.index} / ${curFile?.fileSize}")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListProgress).post(InterfaceEvent(model, (this.index * 100).div(this.fileSize)))
+                    LepuBleLog.d(tag, "model:$model, 读文件中：${this.fileName}   => ${this.index} / ${this.fileSize}")
 
                     if (this.index < this.fileSize) {
                         sendOxyCmd(CheckmePodBleCmd.OXY_CMD_READ_CONTENT, CheckmePodBleCmd.readFileContent())
                     } else {
                         sendOxyCmd(CheckmePodBleCmd.OXY_CMD_READ_END, CheckmePodBleCmd.readFileEnd())
                     }
+                } ?: kotlin.run {
+                    LepuBleLog.d(tag, "model:$model,  curFile error!!")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListError).post(InterfaceEvent(model, true))
                 }
             }
             CheckmePodBleCmd.OXY_CMD_READ_END -> {

@@ -32,7 +32,9 @@ import com.lepu.demo.MainViewModel
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.ble.WifiAdapter
 import com.lepu.demo.cofig.Constant
+import com.lepu.demo.data.DeviceFactoryData
 import com.lepu.demo.databinding.FragmentSettingsBinding
+import com.lepu.demo.util.DateUtil
 import com.lepu.demo.util.FileUtil
 import com.lepu.demo.util.StringUtil.*
 import com.lepu.demo.util.icon.BitmapConvertor
@@ -49,6 +51,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private val binding: FragmentSettingsBinding by binding()
     private val mainViewModel: MainViewModel by activityViewModels()
     private lateinit var measureTime: Array<String?>
+
+    private var deviceFactoryData = DeviceFactoryData()
 
     private lateinit var config: Any
     private var phy = Bp2BlePhyState()
@@ -94,6 +98,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.bpmLayout.visibility = View.GONE
         binding.pc60fwLayout.visibility = View.GONE
         binding.er3Layout.root.visibility = View.GONE
+        binding.lepodLayout.root.visibility = View.GONE
         binding.sendCmd.visibility = View.GONE
         binding.content.visibility = View.GONE
         if (v == null) return
@@ -109,6 +114,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         }
         mainViewModel.curBluetooth.observe(viewLifecycleOwner) {
+            deviceFactoryData.name = it?.deviceName
+            deviceFactoryData.address = it?.deviceMacAddress
             when (it!!.modelNo) {
                 Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
                     setViewVisible(binding.er1Layout.root)
@@ -122,9 +129,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     setViewVisible(binding.er2Layout.root)
                     LpBleUtil.getEr2SwitcherState(it.modelNo)
                 }
-                Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> {
+                Bluetooth.MODEL_ER3 -> {
                     setViewVisible(binding.er3Layout.root)
                     LpBleUtil.er3GetConfig(it.modelNo)
+                }
+                Bluetooth.MODEL_LEPOD -> {
+                    setViewVisible(binding.lepodLayout.root)
+                    LpBleUtil.lepodGetConfig(it.modelNo)
                 }
                 Bluetooth.MODEL_BP2 -> {
                     setViewVisible(binding.bp2Layout.root)
@@ -335,6 +346,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
             config.setBurnFlag(enableSn, enableVersion, enableCode)
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
+            deviceFactoryData.sn = tempSn
+            deviceFactoryData.code = tempCode
+            deviceFactoryData.time = DateUtil.stringFromDate(Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL)
+            FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
         }
         binding.er1Layout.er1SetSound.setOnClickListener {
             val temp1 = trimStr(binding.er1Layout.er1Hr1.text.toString())
@@ -402,6 +417,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
             config.setBurnFlag(enableSn, enableVersion, enableCode)
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
+            deviceFactoryData.sn = tempSn
+            deviceFactoryData.code = tempCode
+            deviceFactoryData.time = DateUtil.stringFromDate(Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL)
+            FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
         }
         binding.er2Layout.er2SetConfig.setOnClickListener {
             switchState = !switchState
@@ -675,25 +694,32 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.o2Layout.o2FactoryConfig.setOnClickListener {
             val config = FactoryConfig()
             var enableVersion = true
-            if (binding.o2Layout.o2Version.text.isNullOrEmpty()) {
+            val tempVersion = binding.o2Layout.o2Version.text
+            if (tempVersion.isNullOrEmpty()) {
                 enableVersion = false
             } else {
-                config.setHwVersion(binding.o2Layout.o2Version.text.first())
+                config.setHwVersion(tempVersion.first())
             }
             var enableSn = true
-            if (binding.o2Layout.o2Sn.text.isNullOrEmpty()) {
+            val tempSn = trimStr(binding.o2Layout.o2Sn.text.toString())
+            if (tempSn.isNullOrEmpty()) {
                 enableSn = false
             } else {
-                config.setSnCode(trimStr(binding.o2Layout.o2Sn.text.toString()))
+                config.setSnCode(tempSn)
             }
             var enableCode = true
-            if (binding.o2Layout.o2Code.text.isNullOrEmpty()) {
+            val tempCode = trimStr(binding.o2Layout.o2Code.text.toString())
+            if (tempCode.isNullOrEmpty()) {
                 enableCode = false
             } else {
-                config.setBranchCode(trimStr(binding.o2Layout.o2Code.text.toString()))
+                config.setBranchCode(tempCode)
             }
             config.setBurnFlag(enableSn, enableVersion, enableCode)
             LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
+            deviceFactoryData.sn = tempSn
+            deviceFactoryData.code = tempCode
+            deviceFactoryData.time = DateUtil.stringFromDate(Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL)
+            FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
         }
         binding.o2Layout.o2SetOxiThr.setOnClickListener {
             val temp = trimStr(binding.o2Layout.o2OxiThr.text.toString())
@@ -2085,6 +2111,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Toast.makeText(context, "code请输入8位", Toast.LENGTH_SHORT).show()
             } else {
                 LpBleUtil.pc60fwSetBranchCode(Constant.BluetoothConfig.currentModel[0], code)
+                deviceFactoryData.sn = mainViewModel._boInfo.value?.sn
+                deviceFactoryData.code = code
+                deviceFactoryData.time = DateUtil.stringFromDate(Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL)
+                FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
                 cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
                 binding.sendCmd.text = cmdStr
             }
@@ -2099,6 +2129,20 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             } else {
                 Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
             }
+        }
+        // ---------------------------lepod---------------------------
+        binding.lepodLayout.setEcgMode.setOnClickListener {
+            val mode = trimStr(binding.lepodLayout.ecgMode.text.toString())
+            if (isNumber(mode) && (mode.toInt() in 0..2)) {
+                LpBleUtil.lepodSetConfig(Constant.BluetoothConfig.currentModel[0], mode.toInt())
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            } else {
+                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+        }
+        binding.lepodLayout.getRtParam.setOnClickListener {
+            LpBleUtil.lepodGetRtParam(Constant.BluetoothConfig.currentModel[0])
         }
 
     }
@@ -3145,6 +3189,29 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 val data = it.data as Int
                 binding.er3Layout.er3EcgMode.setText("$data")
                 Toast.makeText(context, "获取mode成功", Toast.LENGTH_SHORT).show()
+            }
+        //------------------------lepod-------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodSetConfig)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    Toast.makeText(context, "设置mode成功", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "设置mode失败", Toast.LENGTH_SHORT).show()
+                }
+                LpBleUtil.lepodGetConfig(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodGetConfig)
+            .observe(this) {
+                val data = it.data as Int
+                binding.lepodLayout.ecgMode.setText("$data")
+                Toast.makeText(context, "获取mode成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodRtParam)
+            .observe(this) {
+                val data = it.data as LepodBleResponse.RtParam
+                binding.lepodLayout.deviceInfo.text = "$data"
+                Toast.makeText(context, "获取实时参数成功", Toast.LENGTH_SHORT).show()
             }
 
         //-----------------------------------

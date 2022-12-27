@@ -645,7 +645,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * Er3BleInterface发出的通知
-     * 包含model: MODEL_ER3, MODEL_LEPOD
+     * 包含model: MODEL_ER3
      */
     interface ER3 {
         companion object {
@@ -664,7 +664,46 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventEr3SetTime = "com.lepu.ble.er3.set.time"                           // 同步时间 boolean
             const val EventEr3BurnFactoryInfo = "com.lepu.ble.er3.burn.factory.info"          // 烧录出厂信息 boolean
             const val EventEr3BurnLockFlash = "com.lepu.ble.er3.burn.lock.flash"              // 加密Flash boolean
-            const val EventEr3EcgStop = "com.lepu.ble.er3.ecg.stop"                           // 结束测量 boolean
+        }
+    }
+
+    /**
+     * LepodBleInterface发出的通知
+     * 包含model: MODEL_LEPOD
+     */
+    interface Lepod {
+        companion object {
+            const val EventLepodInfo = "com.lepu.ble.lepod.info"                                  // 设备信息 LepuDevice
+            const val EventLepodRtParam = "com.lepu.ble.lepod.rtParam"                            // 实时参数 LepodBleResponse.RtParam
+            const val EventLepodRtData = "com.lepu.ble.lepod.rtData"                              // 实时数据 LepodBleResponse.RtData
+            const val EventLepodFileList = "com.lepu.ble.lepod.fileList"                          // 文件列表 LepodBleResponse.FileList
+            const val EventLepodReadFileError = "com.lepu.ble.lepod.read.file.error"              // 传输文件出错 true
+            const val EventLepodReadingFileProgress = "com.lepu.ble.lepod.reading.file.progress"  // 传输文件进度 int(0-100)
+            const val EventLepodReadFileComplete = "com.lepu.ble.lepod.read.file.complete"        // 传输文件完成 ByteArray
+            const val EventLepodReset = "com.lepu.ble.lepod.reset"                                // 复位 boolean
+            const val EventLepodFactoryReset = "com.lepu.ble.lepod.factory.reset"                 // 恢复出厂设置 boolean
+            const val EventLepodFactoryResetAll = "com.lepu.ble.lepod.factory.reset.all"          // 恢复生产出厂状态 boolean
+            const val EventLepodGetConfig = "com.lepu.ble.lepod.get.config"                       // 获取配置参数 int
+            const val EventLepodGetConfigError = "com.lepu.ble.lepod.get.config.error"            // 获取配置参数失败 boolean
+            const val EventLepodSetConfig = "com.lepu.ble.lepod.set.config"                       // 设置模式 boolean
+            const val EventLepodSetTime = "com.lepu.ble.lepod.set.time"                           // 同步时间 boolean
+            const val EventLepodBurnFactoryInfo = "com.lepu.ble.lepod.burn.factory.info"          // 烧录出厂信息 boolean
+            const val EventLepodBurnLockFlash = "com.lepu.ble.lepod.burn.lock.flash"              // 加密Flash boolean
+            const val EventLepodEcgStart = "com.lepu.ble.lepod.ecg.start"                         // 开始测量 boolean
+            const val EventLepodEcgStop = "com.lepu.ble.lepod.ecg.stop"                           // 结束测量 boolean
+        }
+    }
+
+    interface VTM01 {
+        companion object {
+            const val EventVtm01Info = "com.lepu.ble.vtm01.info"
+            const val EventVtm01RtData = "com.lepu.ble.vtm01.rtData"
+            const val EventVtm01RtParam = "com.lepu.ble.vtm01.rtParam"
+            const val EventVtm01OriginalData = "com.lepu.ble.vtm01.original.data"
+            const val EventVtm01Reset = "com.lepu.ble.vtm01.reset"
+            const val EventVtm01FactoryReset = "com.lepu.ble.vtm01.factory.reset"
+            const val EventVtm01GetConfig = "com.lepu.ble.vtm01.get.config"
+            const val EventVtm01SleepMode = "com.lepu.ble.vtm01.sleep.mode"
         }
     }
 

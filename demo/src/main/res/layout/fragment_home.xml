@@ -79,7 +79,7 @@
             app:layout_constraintTop_toBottomOf="@id/reconnect_by_name"
             android:layout_marginTop="20dp"
             android:layout_marginRight="200dp"
-            android:textSize="20sp"/>
+            android:textSize="18sp"/>
         <Button
             android:visibility="gone"
             android:id="@+id/scan_by_name"
@@ -101,7 +101,7 @@
             app:layout_constraintTop_toBottomOf="@id/scan_name"
             android:layout_marginTop="20dp"
             android:layout_marginRight="200dp"
-            android:textSize="20sp"/>
+            android:textSize="18sp"/>
         <Button
             android:visibility="gone"
             android:id="@+id/scan_by_address"
@@ -118,20 +118,22 @@
             android:layout_height="wrap_content"
             android:id="@+id/ble_device"
             android:text="蓝牙设备"
+            android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/scan_address"
             android:layout_marginTop="20dp"
-            android:textSize="20sp"/>
+            android:textSize="18sp"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/ble_state"
             android:text="连接状态"
+            android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ble_device"
             android:layout_marginTop="20dp"
-            android:textSize="20sp"/>
+            android:textSize="18sp"/>
 
         <Button
             android:id="@+id/disconnect2"
@@ -158,16 +160,17 @@
             android:layout_height="wrap_content"
             android:id="@+id/duration_tag"
             android:text="采集时长(S):"
+            android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/home_tip"
             android:layout_marginTop="20dp"
-            android:textSize="20sp"/>
+            android:textSize="18sp"/>
         <TextView
             android:visibility="gone"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:id="@+id/duration"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textColor="@color/black"
             app:layout_constraintStart_toEndOf="@id/duration_tag"
             app:layout_constraintTop_toTopOf="@id/duration_tag"

@@ -6,12 +6,10 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.Pc100DeviceInfo
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.pc102.*
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.HexString.trimStr
-import java.util.*
 
 /**
  * pc100血压血氧体温设备：
@@ -21,11 +19,9 @@ import java.util.*
  * 1.实时血氧、血压
  * 血氧采样率：参数1HZ，波形50HZ
  */
-
 class Pc100BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "PC100BleInterface"
 
-    private lateinit var context: Context
     private var pc100Device = DeviceInfo()
     private var bpResult = BpResult()
     private var bpResultError = BpResultError()
@@ -34,8 +30,18 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
     private var oxyWave = RtOxyWave()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
-        manager = Pc100BleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = Pc100BleManager(context)
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = Pc100BleManager(context)
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -110,6 +116,10 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                 when (response.type) {
                     Pc100BleCmd.BP_RESULT -> {
                         LepuBleLog.d(tag, "model:$model,BP_GET_RESULT BP_RESULT => success")
+                        if (response.content.size < 5) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val info = Pc100BleResponse.BpResult(response.content)
                         bpResult.sys = info.sys
                         bpResult.dia = info.dia
@@ -125,6 +135,10 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                     }
                     Pc100BleCmd.BP_RESULT_ERROR -> {
                         LepuBleLog.d(tag, "model:$model,BP_GET_RESULT BP_RESULT_ERROR => success")
+                        if (response.content.isEmpty()) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val info = Pc100BleResponse.BpResultError(response.content)
                         bpResultError.errorMess = info.errorMess
                         bpResultError.errorNum = info.errorNum
@@ -137,6 +151,10 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             }
             Pc100BleCmd.BP_GET_STATUS -> {
                 LepuBleLog.d(tag, "model:$model,BP_GET_STATUS => success")
+                if (response.content.isEmpty()) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = Pc100BleResponse.BpStatus(response.content)
 //                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpStatus).post(InterfaceEvent(model, info))
                 LepuBleLog.d(tag, "model:$model,BP_GET_STATUS info.status => " + info.status)
@@ -144,6 +162,10 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             }
             Pc100BleCmd.BP_RT_DATA -> {
                 LepuBleLog.d(tag, "model:$model,BP_RT_DATA => success")
+                if (response.content.size < 2) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = Pc100BleResponse.RtBpData(response.content)
                 rtBpData.sign = info.sign
                 rtBpData.ps = info.psValue
@@ -156,6 +178,10 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                 when (response.type) {
                     Pc100BleCmd.BO_START -> {
                         LepuBleLog.d(tag, "model:$model,BO_MODULE_STATE BO_START => success")
+                        if (response.content.isEmpty()) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val status = (response.content[0].toUInt() and 0xFFu).toInt()
                         LepuBleLog.d(tag, "model:$model,BO_START info.status => $status")
                     }
@@ -166,6 +192,10 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             }
             Pc100BleCmd.BO_GET_STATUS -> {
                 LepuBleLog.d(tag, "model:$model,BO_GET_STATUS => success")
+                if (response.content.size < 3) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = Pc100BleResponse.BoStatus(response.content)
                 LepuBleLog.d(tag, "model:$model,BO_GET_STATUS info.status => " + info.status)
                 LepuBleLog.d(tag, "model:$model,BO_GET_STATUS info.statusMess => " + info.statusMess)
@@ -183,6 +213,10 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             }
             Pc100BleCmd.BO_RT_PARAM -> {
                 LepuBleLog.d(tag, "model:$model,BO_RT_PARAM => success")
+                if (response.content.size < 5) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = Pc100BleResponse.RtBoParam(response.content)
                 oxyParam.isDetecting = info.isDetecting
                 oxyParam.isScanning = info.isScanning
@@ -199,6 +233,10 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                 when (response.type) {
                     Pc100BleCmd.BS_START -> {
                         LepuBleLog.d(tag, "model:$model,BS_MODULE_STATE BS_START => success")
+                        if (response.content.isEmpty()) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val status = (response.content[0].toUInt() and 0xFFu).toInt()
                         LepuBleLog.d(tag, "model:$model,BS_START info.status => $status")
                     }
@@ -209,6 +247,10 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             }
             Pc100BleCmd.BS_GET_RESULT -> {
                 LepuBleLog.d(tag, "model:$model,BS_GET_RESULT => success")
+                if (response.content.size < 3) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = Pc100BleResponse.BsResult(response.content)
                 LepuBleLog.d(tag, "model:$model,BS_GET_RESULT info.type => " + info.type)
                 LepuBleLog.d(tag, "model:$model,BS_GET_RESULT info.unit => " + info.unit)
@@ -216,6 +258,10 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             }
             Pc100BleCmd.BS_GET_STATUS -> {
                 LepuBleLog.d(tag, "model:$model,BS_GET_STATUS => success")
+                if (response.content.size < 3) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = Pc100BleResponse.BsStatus(response.content)
                 LepuBleLog.d(tag, "model:$model,BS_GET_STATUS info.status => " + info.status)
                 LepuBleLog.d(tag, "model:$model,BS_GET_STATUS info.sw_ver => " + info.sw_ver)
@@ -226,6 +272,10 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                 when (response.type) {
                     Pc100BleCmd.BT_START -> {
                         LepuBleLog.d(tag, "model:$model,BT_MODULE_STATE BT_START => success")
+                        if (response.content.isEmpty()) {
+                            LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                            return
+                        }
                         val status = (response.content[0].toUInt() and 0xFFu).toInt()
                         LepuBleLog.d(tag, "model:$model,BT_START info.status => $status")
                     }
@@ -236,12 +286,20 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             }
             Pc100BleCmd.BT_GET_RESULT -> {
                 LepuBleLog.d(tag, "model:$model,BT_GET_RESULT => success")
+                if (response.content.size < 3) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = Pc100BleResponse.BtResult(response.content)
                 LepuBleLog.d(tag, "model:$model,BT_GET_RESULT info.status => " + info.status)
                 LepuBleLog.d(tag, "model:$model,BT_GET_RESULT info.data => " + info.data)
             }
             Pc100BleCmd.BT_GET_STATUS -> {
                 LepuBleLog.d(tag, "model:$model,BT_GET_STATUS => success")
+                if (response.content.size < 3) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = Pc100BleResponse.BtStatus(response.content)
                 LepuBleLog.d(tag, "model:$model,BT_GET_STATUS info.status => " + info.status)
                 LepuBleLog.d(tag, "model:$model,BT_GET_STATUS info.sw_ver => " + info.sw_ver)

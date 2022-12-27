@@ -14,12 +14,6 @@
             android:layout_height="wrap_content"
             android:padding="5dp"
             android:orientation="vertical">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_margin="@dimen/dp_10"
-                android:text="公共方法测试"/>
             <Button
                 android:visibility="gone"
                 android:id="@+id/bytes_switch"
@@ -72,7 +66,7 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/file_name"
                     android:hint="文件名"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"/>
             </LinearLayout>
@@ -187,19 +181,22 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/ecg_rcv"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10">
 
             </androidx.recyclerview.widget.RecyclerView>
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/oxy_rcv"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10">
 
             </androidx.recyclerview.widget.RecyclerView>
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/bp_rcv"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10">
 
             </androidx.recyclerview.widget.RecyclerView>
 
@@ -208,11 +205,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/device_info"
-                android:textSize="20sp" />
+                android:textColor="@color/black"
+                android:textSize="18sp" />
 
             <TextView
                 android:visibility="gone"
                 android:id="@+id/send_cmd"
+                android:textColor="@color/black"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp_10"/>
@@ -220,12 +219,14 @@
             <TextView
                 android:visibility="gone"
                 android:id="@+id/response_cmd"
+                android:textColor="@color/black"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp_10"/>
             <TextView
                 android:visibility="gone"
                 android:id="@+id/receive_cmd"
+                android:textColor="@color/black"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp_10"/>
@@ -235,10 +236,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="(以下是数据解析日志)"
+                android:textColor="@color/black"
                 android:layout_marginTop="50dp"/>
             <TextView
                 android:visibility="gone"
                 android:id="@+id/info"
+                android:textColor="@color/black"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp_10"/>
@@ -246,6 +249,7 @@
             <TextView
                 android:visibility="gone"
                 android:id="@+id/process"
+                android:textColor="@color/black"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp_10"/>

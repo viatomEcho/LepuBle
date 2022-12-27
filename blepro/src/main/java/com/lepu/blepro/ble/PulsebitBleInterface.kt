@@ -5,7 +5,6 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.pulsebit.DeviceInfo
 import com.lepu.blepro.ext.pulsebit.EcgFile
@@ -41,7 +40,18 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
     private var result = ExEcgDiagnosis()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = OxyBleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = OxyBleManager(context)
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = OxyBleManager(context)
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -144,8 +154,11 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
                     curSize = 0
                     fileContent = null
                     LepuBleLog.d(tag, "model:$model, 文件大小：${fileSize}  文件名：$curFileName")
-                    sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_CONTENT, PulsebitBleCmd.readFileContent())
-
+                    if (fileSize == 0) {
+                        sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_END, PulsebitBleCmd.readFileEnd())
+                    } else {
+                        sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_CONTENT, PulsebitBleCmd.readFileContent())
+                    }
                 } else {
                     if (curFileName.contains(".dat")) {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileListError).post(InterfaceEvent(model, true))

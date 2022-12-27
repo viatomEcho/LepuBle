@@ -148,6 +148,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
     abstract fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean = false)
 
+    fun isManagerInitialized(): Boolean = this::manager.isInitialized
 
     /**
      * 订阅者集合
@@ -297,7 +298,12 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
-
+        if (!this::manager.isInitialized) {
+            LepuBleLog.d(tag, "manager unInitialized")
+        } else {
+            manager.close()
+            LepuBleLog.d(tag, "onDeviceDisconnected manager.close()")
+        }
         state = false
         ready = false
         connecting = false
@@ -439,7 +445,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             || model == Bluetooth.MODEL_POCTOR_M3102
             || model == Bluetooth.MODEL_BIOLAND_BGM
             || model == Bluetooth.MODEL_PC300
-            || model == Bluetooth.MODEL_PC300_BLE) { // 部分设备没有同步时间命令，发送此消息通知获取设备信息，进行绑定操作
+            || model == Bluetooth.MODEL_PC300_BLE
+            || model == Bluetooth.MODEL_VTM01) { // 部分设备没有同步时间命令，发送此消息通知获取设备信息，进行绑定操作
             LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceReady).post(model)
         } else {
             if (!manager.isUpdater) syncTime()

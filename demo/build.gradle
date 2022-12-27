@@ -97,5 +97,7 @@ dependencies {
     implementation 'me.dm7.barcodescanner:zxing:1.9.13'
 
     implementation 'com.github.PhilJay:MPAndroidChart:v2.2.5'
+    // excel
+    implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'
 
 }

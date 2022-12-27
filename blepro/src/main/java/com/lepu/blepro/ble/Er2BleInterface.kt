@@ -8,7 +8,6 @@ import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.cmd.Er2File
 import com.lepu.blepro.ble.data.Er2DeviceInfo
 import com.lepu.blepro.ble.data.FactoryConfig
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.er2.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
@@ -41,7 +40,18 @@ class Er2BleInterface(model: Int): BleInterface(model) {
     private var deviceRtWave = RtWave()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        manager = Er2BleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = Er2BleManager(context)
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = Er2BleManager(context)
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -100,6 +110,10 @@ class Er2BleInterface(model: Int): BleInterface(model) {
     private fun onResponseReceived(respPkg: Er2BleResponse) {
         when(respPkg.cmd) {
             Er2BleCmd.CMD_RETRIEVE_DEVICE_INFO -> {
+                if (respPkg.data.size < 38) {
+                    LepuBleLog.e(tag, "response.size:${respPkg.data.size} error")
+                    return
+                }
                 val info = if (device.name == null) {
                     Er2DeviceInfo("", device.address, respPkg.data)
                 } else {
@@ -117,11 +131,6 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                 deviceInfo.sn = info.serialNum
 
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2Info).post(InterfaceEvent(model, deviceInfo))
-                // 本版本注释，测试通过后删除
-                /*if (runRtImmediately){
-                    runRtTask()
-                    runRtImmediately = false
-                }*/
             }
             Er2BleCmd.CMD_SET_TIME -> {
 
@@ -183,7 +192,10 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                 }
             }
             Er2BleCmd.CMD_GET_REAL_TIME_DATA -> {
-
+                if (respPkg.data.size < 20) {
+                    LepuBleLog.e(tag, "response.size:${respPkg.data.size} error")
+                    return
+                }
                 val rtData = Er2RtData(respPkg.data)
 
                 LepuBleLog.d(tag, "model:$model,CMD_GET_REAL_TIME_DATA => success")
@@ -204,6 +216,10 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2RtData).post(InterfaceEvent(model, deviceRtData))
             }
             Er2BleCmd.CMD_LIST_FILE -> {
+                if (respPkg.data.isEmpty()) {
+                    LepuBleLog.e(tag, "response.size:${respPkg.data.size} error")
+                    return
+                }
                 val fileArray = Er2FileList(respPkg.data)
 
                 LepuBleLog.d(tag, "model:$model,CMD_LIST_FILE => success")
@@ -219,8 +235,13 @@ class Er2BleInterface(model: Int): BleInterface(model) {
 
                 LepuBleLog.d(tag, "model:$model,CMD_START_READ_FILE => success, $respPkg")
                 if (respPkg.pkgType == 0x01.toByte()) {
+                    val fileSize = toUInt(respPkg.data)
+                    if (fileSize == 0) {
+                        sendCmd(Er2BleCmd.readFileEnd())
+                        return
+                    }
                     curFile = curFileName?.let {
-                        Er2File(model, it, toUInt(respPkg.data), userId!!)
+                        Er2File(model, it, fileSize, userId!!)
                     }
                     sendCmd(Er2BleCmd.readFileData(0))
                 } else {
@@ -251,6 +272,9 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                     } else {
                         sendCmd(Er2BleCmd.readFileEnd())
                     }
+                }?: kotlin.run {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileError).post(InterfaceEvent(model, true))
+                    LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
                 }
             }
             Er2BleCmd.CMD_END_READ_FILE -> {
@@ -269,7 +293,10 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                         file.content = it.content
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileComplete).post(InterfaceEvent(model, file))
                     }
-                }?: LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
+                }?: kotlin.run {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileError).post(InterfaceEvent(model, true))
+                    LepuBleLog.d(tag, "READ_FILE_END  model:$model,  curFile error!!")
+                }
                 curFile = null
             }
             Er2BleCmd.CMD_BURN_SN_CODE -> {

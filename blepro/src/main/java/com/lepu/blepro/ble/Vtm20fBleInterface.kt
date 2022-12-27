@@ -5,7 +5,6 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.vtm20f.*
 import com.lepu.blepro.utils.*
@@ -17,18 +16,25 @@ import com.lepu.blepro.utils.ByteUtils.byte2UInt
  * 1.实时血氧
  * 血氧采样率：参数1HZ，波形50HZ
  */
-
 class Vtm20fBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Vtm20fBleInterface"
-
-    private lateinit var context: Context
 
     private var param = RtParam()
     private var wave = RtWave()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
-        this.context = context
-        manager = Vtm20fBleManager(context)
+        if (isManagerInitialized()) {
+            if (manager.bluetoothDevice == null) {
+                manager = Vtm20fBleManager(context)
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
+                LepuBleLog.d(tag, "isManagerInitialized, manager.create done")
+            } else {
+                LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice != null")
+            }
+        } else {
+            manager = Vtm20fBleManager(context)
+            LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
+        }
         manager.isUpdater = isUpdater
         manager.setConnectionObserver(this)
         manager.notifyListener = this
@@ -48,6 +54,10 @@ class Vtm20fBleInterface(model: Int): BleInterface(model) {
         when (response.cmd) {
             Vtm20fBleResponse.RT_PARAM -> {
                 LepuBleLog.d(tag, "model:$model,RT_PARAM => success " + bytesToHex(response.bytes))
+                if (response.content.size < 6) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = Vtm20fBleResponse.RtParam(response.content)
 
                 param.seqNo = info.seqNo
@@ -59,6 +69,10 @@ class Vtm20fBleInterface(model: Int): BleInterface(model) {
             }
             Vtm20fBleResponse.RT_WAVE -> {
                 LepuBleLog.d(tag, "model:$model,RT_WAVE => success " + bytesToHex(response.bytes))
+                if (response.content.size < 4) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val info = Vtm20fBleResponse.RtWave(response.content)
 
                 wave.seqNo = info.seqNo

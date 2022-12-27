@@ -11,6 +11,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="硬件版本:" />
             <EditText
                 android:id="@+id/o2_version"
@@ -25,6 +27,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="sn:" />
             <EditText
                 android:id="@+id/o2_sn"
@@ -39,6 +43,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="branch code:" />
             <EditText
                 android:id="@+id/o2_code"
@@ -58,6 +64,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="低于血氧阈值提醒："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -86,6 +94,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="低于心率阈值提醒："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -114,6 +124,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="高于心率阈值提醒："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -147,6 +159,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="高于体动阈值提醒："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -174,6 +188,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="高于无效值阈值提醒："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -196,6 +212,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="血氧阈值提醒开关："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -248,6 +266,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="心率阈值提醒开关："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -275,6 +295,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="震动强度："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -357,6 +379,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="声音强度："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -409,6 +433,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="亮屏模式："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -446,6 +472,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="屏幕亮度："/>
             <RelativeLayout
                 android:layout_width="match_parent"

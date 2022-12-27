@@ -37,6 +37,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="取消"
+            android:textSize="18sp"
             android:textColor="@color/black" />
 
         <View
@@ -51,6 +52,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="确定"
+            android:textSize="18sp"
             android:textColor="@color/purple_500" />
 
     </LinearLayout>

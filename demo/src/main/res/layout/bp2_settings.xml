@@ -11,6 +11,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="设置设备状态："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -67,6 +69,8 @@
                 android:id="@+id/bp2_rt_state"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="设备当前状态："/>
         </LinearLayout>
         <TextView
@@ -132,6 +136,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
                     android:text="播报音量："/>
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -165,6 +171,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
                     android:text="测量模式："/>
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -221,6 +229,8 @@
                 android:id="@+id/bp2_phy_lead_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
                 android:text="电极状态："/>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -228,6 +238,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
                     android:text="理疗模式："/>
                 <EditText
                     android:id="@+id/bp2_phy_mode"
@@ -246,6 +258,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
                     android:text="理疗强度："/>
                 <EditText
                     android:id="@+id/bp2_phy_intensy"
@@ -264,6 +278,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
                     android:text="理疗时间："/>
                 <EditText
                     android:id="@+id/bp2_phy_time"

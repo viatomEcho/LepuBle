@@ -16,7 +16,6 @@ public class Er3BleCmd {
     public static final int RT_DATA = 0x06;
     public static final int GET_CONFIG = 0x00;
     public static final int SET_CONFIG = 0x04;
-    public static final int STOP_ECG = 0x07;
     public static final int READ_FILE_LIST = 0xF1;
     public static final int READ_FILE_START = 0xF2;
     public static final int READ_FILE_DATA = 0xF3;
@@ -52,21 +51,6 @@ public class Er3BleCmd {
         cmd[cmdLength - 1] = BleCRC.calCRC8(cmd);
         addNo();
 
-        return cmd;
-    }
-
-    public static byte[] stopEcg() {
-        byte[] cmd = new byte[8];
-        cmd[0] = (byte) 0xA5;
-        cmd[1] = (byte) STOP_ECG;
-        cmd[2] = (byte) ~STOP_ECG;
-        cmd[3] = (byte) 0x00;
-        cmd[4] = (byte) seqNo;
-        cmd[5] = (byte) 0x00;
-        cmd[6] = (byte) 0x00;
-        cmd[7] = BleCRC.calCRC8(cmd);
-
-        addNo();
         return cmd;
     }
 
