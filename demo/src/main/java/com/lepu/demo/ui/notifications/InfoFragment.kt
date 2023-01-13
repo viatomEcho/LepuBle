@@ -237,13 +237,14 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_DUOEK
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM3
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER3
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_VTM01
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LEPOD) {
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
             }
         }
         mainViewModel.er2Info.observe(viewLifecycleOwner) {
@@ -266,7 +267,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2A
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2T) {
                 binding.info.text = "$it"
-                binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fmV}\nsn：${it.sn}\ncode：${it.branchCode}"
+                binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fmV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
             }
         }
         mainViewModel.bpmInfo.observe(viewLifecycleOwner) {

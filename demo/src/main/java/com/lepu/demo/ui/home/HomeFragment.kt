@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.SeekBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -15,6 +16,7 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BIOL
+import com.lepu.blepro.vals.bleRssi
 import com.lepu.demo.DeviceFactoryDataActivity
 import com.lepu.demo.MainActivity
 import com.lepu.demo.MainViewModel
@@ -30,6 +32,8 @@ import com.lepu.demo.util.CollectUtil
 import com.lepu.demo.util.DialogUtil
 import com.lepu.demo.util.ToastUtil
 import no.nordicsemi.android.ble.observer.ConnectionObserver
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class HomeFragment : Fragment(R.layout.fragment_home){
@@ -133,7 +137,22 @@ class HomeFragment : Fragment(R.layout.fragment_home){
 
             }
         }
+        binding.filterRssi.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                bleRssi  = -(progress * 0.6 + 40).toInt()
+                binding.rssiFilterValue.text = "$bleRssi dBm"
+                splitDevices(binding.bleSplit.text.toString())
+            }
 
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+
+        })
+        binding.filterRssi.progress = (-40 - bleRssi) * 100 / 60
+        binding.rssiFilterValue.text = "$bleRssi dBm"
         mainViewModel.bleState.observe(viewLifecycleOwner) {
             if (it) {
                 binding.bleState.text = "连接状态：已连接"
@@ -157,12 +176,18 @@ class HomeFragment : Fragment(R.layout.fragment_home){
 
     private fun splitDevices(name: String) {
         splitDevice.clear()
-        for (b in BluetoothController.getDevices()) {
+        for (b in BluetoothController.getDevicesByRssi(bleRssi)) {
             if (b.name.contains(name, true)) {
                 splitDevice.add(b)
             }
         }
-
+        splitDevice.sortWith { o1, o2 ->
+            if (o2.rssi > o1.rssi) {
+                return@sortWith 1
+            } else {
+                return@sortWith -1
+            }
+        }
         adapter.setNewInstance(splitDevice)
         adapter.notifyDataSetChanged()
 

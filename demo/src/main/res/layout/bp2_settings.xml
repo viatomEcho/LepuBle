@@ -116,14 +116,19 @@
         <LinearLayout
             android:id="@+id/bp2_switch_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
             <Button
                 android:id="@+id/bp2_set_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="心跳音"/>
+            <Button
+                android:id="@+id/bp2_delete_file"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:text="删除文件"/>
         </LinearLayout>
         <LinearLayout
             android:id="@+id/bp2_volume_layout"
@@ -320,13 +325,9 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/bp2_rcv"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10"/>
         </LinearLayout>
-        <Button
-            android:id="@+id/bp2_delete_file"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="删除文件"/>
     </LinearLayout>
 
 </layout>

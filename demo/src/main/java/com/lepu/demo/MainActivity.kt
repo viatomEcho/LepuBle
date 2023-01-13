@@ -261,6 +261,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     else -> Toast.makeText(this, "BP2 完成时间同步", Toast.LENGTH_SHORT).show()
                 }
                 LpBleUtil.getInfo(it.model)
+                LpBleUtil.bp2GetRtState(it.model)
             }
         //bp2 info
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Info)
@@ -281,11 +282,19 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._bp2Info.value = it
                 }
             }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2State)
+            .observe(this) { event ->
+                (event.data as Bp2BleRtState).let {
+                    viewModel._battery.value = "${it.battery.percent} %"
+                }
+            }
         //-------------------------bp2w---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSyncTime)
             .observe(this) {
                 Toast.makeText(this, "BP2W 完成时间同步", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
+                LpBleUtil.bp2GetRtState(it.model)
+                LpBleUtil.bp2GetWifiConfig(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wInfo)
             .observe(this) { event ->
@@ -294,22 +303,38 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._er1Info.value = it
                 }
             }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wRtState)
+            .observe(this) { event ->
+                (event.data as Bp2BleRtState).let {
+                    viewModel._battery.value = "${it.battery.percent} %"
+                }
+            }
         //-------------------------LeBp2w---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSyncTime)
             .observe(this) {
                 Toast.makeText(this, "LP-BP2W 完成时间同步", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
+                LpBleUtil.bp2GetRtState(it.model)
+                LpBleUtil.bp2GetWifiConfig(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSyncUtcTime)
             .observe(this) {
                 Toast.makeText(this, "LP-BP2W 完成UTC时间同步", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
+                LpBleUtil.bp2GetRtState(it.model)
+                LpBleUtil.bp2GetWifiConfig(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wInfo)
             .observe(this) { event ->
                 (event.data as LepuDevice).let {
                     Toast.makeText(this, "LP-BP2W 获取设备信息成功", Toast.LENGTH_SHORT).show()
                     viewModel._er1Info.value = it
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wRtState)
+            .observe(this) { event ->
+                (event.data as Bp2BleRtState).let {
+                    viewModel._battery.value = "${it.battery.percent} %"
                 }
             }
         //-------------------------bpm---------------------------
