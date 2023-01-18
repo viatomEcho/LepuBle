@@ -26,6 +26,9 @@ import com.lepu.blepro.utils.HexString.hexToBytes
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
+import com.lepu.blepro.vals.server
+import com.lepu.blepro.vals.wifi
+import com.lepu.blepro.vals.wifiConfig
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.ble.WifiAdapter
@@ -34,6 +37,7 @@ import com.lepu.demo.data.DeviceFactoryData
 import com.lepu.demo.databinding.FragmentSettingsBinding
 import com.lepu.demo.util.DateUtil
 import com.lepu.demo.util.FileUtil
+import com.lepu.demo.util.StringUtil
 import com.lepu.demo.util.StringUtil.*
 import com.lepu.demo.util.icon.BitmapConvertor
 import java.util.*
@@ -544,7 +548,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
                 popupWindow?.let { v ->
                     v.width = ViewGroup.LayoutParams.MATCH_PARENT
-                    v.height = 650
+                    v.height = 1000
                     v.contentView = popupView
                     v.isFocusable = true
                     v.showAsDropDown(view)
@@ -561,24 +565,35 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 val ssid = popupView.findViewById<TextView>(R.id.ssid)
                 val sure = popupView.findViewById<Button>(R.id.sure)
                 val cancel = popupView.findViewById<Button>(R.id.cancel)
+                val address = popupView.findViewById<EditText>(R.id.server_address)
+                val port = popupView.findViewById<EditText>(R.id.server_port)
                 ssid.text = "WiFi：${it.ssid}"
                 sure.setOnClickListener { it1 ->
                     val pass = trimStr(password.text.toString())
-                    if (pass.isNullOrEmpty()) {
-                        Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
+                    val addr = trimStr(address.text.toString())
+                    val p = trimStr(port.text.toString())
+                    if (pass.isNullOrEmpty() || addr.isNullOrEmpty() || p.isNullOrEmpty()) {
+                        Toast.makeText(context, "请输入完整信息", Toast.LENGTH_SHORT).show()
                         return@setOnClickListener
                     } else {
-                        val wifiConfig = Bp2WifiConfig()
+//                        val wifiConfig = Bp2WifiConfig()
                         wifiConfig.option = 3
                         it.pwd = pass
                         wifiConfig.wifi = it
-                        val server = Bp2Server()
+                        wifi = it
+//                        val server = Bp2Server()
 //                        server.addr = "34.209.148.123"
-                        server.addr = "bptest.viatomtech.com"
+                        //server.addr = "bptest.viatomtech.com"
+                        server.addr = addr
 //                        server.addr = "bp.viatomtech.com"
 //                        server.addr = "ai.viatomtech.com.cn"
-                        server.port = 7100
-                        server.addrType = 1
+                        //server.port = 7100
+                        server.port = p.toInt()
+                        if (isEnglish(addr.substring(1))) {
+                            server.addrType = 1
+                        } else {
+                            server.addrType = 0
+                        }
                         wifiConfig.server = server
                         LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
                         binding.content.text = "$wifiConfig"

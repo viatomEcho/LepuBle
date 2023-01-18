@@ -21,6 +21,9 @@ import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.getTimeString
+import com.lepu.blepro.vals.server
+import com.lepu.blepro.vals.wifiConfig
+import com.lepu.blepro.vals.wifi
 import com.lepu.demo.*
 import com.lepu.demo.ble.BpAdapter
 import com.lepu.demo.ble.EcgAdapter
@@ -245,6 +248,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W) {
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
+                binding.wifiConfig.visibility = View.VISIBLE
             }
         }
         mainViewModel.er2Info.observe(viewLifecycleOwner) {
@@ -524,6 +528,28 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         binding.factoryAll.setOnClickListener {
             LpBleUtil.factoryResetAll(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])}"
+        }
+        // bp2 wifi
+        binding.setWifiConfig.setOnClickListener {
+            if (wifi != null) {
+                LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
+            } else {
+                Toast.makeText(context, "请在设置页完成首次配置WiFi，设置成功后连接其他设备可直接在此配置WiFi。", Toast.LENGTH_SHORT).show()
+            }
+        }
+        if (wifi != null) {
+            binding.wifiInfo.text = "热点：${wifi?.ssid}\n密码：${wifi?.pwd}\n状态：${
+                when (wifi?.state) {
+                    0 -> "断开"
+                    1 -> "连接中"
+                    2 -> "已连接"
+                    0xff -> "密码错误"
+                    0xfd -> "找不到SSID"
+                    else -> "未配置WiFi"
+                }
+            }\n服务器地址：${server.addr}\n服务器端口号：${server.port}"
+        } else {
+            binding.wifiInfo.text = "注意：请在设置页完成首次配置WiFi，设置成功后连接其他设备可直接在此配置WiFi。"
         }
 
         binding.getMtu.setOnClickListener {
@@ -885,6 +911,30 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     }
                 }
             }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSetWifiConfig)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    LpBleUtil.bp2GetWifiConfig(it.model)
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetWifiConfig)
+            .observe(this) {
+                val data = it.data as Bp2WifiConfig
+                binding.wifiInfo.text = "热点：${data.wifi.ssid}\n密码：${data.wifi.pwd}\n状态：${
+                    when (data.wifi.state) {
+                        0 -> "断开"
+                        1 -> "连接中"
+                        2 -> "已连接"
+                        0xff -> "密码错误"
+                        0xfd -> "找不到SSID"
+                        else -> "未配置WiFi"
+                    }
+                }\n服务器地址：${data.server.addr}\n服务器端口号：${data.server.port}"
+                if (data.wifi.state == 0 || data.wifi.state == 1) {
+                    LpBleUtil.bp2GetWifiConfig(it.model)
+                }
+            }
         //--------------------------------le bp2w-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wList)
             .observe(this) {
@@ -974,6 +1024,30 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     ecgList.add(temp)
                     ecgAdapter.setNewInstance(ecgList)
                     ecgAdapter.notifyDataSetChanged()
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSetWifiConfig)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    LpBleUtil.bp2GetWifiConfig(it.model)
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetWifiConfig)
+            .observe(this) {
+                val data = it.data as Bp2WifiConfig
+                binding.wifiInfo.text = "热点：${data.wifi.ssid}\n密码：${data.wifi.pwd}\n状态：${
+                    when (data.wifi.state) {
+                        0 -> "断开"
+                        1 -> "连接中"
+                        2 -> "已连接"
+                        0xff -> "密码错误"
+                        0xfd -> "找不到SSID"
+                        else -> "未配置WiFi"
+                    }
+                }\n服务器地址：${data.server.addr}\n服务器端口号：${data.server.port}"
+                if (data.wifi.state == 0 || data.wifi.state == 1) {
+                    LpBleUtil.bp2GetWifiConfig(it.model)
                 }
             }
         //------------------------------bpm--------------------------------------

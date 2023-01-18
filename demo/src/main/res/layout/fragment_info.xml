@@ -95,7 +95,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="@dimen/dp_10">
                 <Button
                     android:id="@+id/reset"
                     android:layout_width="wrap_content"
@@ -135,6 +135,25 @@
                 android:textColor="@color/colorRed"
                 android:layout_marginTop="10dp"
                 android:layout_marginStart="10dp"/>
+            <LinearLayout
+                android:id="@+id/wifi_config"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <Button
+                    android:id="@+id/set_wifi_config"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_10"
+                    android:text="配置WIFI"/>
+                <TextView
+                    android:id="@+id/wifi_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:textColor="@color/colorRed"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:visibility="gone"

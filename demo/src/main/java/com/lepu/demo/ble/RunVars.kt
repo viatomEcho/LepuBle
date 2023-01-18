@@ -1,5 +1,9 @@
 package com.lepu.blepro.vals
 
+import com.lepu.blepro.ble.data.Bp2Server
+import com.lepu.blepro.ble.data.Bp2Wifi
+import com.lepu.blepro.ble.data.Bp2WifiConfig
+
 
 /**
  * relay info
@@ -85,6 +89,10 @@ var wifiState = false
 var wifiRssi = 100
 var wifiSsid = ""
 //var hostState = false
+// bp2 wifi
+val wifiConfig = Bp2WifiConfig()
+val server = Bp2Server()
+var wifi: Bp2Wifi? = null
 
 var bleRssi = -100
 
