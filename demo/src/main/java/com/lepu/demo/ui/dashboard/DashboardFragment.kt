@@ -198,7 +198,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK,
             Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2,
             Bluetooth.MODEL_BP2W,
-            Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_LE_BP2W,
+            Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_LP_BP2W,
             Bluetooth.MODEL_PC80B, Bluetooth.MODEL_LES1,
             Bluetooth.MODEL_W12C, Bluetooth.MODEL_HHM1,
             Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
@@ -294,7 +294,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.oxyLayout.visibility = View.GONE
                 startWave(it.modelNo)
             }
-            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LE_BP2W -> {
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LP_BP2W -> {
                 binding.bpLayout.visibility = View.VISIBLE
                 binding.ecgLayout.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
@@ -1046,7 +1046,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.dataStr.text = "dataType: " + bp2Rt.rtWave.waveDataType + " " + data1.toString() + "----rtState--" + bp2Rt.rtState.toString()
             }
         //------------------------------le bp2w------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wRtData)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wRtData)
             .observe(this) {
                 val bp2Rt = it.data as Bp2BleRtData
 

@@ -1,8 +1,6 @@
-package com.lepu.blepro.ext.bp2;
+package com.lepu.blepro.ext.bp2w;
 
-import java.util.Arrays;
-
-public class Bp2File {
+public class Bp2wFile {
     private String fileName;
     private int type;  // 1:BP血压, 2:ECG心电
     private byte[] content;
@@ -33,7 +31,7 @@ public class Bp2File {
 
     @Override
     public String toString() {
-        return "Bp2File{" +
+        return "Bp2wFile{" +
                 "fileName='" + fileName + '\'' +
                 ", type=" + type +
                 '}';

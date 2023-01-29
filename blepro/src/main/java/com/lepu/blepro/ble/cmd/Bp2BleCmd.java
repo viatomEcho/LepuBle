@@ -98,12 +98,11 @@ public class Bp2BleCmd {
         return getReq(FACTORY_RESET_ALL, new byte[0]);
     }
 
-    public static byte[] setConfig(boolean switchState, int volume) {
+    public static byte[] setConfig(boolean switchState) {
         byte[] cmd = new byte[40];
         if(switchState) {
             cmd[24] = (byte) 0x01;
         }
-        cmd[26] = (byte) volume;
         return getReq(SET_CONFIG, cmd);
     }
 

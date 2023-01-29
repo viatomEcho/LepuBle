@@ -196,4 +196,27 @@ object Constant {
         }
     }
 
+    /**
+     * bp2切换状态
+     */
+    interface Bp2SwitchState {
+        companion object {
+            const val ENTER_BP = 0
+            const val ENTER_ECG = 1
+            const val ENTER_HISTORY = 2
+            const val ENTER_ON = 3
+            const val ENTER_OFF = 4
+        }
+    }
+
+    /**
+     * lp-bp2列表类型
+     */
+    interface LpBp2wListType {
+        companion object {
+            const val USER_TYPE = 0
+            const val BP_TYPE = 1
+            const val ECG_TYPE = 2
+        }
+    }
 }

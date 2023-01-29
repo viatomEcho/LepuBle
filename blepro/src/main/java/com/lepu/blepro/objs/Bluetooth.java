@@ -82,7 +82,7 @@ public class Bluetooth implements Parcelable {
 
     public static final String BT_NAME_VETCORDER = "Vetcorder";
     public static final String BT_NAME_VTM_AD5 = "VTM AD5";
-    public static final String BT_NAME_LE_BP2W = "LP-BP2W";  // 国内版bp2WiFi
+    public static final String BT_NAME_LP_BP2W = "LP-BP2W";  // 国内版bp2WiFi
     public static final String BT_NAME_PC_68B = "PC-68B";
 
     public static final String BT_NAME_PC_300 = "PC_300SNT";
@@ -179,7 +179,7 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_KCA = 49;
     public static final int MODEL_VTM_AD5 = 50;
     public static final int MODEL_SP20 = 51;
-    public static final int MODEL_LE_BP2W = 52;
+    public static final int MODEL_LP_BP2W = 52;
     public static final int MODEL_F8_SCALE = 53;
     public static final int MODEL_PC_68B = 54;
 
@@ -242,7 +242,7 @@ public class Bluetooth implements Parcelable {
             MODEL_BABYO2N, MODEL_BP2T, MODEL_BP2W, MODEL_STATION, MODEL_POD2B, MODEL_PC_60NW_1, MODEL_PC_60NW, MODEL_POD_1W, MODEL_PC_60B,
             MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2M, MODEL_BPM,MODEL_BP2A, MODEL_PC60FW, MODEL_PC80B, MODEL_FHR, MODEL_BPW1,
             MODEL_F4_SCALE, MODEL_MY_SCALE, MODEL_F5_SCALE, MODEL_PC66B, MODEL_AP20, MODEL_LEW, MODEL_VETCORDER, MODEL_VTM_AD5, MODEL_SP20,
-            MODEL_LE_BP2W, MODEL_F8_SCALE, MODEL_PC_68B, MODEL_PC300, MODEL_CHECKME_LE, MODEL_PF_10, MODEL_PF_20, MODEL_LES1, MODEL_CHECK_ADV,
+            MODEL_LP_BP2W, MODEL_F8_SCALE, MODEL_PC_68B, MODEL_PC300, MODEL_CHECKME_LE, MODEL_PF_10, MODEL_PF_20, MODEL_LES1, MODEL_CHECK_ADV,
             MODEL_BBSM_S1, MODEL_BBSM_S2, MODEL_CMRING, MODEL_LPRE, MODEL_LE_B1, MODEL_OXYU, MODEL_S5W, MODEL_W12C, MODEL_AI_S100,
             MODEL_HHM1, MODEL_HHM2, MODEL_HHM3, MODEL_HHM4, MODEL_LP_ER2, MODEL_LPM311, MODEL_POCTOR_M3102, MODEL_S6W, MODEL_S7W, MODEL_S7BW,
             MODEL_BIOLAND_BGM, MODEL_S6W1, MODEL_PF_10AW, MODEL_PF_10AW1, MODEL_PF_10BW, MODEL_PF_10BW1, MODEL_PF_20AW, MODEL_PF_20B,
@@ -482,8 +482,8 @@ public class Bluetooth implements Parcelable {
                 return MODEL_F8_SCALE;
             case BT_NAME_VETCORDER:
                 return MODEL_VETCORDER;
-            case BT_NAME_LE_BP2W:
-                return MODEL_LE_BP2W;
+            case BT_NAME_LP_BP2W:
+                return MODEL_LP_BP2W;
             case BT_NAME_ER3:
                 return MODEL_ER3;
             case BT_NAME_VTM01:
@@ -498,7 +498,7 @@ public class Bluetooth implements Parcelable {
             BT_NAME_FHR, BT_NAME_BABYO2N, BT_NAME_STATION, BT_NAME_BPW1, BT_NAME_LEW, BT_NAME_VETCORDER, BT_NAME_PC60FW, FETAL_DEVICE_NAME,
             BT_NAME_TV221U, BT_NAME_PC100, BT_NAME_AOJ20A, BT_NAME_VCOMIN, BT_NAME_CHECK_POD, BT_NAME_BODY_FAT, BT_NAME_POD2B, BT_NAME_PC_60NW_1, BT_NAME_PC_60NW,
             BT_NAME_POD_1W, BT_NAME_PC_60B, BT_NAME_KCA, BT_NAME_PC80B, BT_NAME_PC66B, BT_NAME_AP20, BT_NAME_MY_SCALE, BT_NAME_F5_SCALE, BT_NAME_VTM_AD5, BT_NAME_SP20,
-            BT_NAME_LE_BP2W, BT_NAME_F8_SCALE, BT_NAME_PC_68B, BT_NAME_F4_SCALE, BT_NAME_PC_300, BT_NAME_CHECKME_LE, BT_NAME_PF_10, BT_NAME_PF_20, BT_NAME_LES1,
+            BT_NAME_LP_BP2W, BT_NAME_F8_SCALE, BT_NAME_PC_68B, BT_NAME_F4_SCALE, BT_NAME_PC_300, BT_NAME_CHECKME_LE, BT_NAME_PF_10, BT_NAME_PF_20, BT_NAME_LES1,
             BT_NAME_CHECK_ADV, BT_NAME_BBSM_S1, BT_NAME_BBSM_S2, BT_NAME_CMRING, BT_NAME_LPRE, BT_NAME_LE_B1, BT_NAME_OXYU, BT_NAME_S5W, BT_NAME_W12C, BT_NAME_AI_S100,
             BT_NAME_HHM1, BT_NAME_HHM2, BT_NAME_HHM3, BT_NAME_HHM4, BT_NAME_LP_ER2, BT_NAME_LPM311, BT_NAME_POCTOR_M3102, BT_NAME_S6W, BT_NAME_S7W, BT_NAME_S7BW,
             BT_NAME_BIOLAND_BGM, BT_NAME_S6W1, BT_NAME_PF_10AW, BT_NAME_PF_10AW1, BT_NAME_PF_10BW, BT_NAME_PF_10BW1, BT_NAME_PF_20AW, BT_NAME_PF_20B,
@@ -635,8 +635,8 @@ public class Bluetooth implements Parcelable {
                 return BT_NAME_F8_SCALE;
             case MODEL_VTM_AD5:
                 return BT_NAME_VTM_AD5;
-            case MODEL_LE_BP2W:
-                return BT_NAME_LE_BP2W;
+            case MODEL_LP_BP2W:
+                return BT_NAME_LP_BP2W;
             case MODEL_PC_68B:
                 return BT_NAME_PC_68B;
             case MODEL_PC300:

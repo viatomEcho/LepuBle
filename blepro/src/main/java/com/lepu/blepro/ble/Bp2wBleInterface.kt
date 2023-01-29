@@ -9,6 +9,7 @@ import com.lepu.blepro.ble.cmd.Bp2wBleCmd.*
 import com.lepu.blepro.ble.cmd.LepuBleResponse
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.bp2w.*
 import com.lepu.blepro.utils.CrcUtil.calCRC8
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
@@ -35,7 +36,13 @@ import kotlin.experimental.inv
  */
 class Bp2wBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Bp2wBleInterface"
-
+    private var deviceInfo = DeviceInfo()
+    private var fileNames = arrayListOf<String>()
+    private var bp2wFile = Bp2wFile()
+    private var rtData = RtData()
+    private var rtStatus = RtStatus()
+    private var rtParam = RtParam()
+    private var config = Bp2wConfig()
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         if (isManagerInitialized()) {
             if (manager.bluetoothDevice == null) {
@@ -111,7 +118,13 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 }
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
                 val info = LepuDevice(bleResponse.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wInfo).post(InterfaceEvent(model, info))
+                deviceInfo.hwVersion = info.hwV
+                deviceInfo.swVersion = info.fwV
+                deviceInfo.btlVersion = info.btlV
+                deviceInfo.branchCode = info.branchCode
+                deviceInfo.snLen = info.snLen
+                deviceInfo.sn = info.sn
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wInfo).post(InterfaceEvent(model, deviceInfo))
             }
 
             SET_TIME -> {
@@ -127,8 +140,16 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 }
                 // 主机状态
                 LepuBleLog.d(tag, "model:$model,RT_STATE => success")
-                val data = Bp2BleRtState(bleResponse.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wRtState).post(InterfaceEvent(model, data))
+                val rtState = Bp2BleRtState(bleResponse.content)
+                rtStatus.deviceStatus = rtState.status
+                rtStatus.deviceStatusMsg = rtState.statusMsg
+                rtStatus.batteryStatus = rtState.battery.state
+                rtStatus.batteryStatusMsg = rtState.battery.stateMsg
+                rtStatus.percent = rtState.battery.percent
+                rtStatus.vol = rtState.battery.vol
+                rtStatus.avgCnt = rtState.avgCnt
+                rtStatus.avgWaitTick = rtState.avgWaitTick
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wRtState).post(InterfaceEvent(model, rtStatus))
             }
 
             GET_FILE_LIST -> {
@@ -143,7 +164,10 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 } else {
                     KtBleFileList(bleResponse.content, device.name)
                 }
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wFileList).post(InterfaceEvent(model, list))
+                for (name in list.fileNameList) {
+                    fileNames.add(name)
+                }
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wFileList).post(InterfaceEvent(model, fileNames))
             }
 
             //----------------------------读文件--------------------------
@@ -195,7 +219,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 fileContent = add(fileContent, bleResponse.content)
                 LepuBleLog.d(tag, "download file $fileName READ_FILE_CONTENT curSize == $curSize | fileSize == $fileSize")
 
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadingFileProgress).post(InterfaceEvent(model, part))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadingFileProgress).post(InterfaceEvent(model, (part.percent*100).toInt()))
                 if (curSize < fileSize) {
                     sendCmd(readFileData(curSize))
                 } else {
@@ -226,7 +250,10 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                         } else {
                             Bp2BleFile(fileName, it, device.name)
                         }
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileComplete).post(InterfaceEvent(model, data))
+                        bp2wFile.fileName = data.name
+                        bp2wFile.type = data.type
+                        bp2wFile.content = data.content
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileComplete).post(InterfaceEvent(model, bp2wFile))
                     }
                 }
             }
@@ -239,7 +266,22 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 }
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success")
 
-                val rtData = Bp2BleRtData(bleResponse.content)
+                val data = Bp2BleRtData(bleResponse.content)
+                rtStatus.deviceStatus = data.rtState.status
+                rtStatus.deviceStatusMsg = data.rtState.statusMsg
+                rtStatus.batteryStatus = data.rtState.battery.state
+                rtStatus.batteryStatusMsg = data.rtState.battery.stateMsg
+                rtStatus.percent = data.rtState.battery.percent
+                rtStatus.vol = data.rtState.battery.vol
+                rtStatus.avgCnt = data.rtState.avgCnt
+                rtStatus.avgWaitTick = data.rtState.avgWaitTick
+                rtData.status = rtStatus
+                rtParam.paramDataType = data.rtWave.waveDataType
+                rtParam.paramData = data.rtWave.waveData
+                rtParam.ecgBytes = data.rtWave.waveform
+                rtParam.ecgShorts = data.rtWave.waveShorts
+                rtParam.ecgFloats = data.rtWave.waveFloats
+                rtData.param = rtParam
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wRtData).post(InterfaceEvent(model, rtData))
             }
 
@@ -262,7 +304,9 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 }
                 LepuBleLog.d(tag, "model:$model,GET_CONFIG => success")
                 val data = Bp2Config(bleResponse.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetConfig).post(InterfaceEvent(model, data))
+                config.isSoundOn = data.beepSwitch
+                config.avgMeasureMode = data.avgMeasureMode
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetConfig).post(InterfaceEvent(model, config))
             }
 
             RESET -> {
@@ -378,7 +422,10 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "getRtData ...")
     }
 
-    fun setConfig(config: Bp2Config){
+    fun setConfig(c: Bp2wConfig){
+        val config = Bp2Config()
+        config.beepSwitch = c.isSoundOn
+        config.avgMeasureMode = c.avgMeasureMode
         sendCmd(setConfig(config.getDataBytes()))
         LepuBleLog.d(tag, "setConfig...$config")
     }
@@ -388,6 +435,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getFileList() {
+        fileNames.clear()
         sendCmd(Bp2wBleCmd.getFileList())
         LepuBleLog.d(tag, "getFileList...")
     }

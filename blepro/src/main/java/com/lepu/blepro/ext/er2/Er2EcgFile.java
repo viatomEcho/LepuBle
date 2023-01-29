@@ -56,4 +56,14 @@ public class Er2EcgFile {
     public void setMagic(int magic) {
         this.magic = magic;
     }
+
+    @Override
+    public String toString() {
+        return "Er2EcgFile{" +
+                "fileVersion=" + fileVersion +
+                ", recordingTime=" + recordingTime +
+                ", dataCrc=" + dataCrc +
+                ", magic=" + magic +
+                '}';
+    }
 }

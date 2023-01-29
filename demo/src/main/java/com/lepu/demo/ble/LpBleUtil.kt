@@ -464,10 +464,6 @@ class LpBleUtil {
             BleServiceHelper.er2GetConfig(model)
         }
 
-        @JvmOverloads
-        fun bp2SetConfig(model: Int, switchState: Boolean, volume: Int = 2){
-            BleServiceHelper.bp2SetConfig(model, switchState, volume)
-        }
         fun bp2GetConfig(model: Int){
             BleServiceHelper.bp2GetConfig(model)
         }
@@ -475,38 +471,38 @@ class LpBleUtil {
            BleServiceHelper.bp2SwitchState(model, state)
         }
         fun bp2GetPhyState(model: Int) {
-            BleServiceHelper.bp2GetPhyState(model)
+//            BleServiceHelper.bp2GetPhyState(model)
         }
         fun bp2SetPhyState(model: Int, state: Bp2BlePhyState) {
-            BleServiceHelper.bp2SetPhyState(model, state)
+//            BleServiceHelper.bp2SetPhyState(model, state)
         }
 
         fun bp2SetConfig(model: Int, config: Bp2Config) {
-            BleServiceHelper.bp2SetConfig(model, config)
+//            BleServiceHelper.bp2SetConfig(model, config)
         }
         fun bp2GetRtState(model: Int) {
             BleServiceHelper.bp2GetRtState(model)
         }
         fun bp2GetWifiDevice(model: Int) {
-            BleServiceHelper.bp2GetWifiDevice(model)
+//            BleServiceHelper.bp2GetWifiDevice(model)
         }
         fun bp2SetWifiConfig(model: Int, config: Bp2WifiConfig) {
-            BleServiceHelper.bp2SetWifiConfig(model, config)
+//            BleServiceHelper.bp2SetWifiConfig(model, config)
         }
         fun bp2GetWifiConfig(model: Int) {
-            BleServiceHelper.bp2GetWifiConfig(model)
+//            BleServiceHelper.bp2GetWifiConfig(model)
         }
         fun bp2WriteUserList(model: Int, userList: LeBp2wUserList) {
-            BleServiceHelper.bp2WriteUserList(model, userList)
+//            BleServiceHelper.bp2WriteUserList(model, userList)
         }
         fun bp2GetFileListCrc(model: Int, fileType: Int) {
-            BleServiceHelper.bp2GetFileListCrc(model, fileType)
+//            BleServiceHelper.bp2GetFileListCrc(model, fileType)
         }
         fun bp2DeleteFile(model: Int) {
-            BleServiceHelper.bp2DeleteFile(model)
+//            BleServiceHelper.bp2DeleteFile(model)
         }
         fun bp2SyncUtcTime(model: Int) {
-            BleServiceHelper.bp2SyncUtcTime(model)
+//            BleServiceHelper.bp2SyncUtcTime(model)
         }
 
         fun oxyGetRtWave(model: Int) {

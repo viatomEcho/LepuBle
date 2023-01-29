@@ -86,24 +86,24 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface BP2 {
         companion object {
-            const val EventBp2Info = "com.lepu.ble.bp2.info"                                  // 设备信息 Bp2DeviceInfo
-            const val EventBp2RtData = "com.lepu.ble.bp2.rtData"                              // 实时数据 Bp2BleRtData
-            const val EventBp2State = "com.lepu.ble.bp2.state"                                // 实时状态 Bp2BleRtState
-            const val EventBp2FileList = "com.lepu.ble.bp2.fileList"                          // 文件列表 KtBleFileList
+            const val EventBp2Info = "com.lepu.ble.bp2.info"                                  // 设备信息 com.lepu.blepro.ext.bp2.DeviceInfo
+            const val EventBp2RtData = "com.lepu.ble.bp2.rtData"                              // 实时数据 com.lepu.blepro.ext.bp2.RtData
+            const val EventBp2State = "com.lepu.ble.bp2.state"                                // 实时状态 com.lepu.blepro.ext.bp2.RtStatus
+            const val EventBp2FileList = "com.lepu.ble.bp2.fileList"                          // 文件列表 ArrayList<String>
             const val EventBp2ReadFileError = "com.lepu.ble.bp2.read.file.error"              // 读文件出错 String(fileName)
-            const val EventBp2ReadingFileProgress = "com.lepu.ble.bp2.reading.file.progress"  // 传输文件进度 Bp2FilePart
-            const val EventBp2ReadFileComplete = "com.lepu.ble.bp2.read.file.complete"        // 传输文件完成 Bp2BleFile
-            const val EventBp2Reset = "com.lepu.ble.bp2.reset"                                // 复位 int(0：失败 1：成功)
-            const val EventBp2FactoryReset = "com.lepu.ble.bp2.factory.reset"                 // 恢复出厂设置 int(0：失败 1：成功)
-            const val EventBp2FactoryResetAll = "com.lepu.ble.bp2.factory.reset.all"          // 恢复生产出厂状态 int(0：失败 1：成功)
-            const val EventBp2SetConfigResult = "com.lepu.ble.bp2.set.config.result"          // 设置心跳音开关 int(0：失败 1：成功)
-            const val EventBp2GetConfigResult = "com.lepu.ble.bp2.get.config.result"          // 获取配置信息 Bp2Config
+            const val EventBp2ReadingFileProgress = "com.lepu.ble.bp2.reading.file.progress"  // 传输文件进度 int(0-100)
+            const val EventBp2ReadFileComplete = "com.lepu.ble.bp2.read.file.complete"        // 传输文件完成 com.lepu.blepro.ext.bp2.Bp2File
+            const val EventBp2Reset = "com.lepu.ble.bp2.reset"                                // 复位 boolean(false：失败 true：成功)
+            const val EventBp2FactoryReset = "com.lepu.ble.bp2.factory.reset"                 // 恢复出厂设置 boolean
+            const val EventBp2FactoryResetAll = "com.lepu.ble.bp2.factory.reset.all"          // 恢复生产出厂状态 boolean
+            const val EventBp2SetConfig = "com.lepu.ble.bp2.set.config"                       // 设置心跳音开关 boolean
+            const val EventBp2GetConfig = "com.lepu.ble.bp2.get.config"                       // 获取配置信息 com.lepu.blepro.ext.bp2.Bp2Config
             const val EventBp2GetConfigError = "com.lepu.ble.bp2.get.config.error"            // 获取配置信息失败 true
             const val EventBp2SyncTime = "com.lepu.ble.bp2.sync.time"                         // 同步时间 boolean
             const val EventBp2SwitchState = "com.lepu.ble.bp2.switch.state"                   // 切换设备状态 boolean
-            const val EventBp2SetPhyState = "com.lepu.ble.bp2.set.phy.state"                  // 设置理疗状态 Bp2BlePhyState
-            const val EventBp2GetPhyState = "com.lepu.ble.bp2.get.phy.state"                  // 获取理疗状态 Bp2BlePhyState
-            const val EventBp2GetPhyStateError = "com.lepu.ble.bp2.get.phy.state.error"       // 获取理疗状态出错 boolean
+//            const val EventBp2SetPhyState = "com.lepu.ble.bp2.set.phy.state"                  // 设置理疗状态 Bp2BlePhyState
+//            const val EventBp2GetPhyState = "com.lepu.ble.bp2.get.phy.state"                  // 获取理疗状态 Bp2BlePhyState
+//            const val EventBp2GetPhyStateError = "com.lepu.ble.bp2.get.phy.state.error"       // 获取理疗状态出错 boolean
         }
     }
 
@@ -136,36 +136,39 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * LeBp2wBleInterface发出的通知
-     * 包含model: MODEL_LE_BP2W
+     * LpBp2wBleInterface发出的通知
+     * 包含model: MODEL_LP_BP2W
      */
-    interface LeBP2W {
+    interface LpBp2w {
         companion object {
-            const val EventLeBp2wInfo = "com.lepu.ble.le.bp2w.info"                                  // 设备信息 LepuDevice
-            const val EventLeBp2wRtState = "com.lepu.ble.le.bp2w.rtState"                            // 主机状态 Bp2BleRtState
-            const val EventLeBp2wRtData = "com.lepu.ble.le.bp2w.rtData"                              // 实时数据 Bp2BleRtData
-            const val EventLeBp2wList = "com.lepu.ble.le.bp2w.List"                                  // 列表名 LeBp2wBleList
-            const val EventLeBp2wFileList = "com.lepu.ble.le.bp2w.fileList"                          // 文件列表内容 Bp2BleFile(type 0：LeBp2wUserList 1：LeBp2wBpList 2：LeBp2wEcgList)
-            const val EventLeBp2wReadFileError = "com.lepu.ble.le.bp2w.read.file.error"              // 读文件出错 String(fileName)
-            const val EventLeBp2wReadingFileProgress = "com.lepu.ble.le.bp2w.reading.file.progress"  // 传输文件进度 Bp2FilePart
-            const val EventLeBp2wReadFileComplete = "com.lepu.ble.le.bp2w.read.file.complete"        // 传输文件完成 LeBp2wEcgFile
-            const val EventLeBp2WriteFileError = "com.lepu.ble.le.bp2w.write.file.error"             // 写文件出错 String(fileName)
-            const val EventLeBp2WriteFileComplete = "com.lepu.ble.le.bp2w.write.file.complete"       // 写文件完成 FileListCrc
-            const val EventLeBp2WritingFileProgress = "com.lepu.ble.le.bp2w.writing.file.progress"   // 写文件进度 Bp2FilePart
-            const val EventLeBp2wReset = "com.lepu.ble.le.bp2w.reset"                                // 复位 boolean
-            const val EventLeBp2wFactoryReset = "com.lepu.ble.le.bp2w.factory.reset"                 // 恢复出厂设置 boolean
-            const val EventLeBp2wFactoryResetAll = "com.lepu.ble.le.bp2w.factory.reset.all"          // 恢复生产出厂状态 boolean
-            const val EventLeBp2wSetConfig = "com.lepu.ble.le.bp2w.set.config"                       // 设置心跳音开关 boolean
-            const val EventLeBp2wGetConfig = "com.lepu.ble.le.bp2w.get.config"                       // 获取参数 Bp2Config
-            const val EventLeBp2wSyncTime = "com.lepu.ble.le.bp2w.sync.time"                         // 同步时间 boolean
-            const val EventLeBp2wSyncUtcTime = "com.lepu.ble.le.bp2w.sync.utc.time"                  // 同步UTC时间 boolean
-            const val EventLeBp2wSwitchState = "com.lepu.ble.le.bp2w.switch.state"                   // 切换设备状态 boolean
-            const val EventLeBp2WifiDevice = "com.lepu.ble.le.bp2w.wifi.device"                      // 获取路由 Bp2WifiDevice
-            const val EventLeBp2WifiScanning = "com.lepu.ble.le.bp2w.wifi.scanning"                  // 正在扫描路由 boolean
-            const val EventLeBp2wGetWifiConfig = "com.lepu.ble.le.bp2w.get.wifi.config"              // 获取WiFi配置 Bp2WifiConfig
-            const val EventLeBp2wSetWifiConfig = "com.lepu.ble.le.bp2w.set.wifi.config"              // 设置WiFi boolean
-            const val EventLeBp2wGetFileListCrc = "com.lepu.ble.le.bp2w.get.fileList.crc"            // 获取列表校验值 FileListCrc
-            const val EventLeBp2wDeleteFile = "com.lepu.ble.le.bp2w.delete.file"                     // 删除文件 boolean
+            const val EventLpBp2wInfo = "com.lepu.ble.lp.bp2w.info"                                  // 设备信息 LepuDevice
+            const val EventLpBp2wRtState = "com.lepu.ble.lp.bp2w.rtState"                            // 主机状态 Bp2BleRtState
+            const val EventLpBp2wRtData = "com.lepu.ble.lp.bp2w.rtData"                              // 实时数据 Bp2BleRtData
+//            const val EventLpBp2wList = "com.lepu.ble.lp.bp2w.List"                                  // 列表名 LeBp2wBleList
+//            const val EventLpBp2wFileList = "com.lepu.ble.lp.bp2w.fileList"                          // 文件列表内容 Bp2BleFile(type 0：LeBp2wUserList 1：LeBp2wBpList 2：LeBp2wEcgList)
+            const val EventLpBp2wUserFileList = "com.lepu.ble.lp.bp2w.fileList"                      // 用户文件列表
+            const val EventLpBp2wBpFileList = "com.lepu.ble.lp.bp2w.bp.fileList"                     // 血压文件列表
+            const val EventLpBp2wEcgFileList = "com.lepu.ble.lp.bp2w.fileList"                       // 心电文件列表
+            const val EventLpBp2wReadFileError = "com.lepu.ble.lp.bp2w.read.file.error"              // 读文件出错 String(fileName)
+            const val EventLpBp2wReadingFileProgress = "com.lepu.ble.lp.bp2w.reading.file.progress"  // 传输文件进度 Bp2FilePart
+            const val EventLpBp2wReadFileComplete = "com.lepu.ble.lp.bp2w.read.file.complete"        // 传输文件完成 LeBp2wEcgFile
+            const val EventLpBp2WriteFileError = "com.lepu.ble.lp.bp2w.write.file.error"             // 写文件出错 String(fileName)
+            const val EventLpBp2WriteFileComplete = "com.lepu.ble.lp.bp2w.write.file.complete"       // 写文件完成 FileListCrc
+            const val EventLpBp2WritingFileProgress = "com.lepu.ble.lp.bp2w.writing.file.progress"   // 写文件进度 Bp2FilePart
+            const val EventLpBp2wReset = "com.lepu.ble.lp.bp2w.reset"                                // 复位 boolean
+            const val EventLpBp2wFactoryReset = "com.lepu.ble.lp.bp2w.factory.reset"                 // 恢复出厂设置 boolean
+            const val EventLpBp2wFactoryResetAll = "com.lepu.ble.lp.bp2w.factory.reset.all"          // 恢复生产出厂状态 boolean
+            const val EventLpBp2wSetConfig = "com.lepu.ble.lp.bp2w.set.config"                       // 设置心跳音开关 boolean
+            const val EventLpBp2wGetConfig = "com.lepu.ble.lp.bp2w.get.config"                       // 获取参数 Bp2Config
+//            const val EventLpBp2wSyncTime = "com.lepu.ble.lp.bp2w.sync.time"                         // 同步时间 boolean
+            const val EventLpBp2wSyncUtcTime = "com.lepu.ble.lp.bp2w.sync.utc.time"                  // 同步UTC时间 boolean
+            const val EventLpBp2wSwitchState = "com.lepu.ble.lp.bp2w.switch.state"                   // 切换设备状态 boolean
+            const val EventLpBp2WifiDevice = "com.lepu.ble.lp.bp2w.wifi.device"                      // 获取路由 Bp2WifiDevice
+            const val EventLpBp2WifiScanning = "com.lepu.ble.lp.bp2w.wifi.scanning"                  // 正在扫描路由 boolean
+            const val EventLpBp2wGetWifiConfig = "com.lepu.ble.lp.bp2w.get.wifi.config"              // 获取WiFi配置 Bp2WifiConfig
+            const val EventLpBp2wSetWifiConfig = "com.lepu.ble.lp.bp2w.set.wifi.config"              // 设置WiFi boolean
+//            const val EventLpBp2wGetFileListCrc = "com.lepu.ble.lp.bp2w.get.fileList.crc"            // 获取列表校验值 FileListCrc
+            const val EventLpBp2wDeleteFile = "com.lepu.ble.lp.bp2w.delete.file"                     // 删除文件 boolean
         }
     }
 

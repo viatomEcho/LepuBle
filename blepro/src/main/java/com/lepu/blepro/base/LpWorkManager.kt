@@ -213,8 +213,8 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_LE_BP2W -> {
-                LeBp2wBleInterface(m).apply {
+            Bluetooth.MODEL_LP_BP2W -> {
+                LpBp2wBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
                     return this
@@ -495,7 +495,7 @@ object LpWorkManager {
                 }
             }
             Bluetooth.MODEL_BP2 , Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T,
-            Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LE_BP2W -> {
+            Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LP_BP2W -> {
                 Bp2BleManager(context).apply {
                     vailManager.put(m, this)
                     return this

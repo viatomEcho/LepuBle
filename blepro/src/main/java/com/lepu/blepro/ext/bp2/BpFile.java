@@ -1,0 +1,102 @@
+package com.lepu.blepro.ext.bp2;
+
+public class BpFile {
+    private int fileVersion;       // 文件版本 e.g.  0x01 :  V1
+    private int fileType;          // 文件类型 1：血压；2：心电
+    private int measureTime;       // 测量时间时间戳s
+    private int sys;               // 收缩压
+    private int dia;               // 舒张压
+    private int mean;              // 平均压
+    private int pr;                // 心率
+    private boolean arrhythmia;    // 诊断结果 bit0:心率不齐
+
+    public BpFile(byte[] bytes) {
+        com.lepu.blepro.ble.data.Bp2BpFile data = new com.lepu.blepro.ble.data.Bp2BpFile(bytes);
+        fileVersion = data.getFileVersion();
+        fileType = data.getFileType();
+        measureTime = data.getMeasureTime();
+        sys = data.getSys();
+        dia = data.getDia();
+        mean = data.getMean();
+        pr = data.getPr();
+        arrhythmia = data.getResult() == 1;
+    }
+
+    public int getFileVersion() {
+        return fileVersion;
+    }
+
+    public void setFileVersion(int fileVersion) {
+        this.fileVersion = fileVersion;
+    }
+
+    public int getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(int fileType) {
+        this.fileType = fileType;
+    }
+
+    public int getMeasureTime() {
+        return measureTime;
+    }
+
+    public void setMeasureTime(int measureTime) {
+        this.measureTime = measureTime;
+    }
+
+    public int getSys() {
+        return sys;
+    }
+
+    public void setSys(int sys) {
+        this.sys = sys;
+    }
+
+    public int getDia() {
+        return dia;
+    }
+
+    public void setDia(int dia) {
+        this.dia = dia;
+    }
+
+    public int getMean() {
+        return mean;
+    }
+
+    public void setMean(int mean) {
+        this.mean = mean;
+    }
+
+    public int getPr() {
+        return pr;
+    }
+
+    public void setPr(int pr) {
+        this.pr = pr;
+    }
+
+    public boolean isArrhythmia() {
+        return arrhythmia;
+    }
+
+    public void setArrhythmia(boolean arrhythmia) {
+        this.arrhythmia = arrhythmia;
+    }
+
+    @Override
+    public String toString() {
+        return "BpFile{" +
+                "fileVersion=" + fileVersion +
+                ", fileType=" + fileType +
+                ", measureTime=" + measureTime +
+                ", sys=" + sys +
+                ", dia=" + dia +
+                ", mean=" + mean +
+                ", pr=" + pr +
+                ", arrhythmia=" + arrhythmia +
+                '}';
+    }
+}

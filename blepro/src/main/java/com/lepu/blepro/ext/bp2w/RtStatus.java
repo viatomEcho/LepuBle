@@ -1,4 +1,4 @@
-package com.lepu.blepro.ext.bp2;
+package com.lepu.blepro.ext.bp2w;
 
 public class RtStatus {
     private int deviceStatus;
@@ -7,6 +7,8 @@ public class RtStatus {
     private String batteryStatusMsg;
     private int percent;
     private float vol;
+    private int avgCnt;              // x3当前测量下标 0,1,2
+    private int avgWaitTick;         // x3等待计时
 
     public int getDeviceStatus() {
         return deviceStatus;
@@ -56,15 +58,33 @@ public class RtStatus {
         this.vol = vol;
     }
 
+    public int getAvgCnt() {
+        return avgCnt;
+    }
+
+    public void setAvgCnt(int avgCnt) {
+        this.avgCnt = avgCnt;
+    }
+
+    public int getAvgWaitTick() {
+        return avgWaitTick;
+    }
+
+    public void setAvgWaitTick(int avgWaitTick) {
+        this.avgWaitTick = avgWaitTick;
+    }
+
     @Override
     public String toString() {
         return "RtStatus{" +
                 "deviceStatus=" + deviceStatus +
                 ", deviceStatusMsg='" + deviceStatusMsg + '\'' +
                 ", batteryStatus=" + batteryStatus +
-                ", batteryStatusMsg=" + batteryStatusMsg +
+                ", batteryStatusMsg='" + batteryStatusMsg + '\'' +
                 ", percent=" + percent +
                 ", vol=" + vol +
+                ", avgCnt=" + avgCnt +
+                ", avgWaitTick=" + avgWaitTick +
                 '}';
     }
 }

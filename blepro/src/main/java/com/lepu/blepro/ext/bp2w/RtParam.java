@@ -1,4 +1,4 @@
-package com.lepu.blepro.ext.bp2;
+package com.lepu.blepro.ext.bp2w;
 
 public class RtParam {
     private int paramDataType;

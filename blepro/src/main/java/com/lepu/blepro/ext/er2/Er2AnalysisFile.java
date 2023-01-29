@@ -116,6 +116,27 @@ public class Er2AnalysisFile {
         public void setSt(short st) {
             this.st = st;
         }
+
+        @Override
+        public String toString() {
+            return "AnalysisResult{" +
+                    "result=" + result +
+                    ", diagnosis=" + diagnosis +
+                    ", hr=" + hr +
+                    ", qrs=" + qrs +
+                    ", pvcs=" + pvcs +
+                    ", qtc=" + qtc +
+                    ", st=" + st +
+                    '}';
+        }
     }
 
+    @Override
+    public String toString() {
+        return "Er2AnalysisFile{" +
+                "fileVersion=" + fileVersion +
+                ", recordingTime=" + recordingTime +
+                ", resultList=" + resultList +
+                '}';
+    }
 }

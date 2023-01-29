@@ -294,17 +294,12 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 }
             }
         //-------------------------LeBp2w---------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSyncTime)
-            .observe(this) {
-                Toast.makeText(this, "LP-BP2W 完成时间同步", Toast.LENGTH_SHORT).show()
-                LpBleUtil.getInfo(it.model)
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSyncUtcTime)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wSyncUtcTime)
             .observe(this) {
                 Toast.makeText(this, "LP-BP2W 完成UTC时间同步", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wInfo)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wInfo)
             .observe(this) { event ->
                 (event.data as LepuDevice).let {
                     Toast.makeText(this, "LP-BP2W 获取设备信息成功", Toast.LENGTH_SHORT).show()

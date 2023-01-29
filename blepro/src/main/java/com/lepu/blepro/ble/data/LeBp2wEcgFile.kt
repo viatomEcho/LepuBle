@@ -32,7 +32,7 @@ class LeBp2wEcgFile {
         for (i in waveShortData.indices) {
             waveShortData[i] = toSignedShort(waveData[2 * i], waveData[2 * i + 1])
         }
-        duration = waveData.size.div(2*250)
+        duration = waveData.size.div(2*125)
     }
 
     override fun toString(): String {

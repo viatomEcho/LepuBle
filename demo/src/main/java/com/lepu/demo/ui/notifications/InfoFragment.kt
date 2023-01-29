@@ -239,7 +239,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM3
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP2W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER3
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_VTM01
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LEPOD) {
@@ -454,7 +454,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     fileType = LewBleCmd.ListType.SPORT
                 }
                 LpBleUtil.lewGetFileList(Constant.BluetoothConfig.currentModel[0], fileType, 0)
-            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W) {
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP2W) {
                 fileType++
                 if (fileType > LeBp2wBleCmd.FileType.ECG_TYPE) {
                     fileType = LeBp2wBleCmd.FileType.USER_TYPE
@@ -886,18 +886,18 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 }
             }
         //--------------------------------le bp2w-----------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wList)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wList)
             .observe(this) {
                 val data = it.data as LeBp2wBleList
                 binding.info.text = "$data"
                 setReceiveCmd(data.bytes)
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileError)
+            }*/
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wReadFileError)
             .observe(this) {
                 mAlertDialog?.dismiss()
                 Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFileList)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wFileList)
             .observe(this) { event ->
                 (event.data as Bp2BleFile).let {
                     setReceiveCmd(it.content)
@@ -949,8 +949,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     }
                     binding.deviceInfo.text = fileNames.toString()
                 }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadingFileProgress)
+            }*/
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wReadingFileProgress)
             .observe(this) { event ->
                 (event.data as Bp2FilePart).let {
                     process = (it.percent.times(100)).toInt()
@@ -958,7 +958,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileComplete)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wReadFileComplete)
             .observe(this) { event ->
                 (event.data as LeBp2wEcgFile).let {
                     setReceiveCmd(it.content)
