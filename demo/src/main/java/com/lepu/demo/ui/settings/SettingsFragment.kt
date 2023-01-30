@@ -37,7 +37,6 @@ import com.lepu.demo.data.DeviceFactoryData
 import com.lepu.demo.databinding.FragmentSettingsBinding
 import com.lepu.demo.util.DateUtil
 import com.lepu.demo.util.FileUtil
-import com.lepu.demo.util.StringUtil
 import com.lepu.demo.util.StringUtil.*
 import com.lepu.demo.util.icon.BitmapConvertor
 import java.util.*
@@ -2428,7 +2427,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                             "服务器连接状态：${data.server.state}\n" +
                             "(0:断开 1:连接中 2:已连接 0xff:服务器无法连接)"
                 } else {
-                    Toast.makeText(context, "尚未配置WiFi信息", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(context, "尚未配置WiFi信息", Toast.LENGTH_SHORT).show()
                 }
             }
         //------------------------------lp bp2w-------------------------------------
@@ -2512,7 +2511,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                             "服务器连接状态：${data.server.state}\n" +
                             "(0:断开 1:连接中 2:已连接 0xff:服务器无法连接)"
                 } else {
-                    Toast.makeText(context, "尚未配置WiFi信息", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(context, "尚未配置WiFi信息", Toast.LENGTH_SHORT).show()
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetFileListCrc)
