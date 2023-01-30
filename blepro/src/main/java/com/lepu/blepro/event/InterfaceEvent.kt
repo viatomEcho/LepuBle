@@ -144,11 +144,11 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventLpBp2wInfo = "com.lepu.ble.lp.bp2w.info"                                  // 设备信息 LepuDevice
             const val EventLpBp2wRtState = "com.lepu.ble.lp.bp2w.rtState"                            // 主机状态 Bp2BleRtState
             const val EventLpBp2wRtData = "com.lepu.ble.lp.bp2w.rtData"                              // 实时数据 Bp2BleRtData
-//            const val EventLpBp2wList = "com.lepu.ble.lp.bp2w.List"                                  // 列表名 LeBp2wBleList
-//            const val EventLpBp2wFileList = "com.lepu.ble.lp.bp2w.fileList"                          // 文件列表内容 Bp2BleFile(type 0：LeBp2wUserList 1：LeBp2wBpList 2：LeBp2wEcgList)
-            const val EventLpBp2wUserFileList = "com.lepu.ble.lp.bp2w.fileList"                      // 用户文件列表
+//            const val EventLpBp2wList = "com.lepu.ble.lp.bp2w.List"                                // 列表名 LeBp2wBleList
+//            const val EventLpBp2wFileList = "com.lepu.ble.lp.bp2w.fileList"                        // 文件列表内容 Bp2BleFile(type 0：LeBp2wUserList 1：LeBp2wBpList 2：LeBp2wEcgList)
+            const val EventLpBp2wUserFileList = "com.lepu.ble.lp.bp2w.user.fileList"                 // 用户文件列表
             const val EventLpBp2wBpFileList = "com.lepu.ble.lp.bp2w.bp.fileList"                     // 血压文件列表
-            const val EventLpBp2wEcgFileList = "com.lepu.ble.lp.bp2w.fileList"                       // 心电文件列表
+            const val EventLpBp2wEcgFileList = "com.lepu.ble.lp.bp2w.ecg.fileList"                   // 心电文件列表
             const val EventLpBp2wReadFileError = "com.lepu.ble.lp.bp2w.read.file.error"              // 读文件出错 String(fileName)
             const val EventLpBp2wReadingFileProgress = "com.lepu.ble.lp.bp2w.reading.file.progress"  // 传输文件进度 Bp2FilePart
             const val EventLpBp2wReadFileComplete = "com.lepu.ble.lp.bp2w.read.file.complete"        // 传输文件完成 LeBp2wEcgFile

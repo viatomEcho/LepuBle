@@ -350,7 +350,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                         oxyFile.o2Score = tempFile.o2Score
                         oxyFile.stepCounter = tempFile.stepCounter
                         for (i in tempFile.data) {
-                            val data = oxyFile.EachData()
+                            val data = OxyFile().EachData()
                             data.spo2 = i.spo2
                             data.pr = i.pr
                             data.vector = i.vector

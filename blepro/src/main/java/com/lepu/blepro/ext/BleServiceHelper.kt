@@ -1462,9 +1462,9 @@ class BleServiceHelper private constructor() {
         }
     }
     /**
-     * 写用户信息（le bp2w）xxxxxxx
+     * 写用户信息（lp bp2w）
      */
-    fun lpBp2WriteUserList(model: Int, userList: LeBp2wUserList) {
+    fun lpBp2WriteUserList(model: Int, userList: ArrayList<com.lepu.blepro.ext.lpbp2w.UserInfo>) {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_LP_BP2W -> {

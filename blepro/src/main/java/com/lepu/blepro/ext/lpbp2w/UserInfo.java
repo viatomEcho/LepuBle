@@ -4,11 +4,12 @@ public class UserInfo {
     private int aid = 0;                // 主账户id
     private int uid = 0;                // 用户id
     private String firstName = "";      // 姓
-    private String lastName = "";           // 名
-    private String birthday = "0-0-0";  // 生日 "1997-01-01"
+    private String lastName = "";       // 名
+    private String birthday = "0-0-0";  // 出生日期
     private int height = 0;             // 身高 cm (init 170cm -> cmdSend 1700)
     private float weight = 0f;          // 体重 kg (init 75.5kg -> cmdSend 755)
     private int gender = 0;             // 性别 0：男 1：女
+    private Icon icon;
 
     public int getAid() {
         return aid;
@@ -74,6 +75,14 @@ public class UserInfo {
         this.gender = gender;
     }
 
+    public Icon getIcon() {
+        return icon;
+    }
+
+    public void setIcon(Icon icon) {
+        this.icon = icon;
+    }
+
     @Override
     public String toString() {
         return "UserInfo{" +
@@ -86,5 +95,35 @@ public class UserInfo {
                 ", weight=" + weight +
                 ", gender=" + gender +
                 '}';
+    }
+
+    public class Icon {
+        private int width;
+        private int height;
+        private byte[] icon;
+
+        public int getWidth() {
+            return width;
+        }
+
+        public void setWidth(int width) {
+            this.width = width;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+
+        public void setHeight(int height) {
+            this.height = height;
+        }
+
+        public byte[] getIcon() {
+            return icon;
+        }
+
+        public void setIcon(byte[] icon) {
+            this.icon = icon;
+        }
     }
 }
