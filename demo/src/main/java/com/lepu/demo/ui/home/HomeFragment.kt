@@ -91,12 +91,14 @@ class HomeFragment : Fragment(R.layout.fragment_home){
             binding.rcv.visibility = View.VISIBLE
         }
 
-        binding.disconnect.setOnClickListener{
+        binding.disconnect.setOnClickListener {
             LpBleUtil.disconnect(false)
         }
-        binding.disconnect2.setOnClickListener{
+        binding.disconnect2.setOnClickListener {
             isPairing = false
             LpBleUtil.disconnect(false)
+            mainViewModel._scanning.value = true
+            binding.rcv.visibility = View.VISIBLE
         }
 
         binding.reconnectByName.setOnClickListener {
@@ -109,23 +111,14 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                 LpBleUtil.reconnectByMac(currentModel[0], it1.deviceMacAddress)
             }
         }
-        if (Constant.BluetoothConfig.needPair) {
-            binding.needPair.text = "配对连接"
-        } else {
-            binding.needPair.text = "手动连接"
-        }
+        binding.needPair.isChecked = Constant.BluetoothConfig.needPair
         binding.needPair.setOnClickListener {
             if (Constant.BluetoothConfig.splitType == 0 || Constant.BluetoothConfig.splitType == 6) {
+                binding.needPair.isChecked = false
                 Toast.makeText(context, "该设备类型不支持配对连接！", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            if (binding.needPair.text.toString() == "手动连接") {
-                binding.needPair.text = "配对连接"
-                Constant.BluetoothConfig.needPair = true
-            } else {
-                binding.needPair.text = "手动连接"
-                Constant.BluetoothConfig.needPair = false
-            }
+            Constant.BluetoothConfig.needPair = binding.needPair.isChecked
             LpBleUtil.setNeedPair(Constant.BluetoothConfig.needPair)
         }
         binding.scanByName.setOnClickListener {
@@ -147,7 +140,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                 splitDevices(binding.bleSplit.text.toString())
                 if (position == 0 || position == 6) {
                     Constant.BluetoothConfig.needPair = false
-                    binding.needPair.text = "手动连接"
+                    binding.needPair.isChecked = false
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {

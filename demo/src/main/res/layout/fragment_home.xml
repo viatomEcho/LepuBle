@@ -38,12 +38,14 @@
                 android:layout_marginStart="@dimen/dp_10"
                 android:layout_toLeftOf="@+id/need_pair"
                 android:layout_toRightOf="@+id/device_type"/>
-            <Button
+
+            <CheckBox
                 android:id="@+id/need_pair"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:text="手动连接"/>
+                android:layoutDirection="rtl"
+                android:text="配对连接" />
         </RelativeLayout>
         <Button
             android:id="@+id/scan"
@@ -51,7 +53,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@+id/device_type_layout"
             app:layout_constraintEnd_toEndOf="parent"
-            android:text="刷新"/>
+            android:text="扫描"/>
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
