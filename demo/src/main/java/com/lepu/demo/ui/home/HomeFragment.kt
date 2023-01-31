@@ -113,7 +113,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         }
         binding.needPair.isChecked = Constant.BluetoothConfig.needPair
         binding.needPair.setOnClickListener {
-            if (Constant.BluetoothConfig.splitType == 0 || Constant.BluetoothConfig.splitType == 6) {
+            if (Constant.BluetoothConfig.splitType == 10) {
                 binding.needPair.isChecked = false
                 Toast.makeText(context, "该设备类型不支持配对连接！", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -129,7 +129,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         }
         deviceTypeAdapter = ArrayAdapter(requireContext(),
             android.R.layout.simple_list_item_1,
-            arrayListOf("全部", "BP2", "ER1", "ER2", "DuoEK", "O2", "PC")
+            arrayListOf("全部", "BP2", "ER1", "VBeat", "HHM1", "DuoEK", "HHM2", "HHM3", "ER2", "O2", "PC")
         ).apply {
             binding.deviceTypeSpinner.adapter = this
         }
@@ -138,7 +138,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 Constant.BluetoothConfig.splitType = position
                 splitDevices(binding.bleSplit.text.toString())
-                if (position == 0 || position == 6) {
+                if (position == 10) {
                     Constant.BluetoothConfig.needPair = false
                     binding.needPair.isChecked = false
                 }
@@ -248,33 +248,38 @@ class HomeFragment : Fragment(R.layout.fragment_home){
 
     }
     private fun getNameFromDeviceType(): String {
-        when (Constant.BluetoothConfig.splitType) {
-            0 -> return ""
-            1 -> return "BP2"
-            2 -> return "ER1"
-            3 -> return "ER2"
-            4 -> return "DuoEK"
-            5 -> return "O2"
-            6 -> return "PC"
-            else -> return ""
+        return when (Constant.BluetoothConfig.splitType) {
+            0 -> ""
+            1 -> "BP2"
+            2 -> "ER1"
+            3 -> "VBeat"
+            4 -> "HHM1"
+            5 -> "DuoEK"
+            6 -> "HHM2"
+            7 -> "HHM3"
+            8 -> "ER2"
+            9 -> "O2"
+            10 -> "PC"
+            else -> ""
         }
     }
     private fun containModelFromDeviceType(model: Int): Boolean {
         when (Constant.BluetoothConfig.splitType) {
+            0 -> return true
             1 -> return (model == Bluetooth.MODEL_BP2
                         || model == Bluetooth.MODEL_BP2A
                         || model == Bluetooth.MODEL_BP2T
                         || model == Bluetooth.MODEL_BP2W
                         || model == Bluetooth.MODEL_LE_BP2W)
-            2 -> return (model == Bluetooth.MODEL_ER1
-                    || model == Bluetooth.MODEL_ER1_N
-                    || model == Bluetooth.MODEL_HHM1)
-            3 -> return (model == Bluetooth.MODEL_ER2
+            2 -> return model == Bluetooth.MODEL_ER1
+            3 -> return model == Bluetooth.MODEL_ER1_N
+            4 -> return model == Bluetooth.MODEL_HHM1
+            5 -> return model == Bluetooth.MODEL_DUOEK
+            6 -> return model == Bluetooth.MODEL_HHM2
+            7 -> return model == Bluetooth.MODEL_HHM3
+            8 -> return (model == Bluetooth.MODEL_ER2
                     || model == Bluetooth.MODEL_LP_ER2)
-            4 -> return (model == Bluetooth.MODEL_DUOEK
-                    || model == Bluetooth.MODEL_HHM2
-                    || model == Bluetooth.MODEL_HHM3)
-            5 -> return return (model == Bluetooth.MODEL_O2RING
+            9 -> return (model == Bluetooth.MODEL_O2RING
                     || model == Bluetooth.MODEL_BABYO2
                     || model == Bluetooth.MODEL_BABYO2N
                     || model == Bluetooth.MODEL_CHECKO2
@@ -282,17 +287,8 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     || model == Bluetooth.MODEL_SLEEPO2
                     || model == Bluetooth.MODEL_SNOREO2
                     || model == Bluetooth.MODEL_WEARO2
-                    || model == Bluetooth.MODEL_SLEEPU
-                    || model == Bluetooth.MODEL_OXYLINK
                     || model == Bluetooth.MODEL_KIDSO2
-                    || model == Bluetooth.MODEL_OXYFIT
-                    || model == Bluetooth.MODEL_OXYRING
-                    || model == Bluetooth.MODEL_BBSM_S1
-                    || model == Bluetooth.MODEL_BBSM_S2
-                    || model == Bluetooth.MODEL_OXYU
-                    || model == Bluetooth.MODEL_AI_S100
-                    || model == Bluetooth.MODEL_O2M_WPS
-                    || model == Bluetooth.MODEL_CMRING)
+                    || model == Bluetooth.MODEL_O2M_WPS)
             else -> return false
         }
     }
@@ -318,7 +314,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     ConnectionObserver.REASON_TIMEOUT -> "连接失败 REASON_TIMEOUT"
                     else -> "连接失败"
                 }
-                Toast.makeText(context, status, Toast.LENGTH_SHORT).show()
+//                Toast.makeText(context, status, Toast.LENGTH_SHORT).show()
             }
         // 配对连接
         LiveEventBus.get<HashMap<String, Any>>(EventMsgConst.Discovery.EventDeviceFound_ScanRecord)

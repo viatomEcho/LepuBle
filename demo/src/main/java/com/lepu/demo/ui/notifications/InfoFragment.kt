@@ -259,7 +259,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 }
                 popupWindow?.let { v ->
                     v.width = ViewGroup.LayoutParams.MATCH_PARENT
-                    v.height = 1000
+                    v.height = 600
                     v.contentView = popupView
                     v.isFocusable = true
                     v.showAsDropDown(view)
@@ -276,14 +276,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 val ssid = popupView.findViewById<TextView>(R.id.ssid)
                 val sure = popupView.findViewById<Button>(R.id.sure)
                 val cancel = popupView.findViewById<Button>(R.id.cancel)
-                val address = popupView.findViewById<EditText>(R.id.server_address)
-                val port = popupView.findViewById<EditText>(R.id.server_port)
                 ssid.text = "WiFi：${it.ssid}"
                 sure.setOnClickListener { it1 ->
                     val pass = trimStr(password.text.toString())
-                    val addr = trimStr(address.text.toString())
-                    val p = trimStr(port.text.toString())
-                    if (pass.isNullOrEmpty() || addr.isNullOrEmpty() || p.isNullOrEmpty()) {
+                    if (pass.isNullOrEmpty()) {
                         Toast.makeText(context, "请输入完整信息", Toast.LENGTH_SHORT).show()
                         return@setOnClickListener
                     } else {
@@ -291,12 +287,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         it.pwd = pass
                         wifiConfig.wifi = it
                         wifi = it
-                        server.addr = addr
-                        server.port = p.toInt()
-                        if (StringUtil.isEnglish(addr.substring(1))) {
-                            server.addrType = 1
-                        } else {
-                            server.addrType = 0
+                        if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W) {
+                            server.addr = "34.209.148.123"
+                            server.port = 7100
+                        } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W) {
+                            server.addr = "212.129.241.54"
+                            server.port = 7200
                         }
                         wifiConfig.server = server
                         LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
@@ -622,6 +618,14 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             bp2wAdapter.notifyDataSetChanged()
             if (wifi != null) {
                 mAlertDialogCanCancel?.show()
+                if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W) {
+                    server.addr = "34.209.148.123"
+                    server.port = 7100
+                } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W) {
+                    server.addr = "212.129.241.54"
+                    server.port = 7200
+                }
+                wifiConfig.server = server
                 LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
             } else {
                 Toast.makeText(context, "请先完成首次配置WiFi，设置成功后连接其他设备可直接配置WiFi。", Toast.LENGTH_SHORT).show()
