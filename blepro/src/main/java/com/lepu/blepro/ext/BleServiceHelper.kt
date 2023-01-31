@@ -17,6 +17,8 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.ext.bp2w.Bp2wConfig
 import com.lepu.blepro.ext.er1.Er1Config
 import com.lepu.blepro.ext.er2.Er2Config
+import com.lepu.blepro.ext.lpbp2w.LpBp2WifiConfig
+import com.lepu.blepro.ext.bp2w.Bp2WifiConfig
 import com.lepu.blepro.ext.lpbp2w.LpBp2wConfig
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
@@ -1400,6 +1402,59 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "bp2wSetConfig current model $model unsupported!!")
         }
     }
+    /**
+     * 获取路由（bp2w）
+     */
+    fun bp2wGetWifiList(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2wGetWifiList")
+                        it.getWifiDevice()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp2wGetWifiList current model $model unsupported!!")
+        }
+    }
+
+    /**
+     * 配置WiFi信息（bp2w）
+     */
+    fun bp2wSetWifiConfig(model: Int, config: Bp2WifiConfig) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2wSetWifiConfig")
+                        it.setWifiConfig(config)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp2wSetWifiConfig current model $model unsupported!!")
+        }
+    }
+
+    /**
+     * 获取WiFi配置信息（bp2w）
+     */
+    fun bp2wGetWifiConfig(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2wGetWifiConfig")
+                        it.getWifiConfig()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp2wGetWifiConfig current model $model unsupported!!")
+        }
+    }
 
     /**
      * 删除文件（lpBp2w）
@@ -1497,80 +1552,56 @@ class BleServiceHelper private constructor() {
         }
     }
     /**
-     * 获取路由（bp2w，le bp2w）
+     * 获取路由（lp bp2w）
      */
-    fun bp2GetWifiDevice(model: Int) {
+    fun lpBp2wGetWifiList(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_BP2W -> {
+            Bluetooth.MODEL_LP_BP2W -> {
                 getInterface(model)?.let { it1 ->
-                    (it1 as Bp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2GetWifiDevice")
+                    (it1 as LpBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wGetWifiList")
                         it.getWifiDevice()
                     }
                 }
             }
-            Bluetooth.MODEL_LP_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LpBp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--bp2GetWifiDevice")
-                        it.getWifiDevice()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "bp2GetWifiDevice current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "lpBp2wGetWifiList current model $model unsupported!!")
         }
     }
 
     /**
-     * 配置WiFi信息（bp2w，le bp2w）
+     * 配置WiFi信息（lp bp2w）
      */
-    fun bp2SetWifiConfig(model: Int, config: Bp2WifiConfig) {
+    fun lpBp2wSetWifiConfig(model: Int, config: LpBp2WifiConfig) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2SetWifiConfig")
-                        it.setWifiConfig(config)
-                    }
-                }
-            }
             Bluetooth.MODEL_LP_BP2W -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as LpBp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--bp2SetWifiConfig")
+                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wSetWifiConfig")
                         it.setWifiConfig(config)
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "bp2SetWifiConfig current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "lpBp2wSetWifiConfig current model $model unsupported!!")
         }
     }
 
     /**
-     * 获取WiFi配置信息（bp2w，le bp2w）
+     * 获取WiFi配置信息（lp bp2w）
      */
-    fun bp2GetWifiConfig(model: Int) {
+    fun lpBp2wGetWifiConfig(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2GetWifiConfig")
-                        it.getWifiConfig()
-                    }
-                }
-            }
             Bluetooth.MODEL_LP_BP2W -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as LpBp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--bp2GetWifiConfig")
+                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wGetWifiConfig")
                         it.getWifiConfig()
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "bp2GetWifiConfig current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "lpBp2wGetWifiConfig current model $model unsupported!!")
         }
     }
 

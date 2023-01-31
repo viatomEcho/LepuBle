@@ -2383,7 +2383,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     LpBleUtil.bp2GetWifiDevice(it.model)
                 }, 1000)
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiDevice)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiList)
             .observe(this) {
                 alertDialog?.dismiss()
                 val data = it.data as Bp2WifiDevice
@@ -2467,7 +2467,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.content.text = "设备正在扫描wifi"
                 LpBleUtil.bp2GetWifiDevice(it.model)
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2WifiDevice)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2WifiList)
             .observe(this) {
                 alertDialog?.dismiss()
                 val data = it.data as Bp2WifiDevice

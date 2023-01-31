@@ -5,27 +5,29 @@ import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.bytesToHex
 import java.nio.charset.Charset
 
-class Bp2Wifi(i: Int, val bytes: ByteArray) {
+class Bp2Wifi() {
 
     var length = 0
 
-    var state: Int           // 0:断开 1:连接中 2:已连接 0xff:密码错误 0xfd:找不到SSID
-    var ssidLen: Int
-    var ssid: String         // ssid
-    var type: Int            // wifi类型	0:2.4G   1:5G
-    var rssi: Int            // 信号强度
-    var pwdLen: Int
-    var pwd: String
-    var macAddr: String      // wifi模块mac地址
-    var ipType: Int          // ip类型 0动态 1静态
-    var ipLen: Int
-    var ipAddr: String       // ip信息
-    var netmaskLen: Int
-    var netmaskAddr: String  // 子网掩码
-    var gatewayLen: Int
-    var gatewayAddr: String  // 网关
+    var state: Int = 0           // 0:断开 1:连接中 2:已连接 0xff:密码错误 0xfd:找不到SSID
+    var ssidLen: Int = 0
+    var ssid: String = ""         // ssid
+    var type: Int = 0            // wifi类型	0:2.4G   1:5G
+    var rssi: Int = 0            // 信号强度
+    var pwdLen: Int = 0
+    var pwd: String = ""
+    var macAddr: String = ""      // wifi模块mac地址
+    var ipType: Int = 0          // ip类型 0动态 1静态
+    var ipLen: Int = 0
+    var ipAddr: String = ""       // ip信息
+    var netmaskLen: Int = 0
+    var netmaskAddr: String = ""  // 子网掩码
+    var gatewayLen: Int = 0
+    var gatewayAddr: String = ""  // 网关
+    var bytes = byteArrayOf(0)
 
-    init {
+    constructor(i: Int, bytes: ByteArray) : this() {
+        this.bytes = bytes
         var index = i
         state = (bytes[index].toUInt() and 0xFFu).toInt()
         index++

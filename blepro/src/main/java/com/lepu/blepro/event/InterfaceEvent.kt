@@ -127,7 +127,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBp2wGetConfig = "com.lepu.ble.bp2w.get.config"                       // 获取参数 Bp2Config
             const val EventBp2wSyncTime = "com.lepu.ble.bp2w.sync.time"                         // 同步时间 boolean
             const val EventBp2wSwitchState = "com.lepu.ble.bp2w.switch.state"                   // 切换设备状态 boolean
-            const val EventBp2WifiDevice = "com.lepu.ble.bp2w.wifi.device"                      // 获取路由 Bp2WifiDevice
+            const val EventBp2WifiList = "com.lepu.ble.bp2w.wifi.list"                          // 获取路由 Bp2WifiDevice
             const val EventBp2WifiScanning = "com.lepu.ble.bp2w.wifi.scanning"                  // 正在扫描路由 boolean
             const val EventBp2wGetWifiConfig = "com.lepu.ble.bp2w.get.wifi.config"              // 获取WiFi配置 Bp2WifiConfig
             const val EventBp2wSetWifiConfig = "com.lepu.ble.bp2w.set.wifi.config"              // 设置WiFi boolean
@@ -163,7 +163,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 //            const val EventLpBp2wSyncTime = "com.lepu.ble.lp.bp2w.sync.time"                         // 同步时间 boolean
             const val EventLpBp2wSyncUtcTime = "com.lepu.ble.lp.bp2w.sync.utc.time"                  // 同步UTC时间 boolean
             const val EventLpBp2wSwitchState = "com.lepu.ble.lp.bp2w.switch.state"                   // 切换设备状态 boolean
-            const val EventLpBp2WifiDevice = "com.lepu.ble.lp.bp2w.wifi.device"                      // 获取路由 Bp2WifiDevice
+            const val EventLpBp2WifiList = "com.lepu.ble.lp.bp2w.wifi.list"                          // 获取路由 Bp2WifiDevice
             const val EventLpBp2WifiScanning = "com.lepu.ble.lp.bp2w.wifi.scanning"                  // 正在扫描路由 boolean
             const val EventLpBp2wGetWifiConfig = "com.lepu.ble.lp.bp2w.get.wifi.config"              // 获取WiFi配置 Bp2WifiConfig
             const val EventLpBp2wSetWifiConfig = "com.lepu.ble.lp.bp2w.set.wifi.config"              // 设置WiFi boolean

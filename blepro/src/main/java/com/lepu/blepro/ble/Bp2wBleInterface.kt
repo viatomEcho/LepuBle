@@ -6,10 +6,13 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.Bp2wBleCmd
 import com.lepu.blepro.ble.cmd.Bp2wBleCmd.*
+import com.lepu.blepro.ble.cmd.LeBp2wBleCmd
 import com.lepu.blepro.ble.cmd.LepuBleResponse
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ble.data.Bp2WifiConfig
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.bp2w.*
+import com.lepu.blepro.ext.bp2w.Bp2Wifi
 import com.lepu.blepro.utils.CrcUtil.calCRC8
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
@@ -43,6 +46,11 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
     private var rtStatus = RtStatus()
     private var rtParam = RtParam()
     private var config = Bp2wConfig()
+    private var wifiList = arrayListOf<Bp2Wifi>()
+    private var wifi = Bp2Wifi()
+    private var server = Bp2wServer()
+    private var wifiConfig = com.lepu.blepro.ext.bp2w.Bp2WifiConfig()
+
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         if (isManagerInitialized()) {
             if (manager.bluetoothDevice == null) {
@@ -362,7 +370,26 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 } else {
                     val data = Bp2WifiDevice(bleResponse.content)
                     LepuBleLog.d(tag, "model:$model, data.toString == $data")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiDevice).post(InterfaceEvent(model, data))
+                    for (w in data.wifiList) {
+                        val wifi = Bp2Wifi()
+                        wifi.state = w.state
+                        wifi.ssidLen = w.ssidLen
+                        wifi.ssid = w.ssid
+                        wifi.type = w.type
+                        wifi.rssi = w.rssi
+                        wifi.pwdLen = w.pwdLen
+                        wifi.pwd = w.pwd
+                        wifi.macAddr = w.macAddr
+                        wifi.ipType = w.ipType
+                        wifi.ipLen = w.ipLen
+                        wifi.ipAddr = w.ipAddr
+                        wifi.netmaskLen = w.netmaskLen
+                        wifi.netmaskAddr = w.netmaskAddr
+                        wifi.gatewayLen = w.gatewayLen
+                        wifi.gatewayAddr = w.gatewayAddr
+                        wifiList.add(wifi)
+                    }
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiList).post(InterfaceEvent(model, wifiList))
                 }
             }
 
@@ -373,9 +400,31 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 }
                 LepuBleLog.d(tag, "model:$model,GET_WIFI_CONFIG => success")
                 LepuBleLog.d(tag, "model:$model,bytesToHex == " + bytesToHex(bleResponse.content))
-                var data = Bp2WifiConfig(bleResponse.content)
+                val data = Bp2WifiConfig(bleResponse.content)
                 LepuBleLog.d(tag, "model:$model, data.toString == $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetWifiConfig).post(InterfaceEvent(model, data))
+                wifi.state = data.wifi.state
+                wifi.ssidLen = data.wifi.ssidLen
+                wifi.ssid = data.wifi.ssid
+                wifi.type = data.wifi.type
+                wifi.rssi = data.wifi.rssi
+                wifi.pwdLen = data.wifi.pwdLen
+                wifi.pwd = data.wifi.pwd
+                wifi.macAddr = data.wifi.macAddr
+                wifi.ipType = data.wifi.ipType
+                wifi.ipLen = data.wifi.ipLen
+                wifi.ipAddr = data.wifi.ipAddr
+                wifi.netmaskLen = data.wifi.netmaskLen
+                wifi.netmaskAddr = data.wifi.netmaskAddr
+                wifi.gatewayLen = data.wifi.gatewayLen
+                wifi.gatewayAddr = data.wifi.gatewayAddr
+                wifiConfig.wifi = wifi
+                server.state = data.server.state
+                server.addrType = data.server.addrType
+                server.addrLen = data.server.addrLen
+                server.addr = data.server.addr
+                server.port = data.server.port
+                wifiConfig.server = server
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetWifiConfig).post(InterfaceEvent(model, wifiConfig))
             }
 
             SET_WIFI_CONFIG -> {
@@ -476,6 +525,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
      * 获取wifi路由
      */
     fun getWifiDevice() {
+        wifiList.clear()
         sendCmd(getWifiRoute(0))
         LepuBleLog.d(tag, "getWifiDevice...")
     }
@@ -485,6 +535,37 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
      */
     fun setWifiConfig(config: Bp2WifiConfig) {
         sendCmd(setWifiConfig(config.getDataBytes()))
+        LepuBleLog.d(tag, "setWifiConfig...config:$config")
+    }
+
+    fun setWifiConfig(c: com.lepu.blepro.ext.bp2w.Bp2WifiConfig) {
+        val config = Bp2WifiConfig()
+        config.option = 3
+        val wifi = com.lepu.blepro.ble.data.Bp2Wifi()
+        wifi.state = c.wifi.state
+        wifi.ssidLen = c.wifi.ssidLen
+        wifi.ssid = c.wifi.ssid
+        wifi.type = c.wifi.type
+        wifi.rssi = c.wifi.rssi
+        wifi.pwdLen = c.wifi.pwdLen
+        wifi.pwd = c.wifi.pwd
+        wifi.macAddr = c.wifi.macAddr
+        wifi.ipType = c.wifi.ipType
+        wifi.ipLen = c.wifi.ipLen
+        wifi.ipAddr = c.wifi.ipAddr
+        wifi.netmaskLen = c.wifi.netmaskLen
+        wifi.netmaskAddr = c.wifi.netmaskAddr
+        wifi.gatewayLen = c.wifi.gatewayLen
+        wifi.gatewayAddr = c.wifi.gatewayAddr
+        config.wifi = wifi
+        val server = Bp2Server()
+        server.state = c.server.state
+        server.addrType = c.server.addrType
+        server.addrLen = c.server.addrLen
+        server.addr = c.server.addr
+        server.port = c.server.port
+        config.server = server
+        sendCmd(LeBp2wBleCmd.setWifiConfig(config.getDataBytes()))
         LepuBleLog.d(tag, "setWifiConfig...config:$config")
     }
 
