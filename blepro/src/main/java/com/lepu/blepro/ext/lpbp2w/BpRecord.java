@@ -5,7 +5,6 @@ public class BpRecord {
     private String fileName;      // 文件名
     private int uid;              // 用户id
     private int measureMode;      // 测量模式 0：单次 1：3次
-    private int interval;         // 测量间隔 单位s 非单次测量模式有效
     private int sys;              // 收缩压
     private int dia;              // 舒张压
     private int mean;             // 平均压
@@ -43,14 +42,6 @@ public class BpRecord {
 
     public void setMeasureMode(int measureMode) {
         this.measureMode = measureMode;
-    }
-
-    public int getInterval() {
-        return interval;
-    }
-
-    public void setInterval(int interval) {
-        this.interval = interval;
     }
 
     public int getSys() {
@@ -108,7 +99,6 @@ public class BpRecord {
                 ", fileName='" + fileName + '\'' +
                 ", uid=" + uid +
                 ", measureMode=" + measureMode +
-                ", interval=" + interval +
                 ", sys=" + sys +
                 ", dia=" + dia +
                 ", mean=" + mean +

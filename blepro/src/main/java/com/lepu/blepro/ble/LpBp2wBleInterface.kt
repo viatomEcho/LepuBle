@@ -277,7 +277,6 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                                         record.fileName = r.fileName
                                         record.uid = r.uid
                                         record.measureMode = r.mode
-                                        record.interval = r.interval
                                         record.sys = r.sys
                                         record.dia = r.dia
                                         record.mean = r.mean
@@ -355,7 +354,6 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                                         record.fileName = r.fileName
                                         record.uid = r.uid
                                         record.measureMode = r.mode
-                                        record.interval = r.interval
                                         record.sys = r.sys
                                         record.dia = r.dia
                                         record.mean = r.mean
