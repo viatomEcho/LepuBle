@@ -1,5 +1,8 @@
 package com.lepu.blepro.ble.cmd;
 
+import com.lepu.blepro.utils.ByteArrayKt;
+import com.lepu.blepro.utils.LepuBleLog;
+
 /**
  * @author chenyongfeng
  */
@@ -11,6 +14,7 @@ public class Vtm01BleCmd {
     public static final int GET_INFO = 0xE1;
     public static final int RESET = 0xE2;
     public static final int FACTORY_RESET = 0xE3;
+    public static final int BURN_FACTORY_INFO = 0xEA;
 
     public static final int GET_CONFIG = 0x00;
     public static final int RT_PARAM = 0x01;
@@ -43,6 +47,10 @@ public class Vtm01BleCmd {
 
         addNo();
         return cmd;
+    }
+
+    public static byte[] burnFactoryInfo(byte[] config) {
+        return getReq(BURN_FACTORY_INFO, config);
     }
 
     public static byte[] getInfo() {

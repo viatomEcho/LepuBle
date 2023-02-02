@@ -100,6 +100,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.pc60fwLayout.visibility = View.GONE
         binding.er3Layout.root.visibility = View.GONE
         binding.lepodLayout.root.visibility = View.GONE
+        binding.vtm01Layout.root.visibility = View.GONE
         binding.sendCmd.visibility = View.GONE
         binding.content.visibility = View.GONE
         if (v == null) return
@@ -258,6 +259,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_S6W1 -> {
                     setViewVisible(binding.pc60fwLayout)
                 }
+                Bluetooth.MODEL_VTM01 -> {
+                    setViewVisible(binding.vtm01Layout.root)
+                }
                 else -> {
                     setViewVisible(null)
                 }
@@ -276,6 +280,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.er2Layout.er2Version.setText("${it.hwV}")
                 binding.er2Layout.er2Sn.setText("${it.sn}")
                 binding.er2Layout.er2Code.setText("${it.branchCode}")
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_VTM01) {
+                binding.vtm01Layout.version.setText("${it.hwV}")
+                binding.vtm01Layout.sn.setText("${it.sn}")
+                binding.vtm01Layout.code.setText("${it.branchCode}")
             }
         }
         mainViewModel.er2Info.observe(viewLifecycleOwner) {
@@ -2156,6 +2164,46 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.lepodLayout.getRtParam.setOnClickListener {
             LpBleUtil.lepodGetRtParam(Constant.BluetoothConfig.currentModel[0])
         }
+        // --------------------------vtm01--------------------------------
+        binding.vtm01Layout.factoryConfig.setOnClickListener {
+            val config = FactoryConfig()
+            var enableVersion = true
+            val tempVersion = binding.vtm01Layout.version.text
+            if (tempVersion.isNullOrEmpty()) {
+                enableVersion = false
+            } else if (tempVersion.length == 1 && isBigLetter(tempVersion.toString())) {
+                config.setHwVersion(tempVersion.first())
+            } else {
+                Toast.makeText(context, "硬件版本请输入A-Z字母", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            var enableSn = true
+            val tempSn = trimStr(binding.vtm01Layout.sn.text.toString())
+            if (tempSn.isNullOrEmpty()) {
+                enableSn = false
+            } else if (tempSn.length == 10) {
+                config.setSnCode(tempSn)
+            } else {
+                Toast.makeText(context, "sn请输入10位", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            var enableCode = true
+            val tempCode = trimStr(binding.vtm01Layout.code.text.toString())
+            if (tempCode.isNullOrEmpty()) {
+                enableCode = false
+            } else if (tempCode.length == 8) {
+                config.setBranchCode(tempCode)
+            } else {
+                Toast.makeText(context, "code请输入8位", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            config.setBurnFlag(enableSn, enableVersion, enableCode)
+            LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
+            deviceFactoryData.sn = tempSn
+            deviceFactoryData.code = tempCode
+            deviceFactoryData.time = DateUtil.stringFromDate(Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL)
+            FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
+        }
 
     }
 
@@ -3224,6 +3272,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 val data = it.data as LepodBleResponse.RtParam
                 binding.lepodLayout.deviceInfo.text = "$data"
                 Toast.makeText(context, "获取实时参数成功", Toast.LENGTH_SHORT).show()
+            }
+        // --------------------------vtm01--------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01BurnFactoryInfo)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    Toast.makeText(context, "烧录成功", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "烧录失败", Toast.LENGTH_SHORT).show()
+                }
+                LpBleUtil.getInfo(it.model)
             }
 
         //-----------------------------------

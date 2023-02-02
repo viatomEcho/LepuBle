@@ -28,6 +28,9 @@
             <include
                 android:id="@+id/bp2_layout"
                 layout="@layout/bp2_settings"/>
+            <include
+                android:id="@+id/vtm01_layout"
+                layout="@layout/vtm01_settings"/>
             <LinearLayout
                 android:id="@+id/le_bp2w_layout"
                 android:layout_width="match_parent"

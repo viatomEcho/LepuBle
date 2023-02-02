@@ -996,6 +996,14 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
+            Bluetooth.MODEL_VTM01 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Vtm01BleInterface).let {
+                        LepuBleLog.d(tag, "it as OxyBleInterface--burnFactoryInfo")
+                        it.burnFactoryInfo(config)
+                    }
+                }
+            }
             else -> LepuBleLog.d(tag, "burnFactoryInfo current model $model unsupported!!")
         }
     }
