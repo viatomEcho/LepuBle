@@ -9,7 +9,6 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.base.LpWorkManager
 import com.lepu.blepro.ble.*
 import com.lepu.blepro.ble.data.*
-import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
 import com.lepu.blepro.constants.Ble
@@ -17,15 +16,12 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.ext.bp2w.Bp2wConfig
 import com.lepu.blepro.ext.er1.Er1Config
 import com.lepu.blepro.ext.er2.Er2Config
-import com.lepu.blepro.ext.lpbp2w.LpBp2WifiConfig
-import com.lepu.blepro.ext.bp2w.Bp2WifiConfig
 import com.lepu.blepro.ext.lpbp2w.LpBp2wConfig
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.LepuBleLog
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * 单例的蓝牙服务帮助类，原则上只通过此类开放API
@@ -375,18 +371,6 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * 获取发送的指令字符串
-     */
-    fun getSendCmd(model: Int): String {
-        if (!checkService()) return ""
-        getInterface(model)?.let {
-            LepuBleLog.d(tag, "getSendCmd:${it.getSendCmd()}")
-            return it.getSendCmd()
-        }
-        return ""
-    }
-
-    /**
      * 主动获取当前蓝牙连接状态
      */
     fun getConnectState(model: Int): Int {
@@ -401,7 +385,7 @@ class BleServiceHelper private constructor() {
     /**
      * 获取扫描状态
      */
-    fun isScanning(): Boolean{
+    fun isScanning(): Boolean {
         if (!checkService()) return false
         LepuBleLog.d(tag, "isScanning:${LpWorkManager.isDiscovery}")
         return LpWorkManager.isDiscovery
@@ -410,33 +394,15 @@ class BleServiceHelper private constructor() {
     /**
      * 获取实时任务停止状态
      */
-    fun isRtStop(model: Int): Boolean{
+    fun isRtStop(model: Int): Boolean {
         if (!checkService()) return false
         return getInterface(model)?.isRtStop ?: true
     }
 
     /**
-     * 设置mtu
-     */
-    fun setBleMtu(model: Int, mtu: Int){
-        if (!checkService()) return
-        getInterface(model)?.setBleMtu(mtu)
-    }
-
-    /**
-     * 获取mtu
-     */
-    fun getBleMtu(model: Int): Int{
-        var mtu = 0
-        if (!checkService()) return mtu
-        mtu = getInterface(model)?.getBleMtu()!!
-        return mtu
-    }
-
-    /**
      * 设置匹配状态
      */
-    fun setNeedPair(needPair : Boolean){
+    fun setNeedPair(needPair : Boolean) {
         LpWorkManager.needPair = needPair
     }
 
@@ -464,7 +430,7 @@ class BleServiceHelper private constructor() {
         LepuBleLog.d(tag, "removeReconnectAddress:$address")
     }
 
-    fun getReconnectDeviceName(): ArrayList<String>{
+    fun getReconnectDeviceName(): ArrayList<String> {
         return LpWorkManager.reconnectDeviceName
     }
 
@@ -473,7 +439,7 @@ class BleServiceHelper private constructor() {
      * @param model IntArray
      * @return Boolean
      */
-    fun hasUnConnected(model: IntArray): Boolean{
+    fun hasUnConnected(model: IntArray): Boolean {
         LepuBleLog.d(tag, "into hasUnConnected...")
         if (!checkService()) return false
         for (m in model){
@@ -505,7 +471,7 @@ class BleServiceHelper private constructor() {
     /**
      * BleService初始化判断
      */
-    fun checkService(): Boolean{
+    fun checkService(): Boolean {
         if (LpWorkManager.application == null){
             LepuBleLog.d("Error: LpWorkManager application == null")
             return false
@@ -539,8 +505,14 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_O2M_WPS -> {
                 return inter is OxyBleInterface
             }
-            Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T ->{
+            Bluetooth.MODEL_BP2,Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
                 return inter is Bp2BleInterface
+            }
+            Bluetooth.MODEL_BP2W -> {
+                return inter is Bp2wBleInterface
+            }
+            Bluetooth.MODEL_LP_BP2W -> {
+                return inter is LpBp2wBleInterface
             }
             Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
             Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
@@ -560,175 +532,57 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PC80B_BLE2 -> {
                 return inter is Pc80BleInterface
             }
-            Bluetooth.MODEL_FHR -> {
-                return inter is FhrBleInterface
-            }
-            Bluetooth.MODEL_BPW1 -> {
-                return inter is Bpw1BleInterface
-            }
-            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE -> {
-                return inter is F4ScaleBleInterface
-            }
-            Bluetooth.MODEL_MY_SCALE, Bluetooth.MODEL_F5_SCALE -> {
-                return inter is F5ScaleBleInterface
+            Bluetooth.MODEL_PC100 -> {
+                return inter is Pc100BleInterface
             }
             Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
                 return inter is Ap20BleInterface
             }
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
+            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
+                return inter is Sp20BleInterface
+            }
+            Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV -> {
+                return inter is VetcorderBleInterface
+            }
+            Bluetooth.MODEL_TV221U -> {
+                return inter is Vtm20fBleInterface
+            }
+            Bluetooth.MODEL_AOJ20A -> {
+                return inter is Aoj20aBleInterface
+            }
+            Bluetooth.MODEL_CHECK_POD -> {
+                return inter is CheckmePodBleInterface
+            }
             Bluetooth.MODEL_PC_68B -> {
                 return inter is Pc68bBleInterface
+            }
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
+                return inter is Pc300BleInterface
+            }
+            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4,
+            Bluetooth.MODEL_CHECKME -> {
+                return inter is PulsebitBleInterface
+            }
+            Bluetooth.MODEL_CHECKME_LE -> {
+                return inter is CheckmeLeBleInterface
+            }
+            Bluetooth.MODEL_LEM -> {
+                return inter is LemBleInterface
+            }
+            Bluetooth.MODEL_LPM311 -> {
+                return inter is Lpm311BleInterface
+            }
+            Bluetooth.MODEL_POCTOR_M3102 -> {
+                return inter is PoctorM3102BleInterface
+            }
+            Bluetooth.MODEL_BIOLAND_BGM -> {
+                return inter is BiolandBgmBleInterface
             }
             else -> {
                 LepuBleLog.d(tag, "checkModel, 无效model：$model,${inter.javaClass}")
                 return false
             }
-        }
-    }
-
-    fun pc100GetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun pc60fwGetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun pc80bGetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun ap20GetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun sp20GetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun pod1wGetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun oxyGetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun bpmGetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-
-    /**
-     * 获取主机信息
-     */
-    fun getInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-
-    /**
-     * 获取设备文件列表
-     * @param fileType LpBp2w获取文件列表类型（LeBp2wBleCmd.FileType.ECG_TYPE, BP_TYPE, USER_TYPE）
-     * @param fileType CheckmeLe获取文件列表类型（CheckmeLeBleCmd.ListType.ECG_TYPE, OXY_TYPE, DLC_TYPE）
-     * @param fileType 4G手表获取文件列表类型（LewBleCmd.ListType.SPORT, ECG, HR, OXY, SLEEP）
-     * @param startTime 起始时间戳 单位秒
-     */
-    @JvmOverloads
-    fun getFileList(model: Int, fileType: Int? = null, startTime: Int = 0){
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LP_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LpBp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--getFileList")
-                        if (fileType == null) {
-                            it.getFileList()
-                        } else {
-                            it.getFileList(fileType)
-                        }
-                    }
-                }
-            }
-            Bluetooth.MODEL_CHECKME_LE -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as CheckmeLeBleInterface).let {
-                        LepuBleLog.d(tag, "it as CheckmeLeBleInterface--getFileList")
-                        if (fileType == null) {
-                            it.getFileList()
-                        } else {
-                            it.getFileList(fileType)
-                        }
-                    }
-                }
-            }
-            Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LewBleInterface).let {
-                        LepuBleLog.d(tag, "it as LewBleInterface--lewGetFileList")
-                        if (fileType == null) {
-                            it.getFileList()
-                        } else {
-                            it.getFileList(fileType, startTime)
-                        }
-                    }
-                }
-            }
-            else -> {
-                getInterface(model)?.getFileList()
-            }
-        }
-    }
-
-    /**
-     * 读取主机文件
-     * @param userId String
-     * @param fileName String
-     * @param model Int
-     * @param offset Int 开始读文件的偏移量
-     */
-    @JvmOverloads
-    fun readFile(userId: String, fileName: String, model: Int, offset: Int = 0) {
-        if (!checkService()) return
-        getInterface(model)?.let {
-            it.readFile(userId, fileName, offset)
-        }
-    }
-
-    /**
-     * 取消读取文件
-     * @param model Int
-     */
-    fun cancelReadFile(model: Int){
-        if (!checkService()) return
-        getInterface(model)?.let {
-            it.isCancelRF = true
-            LiveEventBus.get<Int>(EventMsgConst.Download.EventIsCancel).post(model)
-        }
-    }
-
-    /**
-     * 暂停 读取文件
-     * @param model Int
-     * @param isPause Boolean
-     */
-    fun pauseReadFile(model: Int){
-        if (!checkService()) return
-        getInterface(model)?.let {
-            it.isPausedRF = true
-            LiveEventBus.get<Int>(EventMsgConst.Download.EventIsPaused).post(model)
-        }
-    }
-
-    /**
-     * 继续读取文件,并发送通知
-     * @param model Int
-     */
-    fun continueReadFile(model: Int,userId: String, fileName: String, offset: Int){
-        if (!checkService()) return
-        getInterface(model)?.let {
-            it.isPausedRF = false
-            it.continueRf(userId, fileName, offset)
-            LiveEventBus.get<Int>(EventMsgConst.Download.EventIsContinue).post(model)
         }
     }
 
@@ -743,43 +597,17 @@ class BleServiceHelper private constructor() {
     /**
      * 设置实时任务的间隔时间
      */
-    fun setRTDelayTime(model: Int, delayMillis: Long){
+    fun setRTDelayTime(model: Int, delayMillis: Long) {
         if (!checkService()) return
         getInterface(model)?.delayMillis = delayMillis
     }
 
     /**
-     * 恢复生产出厂状态
-     */
-    fun factoryResetAll(model: Int){
-        if (!checkService()) return
-        getInterface(model)?.factoryResetAll()
-    }
-
-    /**
-     * 恢复出厂设置
-     */
-    fun factoryReset(model: Int){
-        if (!checkService()) return
-        getInterface(model)?.factoryReset()
-    }
-
-    /**
-     * 设备复位
-     */
-    fun reset(model: Int){
-        if (!checkService()) return
-        getInterface(model)?.reset()
-    }
-
-    /**
      * 开启实时任务
      */
-    fun startRtTask(model: Int){
+    fun startRtTask(model: Int) {
         if (!checkService()) return
-        getInterface(model)?.let {
-            it.runRtTask()
-        }
+        getInterface(model)?.runRtTask()
     }
 
     /**
@@ -795,10 +623,879 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    // Oxy
+    fun oxyGetInfo(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
+            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
+            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
+            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
+            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
+            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    fun oxyReadFile(model: Int, fileName: String) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
+            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
+            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
+            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
+            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
+            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
+                getInterface(model)?.let {
+                    LepuBleLog.d(tag, "--oxyReadFile--")
+                    it.readFile("", fileName)
+                }
+            }
+        }
+    }
+    fun oxyFactoryReset(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
+            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
+            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
+            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
+            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
+            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
+                getInterface(model)?.let {
+                    LepuBleLog.d(tag, "--oxyFactoryReset--")
+                    it.factoryReset()
+                }
+            }
+        }
+    }
+    fun oxyGetRtWave(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
+            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
+            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
+            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
+            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
+            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as OxyBleInterface).let{
+                        LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetRtWave")
+                        it.getRtWave()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "oxyGetRtWave current model $model unsupported!!")
+        }
+    }
+    fun oxyGetRtParam(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
+            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
+            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
+            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
+            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
+            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as OxyBleInterface).let{
+                        LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetRtParam")
+                        it.getRtParam()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "oxyGetRtParam current model $model unsupported!!")
+        }
+    }
+    fun oxyUpdateSetting(model: Int, type: String, value: Any) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
+            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
+            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
+            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
+            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
+            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as OxyBleInterface).let{
+                        LepuBleLog.d(tag, "it as OxyBleInterface--oxyUpdateSetting")
+                        it.updateSetting(type, value)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "oxyUpdateSetting current model $model unsupported!!")
+        }
+    }
+    /**
+     * type: "SetOxiThr", value: 80~95
+     *       "SetOxiSwitch", value: (1) just sound or vibration: 0(0ff), 1(on)
+     *                              (2) sound and vibration: 0(sound off, vibration off), 1(sound off, vibration on), 2(sound on, vibration off), 3(sound on, vibration on)
+     *       "SetHRSwitch", value: (1) just sound or vibration: 0(0ff), 1(on)
+     *                             (2) sound and vibration: 0(sound off, vibration off), 1(sound off, vibration on), 2(sound on, vibration off), 3(sound on, vibration on)
+     *       "SetHRLowThr", value: 30~250
+     *       "SetHRHighThr", value: 30~250
+     *       "SetMotor", value: (1) KidsO2、Oxylink(0-5: MIN, 5-10: LOW, 10-17: MID, 17-22: HIGH, 22-35: MAX, 0 is off)
+     *                          (2) O2Ring(0-20: MIN, 20-40: LOW, 40-60: MID, 60-80: HIGH, 80-100: MAX, 0 is off)
+     *       "SetBuzzer", value: just for checkO2Plus(0-20：MIN，20-40：LOW，40-60：MID，60-80：HIGH，80-100：MAX，0 is off)
+     */
+    fun oxyUpdateSetting(model: Int, type: Array<String>, value: IntArray) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
+            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
+            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
+            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
+            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
+            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as OxyBleInterface).let{
+                        LepuBleLog.d(tag, "it as OxyBleInterface--oxyUpdateSetting")
+                        it.updateSetting(type, value)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "oxyUpdateSetting current model $model unsupported!!")
+        }
+    }
+    // ER1
+    fun er1GetInfo(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    fun er1GetFileList(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
+                getInterface(model)?.getFileList()
+            }
+        }
+    }
+    @JvmOverloads
+    fun er1ReadFile(model: Int, fileName: String, offset: Int = 0) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
+                getInterface(model)?.readFile("", fileName, offset)
+            }
+        }
+    }
+    /**
+     * 取消读取文件
+     * @param model Int
+     */
+    fun er1CancelReadFile(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
+                getInterface(model)?.let {
+                    it.isCancelRF = true
+                    LiveEventBus.get<Int>(EventMsgConst.Download.EventIsCancel).post(model)
+                }
+            }
+        }
+    }
+    /**
+     * 暂停 读取文件
+     * @param model Int
+     * @param isPause Boolean
+     */
+    fun er1PauseReadFile(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
+                getInterface(model)?.let {
+                    it.isPausedRF = true
+                    LiveEventBus.get<Int>(EventMsgConst.Download.EventIsPaused).post(model)
+                }
+            }
+        }
+    }
+    /**
+     * 继续读取文件,并发送通知
+     * @param model Int
+     */
+    fun er1ContinueReadFile(model: Int,userId: String, fileName: String, offset: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
+                getInterface(model)?.let {
+                    it.isPausedRF = false
+                    it.continueRf(userId, fileName, offset)
+                    LiveEventBus.get<Int>(EventMsgConst.Download.EventIsContinue).post(model)
+                }
+            }
+        }
+    }
+    fun er1Reset(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
+                getInterface(model)?.reset()
+            }
+        }
+    }
+    fun er1FactoryReset(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
+                getInterface(model)?.factoryReset()
+            }
+        }
+    }
+    fun er1FactoryResetAll(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
+                getInterface(model)?.factoryResetAll()
+            }
+        }
+    }
+    fun er1GetConfig(model: Int){
+        if (!checkService()) return
+        when(model){
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 ->{
+                getInterface(model)?.let { it1 ->
+                    (it1 as Er1BleInterface).let {
+                        LepuBleLog.d(tag, "it as Er1BleInterface--er1GetConfig")
+                        it.getVibrateConfig()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "er1GetConfig current model $model unsupported!!")
+        }
+    }
+    fun er1SetConfig(model: Int, config: Er1Config){
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Er1BleInterface).let {
+                        LepuBleLog.d(tag, "it as Er1BleInterface--er1SetConfig")
+                        it.setVibrateConfig(config.isVibration, config.threshold1, config.threshold2)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "er1SetConfig current model $model unsupported!!")
+        }
+    }
+    // BPM
+    fun bpmGetInfo(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BPM -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    fun bpmGetFileList(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BPM -> {
+                getInterface(model)?.getFileList()
+            }
+        }
+    }
+    fun bpmGetRtState(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BPM -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as BpmBleInterface).let {
+                        LepuBleLog.d(tag, "it as BpmBleInterface--bpmGetRtState")
+                        it.getRtState()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bpmGetRtState current model $model unsupported!!")
+        }
+    }
+    // BP2
+    fun bp2GetInfo(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    fun bp2GetFileList(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+                getInterface(model)?.getFileList()
+            }
+        }
+    }
+    fun bp2ReadFile(model: Int, fileName: String) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+                getInterface(model)?.readFile("", fileName)
+            }
+        }
+    }
+    fun bp2Reset(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+                getInterface(model)?.reset()
+            }
+        }
+    }
+    fun bp2FactoryReset(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+                getInterface(model)?.factoryReset()
+            }
+        }
+    }
+    fun bp2FactoryResetAll(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+                getInterface(model)?.factoryResetAll()
+            }
+        }
+    }
+    fun bp2GetConfig(model: Int){
+        if (!checkService()) return
+        when(model){
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2GetConfig")
+                        it.getConfig()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp2GetConfig current model $model unsupported!!")
+        }
+    }
+    fun bp2SetConfig(model: Int, config: com.lepu.blepro.ext.bp2.Bp2Config){
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2SetConfig")
+                        it.setConfig(config.isSoundOn)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp2SetConfig current model $model unsupported!!")
+        }
+    }
+    // BP2W
+    fun bp2wGetInfo(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    fun bp2wGetFileList(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.getFileList()
+            }
+        }
+    }
+    fun bp2wReadFile(model: Int, fileName: String) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.readFile("", fileName)
+            }
+        }
+    }
+    fun bp2wReset(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.reset()
+            }
+        }
+    }
+    fun bp2wFactoryReset(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.factoryReset()
+            }
+        }
+    }
+    fun bp2wFactoryResetAll(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.factoryResetAll()
+            }
+        }
+    }
+    fun bp2wGetConfig(model: Int){
+        if (!checkService()) return
+        when(model){
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2wGetConfig")
+                        it.getConfig()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp2wGetConfig current model $model unsupported!!")
+        }
+    }
+    fun bp2wSetConfig(model: Int, config: Bp2wConfig){
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2wSetConfig")
+                        it.setConfig(config)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp2wSetConfig current model $model unsupported!!")
+        }
+    }
+    fun bp2wDeleteFile(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2wDeleteFile")
+                        it.deleteFile()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp2wDeleteFile current model $model unsupported!!")
+        }
+    }
+    /**
+     * 获取路由（bp2w）
+     */
+    /*fun bp2wGetWifiList(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2wGetWifiList")
+                        it.getWifiDevice()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp2wGetWifiList current model $model unsupported!!")
+        }
+    }*/
+
+    /**
+     * 配置WiFi信息（bp2w）
+     */
+    /*fun bp2wSetWifiConfig(model: Int, config: Bp2WifiConfig) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2wSetWifiConfig")
+                        it.setWifiConfig(config)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp2wSetWifiConfig current model $model unsupported!!")
+        }
+    }*/
+
+    /**
+     * 获取WiFi配置信息（bp2w）
+     */
+    /*fun bp2wGetWifiConfig(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2wGetWifiConfig")
+                        it.getWifiConfig()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp2wGetWifiConfig current model $model unsupported!!")
+        }
+    }*/
+    // LpBp2w
+    fun lpBp2wGetInfo(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP2W -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    fun lpBp2wReadFile(model: Int, fileName: String) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP2W -> {
+                getInterface(model)?.readFile("", fileName)
+            }
+        }
+    }
+    fun lpBp2wReset(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP2W -> {
+                getInterface(model)?.reset()
+            }
+        }
+    }
+    fun lpBp2wFactoryReset(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP2W -> {
+                getInterface(model)?.factoryReset()
+            }
+        }
+    }
+    fun lpBp2wFactoryResetAll(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP2W -> {
+                getInterface(model)?.factoryResetAll()
+            }
+        }
+    }
+    /**
+     * fileType: 0-2
+     * 0: Constant.LpBp2wListType.USER_TYPE
+     * 1: Constant.LpBp2wListType.BP_TYPE
+     * 2: Constant.LpBp2wListType.ECG_TYPE
+     */
+    fun lpBp2wGetFileList(model: Int, fileType: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LpBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wGetFileList")
+                        it.getFileList(fileType)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lpBp2wDeleteFile current model $model unsupported!!")
+        }
+    }
+    fun lpBp2wGetConfig(model: Int){
+        if (!checkService()) return
+        when(model){
+            Bluetooth.MODEL_LP_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LpBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wGetConfig")
+                        it.getConfig()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lpBp2wGetConfig current model $model unsupported!!")
+        }
+    }
+    fun lpBp2wSetConfig(model: Int, config: LpBp2wConfig){
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_LP_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LpBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wSetConfig")
+                        it.setConfig(config)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lpBp2wSetConfig current model $model unsupported!!")
+        }
+    }
+    fun lpBp2wDeleteFile(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LpBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wDeleteFile")
+                        it.deleteFile()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lpBp2wDeleteFile current model $model unsupported!!")
+        }
+    }
+    fun lpBp2WriteUserList(model: Int, userList: ArrayList<com.lepu.blepro.ext.lpbp2w.UserInfo>) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LpBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2WriteUserList")
+                        it.writeUserList(userList)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lpBp2WriteUserList current model $model unsupported!!")
+        }
+    }
+    /**
+     * 获取路由（lp bp2w）
+     */
+    /*fun lpBp2wGetWifiList(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LpBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wGetWifiList")
+                        it.getWifiDevice()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lpBp2wGetWifiList current model $model unsupported!!")
+        }
+    }*/
+
+    /**
+     * 配置WiFi信息（lp bp2w）
+     */
+    /*fun lpBp2wSetWifiConfig(model: Int, config: LpBp2WifiConfig) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LpBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wSetWifiConfig")
+                        it.setWifiConfig(config)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lpBp2wSetWifiConfig current model $model unsupported!!")
+        }
+    }*/
+
+    /**
+     * 获取WiFi配置信息（lp bp2w）
+     */
+    /*fun lpBp2wGetWifiConfig(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LpBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wGetWifiConfig")
+                        it.getWifiConfig()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lpBp2wGetWifiConfig current model $model unsupported!!")
+        }
+    }*/
+    // ER2
+    fun er2GetInfo(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
+            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    fun er2GetFileList(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
+            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
+                getInterface(model)?.getFileList()
+            }
+        }
+    }
+    fun er2ReadFile(model: Int, fileName: String) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
+            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
+                getInterface(model)?.readFile("", fileName)
+            }
+        }
+    }
+    fun er2Reset(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
+            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
+                getInterface(model)?.reset()
+            }
+        }
+    }
+    fun er2FactoryReset(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
+            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
+                getInterface(model)?.factoryReset()
+            }
+        }
+    }
+    fun er2FactoryResetAll(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
+            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
+                getInterface(model)?.factoryResetAll()
+            }
+        }
+    }
+    fun er2SetConfig(model: Int, config: Er2Config){
+        if (!checkService()) return
+        when(model){
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
+            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Er2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Er2BleInterface--er2SetConfig")
+                        it.setConfig(config)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "setEr2SwitcherState current model $model unsupported!!")
+        }
+    }
+    fun er2GetConfig(model: Int){
+        if (!checkService()) return
+        when(model){
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
+            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Er2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Er2BleInterface--er2GetConfig")
+                        it.getSwitcherState()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "er2GetConfig current model $model unsupported!!")
+        }
+    }
+    // PC60Fw
+    fun pc60fwGetInfo(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
+            Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
+            Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
+            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
+            Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
+            Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
+            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
+            Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
+            Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
+            Bluetooth.MODEL_PC60NW_WPS -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    /**
+     * 使能实时数据发送（pc60fw，pc66b，oxysmart，pod1w）
+     * @param type Pc60FwBleCmd.EnableType
+     * @param enable true打开，false关闭
+     */
+    fun pc60fwEnableRtData(model: Int, type: Int, enable: Boolean) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
+            Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
+            Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
+            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
+            Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
+            Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
+            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
+            Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
+            Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
+            Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
+            Bluetooth.MODEL_PC60NW_WPS -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Pc60FwBleInterface).let {
+                        LepuBleLog.d(tag, "it as Pc60FwBleInterface--pc60fwEnableRtData")
+                        it.enableRtData(type, enable)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "pc60fwEnableRtData current model $model unsupported!!")
+        }
+    }
+    // PC80B
+    fun pc80bGetInfo(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE,
+            Bluetooth.MODEL_PC80B_BLE2 -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    fun pc80bGetBattery(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE,
+            Bluetooth.MODEL_PC80B_BLE2 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Pc80BleInterface).let {
+                        LepuBleLog.d(tag, "it as PC80BleInterface--sendHeartbeat")
+                        it.sendHeartbeat()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "sendHeartbeat current model $model unsupported!!")
+        }
+    }
+    // PC100
+    fun pc100GetInfo(model: Int) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_PC100 -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
     fun pc100StartBp(model: Int) {
         if (!checkService()) return
         when(model){
-            Bluetooth.MODEL_PC100 ->{
+            Bluetooth.MODEL_PC100 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc100BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc100BleInterface--pc100StartBp")
@@ -823,1051 +1520,450 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.e(tag, "pc100StopBp model error  ")
         }
     }
-
-    /**
-     * 开始测量血压
-     */
-    fun startBp(model: Int) {
-        if (!checkService()) return
-        when(model){
-            Bluetooth.MODEL_BPM ->{
-                getInterface(model)?.let { it1 ->
-                    (it1 as BpmBleInterface).let {
-                        LepuBleLog.d(tag, "it as BpmBleInterface--startBp")
-                        it.startBp()
-                    }
-                }
-            }
-            Bluetooth.MODEL_BPW1 ->{
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bpw1BleInterface).let {
-                        LepuBleLog.d(tag, "it as Bpw1BleInterface--startBp")
-                        it.startBp()
-                    }
-                }
-            }
-            Bluetooth.MODEL_PC100 ->{
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc100BleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc100BleInterface--startBp")
-                        it.startBp()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "startBp current model $model unsupported!!")
-        }
-
-    }
-
-    /**
-     * 停止测量血压
-     */
-    fun stopBp(model: Int) {
-        if (!checkService()) return
-        when(model) {
-            Bluetooth.MODEL_BPM -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as BpmBleInterface).let {
-                        LepuBleLog.d(tag, "it as BpmBleInterface--stopBp")
-                        it.stopBp()
-                    }
-                }
-            }
-            Bluetooth.MODEL_BPW1 ->{
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bpw1BleInterface).let {
-                        LepuBleLog.d(tag, "it as Bpw1BleInterface--stopBp")
-                        it.stopBp()
-                    }
-                }
-            }
-            Bluetooth.MODEL_PC100 ->{
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc100BleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc100BleInterface--stopBp")
-                        it.stopBp()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "stopBp current model $model unsupported!!")
-        }
-    }
-
-    fun bpmGetFileList(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getFileList()
-    }
-    fun bpmGetRtState(model: Int) {
+    // AP20
+    fun ap20GetInfo(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_BPM -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as BpmBleInterface).let {
-                        LepuBleLog.d(tag, "it as BpmBleInterface--bpmGetRtState")
-                        it.getRtState()
-                    }
-                }
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
+                getInterface(model)?.getInfo()
             }
-            else -> LepuBleLog.d(tag, "bpmGetRtState current model $model unsupported!!")
         }
     }
-
     /**
-     * 烧录出厂信息
+     * type: 0-4
+     * 0: Constant.Ap20ConfigType.BACK_LIGHT, config: 0~5
+     * 1: Constant.Ap20ConfigType.ALARM_SWITCH, config: 0 off, 1 on
+     * 2: Constant.Ap20ConfigType.LOW_OXY_THRESHOLD, config: 85~99
+     * 3: Constant.Ap20ConfigType.LOW_HR_THRESHOLD, config: 30~99
+     * 4: Constant.Ap20ConfigType.HIGH_HR_THRESHOLD, config: 100~250
      */
-    fun burnFactoryInfo(model: Int, config: FactoryConfig) {
-        if (!checkService()) return
-        when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Er1BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er1BleInterface--burnFactoryInfo")
-                        it.burnFactoryInfo(config)
-                    }
-                }
-            }
-            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
-            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Er2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er2BleInterface--burnFactoryInfo")
-                        it.burnFactoryInfo(config)
-                    }
-                }
-            }
-            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
-            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
-            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
-            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
-            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
-            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
-            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
-            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as OxyBleInterface).let {
-                        LepuBleLog.d(tag, "it as OxyBleInterface--burnFactoryInfo")
-                        it.burnFactoryInfo(config)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "burnFactoryInfo current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 加密Flash
-     */
-    fun burnLockFlash(model: Int) {
-        if (!checkService()) return
-        when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Er1BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er1BleInterface--burnLockFlash")
-                        it.burnLockFlash()
-                    }
-                }
-            }
-            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
-            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Er2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er2BleInterface--burnLockFlash")
-                        it.burnLockFlash()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "burnLockFlash current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 获取Bpm设备文件列表
-     */
-    fun getBpmFileList(model: Int, map: HashMap<String, Any>){
+    fun ap20SetConfig(model: Int, type: Int, config: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_BPM -> {
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
                 getInterface(model)?.let { it1 ->
-                    (it1 as BpmBleInterface).let {
-                        LepuBleLog.d(tag, "it as BpmBleInterface--getBpmFileList")
-                        it.getBpmFileList(map)
+                    (it1 as Ap20BleInterface).let {
+                        LepuBleLog.d(tag, "it as Ap20BleInterface--ap20SetConfig")
+                        it.setConfig(type, config)
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "getBpmFileList current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "ap20SetConfig current model $model unsupported!!")
         }
     }
-
-    fun getBpmRtState(model: Int) {
+    /**
+     * type: 0-4
+     * 0: Constant.Ap20ConfigType.BACK_LIGHT
+     * 1: Constant.Ap20ConfigType.ALARM_SWITCH
+     * 2: Constant.Ap20ConfigType.LOW_OXY_THRESHOLD
+     * 3: Constant.Ap20ConfigType.LOW_HR_THRESHOLD
+     * 4: Constant.Ap20ConfigType.HIGH_HR_THRESHOLD
+     */
+    fun ap20GetConfig(model: Int, type: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_BPM -> {
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
                 getInterface(model)?.let { it1 ->
-                    (it1 as BpmBleInterface).let {
-                        LepuBleLog.d(tag, "it as BpmBleInterface--getBpmRtState")
-                        it.getRtState()
+                    (it1 as Ap20BleInterface).let {
+                        LepuBleLog.d(tag, "it as Ap20BleInterface--ap20GetConfig")
+                        it.getConfig(type)
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "getBpmRtState current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "ap20GetConfig current model $model unsupported!!")
         }
     }
-
-    /**
-     * er2 设置hr开关状态
-     * @param model Int
-     * @param hrFlag Boolean
-     */
-    fun er2SetConfig(model: Int, config: Er2Config){
-        if (!checkService()) return
-        when(model){
-            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
-            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Er2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er2BleInterface--er2SetConfig")
-//                        it.setSwitcherState(config.isSoundOn)
-                        it.setConfig(config)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "setEr2SwitcherState current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * er2 获取hr开关状态
-     * @param model Int
-     */
-    fun er2GetConfig(model: Int){
-        if (!checkService()) return
-        when(model){
-            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_DUOEK,
-            Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Er2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er2BleInterface--er2GetConfig")
-                        it.getSwitcherState()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "er2GetConfig current model $model unsupported!!")
-        }
-    }
-
-    fun er2GetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun er2GetFileList(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getFileList()
-    }
-    fun er2ReadFile(model: Int, fileName: String) {
-        if (!checkService()) return
-        getInterface(model)?.readFile("", fileName)
-    }
-    fun er2FactoryReset(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.factoryReset()
-    }
-
-    fun er1GetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun er1GetFileList(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getFileList()
-    }
-    fun er1ReadFile(model: Int, fileName: String) {
-        if (!checkService()) return
-        getInterface(model)?.readFile("", fileName)
-    }
-    fun er1FactoryReset(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.factoryReset()
-    }
-
-    /**
-     * er1/duoek获取参数
-     */
-    fun er1GetConfig(model: Int){
-        if (!checkService()) return
-        when(model){
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 ->{
-                getInterface(model)?.let { it1 ->
-                    (it1 as Er1BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er1BleInterface--er1GetConfig")
-                        it.getVibrateConfig()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "er1GetConfig current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * er1设置参数
-     */
-    fun er1SetConfig(model: Int, config: Er1Config){
-        if (!checkService()) return
-        when(model) {
-            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Er1BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er1BleInterface--er1SetConfig")
-                        it.setVibrateConfig(config.isVibration, config.threshold1, config.threshold2)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "er1SetConfig current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * duoek设置参数
-     */
-    /*fun setEr1Vibrate(model: Int,switcher: Boolean, vector: Int, motionCount: Int,motionWindows: Int ){
-        if (!checkService()) return
-        when(model) {
-            Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Er1BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er1BleInterface--setEr1Vibrate")
-                        it.setVibrateConfig(switcher, vector, motionCount, motionWindows)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "setEr1Vibrate current model $model unsupported!!")
-
-        }
-    }*/
-
-    fun bp2GetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun bp2GetFileList(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getFileList()
-    }
-    fun bp2ReadFile(model: Int, fileName: String) {
-        if (!checkService()) return
-        getInterface(model)?.readFile("", fileName)
-    }
-    fun bp2FactoryReset(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.factoryReset()
-    }
-    /**
-     * 获取配置信息（bp2，bp2a，bp2t）
-     */
-    fun bp2GetConfig(model: Int){
-        if (!checkService()) return
-        when(model){
-            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T ->{
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bp2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2GetConfig")
-                        it.getConfig()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "bp2GetConfig current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 设置提示音开关（bp2，bp2a，bp2t）
-     */
-    fun bp2SetConfig(model: Int, config: com.lepu.blepro.ext.bp2.Bp2Config){
-        if (!checkService()) return
-        when(model) {
-            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bp2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2SetConfig")
-                        it.setConfig(config.isSoundOn)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "bp2SetConfig current model $model unsupported!!")
-        }
-    }
-    /**
-     * 配置参数（bp2，bp2a，bp2w，le bp2w）
-     */
-    /*fun bp2SetConfig(model: Int, config: Bp2Config) {
-        if (!checkService()) return
-        when(model){
-            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bp2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2SetConfig")
-                        it.setConfig(config)
-                    }
-                }
-            }
-            Bluetooth.MODEL_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2SetConfig")
-                        it.setConfig(config)
-                    }
-                }
-            }
-            Bluetooth.MODEL_LP_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LpBp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--bp2SetConfig")
-                        it.setConfig(config)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "bp2SetConfig current model $model unsupported!!")
-        }
-    }*/
-
-    /**
-     * 设置理疗状态（bp2t）
-     */
-    /*fun bp2SetPhyState(model: Int, state: Bp2BlePhyState){
-        if (!checkService()) return
-        when(model){
-            Bluetooth.MODEL_BP2T -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bp2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2SetPhyState")
-                        it.setPhyState(state)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "bp2SetPhyState current model $model unsupported!!")
-        }
-    }*/
-    /**
-     * 获取理疗状态（bp2t）
-     */
-    /*fun bp2GetPhyState(model: Int){
-        if (!checkService()) return
-        when(model){
-            Bluetooth.MODEL_BP2T -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bp2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2GetPhyState")
-                        it.getPhyState()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "bp2GetPhyState current model $model unsupported!!")
-        }
-    }*/
-
-    /**
-     * 切换设备状态（bp2，bp2a，bp2t，bp2w，le bp2w）
-     * @param state Bp2BleCmd.SwitchState
-     */
-    fun bp2SwitchState(model: Int, state: Int) {
+    fun ap20GetBattery(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
                 getInterface(model)?.let { it1 ->
-                    (it1 as Bp2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2SwitchState")
-                        it.switchState(state)
+                    (it1 as Ap20BleInterface).let {
+                        LepuBleLog.d(tag, "it as Ap20BleInterface--ap20GetBattery")
+                        it.getBattery()
                     }
                 }
             }
-            Bluetooth.MODEL_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2SwitchState")
-                        it.switchState(state)
-                    }
-                }
-            }
-            Bluetooth.MODEL_LP_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LpBp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--bp2SwitchState")
-                        it.switchState(state)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "bp2SwitchState current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "ap20GetBattery current model $model unsupported!!")
         }
     }
     /**
-     * 获取设备状态（bp2，bp2a，bp2t，bp2w，le bp2w）
+     * 使能实时数据发送（ap20）
+     * @param type Ap20BleCmd.EnableType
+     * @param enable true打开，false关闭
      */
-    fun bp2GetRtState(model: Int) {
+    fun ap20EnableRtData(model: Int, type: Int, enable: Boolean) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
                 getInterface(model)?.let { it1 ->
-                    (it1 as Bp2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2GetRtState")
-                        it.getRtState()
+                    (it1 as Ap20BleInterface).let {
+                        LepuBleLog.d(tag, "it as Ap20BleInterface--ap20EnableRtData")
+                        it.enableRtData(type,enable)
                     }
                 }
             }
-            Bluetooth.MODEL_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2GetRtState")
-                        it.getRtState()
-                    }
-                }
-            }
-            Bluetooth.MODEL_LP_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LpBp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--bp2GetRtState")
-                        it.getRtState()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "bp2GetRtState current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "ap20EnableRtData current model $model unsupported!!")
         }
     }
-
-    /**
-     * 删除文件（bp2w）
-     */
-    fun bp2wDeleteFile(model: Int) {
+    // SP20
+    fun sp20GetInfo(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2wDeleteFile")
-                        it.deleteFile()
-                    }
-                }
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
+            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
+                getInterface(model)?.getInfo()
             }
-            else -> LepuBleLog.d(tag, "bp2wDeleteFile current model $model unsupported!!")
-        }
-    }
-    fun bp2wGetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun bp2wGetFileList(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getFileList()
-    }
-    fun bp2wReadFile(model: Int, fileName: String) {
-        if (!checkService()) return
-        getInterface(model)?.readFile("", fileName)
-    }
-    fun bp2wFactoryReset(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.factoryReset()
-    }
-    /**
-     * 获取配置信息（bp2w）
-     */
-    fun bp2wGetConfig(model: Int){
-        if (!checkService()) return
-        when(model){
-            Bluetooth.MODEL_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2wGetConfig")
-                        it.getConfig()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "bp2wGetConfig current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 设置提示音开关和血压测量模式（bp2w）
-     */
-    fun bp2wSetConfig(model: Int, config: Bp2wConfig){
-        if (!checkService()) return
-        when(model) {
-            Bluetooth.MODEL_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2wSetConfig")
-                        it.setConfig(config)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "bp2wSetConfig current model $model unsupported!!")
         }
     }
     /**
-     * 获取路由（bp2w）
+     * type: 2-4
+     * 2: Constant.Sp20ConfigType.LOW_OXY_THRESHOLD, config: 85~99
+     * 3: Constant.Sp20ConfigType.LOW_HR_THRESHOLD, config: 30~99
+     * 4: Constant.Sp20ConfigType.HIGH_HR_THRESHOLD, config: 100~250
      */
-    fun bp2wGetWifiList(model: Int) {
+    fun sp20SetConfig(model: Int, type: Int, config: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_BP2W -> {
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
+            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
                 getInterface(model)?.let { it1 ->
-                    (it1 as Bp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2wGetWifiList")
-                        it.getWifiDevice()
+                    (it1 as Sp20BleInterface).let {
+                        LepuBleLog.d(tag, "it as Sp20BleInterface--sp20SetConfig")
+                        it.setConfig(type, config)
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "bp2wGetWifiList current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "sp20SetConfig current model $model unsupported!!")
         }
     }
-
     /**
-     * 配置WiFi信息（bp2w）
+     * type: 2-4
+     * 2: Constant.Sp20ConfigType.LOW_OXY_THRESHOLD
+     * 3: Constant.Sp20ConfigType.LOW_HR_THRESHOLD
+     * 4: Constant.Sp20ConfigType.HIGH_HR_THRESHOLD
      */
-    fun bp2wSetWifiConfig(model: Int, config: Bp2WifiConfig) {
+    fun sp20GetConfig(model: Int, type: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_BP2W -> {
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
+            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
                 getInterface(model)?.let { it1 ->
-                    (it1 as Bp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2wSetWifiConfig")
-                        it.setWifiConfig(config)
+                    (it1 as Sp20BleInterface).let {
+                        LepuBleLog.d(tag, "it as Sp20BleInterface--sp20GetConfig")
+                        it.getConfig(type)
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "bp2wSetWifiConfig current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "sp20GetConfig current model $model unsupported!!")
         }
     }
-
+    fun sp20GetBattery(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
+            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Sp20BleInterface).let {
+                        LepuBleLog.d(tag, "it as Sp20BleInterface--sp20GetBattery")
+                        it.getBattery()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "sp20GetBattery current model $model unsupported!!")
+        }
+    }
     /**
-     * 获取WiFi配置信息（bp2w）
+     * 使能实时数据发送（sp20）
+     * @param type Sp20BleCmd.EnableType
+     * @param enable true打开，false关闭
      */
-    fun bp2wGetWifiConfig(model: Int) {
+    fun sp20EnableRtData(model: Int, type: Int, enable: Boolean) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_BP2W -> {
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
+            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
                 getInterface(model)?.let { it1 ->
-                    (it1 as Bp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2wBleInterface--bp2wGetWifiConfig")
-                        it.getWifiConfig()
+                    (it1 as Sp20BleInterface).let {
+                        LepuBleLog.d(tag, "it as Sp20BleInterface--sp20EnableRtData")
+                        it.enableRtData(type,enable)
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "bp2wGetWifiConfig current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "sp20EnableRtData current model $model unsupported!!")
         }
     }
-
+    // AOJ20a
+    fun aoj20aGetInfo(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_AOJ20A -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    fun aoj20aGetFileList(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_AOJ20A -> {
+                getInterface(model)?.getFileList()
+            }
+        }
+    }
+    fun aoj20aDeleteData(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_AOJ20A -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Aoj20aBleInterface).let {
+                        LepuBleLog.d(tag, "it as Aoj20aBleInterface--aoj20aDeleteData")
+                        it.deleteData()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "aoj20aDeleteData current model $model unsupported!!")
+        }
+    }
+    // CheckmePod
+    fun checkmePodGetInfo(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_CHECK_POD -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    fun checkmePodGetFileList(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_CHECK_POD -> {
+                getInterface(model)?.getFileList()
+            }
+        }
+    }
+    // Pulsebit
+    fun pulsebitExGetInfo(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4, Bluetooth.MODEL_CHECKME -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    fun pulsebitExGetFileList(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4, Bluetooth.MODEL_CHECKME -> {
+                getInterface(model)?.getFileList()
+            }
+        }
+    }
+    fun pulsebitExReadFile(model: Int, fileName: String) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4, Bluetooth.MODEL_CHECKME -> {
+                getInterface(model)?.readFile("", fileName)
+            }
+        }
+    }
+    // PC68B
+    fun pc68bGetInfo(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_PC_68B -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
     /**
-     * 删除文件（lpBp2w）
+     * 使能实时数据发送（pc68b）
+     * @param type Pc68bBleCmd.EnableType
+     * @param enable true打开，false关闭
      */
-    fun lpBp2wDeleteFile(model: Int) {
+    fun pc68bEnableRtData(model: Int, type: Int, enable: Boolean) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_LP_BP2W -> {
+            Bluetooth.MODEL_PC_68B -> {
                 getInterface(model)?.let { it1 ->
-                    (it1 as LpBp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wDeleteFile")
-                        it.deleteFile()
+                    (it1 as Pc68bBleInterface).let {
+                        LepuBleLog.d(tag, "it as Pc68bBleInterface--pc68bEnableRtData")
+                        it.enableRtData(type, enable)
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "lpBp2wDeleteFile current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "pc68bEnableRtData current model $model unsupported!!")
         }
     }
-    fun lpBp2wGetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun lpBp2wReadFile(model: Int, fileName: String) {
-        if (!checkService()) return
-        getInterface(model)?.readFile("", fileName)
-    }
-    fun lpBp2wFactoryReset(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.factoryReset()
-    }
-    fun lpBp2wGetFileList(model: Int, fileType: Int) {
+    // PC300
+    fun pc300GetInfo(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_LP_BP2W -> {
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    // CheckmeLE
+    fun checkmeLeGetInfo(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_CHECKME_LE -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    fun checkmeLeReadFile(model: Int, fileName: String) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_CHECKME_LE -> {
+                getInterface(model)?.readFile("", fileName)
+            }
+        }
+    }
+    /**
+     * fileType: 0-3
+     * 0: Constant.CheckmeLeListType.ECG_TYPE
+     * 1: Constant.CheckmeLeListType.OXY_TYPE
+     * 2: Constant.CheckmeLeListType.DLC_TYPE
+     * 3: Constant.CheckmeLeListType.TEMP_TYPE
+     */
+    fun checkmeLeGetFileList(model: Int, fileType: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_CHECKME_LE -> {
                 getInterface(model)?.let { it1 ->
-                    (it1 as LpBp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wGetFileList")
+                    (it1 as CheckmeLeBleInterface).let {
+                        LepuBleLog.d(tag, "it as CheckmeLeBleInterface--checkmeLeGetList")
                         it.getFileList(fileType)
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "lpBp2wDeleteFile current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "checkmeLeGetList current model $model unsupported!!")
         }
     }
-    /**
-     * 获取配置信息（lpBp2w）
-     */
-    fun lpBp2wGetConfig(model: Int){
-        if (!checkService()) return
-        when(model){
-            Bluetooth.MODEL_LP_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LpBp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wGetConfig")
-                        it.getConfig()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "lpBp2wGetConfig current model $model unsupported!!")
-        }
-    }
-    /**
-     * 写用户信息（lp bp2w）
-     */
-    fun lpBp2WriteUserList(model: Int, userList: ArrayList<com.lepu.blepro.ext.lpbp2w.UserInfo>) {
+    // LEM
+    fun lemGetInfo(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_LP_BP2W -> {
+            Bluetooth.MODEL_LEM -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    fun lemGetBattery(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEM -> {
                 getInterface(model)?.let { it1 ->
-                    (it1 as LpBp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2WriteUserList")
-                        it.writeUserList(userList)
+                    (it1 as LemBleInterface).let {
+                        LepuBleLog.d(tag, "it as LemBleInterface--lemGetBattery")
+                        it.getBattery()
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "lpBp2WriteUserList current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "lemGetBattery current model $model unsupported!!")
+        }
+    }
+    fun lemHeatMode(model: Int, on: Boolean) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEM -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LemBleInterface).let {
+                        LepuBleLog.d(tag, "it as LemBleInterface--lemHeatMode")
+                        it.heatMode(on)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lemHeatMode current model $model unsupported!!")
+        }
+    }
+    /**
+     * mode: 0-4
+     * 0: Vitality mode(Constant.LemMassageMode.VITALITY)
+     * 1: Dynamic mode(Constant.LemMassageMode.DYNAMIC)
+     * 2: Thump mode(Constant.LemMassageMode.HAMMERING)
+     * 3: Soothing mode(Constant.LemMassageMode.SOOTHING)
+     * 4: Automatic mode(Constant.LemMassageMode.AUTOMATIC)
+     */
+    fun lemMassageMode(model: Int, mode: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEM -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LemBleInterface).let {
+                        LepuBleLog.d(tag, "it as LemBleInterface--lemMassageMode")
+                        it.massageMode(mode)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lemMassageMode current model $model unsupported!!")
+        }
+    }
+    /**
+     * level: 0-15
+     */
+    fun lemMassageLevel(model: Int, level: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEM -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LemBleInterface).let {
+                        LepuBleLog.d(tag, "it as LemBleInterface--lemMassageLevel")
+                        it.massageLevel(level)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lemMassageLevel current model $model unsupported!!")
+        }
+    }
+    /**
+     * time: 0-2
+     * 0: 15 min(Constant.LemMassageTime.MIN_15)
+     * 1: 10min(Constant.LemMassageTime.MIN_10)
+     * 2: 5min(Constant.LemMassageTime.MIN_5)
+     */
+    fun lemMassageTime(model: Int, time: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEM -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LemBleInterface).let {
+                        LepuBleLog.d(tag, "it as LemBleInterface--lemMassageTime")
+                        it.massageTime(time)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lemMassageTime current model $model unsupported!!")
+        }
+    }
+    // LPM311
+    fun lpm311GetData(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LPM311 -> {
+                getInterface(model)?.getFileList()
+            }
+        }
+    }
+    // BiolandBgm
+    fun biolandBgmGetInfo(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BIOLAND_BGM -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    fun biolandBgmGetGluData(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BIOLAND_BGM -> {
+                getInterface(model)?.getFileList()
+            }
         }
     }
 
-    /**
-     * 设置提示音开关和血压测量模式（lp-bp2w）
-     */
-    fun lpBp2wSetConfig(model: Int, config: LpBp2wConfig){
-        if (!checkService()) return
-        when(model) {
-            Bluetooth.MODEL_LP_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LpBp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wSetConfig")
-                        it.setConfig(config)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "lpBp2wSetConfig current model $model unsupported!!")
-        }
-    }
-    /**
-     * 获取路由（lp bp2w）
-     */
-    fun lpBp2wGetWifiList(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LP_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LpBp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wGetWifiList")
-                        it.getWifiDevice()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "lpBp2wGetWifiList current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 配置WiFi信息（lp bp2w）
-     */
-    fun lpBp2wSetWifiConfig(model: Int, config: LpBp2WifiConfig) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LP_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LpBp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wSetWifiConfig")
-                        it.setWifiConfig(config)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "lpBp2wSetWifiConfig current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 获取WiFi配置信息（lp bp2w）
-     */
-    fun lpBp2wGetWifiConfig(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LP_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LpBp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wGetWifiConfig")
-                        it.getWifiConfig()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "lpBp2wGetWifiConfig current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 获取文件列表校验码（le bp2w）
-     * @param fileType LeBp2wBleCmd.FileType
-     */
-    /*fun bp2GetFileListCrc(model: Int, fileType: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LP_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LpBp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--bp2GetFileListCrc")
-                        it.getFileListCrc(fileType)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "bp2GetFileListCrc current model $model unsupported!!")
-        }
-    }*/
-
-    /**
-     * 同步时区时间（le bp2w）
-     */
-    /*fun bp2SyncUtcTime(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LP_BP2W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LpBp2wBleInterface).let {
-                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--bp2SyncUtcTime")
-                        it.syncUtcTime()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "bp2SyncUtcTime current model $model unsupported!!")
-        }
-    }*/
-
-    fun oxyReadFile(model: Int, fileName: String) {
-        if (!checkService()) return
-        getInterface(model)?.let {
-            LepuBleLog.d(tag, "--oxyReadFile--")
-            it.readFile("", fileName)
-        }
-    }
-    fun oxyFactoryReset(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.let {
-            LepuBleLog.d(tag, "--oxyFactoryReset--")
-            it.factoryReset()
-        }
-    }
-    /**
-     * 获取实时波形（O2系列）
-     */
-    fun oxyGetRtWave(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
-            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
-            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
-            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
-            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
-            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
-            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
-            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as OxyBleInterface).let{
-                        LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetRtWave")
-                        it.getRtWave()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "oxyGetRtWave current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 获取实时参数值（O2系列）
-     */
-    fun oxyGetRtParam(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
-            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
-            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
-            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
-            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
-            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
-            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
-            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as OxyBleInterface).let{
-                        LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetRtParam")
-                        it.getRtParam()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "oxyGetRtParam current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 实时PPG数据（O2系列）
-     */
-    fun oxyGetPpgRt(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
-            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
-            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
-            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
-            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
-            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
-            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
-            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as OxyBleInterface).let{
-                        LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetPpgRt")
-                        it.getPpgRT()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "oxyGetPpgRt current model $model unsupported!!")
-        }
-    }
-    fun oxyUpdateSetting(model: Int, type: String, value: Any) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
-            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
-            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
-            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
-            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
-            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
-            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as OxyBleInterface).let{
-                        LepuBleLog.d(tag, "it as OxyBleInterface--oxyUpdateSetting")
-                        it.updateSetting(type, value)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "oxyUpdateSetting current model $model unsupported!!")
-        }
-    }
-    fun oxyUpdateSetting(model: Int, type: Array<String>, value: IntArray) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
-            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
-            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
-            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
-            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
-            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
-            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as OxyBleInterface).let{
-                        LepuBleLog.d(tag, "it as OxyBleInterface--oxyUpdateSetting")
-                        it.updateSetting(type, value)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "oxyUpdateSetting current model $model unsupported!!")
-        }
-    }
-    /**
-     * 更新设备设置（O2系列）
-     * 单个设置
-     */
-    fun updateSetting(model: Int, type: String, value: Any) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
-            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
-            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
-            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
-            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
-            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
-            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
-            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as OxyBleInterface).let{
-                        LepuBleLog.d(tag, "it as OxyBleInterface--updateSetting")
-                        it.updateSetting(type, value)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "updateSetting current model $model unsupported!!")
-        }
-    }
-    /**
-     * 更新设备设置（O2系列）
-     * 多个参数设置
-     */
-    fun updateSetting(model: Int, type: Array<String>, value: IntArray) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
-            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
-            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,
-            Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
-            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
-            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
-            Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
-            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
-            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as OxyBleInterface).let{
-                        LepuBleLog.d(tag, "it as OxyBleInterface--updateSetting")
-                        it.updateSetting(type, value)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "updateSetting current model $model unsupported!!")
-        }
-    }
-    /**
-     * 获取盒子信息（BabyO2N）
-     */
-    fun oxyGetBoxInfo(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_BABYO2N -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as OxyBleInterface).let{
-                        LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetBoxInfo")
-                        it.getBoxInfo()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "oxyGetBoxInfo current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 电量查询（pc80b）
-     */
-    fun pc80bGetBattery(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE,
-            Bluetooth.MODEL_PC80B_BLE2 -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc80BleInterface).let {
-                        LepuBleLog.d(tag, "it as PC80BleInterface--sendHeartbeat")
-                        it.sendHeartbeat()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "sendHeartbeat current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 设置定时测量血压时间（Bpw1）
-     * @param measureTime Array<String?> 字符串格式："startHH,startMM,stopHH,stopMM,interval,serialNum,totalNum"
-     */
     fun bpw1SetMeasureTime(model: Int, measureTime: Array<String?>) {
         if (!checkService()) return
         when (model) {
@@ -1966,88 +2062,6 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.d(tag, "setUserList current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 配置参数（ap20）
-     * @param type Ap20BleCmd.ConfigType
-     * @param config
-     * 0 设置背光等级（0-5）
-     * 1 警报功能开关（0 off，1 on）
-     * 2 血氧过低阈值（85-99）
-     * 3 脉率过低阈值（30-99）
-     * 4 脉率过高阈值（100-250）
-     */
-    fun ap20SetConfig(model: Int, type: Int, config: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Ap20BleInterface).let {
-                        LepuBleLog.d(tag, "it as Ap20BleInterface--ap20SetConfig")
-                        it.setConfig(type, config)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "ap20SetConfig current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 获取参数（ap20）
-     * @param type Ap20BleCmd.ConfigType
-     */
-    fun ap20GetConfig(model: Int, type: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Ap20BleInterface).let {
-                        LepuBleLog.d(tag, "it as Ap20BleInterface--ap20GetConfig")
-                        it.getConfig(type)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "ap20GetConfig current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 使能实时数据发送（ap20）
-     * @param type Ap20BleCmd.EnableType
-     * @param enable true打开，false关闭
-     */
-    fun ap20EnableRtData(model: Int, type: Int, enable: Boolean) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Ap20BleInterface).let {
-                        LepuBleLog.d(tag, "it as Ap20BleInterface--ap20EnableRtData")
-                        it.enableRtData(type,enable)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "ap20EnableRtData current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 获取电量（ap20）
-     */
-    fun ap20GetBattery(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Ap20BleInterface).let {
-                        LepuBleLog.d(tag, "it as Ap20BleInterface--ap20GetBattery")
-                        it.getBattery()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "ap20GetBattery current model $model unsupported!!")
         }
     }
 
@@ -2907,362 +2921,6 @@ class BleServiceHelper private constructor() {
         }
     }
 
-    fun sp20SetConfig(model: Int, type: Int, config: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_SP20 -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Sp20BleInterface).let {
-                        LepuBleLog.d(tag, "it as Sp20BleInterface--sp20SetConfig")
-                        it.setConfig(type, config)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "sp20SetConfig current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 配置参数（sp20）
-     * @param config Sp20Config
-     */
-    fun sp20SetConfig(model: Int, config: Sp20Config) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
-            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Sp20BleInterface).let {
-                        LepuBleLog.d(tag, "it as Sp20BleInterface--sp20SetConfig")
-                        it.setConfig(config)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "sp20SetConfig current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 获取参数（sp20）
-     * @param type Sp20BleCmd.ConfigType
-     */
-    fun sp20GetConfig(model: Int, type: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
-            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Sp20BleInterface).let {
-                        LepuBleLog.d(tag, "it as Sp20BleInterface--sp20GetConfig")
-                        it.getConfig(type)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "sp20GetConfig current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 使能实时数据发送（sp20）
-     * @param type Sp20BleCmd.EnableType
-     * @param enable true打开，false关闭
-     */
-    fun sp20EnableRtData(model: Int, type: Int, enable: Boolean) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
-            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Sp20BleInterface).let {
-                        LepuBleLog.d(tag, "it as Sp20BleInterface--sp20EnableRtData")
-                        it.enableRtData(type,enable)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "sp20EnableRtData current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 获取电量（ap20）
-     */
-    fun sp20GetBattery(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS,
-            Bluetooth.MODEL_SP20_NO_SN, Bluetooth.MODEL_SP20_WPS_NO_SN -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Sp20BleInterface).let {
-                        LepuBleLog.d(tag, "it as Sp20BleInterface--sp20GetBattery")
-                        it.getBattery()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "sp20GetBattery current model $model unsupported!!")
-        }
-    }
-
-    fun aoj20aGetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun aoj20aGetFileList(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getFileList()
-    }
-    /**
-     * 删除历史数据（aoj20a）
-     */
-    fun aoj20aDeleteData(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_AOJ20A -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Aoj20aBleInterface).let {
-                        LepuBleLog.d(tag, "it as Aoj20aBleInterface--aoj20aDeleteData")
-                        it.deleteData()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "aoj20aDeleteData current model $model unsupported!!")
-        }
-    }
-    /**
-     * 获取最新测量数据（aoj20a）
-     */
-    fun aoj20aGetRtData(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_AOJ20A -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Aoj20aBleInterface).let {
-                        LepuBleLog.d(tag, "it as Aoj20aBleInterface--aoj20aGetRtData")
-                        it.getRtData()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "aoj20aGetRtData current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 使能实时数据发送（pc60fw，pc66b，oxysmart，pod1w）
-     * @param type Pc60FwBleCmd.EnableType
-     * @param enable true打开，false关闭
-     */
-    fun pc60fwEnableRtData(model: Int, type: Int, enable: Boolean) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
-            Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
-            Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
-            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
-            Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
-            Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
-            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
-            Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
-            Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
-            Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
-            Bluetooth.MODEL_PC60NW_WPS -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc60FwBleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc60FwBleInterface--pc60fwEnableRtData")
-                        it.enableRtData(type, enable)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "pc60fwEnableRtData current model $model unsupported!!")
-        }
-    }
-    fun pc60fwGetBranchCode(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
-            Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
-            Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
-            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
-            Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
-            Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
-            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
-            Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
-            Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
-            Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
-            Bluetooth.MODEL_PC60NW_WPS -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc60FwBleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc60FwBleInterface--pc60fwGetBranchCode")
-                        it.getBranchCode()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "pc60fwGetBranchCode current model $model unsupported!!")
-        }
-    }
-    fun pc60fwSetBranchCode(model: Int, code: String) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
-            Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
-            Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
-            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
-            Bluetooth.MODEL_PF_10AW, Bluetooth.MODEL_PF_10AW1,
-            Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
-            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
-            Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
-            Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
-            Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
-            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
-            Bluetooth.MODEL_PC60NW_WPS -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc60FwBleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc60FwBleInterface--pc60fwSetBranchCode")
-                        it.setBranchCode(code)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "pc60fwSetBranchCode current model $model unsupported!!")
-        }
-    }
-
-    fun pod1wEnableRtData(model: Int, type: Int, enable: Boolean) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B,
-            Bluetooth.MODEL_OXYSMART, Bluetooth.MODEL_POD_1W,
-            Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
-            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10,
-            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PC_60NW,
-            Bluetooth.MODEL_S5W -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc60FwBleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc60FwBleInterface--pod1wEnableRtData")
-                        it.enableRtData(type, enable)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "pod1wEnableRtData current model $model unsupported!!")
-        }
-    }
-
-    fun pc68bGetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-
-    /**
-     * 使能实时数据发送（pc68b）
-     * @param type Pc68bBleCmd.EnableType
-     * @param enable true打开，false关闭
-     */
-    fun pc68bEnableRtData(model: Int, type: Int, enable: Boolean) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC_68B -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc68bBleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc68bBleInterface--pc68bEnableRtData")
-                        it.enableRtData(type, enable)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "pc68bEnableRtData current model $model unsupported!!")
-        }
-    }
-
-    /**
-     * 删除文件（pc68b）
-     */
-    /*fun pc68bDeleteFile(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC_68B -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc68bBleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc68bBleInterface--pc68bDeleteFile")
-                        it.deleteFile()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "pc68bDeleteFile current model $model unsupported!!")
-        }
-    }*/
-
-    /**
-     * 定时获取状态（pc68b）
-     * @param interval 时间间隔
-     */
-    /*fun pc68bGetStateInfo(model: Int, interval: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC_68B -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc68bBleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc68bBleInterface--pc68bGetStateInfo")
-                        it.getStateInfo(interval)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "pc68bGetStateInfo current model $model unsupported!!")
-        }
-    }*/
-
-    /**
-     * 获取配置（pc68b）
-     */
-    /*fun pc68bGetConfig(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC_68B -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc68bBleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc68bBleInterface--pc68bGetConfig")
-                        it.getConfig()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "pc68bGetConfig current model $model unsupported!!")
-        }
-    }*/
-
-    /**
-     * 配置参数（pc68b）
-     * @param config Pc68bConfig
-     */
-    /*fun pc68bSetConfig(model: Int, config: Pc68bConfig) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC_68B -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc68bBleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc68bBleInterface--pc68bSetConfig")
-                        it.setConfig(config)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "pc68bSetConfig current model $model unsupported!!")
-        }
-    }*/
-
-    /**
-     * 获取时间（pc68b）
-     */
-    /*fun pc68bGetTime(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC_68B -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc68bBleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc68bBleInterface--pc68bGetTime")
-                        it.getTime()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "pc68bGetTime current model $model unsupported!!")
-        }
-    }*/
-
     fun ad5EnableRtData(model: Int, enable: Boolean) {
         if (!checkService()) return
         when (model) {
@@ -3276,341 +2934,6 @@ class BleServiceHelper private constructor() {
             }
             else -> LepuBleLog.d(tag, "ad5EnableRtData current model $model unsupported!!")
         }
-    }
-
-    fun pulsebitExGetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun pulsebitExGetFileList(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getFileList()
-    }
-    fun pulsebitExReadFile(model: Int, fileName: String) {
-        if (!checkService()) return
-        getInterface(model)?.let {
-            it.readFile("", fileName)
-        }
-    }
-
-    fun checkmePodGetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun checkmePodGetFileList(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getFileList()
-    }
-
-    fun checkmeLeGetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun checkmeLeReadFile(model: Int, fileName: String) {
-        if (!checkService()) return
-        getInterface(model)?.let {
-            it.readFile("", fileName)
-        }
-    }
-    fun checkmeLeGetFileList(model: Int, fileType: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_CHECKME_LE -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as CheckmeLeBleInterface).let {
-                        LepuBleLog.d(tag, "it as CheckmeLeBleInterface--checkmeLeGetList")
-                        it.getFileList(fileType)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "checkmeLeGetList current model $model unsupported!!")
-        }
-    }
-
-    fun startEcg(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc300BleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc300BleInterface--startEcg")
-                        it.startEcg()
-                    }
-                }
-            }
-            Bluetooth.MODEL_LEPOD -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LepodBleInterface).let {
-                        LepuBleLog.d(tag, "it as LepodBleInterface--startEcg")
-                        it.startEcg()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "startEcg current model $model unsupported!!")
-        }
-    }
-    fun stopEcg(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc300BleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc300BleInterface--stopEcg")
-                        it.stopEcg()
-                    }
-                }
-            }
-            Bluetooth.MODEL_LEPOD -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LepodBleInterface).let {
-                        LepuBleLog.d(tag, "it as LepodBleInterface--stopEcg")
-                        it.stopEcg()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "stopEcg current model $model unsupported!!")
-        }
-    }
-    fun pc300SetEcgDataDigit(model: Int, digit: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc300BleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetEcgDataDigit")
-                        it.setEcgDataDigit(digit)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "pc300SetEcgDataDigit current model $model unsupported!!")
-        }
-    }
-    /*fun pc300SetGluUnit(model: Int, unit: Int) {
-        if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as Pc300BleInterface).let {
-                LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetGluUnit")
-                it.setGluUnit(unit)
-            }
-        }
-    }
-    fun pc300SetDeviceId(model: Int, id: Int) {
-        if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as Pc300BleInterface).let {
-                LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetDeviceId")
-                it.setDeviceId(id)
-            }
-        }
-    }
-    fun pc300GetDeviceId(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as Pc300BleInterface).let {
-                LepuBleLog.d(tag, "it as Pc300BleInterface--pc300GetDeviceId")
-                it.getDeviceId()
-            }
-        }
-    }*/
-    fun pc300SetGlucometerType(model: Int, type: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc300BleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetGlucometerType")
-                        it.setGlucometerType(type)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "pc300SetGlucometerType current model $model unsupported!!")
-        }
-    }
-    fun pc300GetGlucometerType(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc300BleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc300BleInterface--pc300GetGlucometerType")
-                        it.getGlucometerType()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "pc300GetGlucometerType current model $model unsupported!!")
-        }
-    }
-    /*fun pc300SetTempMode(model: Int, mode: Int) {
-        if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as Pc300BleInterface).let {
-                LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetTempMode")
-                it.setTempMode(mode)
-            }
-        }
-    }
-    fun pc300GetTempMode(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as Pc300BleInterface).let {
-                LepuBleLog.d(tag, "it as Pc300BleInterface--pc300GetTempMode")
-                it.getTempMode()
-            }
-        }
-    }
-    fun pc300SetBpMode(model: Int, mode: Int) {
-        if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as Pc300BleInterface).let {
-                LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetBpMode")
-                it.setBpMode(mode)
-            }
-        }
-    }
-    fun pc300GetBpMode(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.let { it1 ->
-            (it1 as Pc300BleInterface).let {
-                LepuBleLog.d(tag, "it as Pc300BleInterface--pc300GetBpMode")
-                it.getBpMode()
-            }
-        }
-    }*/
-
-    fun pc300GetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun pc300StartEcg(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC300 -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc300BleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc300BleInterface--pc300StartEcg")
-                        it.startEcg()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "pc300StartEcg current model $model unsupported!!")
-        }
-    }
-    fun pc300StopEcg(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_PC300 -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Pc300BleInterface).let {
-                        LepuBleLog.d(tag, "it as Pc300BleInterface--pc300StopEcg")
-                        it.stopEcg()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "pc300StopEcg current model $model unsupported!!")
-        }
-    }
-
-    fun lemGetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-
-    fun lemDeviceSwitch(model: Int, on: Boolean) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LEM -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LemBleInterface).let {
-                        LepuBleLog.d(tag, "it as LemBleInterface--lemDeviceSwitch")
-                        it.deviceSwitch(on)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "lemDeviceSwitch current model $model unsupported!!")
-        }
-    }
-    fun lemGetBattery(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LEM -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LemBleInterface).let {
-                        LepuBleLog.d(tag, "it as LemBleInterface--lemGetBattery")
-                        it.getBattery()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "lemGetBattery current model $model unsupported!!")
-        }
-    }
-    fun lemHeatMode(model: Int, on: Boolean) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LEM -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LemBleInterface).let {
-                        LepuBleLog.d(tag, "it as LemBleInterface--lemHeatMode")
-                        it.heatMode(on)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "lemHeatMode current model $model unsupported!!")
-        }
-    }
-    fun lemMassageMode(model: Int, mode: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LEM -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LemBleInterface).let {
-                        LepuBleLog.d(tag, "it as LemBleInterface--lemMassageMode")
-                        it.massageMode(mode)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "lemMassageMode current model $model unsupported!!")
-        }
-    }
-    fun lemMassageLevel(model: Int, level: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LEM -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LemBleInterface).let {
-                        LepuBleLog.d(tag, "it as LemBleInterface--lemMassageLevel")
-                        it.massageLevel(level)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "lemMassageLevel current model $model unsupported!!")
-        }
-    }
-    fun lemMassageTime(model: Int, time: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LEM -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LemBleInterface).let {
-                        LepuBleLog.d(tag, "it as LemBleInterface--lemMassageTime")
-                        it.massageTime(time)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "lemMassageTime current model $model unsupported!!")
-        }
-    }
-
-    fun biolandBgmGetInfo(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getInfo()
-    }
-    fun biolandBgmGetGluData(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getFileList()
-    }
-    fun lpm311GetData(model: Int) {
-        if (!checkService()) return
-        getInterface(model)?.getFileList()
     }
 
     fun er3GetConfig(model: Int) {

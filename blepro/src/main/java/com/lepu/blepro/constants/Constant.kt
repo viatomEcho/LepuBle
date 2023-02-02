@@ -79,23 +79,6 @@ object Constant {
     }
 
     /**
-     * pod1w使能类型
-     */
-    interface Pod1wEnableType {
-        companion object {
-            /**
-             * 使能血氧参数
-             */
-            const val OXY_PARAM = 0
-
-            /**
-             * 使能血氧波形
-             */
-            const val OXY_WAVE = 1
-        }
-    }
-
-    /**
      * pc68b使能类型
      */
     interface Pc68bEnableType {
@@ -130,11 +113,6 @@ object Constant {
     interface Sp20ConfigType {
         companion object {
             /**
-             * 警报功能开关
-             */
-            const val ALARM_SWITCH = 1
-
-            /**
              * 血氧过低阈值
              */
             const val LOW_OXY_THRESHOLD = 2
@@ -148,11 +126,6 @@ object Constant {
              * 脉率过高阈值
              */
             const val HIGH_HR_THRESHOLD = 4
-
-            /**
-             * 搏动音开关
-             */
-            const val PULSE_BEEP = 5
         }
     }
 

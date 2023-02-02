@@ -161,7 +161,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 boxInfo.snLen = info.snLen
                 boxInfo.sn = info.sn
 
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBoxInfo).post(InterfaceEvent(model, boxInfo))
+//                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBoxInfo).post(InterfaceEvent(model, boxInfo))
             }
 
             OxyBleCmd.OXY_CMD_INFO -> {
@@ -288,9 +288,9 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
                 if (response.content.size > 10) {
                     val ppgData = OxyBleResponse.PPGData(response.content)
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData).post(InterfaceEvent(model, ppgData))
-                }else{
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgRes).post(InterfaceEvent(model, true))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData).post(InterfaceEvent(model, ppgData))
+                } else {
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgRes).post(InterfaceEvent(model, true))
                 }
             }
 
@@ -380,7 +380,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 clearTimeout()
                 LepuBleLog.d(tag, "model:$model,  OXY_CMD_BURN_FACTORY_INFO => success")
 
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBurnFactoryInfo).post(InterfaceEvent(model, true))
+//                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBurnFactoryInfo).post(InterfaceEvent(model, true))
             }
 
             else -> {

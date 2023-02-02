@@ -277,17 +277,17 @@ class Er1BleInterface(model: Int): BleInterface(model) {
             Er1BleCmd.BURN_FACTORY_INFO -> {
                 LepuBleLog.d(tag, "model:$model,BURN_FACTORY_INFO => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnFactoryInfo).post(InterfaceEvent(model, true))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnFactoryInfo).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnFactoryInfo).post(InterfaceEvent(model, false))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnFactoryInfo).post(InterfaceEvent(model, false))
                 }
             }
             Er1BleCmd.BURN_LOCK_FLASH -> {
                 LepuBleLog.d(tag, "model:$model,BURN_LOCK_FLASH => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnLockFlash).post(InterfaceEvent(model, true))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnLockFlash).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnLockFlash).post(InterfaceEvent(model, false))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnLockFlash).post(InterfaceEvent(model, false))
                 }
             }
         }

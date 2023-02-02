@@ -14,8 +14,7 @@ import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_S
 import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_WORKING_STATUS
 import com.lepu.blepro.ble.data.BoDeviceInfo
 import com.lepu.blepro.event.InterfaceEvent
-import com.lepu.blepro.ext.pc60fw.PpgData
-import com.lepu.blepro.ext.pc60fw.WorkingStatus
+import com.lepu.blepro.ext.pc60fw.*
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.CrcUtil
 import com.lepu.blepro.utils.LepuBleLog
@@ -40,7 +39,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
     private var pc60FwDevice = BoDeviceInfo()
 
     private var pc60fwDeviceInfo = com.lepu.blepro.ext.pc60fw.DeviceInfo()
-    private var ppgData = PpgData()
+//    private var ppgData = PpgData()
     private var pc60fwRtParam = com.lepu.blepro.ext.pc60fw.RtParam()
     private var pc60fwRtWave = com.lepu.blepro.ext.pc60fw.RtWave()
     private var workingStatus = WorkingStatus()
@@ -202,14 +201,14 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                     val data = com.lepu.blepro.utils.toString(response.content)
                     pc60FwDevice.branchCode = data
                     LepuBleLog.d(tag, "toString == $data")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwGetCode).post(InterfaceEvent(model, data))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwGetCode).post(InterfaceEvent(model, data))
                 }
                 Pc60FwBleCmd.MSG_SET_CODE.toByte() -> {
                     LepuBleLog.d(tag, "model:$model,MSG_SET_CODE => success")
                     if (toUInt(response.content) == 1) {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwSetCode).post(InterfaceEvent(model, true))
+//                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwSetCode).post(InterfaceEvent(model, true))
                     } else {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwSetCode).post(InterfaceEvent(model, false))
+//                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwSetCode).post(InterfaceEvent(model, false))
                     }
                 }
 
@@ -306,12 +305,12 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                     PC60FwBleResponse.OriginalData(response.content).let {
                         LepuBleLog.d(tag, "model:$model,MSG_IR_RED_FREQ => success $it")
 
-                        ppgData.irFrqBytes = it.irFrqBytes
+                        /*ppgData.irFrqBytes = it.irFrqBytes
                         ppgData.irFrqInt = it.irFrqInt
                         ppgData.redFrqBytes = it.redFrqBytes
-                        ppgData.redFrqInt = it.redFrqInt
+                        ppgData.redFrqInt = it.redFrqInt*/
 
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwPpgData).post(InterfaceEvent(model, ppgData))
+//                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwPpgData).post(InterfaceEvent(model, ppgData))
                     }
                 }
                 Pc60FwBleCmd.MSG_HEARTBEAT.toByte() -> {

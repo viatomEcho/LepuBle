@@ -236,15 +236,17 @@ class LpBleUtil {
         }
 
         fun getSendCmd(model: Int): String {
-            Log.d("test12345", "${BleServiceHelper.getSendCmd(model)}")
-            return BleServiceHelper.getSendCmd(model)
+//            Log.d("test12345", "${BleServiceHelper.getSendCmd(model)}")
+//            return BleServiceHelper.getSendCmd(model)
+            return ""
         }
 
         fun getBleMtu(model: Int): Int {
-            return BleServiceHelper.getBleMtu(model)
+//            return BleServiceHelper.getBleMtu(model)
+            return 0
         }
         fun setBleMtu(model: Int, mtu: Int) {
-            BleServiceHelper.setBleMtu(model, mtu)
+//            BleServiceHelper.setBleMtu(model, mtu)
         }
         fun setTime(model: Int) {
             BleServiceHelper.syncTime(model)
@@ -261,7 +263,7 @@ class LpBleUtil {
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.getInfo(model)
+//                BleServiceHelper.getInfo(model)
             }
         }
         fun oxyGetBoxInfo(model: Int) {
@@ -271,11 +273,11 @@ class LpBleUtil {
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.oxyGetBoxInfo(model)
+//                BleServiceHelper.oxyGetBoxInfo(model)
             }
         }
         fun updateSetting(model: Int, type: Array<String>, value: IntArray) {
-            BleServiceHelper.updateSetting(model, type, value)
+//            BleServiceHelper.updateSetting(model, type, value)
         }
         fun updateSetting(model: Int, type: String, value: Any) {
             Log.d(TAG, "updateSetting")
@@ -284,7 +286,7 @@ class LpBleUtil {
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.updateSetting(model, type, value)
+//                BleServiceHelper.updateSetting(model, type, value)
             }
         }
         fun reset(model: Int) {
@@ -294,7 +296,7 @@ class LpBleUtil {
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.reset(model)
+//                BleServiceHelper.reset(model)
             }
         }
         fun factoryReset(model: Int) {
@@ -304,7 +306,7 @@ class LpBleUtil {
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.factoryReset(model)
+//                BleServiceHelper.factoryReset(model)
             }
         }
         fun factoryResetAll(model: Int) {
@@ -314,12 +316,12 @@ class LpBleUtil {
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.factoryResetAll(model)
+//                BleServiceHelper.factoryResetAll(model)
             }
         }
 
         fun burnFactoryInfo(model: Int, config: FactoryConfig) {
-            BleServiceHelper.burnFactoryInfo(model, config)
+//            BleServiceHelper.burnFactoryInfo(model, config)
         }
 
         /**
@@ -327,7 +329,7 @@ class LpBleUtil {
          */
         @JvmOverloads
         fun getFileList(model: Int, fileType: Int? = null){
-            BleServiceHelper.getFileList(model, fileType)
+//            BleServiceHelper.getFileList(model, fileType)
         }
 
         /**
@@ -339,16 +341,16 @@ class LpBleUtil {
          */
         @JvmOverloads
         fun readFile(userId: String, fileName: String, model: Int, offset: Int = 0) {
-            BleServiceHelper.readFile(userId, fileName, model, offset)
+//            BleServiceHelper.readFile(userId, fileName, model, offset)
         }
         fun cancelReadFile(model: Int){
-            BleServiceHelper.cancelReadFile(model)
+//            BleServiceHelper.cancelReadFile(model)
         }
         fun pauseReadFile(model: Int){
-            BleServiceHelper.pauseReadFile(model)
+//            BleServiceHelper.pauseReadFile(model)
         }
         fun continueReadFile(model: Int, userId: String, fileName: String, offset: Int){
-            BleServiceHelper.continueReadFile(model, userId, fileName, offset)
+//            BleServiceHelper.continueReadFile(model, userId, fileName, offset)
         }
         fun getRawFolder(model: Int): String? {
             return BleServiceHelper.rawFolder?.get(model)
@@ -468,7 +470,7 @@ class LpBleUtil {
             BleServiceHelper.bp2GetConfig(model)
         }
         fun bp2SwitchState(model: Int, state: Int){
-           BleServiceHelper.bp2SwitchState(model, state)
+//           BleServiceHelper.bp2SwitchState(model, state)
         }
         fun bp2GetPhyState(model: Int) {
 //            BleServiceHelper.bp2GetPhyState(model)
@@ -481,7 +483,7 @@ class LpBleUtil {
 //            BleServiceHelper.bp2SetConfig(model, config)
         }
         fun bp2GetRtState(model: Int) {
-            BleServiceHelper.bp2GetRtState(model)
+//            BleServiceHelper.bp2GetRtState(model)
         }
         fun bp2GetWifiDevice(model: Int) {
 //            BleServiceHelper.bp2GetWifiDevice(model)
@@ -512,7 +514,7 @@ class LpBleUtil {
             BleServiceHelper.oxyGetRtParam(model)
         }
         fun oxyGetPpgRt(model: Int){
-            BleServiceHelper.oxyGetPpgRt(model)
+//            BleServiceHelper.oxyGetPpgRt(model)
         }
 
         fun startBp(model: Int) {
@@ -522,7 +524,7 @@ class LpBleUtil {
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.startBp(model)
+//                BleServiceHelper.startBp(model)
             }
         }
         fun stopBp(model: Int) {
@@ -532,7 +534,7 @@ class LpBleUtil {
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.stopBp(model)
+//                BleServiceHelper.stopBp(model)
             }
         }
         fun bpw1SetMeasureTime(model: Int, measureTime: Array<String?>) {
@@ -790,7 +792,7 @@ class LpBleUtil {
             BleServiceHelper.lewGetRtData(model)
         }
         fun lewGetFileList(model: Int, type: Int, startTime: Int) {
-            BleServiceHelper.getFileList(model, type, startTime)
+//            BleServiceHelper.getFileList(model, type, startTime)
         }
         fun lewGetHrThreshold(model: Int) {
             BleServiceHelper.lewGetHrThreshold(model)
@@ -832,7 +834,7 @@ class LpBleUtil {
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.sp20SetConfig(model, config)
+//                BleServiceHelper.sp20SetConfig(model, config)
             }
         }
 
@@ -847,7 +849,7 @@ class LpBleUtil {
             }
         }
         fun aoj20aGetRtData(model: Int) {
-            BleServiceHelper.aoj20aGetRtData(model)
+//            BleServiceHelper.aoj20aGetRtData(model)
         }
 
         fun enableRtData(model: Int, type: Int, enable: Boolean) {
@@ -887,10 +889,10 @@ class LpBleUtil {
         }
 
         fun pc60fwGetBranchCode(model: Int) {
-            BleServiceHelper.pc60fwGetBranchCode(model)
+//            BleServiceHelper.pc60fwGetBranchCode(model)
         }
         fun pc60fwSetBranchCode(model: Int, code: String) {
-            BleServiceHelper.pc60fwSetBranchCode(model, code)
+//            BleServiceHelper.pc60fwSetBranchCode(model, code)
         }
 
         fun pc68bDeleteFile(model: Int) {
@@ -945,13 +947,13 @@ class LpBleUtil {
         }
         
         fun startEcg(model: Int) {
-            BleServiceHelper.startEcg(model)
+//            BleServiceHelper.startEcg(model)
         }
         fun stopEcg(model: Int) {
-            BleServiceHelper.stopEcg(model)
+//            BleServiceHelper.stopEcg(model)
         }
         fun pc300SetEcgDataDigit(model: Int, digit: Int) {
-            BleServiceHelper.pc300SetEcgDataDigit(model, digit)
+//            BleServiceHelper.pc300SetEcgDataDigit(model, digit)
         }
         /*fun pc300SetGluUnit(model: Int, unit: Int) {
             BleServiceHelper.pc300SetGluUnit(model, unit)
@@ -963,10 +965,10 @@ class LpBleUtil {
             BleServiceHelper.pc300GetDeviceId(model)
         }*/
         fun pc300SetGlucometerType(model: Int, type: Int) {
-            BleServiceHelper.pc300SetGlucometerType(model, type)
+//            BleServiceHelper.pc300SetGlucometerType(model, type)
         }
         fun pc300GetGlucometerType(model: Int) {
-            BleServiceHelper.pc300GetGlucometerType(model)
+//            BleServiceHelper.pc300GetGlucometerType(model)
         }
         /*fun pc300SetTempMode(model: Int, mode: Int) {
             BleServiceHelper.pc300SetTempMode(model, mode)
@@ -982,7 +984,7 @@ class LpBleUtil {
         }*/
 
         fun lemDeviceSwitch(model: Int, on: Boolean) {
-            BleServiceHelper.lemDeviceSwitch(model, on)
+//            BleServiceHelper.lemDeviceSwitch(model, on)
         }
         fun lemHeatMode(model: Int, on: Boolean) {
             BleServiceHelper.lemHeatMode(model, on)
@@ -1018,7 +1020,7 @@ class LpBleUtil {
         }
 
         fun bpmGetRtState(model: Int) {
-            BleServiceHelper.getBpmRtState(model)
+//            BleServiceHelper.getBpmRtState(model)
         }
 
         fun vtm01GetOriginalData(model: Int) {

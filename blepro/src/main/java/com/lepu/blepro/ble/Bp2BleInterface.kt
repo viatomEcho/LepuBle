@@ -271,7 +271,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 rtStatus.batteryStatusMsg = rtState.battery.stateMsg
                 rtStatus.percent = rtState.battery.percent
                 rtStatus.vol = rtState.battery.vol
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2State).post(InterfaceEvent(model, rtStatus))
+//                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2State).post(InterfaceEvent(model, rtStatus))
 
             }
 
@@ -338,9 +338,9 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,SWITCH_STATE => success")
                 //切换状态
                 if (bleResponse.type != 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SwitchState).post(InterfaceEvent(model, false))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SwitchState).post(InterfaceEvent(model, false))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SwitchState).post(InterfaceEvent(model, true))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SwitchState).post(InterfaceEvent(model, true))
                 }
             }
 

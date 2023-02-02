@@ -1163,7 +1163,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         }"
             }
         // o2ring ppg
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
             .observe(this) {
 
                 LpBleUtil.oxyGetRtWave(it.model)
@@ -1187,7 +1187,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             .observe(this) {
                 Log.d(TAG, "------------EventOxyPpgRes------------")
                 LpBleUtil.oxyGetRtWave(it.model)
-            }
+            }*/
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtWaveRes)
             .observe(this) {
                 Log.d(TAG, "------------EventOxyRtWaveRes------------")
@@ -1288,7 +1288,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 //                binding.dataStr.text = dataString
             }
         //------------------------------vetcorder------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Vetcorder.EventVetcorderInfo)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Vetcorder.EventVetcorderInfo)
             .observe(this) {
                 val rtData = it.data as VetcorderInfo
                 viewModel.oxyPr.value = rtData.pr
@@ -1308,7 +1308,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "ECG -note：${rtData.ecgNote}\n" +
                         "SpO2-pulse sound：${rtData.pulseSound}\n" +
                         "SpO2-note：${rtData.spo2Note}"
-            }
+            }*/
         //------------------------------sp20------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20RtWave)
             .observe(this) {
@@ -1501,10 +1501,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         }\n" +
                         "血糖值：${data.data}"
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300EcgStart)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300EcgStart)
             .observe(this) {
                 LpBleUtil.startRtTask()
-            }
+            }*/
         // ------------------------le S1--------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1RtData)
             .observe(this) {

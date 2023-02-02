@@ -135,7 +135,7 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
 
 
         // o2ring ppg
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
             .observe(this) {
 
                 LpBleUtil.oxyGetPpgRt(it.model)
@@ -145,7 +145,7 @@ class OxyDashboardFragment : Fragment(R.layout.fragment_oxy_dashboard) {
                     Log.d("ppg", "len  = ${data.rawDataBytes.size}")
                 }
 
-            }
+            }*/
 
 
     }

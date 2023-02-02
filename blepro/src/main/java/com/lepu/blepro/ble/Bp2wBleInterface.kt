@@ -12,7 +12,6 @@ import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.Bp2WifiConfig
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.bp2w.*
-import com.lepu.blepro.ext.bp2w.Bp2Wifi
 import com.lepu.blepro.utils.CrcUtil.calCRC8
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
@@ -46,10 +45,10 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
     private var rtStatus = RtStatus()
     private var rtParam = RtParam()
     private var config = Bp2wConfig()
-    private var wifiList = arrayListOf<Bp2Wifi>()
+    /*private var wifiList = arrayListOf<Bp2Wifi>()
     private var wifi = Bp2Wifi()
     private var server = Bp2wServer()
-    private var wifiConfig = com.lepu.blepro.ext.bp2w.Bp2WifiConfig()
+    private var wifiConfig = com.lepu.blepro.ext.bp2w.Bp2WifiConfig()*/
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         if (isManagerInitialized()) {
@@ -157,7 +156,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 rtStatus.vol = rtState.battery.vol
                 rtStatus.avgCnt = rtState.avgCnt
                 rtStatus.avgWaitTick = rtState.avgWaitTick
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wRtState).post(InterfaceEvent(model, rtStatus))
+//                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wRtState).post(InterfaceEvent(model, rtStatus))
             }
 
             GET_FILE_LIST -> {
@@ -352,25 +351,25 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
 
             SWITCH_STATE ->{
                 if (bleResponse.pkgType != 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSwitchState).post(InterfaceEvent(model, false))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSwitchState).post(InterfaceEvent(model, false))
                     LepuBleLog.d(tag, "model:$model,SWITCH_STATE => error")
                     return
                 }
 
                 LepuBleLog.d(tag, "model:$model,SWITCH_STATE => success")
                 //切换状态
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSwitchState).post(InterfaceEvent(model, true))
+//                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSwitchState).post(InterfaceEvent(model, true))
             }
 
             GET_WIFI_ROUTE -> {
                 LepuBleLog.d(tag, "model:$model,GET_WIFI_ROUTE => success")
                 LepuBleLog.d(tag, "model:$model,bytesToHex == " + bytesToHex(bleResponse.content))
                 if (bleResponse.pkgType == 0xFF.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiScanning).post(InterfaceEvent(model, true))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiScanning).post(InterfaceEvent(model, true))
                 } else {
                     val data = Bp2WifiDevice(bleResponse.content)
                     LepuBleLog.d(tag, "model:$model, data.toString == $data")
-                    for (w in data.wifiList) {
+                    /*for (w in data.wifiList) {
                         val wifi = Bp2Wifi()
                         wifi.state = w.state
                         wifi.ssidLen = w.ssidLen
@@ -389,7 +388,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                         wifi.gatewayAddr = w.gatewayAddr
                         wifiList.add(wifi)
                     }
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiList).post(InterfaceEvent(model, wifiList))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiList).post(InterfaceEvent(model, wifiList))*/
                 }
             }
 
@@ -402,7 +401,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,bytesToHex == " + bytesToHex(bleResponse.content))
                 val data = Bp2WifiConfig(bleResponse.content)
                 LepuBleLog.d(tag, "model:$model, data.toString == $data")
-                wifi.state = data.wifi.state
+                /*wifi.state = data.wifi.state
                 wifi.ssidLen = data.wifi.ssidLen
                 wifi.ssid = data.wifi.ssid
                 wifi.type = data.wifi.type
@@ -424,16 +423,16 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 server.addr = data.server.addr
                 server.port = data.server.port
                 wifiConfig.server = server
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetWifiConfig).post(InterfaceEvent(model, wifiConfig))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetWifiConfig).post(InterfaceEvent(model, wifiConfig))*/
             }
 
             SET_WIFI_CONFIG -> {
                 if (bleResponse.pkgType != 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSetWifiConfig).post(InterfaceEvent(model, false))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSetWifiConfig).post(InterfaceEvent(model, false))
                     LepuBleLog.d(tag, "model:$model,SET_WIFI_CONFIG => error")
                     return
                 }
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSetWifiConfig).post(InterfaceEvent(model, true))
+//                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSetWifiConfig).post(InterfaceEvent(model, true))
                 LepuBleLog.d(tag, "model:$model,SET_WIFI_CONFIG => success")
             }
 
@@ -525,7 +524,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
      * 获取wifi路由
      */
     fun getWifiDevice() {
-        wifiList.clear()
+//        wifiList.clear()
         sendCmd(getWifiRoute(0))
         LepuBleLog.d(tag, "getWifiDevice...")
     }
@@ -538,7 +537,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "setWifiConfig...config:$config")
     }
 
-    fun setWifiConfig(c: com.lepu.blepro.ext.bp2w.Bp2WifiConfig) {
+    /*fun setWifiConfig(c: com.lepu.blepro.ext.bp2w.Bp2WifiConfig) {
         val config = Bp2WifiConfig()
         config.option = 3
         val wifi = com.lepu.blepro.ble.data.Bp2Wifi()
@@ -567,7 +566,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
         config.server = server
         sendCmd(LeBp2wBleCmd.setWifiConfig(config.getDataBytes()))
         LepuBleLog.d(tag, "setWifiConfig...config:$config")
-    }
+    }*/
 
     /**
      * 获取当前配置的wifi

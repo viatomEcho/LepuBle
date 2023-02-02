@@ -40,18 +40,14 @@ public class Sp20BleCmd {
 
 
     /**
-     * 1：警报功能开关
      * 2：血氧过低阈值
      * 3：脉率过低阈值
      * 4：脉率过高阈值
-     * 5：搏动音开关
      */
     public static class ConfigType {
-        public static final int ALARM_SWITCH = 1;
         public static final int LOW_OXY_THRESHOLD = 2;
         public static final int LOW_HR_THRESHOLD = 3;
         public static final int HIGH_HR_THRESHOLD = 4;
-        public static final int PULSE_BEEP = 5;
     }
 
     /**

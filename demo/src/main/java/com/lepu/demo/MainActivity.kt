@@ -338,11 +338,11 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 }
             }
         }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBoxInfo).observe(this) { event ->
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBoxInfo).observe(this) { event ->
             (event.data as LepuDevice).let {
                 Toast.makeText(this, "BABYO2N 获取盒子信息成功 $it", Toast.LENGTH_SHORT).show()
             }
-        }
+        }*/
         //-------------------------pc100---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100DeviceInfo)
             .observe(this) { event ->
