@@ -14,7 +14,7 @@ class Bp2BleResponse {
             cmd = byte2UInt(bytes[1])
             type = bytes[3]
             len = toUInt(bytes.copyOfRange(5, 7))
-            content = if (len == 0) ByteArray(0) else bytes.copyOfRange(7, 7 + len)
+            content = if (len <= 0) ByteArray(0) else bytes.copyOfRange(7, 7 + len)
         }
     }
 

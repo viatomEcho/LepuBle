@@ -28,7 +28,7 @@ class PairDevice {
             while (index < scanRecord.size) {
                 val length = scanRecord[index++].toInt()
                 //Zero value indicates that we are done with the record now
-                if (length == 0) break
+                if (length <= 0) break
                 val type = scanRecord[index].toInt()
                 //if the type is zero, then we are pass the significant section of the data,
                 // and we are thud done

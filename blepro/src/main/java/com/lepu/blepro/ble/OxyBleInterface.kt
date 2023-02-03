@@ -192,7 +192,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                     val fileSize = toUInt(response.content)
 
                     LepuBleLog.d(tag, "model:$model, 文件大小：${fileSize}  文件名：$curFileName")
-                    if (fileSize == 0) {
+                    if (fileSize <= 0) {
                         sendOxyCmd(OxyBleCmd.OXY_CMD_READ_END, OxyBleCmd.readFileEnd())
                         return
                     }

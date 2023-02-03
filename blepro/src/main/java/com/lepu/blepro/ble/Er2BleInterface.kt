@@ -189,7 +189,7 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,CMD_START_READ_FILE => success, $respPkg")
                 if (respPkg.pkgType == 0x01.toByte()) {
                     val fileSize = toUInt(respPkg.data)
-                    if (fileSize == 0) {
+                    if (fileSize <= 0) {
                         sendCmd(Er2BleCmd.readFileEnd())
                         return
                     }

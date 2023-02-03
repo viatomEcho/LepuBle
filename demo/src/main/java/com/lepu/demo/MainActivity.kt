@@ -32,17 +32,14 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
-import com.lepu.blepro.utils.ByteUtils
-import com.lepu.blepro.utils.HexString
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.CHECK_BLE_REQUEST_CODE
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.SUPPORT_MODELS
-import com.lepu.demo.data.entity.DeviceEntity
 import com.lepu.demo.util.CollectUtil
 import com.permissionx.guolindev.PermissionX
-import java.util.*
 
 
 class MainActivity : AppCompatActivity() , BleChangeObserver {
@@ -133,6 +130,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             .observe(this) {
                 Constant.BluetoothConfig.bleSdkServiceEnable = true
                 afterLpBleInit()
+            }
+        LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseContent)
+            .observe(this) {
+                Log.d(TAG, "${bytesToHex(it)}")
             }
         //-------------------------er1---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetTime)
