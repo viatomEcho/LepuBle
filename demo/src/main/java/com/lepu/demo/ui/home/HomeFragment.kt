@@ -3,7 +3,6 @@ package com.lepu.demo.ui.home
 import android.app.Activity
 import android.app.AlertDialog
 import android.bluetooth.le.ScanRecord
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -14,12 +13,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.event.EventMsgConst
-import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
 import com.lepu.blepro.observer.BIOL
 import com.lepu.blepro.vals.bleRssi
-import com.lepu.demo.DeviceFactoryDataActivity
 import com.lepu.demo.MainActivity
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
@@ -36,7 +33,6 @@ import com.lepu.demo.util.CollectUtil
 import com.lepu.demo.util.DialogUtil
 import com.lepu.demo.util.ToastUtil
 import no.nordicsemi.android.ble.observer.ConnectionObserver
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -50,7 +46,6 @@ class HomeFragment : Fragment(R.layout.fragment_home){
     private val binding: FragmentHomeBinding by binding()
 
     private lateinit var deviceAdapter: DeviceAdapter
-    private lateinit var deviceTypeAdapter: ArrayAdapter<String>
     private lateinit var numberAdapter: StringAdapter
     var mAlertDialog: AlertDialog? = null
     private var isPairing = false
@@ -127,7 +122,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         binding.scanByAddress.setOnClickListener {
             LpBleUtil.startScanByAddress(binding.scanAddress.text.toString())
         }
-        deviceTypeAdapter = ArrayAdapter(requireContext(),
+        ArrayAdapter(requireContext(),
             android.R.layout.simple_list_item_1,
             arrayListOf("全部", "BP2", "ER1", "VBeat", "HHM1", "DuoEK", "HHM2", "HHM3", "ER2", "O2", "PC")
         ).apply {

@@ -34,33 +34,18 @@
             <LinearLayout
                 android:id="@+id/le_bp2w_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <Button
-                        android:id="@+id/le_bp2w_utc_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="UTC时间"
-                        android:layout_marginStart="20dp"/>
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <Button
-                        android:id="@+id/le_bp2w_user_list"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="写用户信息"/>
-                    <Button
-                        android:id="@+id/le_bp2w_get_file_crc"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="获取文件列表crc"
-                        android:layout_marginStart="10dp"/>
-                </LinearLayout>
+                android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/le_bp2w_utc_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="UTC时间"/>
+                <Button
+                    android:id="@+id/le_bp2w_get_file_crc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="获取文件列表crc"
+                    android:layout_marginStart="@dimen/dp_10"/>
             </LinearLayout>
             <include
                 android:id="@+id/o2_layout"
@@ -84,7 +69,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="用户列表"
-                        android:layout_marginStart="20dp"/>
+                        android:layout_marginStart="@dimen/dp_10"/>
                 </LinearLayout>
             </LinearLayout>
             <LinearLayout
@@ -105,7 +90,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="血氧状态"
-                        android:layout_marginStart="20dp"/>
+                        android:layout_marginStart="@dimen/dp_10"/>
                 </LinearLayout>
             </LinearLayout>
             <include
@@ -135,7 +120,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="获取最新测量数据"
-                        android:layout_marginStart="20dp"/>
+                        android:layout_marginStart="@dimen/dp_10"/>
                 </LinearLayout>
             </LinearLayout>
             <LinearLayout
@@ -156,7 +141,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="配置参数"
-                        android:layout_marginStart="20dp"/>
+                        android:layout_marginStart="@dimen/dp_10"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -171,7 +156,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="删除记录"
-                        android:layout_marginStart="20dp"/>
+                        android:layout_marginStart="@dimen/dp_10"/>
                 </LinearLayout>
             </LinearLayout>
             <LinearLayout
@@ -179,15 +164,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <Button
-                        android:id="@+id/ad5_enable_rt_data"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="使能开关"/>
-                </LinearLayout>
+                <CheckBox
+                    android:id="@+id/ad5_enable_rt_data"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="使能开关"/>
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/pc300_layout"
@@ -207,7 +188,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="设置血糖单位"
-                        android:layout_marginStart="20dp"/>
+                        android:layout_marginStart="@dimen/dp_10"/>
                 </LinearLayout>
                 <!--<LinearLayout
                     android:layout_width="match_parent"
@@ -237,7 +218,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="获取血糖仪类型"
-                        android:layout_marginStart="20dp"/>
+                        android:layout_marginStart="@dimen/dp_10"/>
                 </LinearLayout>
                 <!--<LinearLayout
                     android:layout_width="match_parent"
@@ -278,22 +259,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <Button
-                        android:id="@+id/bpm_get_state"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="设备状态"/>
-                </LinearLayout>
+                <Button
+                    android:id="@+id/bpm_get_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="设备状态"/>
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/pc60fw_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -308,7 +284,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="长度:8位"
-                        android:layout_marginStart="20dp"/>
+                        android:layout_marginStart="@dimen/dp_10"/>
                 </LinearLayout>
                 <Button
                     android:id="@+id/pc60fw_set_code"

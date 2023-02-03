@@ -61,9 +61,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private var switchState = false
     private var state = 0
-    private var volume = 0
-    private var motor1 = intArrayOf(20, 40, 60, 80, 100)  // O2Ring
-    private var motor2 = intArrayOf(5, 10, 17, 22, 35)    // KidsO2、Oxylink、BabyO2、BabyO2N
     private var cmdStr = ""
 
     private var fileType = LeBp2wBleCmd.FileType.ECG_TYPE
@@ -144,49 +141,41 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     binding.bp2Layout.bp2VolumeLayout.visibility = View.GONE
                     binding.bp2Layout.bp2ModeLayout.visibility = View.GONE
                     binding.bp2Layout.bp2PhyLayout.visibility = View.GONE
-                    binding.bp2Layout.bp2WifiLayout.visibility = View.GONE
-                    binding.bp2Layout.bp2tState.visibility = View.GONE
                     binding.bp2Layout.bp2DeleteFile.visibility = View.GONE
+                    binding.bp2Layout.bp2WriteUser.visibility = View.GONE
                     LpBleUtil.bp2GetConfig(it.modelNo)
-                    LpBleUtil.bp2GetRtState(it.modelNo)
                 }
                 Bluetooth.MODEL_BP2A -> {
                     setViewVisible(binding.bp2Layout.root)
-                    binding.bp2Layout.bp2SwitchLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2SetSwitch.visibility = View.GONE
                     binding.bp2Layout.bp2VolumeLayout.visibility = View.GONE
                     binding.bp2Layout.bp2ModeLayout.visibility = View.GONE
                     binding.bp2Layout.bp2PhyLayout.visibility = View.GONE
-                    binding.bp2Layout.bp2WifiLayout.visibility = View.GONE
-                    binding.bp2Layout.bp2tState.visibility = View.GONE
                     binding.bp2Layout.bp2DeleteFile.visibility = View.GONE
+                    binding.bp2Layout.bp2WriteUser.visibility = View.GONE
                     LpBleUtil.bp2GetConfig(it.modelNo)
-                    LpBleUtil.bp2GetRtState(it.modelNo)
                 }
                 Bluetooth.MODEL_BP2T -> {
                     setViewVisible(binding.bp2Layout.root)
-                    binding.bp2Layout.bp2SwitchLayout.visibility = View.GONE
+                    binding.bp2Layout.bp2SetSwitch.visibility = View.GONE
                     binding.bp2Layout.bp2VolumeLayout.visibility = View.GONE
                     binding.bp2Layout.bp2ModeLayout.visibility = View.GONE
-                    binding.bp2Layout.bp2WifiLayout.visibility = View.GONE
                     binding.bp2Layout.bp2DeleteFile.visibility = View.GONE
+                    binding.bp2Layout.bp2WriteUser.visibility = View.GONE
                     LpBleUtil.bp2GetConfig(it.modelNo)
-                    LpBleUtil.bp2GetRtState(it.modelNo)
                     LpBleUtil.bp2GetPhyState(it.modelNo)
                 }
                 Bluetooth.MODEL_BP2W -> {
                     setViewVisible(binding.bp2Layout.root)
                     binding.bp2Layout.bp2VolumeLayout.visibility = View.GONE
                     binding.bp2Layout.bp2PhyLayout.visibility = View.GONE
-                    binding.bp2Layout.bp2tState.visibility = View.GONE
+                    binding.bp2Layout.bp2WriteUser.visibility = View.GONE
                     LpBleUtil.bp2GetConfig(it.modelNo)
-                    LpBleUtil.bp2GetRtState(it.modelNo)
                 }
                 Bluetooth.MODEL_LE_BP2W -> {
                     setViewVisible(binding.bp2Layout.root)
                     binding.bp2Layout.bp2PhyLayout.visibility = View.GONE
-                    binding.bp2Layout.bp2tState.visibility = View.GONE
                     LpBleUtil.bp2GetConfig(it.modelNo)
-                    LpBleUtil.bp2GetRtState(it.modelNo)
                 }
                 Bluetooth.MODEL_O2RING, Bluetooth.MODEL_BABYO2,
                 Bluetooth.MODEL_BBSM_S1, Bluetooth.MODEL_BBSM_S2,
@@ -360,19 +349,19 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             deviceFactoryData.time = DateUtil.stringFromDate(Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL)
             FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
         }
-        binding.er1Layout.er1SetSound.setOnClickListener {
+        binding.er1Layout.er1SetSound.setOnCheckedChangeListener { buttonView, isChecked ->
             val temp1 = trimStr(binding.er1Layout.er1Hr1.text.toString())
             val temp2 = trimStr(binding.er1Layout.er1Hr2.text.toString())
             if (temp1.isNullOrEmpty() || temp2.isNullOrEmpty()) {
-                Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "阈值输入不能为空", Toast.LENGTH_SHORT).show()
+                return@setOnCheckedChangeListener
             } else {
                 if (isNumber(temp1) && isNumber(temp2)) {
-                    switchState = !switchState
-                    LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, temp1.toInt(), temp2.toInt())
+                    LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], isChecked, temp1.toInt(), temp2.toInt())
                     cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
                     binding.sendCmd.text = cmdStr
                 } else {
-                    Toast.makeText(context, "请输入数字", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "阈值请输入数字", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -431,55 +420,19 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             deviceFactoryData.time = DateUtil.stringFromDate(Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL)
             FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
         }
-        binding.er2Layout.er2SetConfig.setOnClickListener {
-            switchState = !switchState
+        binding.er2Layout.er2SetConfig.setOnCheckedChangeListener { buttonView, isChecked ->
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_ER2) {
-                LpBleUtil.setEr2SwitcherState(Constant.BluetoothConfig.currentModel[0], switchState)
+                LpBleUtil.setEr2SwitcherState(Constant.BluetoothConfig.currentModel[0], isChecked)
             } else {
-                LpBleUtil.setDuoekVibrate(Constant.BluetoothConfig.currentModel[0], switchState, 0, 0, 0)
+                LpBleUtil.setDuoekVibrate(Constant.BluetoothConfig.currentModel[0], isChecked, 0, 0, 0)
             }
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
         //-------------------------bp2/bp2a/bp2t/bp2w/lp bp2w--------------------
-        binding.bp2Layout.bp2SetDeviceState.setOnClickListener {
-            val tempState = trimStr(binding.bp2Layout.bp2DeviceState.text.toString())
-            if (isNumber(tempState) && (tempState.toInt() in 0..5)) {
-                state = tempState.toInt()
-                LpBleUtil.bp2SwitchState(Constant.BluetoothConfig.currentModel[0], state)
-                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-                binding.sendCmd.text = cmdStr
-            } else {
-                Toast.makeText(context, "请输入0-5之间的数值", Toast.LENGTH_SHORT).show()
-            }
-        }
-        binding.bp2Layout.bp2SetSwitch.setOnClickListener {
-            (config as Bp2Config).beepSwitch = !(config as Bp2Config).beepSwitch
-            LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.bp2Layout.bp2SetVolume.setOnClickListener {
-            val tempVolume = trimStr(binding.bp2Layout.bp2Volume.text.toString())
-            if (isNumber(tempVolume) && (tempVolume.toInt() in 0..3)) {
-                (config as Bp2Config).volume = tempVolume.toInt()
-            } else {
-                Toast.makeText(context, "请输入0-3之间的音量", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.bp2Layout.bp2SetMode.setOnClickListener {
-            val tempMode = trimStr(binding.bp2Layout.bp2Mode.text.toString())
-            if (isNumber(tempMode) && (tempMode.toInt() in 0..4)) {
-                (config as Bp2Config).avgMeasureMode = tempMode.toInt()
-            } else {
-                Toast.makeText(context, "请输入0-4之间的模式", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+        binding.bp2Layout.bp2SetSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            (config as Bp2Config).beepSwitch = isChecked
             LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
@@ -520,102 +473,60 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.bp2Layout.bp2GetWifiRoute.setOnClickListener {
-            if (alertDialog == null) {
-                alertDialog = AlertDialog.Builder(context)
-                    .setCancelable(false)
-                    .setMessage("正在处理，请稍等...")
-                    .create()
+        ArrayAdapter(requireContext(),
+            android.R.layout.simple_list_item_1,
+            arrayListOf("请选择", "血压测量", "心电测量", "历史回顾", "开机预备状态", "关机")
+        ).apply {
+            binding.bp2Layout.deviceStateSpinner.adapter = this
+        }
+        binding.bp2Layout.deviceStateSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (position == 0) {
+                    Toast.makeText(context, "请选择设置状态", Toast.LENGTH_SHORT).show()
+                    return
+                }
+                LpBleUtil.bp2SwitchState(Constant.BluetoothConfig.currentModel[0], position-1)
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
             }
-            alertDialog?.show()
-            LpBleUtil.bp2GetWifiDevice(Constant.BluetoothConfig.currentModel[0])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.bp2Layout.bp2GetWifiConfig.setOnClickListener {
-            bp2wAdapter.setList(null)
-            bp2wAdapter.notifyDataSetChanged()
-            LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-
-        LinearLayoutManager(context).apply {
-            this.orientation = LinearLayoutManager.VERTICAL
-            binding.bp2Layout.bp2Rcv.layoutManager = this
-        }
-        bp2wAdapter = WifiAdapter(R.layout.device_item, null).apply {
-            binding.bp2Layout.bp2Rcv.adapter = this
-        }
-        bp2wAdapter.setOnItemClickListener { adapter, view, position ->
-            (adapter.getItem(position) as Bp2Wifi).let {
-                val popupView = View.inflate(context, R.layout.popup_window, null)
-                if (popupWindow == null) {
-                    popupWindow = PopupWindow(context)
-                }
-                popupWindow?.let { v ->
-                    v.width = ViewGroup.LayoutParams.MATCH_PARENT
-                    v.height = 1000
-                    v.contentView = popupView
-                    v.isFocusable = true
-                    v.showAsDropDown(view)
-                    val attr = activity?.window?.attributes
-                    attr?.alpha = 0.5f
-                    activity?.window?.attributes = attr
-                    v.setOnDismissListener {
-                        val attr = activity?.window?.attributes
-                        attr?.alpha = 1f
-                        activity?.window?.attributes = attr
-                    }
-                }
-                val password = popupView.findViewById<EditText>(R.id.password)
-                val ssid = popupView.findViewById<TextView>(R.id.ssid)
-                val sure = popupView.findViewById<Button>(R.id.sure)
-                val cancel = popupView.findViewById<Button>(R.id.cancel)
-                val address = popupView.findViewById<EditText>(R.id.server_address)
-                val port = popupView.findViewById<EditText>(R.id.server_port)
-                ssid.text = "WiFi：${it.ssid}"
-                sure.setOnClickListener { it1 ->
-                    val pass = trimStr(password.text.toString())
-                    val addr = trimStr(address.text.toString())
-                    val p = trimStr(port.text.toString())
-                    if (pass.isNullOrEmpty() || addr.isNullOrEmpty() || p.isNullOrEmpty()) {
-                        Toast.makeText(context, "请输入完整信息", Toast.LENGTH_SHORT).show()
-                        return@setOnClickListener
-                    } else {
-//                        val wifiConfig = Bp2WifiConfig()
-                        wifiConfig.option = 3
-                        it.pwd = pass
-                        wifiConfig.wifi = it
-                        wifi = it
-//                        val server = Bp2Server()
-//                        server.addr = "34.209.148.123"
-                        //server.addr = "bptest.viatomtech.com"
-                        server.addr = addr
-//                        server.addr = "bp.viatomtech.com"
-//                        server.addr = "ai.viatomtech.com.cn"
-                        //server.port = 7100
-                        server.port = p.toInt()
-                        if (isEnglish(addr.substring(1))) {
-                            server.addrType = 1
-                        } else {
-                            server.addrType = 0
-                        }
-                        wifiConfig.server = server
-                        LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
-                        binding.content.text = "$wifiConfig"
-                        adapter.setList(null)
-                        adapter.notifyDataSetChanged()
-                        popupWindow?.dismiss()
-                        Toast.makeText(context, "点击 获取WiFi信息 查看配置情况", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                cancel.setOnClickListener {
-                    popupWindow?.dismiss()
-                }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
-        binding.leBp2wUserList.setOnClickListener {
+        ArrayAdapter(requireContext(),
+            android.R.layout.simple_list_item_1,
+            arrayListOf("关", "1", "2", "3")
+        ).apply {
+            binding.bp2Layout.volumeSpinner.adapter = this
+        }
+        binding.bp2Layout.volumeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (!this@SettingsFragment::config.isInitialized) return
+                (config as Bp2Config).volume = position
+                LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+        ArrayAdapter(requireContext(),
+            android.R.layout.simple_list_item_1,
+            arrayListOf("x3模式关闭", "x3模式开启(时间间隔30s)", "x3模式开启(时间间隔60s)", "x3模式开启(时间间隔90s)", "x3模式开启(时间间隔120s)")
+        ).apply {
+            binding.bp2Layout.modeSpinner.adapter = this
+        }
+        binding.bp2Layout.modeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (!this@SettingsFragment::config.isInitialized) return
+                (config as Bp2Config).avgMeasureMode = position
+                LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+        binding.bp2Layout.bp2WriteUser.setOnClickListener {
             FileUtil.getBmp(context)
 //            val string = "0007040F0C0700040504060D070405000007040C0F0404070002020F0202020000070C0F040407000F090F090F090F000007040F0404070009090F090F09090000000102030700000000020404040603030000020404040607030000F891FE9FF70503DF56DA76D2D0DF0300F993BCF79395F3434C70FF7048444300F893FC9793F503FF203CA46521FF0100F893FE9793F701FF0CF01CF119FF0100000000FFFF0000000003070C1830F0C000000120202060D19F0E00408000C0404040C040404040C0408040800000C0404040404040404040408040800000C0404040404040404040C08040800000C04040404040404040404080000000008080000000008080808080808000000080808080800000"
             val string = "00000000000000000000001F00000000000000000000001F00000000000000000000001F00000000000000000000001F1810181030FE10FE0000001F7DFE7F107EAA7E28041E0F9F5428497E52AA52281C2391DF549A491052FE52FE2C0180DF7CAE7F107E927EAA0C0180DF54FE49FF528A52AA0C01819F5410593852FE52AA0C030F1F7CFE7F387EA27EBE0C0700DF58A2505450A250D60C0C007F1ED21A521ABA1AD20C18007F1DFB2D912D823E820C30007F2F836F912F8F2F8F0C3010DF28854801480348010C3F8F9F4FFE8FFE8FFE8FFE0000001F00000000000000000000001F00000000000000000000001F00000000000000000000001F"
@@ -682,8 +593,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             userList.userList.add(userInfo1)
 
             FileUtil.saveFile(context, userList.getDataBytes(), "userlist.dat")
-
-
 
             LepuBleLog.d("test icon1 == " + bytesToHex(icon1.getDataBytes()))
             LepuBleLog.d("test icon1.getDataBytes().size == " + icon1.getDataBytes().size)
@@ -752,7 +661,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         }
         binding.o2Layout.o2SetHrThr1.setOnClickListener {
-            val temp = trimStr(binding.o2Layout.o2SetHrThr1.text.toString())
+            val temp = trimStr(binding.o2Layout.o2HrThr1.text.toString())
             if (isNumber(temp)) {
                 LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_HR_LOW_THR, temp.toInt())
                 cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
@@ -779,6 +688,21 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.sendCmd.text = cmdStr
             } else {
                 Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+        }
+        ArrayAdapter(requireContext(),
+            android.R.layout.simple_list_item_1,
+            arrayListOf("Standard模式", "Always Off模式", "Always On模式")
+        ).apply {
+            binding.o2Layout.lightModeSpinner.adapter = this
+        }
+        binding.o2Layout.lightModeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_LIGHTING_MODE, position)
+                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                binding.sendCmd.text = cmdStr
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
         binding.o2Layout.o2HrSwitch.setOnClickListener {
@@ -811,24 +735,19 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
             }
         }
-        binding.o2Layout.o2SetLightMode.setOnClickListener {
-            val temp = trimStr(binding.o2Layout.o2LightMode.text.toString())
-            if (isNumber(temp)) {
-                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_LIGHTING_MODE, temp.toInt())
-                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-                binding.sendCmd.text = cmdStr
-            } else {
-                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
-            }
+        ArrayAdapter(requireContext(),
+            android.R.layout.simple_list_item_1,
+            arrayListOf("低", "中", "高")
+        ).apply {
+            binding.o2Layout.lightLevelSpinner.adapter = this
         }
-        binding.o2Layout.o2SetLightStr.setOnClickListener {
-            val temp = trimStr(binding.o2Layout.o2LightStr.text.toString())
-            if (isNumber(temp)) {
-                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_LIGHT_STR, temp.toInt())
+        binding.o2Layout.lightLevelSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_LIGHT_STR, position)
                 cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
                 binding.sendCmd.text = cmdStr
-            } else {
-                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
         binding.o2Layout.o2SetMtThr.setOnClickListener {
@@ -841,11 +760,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
             }
         }
-        binding.o2Layout.o2MtSwitch.setOnClickListener {
-            if (binding.o2Layout.o2MtSwitch.text == "体动提醒开") {
-                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MT_SW, 0)
-            } else {
+        binding.o2Layout.o2MtSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
                 LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MT_SW, 1)
+            } else {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_MT_SW, 0)
             }
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
@@ -860,11 +779,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
             }
         }
-        binding.o2Layout.o2IvSwitch.setOnClickListener {
-            if (binding.o2Layout.o2MtSwitch.text == "无效值提醒开") {
-                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_IV_SW, 0)
-            } else {
+        binding.o2Layout.o2IvSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
                 LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_IV_SW, 1)
+            } else {
+                LpBleUtil.updateSetting(Constant.BluetoothConfig.currentModel[0], OxyBleCmd.SYNC_TYPE_IV_SW, 0)
             }
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
@@ -1846,9 +1765,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
 
         //-------------------------ap20-----------------------
-        binding.ap20Layout.setSwitch.setOnClickListener {
-            switchState = !switchState
-            if (switchState) {
+        binding.ap20Layout.setSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
                 LpBleUtil.ap20SetConfig(Constant.BluetoothConfig.currentModel[0], 1, 1)
             } else {
                 LpBleUtil.ap20SetConfig(Constant.BluetoothConfig.currentModel[0], 1, 0)
@@ -1856,15 +1774,23 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.ap20Layout.setLightLevel.setOnClickListener {
-            val temp = trimStr(binding.ap20Layout.lightLevel.text.toString())
-            if (isNumber(temp)) {
-                LpBleUtil.ap20SetConfig(Constant.BluetoothConfig.currentModel[0], 0, temp.toInt())
+        ArrayAdapter(requireContext(),
+            android.R.layout.simple_list_item_1,
+            arrayListOf("0", "1", "2", "3", "4", "5")
+        ).apply {
+            binding.ap20Layout.lightLevelSpinner.adapter = this
+        }
+        binding.ap20Layout.lightLevelSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                LpBleUtil.ap20SetConfig(Constant.BluetoothConfig.currentModel[0], 0, position)
                 cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
                 binding.sendCmd.text = cmdStr
-            } else {
-                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
             }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                TODO("Not yet implemented")
+            }
+
         }
         binding.ap20Layout.setLowSpo2.setOnClickListener {
             val temp = trimStr(binding.ap20Layout.lowSpo2.text.toString())
@@ -1981,14 +1907,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
 
         //----------------------ad5---------------------
-        binding.ad5EnableRtData.setOnClickListener {
-            switchState = !switchState
-            LpBleUtil.enableRtData(Constant.BluetoothConfig.currentModel[0], 0, switchState)
-            binding.ad5EnableRtData.text = if (switchState) {
-                "使能开"
-            } else {
-                "使能关"
-            }
+        binding.ad5EnableRtData.setOnCheckedChangeListener { buttonView, isChecked ->
+            LpBleUtil.enableRtData(Constant.BluetoothConfig.currentModel[0], 0, isChecked)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -2068,18 +1988,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }*/
 
         // ---------------------------lem---------------------------
-        binding.lemLayout.lemDeviceSwitch.setOnClickListener {
-            switchState = !switchState
-            LpBleUtil.lemDeviceSwitch(Constant.BluetoothConfig.currentModel[0], switchState)
+        binding.lemLayout.lemDeviceSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            LpBleUtil.lemDeviceSwitch(Constant.BluetoothConfig.currentModel[0], isChecked)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lemLayout.lemHeatSwitch.setOnClickListener {
-            if (binding.lemLayout.lemHeatSwitch.text == "加热模式开") {
-                LpBleUtil.lemHeatMode(Constant.BluetoothConfig.currentModel[0], false)
-            } else {
-                LpBleUtil.lemHeatMode(Constant.BluetoothConfig.currentModel[0], true)
-            }
+        binding.lemLayout.lemHeatSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            LpBleUtil.lemHeatMode(Constant.BluetoothConfig.currentModel[0], isChecked)
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
@@ -2088,24 +2003,34 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }
-        binding.lemLayout.lemSetMassMode.setOnClickListener {
-            val temp = trimStr(binding.lemLayout.lemMassMode.text.toString())
-            if (isNumber(temp)) {
-                LpBleUtil.lemMassMode(Constant.BluetoothConfig.currentModel[0], temp.toInt())
+        ArrayAdapter(requireContext(),
+            android.R.layout.simple_list_item_1,
+            arrayListOf("活力模式", "动感模式", "捶击模式", "舒缓模式", "自动模式")
+        ).apply {
+            binding.lemLayout.massModeSpinner.adapter = this
+        }
+        binding.lemLayout.massModeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                LpBleUtil.lemMassMode(Constant.BluetoothConfig.currentModel[0], position)
                 cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
                 binding.sendCmd.text = cmdStr
-            } else {
-                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
-        binding.lemLayout.lemSetMassTime.setOnClickListener {
-            val temp = trimStr(binding.lemLayout.lemMassTime.text.toString())
-            if (isNumber(temp)) {
-                LpBleUtil.lemMassTime(Constant.BluetoothConfig.currentModel[0], temp.toInt())
+        ArrayAdapter(requireContext(),
+            android.R.layout.simple_list_item_1,
+            arrayListOf("15min", "10min", "5min")
+        ).apply {
+            binding.lemLayout.massTimeSpinner.adapter = this
+        }
+        binding.lemLayout.massTimeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                LpBleUtil.lemMassTime(Constant.BluetoothConfig.currentModel[0], position)
                 cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
                 binding.sendCmd.text = cmdStr
-            } else {
-                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
         binding.lemLayout.lemSetMassLevel.setOnClickListener {
@@ -2140,25 +2065,30 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         }
         // ---------------------------er3---------------------------
-        binding.er3Layout.er3SetEcgMode.setOnClickListener {
-            val mode = trimStr(binding.er3Layout.er3EcgMode.text.toString())
-            if (isNumber(mode) && (mode.toInt() in 0..2)) {
-                LpBleUtil.er3SetConfig(Constant.BluetoothConfig.currentModel[0], mode.toInt())
+        ArrayAdapter(requireContext(),
+            android.R.layout.simple_list_item_1,
+            arrayListOf("监护模式(带宽0.5-40HZ)", "手术模式(带宽1-20HZ)", "ST模式(带宽0.05-40HZ)")
+        ).apply {
+            binding.er3Layout.modeSpinner.adapter = this
+            binding.lepodLayout.modeSpinner.adapter = this
+        }
+        binding.lepodLayout.modeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                LpBleUtil.er3SetConfig(Constant.BluetoothConfig.currentModel[0], position)
                 cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
                 binding.sendCmd.text = cmdStr
-            } else {
-                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
         // ---------------------------lepod---------------------------
-        binding.lepodLayout.setEcgMode.setOnClickListener {
-            val mode = trimStr(binding.lepodLayout.ecgMode.text.toString())
-            if (isNumber(mode) && (mode.toInt() in 0..2)) {
-                LpBleUtil.lepodSetConfig(Constant.BluetoothConfig.currentModel[0], mode.toInt())
+        binding.lepodLayout.modeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                LpBleUtil.lepodSetConfig(Constant.BluetoothConfig.currentModel[0], position)
                 cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
                 binding.sendCmd.text = cmdStr
-            } else {
-                Toast.makeText(context, "输入不正确，请重新输入", Toast.LENGTH_SHORT).show()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
         binding.lepodLayout.getRtParam.setOnClickListener {
@@ -2251,11 +2181,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 if (it.model == Bluetooth.MODEL_DUOEK || it.model == Bluetooth.MODEL_HHM2 || it.model == Bluetooth.MODEL_HHM3) {
                     val data = it.data as ByteArray
                     val config = SwitcherConfig.parse(data)
-                    switchState = config.switcher
-                    var temp = "关"
-                    if (config.switcher)
-                        temp = "开"
-                    binding.er2Layout.er2SetConfig.text = "心跳音$temp"
+                    binding.er2Layout.er2SetConfig.isChecked = config.switcher
                     binding.content.text = "switcher : ${config.switcher} vector : ${config.vector} motionCount : ${config.motionCount} motionWindows : ${config.motionWindows}"
                     when (it.model) {
                         Bluetooth.MODEL_DUOEK -> {
@@ -2271,12 +2197,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     }
                 } else {
                     val config = VbVibrationSwitcherConfig.parse(data)
-                    switchState = config.switcher
                     this.config = config
-                    var temp = "关"
-                    if (config.switcher)
-                        temp = "开"
-                    binding.er1Layout.er1SetSound.text = "震动$temp"
+                    binding.er1Layout.er1SetSound.isChecked = config.switcher
                     binding.er1Layout.er1Hr1.setText("${config.hr1}")
                     binding.er1Layout.er1Hr2.setText("${config.hr2}")
                     binding.content.text = "switcher : " + config.switcher + " hr1 : " + config.hr1 + " hr2 : " + config.hr2
@@ -2317,12 +2239,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 val data = it.data as ByteArray
                 setReceiveCmd(data)
                 val config = SwitcherConfig.parse(data)
-                switchState = config.switcher
                 this.config = config
-                var temp = "关"
-                if (config.switcher)
-                    temp = "开"
-                binding.er2Layout.er2SetConfig.text = "心跳音$temp"
+                binding.er2Layout.er2SetConfig.isChecked = config.switcher
                 binding.content.text = "switcher : " + config.switcher + " vector : " + config.vector + " motionCount : " + config.motionCount + " motionWindows : " + config.motionWindows
                 when (it.model) {
                     Bluetooth.MODEL_ER2 -> {
@@ -2339,11 +2257,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this) {
                 val config = it.data as Bp2Config
                 this.config = config
-                var temp = "关"
-                if (config.beepSwitch)
-                    temp = "开"
                 binding.content.text = "$config"
-                binding.bp2Layout.bp2SetSwitch.text = "心跳音$temp"
+                binding.bp2Layout.bp2SetSwitch.isChecked = config.beepSwitch
                 Toast.makeText(context, "获取参数成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SetConfigResult)
@@ -2357,14 +2272,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 setReceiveCmd(data.bytes)
                 binding.content.text = "$data"
                 state = data.status
-                binding.bp2Layout.bp2RtState.text = "设备当前状态：$state"
-                Toast.makeText(context, "获取设备状态成功", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(context, "获取设备状态成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SwitchState)
             .observe(this) {
-                handler.postDelayed({
-                    LpBleUtil.bp2GetRtState(it.model)
-                }, 1000)
                 val data = it.data as Boolean
                 binding.content.text = "$data"
                 Toast.makeText(context, "设置设备状态$data", Toast.LENGTH_SHORT).show()
@@ -2375,7 +2286,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 this.phy = phy
                 setReceiveCmd(phy.bytes)
                 binding.content.text = "$phy"
-                binding.bp2Layout.bp2PhyLeadStatus.text = "电极状态：${phy.leadOff}"
+                binding.bp2Layout.bp2PhyLeadStatus.text = "电极导联状态：${phy.leadOff}"
                 binding.bp2Layout.bp2PhyMode.setText("${phy.mode}")
                 binding.bp2Layout.bp2PhyIntensy.setText("${phy.intensy}")
                 binding.bp2Layout.bp2PhyTime.setText("${phy.remainingTime}")
@@ -2391,7 +2302,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 this.phy = phy
                 setReceiveCmd(phy.bytes)
                 binding.content.text = "$phy"
-                binding.bp2Layout.bp2PhyLeadStatus.text = "电极状态：${phy.leadOff}"
+                binding.bp2Layout.bp2PhyLeadStatus.text = "电极导联状态：${phy.leadOff}"
                 binding.bp2Layout.bp2PhyMode.setText("${phy.mode}")
                 binding.bp2Layout.bp2PhyIntensy.setText("${phy.intensy}")
                 binding.bp2Layout.bp2PhyTime.setText("${phy.remainingTime}")
@@ -2409,31 +2320,18 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSwitchState)
             .observe(this) {
-                handler.postDelayed({
-                    LpBleUtil.bp2GetRtState(it.model)
-                }, 1000)
-                Toast.makeText(context, "设置主机状态成功", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wRtState)
-            .observe(this) {
-                val data = it.data as Bp2BleRtState
-                setReceiveCmd(data.bytes)
+                val data = it.data as Boolean
                 binding.content.text = "$data"
-                state = data.status
-                binding.bp2Layout.bp2RtState.text = "设备当前状态：$state"
-                Toast.makeText(context, "获取设备状态成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "设置主机状态$data", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetConfig)
             .observe(this) {
                 val config = it.data as Bp2Config
                 this.config = config
                 setReceiveCmd(config.bytes)
-                var temp = "关"
-                if (config.beepSwitch)
-                    temp = "开"
                 binding.content.text = "$config"
-                binding.bp2Layout.bp2SetSwitch.text = "心跳音$temp"
-                binding.bp2Layout.bp2Mode.setText("${config.avgMeasureMode}")
+                binding.bp2Layout.bp2SetSwitch.isChecked = config.beepSwitch
+                binding.bp2Layout.modeSpinner.setSelection(config.avgMeasureMode)
                 Toast.makeText(context, "获取参数成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiScanning)
@@ -2494,32 +2392,19 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSwitchState)
             .observe(this) {
-                handler.postDelayed({
-                    LpBleUtil.bp2GetRtState(it.model)
-                }, 1000)
-                Toast.makeText(context, "设置主机状态成功", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wRtState)
-            .observe(this) {
-                val data = it.data as Bp2BleRtState
-                setReceiveCmd(data.bytes)
+                val data = it.data as Boolean
                 binding.content.text = "$data"
-                state = data.status
-                binding.bp2Layout.bp2RtState.text = "设备当前状态：$state"
-                Toast.makeText(context, "获取设备状态成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "设置主机状态$data", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetConfig)
             .observe(this) {
                 val config = it.data as Bp2Config
                 this.config = config
                 setReceiveCmd(config.bytes)
-                var temp = "关"
-                if (config.beepSwitch)
-                    temp = "开"
                 binding.content.text = "$config"
-                binding.bp2Layout.bp2SetSwitch.text = "心跳音$temp"
-                binding.bp2Layout.bp2Volume.setText("${config.volume}")
-                binding.bp2Layout.bp2Mode.setText("${config.avgMeasureMode}")
+                binding.bp2Layout.bp2SetSwitch.isChecked = config.beepSwitch
+                binding.bp2Layout.volumeSpinner.setSelection(config.volume)
+                binding.bp2Layout.modeSpinner.setSelection(config.avgMeasureMode)
                 Toast.makeText(context, "获取参数成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2WifiScanning)
@@ -2599,20 +2484,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.o2Layout.o2Hr.setText("${data.hrSwitch}")
                 binding.o2Layout.o2Motor.setText("${data.motor}")
                 binding.o2Layout.o2Buzzer.setText("${data.buzzer}")
-                binding.o2Layout.o2LightMode.setText("${data.lightingMode}")
-                binding.o2Layout.o2LightStr.setText("${data.lightStr}")
+                binding.o2Layout.lightModeSpinner.setSelection(data.lightingMode)
+                binding.o2Layout.lightLevelSpinner.setSelection(data.lightStr)
                 binding.o2Layout.o2MtThr.setText("${data.mtThr}")
-                binding.o2Layout.o2MtSwitch.text = if (data.mtSwitch == 1) {
-                    "体动提醒开"
-                } else {
-                    "体动提醒关"
-                }
+                binding.o2Layout.o2MtSwitch.isChecked = data.mtSwitch == 1
                 binding.o2Layout.o2IvThr.setText("${data.ivThr}")
-                binding.o2Layout.o2IvSwitch.text = if (data.ivSwitch == 1) {
-                    "无效值提醒开"
-                } else {
-                    "无效值提醒关"
-                }
+                binding.o2Layout.o2IvSwitch.isChecked = data.ivSwitch == 1
                 binding.content.text = "$data"
             }
         //------------------------------ap20-------------------------------------
@@ -2678,9 +2555,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this) {
                 val data = it.data as Ap20BleResponse.ConfigInfo
                 when (data.type) {
-                    0 -> binding.ap20Layout.lightLevel.setText("${data.data}")
+                    0 -> binding.ap20Layout.lightLevelSpinner.setSelection(data.data)
                     1 -> {
-                        binding.ap20Layout.setSwitch.text = "警报${if (data.data == 1) "开" else "关" }"
+                        binding.ap20Layout.setSwitch.isChecked = data.data == 1
                         switchState = data.data == 1
                     }
                     2 -> binding.ap20Layout.lowSpo2.setText("${data.data}")
@@ -3181,9 +3058,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.content.text = "$data"
                 binding.lemLayout.lemGetBattery.text = "电量${data.battery}%"
                 binding.lemLayout.lemHeatSwitch.text = "加热模式${if (data.heatMode) "开" else "关" }"
-                binding.lemLayout.lemMassMode.setText("${data.massageMode}")
+                binding.lemLayout.massModeSpinner.setSelection(data.massageMode)
                 binding.lemLayout.lemMassLevel.setText("${data.massageLevel}")
-                binding.lemLayout.lemMassTime.setText("${data.massageTime}")
+                binding.lemLayout.massTimeSpinner.setSelection(data.massageTime)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemBattery)
             .observe(this) {
@@ -3200,7 +3077,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetMassageMode)
             .observe(this) {
                 val data = it.data as Int
-                binding.lemLayout.lemMassMode.setText("$data")
+                binding.lemLayout.massModeSpinner.setSelection(data)
                 Toast.makeText(context, "设置按摩模式成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetMassageLevel)
@@ -3212,7 +3089,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemSetMassageTime)
             .observe(this) {
                 val data = it.data as Int
-                binding.lemLayout.lemMassTime.setText("$data")
+                binding.lemLayout.massTimeSpinner.setSelection(data)
                 Toast.makeText(context, "设置按摩时间成功", Toast.LENGTH_SHORT).show()
             }
 
@@ -3247,7 +3124,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3GetConfig)
             .observe(this) {
                 val data = it.data as Int
-                binding.er3Layout.er3EcgMode.setText("$data")
+                binding.er3Layout.modeSpinner.setSelection(data)
                 Toast.makeText(context, "获取mode成功", Toast.LENGTH_SHORT).show()
             }
         //------------------------lepod-------------------
@@ -3264,7 +3141,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodGetConfig)
             .observe(this) {
                 val data = it.data as Int
-                binding.lepodLayout.ecgMode.setText("$data")
+                binding.lepodLayout.modeSpinner.setSelection(data)
                 Toast.makeText(context, "获取mode成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodRtParam)

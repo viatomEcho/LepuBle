@@ -6,7 +6,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingHorizontal="20dp"
+        android:paddingHorizontal="@dimen/dp_10"
         tools:context=".ui.home.HomeFragment">
         <TextView
             android:id="@+id/app_version"
@@ -78,7 +78,6 @@
             android:id="@+id/rssi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
             android:text="RSSI"
             android:textColor="@color/black"
             android:textSize="16sp"
@@ -90,7 +89,6 @@
             android:id="@+id/rssi_filter_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
             android:textColor="@color/black"
             android:textSize="16sp"
             android:layout_marginTop="15dp"
