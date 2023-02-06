@@ -610,6 +610,14 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     /**
      * LepodBleInterface发出的通知
      * 包含model: MODEL_LEPOD
+     * 功能：
+     * 1.获取设备信息：BleServiceHelper.lepodGetInfo()
+     * 2.获取实时数据：BleServiceHelper.startRtTask()/BleServiceHelper.stopRtTask()
+     * 3.设置/获取配置信息：BleServiceHelper.lepodSetConfig()/BleServiceHelper.lepodGetConfig()
+     * 4.复位：BleServiceHelper.lepodReset()
+     * 5.恢复出厂设置：BleServiceHelper.lepodFactoryReset()
+     * 6.恢复生产出厂状态：BleServiceHelper.lepodFactoryResetAll()
+     * 7.开始/结束测量：BleServiceHelper.lepodStartEcg()/BleServiceHelper.lepodStopEcg()
      */
     interface Lepod {
         companion object {
