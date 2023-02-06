@@ -94,7 +94,9 @@ class FhrBleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i+4+len)
-
+            if (temp.size < 7) {
+                continue@loop
+            }
             // 16位校验有问题 暂时不进行校验
 //            val crc16 = toUInt(bytes.copyOfRange(bytes.size - 2, bytes.size))  // 小端模式
 //            val crc16 = ((bytes[bytes.size - 2].toUInt() and 0x0Fu).toInt() shl 8) + ((bytes[bytes.size - 1].toUInt() and 0xFFu).toInt())  // 大端模式

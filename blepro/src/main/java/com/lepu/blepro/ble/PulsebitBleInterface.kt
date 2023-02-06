@@ -154,7 +154,7 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
                     curSize = 0
                     fileContent = null
                     LepuBleLog.d(tag, "model:$model, 文件大小：${fileSize}  文件名：$curFileName")
-                    if (fileSize == 0) {
+                    if (fileSize <= 0) {
                         sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_END, PulsebitBleCmd.readFileEnd())
                     } else {
                         sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_CONTENT, PulsebitBleCmd.readFileContent())

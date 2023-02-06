@@ -159,6 +159,8 @@ class Constant{
             var bpData = BpData()
 
             var splitText = ""
+            var splitType = 0
+            var needPair = false
         }
     }
 

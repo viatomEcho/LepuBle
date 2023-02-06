@@ -64,7 +64,7 @@ class Aoj20aBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aSetTime).post(InterfaceEvent(model, true))
             }
             Aoj20aBleCmd.MSG_GET_RT_DATA -> {
-                if (response.len == 0 || response.content.size < 3) {
+                if (response.len <= 0 || response.content.size < 3) {
                     LepuBleLog.d(tag, "model:$model,MSG_GET_RT_DATA => null " + bytesToHex(response.bytes))
                     return
                 }
@@ -99,7 +99,7 @@ class Aoj20aBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aDeleteData).post(InterfaceEvent(model, true))
             }
             Aoj20aBleCmd.MSG_GET_DEVICE_DATA -> {
-                if (response.len == 0 || response.content.size < 3) {
+                if (response.len <= 0 || response.content.size < 3) {
                     LepuBleLog.d(tag, "model:$model,MSG_GET_DEVICE_DATA => null " + bytesToHex(response.bytes))
                     return
                 }
@@ -114,7 +114,7 @@ class Aoj20aBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aDeviceData).post(InterfaceEvent(model, deviceInfo))
             }
             Aoj20aBleCmd.MSG_ERROR_CODE -> {
-                if (response.len == 0 || response.content.isEmpty()) {
+                if (response.len <= 0 || response.content.isEmpty()) {
                     LepuBleLog.d(tag, "model:$model,MSG_ERROR_CODE => null " + bytesToHex(response.bytes))
                     return
                 }

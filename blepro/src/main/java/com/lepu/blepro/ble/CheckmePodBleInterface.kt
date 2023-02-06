@@ -152,7 +152,7 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
                 if (response.state) {
                     val fileSize = toUInt(response.content)
                     LepuBleLog.d(tag, "model:$model, 文件大小：${fileSize}  文件名：$curFileName")
-                    if (fileSize == 0) {
+                    if (fileSize <= 0) {
                         sendOxyCmd(CheckmePodBleCmd.OXY_CMD_READ_END, CheckmePodBleCmd.readFileEnd())
                         return
                     }

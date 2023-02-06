@@ -3,9 +3,11 @@ package com.lepu.demo.ui.notifications
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import com.blankj.utilcode.util.LogUtils
 import android.view.View
-import android.widget.Toast
+import android.view.ViewGroup
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,11 +24,11 @@ import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.getTimeString
+import com.lepu.blepro.vals.server
+import com.lepu.blepro.vals.wifiConfig
+import com.lepu.blepro.vals.wifi
 import com.lepu.demo.*
-import com.lepu.demo.ble.BpAdapter
-import com.lepu.demo.ble.EcgAdapter
-import com.lepu.demo.ble.LpBleUtil
-import com.lepu.demo.ble.OxyAdapter
+import com.lepu.demo.ble.*
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.ecgData
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.oxyData
@@ -36,6 +38,7 @@ import com.lepu.demo.data.OxyData
 import com.lepu.demo.databinding.FragmentInfoBinding
 import com.lepu.demo.util.DataConvert
 import com.lepu.demo.util.FileUtil
+import com.lepu.demo.util.StringUtil
 import org.apache.commons.io.FileUtils
 import java.io.*
 
@@ -69,7 +72,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
     var bpList: ArrayList<BpData> = arrayListOf()
 
     var mAlertDialog: AlertDialog? = null
+    var mAlertDialogCanCancel: AlertDialog? = null
     var mCancelDialog: AlertDialog? = null
+    private lateinit var bp2wAdapter: WifiAdapter
+    private var popupWindow: PopupWindow? = null
+    private var handler = Handler()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -166,7 +173,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 .setMessage("正在处理，请稍等...")
                 .create()
         }
-
+        mAlertDialogCanCancel = AlertDialog.Builder(requireContext())
+            .setCancelable(true)
+            .setMessage("正在处理，请稍等...")
+            .create()
         mainViewModel.downloadTip.observe(viewLifecycleOwner) {
             mAlertDialog?.setMessage("正在处理，请稍等... $it")
         }
@@ -230,7 +240,74 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 binding.bytesSwitch.text = "原始数据显示关"
             }
         }
+        binding.getWifiRoute.setOnClickListener {
+            mAlertDialogCanCancel?.show()
+            LpBleUtil.bp2GetWifiDevice(Constant.BluetoothConfig.currentModel[0])
+        }
 
+        LinearLayoutManager(context).apply {
+            this.orientation = LinearLayoutManager.VERTICAL
+            binding.wifiRcv.layoutManager = this
+        }
+        bp2wAdapter = WifiAdapter(R.layout.device_item, null).apply {
+            binding.wifiRcv.adapter = this
+        }
+        bp2wAdapter.setOnItemClickListener { adapter, view, position ->
+            (adapter.getItem(position) as Bp2Wifi).let {
+                val popupView = View.inflate(context, R.layout.popup_window, null)
+                if (popupWindow == null) {
+                    popupWindow = PopupWindow(context)
+                }
+                popupWindow?.let { v ->
+                    v.width = ViewGroup.LayoutParams.MATCH_PARENT
+                    v.height = 600
+                    v.contentView = popupView
+                    v.isFocusable = true
+                    v.showAsDropDown(view)
+                    val attr = activity?.window?.attributes
+                    attr?.alpha = 0.5f
+                    activity?.window?.attributes = attr
+                    v.setOnDismissListener {
+                        val attr = activity?.window?.attributes
+                        attr?.alpha = 1f
+                        activity?.window?.attributes = attr
+                    }
+                }
+                val password = popupView.findViewById<EditText>(R.id.password)
+                val ssid = popupView.findViewById<TextView>(R.id.ssid)
+                val sure = popupView.findViewById<Button>(R.id.sure)
+                val cancel = popupView.findViewById<Button>(R.id.cancel)
+                ssid.text = "WiFi：${it.ssid}"
+                sure.setOnClickListener { it1 ->
+                    val pass = trimStr(password.text.toString())
+                    if (pass.isNullOrEmpty()) {
+                        Toast.makeText(context, "请输入完整信息", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    } else {
+                        wifiConfig.option = 3
+                        it.pwd = pass
+                        wifiConfig.wifi = it
+                        wifi = it
+                        if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W) {
+                            server.addr = "34.209.148.123"
+                            server.port = 7100
+                        } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP2W) {
+                            server.addr = "212.129.241.54"
+                            server.port = 7200
+                        }
+                        wifiConfig.server = server
+                        LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
+                        adapter.setList(null)
+                        adapter.notifyDataSetChanged()
+                        popupWindow?.dismiss()
+                        mAlertDialogCanCancel?.show()
+                    }
+                }
+                cancel.setOnClickListener {
+                    popupWindow?.dismiss()
+                }
+            }
+        }
         mainViewModel.er1Info.observe(viewLifecycleOwner) {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1_N
@@ -245,6 +322,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LEPOD) {
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP2W) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
+                binding.wifiConfig.visibility = View.VISIBLE
+                LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
             }
         }
         mainViewModel.er2Info.observe(viewLifecycleOwner) {
@@ -267,7 +349,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2A
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2T) {
                 binding.info.text = "$it"
-                binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fmV}\nsn：${it.sn}\ncode：${it.branchCode}"
+                binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fmV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
             }
         }
         mainViewModel.bpmInfo.observe(viewLifecycleOwner) {
@@ -410,6 +492,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             bpList.clear()
             bpAdapter.setNewInstance(bpList)
             bpAdapter.notifyDataSetChanged()
+            bp2wAdapter.setList(null)
+            bp2wAdapter.notifyDataSetChanged()
         }
         // 获取文件列表
         binding.getFileList.setOnClickListener {
@@ -425,7 +509,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             bpList.clear()
             bpAdapter.setNewInstance(bpList)
             bpAdapter.notifyDataSetChanged()
-
+            bp2wAdapter.setList(null)
+            bp2wAdapter.notifyDataSetChanged()
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CMRING
@@ -485,6 +570,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             bpList.clear()
             bpAdapter.setNewInstance(bpList)
             bpAdapter.notifyDataSetChanged()
+            bp2wAdapter.setList(null)
+            bp2wAdapter.notifyDataSetChanged()
             readFile()
         }
         // 暂停读取文件
@@ -524,6 +611,28 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         binding.factoryAll.setOnClickListener {
             LpBleUtil.factoryResetAll(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])}"
+        }
+        // bp2 wifi
+        binding.getWifiConfig.setOnClickListener {
+            LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
+        }
+        binding.setWifiConfig.setOnClickListener {
+            bp2wAdapter.setList(null)
+            bp2wAdapter.notifyDataSetChanged()
+            if (wifi != null) {
+                mAlertDialogCanCancel?.show()
+                if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W) {
+                    server.addr = "34.209.148.123"
+                    server.port = 7100
+                } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP2W) {
+                    server.addr = "212.129.241.54"
+                    server.port = 7200
+                }
+                wifiConfig.server = server
+                LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
+            } else {
+                Toast.makeText(context, "请先完成首次配置WiFi，设置成功后连接其他设备可直接配置WiFi。", Toast.LENGTH_SHORT).show()
+            }
         }
 
         binding.getMtu.setOnClickListener {
@@ -885,6 +994,55 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     }
                 }
             }
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiScanning)
+            .observe(this) {
+                handler.postDelayed({
+                    LpBleUtil.bp2GetWifiDevice(it.model)
+                }, 1000)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiDevice)
+            .observe(this) {
+                mAlertDialogCanCancel?.dismiss()
+                val data = it.data as Bp2WifiDevice
+                setReceiveCmd(data.bytes)
+                bp2wAdapter.setNewInstance(data.wifiList)
+                bp2wAdapter.notifyDataSetChanged()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSetWifiConfig)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    handler.postDelayed({
+                        LpBleUtil.bp2GetWifiConfig(it.model)
+                    }, 1000)
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetWifiConfig)
+            .observe(this) {
+                val data = it.data as Bp2WifiConfig
+                wifi?.let { w ->
+                    w.state = data.wifi.state
+                    binding.wifiInfo.text = "热点：${w.ssid}\n密码：${w.pwd}\n连接状态：${
+                        when (w.state) {
+                            0 -> "断开"
+                            1 -> "连接中"
+                            2 -> "已连接"
+                            0xff -> "密码错误"
+                            0xfd -> "找不到SSID"
+                            else -> "未配置WiFi"
+                        }
+                    }"
+                    if (((w.state == 0) && (data.wifi.ssid.isNotEmpty())) || w.state == 1) {
+                        handler.postDelayed({
+                            LpBleUtil.bp2GetWifiConfig(it.model)
+                        }, 1000)
+                    } else {
+                        mAlertDialogCanCancel?.dismiss()
+                    }
+                } ?: kotlin.run {
+                    binding.wifiInfo.text = "注意：请先完成首次配置WiFi，设置成功后连接其他设备可直接配置WiFi。"
+                }
+            }*/
         //--------------------------------le bp2w-----------------------------------
         /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wList)
             .observe(this) {
@@ -976,6 +1134,55 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     ecgAdapter.notifyDataSetChanged()
                 }
             }
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2WifiScanning)
+            .observe(this) {
+                handler.postDelayed({
+                    LpBleUtil.bp2GetWifiDevice(it.model)
+                }, 1000)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2WifiDevice)
+            .observe(this) {
+                mAlertDialogCanCancel?.dismiss()
+                val data = it.data as Bp2WifiDevice
+                setReceiveCmd(data.bytes)
+                bp2wAdapter.setNewInstance(data.wifiList)
+                bp2wAdapter.notifyDataSetChanged()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wSetWifiConfig)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    handler.postDelayed({
+                        LpBleUtil.bp2GetWifiConfig(it.model)
+                    }, 1000)
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wGetWifiConfig)
+            .observe(this) {
+                val data = it.data as Bp2WifiConfig
+                wifi?.let { w ->
+                    w.state = data.wifi.state
+                    binding.wifiInfo.text = "热点：${w.ssid}\n密码：${w.pwd}\n连接状态：${
+                        when (w.state) {
+                            0 -> "断开"
+                            1 -> "连接中"
+                            2 -> "已连接"
+                            0xff -> "密码错误"
+                            0xfd -> "找不到SSID"
+                            else -> "未配置WiFi"
+                        }
+                    }"
+                    if (((w.state == 0) && (data.wifi.ssid.isNotEmpty())) || w.state == 1) {
+                        handler.postDelayed({
+                            LpBleUtil.bp2GetWifiConfig(it.model)
+                        }, 1000)
+                    } else {
+                        mAlertDialogCanCancel?.dismiss()
+                    }
+                } ?: kotlin.run {
+                    binding.wifiInfo.text = "注意：请先完成首次配置WiFi，设置成功后连接其他设备可直接配置WiFi。"
+                }
+            }*/
         //------------------------------bpm--------------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordData)
             .observe(this) { event ->

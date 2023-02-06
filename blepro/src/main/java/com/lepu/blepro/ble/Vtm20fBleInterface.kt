@@ -110,6 +110,9 @@ class Vtm20fBleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i+len)
+            if (temp.size < 4) {
+                continue@loop
+            }
             val bleResponse = Vtm20fBleResponse.BleResponse(temp)
             onResponseReceived(bleResponse)
 

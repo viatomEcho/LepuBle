@@ -101,7 +101,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
         when(response.cmd) {
             LewBleCmd.SET_TIME -> {
                 LepuBleLog.d(tag, "model:$model,SET_TIME => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetTime).post(InterfaceEvent(model, true))
                 } else {
@@ -111,8 +111,8 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 }
             }
             LewBleCmd.GET_BATTERY -> {
-                if (response.len == 0) {
-                    LepuBleLog.d(tag, "GET_BATTERY response.len == 0")
+                if (response.len <= 0) {
+                    LepuBleLog.d(tag, "GET_BATTERY response.len <= 0")
                     return
                 }
                 val data = BatteryInfo(response.content)
@@ -120,8 +120,8 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewBatteryInfo).post(InterfaceEvent(model, data))
             }
             LewBleCmd.GET_INFO -> {
-                if (response.len == 0) {
-                    LepuBleLog.d(tag, "GET_INFO response.len == 0")
+                if (response.len <= 0) {
+                    LepuBleLog.d(tag, "GET_INFO response.len <= 0")
                     return
                 }
                 val data = DeviceInfo(response.content)
@@ -129,8 +129,8 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewDeviceInfo).post(InterfaceEvent(model, data))
             }
             LewBleCmd.BOUND_DEVICE -> {
-                if (response.len == 0) {
-                    LepuBleLog.d(tag, "BOUND_DEVICE response.len == 0")
+                if (response.len <= 0) {
+                    LepuBleLog.d(tag, "BOUND_DEVICE response.len <= 0")
                     return
                 }
                 LepuBleLog.d(tag, "model:$model,BOUND_DEVICE => success")
@@ -145,8 +145,8 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewUnBoundDevice).post(InterfaceEvent(model, true))
             }
             LewBleCmd.FIND_DEVICE -> {
-                if (response.len == 0) {
-                    LepuBleLog.d(tag, "FIND_DEVICE response.len == 0")
+                if (response.len <= 0) {
+                    LepuBleLog.d(tag, "FIND_DEVICE response.len <= 0")
                     return
                 }
                 LepuBleLog.d(tag, "model:$model,FIND_DEVICE => success")
@@ -158,8 +158,8 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 }
             }
             LewBleCmd.GET_DEVICE_NETWORK -> {
-                if (response.len == 0) {
-                    LepuBleLog.d(tag, "GET_DEVICE_NETWORK response.len == 0")
+                if (response.len <= 0) {
+                    LepuBleLog.d(tag, "GET_DEVICE_NETWORK response.len <= 0")
                     return
                 }
                 val data = DeviceNetwork(response.content)
@@ -167,8 +167,8 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewGetDeviceNetwork).post(InterfaceEvent(model, data))
             }
             LewBleCmd.GET_SYSTEM_SETTING -> {
-                if (response.len == 0) {
-                    LepuBleLog.d(tag, "GET_SYSTEM_SETTING response.len == 0")
+                if (response.len <= 0) {
+                    LepuBleLog.d(tag, "GET_SYSTEM_SETTING response.len <= 0")
                     return
                 }
                 val data = SystemSetting(response.content)
@@ -181,7 +181,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.LANGUAGE_SETTING -> {
                 LepuBleLog.d(tag, "model:$model,LANGUAGE_SETTING => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetLanguageSetting).post(InterfaceEvent(model, true))
                 } else {
@@ -192,7 +192,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.UNIT_SETTING -> {
                 LepuBleLog.d(tag, "model:$model,UNIT_SETTING => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetUnitSetting).post(InterfaceEvent(model, true))
                 } else {
@@ -203,7 +203,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.HAND_RAISE_SETTING -> {
                 LepuBleLog.d(tag, "model:$model,HAND_RAISE_SETTING => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetHandRaiseSetting).post(InterfaceEvent(model, true))
                 } else {
@@ -214,7 +214,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.LR_HAND_SETTING -> {
                 LepuBleLog.d(tag, "model:$model,LR_HAND_SETTING => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetLrHandSetting).post(InterfaceEvent(model, true))
                 } else {
@@ -226,7 +226,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
 
             LewBleCmd.NO_DISTURB_MODE -> {
                 LepuBleLog.d(tag, "model:$model,NO_DISTURB_MODE => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetNoDisturbMode).post(InterfaceEvent(model, true))
                 } else {
@@ -237,7 +237,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.APP_SWITCH -> {
                 LepuBleLog.d(tag, "model:$model,APP_SWITCH => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetAppSwitch).post(InterfaceEvent(model, true))
                 } else {
@@ -252,7 +252,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.DEVICE_MODE -> {
                 LepuBleLog.d(tag, "model:$model,DEVICE_MODE => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetDeviceMode).post(InterfaceEvent(model, true))
                 } else {
@@ -263,7 +263,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.ALARM_CLOCK_INFO -> {
                 LepuBleLog.d(tag, "model:$model,ALARM_CLOCK_INFO => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetAlarmClock).post(InterfaceEvent(model, true))
                 } else {
@@ -274,7 +274,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.PHONE_SWITCH -> {
                 LepuBleLog.d(tag, "model:$model,PHONE_SWITCH => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetPhoneSwitch).post(InterfaceEvent(model, true))
                 } else {
@@ -289,7 +289,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.MEDICINE_REMIND -> {
                 LepuBleLog.d(tag, "model:$model,MEDICINE_REMIND => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetMedicineRemind).post(InterfaceEvent(model, true))
                 } else {
@@ -299,8 +299,8 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 }
             }
             LewBleCmd.GET_MEASURE_SETTING -> {
-                if (response.len == 0) {
-                    LepuBleLog.d(tag, "GET_MEASURE_SETTING response.len == 0")
+                if (response.len <= 0) {
+                    LepuBleLog.d(tag, "GET_MEASURE_SETTING response.len <= 0")
                     return
                 }
                 val data = MeasureSetting(response.content)
@@ -313,7 +313,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.SPORT_TARGET -> {
                 LepuBleLog.d(tag, "model:$model,SPORT_TARGET => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetSportTarget).post(InterfaceEvent(model, true))
                 } else {
@@ -324,7 +324,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.TARGET_REMIND -> {
                 LepuBleLog.d(tag, "model:$model,TARGET_REMIND => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetTargetRemind).post(InterfaceEvent(model, true))
                 } else {
@@ -335,7 +335,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.SITTING_REMIND -> {
                 LepuBleLog.d(tag, "model:$model,SITTING_REMIND => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetSittingRemind).post(InterfaceEvent(model, true))
                 } else {
@@ -346,7 +346,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.HR_DETECT -> {
                 LepuBleLog.d(tag, "model:$model,HR_DETECT => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetHrDetect).post(InterfaceEvent(model, true))
                 } else {
@@ -357,7 +357,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.OXY_DETECT -> {
                 LepuBleLog.d(tag, "model:$model,OXY_DETECT => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetOxyDetect).post(InterfaceEvent(model, true))
                 } else {
@@ -369,7 +369,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
 
             LewBleCmd.USER_INFO -> {
                 LepuBleLog.d(tag, "model:$model,USER_INFO => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetUserInfo).post(InterfaceEvent(model, true))
                 } else {
@@ -380,7 +380,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.PHONE_BOOK -> {
                 LepuBleLog.d(tag, "model:$model,PHONE_BOOK => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetPhoneBook).post(InterfaceEvent(model, true))
                 } else {
@@ -391,7 +391,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.SOS_CONTACT -> {
                 LepuBleLog.d(tag, "model:$model,SOS_CONTACT => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetSosContact).post(InterfaceEvent(model, true))
                 } else {
@@ -402,7 +402,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.SECOND_SCREEN -> {
                 LepuBleLog.d(tag, "model:$model,SECOND_SCREEN => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetSecondScreen).post(InterfaceEvent(model, true))
                 } else {
@@ -413,7 +413,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.CARDS -> {
                 LepuBleLog.d(tag, "model:$model,CARDS => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetCards).post(InterfaceEvent(model, true))
                 } else {
@@ -426,8 +426,8 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 }
             }
             LewBleCmd.GET_SPORT_LIST -> {
-                if (response.len == 0) {
-                    LepuBleLog.d(tag, "GET_SPORT_LIST response.len == 0")
+                if (response.len <= 0) {
+                    LepuBleLog.d(tag, "GET_SPORT_LIST response.len <= 0")
                     return
                 }
                 listSize += byte2UInt(response.content[1])
@@ -440,8 +440,8 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 }
             }
             LewBleCmd.GET_ECG_LIST -> {
-                if (response.len == 0) {
-                    LepuBleLog.d(tag, "GET_ECG_LIST response.len == 0")
+                if (response.len <= 0) {
+                    LepuBleLog.d(tag, "GET_ECG_LIST response.len <= 0")
                     return
                 }
                 listSize += byte2UInt(response.content[1])
@@ -454,8 +454,8 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 }
             }
             LewBleCmd.GET_HR_LIST -> {
-                if (response.len == 0) {
-                    LepuBleLog.d(tag, "GET_HR_LIST response.len == 0")
+                if (response.len <= 0) {
+                    LepuBleLog.d(tag, "GET_HR_LIST response.len <= 0")
                     return
                 }
                 listSize += byte2UInt(response.content[1])
@@ -468,8 +468,8 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 }
             }
             LewBleCmd.GET_OXY_LIST -> {
-                if (response.len == 0) {
-                    LepuBleLog.d(tag, "GET_OXY_LIST response.len == 0")
+                if (response.len <= 0) {
+                    LepuBleLog.d(tag, "GET_OXY_LIST response.len <= 0")
                     return
                 }
 
@@ -483,8 +483,8 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 }
             }
             LewBleCmd.GET_SLEEP_LIST -> {
-                if (response.len == 0) {
-                    LepuBleLog.d(tag, "GET_SLEEP_LIST response.len == 0")
+                if (response.len <= 0) {
+                    LepuBleLog.d(tag, "GET_SLEEP_LIST response.len <= 0")
                     return
                 }
                 listSize += byte2UInt(response.content[1])
@@ -498,7 +498,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.HR_THRESHOLD -> {
                 LepuBleLog.d(tag, "model:$model,HR_THRESHOLD => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetHrThreshold).post(InterfaceEvent(model, true))
                 } else {
@@ -509,7 +509,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
             LewBleCmd.OXY_THRESHOLD -> {
                 LepuBleLog.d(tag, "model:$model,OXY_THRESHOLD => success")
-                if (response.len == 0) {
+                if (response.len <= 0) {
                     LepuBleLog.d(tag, "model:$model,set => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetOxyThreshold).post(InterfaceEvent(model, true))
                 } else {
@@ -519,8 +519,8 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 }
             }
             LewBleCmd.RT_DATA -> {
-                if (response.len == 0) {
-                    LepuBleLog.d(tag, "RT_DATA response.len == 0")
+                if (response.len <= 0) {
+                    LepuBleLog.d(tag, "RT_DATA response.len <= 0")
                     return
                 }
                 val data = RtData(response.content)
@@ -543,8 +543,8 @@ class LewBleInterface(model: Int): BleInterface(model) {
 
             // 以下部分是之前协议，需测试手表是否兼容
             LewBleCmd.GET_FILE_LIST -> {
-                if (response.len == 0) {
-                    LepuBleLog.d(tag, "GET_FILE_LIST response.len == 0")
+                if (response.len <= 0) {
+                    LepuBleLog.d(tag, "GET_FILE_LIST response.len <= 0")
                     return
                 }
                 val data = trimStr(com.lepu.blepro.utils.toString(response.content.copyOfRange(1, response.content.size)))
@@ -557,7 +557,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,READ_FILE_START => success")
                 if (response.pkgType == 0x01.toByte()) {
                     val fileSize = toUInt(response.content)
-                    if (fileSize == 0) {
+                    if (fileSize <= 0) {
                         sendCmd(LewBleCmd.readFileEnd())
                         return
                     }
@@ -583,9 +583,9 @@ class LewBleInterface(model: Int): BleInterface(model) {
                         return
                     }
                     // 心电文件数据不知为何有空数据的文件
-                    if (response.len == 0) {
+                    if (response.len <= 0) {
                         sendCmd(LewBleCmd.readFileEnd())
-                        LepuBleLog.d(tag, "READ_FILE_DATA response.len == 0")
+                        LepuBleLog.d(tag, "READ_FILE_DATA response.len <= 0")
                         return
                     }
 

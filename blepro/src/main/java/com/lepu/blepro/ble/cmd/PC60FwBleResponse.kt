@@ -31,7 +31,7 @@ class PC60FwBleResponse{
         private var valid: Boolean = true
 
         init {
-            content = if (length == 0) ByteArray(0) else bytes.copyOfRange(5, bytes.size - 1)
+            content = if (length <= 0) ByteArray(0) else bytes.copyOfRange(5, bytes.size - 1)
             if (bytes[0] != HEAD_0) {
                 valid = false
             } else if (bytes[1] != HEAD_1) {

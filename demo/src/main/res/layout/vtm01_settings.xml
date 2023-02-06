@@ -5,11 +5,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        <CheckBox
-            android:id="@+id/er2_set_config"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="心跳音" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -22,7 +17,7 @@
                 android:textSize="18sp"
                 android:text="硬件版本:" />
             <EditText
-                android:id="@+id/er2_version"
+                android:id="@+id/version"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="A-Z"
@@ -40,7 +35,7 @@
                 android:textSize="18sp"
                 android:text="sn:" />
             <EditText
-                android:id="@+id/er2_sn"
+                android:id="@+id/sn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="长度:10位"
@@ -58,14 +53,14 @@
                 android:textSize="18sp"
                 android:text="branch code:" />
             <EditText
-                android:id="@+id/er2_code"
+                android:id="@+id/code"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="长度:8位"
                 android:layout_marginStart="@dimen/dp_10"/>
         </LinearLayout>
         <Button
-            android:id="@+id/er2_factory_config"
+            android:id="@+id/factory_config"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"

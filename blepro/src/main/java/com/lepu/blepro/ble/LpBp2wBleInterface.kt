@@ -123,8 +123,8 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
 
         when (bleResponse.cmd) {
             GET_INFO -> {
-                if (bleResponse.len == 0 || bleResponse.content.size < 38) {
-                    LepuBleLog.d(tag, "GET_INFO bleResponse.len == 0")
+                if (bleResponse.len <= 0 || bleResponse.content.size < 38) {
+                    LepuBleLog.d(tag, "GET_INFO bleResponse.len <= 0")
                     return
                 }
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success")
@@ -150,8 +150,8 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             RT_STATE -> {
-                if (bleResponse.len == 0 || bleResponse.content.size < 7) {
-                    LepuBleLog.d(tag, "RT_STATE bleResponse.len == 0")
+                if (bleResponse.len <= 0 || bleResponse.content.size < 7) {
+                    LepuBleLog.d(tag, "RT_STATE bleResponse.len <= 0")
                     return
                 }
                 // 主机状态
@@ -189,7 +189,7 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                 fileContent = null
                 fileSize = toUInt(bleResponse.content.copyOfRange(0, 4))
                 LepuBleLog.d(tag, "download file $fileName CMD_FILE_READ_START fileSize == $fileSize")
-                if (fileSize == 0) {
+                if (fileSize <= 0) {
                     sendCmd(readFileEnd())
                 } else {
                     sendCmd(readFileData(0))
@@ -397,7 +397,7 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                     return
                 }
                 LepuBleLog.d(tag, "model:$model,WRITE_FILE_START => success")
-                if (fileSize == 0) {
+                if (fileSize <= 0) {
                     sendCmd(writeFileEnd())
                 } else {
                     curSize = if (fileSize < chunkSize) {
@@ -452,8 +452,8 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
 
             //实时波形
             RT_DATA -> {
-                if (bleResponse.len == 0 || bleResponse.content.size < 32) {
-                    LepuBleLog.d(tag, "RT_DATA bleResponse.len == 0")
+                if (bleResponse.len <= 0 || bleResponse.content.size < 32) {
+                    LepuBleLog.d(tag, "RT_DATA bleResponse.len <= 0")
                     return
                 }
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success")
@@ -490,8 +490,8 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             GET_CONFIG -> {
-                if (bleResponse.len == 0 || bleResponse.content.size < 27) {
-                    LepuBleLog.d(tag, "GET_CONFIG bleResponse.len == 0")
+                if (bleResponse.len <= 0 || bleResponse.content.size < 27) {
+                    LepuBleLog.d(tag, "GET_CONFIG bleResponse.len <= 0")
                     return
                 }
                 LepuBleLog.d(tag, "model:$model,GET_CONFIG => success")
@@ -585,8 +585,8 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             GET_WIFI_CONFIG -> {
-                if (bleResponse.len == 0) {
-                    LepuBleLog.d(tag, "GET_WIFI_CONFIG bleResponse.len == 0")
+                if (bleResponse.len <= 0) {
+                    LepuBleLog.d(tag, "GET_WIFI_CONFIG bleResponse.len <= 0")
                     return
                 }
                 LepuBleLog.d(tag, "model:$model,GET_WIFI_CONFIG => success")
@@ -629,8 +629,8 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             GET_ECG_LIST_CRC -> {
-                if (bleResponse.len == 0) {
-                    LepuBleLog.d(tag, "GET_ECG_LIST_CRC bleResponse.len == 0")
+                if (bleResponse.len <= 0) {
+                    LepuBleLog.d(tag, "GET_ECG_LIST_CRC bleResponse.len <= 0")
                     return
                 }
                 val crc = FileListCrc(FileType.ECG_TYPE, bleResponse.content)
@@ -638,8 +638,8 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,GET_ECG_LIST_CRC => success")
             }
             GET_BP_LIST_CRC -> {
-                if (bleResponse.len == 0) {
-                    LepuBleLog.d(tag, "GET_BP_LIST_CRC bleResponse.len == 0")
+                if (bleResponse.len <= 0) {
+                    LepuBleLog.d(tag, "GET_BP_LIST_CRC bleResponse.len <= 0")
                     return
                 }
                 val crc = FileListCrc(FileType.BP_TYPE, bleResponse.content)
@@ -647,8 +647,8 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,GET_BP_LIST_CRC => success")
             }
             GET_USER_LIST_CRC -> {
-                if (bleResponse.len == 0) {
-                    LepuBleLog.d(tag, "GET_USER_LIST_CRC bleResponse.len == 0")
+                if (bleResponse.len <= 0) {
+                    LepuBleLog.d(tag, "GET_USER_LIST_CRC bleResponse.len <= 0")
                     return
                 }
                 val crc = FileListCrc(FileType.USER_TYPE, bleResponse.content)

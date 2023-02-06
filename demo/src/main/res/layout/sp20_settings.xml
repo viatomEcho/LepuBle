@@ -7,12 +7,14 @@
         android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:text="血氧过低阈值："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -32,12 +34,14 @@
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:text="脉率过低阈值："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -57,12 +61,14 @@
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:text="脉率过高阈值："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -80,15 +86,12 @@
                     android:layout_alignParentRight="true"/>
             </RelativeLayout>
         </LinearLayout>
-        <LinearLayout
+        <Button
+            android:id="@+id/get_battery"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <Button
-                android:id="@+id/get_battery"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="获取电量"/>
-        </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="获取电量"/>
     </LinearLayout>
 
 </layout>

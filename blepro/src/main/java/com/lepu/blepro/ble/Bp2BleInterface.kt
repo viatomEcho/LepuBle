@@ -174,7 +174,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 fileContent = null
                 fileSize = toUInt(bleResponse.content.copyOfRange(0, 4))
                 LepuBleLog.d(tag, "download file $fileName CMD_FILE_READ_START fileSize == $fileSize")
-                if (fileSize == 0) {
+                if (fileSize <= 0) {
                     sendCmd(fileReadEnd())
                 } else {
                     sendCmd(fileReadPkg(0))

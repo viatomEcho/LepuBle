@@ -5,6 +5,7 @@ import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
+import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.LepuDevice
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
@@ -126,6 +127,15 @@ class Vtm01BleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model,SLEEP_MODE_OFF => failed")
                 }
             }
+            Vtm01BleCmd.BURN_FACTORY_INFO -> {
+                if (response.type == 1) {
+                    LepuBleLog.d(tag, "model:$model,BURN_FACTORY_INFO => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01BurnFactoryInfo).post(InterfaceEvent(model, true))
+                } else {
+                    LepuBleLog.d(tag, "model:$model,BURN_FACTORY_INFO => failed")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01BurnFactoryInfo).post(InterfaceEvent(model, false))
+                }
+            }
         }
     }
 
@@ -195,6 +205,9 @@ class Vtm01BleInterface(model: Int): BleInterface(model) {
         }
     }
 
+    fun burnFactoryInfo(config: FactoryConfig) {
+        sendCmd(Vtm01BleCmd.burnFactoryInfo(config.convert2Data()))
+    }
     override fun getFileList() {
         LepuBleLog.e(tag, "getFileList not yet implemented")
     }

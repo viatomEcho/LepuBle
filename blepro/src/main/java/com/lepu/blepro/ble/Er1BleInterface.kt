@@ -151,7 +151,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
 
                 if (response.pkgType == 0x01.toByte()) {
                     val fileSize = toUInt(response.content)
-                    if (fileSize == 0) {
+                    if (fileSize <= 0) {
                         sendCmd(Er1BleCmd.readFileEnd())
                         return
                     }

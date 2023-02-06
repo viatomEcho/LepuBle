@@ -1,6 +1,8 @@
 package com.lepu.blepro.ble.cmd
 
+import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.data.CheckmeLeEcgDiagnosis
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.utils.ByteUtils.*
 import com.lepu.blepro.utils.DateUtil.getSecondTimestamp
 import com.lepu.blepro.utils.bytesToHex
@@ -42,17 +44,13 @@ object CheckmeLeBleResponse{
         var application:String   //
 
         init {
+//            LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseContent).post(bytes)
             val data = String(bytes)
-            infoStr = if (data.contains("{")) {
+            infoStr = if (data.contains("{") && data.contains("}")) {
                 JSONObject(data)
             } else {
                 JSONObject()
             }
-//            try {
-//                var infoStr = JSONObject(String(bytes))
-//            } catch (e: JSONException) {
-//                LogUtils.d(String(bytes))
-//            }
             region = infoStrGetString("Region")
             model = infoStrGetString("Model")
             hwVersion = infoStrGetString("HardwareVer")

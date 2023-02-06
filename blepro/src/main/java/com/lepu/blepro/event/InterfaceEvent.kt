@@ -787,6 +787,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventVtm01FactoryReset = "com.lepu.ble.vtm01.factory.reset"
             const val EventVtm01GetConfig = "com.lepu.ble.vtm01.get.config"
             const val EventVtm01SleepMode = "com.lepu.ble.vtm01.sleep.mode"
+            const val EventVtm01BurnFactoryInfo = "com.lepu.ble.vtm01.burn.factory.info"
         }
     }
 

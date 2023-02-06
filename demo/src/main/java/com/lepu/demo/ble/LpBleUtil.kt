@@ -19,6 +19,7 @@ import com.lepu.blepro.ext.er1.Er1Config
 import com.lepu.blepro.ext.er2.Er2Config
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.demo.BuildConfig
+import com.lepu.demo.cofig.Constant
 import com.lepu.demo.cofig.Constant.BluetoothConfig
 
 class LpBleUtil {
@@ -137,7 +138,7 @@ class LpBleUtil {
 
         @JvmOverloads
         fun startScan(scanModel: IntArray, needPair: Boolean = false) {
-            BleServiceHelper.startScan(scanModel, needPair)
+            BleServiceHelper.startScan(scanModel, BluetoothConfig.needPair)
         }
 
         fun startScanByName(deviceName: String, scanModel: Int? = null) {
@@ -250,6 +251,9 @@ class LpBleUtil {
         }
         fun setTime(model: Int) {
             BleServiceHelper.syncTime(model)
+        }
+        fun setNeedPair(needPair : Boolean) {
+            BleServiceHelper.setNeedPair(needPair)
         }
 
         /**

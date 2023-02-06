@@ -7,37 +7,30 @@
         android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:text="设备背光等级："/>
-            <RelativeLayout
+            <Spinner
+                android:id="@+id/light_level_spinner"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <EditText
-                    android:id="@+id/light_level"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="0-5"/>
-                <Button
-                    android:id="@+id/set_light_level"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="确定"
-                    android:layout_alignParentRight="true"/>
-            </RelativeLayout>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:text="血氧过低阈值："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -57,12 +50,14 @@
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:text="脉率过低阈值："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -82,12 +77,14 @@
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:text="脉率过高阈值："/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -108,7 +105,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-            <Button
+            <CheckBox
                 android:id="@+id/set_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -117,7 +114,7 @@
                 android:id="@+id/get_battery"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="@dimen/dp_10"
                 android:text="获取电量"/>
         </LinearLayout>
     </LinearLayout>

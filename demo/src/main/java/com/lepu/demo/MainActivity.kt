@@ -32,17 +32,14 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
-import com.lepu.blepro.utils.ByteUtils
-import com.lepu.blepro.utils.HexString
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.CHECK_BLE_REQUEST_CODE
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.SUPPORT_MODELS
-import com.lepu.demo.data.entity.DeviceEntity
 import com.lepu.demo.util.CollectUtil
 import com.permissionx.guolindev.PermissionX
-import java.util.*
 
 class MainActivity : AppCompatActivity() , BleChangeObserver {
     private val TAG: String = "MainActivity"
@@ -132,6 +129,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             .observe(this) {
                 Constant.BluetoothConfig.bleSdkServiceEnable = true
                 afterLpBleInit()
+            }
+        LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseContent)
+            .observe(this) {
+                Log.d(TAG, "${bytesToHex(it)}")
             }
         //-------------------------er1---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetTime)
@@ -260,6 +261,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     else -> Toast.makeText(this, "BP2 完成时间同步", Toast.LENGTH_SHORT).show()
                 }
                 LpBleUtil.getInfo(it.model)
+                LpBleUtil.bp2GetRtState(it.model)
             }
         //bp2 info
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Info)
@@ -280,11 +282,19 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._bp2Info.value = it
                 }
             }
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2State)
+            .observe(this) { event ->
+                (event.data as Bp2BleRtState).let {
+                    viewModel._battery.value = "${it.battery.percent} %"
+                }
+            }*/
         //-------------------------bp2w---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSyncTime)
             .observe(this) {
                 Toast.makeText(this, "BP2W 完成时间同步", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
+                LpBleUtil.bp2GetRtState(it.model)
+                LpBleUtil.bp2GetWifiConfig(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wInfo)
             .observe(this) { event ->
@@ -293,11 +303,19 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._er1Info.value = it
                 }
             }
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wRtState)
+            .observe(this) { event ->
+                (event.data as Bp2BleRtState).let {
+                    viewModel._battery.value = "${it.battery.percent} %"
+                }
+            }*/
         //-------------------------LeBp2w---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wSyncUtcTime)
             .observe(this) {
                 Toast.makeText(this, "LP-BP2W 完成UTC时间同步", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
+                LpBleUtil.bp2GetRtState(it.model)
+                LpBleUtil.bp2GetWifiConfig(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wInfo)
             .observe(this) { event ->
@@ -306,6 +324,12 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._er1Info.value = it
                 }
             }
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wRtState)
+            .observe(this) { event ->
+                (event.data as Bp2BleRtState).let {
+                    viewModel._battery.value = "${it.battery.percent} %"
+                }
+            }*/
         //-------------------------bpm---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmSyncTime)
             .observe(this) {

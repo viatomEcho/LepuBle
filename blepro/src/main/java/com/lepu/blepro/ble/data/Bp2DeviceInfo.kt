@@ -48,6 +48,9 @@ class Bp2DeviceInfo {
         this.curTime = c.timeInMillis
         this.protocolMaxLen = toUInt(bytes.copyOfRange(31, 33))
         this.snLen = bytes[37].toInt()
+        if (snLen > 18) {
+            snLen = 18
+        }
         this.sn = trimStr(toString(bytes.copyOfRange(38, 38 + snLen)))
     }
 

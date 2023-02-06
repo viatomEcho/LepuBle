@@ -7,7 +7,9 @@
         android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp">
             <EditText
                 android:id="@+id/er1_hr1"
                 android:layout_width="wrap_content"
@@ -33,31 +35,31 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             android:textColor="@color/colorRed"
             android:text="阈值1范围：80-170"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             android:textColor="@color/colorRed"
             android:text="阈值2范围：120-200"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             android:textColor="@color/colorRed"
-            android:text="阈值1小于阈值2"
-            android:layout_marginBottom="@dimen/dp_10"/>
+            android:text="阈值1小于阈值2"/>
+        <CheckBox
+            android:id="@+id/er1_set_sound"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="震动提醒"/>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <Button
-                android:id="@+id/er1_set_sound"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="震动"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -69,11 +71,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="A-Z"
-                android:layout_marginStart="20dp"/>
+                android:layout_marginStart="@dimen/dp_10"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -85,11 +89,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="长度:10位"
-                android:layout_marginStart="20dp"/>
+                android:layout_marginStart="@dimen/dp_10"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -101,12 +107,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="长度:8位"
-                android:layout_marginStart="20dp"/>
+                android:layout_marginStart="@dimen/dp_10"/>
         </LinearLayout>
         <Button
             android:id="@+id/er1_factory_config"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             android:text="烧录" />
     </LinearLayout>
 

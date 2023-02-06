@@ -154,7 +154,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      * 订阅者集合
      * 用于监听蓝牙状态的改变
      */
-    private var stateSubscriber: ArrayList<BleChangeObserver> = ArrayList()
+//    private var stateSubscriber: ArrayList<BleChangeObserver> = ArrayList()
+    private var stateSubscriber: HashSet<BleChangeObserver> = HashSet()
 
     /**
      * 添加订阅者

@@ -95,7 +95,16 @@ public class BluetoothController {
         LepuBleLog.d("get device: " + model + " -> " + list.size());
         return list;
     }
-
+    synchronized public static ArrayList<Bluetooth> getDevicesByRssi(int rssi) {
+        ArrayList<Bluetooth> list = new ArrayList<>();
+        for (Bluetooth b : bleDevices) {
+            if (b.getRssi() > rssi) {
+                list.add(b);
+            }
+        }
+        LepuBleLog.d("get device: " + rssi + " -> " + list.size());
+        return list;
+    }
     synchronized public static ArrayList<Bluetooth> getConnectedDevices() {
         return connectedDevices;
     }
