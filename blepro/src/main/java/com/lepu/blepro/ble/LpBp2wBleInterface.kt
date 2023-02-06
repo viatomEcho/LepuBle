@@ -290,7 +290,7 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                                 FileType.ECG_TYPE -> {
                                     for (r in LeBp2wEcgList(data.content).ecgFileList) {
                                         val record = EcgRecord()
-                                        record.startIime = r.time
+                                        record.startTime = r.time
                                         record.fileName = r.fileName
                                         record.uid = r.uid
                                         record.recordingTime = r.recordingTime
@@ -367,7 +367,7 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                                 FileType.ECG_TYPE -> {
                                     for (r in LeBp2wEcgList(data.content).ecgFileList) {
                                         val record = EcgRecord()
-                                        record.startIime = r.time
+                                        record.startTime = r.time
                                         record.fileName = r.fileName
                                         record.uid = r.uid
                                         record.recordingTime = r.recordingTime

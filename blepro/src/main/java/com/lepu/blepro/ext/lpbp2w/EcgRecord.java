@@ -1,7 +1,7 @@
 package com.lepu.blepro.ext.lpbp2w;
 
 public class EcgRecord {
-    private long startIime;          // 测量时间戳s
+    private long startTime;          // 测量时间戳s
     private String fileName;         // 文件名
     private int uid;                 // 用户id
     private int recordingTime;       // 记录时长 单位s
@@ -12,12 +12,12 @@ public class EcgRecord {
     private int pvcs;                // 单位个
     private int qtc;                 // 单位ms
 
-    public long getStartIime() {
-        return startIime;
+    public long getStartTime() {
+        return startTime;
     }
 
-    public void setStartIime(long startIime) {
-        this.startIime = startIime;
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
     }
 
     public String getFileName() {
@@ -95,7 +95,7 @@ public class EcgRecord {
     @Override
     public String toString() {
         return "EcgRecord{" +
-                "startIime=" + startIime +
+                "startTime=" + startTime +
                 ", fileName='" + fileName + '\'' +
                 ", uid=" + uid +
                 ", recordingTime=" + recordingTime +
