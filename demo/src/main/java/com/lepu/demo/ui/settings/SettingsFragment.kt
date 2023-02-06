@@ -3146,12 +3146,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.lepodLayout.modeSpinner.setSelection(data)
                 Toast.makeText(context, "获取mode成功", Toast.LENGTH_SHORT).show()
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodRtParam)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodRtParam)
             .observe(this) {
                 val data = it.data as LepodBleResponse.RtParam
                 binding.lepodLayout.deviceInfo.text = "$data"
                 Toast.makeText(context, "获取实时参数成功", Toast.LENGTH_SHORT).show()
-            }
+            }*/
         // --------------------------vtm01--------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01BurnFactoryInfo)
             .observe(this) {

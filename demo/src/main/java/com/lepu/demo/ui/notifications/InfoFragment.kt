@@ -1572,7 +1572,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 Toast.makeText(context, "没有文件", Toast.LENGTH_SHORT).show()
             }
         //------------------------------ER3--------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FileList)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FileList)
             .observe(this) { event ->
                 (event.data as Er3BleResponse.FileList).let {
                     binding.info.text = it.toString()
@@ -1612,7 +1612,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         mAlertDialog?.dismiss()
                     }
                 }
-            }
+            }*/
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3Reset)
             .observe(this) {
                 Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()
@@ -1626,7 +1626,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 Toast.makeText(context, "恢复生产状态成功", Toast.LENGTH_SHORT).show()
             }
         //------------------------------Lepod--------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodFileList)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodFileList)
             .observe(this) { event ->
                 (event.data as LepodBleResponse.FileList).let {
                     binding.info.text = it.toString()
@@ -1666,7 +1666,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         mAlertDialog?.dismiss()
                     }
                 }
-            }
+            }*/
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodReset)
             .observe(this) {
                 Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()

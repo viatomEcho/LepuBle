@@ -46,7 +46,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      * 包含model: MODEL_ER1(ER1 xxxx), MODEL_ER1_N(VBeat xxxx), MODEL_HHM1(HHM1 xxxx)
      * 功能：
      * 1.获取设备信息：BleServiceHelper.er1GetInfo()
-     * 2.获取实时心电数据：BleServiceHelper.startRtTask()
+     * 2.获取实时心电数据：BleServiceHelper.startRtTask()/BleServiceHelper.stopRtTask()
      * 3.获取文件列表：BleServiceHelper.er1GetFileList()
      * 4.读取设备文件：BleServiceHelper.er1ReadFile()
      * 5.设置/获取配置信息：BleServiceHelper.er1SetConfig()/BleServiceHelper.er1GetConfig()
@@ -99,7 +99,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      * 包含model: MODEL_BP2(BP2 xxxx), MODEL_BP2A(BP2A xxxx), MODEL_BP2T(BP2T xxxx)
      * 功能：
      * 1.获取设备信息：BleServiceHelper.bp2GetInfo()
-     * 2.获取实时心电/血压数据：BleServiceHelper.startRtTask()
+     * 2.获取实时心电、血压数据：BleServiceHelper.startRtTask()/BleServiceHelper.stopRtTask()
      * 3.获取文件列表：BleServiceHelper.bp2GetFileList()
      * 4.读取设备文件：BleServiceHelper.bp2ReadFile()
      * 5.设置/获取配置信息：BleServiceHelper.bp2SetConfig()/BleServiceHelper.bp2GetConfig()
@@ -130,7 +130,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      * 包含model: MODEL_BP2W(BP2W xxxx)
      * 功能：
      * 1.获取设备信息：BleServiceHelper.bp2wGetInfo()
-     * 2.获取实时心电/血压数据：BleServiceHelper.startRtTask()
+     * 2.获取实时心电、血压数据：BleServiceHelper.startRtTask()/BleServiceHelper.stopRtTask()
      * 3.获取文件列表：BleServiceHelper.bp2wGetFileList()
      * 4.读取设备文件：BleServiceHelper.bp2wReadFile()
      * 5.设置/获取配置信息：BleServiceHelper.bp2wSetConfig()/BleServiceHelper.bp2wGetConfig()
@@ -166,7 +166,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      * 包含model: MODEL_LP_BP2W(LP-BP2W xxxx)
      * 功能：
      * 1.获取设备信息：BleServiceHelper.lpBp2wGetInfo()
-     * 2.获取实时心电/血压数据：BleServiceHelper.startRtTask()
+     * 2.获取实时心电、血压数据：BleServiceHelper.startRtTask()/BleServiceHelper.stopRtTask()
      * 3.获取用户列表：BleServiceHelper.lpBp2wGetFileList(Constant.LpBp2wListType.USER_TYPE)
      * 4.获取血压列表：BleServiceHelper.lpBp2wGetFileList(Constant.LpBp2wListType.BP_TYPE)
      * 5.获取心电列表：BleServiceHelper.lpBp2wGetFileList(Constant.LpBp2wListType.ECG_TYPE)
@@ -211,7 +211,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      *           MODEL_DUOEK(DuoEK xxxx), MODEL_HHM2(HHM2 xxxx), MODEL_HHM3(HHM3 xxxx)
      * 功能：
      * 1.获取设备信息：BleServiceHelper.er2GetInfo()
-     * 2.获取实时心电数据：BleServiceHelper.startRtTask()
+     * 2.获取实时心电数据：BleServiceHelper.startRtTask()/BleServiceHelper.stopRtTask()
      * 3.获取文件列表：BleServiceHelper.er2GetFileList()
      * 4.读取设备文件：BleServiceHelper.er2ReadFile()
      * 5.设置/获取配置信息：BleServiceHelper.er2SetConfig()
@@ -417,7 +417,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      * 功能：
      * 1.获取设备信息：BleServiceHelper.checkmePodGetInfo()
      * 2.获取文件列表：BleServiceHelper.checkmePodGetFileList()
-     * 3.获取实时血氧/体温数据：BleServiceHelper.startRtTask()
+     * 3.获取实时血氧、体温数据：BleServiceHelper.startRtTask()/BleServiceHelper.stopRtTask()
      */
     interface CheckmePod {
         companion object {
@@ -545,6 +545,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     /**
      * Lpm311BleInterface
      * 包含model: MODEL_LPM311(LPM311)
+     * 功能：
      * 1.获取血脂数据：BleServiceHelper.lpm311GetData()
      */
     interface LPM311 {
@@ -556,6 +557,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     /**
      * PoctorM3102BleInterface
      * 包含model: MODEL_POCTOR_M3102(PoctorM3102)
+     * 功能：
      * 1.实时血糖/尿酸/血酮数据：：设备测量完成自动上发
      */
     interface PoctorM3102 {
@@ -567,6 +569,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     /**
      * BiolandBgmBleInterface
      * 包含model: MODEL_BIOLAND_BGM(Bioland-BGM)
+     * 功能：
      * 1.获取设备信息：BleServiceHelper.biolandBgmGetInfo()
      * 2.获取历史数据（最新一条）：BleServiceHelper.biolandBgmGetGluData()
      */
@@ -576,6 +579,51 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBiolandBgmCountDown = "com.lepu.ble.bioland.bgm.count.down"         // int
             const val EventBiolandBgmGluData = "com.lepu.ble.bioland.bgm.glu.data"             // com.lepu.blepro.ext.bioland.GluData
             const val EventBiolandBgmNoGluData = "com.lepu.ble.bioland.bgm.no.glu.data"        // boolean
+        }
+    }
+
+    /**
+     * Er3BleInterface发出的通知
+     * 包含model: MODEL_ER3
+     * 功能：
+     * 1.获取设备信息：BleServiceHelper.er3GetInfo()
+     * 2.获取实时数据：BleServiceHelper.startRtTask()/BleServiceHelper.stopRtTask()
+     * 3.设置/获取配置信息：BleServiceHelper.er3SetConfig()/BleServiceHelper.er3GetConfig()
+     * 4.复位：BleServiceHelper.er3Reset()
+     * 5.恢复出厂设置：BleServiceHelper.er3FactoryReset()
+     * 6.恢复生产出厂状态：BleServiceHelper.er3FactoryResetAll()
+     */
+    interface ER3 {
+        companion object {
+            const val EventEr3Info = "com.lepu.ble.er3.info"                                  // 设备信息 com.lepu.blepro.ext.er3.DeviceInfo
+            const val EventEr3RtData = "com.lepu.ble.er3.rtData"                              // 实时数据 com.lepu.blepro.ext.er3.RtData
+            const val EventEr3Reset = "com.lepu.ble.er3.reset"                                // 复位 boolean
+            const val EventEr3FactoryReset = "com.lepu.ble.er3.factory.reset"                 // 恢复出厂设置 boolean
+            const val EventEr3FactoryResetAll = "com.lepu.ble.er3.factory.reset.all"          // 恢复生产出厂状态 boolean
+            const val EventEr3GetConfig = "com.lepu.ble.er3.get.config"                       // 获取配置参数 int
+            const val EventEr3GetConfigError = "com.lepu.ble.er3.get.config.error"            // 获取配置参数失败 boolean
+            const val EventEr3SetConfig = "com.lepu.ble.er3.set.config"                       // 设置模式 boolean
+            const val EventEr3SetTime = "com.lepu.ble.er3.set.time"                           // 同步时间 boolean
+        }
+    }
+
+    /**
+     * LepodBleInterface发出的通知
+     * 包含model: MODEL_LEPOD
+     */
+    interface Lepod {
+        companion object {
+            const val EventLepodInfo = "com.lepu.ble.lepod.info"                                  // 设备信息 com.lepu.blepro.ext.lepod.DeviceInfo
+            const val EventLepodRtData = "com.lepu.ble.lepod.rtData"                              // 实时数据 com.lepu.blepro.ext.lepod.RtData
+            const val EventLepodReset = "com.lepu.ble.lepod.reset"                                // 复位 boolean
+            const val EventLepodFactoryReset = "com.lepu.ble.lepod.factory.reset"                 // 恢复出厂设置 boolean
+            const val EventLepodFactoryResetAll = "com.lepu.ble.lepod.factory.reset.all"          // 恢复生产出厂状态 boolean
+            const val EventLepodGetConfig = "com.lepu.ble.lepod.get.config"                       // 获取配置参数 int
+            const val EventLepodGetConfigError = "com.lepu.ble.lepod.get.config.error"            // 获取配置参数失败 boolean
+            const val EventLepodSetConfig = "com.lepu.ble.lepod.set.config"                       // 设置模式 boolean
+            const val EventLepodSetTime = "com.lepu.ble.lepod.set.time"                           // 同步时间 boolean
+            const val EventLepodEcgStart = "com.lepu.ble.lepod.ecg.start"                         // 开始测量 boolean
+            const val EventLepodEcgStop = "com.lepu.ble.lepod.ecg.stop"                           // 结束测量 boolean
         }
     }
 
@@ -724,56 +772,6 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventLeS1Reset = "com.lepu.ble.les1.reset"                                // 复位 boolean
             const val EventLeS1ResetFactory = "com.lepu.ble.les1.reset.factory"                 // 恢复出厂设置 boolean
             const val EventLeS1SetTime = "com.lepu.ble.les1.set.time"                           // 同步时间 boolean
-        }
-    }
-    /**
-     * Er3BleInterface发出的通知
-     * 包含model: MODEL_ER3
-     */
-    interface ER3 {
-        companion object {
-            const val EventEr3Info = "com.lepu.ble.er3.info"                                  // 设备信息 LepuDevice
-            const val EventEr3RtData = "com.lepu.ble.er3.rtData"                              // 实时数据 Er3BleResponse.RtData
-            const val EventEr3FileList = "com.lepu.ble.er3.fileList"                          // 文件列表 Er3BleResponse.FileList
-            const val EventEr3ReadFileError = "com.lepu.ble.er3.read.file.error"              // 传输文件出错 true
-            const val EventEr3ReadingFileProgress = "com.lepu.ble.er3.reading.file.progress"  // 传输文件进度 int(0-100)
-            const val EventEr3ReadFileComplete = "com.lepu.ble.er3.read.file.complete"        // 传输文件完成 ByteArray
-            const val EventEr3Reset = "com.lepu.ble.er3.reset"                                // 复位 boolean
-            const val EventEr3FactoryReset = "com.lepu.ble.er3.factory.reset"                 // 恢复出厂设置 boolean
-            const val EventEr3FactoryResetAll = "com.lepu.ble.er3.factory.reset.all"          // 恢复生产出厂状态 boolean
-            const val EventEr3GetConfig = "com.lepu.ble.er3.get.config"                       // 获取配置参数 int
-            const val EventEr3GetConfigError = "com.lepu.ble.er3.get.config.error"            // 获取配置参数失败 boolean
-            const val EventEr3SetConfig = "com.lepu.ble.er3.set.config"                       // 设置模式 boolean
-            const val EventEr3SetTime = "com.lepu.ble.er3.set.time"                           // 同步时间 boolean
-            const val EventEr3BurnFactoryInfo = "com.lepu.ble.er3.burn.factory.info"          // 烧录出厂信息 boolean
-            const val EventEr3BurnLockFlash = "com.lepu.ble.er3.burn.lock.flash"              // 加密Flash boolean
-        }
-    }
-
-    /**
-     * LepodBleInterface发出的通知
-     * 包含model: MODEL_LEPOD
-     */
-    interface Lepod {
-        companion object {
-            const val EventLepodInfo = "com.lepu.ble.lepod.info"                                  // 设备信息 LepuDevice
-            const val EventLepodRtParam = "com.lepu.ble.lepod.rtParam"                            // 实时参数 LepodBleResponse.RtParam
-            const val EventLepodRtData = "com.lepu.ble.lepod.rtData"                              // 实时数据 LepodBleResponse.RtData
-            const val EventLepodFileList = "com.lepu.ble.lepod.fileList"                          // 文件列表 LepodBleResponse.FileList
-            const val EventLepodReadFileError = "com.lepu.ble.lepod.read.file.error"              // 传输文件出错 true
-            const val EventLepodReadingFileProgress = "com.lepu.ble.lepod.reading.file.progress"  // 传输文件进度 int(0-100)
-            const val EventLepodReadFileComplete = "com.lepu.ble.lepod.read.file.complete"        // 传输文件完成 ByteArray
-            const val EventLepodReset = "com.lepu.ble.lepod.reset"                                // 复位 boolean
-            const val EventLepodFactoryReset = "com.lepu.ble.lepod.factory.reset"                 // 恢复出厂设置 boolean
-            const val EventLepodFactoryResetAll = "com.lepu.ble.lepod.factory.reset.all"          // 恢复生产出厂状态 boolean
-            const val EventLepodGetConfig = "com.lepu.ble.lepod.get.config"                       // 获取配置参数 int
-            const val EventLepodGetConfigError = "com.lepu.ble.lepod.get.config.error"            // 获取配置参数失败 boolean
-            const val EventLepodSetConfig = "com.lepu.ble.lepod.set.config"                       // 设置模式 boolean
-            const val EventLepodSetTime = "com.lepu.ble.lepod.set.time"                           // 同步时间 boolean
-            const val EventLepodBurnFactoryInfo = "com.lepu.ble.lepod.burn.factory.info"          // 烧录出厂信息 boolean
-            const val EventLepodBurnLockFlash = "com.lepu.ble.lepod.burn.lock.flash"              // 加密Flash boolean
-            const val EventLepodEcgStart = "com.lepu.ble.lepod.ecg.start"                         // 开始测量 boolean
-            const val EventLepodEcgStop = "com.lepu.ble.lepod.ecg.stop"                           // 结束测量 boolean
         }
     }
 

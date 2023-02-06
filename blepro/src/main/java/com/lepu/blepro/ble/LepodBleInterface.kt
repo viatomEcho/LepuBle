@@ -6,6 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ext.lepod.*
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
@@ -28,6 +29,11 @@ import kotlin.experimental.inv
  */
 class LepodBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "LepodBleInterface"
+
+    private var deviceInfo = DeviceInfo()
+    private var rtData = RtData()
+    private var rtParam = RtParam()
+    private var rtWave = RtWave()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         if (isManagerInitialized()) {
@@ -73,7 +79,15 @@ class LepodBleInterface(model: Int): BleInterface(model) {
                 }
                 val info = LepuDevice(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success $info")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodInfo).post(InterfaceEvent(model, info))
+                deviceInfo.hwVersion = info.hwV
+                deviceInfo.swVersion = info.fwV
+                deviceInfo.btlVersion = info.btlV
+                deviceInfo.branchCode = info.branchCode
+                deviceInfo.fileVer = info.fileV
+                deviceInfo.spcpVer = info.protocolV
+                deviceInfo.snLen = info.snLen
+                deviceInfo.sn = info.sn
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodInfo).post(InterfaceEvent(model, deviceInfo))
             }
 
             LepodBleCmd.RT_PARAM -> {
@@ -81,9 +95,41 @@ class LepodBleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.e(tag, "response.size:${response.content.size} error")
                     return
                 }
-                val rtParam = LepodBleResponse.RtParam(response.content)
+                val data = LepodBleResponse.RtParam(response.content)
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success ${rtParam}")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodRtData).post(InterfaceEvent(model, rtParam))
+                rtParam.measureStatus = data.measureStatus
+                rtParam.year = data.year
+                rtParam.month = data.month
+                rtParam.day = data.day
+                rtParam.hour = data.hour
+                rtParam.minute = data.minute
+                rtParam.second = data.second
+                rtParam.recordTime = data.recordTime
+                rtParam.batteryStatus = data.batteryStatus
+                rtParam.battery = data.battery
+                rtParam.isInsertEcgLeadWire = data.isInsertEcgLeadWire
+                rtParam.leadType = data.leadType
+                rtParam.isLeadOffRA = data.isLeadOffRA
+                rtParam.isLeadOffLA = data.isLeadOffLA
+                rtParam.isLeadOffLL = data.isLeadOffLL
+                rtParam.isLeadOffRL = data.isLeadOffRL
+                rtParam.isLeadOffV1 = data.isLeadOffV1
+                rtParam.isLeadOffV2 = data.isLeadOffV2
+                rtParam.isLeadOffV3 = data.isLeadOffV3
+                rtParam.isLeadOffV4 = data.isLeadOffV4
+                rtParam.isLeadOffV5 = data.isLeadOffV5
+                rtParam.isLeadOffV6 = data.isLeadOffV6
+                rtParam.hr = data.hr
+                rtParam.isEcgrFlag = data.ecgRFlag
+                rtParam.respRate = data.respRate
+                rtParam.oxyStatus = data.oxyStatus
+                rtParam.spo2 = data.spo2
+                rtParam.pr = data.pr
+                rtParam.pi = data.pi
+                rtParam.isOxyrFlag = data.oxyRFlag
+                rtParam.isInsertTemp = data.isInsertTemp
+                rtParam.temp = data.temp
+//                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodRtParam).post(InterfaceEvent(model, rtParam))
             }
 
             LepodBleCmd.RT_DATA -> {
@@ -91,8 +137,48 @@ class LepodBleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.e(tag, "response.size:${response.content.size} error")
                     return
                 }
-                val rtData = LepodBleResponse.RtData(response.content)
+                val data = LepodBleResponse.RtData(response.content)
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success ${rtData.wave}")
+                rtParam.measureStatus = data.param.measureStatus
+                rtParam.year = data.param.year
+                rtParam.month = data.param.month
+                rtParam.day = data.param.day
+                rtParam.hour = data.param.hour
+                rtParam.minute = data.param.minute
+                rtParam.second = data.param.second
+                rtParam.recordTime = data.param.recordTime
+                rtParam.batteryStatus = data.param.batteryStatus
+                rtParam.battery = data.param.battery
+                rtParam.isInsertEcgLeadWire = data.param.isInsertEcgLeadWire
+                rtParam.leadType = data.param.leadType
+                rtParam.isLeadOffRA = data.param.isLeadOffRA
+                rtParam.isLeadOffLA = data.param.isLeadOffLA
+                rtParam.isLeadOffLL = data.param.isLeadOffLL
+                rtParam.isLeadOffRL = data.param.isLeadOffRL
+                rtParam.isLeadOffV1 = data.param.isLeadOffV1
+                rtParam.isLeadOffV2 = data.param.isLeadOffV2
+                rtParam.isLeadOffV3 = data.param.isLeadOffV3
+                rtParam.isLeadOffV4 = data.param.isLeadOffV4
+                rtParam.isLeadOffV5 = data.param.isLeadOffV5
+                rtParam.isLeadOffV6 = data.param.isLeadOffV6
+                rtParam.hr = data.param.hr
+                rtParam.isEcgrFlag = data.param.ecgRFlag
+                rtParam.respRate = data.param.respRate
+                rtParam.oxyStatus = data.param.oxyStatus
+                rtParam.spo2 = data.param.spo2
+                rtParam.pr = data.param.pr
+                rtParam.pi = data.param.pi
+                rtParam.isOxyrFlag = data.param.oxyRFlag
+                rtParam.isInsertTemp = data.param.isInsertTemp
+                rtParam.temp = data.param.temp
+                rtData.param = rtParam
+                rtWave.samplingRate = data.wave.samplingRate
+                rtWave.compressType = data.wave.compressType
+                rtWave.firstIndex = data.wave.firstIndex
+                rtWave.len = data.wave.len
+                rtWave.waveBytes = data.wave.wave
+                rtWave.waveFloats = data.wave.waveMvs
+                rtData.wave = rtWave
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodRtData).post(InterfaceEvent(model, rtData))
             }
 
@@ -103,7 +189,7 @@ class LepodBleInterface(model: Int): BleInterface(model) {
                 }
                 val fileList = LepodBleResponse.FileList(response.content)
                 LepuBleLog.d(tag, "model:$model,READ_FILE_LIST => success, $fileList")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodFileList).post(InterfaceEvent(model,fileList))
+//                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodFileList).post(InterfaceEvent(model,fileList))
             }
 
             LepodBleCmd.READ_FILE_START -> {
@@ -121,7 +207,7 @@ class LepodBleInterface(model: Int): BleInterface(model) {
                     sendCmd(LepodBleCmd.readFileData(offset))
                 } else {
                     LepuBleLog.d(tag, "read file failed：${response.pkgType}")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodReadFileError).post(InterfaceEvent(model, true))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodReadFileError).post(InterfaceEvent(model, true))
                 }
             }
 
@@ -141,7 +227,7 @@ class LepodBleInterface(model: Int): BleInterface(model) {
                     val nowSize: Long = (this.index).toLong()
                     val size :Long= nowSize * 100
                     val poSize :Int= (size).div(this.fileSize).toInt()
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodReadingFileProgress).post(InterfaceEvent(model,poSize))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodReadingFileProgress).post(InterfaceEvent(model,poSize))
                     LepuBleLog.d(tag, "read file：${this.fileName} => ${this.index } / ${this.fileSize} poSize : $poSize")
 
                     if (this.index < this.fileSize) {
@@ -164,7 +250,7 @@ class LepodBleInterface(model: Int): BleInterface(model) {
                             return
                         }
                     }else {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodReadFileComplete).post(InterfaceEvent(model, it))
+//                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodReadFileComplete).post(InterfaceEvent(model, it))
                     }
                 }?: LepuBleLog.d(tag, "READ_FILE_END model:$model, curFile error!!")
                 curFile = null
@@ -222,17 +308,17 @@ class LepodBleInterface(model: Int): BleInterface(model) {
             LepodBleCmd.BURN_FACTORY_INFO -> {
                 LepuBleLog.d(tag, "model:$model,BURN_FACTORY_INFO => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodBurnFactoryInfo).post(InterfaceEvent(model, true))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodBurnFactoryInfo).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodBurnFactoryInfo).post(InterfaceEvent(model, false))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodBurnFactoryInfo).post(InterfaceEvent(model, false))
                 }
             }
             LepodBleCmd.BURN_LOCK_FLASH -> {
                 LepuBleLog.d(tag, "model:$model,BURN_LOCK_FLASH => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodBurnLockFlash).post(InterfaceEvent(model, true))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodBurnLockFlash).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodBurnLockFlash).post(InterfaceEvent(model, false))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodBurnLockFlash).post(InterfaceEvent(model, false))
                 }
             }
             LepodBleCmd.START_ECG -> {

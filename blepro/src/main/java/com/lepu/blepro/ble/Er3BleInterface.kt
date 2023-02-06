@@ -7,6 +7,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.er3.*
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
@@ -28,6 +29,11 @@ import kotlin.experimental.inv
  */
 class Er3BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Er3BleInterface"
+
+    private var deviceInfo = DeviceInfo()
+    private var rtData = RtData()
+    private var rtParam = RtParam()
+    private var rtWave = RtWave()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         if (isManagerInitialized()) {
@@ -73,7 +79,15 @@ class Er3BleInterface(model: Int): BleInterface(model) {
                 }
                 val info = LepuDevice(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_INFO => success $info")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3Info).post(InterfaceEvent(model, info))
+                deviceInfo.hwVersion = info.hwV
+                deviceInfo.swVersion = info.fwV
+                deviceInfo.btlVersion = info.btlV
+                deviceInfo.branchCode = info.branchCode
+                deviceInfo.fileVer = info.fileV
+                deviceInfo.spcpVer = info.protocolV
+                deviceInfo.snLen = info.snLen
+                deviceInfo.sn = info.sn
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3Info).post(InterfaceEvent(model, deviceInfo))
             }
 
             Er3BleCmd.RT_DATA -> {
@@ -81,8 +95,43 @@ class Er3BleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.e(tag, "response.size:${response.content.size} error")
                     return
                 }
-                val rtData = Er3BleResponse.RtData(response.content)
+                val data = Er3BleResponse.RtData(response.content)
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success ${rtData.wave}")
+                rtParam.hr = data.param.hr
+                rtParam.temp = data.param.temp
+                rtParam.spo2 = data.param.spo2
+                rtParam.pi = data.param.pi
+                rtParam.pr = data.param.pr
+                rtParam.respRate = data.param.respRate
+                rtParam.batteryStatus = data.param.batteryStatus
+                rtParam.isInsertEcgLeadWire = data.param.isInsertEcgLeadWire
+                rtParam.oxyStatus = data.param.oxyStatus
+                rtParam.isInsertTemp = data.param.isInsertTemp
+                rtParam.measureStatus = data.param.measureStatus
+                rtParam.battery = data.param.battery
+                rtParam.recordTime = data.param.recordTime
+                rtParam.year = data.param.year
+                rtParam.month = data.param.month
+                rtParam.day = data.param.day
+                rtParam.hour = data.param.hour
+                rtParam.minute = data.param.minute
+                rtParam.second = data.param.second
+                rtParam.leadType = data.param.leadType
+                rtParam.leadSn = data.param.leadSn
+                rtParam.isLeadOffLA = data.param.isLeadOffI
+                rtParam.isLeadOffLL = data.param.isLeadOffII
+                rtParam.isLeadOffV1 = data.param.isLeadOffV1
+                rtParam.isLeadOffV2 = data.param.isLeadOffV2
+                rtParam.isLeadOffV3 = data.param.isLeadOffV3
+                rtParam.isLeadOffV4 = data.param.isLeadOffV4
+                rtParam.isLeadOffV5 = data.param.isLeadOffV5
+                rtParam.isLeadOffV6 = data.param.isLeadOffV6
+                rtData.param = rtParam
+                rtWave.firstIndex = data.wave.firstIndex
+                rtWave.len = data.wave.len
+                rtWave.waveBytes = data.wave.wave
+                rtWave.waveFloats = data.wave.waveMvs
+                rtData.wave = rtWave
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3RtData).post(InterfaceEvent(model, rtData))
             }
 
@@ -93,7 +142,7 @@ class Er3BleInterface(model: Int): BleInterface(model) {
                 }
                 val fileList = Er3BleResponse.FileList(response.content)
                 LepuBleLog.d(tag, "model:$model,READ_FILE_LIST => success, $fileList")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FileList).post(InterfaceEvent(model,fileList))
+//                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FileList).post(InterfaceEvent(model,fileList))
             }
 
             Er3BleCmd.READ_FILE_START -> {
@@ -111,7 +160,7 @@ class Er3BleInterface(model: Int): BleInterface(model) {
                     sendCmd(Er3BleCmd.readFileData(offset))
                 } else {
                     LepuBleLog.d(tag, "read file failed：${response.pkgType}")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3ReadFileError).post(InterfaceEvent(model, true))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3ReadFileError).post(InterfaceEvent(model, true))
                 }
             }
 
@@ -131,7 +180,7 @@ class Er3BleInterface(model: Int): BleInterface(model) {
                     val nowSize: Long = (this.index).toLong()
                     val size :Long= nowSize * 100
                     val poSize :Int= (size).div(this.fileSize).toInt()
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3ReadingFileProgress).post(InterfaceEvent(model,poSize))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3ReadingFileProgress).post(InterfaceEvent(model,poSize))
                     LepuBleLog.d(tag, "read file：${this.fileName} => ${this.index } / ${this.fileSize} poSize : $poSize")
 
                     if (this.index < this.fileSize) {
@@ -154,7 +203,7 @@ class Er3BleInterface(model: Int): BleInterface(model) {
                             return
                         }
                     }else {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3ReadFileComplete).post(InterfaceEvent(model, it))
+//                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3ReadFileComplete).post(InterfaceEvent(model, it))
                     }
                 }?: LepuBleLog.d(tag, "READ_FILE_END model:$model, curFile error!!")
                 curFile = null
@@ -212,17 +261,17 @@ class Er3BleInterface(model: Int): BleInterface(model) {
             Er3BleCmd.BURN_FACTORY_INFO -> {
                 LepuBleLog.d(tag, "model:$model,BURN_FACTORY_INFO => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3BurnFactoryInfo).post(InterfaceEvent(model, true))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3BurnFactoryInfo).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3BurnFactoryInfo).post(InterfaceEvent(model, false))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3BurnFactoryInfo).post(InterfaceEvent(model, false))
                 }
             }
             Er3BleCmd.BURN_LOCK_FLASH -> {
                 LepuBleLog.d(tag, "model:$model,BURN_LOCK_FLASH => success")
                 if (response.pkgType == 0x01.toByte()) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3BurnLockFlash).post(InterfaceEvent(model, true))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3BurnLockFlash).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3BurnLockFlash).post(InterfaceEvent(model, false))
+//                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3BurnLockFlash).post(InterfaceEvent(model, false))
                 }
             }
         }

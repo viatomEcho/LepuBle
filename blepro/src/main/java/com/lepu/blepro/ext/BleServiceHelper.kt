@@ -1963,6 +1963,169 @@ class BleServiceHelper private constructor() {
             }
         }
     }
+    // ER3
+    fun er3GetInfo(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_ER3 -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    fun er3Reset(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_ER3 -> {
+                getInterface(model)?.reset()
+            }
+        }
+    }
+    fun er3FactoryReset(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_ER3 -> {
+                getInterface(model)?.factoryReset()
+            }
+        }
+    }
+    fun er3FactoryResetAll(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_ER3 -> {
+                getInterface(model)?.factoryResetAll()
+            }
+        }
+    }
+    fun er3GetConfig(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_ER3 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Er3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Er3BleInterface--er3GetConfig")
+                        it.getConfig()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "er3GetConfig current model $model unsupported!!")
+        }
+    }
+    /**
+     * mode：心电测量模式
+     * 0：监护模式（带宽0.5HZ-40HZ）
+     * 1：手术模式（带宽1HZ-20HZ）
+     * 2：ST模式（带宽0.05HZ-40HZ）
+     */
+    fun er3SetConfig(model: Int, mode: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_ER3 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Er3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Er3BleInterface--er3SetConfig")
+                        it.setConfig(mode)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "er3SetConfig current model $model unsupported!!")
+        }
+    }
+    // Lepod
+    fun lepodGetInfo(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEPOD -> {
+                getInterface(model)?.getInfo()
+            }
+        }
+    }
+    fun lepodReset(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEPOD -> {
+                getInterface(model)?.reset()
+            }
+        }
+    }
+    fun lepodFactoryReset(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEPOD -> {
+                getInterface(model)?.factoryReset()
+            }
+        }
+    }
+    fun lepodFactoryResetAll(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEPOD -> {
+                getInterface(model)?.factoryResetAll()
+            }
+        }
+    }
+    fun lepodStartEcg(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEPOD -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LepodBleInterface).let {
+                        LepuBleLog.d(tag, "it as LepodBleInterface--lepodStartEcg")
+                        it.startEcg()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lepodStartEcg current model $model unsupported!!")
+        }
+    }
+    fun lepodStopEcg(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEPOD -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LepodBleInterface).let {
+                        LepuBleLog.d(tag, "it as LepodBleInterface--lepodStopEcg")
+                        it.stopEcg()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lepodStopEcg current model $model unsupported!!")
+        }
+    }
+    fun lepodGetConfig(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEPOD -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LepodBleInterface).let {
+                        LepuBleLog.d(tag, "it as LepodBleInterface--lepodGetConfig")
+                        it.getConfig()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lepodGetConfig current model $model unsupported!!")
+        }
+    }
+    /**
+     * mode：心电测量模式
+     * 0：监护模式（带宽0.5HZ-40HZ）
+     * 1：手术模式（带宽1HZ-20HZ）
+     * 2：ST模式（带宽0.05HZ-40HZ）
+     */
+    fun lepodSetConfig(model: Int, mode: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LEPOD -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LepodBleInterface).let {
+                        LepuBleLog.d(tag, "it as LepodBleInterface--lepodSetConfig")
+                        it.setConfig(mode)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lepodSetConfig current model $model unsupported!!")
+        }
+    }
+
 
     fun bpw1SetMeasureTime(model: Int, measureTime: Array<String?>) {
         if (!checkService()) return
@@ -2933,90 +3096,6 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.d(tag, "ad5EnableRtData current model $model unsupported!!")
-        }
-    }
-
-    fun er3GetConfig(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_ER3 -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Er3BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er3BleInterface--er3GetConfig")
-                        it.getConfig()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "er3GetConfig current model $model unsupported!!")
-        }
-    }
-    /**
-     * mode：心电测量模式
-     * 0：监护模式（带宽0.5HZ-40HZ）
-     * 1：手术模式（带宽1HZ-20HZ）
-     * 2：ST模式（带宽0.05HZ-40HZ）
-     */
-    fun er3SetConfig(model: Int, mode: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_ER3 -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Er3BleInterface).let {
-                        LepuBleLog.d(tag, "it as Er3BleInterface--er3SetConfig")
-                        it.setConfig(mode)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "er3SetConfig current model $model unsupported!!")
-        }
-    }
-
-    fun lepodGetRtParam(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LEPOD -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LepodBleInterface).let {
-                        LepuBleLog.d(tag, "it as LepodBleInterface--lepodGetRtParam")
-                        it.getRtParam()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "lepodGetRtParam current model $model unsupported!!")
-        }
-    }
-    fun lepodGetConfig(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LEPOD -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LepodBleInterface).let {
-                        LepuBleLog.d(tag, "it as LepodBleInterface--lepodGetConfig")
-                        it.getConfig()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "lepodGetConfig current model $model unsupported!!")
-        }
-    }
-    /**
-     * mode：心电测量模式
-     * 0：监护模式（带宽0.5HZ-40HZ）
-     * 1：手术模式（带宽1HZ-20HZ）
-     * 2：ST模式（带宽0.05HZ-40HZ）
-     */
-    fun lepodSetConfig(model: Int, mode: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LEPOD -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LepodBleInterface).let {
-                        LepuBleLog.d(tag, "it as LepodBleInterface--lepodSetConfig")
-                        it.setConfig(mode)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "lepodSetConfig current model $model unsupported!!")
         }
     }
 

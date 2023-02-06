@@ -1020,7 +1020,7 @@ class LpBleUtil {
             BleServiceHelper.lepodGetConfig(model)
         }
         fun lepodGetRtParam(model: Int) {
-            BleServiceHelper.lepodGetRtParam(model)
+//            BleServiceHelper.lepodGetRtParam(model)
         }
 
         fun bpmGetRtState(model: Int) {
