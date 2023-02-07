@@ -20,6 +20,7 @@ import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.getTimeString
+import com.lepu.demo.DemoWidgetProvider
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
 import com.lepu.demo.ble.LpBleUtil
@@ -822,6 +823,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                             DataController.receive(d)
                         }
                     }
+                    DemoWidgetProvider.updateWidgetView(context, "${data.param.hr}")
                     mainViewModel._battery.value = "${data.param.battery} %"
                     binding.dataStr.text = data.param.toString()
                     viewModel.ecgHr.value = data.param.hr
