@@ -9,6 +9,7 @@ import com.lepu.blepro.ble.cmd.OxyBleCmd
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.LepuDevice
+import com.lepu.blepro.ble.data.ResponseBytes
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
@@ -149,6 +150,10 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             OxyBleCmd.OXY_CMD_INFO -> {
 
                 clearTimeout()
+                val data = ResponseBytes()
+                data.dataType = OxyBleCmd.OXY_CMD_INFO
+                data.data = response.bytes
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyResponseBytes).post(InterfaceEvent(model, data))
                 val info = OxyBleResponse.OxyInfo(response.content)
                 LepuBleLog.d(tag, "model:$model, OXY_CMD_INFO => success $info")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo).post(InterfaceEvent(model, info))

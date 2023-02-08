@@ -1,7 +1,5 @@
 package com.lepu.blepro.ble.cmd
 
-import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.ByteUtils.toSignedShort
 import com.lepu.blepro.utils.LepuBleLog
@@ -43,7 +41,6 @@ class CheckmePodBleResponse{
         var application:String   //
 
         init {
-            LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseContent).post(bytes)
             val data = String(bytes)
             infoStr = if (data.contains("{") && data.contains("}")) {
                 JSONObject(data)

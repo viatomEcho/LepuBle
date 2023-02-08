@@ -38,6 +38,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventOxyRtParamRes = "com.lepu.ble.oxy.rt.param.res"                    // 实时参数失败 true
             const val EventOxyPpgData = "com.lepu.ble.oxy.ppg.data"                           // PPG数据成功 OxyBleResponse.PPGData
             const val EventOxyPpgRes = "com.lepu.ble.oxy.ppg.res"                             // PPG数据失败 true
+            const val EventOxyResponseBytes = "com.lepu.ble.oxy.response.bytes"               // bytes数据 byte[]
         }
     }
 
