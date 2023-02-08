@@ -1734,8 +1734,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "V3导联脱落：${data.param.isLeadOffV3}\n" +
                         "V4导联脱落：${data.param.isLeadOffV4}\n" +
                         "V5导联脱落：${data.param.isLeadOffV5}\n" +
-                        "V6导联脱落：${data.param.isLeadOffV6}\n" +
-                        "${data.param}"
+                        "V6导联脱落：${data.param.isLeadOffV6}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodEcgStart)
             .observe(this) {

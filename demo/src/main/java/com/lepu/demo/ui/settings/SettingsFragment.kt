@@ -3147,7 +3147,67 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodRtParam)
             .observe(this) {
                 val data = it.data as LepodBleResponse.RtParam
-                binding.lepodLayout.deviceInfo.text = "$data"
+                binding.lepodLayout.deviceInfo.text = "心率：${data.hr} bpm\n" +
+                        "体温：${data.temp} ℃\n" +
+                        "血氧：${data.spo2} %\n" +
+                        "pi：${data.pi} %\n" +
+                        "脉率：${data.pr}\n" +
+                        "呼吸率：${data.respRate}\n" +
+                        "电池状态${data.batteryStatus}：${
+                            when (data.batteryStatus) {
+                                0 -> "正常使用"
+                                1 -> "充电中"
+                                2 -> "充满"
+                                3 -> "低电量"
+                                else -> ""
+                            }
+                        }\n" +
+                        "心电导联线状态：${data.isInsertEcgLeadWire}\n" +
+                        "血氧状态${data.oxyStatus}：${
+                            when (data.oxyStatus) {
+                                0 -> "未接入血氧"
+                                1 -> "血氧状态正常"
+                                2 -> "血氧手指脱落"
+                                3 -> "探头故障"
+                                else -> ""
+                            }
+                        }\n" +
+                        "体温状态：${data.isInsertTemp}\n" +
+                        "测量状态${data.measureStatus}：${
+                            when (data.measureStatus) {
+                                0 -> "空闲"
+                                1 -> "检测导联"
+                                2 -> "准备状态"
+                                3 -> "正式测量"
+                                else -> ""
+                            }
+                        }\n" +
+                        "已记录时长：${data.recordTime}\n" +
+                        "开始测量时间：${data.year}-${data.month}-${data.day} ${data.hour}:${data.minute}:${data.second}\n" +
+                        "导联类型${data.leadType}：${
+                            when (data.leadType) {
+                                0 -> "LEAD_12，12导"
+                                1 -> "LEAD_6，6导"
+                                2 -> "LEAD_5，5导"
+                                3 -> "LEAD_3，3导"
+                                4 -> "LEAD_3_TEMP，3导带体温"
+                                5 -> "LEAD_3_LEG，3导胸贴"
+                                6 -> "LEAD_5_LEG，5导胸贴"
+                                7 -> "LEAD_6_LEG，6导胸贴"
+                                0xFF -> "LEAD_NONSUP，不支持的导联"
+                                else -> "UNKNOWN，未知导联"
+                            }
+                        }\n" +
+                        "RA导联脱落：${data.isLeadOffRA}\n" +
+                        "RL导联脱落：${data.isLeadOffRL}\n" +
+                        "LA导联脱落：${data.isLeadOffLA}\n" +
+                        "LL导联脱落：${data.isLeadOffLL}\n" +
+                        "V1导联脱落：${data.isLeadOffV1}\n" +
+                        "V2导联脱落：${data.isLeadOffV2}\n" +
+                        "V3导联脱落：${data.isLeadOffV3}\n" +
+                        "V4导联脱落：${data.isLeadOffV4}\n" +
+                        "V5导联脱落：${data.isLeadOffV5}\n" +
+                        "V6导联脱落：${data.isLeadOffV6}"
                 Toast.makeText(context, "获取实时参数成功", Toast.LENGTH_SHORT).show()
             }
         // --------------------------vtm01--------------------

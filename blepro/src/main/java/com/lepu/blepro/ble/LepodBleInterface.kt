@@ -83,7 +83,7 @@ class LepodBleInterface(model: Int): BleInterface(model) {
                 }
                 val rtParam = LepodBleResponse.RtParam(response.content)
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success ${rtParam}")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodRtData).post(InterfaceEvent(model, rtParam))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodRtParam).post(InterfaceEvent(model, rtParam))
             }
 
             LepodBleCmd.RT_DATA -> {
