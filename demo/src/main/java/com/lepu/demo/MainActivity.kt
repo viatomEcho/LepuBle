@@ -89,6 +89,16 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             R.id.menu_factory_data -> {
                 startActivity(Intent(this, DeviceFactoryDataActivity::class.java))
             }
+            R.id.menu_upgrade -> {
+                if (viewModel._bleState.value == true) {
+                    val intent = Intent(this, UpdateActivity::class.java)
+                    intent.putExtra("macAddr", viewModel._curBluetooth.value?.deviceMacAddress)
+                    intent.putExtra("bleName", viewModel._curBluetooth.value?.deviceName)
+                    startActivity(intent)
+                } else {
+                    Toast.makeText(this, "请先连接需要升级的设备！", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
         return true
     }
