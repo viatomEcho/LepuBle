@@ -88,6 +88,9 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i + 8 + len)
+            if (temp.size < 8) {
+                continue@loop
+            }
             if (temp.last() == BleCRC.calCRC8(temp)) {
                 val bleResponse = CheckmePodBleResponse.BleResponse(temp)
 //                Log.d(TAG, "get response: " + temp.toHex())

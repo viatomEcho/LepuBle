@@ -79,6 +79,9 @@ class LewBleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i + 8 + len)
+            if (temp.size < 7) {
+                continue@loop
+            }
             if (temp.last() == BleCRC.calCRC8(temp)) {
                 val respPkg = LewBleResponse.BleResponse(temp)
                 onResponseReceived(respPkg)

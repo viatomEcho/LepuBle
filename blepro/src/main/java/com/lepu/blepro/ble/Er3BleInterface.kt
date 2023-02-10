@@ -249,6 +249,9 @@ class Er3BleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i+8+len)
+            if (temp.size < 7) {
+                continue@loop
+            }
             if (temp.last() == BleCRC.calCRC8(temp)) {
                 val bleResponse = Er3BleResponse.BleResponse(temp)
 //                LepuBleLog.d(TAG, "get response: ${temp.toHex()}" )

@@ -110,6 +110,9 @@ class BiolandBgmBleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i+len)
+            if (temp.size < 4) {
+                continue@loop
+            }
             if (temp.last() == BiolandBgmBleCmd.getLastByte(temp)) {
                 onResponseReceived(BiolandBgmBleResponse.BleResponse(temp))
 

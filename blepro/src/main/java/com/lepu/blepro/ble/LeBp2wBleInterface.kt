@@ -91,6 +91,9 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i + 8 + len)
+            if (temp.size < 7) {
+                continue@loop
+            }
             if (temp.last() == calCRC8(temp)) {
                 val bleResponse = LepuBleResponse.BleResponse(temp)
                 onResponseReceived(bleResponse)

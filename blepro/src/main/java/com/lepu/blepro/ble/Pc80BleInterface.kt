@@ -99,8 +99,12 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
 
             // 建立会话应答
             Pc80BleCmd.TRANS_SET -> {
-                LepuBleLog.d(tag, "model:$model,TRANS_SET => success")
+                if (response.content.size < 14) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
                 val data = PC80BleResponse.TransSet(response.content)
+                LepuBleLog.d(tag, "model:$model,TRANS_SET => success $data")
                 // 1---传输文件 0---连续测量模式实时
                 transType = data.transType
                 sendCmd(Pc80BleCmd.responseTransSet(Pc80BleCmd.ACK))
@@ -182,6 +186,9 @@ class Pc80BleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i+4+len)
+            if (temp.size < 3) {
+                continue@loop
+            }
             if (temp.last() == CrcUtil.calCRC8Pc(temp)) {
                 val bleResponse = PC80BleResponse.PC80Response(temp)
                 onResponseReceived(bleResponse)

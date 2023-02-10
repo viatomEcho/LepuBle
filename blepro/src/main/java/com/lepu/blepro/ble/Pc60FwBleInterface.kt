@@ -133,6 +133,9 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i+4+len)
+            if (temp.size < 6) {
+                continue@loop
+            }
             if (temp.last() == CrcUtil.calCRC8Pc(temp)) {
                 val bleResponse = PC60FwBleResponse.PC60FwResponse(temp)
                 onResponseReceived(bleResponse)

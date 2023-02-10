@@ -18,7 +18,7 @@ object Pc100BleResponse {
             cmd = (bytes[2].toUInt() and 0xFFu).toInt()
             len = toUInt(bytes.copyOfRange(3, 4))
             type = (bytes[4].toUInt() and 0xFFu).toInt()
-            content = bytes.copyOfRange(5, 5 + len - 2)
+            content = bytes.copyOfRange(5, bytes.size-1)
         }
     }
 

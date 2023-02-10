@@ -159,6 +159,9 @@ class Vtm01BleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i + 8 + len)
+            if (temp.size < 7) {
+                continue@loop
+            }
             if (temp.last() == CrcUtil.calCRC8(temp)) {
                 val bleResponse = Vtm01BleResponse.BleResponse(temp)
                 onResponseReceived(bleResponse)

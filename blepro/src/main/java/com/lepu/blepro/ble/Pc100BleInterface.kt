@@ -57,12 +57,21 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
                 when (response.type) {
                     Pc100BleCmd.HAND_SHAKE -> {
                         LepuBleLog.d(tag, "model:$model,HAND_SHAKE => success")
-                        val str = toString(response.content).split(":")
-                        pc100Device.deviceName = trimStr(toString(response.content))
+                        val deviceName = trimStr(toString(response.content))
+                        pc100Device.deviceName = deviceName
                         device.name?.let {
                             pc100Device.deviceName = it
                         }
-                        pc100Device.sn = str[1]
+                        if (deviceName.contains(":")) {
+                            val str = deviceName.split(":")
+                            pc100Device.sn = if (str.size > 1) {
+                                str[1]
+                            } else {
+                                ""
+                            }
+                        } else {
+                            pc100Device.sn = ""
+                        }
                         LepuBleLog.d(tag, "model:$model,HAND_SHAKE deviceName => " + toString(response.content))
                         LepuBleLog.d(tag, "model:$model,HAND_SHAKE sn => " + pc100Device.sn)
                     }
@@ -305,6 +314,9 @@ class Pc100BleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i+4+len)
+            if (temp.size < 6) {
+                continue@loop
+            }
             if (temp.last() == CrcUtil.calCRC8Pc(temp)) {
                 val bleResponse = Pc100BleResponse.Pc100Response(temp)
 //                LepuBleLog.d(TAG, "get response: ${temp.toHex()}" )

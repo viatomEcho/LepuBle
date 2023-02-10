@@ -109,7 +109,9 @@ class F4ScaleBleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i+4+len)
-
+            if (temp.size < 5) {
+                continue@loop
+            }
             val crc = (temp.last().toUInt() and 0x1Fu).toInt()
 
             if (crc == CrcUtil.calF5ScaleCHK(temp)) {
