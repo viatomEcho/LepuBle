@@ -141,11 +141,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 Constant.BluetoothConfig.bleSdkServiceEnable = true
                 afterLpBleInit()
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyResponseBytes)
-            .observe(this) {
-                val data = it.data as ResponseBytes
-                Log.d(TAG, "${data.dataType} --- ${bytesToHex(data.data)}")
-            }
         //-------------------------er1---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetTime)
             .observe(this) {
