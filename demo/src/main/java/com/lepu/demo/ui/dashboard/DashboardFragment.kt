@@ -24,6 +24,7 @@ import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.getTimeString
+import com.lepu.demo.DemoWidgetProvider
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
 import com.lepu.demo.ble.LpBleUtil
@@ -236,7 +237,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_SP20_WPS_NO_SN, Bluetooth.MODEL_VTM01 -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
-            Bluetooth.MODEL_CHECK_ADV, Bluetooth.MODEL_PC300_BLE -> {
+            Bluetooth.MODEL_CHECK_ADV, Bluetooth.MODEL_PC300_BLE,
+            Bluetooth.MODEL_PC200_BLE -> {
                 waveHandler.post(EcgWaveTask())
                 waveHandler.post(OxyWaveTask())
             }
@@ -370,7 +372,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.bpLayout.visibility = View.GONE
                 startWave(it.modelNo)
             }
-            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
+            Bluetooth.MODEL_PC200_BLE -> {
                 binding.ecgLayout.visibility = View.VISIBLE
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.bpLayout.visibility = View.VISIBLE
@@ -429,14 +432,16 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         }
         binding.startRtEcg.setOnClickListener {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE) {
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC200_BLE) {
                 LpBleUtil.startEcg(Constant.BluetoothConfig.currentModel[0])
             }
             LpBleUtil.startRtTask()
         }
         binding.stopRtEcg.setOnClickListener {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE) {
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC200_BLE) {
                 LpBleUtil.stopEcg(Constant.BluetoothConfig.currentModel[0])
             }
             LpBleUtil.stopRtTask()
@@ -826,6 +831,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                             DataController.receive(d)
                         }
                     }
+                    DemoWidgetProvider.updateWidgetView(context, "${data.param.hr}")
                     mainViewModel._battery.value = "${data.param.battery} %"
                     binding.dataStr.text = data.param.toString()
                     viewModel.ecgHr.value = data.param.hr
@@ -1464,6 +1470,13 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "心电采样点位数类型：${data.digit}\n" +
                         "心电导联脱落：${data.isProbeOff}"
             }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300EcgResult)
+            .observe(this) {
+                val data = it.data as Pc300BleResponse.EcgResult
+                viewModel.ecgHr.value = data.hr
+                binding.deviceInfo.text = "心率：${data.hr}\n" +
+                        "测量结果${data.result}：${data.resultMess}"
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtBpData)
             .observe(this) {
                 val data = it.data as Int
@@ -1729,8 +1742,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "V3导联脱落：${data.param.isLeadOffV3}\n" +
                         "V4导联脱落：${data.param.isLeadOffV4}\n" +
                         "V5导联脱落：${data.param.isLeadOffV5}\n" +
-                        "V6导联脱落：${data.param.isLeadOffV6}\n" +
-                        "${data.param}"
+                        "V6导联脱落：${data.param.isLeadOffV6}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodEcgStart)
             .observe(this) {

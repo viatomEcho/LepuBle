@@ -20,7 +20,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:requestLegacyExternalStorage="true"
-        android:name=".MyApplication"
+        android:name=".DemoApplication"
         android:theme="@style/Theme.LepuBle">
 
         <activity
@@ -45,6 +45,18 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
+        <receiver
+            android:name=".DemoWidgetProvider"
+            android:exported="false"
+            android:label="DemoWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/demo_appwidget_info" />
+        </receiver>
+
     </application>
 
 </manifest>

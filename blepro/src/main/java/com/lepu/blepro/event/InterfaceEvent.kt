@@ -470,6 +470,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     /**
      * PC300BleInterface发出的通知
      * 包含model: MODEL_PC300(PC_300SNT), MODEL_PC300_BLE(PC_300SNT-BLE)
+     *           MODEL_PC200_BLE(PC-200-BLE)
      * 功能：
      * 1.获取设备信息：BleServiceHelper.pc300GetInfo()
      * 2.实时心电/血压/血氧/血糖/体温数据：设备测量时自动上发

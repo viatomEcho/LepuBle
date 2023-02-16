@@ -159,6 +159,7 @@ public class UpdateActivity extends Activity {
                     + speed + ",avgSpeed " + avgSpeed + ",currentPart " + currentPart
                     + ",partTotal " + partsTotal);
             duringUpgradeTv.setVisibility(View.VISIBLE);
+            duringUpgradeTv.setText("升级中..." + percent + "%");
 //            Toast.makeText(MainActivity.this,"升级进度：" + percent + "%",Toast.LENGTH_SHORT).show();
         }
 
@@ -182,7 +183,7 @@ public class UpdateActivity extends Activity {
             Log.i("TEST", "onDfuCompleted: " + deviceAddress);
             duringUpgradeTv.setVisibility(View.GONE);
             updateSuccessLl.setVisibility(View.VISIBLE);
-            finish();
+//            finish();
         }
 
         @Override

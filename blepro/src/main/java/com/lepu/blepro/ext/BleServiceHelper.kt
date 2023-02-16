@@ -262,7 +262,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PC300_BLE, Bluetooth.MODEL_LPM311,
             Bluetooth.MODEL_POCTOR_M3102, Bluetooth.MODEL_BIOLAND_BGM,
             Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_BPM,
-            Bluetooth.MODEL_PC80B_BLE2 -> false
+            Bluetooth.MODEL_PC80B_BLE2, Bluetooth.MODEL_PC200_BLE -> false
             else -> true
         }
     }
@@ -689,7 +689,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
-            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
+            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS,
+            Bluetooth.MODEL_CMRING -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetRtWave")

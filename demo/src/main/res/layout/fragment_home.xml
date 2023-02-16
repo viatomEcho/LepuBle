@@ -59,7 +59,6 @@
             android:layout_height="wrap_content"
             android:id="@+id/ble_split"
             android:hint=" sn"
-            android:inputType="number"
             android:drawableStart="@mipmap/search"
             android:drawablePadding="@dimen/dp_10"
             app:layout_constraintStart_toEndOf="@id/scan"

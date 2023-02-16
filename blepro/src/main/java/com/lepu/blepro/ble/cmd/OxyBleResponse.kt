@@ -1,9 +1,7 @@
 package com.lepu.blepro.ble.cmd
 
 import android.os.Parcelable
-import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.download.DownloadHelper
-import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.toUInt
@@ -62,7 +60,6 @@ class OxyBleResponse{
         var ivThr: Int           // 无效值报警告警时间阈值
 
         init {
-//            LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseContent).post(bytes)
             val data = String(bytes)
             infoStr = if (data.contains("{") && data.contains("}")) {
                 JSONObject(data)

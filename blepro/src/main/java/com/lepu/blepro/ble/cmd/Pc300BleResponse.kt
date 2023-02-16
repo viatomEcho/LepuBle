@@ -18,7 +18,7 @@ object Pc300BleResponse {
             cmd = (bytes[2].toUInt() and 0xFFu).toInt()
             len = toUInt(bytes.copyOfRange(3, 4))
             type = (bytes[4].toUInt() and 0xFFu).toInt()
-            content = bytes.copyOfRange(5, 5 + len - 2)
+            content = bytes.copyOfRange(5, bytes.size-1)
         }
     }
 
@@ -133,7 +133,7 @@ object Pc300BleResponse {
                 4 -> return "Excessive motion artifact"
                 5 -> return "The measurement fails"
                 6 -> return "Air leakage"
-                14 -> return "Low battery"
+                14, 15 -> return "Low battery"
             }
             /*} else if (errorType == 1) {
                 when(errorNum) {
@@ -149,7 +149,7 @@ object Pc300BleResponse {
                     10 -> return "在漏气检测中，发现系统气路漏气"
                     11 -> return "开机后，充气泵、A/D采样、压力传感器出错，或者软件运行中指针出错"
                     12 -> return "某次测量超过规定时间，成人袖带压超过200mmHg时为120秒，未超过时为90秒，新生儿为90秒"
-                    14 -> return "电量过低，暂停使用"
+                    14, 15 -> return "电量过低，暂停使用"
                 }
             }*/
             return ""
@@ -381,7 +381,8 @@ object Pc300BleResponse {
             result = byte2UInt(bytes[index])
             resultMess = getMess(result)
             index++
-            hr = byte2UInt(bytes[index+1])
+            index++
+            hr = byte2UInt(bytes[index])
         }
 
         fun getMess(result: Int): String {
@@ -402,6 +403,7 @@ object Pc300BleResponse {
                 0x0D -> "Suspected slow beat with baseline wander"
                 0x0E -> "Suspected short beat interval with baseline wander"
                 0x0F -> "Suspected irregular beat interval with baseline wander"
+                0xE0 -> "ECG test has not been conducted, no result"
                 0xFF -> "Poor Signal, please try again"
                 else -> ""
             }

@@ -232,6 +232,9 @@ class Sp20BleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i+4+len)
+            if (temp.size < 6) {
+                continue@loop
+            }
             if (temp.last() == CrcUtil.calCRC8Pc(temp)) {
                 val bleResponse = Sp20BleResponse.Sp20Response(temp)
                 onResponseReceived(bleResponse)

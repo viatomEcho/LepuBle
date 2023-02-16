@@ -155,6 +155,9 @@ class Aoj20aBleInterface(model: Int): BleInterface(model) {
                 continue@loop
             }
             val temp: ByteArray = bytes.copyOfRange(i, i+5+len)
+            if (temp.size < 4) {
+                continue@loop
+            }
             if (temp.last() == Aoj20aBleCmd.getLastByte(temp)) {
                 val bleResponse = Aoj20aBleResponse.BleResponse(temp)
                 onResponseReceived(bleResponse)

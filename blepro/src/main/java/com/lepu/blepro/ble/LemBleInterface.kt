@@ -149,6 +149,9 @@ class LemBleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i+9+len)
+            if (temp.size < 7) {
+                continue@loop
+            }
             onResponseReceived(LemBleResponse.BleResponse(temp))
 
             val tempBytes: ByteArray? = if (i+9+len == bytes.size) null else bytes.copyOfRange(i+9+len, bytes.size)

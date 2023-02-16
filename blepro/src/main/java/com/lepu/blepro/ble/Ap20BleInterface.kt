@@ -279,6 +279,9 @@ class Ap20BleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i+4+len)
+            if (temp.size < 6) {
+                continue@loop
+            }
             if (temp.last() == CrcUtil.calCRC8Pc(temp)) {
                 val bleResponse = Ap20BleResponse.Ap20Response(temp)
                 onResponseReceived(bleResponse)

@@ -17,6 +17,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -49,7 +50,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
 
         val navController = findNavController(R.id.nav_host_fragment)
@@ -87,6 +88,16 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         when (item.itemId) {
             R.id.menu_factory_data -> {
                 startActivity(Intent(this, DeviceFactoryDataActivity::class.java))
+            }
+            R.id.menu_upgrade -> {
+                if (viewModel._bleState.value == true) {
+                    val intent = Intent(this, UpdateActivity::class.java)
+                    intent.putExtra("macAddr", viewModel._curBluetooth.value?.deviceMacAddress)
+                    intent.putExtra("bleName", viewModel._curBluetooth.value?.deviceName)
+                    startActivity(intent)
+                } else {
+                    Toast.makeText(this, "请先连接需要升级的设备！", Toast.LENGTH_SHORT).show()
+                }
             }
         }
         return true
@@ -130,9 +141,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 Constant.BluetoothConfig.bleSdkServiceEnable = true
                 afterLpBleInit()
             }
-        LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseContent)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyResponseBytes)
             .observe(this) {
-                Log.d(TAG, "${bytesToHex(it)}")
+                val data = it.data as ResponseBytes
+                Log.d(TAG, "${data.dataType} --- ${bytesToHex(data.data)}")
             }
         //-------------------------er1---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetTime)

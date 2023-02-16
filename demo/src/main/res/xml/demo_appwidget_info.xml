@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialLayout="@layout/layout_appwidget"
+    android:minHeight="110dp"
+    android:minWidth="155dp"
+    android:previewImage="@drawable/ic_dashboard_black_24dp"
+    android:updatePeriodMillis="72720000"
+    android:resizeMode="none"
+    android:widgetCategory="home_screen">
+</appwidget-provider>

@@ -376,6 +376,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S1
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYU
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CMRING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_AI_S100) {
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}\ncode：${it.branchCode}\nfileList：${it.fileList}"
@@ -451,7 +452,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         }
         mainViewModel.pc300Info.observe(viewLifecycleOwner) {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE) {
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC200_BLE) {
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "设备名称：${it.deviceName}\n硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}"
             }

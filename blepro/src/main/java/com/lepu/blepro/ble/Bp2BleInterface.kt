@@ -94,6 +94,9 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i + 8 + len)
+            if (temp.size < 7) {
+                continue@loop
+            }
             if (temp.last() == calCRC8(temp)) {
                 val bleResponse = Bp2BleResponse.BleResponse(temp)
                 onResponseReceived(bleResponse)
@@ -172,7 +175,7 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 }
 
                 fileContent = null
-                fileSize = toUInt(bleResponse.content.copyOfRange(0, 4))
+                fileSize = toUInt(bleResponse.content)
                 LepuBleLog.d(tag, "download file $fileName CMD_FILE_READ_START fileSize == $fileSize")
                 if (fileSize <= 0) {
                     sendCmd(fileReadEnd())
