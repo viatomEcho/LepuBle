@@ -357,7 +357,8 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
+            Bluetooth.MODEL_PC200_BLE -> {
                 Pc300BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -555,7 +556,7 @@ object LpWorkManager {
                 }
             }
             Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC300,
-            Bluetooth.MODEL_PC300_BLE -> {
+            Bluetooth.MODEL_PC300_BLE, Bluetooth.MODEL_PC200_BLE -> {
                 Pc100BleManager(context).apply {
                     vailManager.put(m, this)
                     return this

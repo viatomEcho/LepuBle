@@ -233,7 +233,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_SP20_WPS_NO_SN, Bluetooth.MODEL_VTM01 -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
-            Bluetooth.MODEL_CHECK_ADV, Bluetooth.MODEL_PC300_BLE -> {
+            Bluetooth.MODEL_CHECK_ADV, Bluetooth.MODEL_PC300_BLE,
+            Bluetooth.MODEL_PC200_BLE -> {
                 waveHandler.post(EcgWaveTask())
                 waveHandler.post(OxyWaveTask())
             }
@@ -367,7 +368,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.bpLayout.visibility = View.GONE
                 startWave(it.modelNo)
             }
-            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
+            Bluetooth.MODEL_PC200_BLE -> {
                 binding.ecgLayout.visibility = View.VISIBLE
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.bpLayout.visibility = View.VISIBLE
@@ -426,14 +428,16 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         }
         binding.startRtEcg.setOnClickListener {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE) {
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC200_BLE) {
                 LpBleUtil.startEcg(Constant.BluetoothConfig.currentModel[0])
             }
             LpBleUtil.startRtTask()
         }
         binding.stopRtEcg.setOnClickListener {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE) {
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC200_BLE) {
                 LpBleUtil.stopEcg(Constant.BluetoothConfig.currentModel[0])
             }
             LpBleUtil.stopRtTask()
@@ -1468,6 +1472,13 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.deviceInfo.text = "心电包号：${data.seqNo}\n" +
                         "心电采样点位数类型：${data.digit}\n" +
                         "心电导联脱落：${data.isProbeOff}"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300EcgResult)
+            .observe(this) {
+                val data = it.data as Pc300BleResponse.EcgResult
+                viewModel.ecgHr.value = data.hr
+                binding.deviceInfo.text = "心率：${data.hr}\n" +
+                        "测量结果${data.result}：${data.resultMess}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtBpData)
             .observe(this) {

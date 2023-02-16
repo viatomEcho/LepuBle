@@ -344,7 +344,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PC300_BLE, Bluetooth.MODEL_LPM311,
             Bluetooth.MODEL_POCTOR_M3102, Bluetooth.MODEL_BIOLAND_BGM,
             Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_BPM,
-            Bluetooth.MODEL_PC80B_BLE2 -> false
+            Bluetooth.MODEL_PC80B_BLE2, Bluetooth.MODEL_PC200_BLE -> false
             else -> true
         }
     }
@@ -3060,7 +3060,8 @@ class BleServiceHelper private constructor() {
     fun startEcg(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
+            Bluetooth.MODEL_PC200_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc300BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc300BleInterface--startEcg")
@@ -3082,7 +3083,8 @@ class BleServiceHelper private constructor() {
     fun stopEcg(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
+            Bluetooth.MODEL_PC200_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc300BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc300BleInterface--stopEcg")
@@ -3104,7 +3106,8 @@ class BleServiceHelper private constructor() {
     fun pc300SetEcgDataDigit(model: Int, digit: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
+            Bluetooth.MODEL_PC200_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc300BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetEcgDataDigit")
@@ -3145,7 +3148,8 @@ class BleServiceHelper private constructor() {
     fun pc300SetGlucometerType(model: Int, type: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
+            Bluetooth.MODEL_PC200_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc300BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetGlucometerType")
@@ -3159,7 +3163,8 @@ class BleServiceHelper private constructor() {
     fun pc300GetGlucometerType(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
+            Bluetooth.MODEL_PC200_BLE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc300BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc300BleInterface--pc300GetGlucometerType")

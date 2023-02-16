@@ -545,7 +545,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * PC300BleInterface发出的通知
-     * 包含model: MODEL_PC300, MODEL_PC300_BLE
+     * 包含model: MODEL_PC300, MODEL_PC300_BLE,
+     *           MODEL_PC200_BLE
      */
     interface PC300 {
         companion object {
