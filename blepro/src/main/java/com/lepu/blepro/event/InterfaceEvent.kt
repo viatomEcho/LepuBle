@@ -189,7 +189,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventLpBp2wReadingFileProgress = "com.lepu.ble.lp.bp2w.reading.file.progress"  // 传输文件进度 int(0-100)
             const val EventLpBp2wReadFileComplete = "com.lepu.ble.lp.bp2w.read.file.complete"        // 传输文件完成 com.lepu.blepro.ext.lpbp2w.EcgFile
             const val EventLpBp2WriteFileError = "com.lepu.ble.lp.bp2w.write.file.error"             // 写文件出错 String(fileName)
-            const val EventLpBp2WriteFileComplete = "com.lepu.ble.lp.bp2w.write.file.complete"       // 写文件完成 boolean
+            const val EventLpBp2WriteFileComplete = "com.lepu.ble.lp.bp2w.write.file.complete"       // 写文件完成 com.lepu.blepro.ext.lpbp2w.FileListCrc
             const val EventLpBp2WritingFileProgress = "com.lepu.ble.lp.bp2w.writing.file.progress"   // 写文件进度 int(0-100)
             const val EventLpBp2wReset = "com.lepu.ble.lp.bp2w.reset"                                // 复位 boolean
             const val EventLpBp2wFactoryReset = "com.lepu.ble.lp.bp2w.factory.reset"                 // 恢复出厂设置 boolean
@@ -201,6 +201,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 //            const val EventLpBp2WifiScanning = "com.lepu.ble.lp.bp2w.wifi.scanning"                  // 正在扫描路由 boolean
 //            const val EventLpBp2wGetWifiConfig = "com.lepu.ble.lp.bp2w.get.wifi.config"              // 获取WiFi配置
 //            const val EventLpBp2wSetWifiConfig = "com.lepu.ble.lp.bp2w.set.wifi.config"              // 设置WiFi boolean
+            const val EventLpBp2wGetFileListCrc = "com.lepu.ble.lp.bp2w.get.file.list.crc"           // 获取文件列表CRC com.lepu.blepro.ext.lpbp2w.FileListCrc
             const val EventLpBp2wDeleteFile = "com.lepu.ble.lp.bp2w.delete.file"                     // 删除文件 boolean
         }
     }

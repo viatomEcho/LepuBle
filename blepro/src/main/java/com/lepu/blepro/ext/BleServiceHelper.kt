@@ -1272,6 +1272,26 @@ class BleServiceHelper private constructor() {
         }
     }
     /**
+     * fileType: 0-2
+     * 0: Constant.LpBp2wListType.USER_TYPE
+     * 1: Constant.LpBp2wListType.BP_TYPE
+     * 2: Constant.LpBp2wListType.ECG_TYPE
+     */
+    fun lpBp2wGetFileListCrc(model: Int, fileType: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LpBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2wGetFileListCrc")
+                        it.getFileListCrc(fileType)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "lpBp2wGetFileListCrc current model $model unsupported!!")
+        }
+    }
+    /**
      * 获取路由（lp bp2w）
      */
     /*fun lpBp2wGetWifiList(model: Int) {

@@ -8,8 +8,10 @@ import com.lepu.blepro.ble.cmd.LeBp2wBleCmd
 import com.lepu.blepro.ble.cmd.LeBp2wBleCmd.*
 import com.lepu.blepro.ble.cmd.LepuBleResponse
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ble.data.FileListCrc
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.lpbp2w.*
+import com.lepu.blepro.utils.CrcUtil.calCRC32
 import com.lepu.blepro.utils.CrcUtil.calCRC8
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
@@ -47,6 +49,7 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
     private var users = arrayListOf<UserInfo>()
     private var bpRecords = arrayListOf<BpRecord>()
     private var ecgRecords = arrayListOf<EcgRecord>()
+    private var fileListCrc = com.lepu.blepro.ext.lpbp2w.FileListCrc()
     /*private var wifiList = arrayListOf<LpBp2Wifi>()
     private var wifi = LpBp2Wifi()
     private var server = LpBp2wServer()
@@ -449,7 +452,17 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                 }
                 LepuBleLog.d(tag, "model:$model,WRITE_FILE_END => success")
                 val crc = FileListCrc(FileType.USER_TYPE, bleResponse.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2WriteFileComplete).post(InterfaceEvent(model, true))
+                fileListCrc.fileType = crc.fileType
+                fileListCrc.crc = crc.crc
+                userList?.let {
+                    if (crc.crc == calCRC32(userList?.getDataBytes())) {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2WriteFileComplete).post(InterfaceEvent(model, fileListCrc))
+                    } else {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2WriteFileError).post(InterfaceEvent(model, fileName))
+                    }
+                } ?: kotlin.run {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2WriteFileError).post(InterfaceEvent(model, fileName))
+                }
                 curSize = 0
             }
 
@@ -637,7 +650,9 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                     return
                 }
                 val crc = FileListCrc(FileType.ECG_TYPE, bleResponse.content)
-//                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wGetFileListCrc).post(InterfaceEvent(model, crc))
+                fileListCrc.fileType = crc.fileType
+                fileListCrc.crc = crc.crc
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wGetFileListCrc).post(InterfaceEvent(model, fileListCrc))
                 LepuBleLog.d(tag, "model:$model,GET_ECG_LIST_CRC => success")
             }
             GET_BP_LIST_CRC -> {
@@ -646,7 +661,9 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                     return
                 }
                 val crc = FileListCrc(FileType.BP_TYPE, bleResponse.content)
-//                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wGetFileListCrc).post(InterfaceEvent(model, crc))
+                fileListCrc.fileType = crc.fileType
+                fileListCrc.crc = crc.crc
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wGetFileListCrc).post(InterfaceEvent(model, fileListCrc))
                 LepuBleLog.d(tag, "model:$model,GET_BP_LIST_CRC => success")
             }
             GET_USER_LIST_CRC -> {
@@ -655,7 +672,9 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                     return
                 }
                 val crc = FileListCrc(FileType.USER_TYPE, bleResponse.content)
-//                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wGetFileListCrc).post(InterfaceEvent(model, crc))
+                fileListCrc.fileType = crc.fileType
+                fileListCrc.crc = crc.crc
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wGetFileListCrc).post(InterfaceEvent(model, fileListCrc))
                 LepuBleLog.d(tag, "model:$model,GET_USER_LIST_CRC => success")
             }
             DELETE_FILE -> {
