@@ -321,7 +321,7 @@ class BleServiceHelper private constructor() {
      * @param macAddress Array<String>
      */
     @JvmOverloads
-    fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, needPair: Boolean, toConnectUpdater: Boolean = false) {
+    fun reconnectByAddress(scanModel: IntArray, macAddress: Array<String>, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
         LepuBleLog.d(tag, "into reconnectByAddress 地址重连多个model")
         if (!checkService()) return
         LpWorkManager.reconnectByAddress(scanModel, macAddress, needPair, toConnectUpdater)

@@ -696,7 +696,7 @@ object LpWorkManager {
      *
      * 蓝牙名一致的设备重连不能使用蓝牙名重连方法
      */
-    fun reconnect(scanModel : IntArray? = null,reconnectDeviceName: Array<String>, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
+    fun reconnect(scanModel : IntArray? = null, reconnectDeviceName: Array<String>, needPair: Boolean = false, toConnectUpdater: Boolean = false) {
 
         if (vailFace.isEmpty()){
             LepuBleLog.d(tag, "reconnect vailFace.isEmpty()")

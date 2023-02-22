@@ -259,29 +259,20 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         device.address?.let {
             BleServiceHelper.removeReconnectAddress(it)
         }
-
-        // 多设备重连，因SDK扫描到需重连设备，去连接时并不会关闭扫描，
-        // 所以在重连此设备成功后，检查是否还有设备需要重连，再关闭扫描
-        // 暂不使用
-        /*if (BleServiceHelper.hasUnConnected()) {
+        // 多设备重连
+        if (BleServiceHelper.hasUnConnected()) {
             if (LpWorkManager.isReconnectByAddress) {
-                if (LpWorkManager.reconnectDeviceAddress.size == 0) {
-                    BleServiceHelper.stopScan()
-                    LepuBleLog.d(tag, "onDeviceConnected stopScan")
-                } else {
+                if (LpWorkManager.reconnectDeviceAddress.size != 0) {
+                    BleServiceHelper.reconnectByAddress(LpWorkManager.scanModel!!, LpWorkManager.reconnectDeviceAddress.toTypedArray())
                     LepuBleLog.d(tag, "onDeviceConnected reconnectDeviceAddress : ${LpWorkManager.reconnectDeviceAddress}")
                 }
             } else {
-                if (LpWorkManager.reconnectDeviceName.size == 0) {
-                    BleServiceHelper.stopScan()
-                    LepuBleLog.d(tag, "onDeviceConnected stopScan")
-                } else {
+                if (LpWorkManager.reconnectDeviceName.size != 0) {
+                    BleServiceHelper.reconnect(LpWorkManager.scanModel!!, LpWorkManager.reconnectDeviceName.toTypedArray())
                     LepuBleLog.d(tag, "onDeviceConnected reconnectDeviceName : ${LpWorkManager.reconnectDeviceName}")
                 }
             }
-        } else {
-            BleServiceHelper.stopScan()
-        }*/
+        }
     }
 
 
