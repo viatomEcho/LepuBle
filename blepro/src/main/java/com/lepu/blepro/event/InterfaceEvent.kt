@@ -10,8 +10,7 @@ import com.jeremyliao.liveeventbus.core.LiveEvent
 class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
-     * Oxy LiveDataBus Event
-     * OxyBleInterface发出的通知
+     * OxyBleInterface 发出的通知
      * 包含model: MODEL_O2RING, MODEL_BABYO2, MODEL_BABYO2N,
      *           MODEL_CHECKO2, MODEL_O2M, MODEL_SLEEPO2,
      *           MODEL_SNOREO2, MODEL_WEARO2, MODEL_SLEEPU,
@@ -43,7 +42,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * Er1BleInterface发出的通知
+     * Er1BleInterface 发出的通知
      * 包含model: MODEL_ER1, MODEL_ER1_N, MODEL_DUOEK
      *           MODEL_HHM1, MODEL_HHM2, MODEL_HHM3
      */
@@ -68,7 +67,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * BpmBleInterface发出的通知
+     * BpmBleInterface 发出的通知
      * 包含model: MODEL_BPM
      */
     interface BPM {
@@ -85,7 +84,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * Bp2BleInterface发出的通知
+     * Bp2BleInterface 发出的通知
      * 包含model: MODEL_BP2, MODEL_BP2A, MODEL_BP2T
      */
     interface BP2 {
@@ -112,7 +111,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * Bp2wBleInterface发出的通知
+     * Bp2wBleInterface 发出的通知
      * 包含model: MODEL_BP2W
      */
     interface BP2W {
@@ -140,7 +139,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * LeBp2wBleInterface发出的通知
+     * LeBp2wBleInterface 发出的通知
      * 包含model: MODEL_LE_BP2W
      */
     interface LeBP2W {
@@ -174,7 +173,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * Er2BleInterface发出的通知
+     * Er2BleInterface 发出的通知
      * 包含model: MODEL_ER2, MODEL_LP_ER2
      */
     interface ER2 {
@@ -198,7 +197,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * PC60FwBleInterface发出的通知
+     * PC60FwBleInterface 发出的通知
      * 包含model: MODEL_PC60FW, MODEL_PC66B, MODEL_OXYSMART,
      *           MODEL_POD_1W, MODEL_POD2B,
      *           MODEL_PC_60B, MODEL_PF_10, MODEL_PF_10AW,
@@ -226,7 +225,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * PC80BleInterface发出的通知
+     * PC80BleInterface 发出的通知
      * 包含model: MODEL_PC80B, MODEL_PC80B_BLE, MODEL_PC80B_BLE2
      */
     interface PC80B {
@@ -243,7 +242,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * FhrBleInterface发出的通知
+     * FhrBleInterface 发出的通知
      * 包含model: MODEL_FHR
      */
     interface FHR {
@@ -254,7 +253,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * Bpw1BleInterface发出的通知
+     * Bpw1BleInterface 发出的通知
      * 包含model: MODEL_BPW1
      */
     interface BPW1 {
@@ -273,7 +272,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * PC100BleInterface发出的通知
+     * PC100BleInterface 发出的通知
      * 包含model: MODEL_PC100
      */
     interface PC100 {
@@ -292,7 +291,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * Ap10BleInterface
+     * Ap10BleInterface 发出的通知
      * 包含model: MODEL_AP20, MODEL_AP20_WPS
      */
     interface AP20 {
@@ -322,7 +321,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * LewBleInterface发出的通知
+     * LewBleInterface 发出的通知
      * 包含model: MODEL_LEW, MODEL_W12C
      */
     interface Lew {
@@ -415,7 +414,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * Sp20BleInterface
+     * Sp20BleInterface 发出的通知
      * 包含model: MODEL_SP20, MODEL_SP20_BLE, MODEL_SP20_WPS
      *           MODEL_SP20_NO_SN, MODEL_SP20_WPS_NO_SN
      */
@@ -433,7 +432,6 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
              *        2 血氧过低阈值（value：85-99）
              *        3 脉率过低阈值（value：30-99）
              *        4 脉率过高阈值（value：100-250）
-             *        5 搏动音开关（value：0 off，1 on）
              */
             const val EventSp20GetConfig = "com.lepu.ble.sp20.get.config"          // 获取配置信息 Sp20Config
             /**
@@ -445,7 +443,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * Vtm20fBleInterface
+     * Vtm20fBleInterface 发出的通知
      * 包含model: MODEL_TV221U
      */
     interface VTM20f {
@@ -456,7 +454,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * Aoj20aBleInterface
+     * Aoj20aBleInterface 发出的通知
      * 包含model: MODEL_AOJ20A
      */
     interface AOJ20a {
@@ -471,7 +469,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * CheckmePodBleInterface
+     * CheckmePodBleInterface 发出的通知
      * 包含model: MODEL_CHECK_POD
      */
     interface CheckmePod {
@@ -487,7 +485,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * PulsebitBleInterface
+     * PulsebitBleInterface 发出的通知
      * 包含model: MODEL_PULSEBITEX, MODEL_HHM4, MODEL_CHECKME
      */
     interface Pulsebit {
@@ -505,7 +503,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
 
     /**
-     * Pc68bBleInterface
+     * Pc68bBleInterface 发出的通知
      * 包含model: MODEL_PC_68B
      */
     interface PC68B {
@@ -524,7 +522,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * VcominFhrBleInterface
+     * VcominFhrBleInterface 发出的通知
      * 包含model: MODEL_VCOMIN
      */
     interface VCOMIN {
@@ -534,7 +532,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * Ad5FhrBleInterface
+     * Ad5FhrBleInterface 发出的通知
      * 包含model: MODEL_VTM_AD5, MODEL_FETAL
      */
     interface AD5 {
@@ -544,7 +542,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * PC300BleInterface发出的通知
+     * PC300BleInterface 发出的通知
      * 包含model: MODEL_PC300, MODEL_PC300_BLE,
      *           MODEL_PC200_BLE
      */
@@ -568,7 +566,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * CheckmeLeInterface发出的通知
+     * CheckmeLeInterface 发出的通知
      * 包含model: MODEL_CHECKME_LE
      */
     interface CheckmeLE {
@@ -585,7 +583,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * LemBleInterface
+     * LemBleInterface 发出的通知
      * 包含model: MODEL_LEM
      */
     interface LEM {
@@ -600,7 +598,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * LeS1BleInterface发出的通知
+     * LeS1BleInterface 发出的通知
      * 包含model: MODEL_LES1
      */
     interface LES1 {
@@ -618,7 +616,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * Lpm311BleInterface
+     * Lpm311BleInterface 发出的通知
      * 包含model: MODEL_LPM311
      */
     interface LPM311 {
@@ -628,7 +626,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * PoctorM3102BleInterface
+     * PoctorM3102BleInterface 发出的通知
      * 包含model: MODEL_POCTOR_M3102
      */
     interface PoctorM3102 {
@@ -638,7 +636,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * BiolandBgmBleInterface
+     * BiolandBgmBleInterface 发出的通知
      * 包含model: MODEL_BIOLAND_BGM
      */
     interface BiolandBgm {
@@ -651,7 +649,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * Er3BleInterface发出的通知
+     * Er3BleInterface 发出的通知
      * 包含model: MODEL_ER3
      */
     interface ER3 {
@@ -675,7 +673,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * LepodBleInterface发出的通知
+     * LepodBleInterface 发出的通知
      * 包含model: MODEL_LEPOD
      */
     interface Lepod {
@@ -701,17 +699,20 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * Vtm01BleInterface 发出的通知
+     * 包含model: MODEL_VTM01
+     */
     interface VTM01 {
         companion object {
-            const val EventVtm01Info = "com.lepu.ble.vtm01.info"
-            const val EventVtm01RtData = "com.lepu.ble.vtm01.rtData"
-            const val EventVtm01RtParam = "com.lepu.ble.vtm01.rtParam"
-            const val EventVtm01OriginalData = "com.lepu.ble.vtm01.original.data"
-            const val EventVtm01Reset = "com.lepu.ble.vtm01.reset"
-            const val EventVtm01FactoryReset = "com.lepu.ble.vtm01.factory.reset"
-            const val EventVtm01GetConfig = "com.lepu.ble.vtm01.get.config"
-            const val EventVtm01SleepMode = "com.lepu.ble.vtm01.sleep.mode"
-            const val EventVtm01BurnFactoryInfo = "com.lepu.ble.vtm01.burn.factory.info"
+            const val EventVtm01Info = "com.lepu.ble.vtm01.info"                          // 获取设备信息 LepuDevice
+            const val EventVtm01RtData = "com.lepu.ble.vtm01.rtData"                      // 获取实时数据 Vtm01BleResponse.RtData
+            const val EventVtm01RtParam = "com.lepu.ble.vtm01.rtParam"                    // 获取实时参数 Vtm01BleResponse.RtParam
+            const val EventVtm01OriginalData = "com.lepu.ble.vtm01.original.data"         // 获取原始数据 Vtm01BleResponse.OriginalData
+            const val EventVtm01Reset = "com.lepu.ble.vtm01.reset"                        // 复位 boolean
+            const val EventVtm01FactoryReset = "com.lepu.ble.vtm01.factory.reset"         // 恢复出厂设置 boolean
+            const val EventVtm01SleepMode = "com.lepu.ble.vtm01.sleep.mode"               // 睡眠模式开关 boolean
+            const val EventVtm01BurnFactoryInfo = "com.lepu.ble.vtm01.burn.factory.info"  // 烧录出厂信息 boolean
         }
     }
 

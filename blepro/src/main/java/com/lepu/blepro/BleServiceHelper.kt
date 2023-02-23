@@ -27,7 +27,6 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-
 /**
  * 单例的蓝牙服务帮助类，原则上只通过此类开放API
  *

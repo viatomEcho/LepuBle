@@ -2,11 +2,9 @@ package com.lepu.blepro.download
 
 import android.text.TextUtils
 import com.lepu.blepro.BleServiceHelper
-import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.HexString
 import com.lepu.blepro.utils.LepuBleLog
 import java.io.File
-import java.io.IOException
 import java.io.RandomAccessFile
 
 /**

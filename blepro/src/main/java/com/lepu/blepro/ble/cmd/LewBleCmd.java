@@ -1,7 +1,6 @@
 package com.lepu.blepro.ble.cmd;
 
 import android.util.Log;
-
 import com.lepu.blepro.ble.data.lew.TimeData;
 import com.lepu.blepro.utils.CrcUtil;
 import static com.lepu.blepro.utils.ByteUtils.int4Bytes;

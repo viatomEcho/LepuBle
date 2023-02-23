@@ -2,7 +2,6 @@ package com.lepu.blepro.ble.cmd;
 
 import com.lepu.blepro.utils.CrcUtil;
 import com.lepu.blepro.utils.DateUtil;
-
 import java.util.Date;
 import java.util.TimeZone;
 

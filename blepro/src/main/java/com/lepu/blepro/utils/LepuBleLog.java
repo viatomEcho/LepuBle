@@ -1,10 +1,7 @@
-
 package com.lepu.blepro.utils;
 
 import android.util.Log;
-
 import no.nordicsemi.android.ble.BuildConfig;
-
 
 public class LepuBleLog {
     private static final String TAG = "*ble:v" + BuildConfig.VERSION_NAME + "*"  ;
