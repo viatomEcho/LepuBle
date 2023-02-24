@@ -2,7 +2,6 @@ package com.lepu.blepro.ble.cmd;
 
 import com.lepu.blepro.ble.data.Pc80TimeData;
 import com.lepu.blepro.utils.CrcUtil;
-
 import java.util.Date;
 
 /**

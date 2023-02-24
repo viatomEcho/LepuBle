@@ -1,10 +1,7 @@
 package com.lepu.blepro.ble
 
-import android.bluetooth.BluetoothDevice
 import android.content.Context
-import android.util.Log
 import com.lepu.blepro.base.LpBleManager
-import com.lepu.blepro.ble.cmd.BpmBleCmd
 import com.lepu.blepro.utils.LepuBleLog
 import no.nordicsemi.android.ble.RequestQueue
 import java.util.*

@@ -1,7 +1,6 @@
 package com.lepu.blepro.ble.cmd;
 
 import com.lepu.blepro.ble.data.TimeData;
-
 import java.util.Date;
 
 public class BiolandBgmBleCmd {

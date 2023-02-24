@@ -1,4 +1,5 @@
 package com.lepu.blepro.ble.data
+
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.toUInt
 

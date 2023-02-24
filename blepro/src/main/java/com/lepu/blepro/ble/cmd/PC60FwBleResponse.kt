@@ -6,7 +6,6 @@ import com.lepu.blepro.utils.byteToPointStr
 import com.lepu.blepro.utils.toUInt
 import kotlinx.android.parcel.Parcelize
 
-
 const val HEAD_0 = 0xAA.toByte()
 const val HEAD_1 = 0x55.toByte()
 const val TOKEN_EPI_F0 = 0xF0.toByte() // (EPI -> Equipment Public information)

@@ -14,10 +14,14 @@ import kotlin.experimental.inv
 /**
  * vtm01指甲血氧：
  * send:
- *
- * receive:
- * 1.实时血氧
- * 血氧采样率：参数1HZ，波形50HZ
+ * 1.获取设备信息
+ * 2.获取实时参数
+ * 3.获取实时数据，125HZ
+ * 4.获取原始数据，150HZ
+ * 5.进入睡眠模式
+ * 6.退出睡眠模式
+ * 7.复位
+ * 8.恢复出厂设置
  */
 class Vtm01BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Vtm01BleInterface"

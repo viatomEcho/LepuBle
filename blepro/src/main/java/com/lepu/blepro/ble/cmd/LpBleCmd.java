@@ -2,7 +2,6 @@ package com.lepu.blepro.ble.cmd;
 
 import com.lepu.blepro.utils.CrcUtil;
 import com.lepu.blepro.utils.LepuBleLog;
-
 import java.util.Calendar;
 
 public class LpBleCmd {

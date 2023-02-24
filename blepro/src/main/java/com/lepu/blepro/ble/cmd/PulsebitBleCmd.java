@@ -2,7 +2,6 @@ package com.lepu.blepro.ble.cmd;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import static com.lepu.blepro.utils.StringUtilsKt.makeTimeStr;
 
 /**

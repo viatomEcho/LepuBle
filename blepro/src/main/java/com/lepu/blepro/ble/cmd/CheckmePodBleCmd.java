@@ -1,10 +1,7 @@
 package com.lepu.blepro.ble.cmd;
 
-import com.lepu.blepro.utils.LepuBleLog;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import static com.lepu.blepro.utils.StringUtilsKt.makeTimeStr;
 
 public class CheckmePodBleCmd {

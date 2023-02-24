@@ -1,8 +1,5 @@
 package com.lepu.blepro.ble.cmd;
 
-import com.lepu.blepro.utils.ByteArrayKt;
-import com.lepu.blepro.utils.LepuBleLog;
-
 /**
  * @author chenyongfeng
  */
