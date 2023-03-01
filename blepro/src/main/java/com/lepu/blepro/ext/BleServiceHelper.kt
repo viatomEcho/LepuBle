@@ -639,7 +639,8 @@ class BleServiceHelper private constructor() {
             }
         }
     }
-    fun oxyReadFile(model: Int, fileName: String) {
+    @JvmOverloads
+    fun oxyReadFile(model: Int, fileName: String, userId: String = "") {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
@@ -653,7 +654,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS -> {
                 getInterface(model)?.let {
                     LepuBleLog.d(tag, "--oxyReadFile--")
-                    it.readFile("", fileName)
+                    it.readFile(userId, fileName)
                 }
             }
         }
@@ -794,11 +795,11 @@ class BleServiceHelper private constructor() {
         }
     }
     @JvmOverloads
-    fun er1ReadFile(model: Int, fileName: String, offset: Int = 0) {
+    fun er1ReadFile(model: Int, fileName: String, userId: String = "", offset: Int = 0) {
         if (!checkService()) return
         when(model) {
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
-                getInterface(model)?.readFile("", fileName, offset)
+                getInterface(model)?.readFile(userId, fileName, offset)
             }
         }
     }
@@ -837,7 +838,8 @@ class BleServiceHelper private constructor() {
      * 继续读取文件,并发送通知
      * @param model Int
      */
-    fun er1ContinueReadFile(model: Int,userId: String, fileName: String, offset: Int) {
+    @JvmOverloads
+    fun er1ContinueReadFile(model: Int, fileName: String, userId: String = "", offset: Int = 0) {
         if (!checkService()) return
         when(model) {
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
