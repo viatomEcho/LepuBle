@@ -95,6 +95,19 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 continue@loop
             }
 
+            // 添加包号校验，数据包有概率与协议包头一样
+            // 除读文件数据包号递增，其他都是0
+            val seqNo = toUInt(bytes.copyOfRange(i + 3, i + 5))
+            if (curCmd == OxyBleCmd.OXY_CMD_READ_CONTENT) {
+                if (seqNo != (OxyBleCmd.seqNo-1)) {
+                    continue@loop
+                }
+            } else {
+                if (seqNo != OxyBleCmd.seqNo) {
+                    continue@loop
+                }
+            }
+
             // need content length
             val len = toUInt(bytes.copyOfRange(i + 5, i + 7))
 //            Log.d(TAG, "want bytes length: $len")
