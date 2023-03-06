@@ -18,7 +18,7 @@ import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
-import com.lepu.blepro.utils.bytesToHex
+import com.lepu.blepro.utils.add
 import com.lepu.blepro.utils.getTimeString
 import com.lepu.demo.DemoWidgetProvider
 import com.lepu.demo.MainViewModel
@@ -30,6 +30,8 @@ import com.lepu.demo.data.OxyDataController
 import com.lepu.demo.data.entity.DeviceEntity
 import com.lepu.demo.databinding.FragmentDashboardBinding
 import com.lepu.demo.util.DataConvert
+import com.lepu.demo.util.DateUtil
+import com.lepu.demo.util.FileUtil
 import com.lepu.demo.views.EcgBkg
 import com.lepu.demo.views.EcgView
 import com.lepu.demo.views.Er3EcgView
@@ -44,10 +46,15 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     private val viewModel: DashboardViewModel by activityViewModels()
 
     private val binding: FragmentDashboardBinding by binding()
-    var oxyPpgSize = 0
 
     private var state = false
     private var type = 0
+    // 采集
+    private var o2RtType = 0  // 0: rt param, 1: rt wave, 2: rt ppg
+    private var startCollectTime = 0
+    private var stopCollectTime = 0
+    private var collectBytesData = ByteArray(0)
+    private var collectIntsData = mutableListOf<Int>()
 
     // 心电产品
     private lateinit var ecgBkg: EcgBkg
@@ -325,9 +332,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_O2M_WPS,
             Bluetooth.MODEL_VTM01 -> {
                 binding.oxyLayout.visibility = View.VISIBLE
+                binding.o2RtTypeLayout.visibility = View.VISIBLE
+                binding.collectPpg.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.ecgLayout.visibility = View.GONE
                 binding.bpLayout.visibility = View.GONE
+                binding.o2RtTypeLayout.check(R.id.o2_rt_param)
                 LpBleUtil.startRtTask()
                 startWave(it.modelNo)
             }
@@ -613,7 +623,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYU
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_AI_S100
             ) {
-                LpBleUtil.oxyGetRtParam(Constant.BluetoothConfig.currentModel[0])
+                when (o2RtType) {
+                    0 -> LpBleUtil.oxyGetRtParam(Constant.BluetoothConfig.currentModel[0])
+                    1 -> LpBleUtil.oxyGetRtWave(Constant.BluetoothConfig.currentModel[0])
+                    2 -> LpBleUtil.oxyGetPpgRt(Constant.BluetoothConfig.currentModel[0])
+                }
                 startWave(Constant.BluetoothConfig.currentModel[0])
             } else {
                 LpBleUtil.startRtTask()
@@ -669,6 +683,30 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         }
         binding.er3StopEcg.setOnClickListener {
             LpBleUtil.stopEcg(Constant.BluetoothConfig.currentModel[0])
+        }
+        binding.o2RtTypeLayout.setOnCheckedChangeListener { group, checkedId ->
+            if (binding.collectPpg.isChecked) {
+                when (o2RtType) {
+                    0 -> binding.o2RtTypeLayout.check(R.id.o2_rt_param)
+                    1 -> binding.o2RtTypeLayout.check(R.id.o2_rt_wave)
+                    2 -> binding.o2RtTypeLayout.check(R.id.o2_rt_ppg)
+                }
+                Toast.makeText(context, "请先停止采集PPG数据！", Toast.LENGTH_SHORT).show()
+                return@setOnCheckedChangeListener
+            }
+            when (checkedId) {
+                R.id.o2_rt_param -> o2RtType = 0
+                R.id.o2_rt_wave -> o2RtType = 1
+                R.id.o2_rt_ppg -> o2RtType = 2
+            }
+        }
+        binding.collectPpg.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (o2RtType != 2) {
+                binding.collectPpg.isChecked = !isChecked
+                Toast.makeText(context, "请先选择获取PPG数据，再进行PPG数据采集！", Toast.LENGTH_SHORT).show()
+                return@setOnCheckedChangeListener
+            }
+            collectPpg(isChecked)
         }
     }
 
@@ -803,6 +841,35 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         binding.oxyView.addView(oxyView)
 
         viewModel.dataOxySrc.value = OxyDataController.iniDataSrc(index)
+    }
+
+    private fun collectPpg(isCollect: Boolean) {
+        if (isCollect) {
+            startCollectTime = (System.currentTimeMillis()/1000).toInt()
+            collectBytesData = ByteArray(0)
+            collectIntsData.clear()
+        } else {
+            stopCollectTime = (System.currentTimeMillis()/1000).toInt()
+            val ppgFile = PpgFile()
+            ppgFile.sampleTime = startCollectTime
+            ppgFile.sampleSize = collectBytesData.size.div(4)
+            ppgFile.leadSize = 1
+//            ppgFile.leadSize = 2
+            ppgFile.leadConfig[0] = 1
+//            ppgFile.leadConfig[1] = 2
+            ppgFile.waveConfig[0] = 940
+//            ppgFile.waveConfig[1] = 660
+            ppgFile.accuracy = 0xffff
+            ppgFile.maxValue = 0xffff
+            ppgFile.deviceType = 1
+            ppgFile.sn = mainViewModel.oxyInfo.value?.sn!!
+            ppgFile.sampleData = collectIntsData.toIntArray()
+            val fileName = "${DateUtil.stringFromDate(Date(startCollectTime*1000L), "yyyyMMddHHmmss")}.dat"
+            FileUtil.saveFile(context, ppgFile.getDataBytes(), fileName)
+            Log.d(TAG, "collectIntsData: ${collectIntsData.joinToString(",")}")
+            val file = PpgFile(FileUtil.readFileToByteArray(context, fileName))
+            Log.d(TAG, "file: $file")
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -1135,7 +1202,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
                     toPlayAlarm(data.pr)
                     OxyDataController.receive(data.wFs)
-                    LpBleUtil.oxyGetRtParam(event.model)
+                    when (o2RtType) {
+                        0 -> LpBleUtil.oxyGetRtParam(event.model)
+                        1 -> LpBleUtil.oxyGetRtWave(event.model)
+                        2 -> LpBleUtil.oxyGetPpgRt(event.model)
+                    }
                     viewModel.oxyPr.value = data.pr
                     viewModel.spo2.value = data.spo2
                     viewModel.oxyPr.value = data.pr
@@ -1150,7 +1221,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.pi.value = data.pi.div(10f)
                 viewModel.oxyPr.value = data.pr
                 mainViewModel._battery.value = "${data.battery} %"
-                LpBleUtil.oxyGetPpgRt(it.model)
+                when (o2RtType) {
+                    0 -> LpBleUtil.oxyGetRtParam(it.model)
+                    1 -> LpBleUtil.oxyGetRtWave(it.model)
+                    2 -> LpBleUtil.oxyGetPpgRt(it.model)
+                }
                 binding.dataStr.text = data.toString()
                 binding.deviceInfo.text = "体动：${data.vector}\n" +
                         "导联状态：${if (data.state == 0) "脱落" else "正常"}\n" +
@@ -1167,38 +1242,53 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         // o2ring ppg
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
             .observe(this) {
-
-                LpBleUtil.oxyGetRtWave(it.model)
+                when (o2RtType) {
+                    0 -> LpBleUtil.oxyGetRtParam(it.model)
+                    1 -> LpBleUtil.oxyGetRtWave(it.model)
+                    2 -> LpBleUtil.oxyGetPpgRt(it.model)
+                }
                 val ppgData = it.data as OxyBleResponse.PPGData
                 ppgData.let { data ->
-                    oxyPpgSize += data.rawDataBytes.size
-                    Log.d("ppg", "len  = ${data.rawDataBytes.size}")
-                    Log.d(TAG, "oxyPpgSize == $oxyPpgSize")
-
-                    var bytes = ByteArray(0)
-                    for (i in 0 until data.len) {
-                        bytes = bytes.plus(data.redByteArray[i]!!)
+                    if (binding.collectPpg.isChecked) {
+                        collectBytesData = add(collectBytesData, data.irByteArray)
+                        for (i in data.irArray) {
+                            val temp = i.div(256)
+                            collectIntsData.add(temp)
+                        }
+                        /*for (i in data.irRedArray) {
+                            val temp = i.div(256)
+                            collectIntsData.add(temp)
+                            Log.d(TAG, "i: $i, temp: $temp")
+                        }*/
                     }
-
-                    Log.d(TAG, "------------------------" + bytesToHex(bytes))
-
                 }
-
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgRes)
             .observe(this) {
                 Log.d(TAG, "------------EventOxyPpgRes------------")
-                LpBleUtil.oxyGetRtWave(it.model)
+                when (o2RtType) {
+                    0 -> LpBleUtil.oxyGetRtParam(it.model)
+                    1 -> LpBleUtil.oxyGetRtWave(it.model)
+                    2 -> LpBleUtil.oxyGetPpgRt(it.model)
+                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtWaveRes)
             .observe(this) {
                 Log.d(TAG, "------------EventOxyRtWaveRes------------")
-                LpBleUtil.oxyGetRtParam(it.model)
+                when (o2RtType) {
+                    0 -> LpBleUtil.oxyGetRtParam(it.model)
+                    1 -> LpBleUtil.oxyGetRtWave(it.model)
+                    2 -> LpBleUtil.oxyGetPpgRt(it.model)
+                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamRes)
             .observe(this) {
                 Log.d(TAG, "------------EventOxyRtParamRes------------")
-                LpBleUtil.oxyGetPpgRt(it.model)
+                when (o2RtType) {
+                    0 -> LpBleUtil.oxyGetRtParam(it.model)
+                    1 -> LpBleUtil.oxyGetRtWave(it.model)
+                    2 -> LpBleUtil.oxyGetPpgRt(it.model)
+                }
             }
         //------------------------------pc60fw------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwBattery)

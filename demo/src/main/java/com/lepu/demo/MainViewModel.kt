@@ -214,8 +214,9 @@ class MainViewModel: ViewModel() {
 
     }
 
-
-
+    /**
+     * 采集O2波形数据
+     */
     @Synchronized fun checkStartCollect(activity: Activity, wave: ByteArray?){
         if (preingCollect.value == true ){
 
@@ -228,7 +229,7 @@ class MainViewModel: ViewModel() {
                     if (!util.isTasking && !util.isSaving){
                         LepuBleLog.d(tag,"即将进入采集 isTasking = ${util.isTasking}, isSaving = ${util.isSaving}")
                         util.startCollectData()
-                       startCountDown(activity.applicationContext)
+                        startCountDown(activity.applicationContext)
                     }
 
 

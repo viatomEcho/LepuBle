@@ -107,13 +107,13 @@ class HomeFragment : Fragment(R.layout.fragment_home){
             }
         }
         binding.needPair.isChecked = Constant.BluetoothConfig.needPair
-        binding.needPair.setOnClickListener {
+        binding.needPair.setOnCheckedChangeListener { buttonView, isChecked ->
             if (Constant.BluetoothConfig.splitType == 10) {
                 binding.needPair.isChecked = false
                 Toast.makeText(context, "该设备类型不支持配对连接！", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+                return@setOnCheckedChangeListener
             }
-            Constant.BluetoothConfig.needPair = binding.needPair.isChecked
+            Constant.BluetoothConfig.needPair = isChecked
             LpBleUtil.setNeedPair(Constant.BluetoothConfig.needPair)
         }
         binding.scanByName.setOnClickListener {

@@ -11,13 +11,15 @@ fun ByteArray.toHex() = joinToString("") {
 
 fun byteArrayOfInts(vararg ints: Int) = ByteArray(ints.size) { pos -> ints[pos].toByte() }
 
-
+/**
+ * 数组末尾添加
+ */
 fun add(ori: ByteArray?, add: ByteArray): ByteArray {
     if (ori == null) {
         return add
     }
 
-    val new: ByteArray = ByteArray(ori.size + add.size)
+    val new = ByteArray(ori.size + add.size)
     for ((index, value) in ori.withIndex()) {
         new[index] = value
     }

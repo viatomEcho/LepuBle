@@ -184,12 +184,18 @@ class PC60FwBleResponse{
     @ExperimentalUnsignedTypes
     class OriginalData(val bytes: ByteArray) {
         var redFrq: Int  // 0-600Khz
-        var irFrq: Int
+        var irFrq: Int   // 0-600Khz
         init {
             var index = 0
-            redFrq = toUInt(bytes.copyOfRange(index, index+2))
-            index += 2
-            irFrq = toUInt(bytes.copyOfRange(index, index+2))
+            if (bytes.size >= 8) {
+                irFrq = toUInt(bytes.copyOfRange(index, index+4))
+                index += 4
+                redFrq = toUInt(bytes.copyOfRange(index, index+4))
+            } else {
+                redFrq = toUInt(bytes.copyOfRange(index, index+2))
+                index += 2
+                irFrq = toUInt(bytes.copyOfRange(index, index+2))
+            }
         }
 
         override fun toString(): String {

@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.add
 import com.lepu.blepro.utils.toUInt
 import kotlinx.android.parcel.Parcelize
 import org.json.JSONObject
@@ -317,27 +318,31 @@ class OxyBleResponse{
         var rawDataBytes: ByteArray
 
         var rawDataArray = mutableListOf<PpgRawData>()
+        var irRedArray: IntArray
         var irArray : IntArray
-        var irByteArray = mutableListOf<ByteArray>()
+        var irByteArray = ByteArray(0)
         var redArray : IntArray
-        var redByteArray = mutableListOf<ByteArray>()
+        var redByteArray = ByteArray(0)
         var motionArray : IntArray
 
         init {
             len = toUInt(bytes.copyOfRange(0, 2))
-            rawDataBytes =  bytes.copyOfRange(2, bytes.size)
+            rawDataBytes = bytes.copyOfRange(2, bytes.size)
+            irRedArray = IntArray(len*2)
             irArray = IntArray(len)
             redArray = IntArray(len)
             motionArray = IntArray(len)
-            for (i in 0  until len ){
+            for (i in 0 until len){
                 if (bytes.size < (i * 9) + 11) break
 
-                PpgRawData(bytes.copyOfRange(2 + (i * 9), (i * 9) + 11 )).let {
+                PpgRawData(bytes.copyOfRange(2 + (i * 9), (i * 9) + 11)).let {
                     rawDataArray.add(it)
+                    irRedArray[i*2] = it.ir
+                    irRedArray[i*2+1] = it.red
                     irArray[i] = it.ir
-                    irByteArray.add(it.irBytes)
+                    irByteArray = add(irByteArray, it.irBytes)
                     redArray[i] = it.red
-                    redByteArray.add(it.redBytes)
+                    redByteArray = add(redByteArray, it.redBytes)
                     motionArray[i] = it.motion
                 }
             }
