@@ -1879,7 +1879,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val data = it.data as BtpBleResponse.RtData
                 binding.deviceInfo.text = "心率：${data.hr}\n"
                 if (type == 1) {
-                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "温度：${32+data.temp*1.8} ℉"
+                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "温度：${String.format("%.2f", (32+data.temp*1.8))} ℉"
                 } else {
                     binding.deviceInfo.text = binding.deviceInfo.text.toString() + "温度：${data.temp} ℃"
                 }

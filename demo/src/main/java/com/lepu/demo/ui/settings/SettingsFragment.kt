@@ -3341,6 +3341,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 } else {
                     Toast.makeText(context, "烧录失败", Toast.LENGTH_SHORT).show()
                 }
+                LpBleUtil.getInfo(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetConfig)
             .observe(this) {
@@ -3358,7 +3359,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.btpLayout.hrHighThr.setText("${config.hrHighThr}")
                 binding.btpLayout.tempLowThr.setText("${config.tempLowThr}")
                 binding.btpLayout.tempHighThr.setText("${config.tempHighThr}")
-                Toast.makeText(context, "获取配置信息成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetLowHr)
             .observe(this) {
@@ -3368,6 +3368,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 } else {
                     Toast.makeText(context, "设置心率低阈值失败", Toast.LENGTH_SHORT).show()
                 }
+                LpBleUtil.btpGetConfig(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetHighHr)
             .observe(this) {
@@ -3377,6 +3378,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 } else {
                     Toast.makeText(context, "设置心率高阈值失败", Toast.LENGTH_SHORT).show()
                 }
+                LpBleUtil.btpGetConfig(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetLowTemp)
             .observe(this) {
@@ -3386,6 +3388,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 } else {
                     Toast.makeText(context, "设置温度低阈值失败", Toast.LENGTH_SHORT).show()
                 }
+                LpBleUtil.btpGetConfig(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetHighTemp)
             .observe(this) {
@@ -3395,6 +3398,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 } else {
                     Toast.makeText(context, "设置温度高阈值失败", Toast.LENGTH_SHORT).show()
                 }
+                LpBleUtil.btpGetConfig(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetSystemSwitch)
             .observe(this) {
@@ -3404,6 +3408,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 } else {
                     Toast.makeText(context, "设置系统开关失败", Toast.LENGTH_SHORT).show()
                 }
+                LpBleUtil.btpGetConfig(it.model)
             }
 
         //-----------------------------------

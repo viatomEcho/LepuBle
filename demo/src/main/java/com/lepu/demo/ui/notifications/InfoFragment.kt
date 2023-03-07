@@ -1690,15 +1690,30 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         //-----------------------btp-----------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReset)
             .observe(this) {
-                Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()
+                val data = it.data as Boolean
+                if (data) {
+                    Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "复位失败", Toast.LENGTH_SHORT).show()
+                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpFactoryReset)
             .observe(this) {
-                Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
+                val data = it.data as Boolean
+                if (data) {
+                    Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "恢复出厂设置失败", Toast.LENGTH_SHORT).show()
+                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpFactoryResetAll)
             .observe(this) {
-                Toast.makeText(context, "恢复生产状态成功", Toast.LENGTH_SHORT).show()
+                val data = it.data as Boolean
+                if (data) {
+                    Toast.makeText(context, "恢复生产状态成功", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "恢复生产状态失败", Toast.LENGTH_SHORT).show()
+                }
             }
     }
 
