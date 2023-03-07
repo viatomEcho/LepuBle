@@ -384,6 +384,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.er3Layout.visibility = View.GONE
                 startWave(it.modelNo)
             }
+            Bluetooth.MODEL_BTP -> {
+                LpBleUtil.startRtTask(it.modelNo, 2000)
+                LpBleUtil.btpGetConfig(it.modelNo)
+            }
         }
     }
 
@@ -1868,6 +1872,22 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         else -> ""
                     }
                 }"
+            }
+        //------------------------btp----------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpRtData)
+            .observe(this) {
+                val data = it.data as BtpBleResponse.RtData
+                binding.deviceInfo.text = "心率：${data.hr}\n"
+                if (type == 1) {
+                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "温度：${32+data.temp*1.8} ℉"
+                } else {
+                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "温度：${data.temp} ℃"
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetConfig)
+            .observe(this) {
+                val data = it.data as BtpBleResponse.ConfigInfo
+                type = data.tempUnit
             }
     }
 

@@ -319,7 +319,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LEPOD) {
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
-            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W) {
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BTP) {
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
                 binding.wifiConfig.visibility = View.VISIBLE
@@ -1684,6 +1686,19 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01FactoryReset)
             .observe(this) {
                 Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
+            }
+        //-----------------------btp-----------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReset)
+            .observe(this) {
+                Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpFactoryReset)
+            .observe(this) {
+                Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpFactoryResetAll)
+            .observe(this) {
+                Toast.makeText(context, "恢复生产状态成功", Toast.LENGTH_SHORT).show()
             }
     }
 

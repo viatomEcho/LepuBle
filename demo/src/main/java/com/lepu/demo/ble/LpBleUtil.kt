@@ -1059,6 +1059,32 @@ class LpBleUtil {
         fun vtm01SleepMode(model: Int, on: Boolean) {
             BleServiceHelper.vtm01SleepMode(model, on)
         }
+        // BTP
+        fun btpGetBattery(model: Int) {
+            BleServiceHelper.btpGetBattery(model)
+        }
+        fun btpGetConfig(model: Int) {
+            BleServiceHelper.btpGetConfig(model)
+        }
+        fun btpSetLowHr(model: Int, lowHr: Int) {
+            BleServiceHelper.btpSetLowHr(model, lowHr)
+        }
+        fun btpSetHighHr(model: Int, highHr: Int) {
+            BleServiceHelper.btpSetHighHr(model, highHr)
+        }
+        fun btpSetLowTemp(model: Int, lowTemp: Int) {
+            BleServiceHelper.btpSetLowTemp(model, lowTemp)
+        }
+        fun btpSetHighTemp(model: Int, highTemp: Int) {
+            BleServiceHelper.btpSetHighTemp(model, highTemp)
+        }
+        fun btpSetTempUnit(model: Int, unit: Int) {
+            BleServiceHelper.btpSetTempUnit(model, unit)
+        }
+        fun btpSetSystemSwitch(model: Int, hrSwitch: Boolean, lightSwitch: Boolean, tempSwitch: Boolean) {
+            BleServiceHelper.btpSetSystemSwitch(model, hrSwitch, lightSwitch, tempSwitch)
+        }
+
     }
 
 

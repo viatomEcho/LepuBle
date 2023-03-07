@@ -590,6 +590,24 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 Toast.makeText(this, "VTM01 获取设备信息成功", Toast.LENGTH_SHORT).show()
                 viewModel._er1Info.value = it.data as LepuDevice
             }
+        //--------------------------btp--------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetTime)
+            .observe(this) {
+                Toast.makeText(this, "BTP 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+                LpBleUtil.btpGetBattery(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetInfo)
+            .observe(this) {
+                Toast.makeText(this, "BTP 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                viewModel._er1Info.value = it.data as LepuDevice
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetBattery)
+            .observe(this) { event ->
+                (event.data as KtBleBattery).let {
+                    viewModel._battery.value = "${it.percent} %"
+                }
+            }
     }
     private fun needPermission(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
