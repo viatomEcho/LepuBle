@@ -322,6 +322,7 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                             ecgFile.startTime = data.timestamp
                             ecgFile.waveData = data.waveData
                             ecgFile.waveShortData = data.waveShortData
+                            ecgFile.waveFloatData = data.waveFloatData
                             ecgFile.duration = data.duration
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wReadFileComplete).post(InterfaceEvent(model, ecgFile))
                         }

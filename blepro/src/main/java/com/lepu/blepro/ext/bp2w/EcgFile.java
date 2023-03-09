@@ -15,6 +15,7 @@ public class EcgFile {
     private boolean connectCable;       // 是否接入线缆
     private byte[] waveData;
     private short[] waveShortData;
+    private float[] waveFloatData;
 
     public EcgFile(byte[] bytes) {
         com.lepu.blepro.ble.data.Bp2EcgFile data = new com.lepu.blepro.ble.data.Bp2EcgFile(bytes);
@@ -32,6 +33,7 @@ public class EcgFile {
         connectCable = data.getConnectCable();
         waveData = data.getWaveData();
         waveShortData = data.getWaveShortData();
+        waveFloatData = data.getWaveFloatData();
     }
 
     public int getFileVersion() {
@@ -144,6 +146,14 @@ public class EcgFile {
 
     public void setWaveShortData(short[] waveShortData) {
         this.waveShortData = waveShortData;
+    }
+
+    public float[] getWaveFloatData() {
+        return waveFloatData;
+    }
+
+    public void setWaveFloatData(float[] waveFloatData) {
+        this.waveFloatData = waveFloatData;
     }
 
     @Override

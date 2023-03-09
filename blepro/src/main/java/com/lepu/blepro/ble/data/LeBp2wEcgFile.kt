@@ -12,6 +12,7 @@ class LeBp2wEcgFile {
     var timestamp: Long
     var waveData: ByteArray
     var waveShortData: ShortArray
+    var waveFloatData: FloatArray
     var deviceName: String
     var duration: Int
     constructor(fileName: String, content: ByteArray, deviceName: String) {
@@ -29,8 +30,10 @@ class LeBp2wEcgFile {
         index += 4
         waveData = content.copyOfRange(index, content.size)
         waveShortData = ShortArray(waveData.size.div(2))
+        waveFloatData = FloatArray(waveData.size.div(2))
         for (i in waveShortData.indices) {
             waveShortData[i] = toSignedShort(waveData[2 * i], waveData[2 * i + 1])
+            waveFloatData[i] = waveShortData[i] * 0.003098f
         }
         duration = waveData.size.div(2*125)
     }

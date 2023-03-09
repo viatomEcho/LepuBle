@@ -26,6 +26,7 @@ class Bp2EcgFile(val bytes: ByteArray) {
     // reserved 19
     var waveData: ByteArray
     var waveShortData: ShortArray
+    var waveFloatData: FloatArray
 
     init {
         var index = 0
@@ -59,8 +60,10 @@ class Bp2EcgFile(val bytes: ByteArray) {
         index += 19
         waveData = bytes.copyOfRange(index, bytes.size)
         waveShortData = ShortArray(waveData.size.div(2))
+        waveFloatData = FloatArray(waveData.size.div(2))
         for (i in waveShortData.indices) {
             waveShortData[i] = toSignedShort(waveData[2*i], waveData[2*i+1])
+            waveFloatData[i] = waveShortData[i] * 0.003098f
         }
     }
 
@@ -81,7 +84,8 @@ class Bp2EcgFile(val bytes: ByteArray) {
             qtc : $qtc
             connectCable : $connectCable
             waveData : ${bytesToHex(waveData)}
-            waveShortData : $waveShortData
+            waveShortData : ${waveShortData.joinToString(",")}
+            waveFloatData : ${waveFloatData.joinToString(",")}
         """.trimIndent()
     }
 

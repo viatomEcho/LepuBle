@@ -7,6 +7,7 @@ public class EcgFile {
     private long startTime;
     private byte[] waveData;
     private short[] waveShortData;
+    private float[] waveFloatData;
     private int duration;
 
     public String getFileName() {
@@ -55,6 +56,14 @@ public class EcgFile {
 
     public void setWaveShortData(short[] waveShortData) {
         this.waveShortData = waveShortData;
+    }
+
+    public float[] getWaveFloatData() {
+        return waveFloatData;
+    }
+
+    public void setWaveFloatData(float[] waveFloatData) {
+        this.waveFloatData = waveFloatData;
     }
 
     public int getDuration() {
