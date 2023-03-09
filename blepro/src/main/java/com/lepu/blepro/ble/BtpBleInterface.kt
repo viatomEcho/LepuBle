@@ -267,11 +267,12 @@ class BtpBleInterface(model: Int): BleInterface(model) {
                 continue@loop
             }
 
-            if (bytes[i+1].toInt() == BtpBleCmd.FILE_READ_PKG) {
+            // seqNo
+            /*if (bytes[i+1].toInt() == BtpBleCmd.FILE_READ_PKG) {
                 if (bytes[i+4].toInt() != (BtpBleCmd.seqNo-1)) {
                     continue@loop
                 }
-            }
+            }*/
 
             // need content length
             val len = toUInt(bytes.copyOfRange(i+5, i+7))
@@ -380,7 +381,7 @@ class BtpBleInterface(model: Int): BleInterface(model) {
 
     override fun dealReadFile(userId: String, fileName: String) {
         this.fileName = fileName
-//        sendCmd(BtpBleCmd.getFileStart(fileName.toByteArray(), 0))
+        sendCmd(BtpBleCmd.getFileStart(fileName.toByteArray(), 0))
         LepuBleLog.d(tag, "dealReadFile...")
     }
 
@@ -388,7 +389,7 @@ class BtpBleInterface(model: Int): BleInterface(model) {
      * get file list
      */
     override fun getFileList() {
-//        sendCmd(BtpBleCmd.getFileList())
+        sendCmd(BtpBleCmd.getFileList())
         LepuBleLog.d(tag, "getFileList...")
     }
 

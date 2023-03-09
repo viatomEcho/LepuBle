@@ -3,6 +3,7 @@ package com.lepu.blepro.ble.cmd
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.HexString.trimStr
+import java.util.*
 
 object BtpBleResponse {
 
@@ -155,20 +156,21 @@ object BtpBleResponse {
             index += 8
             magic = toUInt(bytes.copyOfRange(index, index+4))
             index += 4
-            timestamp = toUInt(bytes.copyOfRange(index, index+4))
+            timestamp = toUInt(bytes.copyOfRange(index, index+4)) - TimeZone.getDefault().rawOffset.div(1000)
             index += 4
             duration = toUInt(bytes.copyOfRange(index, index+4))
             index += 4
-            index += 8
-            val len = (bytes.size - index).div(10)
+            index += 4
+            val len = (bytes.size - index).div(12)
             for (i in 0 until len) {
-                pointDatas.add(PointData(bytes.copyOfRange(index, index+10)))
-                index += 10
+                pointDatas.add(PointData(bytes.copyOfRange(index, index+12)))
+                index += 12
             }
         }
         override fun toString(): String {
             return """
                 BtpFile : 
+                bytes : ${bytesToHex(bytes)}
                 fileVersion : $fileVersion
                 fileType : $fileType
                 magic : $magic
@@ -189,7 +191,7 @@ object BtpBleResponse {
         // reserved 3
         init {
             var index = 0
-            timestamp = toUInt(bytes.copyOfRange(index, index+4))
+            timestamp = toUInt(bytes.copyOfRange(index, index+4)) - TimeZone.getDefault().rawOffset.div(1000)
             index += 4
             hrEvent = byte2UInt(bytes[index])
             index++
