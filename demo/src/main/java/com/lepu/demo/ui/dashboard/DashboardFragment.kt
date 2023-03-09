@@ -1879,10 +1879,28 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val data = it.data as BtpBleResponse.RtData
                 binding.deviceInfo.text = "心率：${data.hr}\n"
                 if (type == 1) {
-                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "温度：${String.format("%.2f", (32+data.temp*1.8))} ℉"
+                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "温度：${String.format("%.2f", (32+data.temp*1.8))} ℉\n"
                 } else {
-                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "温度：${data.temp} ℃"
+                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "温度：${data.temp} ℃\n"
                 }
+                binding.deviceInfo.text = binding.deviceInfo.text.toString() + "是否测量中：${data.isWearing}\n" +
+                        "心率可信度：${data.level}\n" +
+                        "心率状态${data.hrStatus}：${
+                            when (data.hrStatus) {
+                                0 -> "正常"
+                                1 -> "心率低异常"
+                                2 -> "心率高异常"
+                                else -> ""
+                            }
+                        }\n" +
+                        "温度状态${data.tempStatus}：${
+                            when (data.tempStatus) {
+                                0 -> "正常"
+                                3 -> "温度低异常"
+                                4 -> "温度高异常"
+                                else -> ""
+                            }
+                        }"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetConfig)
             .observe(this) {

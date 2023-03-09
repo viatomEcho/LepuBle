@@ -595,12 +595,12 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             .observe(this) {
                 Toast.makeText(this, "BTP 完成时间同步", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
-                LpBleUtil.btpGetBattery(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetInfo)
             .observe(this) {
                 Toast.makeText(this, "BTP 获取设备信息成功", Toast.LENGTH_SHORT).show()
                 viewModel._er1Info.value = it.data as LepuDevice
+                LpBleUtil.btpGetBattery(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetBattery)
             .observe(this) { event ->

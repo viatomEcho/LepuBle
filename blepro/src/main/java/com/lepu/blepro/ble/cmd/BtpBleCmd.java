@@ -30,12 +30,12 @@ public class BtpBleCmd {
     public static final int SET_HIGH_TEMP = 0x07;
     public static final int SET_TEMP_UNIT = 0x0C;
 
-//    public static final int GET_FILE_LIST = 0x08;  // 0xF1
-//    public static final int FILE_READ_START = 0x09;  // 0xF2
-//    public static final int FILE_READ_PKG = 0x0A;  // 0xF3
-//    public static final int FILE_READ_END = 0x0B;  // 0xF4
+    public static final int GET_FILE_LIST = 0x08;  // 0xF1
+    public static final int FILE_READ_START = 0x09;  // 0xF2
+    public static final int FILE_READ_PKG = 0x0A;  // 0xF3
+    public static final int FILE_READ_END = 0x0B;  // 0xF4
 
-    private static int seqNo = 0;
+    public static int seqNo = 0;
     private static void addNo() {
         seqNo++;
         if (seqNo >= 255) {
@@ -106,6 +106,37 @@ public class BtpBleCmd {
 
     public static byte[] getInfo() {
         return getReq(GET_INFO, new byte[0]);
+    }
+    public static byte[] getFileList() {
+        return getReq(GET_FILE_LIST, new byte[0]);
+    }
+    public static byte[] getFileStart(byte[] fileName,byte offset){
+        byte[] cmd = new byte[20];
+        System.arraycopy(fileName, 0, cmd, 0, fileName.length);
+        cmd[16] = (byte) offset;
+        cmd[17] = (byte) (offset >> 8);
+        cmd[18] = (byte) (offset >> 16);
+        cmd[19] = (byte) (offset >> 24);
+        return getReq(FILE_READ_START, cmd);
+    }
+    public static byte[] fileReadPkg(int fileId, int addrOffset, int fileSize) {
+        byte[] cmd = new byte[12];
+        cmd[0] = (byte) fileId;
+        cmd[1] = (byte) (fileId >> 8);
+        cmd[2] = (byte) (fileId >> 16);
+        cmd[3] = (byte) (fileId >> 24);
+        cmd[4] = (byte) addrOffset;
+        cmd[5] = (byte) (addrOffset >> 8);
+        cmd[6] = (byte) (addrOffset >> 16);
+        cmd[7] = (byte) (addrOffset >> 24);
+        cmd[8] = (byte) fileSize;
+        cmd[9] = (byte) (fileSize >> 8);
+        cmd[10] = (byte) (fileSize >> 16);
+        cmd[11] = (byte) (fileSize >> 24);
+        return getReq(FILE_READ_PKG, cmd);
+    }
+    public static byte[] fileReadEnd() {
+        return getReq(FILE_READ_END, new byte[0]);
     }
 
     public static byte[] getConfig() {

@@ -282,6 +282,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.btpLayout.version.setText("${it.hwV}")
                 binding.btpLayout.sn.setText("${it.sn}")
                 binding.btpLayout.code.setText("${it.branchCode}")
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LEPOD) {
+                binding.lepodLayout.version.setText("${it.hwV}")
+                binding.lepodLayout.sn.setText("${it.sn}")
+                binding.lepodLayout.code.setText("${it.branchCode}")
             }
         }
         mainViewModel.er2Info.observe(viewLifecycleOwner) {
@@ -2103,6 +2107,45 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.lepodLayout.getRtParam.setOnClickListener {
             LpBleUtil.lepodGetRtParam(Constant.BluetoothConfig.currentModel[0])
         }
+        binding.lepodLayout.factoryConfig.setOnClickListener {
+            val config = FactoryConfig()
+            var enableVersion = true
+            val tempVersion = binding.lepodLayout.version.text
+            if (tempVersion.isNullOrEmpty()) {
+                enableVersion = false
+            } else if (tempVersion.length == 1 && isBigLetter(tempVersion.toString())) {
+                config.setHwVersion(tempVersion.first())
+            } else {
+                Toast.makeText(context, "硬件版本请输入A-Z字母", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            var enableSn = true
+            val tempSn = trimStr(binding.lepodLayout.sn.text.toString())
+            if (tempSn.isNullOrEmpty()) {
+                enableSn = false
+            } else if (tempSn.length == 10) {
+                config.setSnCode(tempSn)
+            } else {
+                Toast.makeText(context, "sn请输入10位", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            var enableCode = true
+            val tempCode = trimStr(binding.lepodLayout.code.text.toString())
+            if (tempCode.isNullOrEmpty()) {
+                enableCode = false
+            } else if (tempCode.length == 8) {
+                config.setBranchCode(tempCode)
+            } else {
+                Toast.makeText(context, "code请输入8位", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            config.setBurnFlag(enableSn, enableVersion, enableCode)
+            LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
+            deviceFactoryData.sn = tempSn
+            deviceFactoryData.code = tempCode
+            deviceFactoryData.time = DateUtil.stringFromDate(Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL)
+            FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
+        }
         // --------------------------vtm01--------------------------------
         binding.vtm01Layout.factoryConfig.setOnClickListener {
             val config = FactoryConfig()
@@ -3239,6 +3282,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Toast.makeText(context, "获取mode成功", Toast.LENGTH_SHORT).show()
             }
         //------------------------lepod-------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodBurnFactoryInfo)
+            .observe(this) {
+
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodSetConfig)
             .observe(this) {
                 val data = it.data as Boolean
@@ -3377,6 +3424,16 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     Toast.makeText(context, "设置心率高阈值成功", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(context, "设置心率高阈值失败", Toast.LENGTH_SHORT).show()
+                }
+                LpBleUtil.btpGetConfig(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetTempUnit)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    Toast.makeText(context, "设置温度单位成功", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "设置温度单位失败", Toast.LENGTH_SHORT).show()
                 }
                 LpBleUtil.btpGetConfig(it.model)
             }

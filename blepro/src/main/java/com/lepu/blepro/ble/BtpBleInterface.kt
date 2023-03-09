@@ -8,6 +8,7 @@ import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.add
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 import kotlin.experimental.inv
@@ -28,6 +29,11 @@ import kotlin.experimental.inv
  */
 class BtpBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "BtpBleInterface"
+
+    private var fileName = ""
+    private var fileId = 0
+    private var fileSize = 0
+    private var fileContent: ByteArray? = null
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         if (isManagerInitialized()) {
@@ -93,7 +99,60 @@ class BtpBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpRtData).post(InterfaceEvent(model, data))
             }
-
+            BtpBleCmd.GET_FILE_LIST -> {
+                if (response.content.isEmpty()) {
+                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                    return
+                }
+                val data = BtpBleResponse.FileList(response.content)
+                LepuBleLog.d(tag, "model:$model,GET_FILE_LIST => success")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetFileList).post(InterfaceEvent(model, data))
+            }
+            BtpBleCmd.FILE_READ_START -> {
+                if (response.content.size < 8 || response.pkgType != 0x01.toByte()) {
+                    sendCmd(BtpBleCmd.fileReadEnd())
+                    LepuBleLog.d(tag, "model:$model,FILE_READ_START => error")
+                    return
+                }
+                fileContent = null
+                fileId = toUInt(response.content.copyOfRange(0, 4))
+                fileSize = toUInt(response.content.copyOfRange(4, 8))
+                if (fileSize <= 0) {
+                    sendCmd(BtpBleCmd.fileReadEnd())
+                } else {
+                    sendCmd(BtpBleCmd.fileReadPkg(fileId, offset, fileSize))
+                }
+                LepuBleLog.d(tag, "model:$model,FILE_READ_START => fileName: $fileName, fileId: $fileId, offset: $offset, fileSize: $fileSize")
+            }
+            BtpBleCmd.FILE_READ_PKG -> {
+                offset += response.len
+                fileContent = add(fileContent, response.content)
+                val percent = offset*100/fileSize
+                LepuBleLog.d(tag, "model:$model,FILE_READ_PKG => fileId: $fileId, offset: $offset, fileSize: $fileSize")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadingFileProgress).post(InterfaceEvent(model, percent))
+                if (offset < fileSize) {
+                    sendCmd(BtpBleCmd.fileReadPkg(fileId, offset, fileSize))
+                } else {
+                    sendCmd(BtpBleCmd.fileReadEnd())
+                }
+            }
+            BtpBleCmd.FILE_READ_END -> {
+                if (offset != fileSize || response.pkgType != 0x01.toByte()) {
+                    LepuBleLog.d(tag, "model:$model,FILE_READ_END => error")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadFileError).post(InterfaceEvent(model, true))
+                    return
+                }
+                offset = 0
+                fileContent?.let {
+                    val data = BtpBleResponse.BtpFile(it)
+                    LepuBleLog.d(tag, "model:$model,FILE_READ_END => data: $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadFileComplete).post(InterfaceEvent(model, data))
+                } ?: kotlin.run {
+                    LepuBleLog.d(tag, "model:$model,FILE_READ_END => error")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadFileError).post(InterfaceEvent(model, true))
+                }
+                fileContent = null
+            }
             BtpBleCmd.GET_CONFIG -> {
                 if (response.pkgType != 0x01.toByte()) {
                     LepuBleLog.d(tag, "model:$model,GET_CONFIG => error")
@@ -208,6 +267,12 @@ class BtpBleInterface(model: Int): BleInterface(model) {
                 continue@loop
             }
 
+            if (bytes[i+1].toInt() == BtpBleCmd.FILE_READ_PKG) {
+                if (bytes[i+4].toInt() != (BtpBleCmd.seqNo-1)) {
+                    continue@loop
+                }
+            }
+
             // need content length
             val len = toUInt(bytes.copyOfRange(i+5, i+7))
 //            Log.d(TAG, "want bytes length: $len")
@@ -314,6 +379,8 @@ class BtpBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
+        this.fileName = fileName
+//        sendCmd(BtpBleCmd.getFileStart(fileName.toByteArray(), 0))
         LepuBleLog.d(tag, "dealReadFile...")
     }
 
@@ -321,6 +388,7 @@ class BtpBleInterface(model: Int): BleInterface(model) {
      * get file list
      */
     override fun getFileList() {
+//        sendCmd(BtpBleCmd.getFileList())
         LepuBleLog.d(tag, "getFileList...")
     }
 

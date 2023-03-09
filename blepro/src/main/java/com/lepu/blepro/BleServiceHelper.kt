@@ -1012,6 +1012,14 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
+            Bluetooth.MODEL_LEPOD -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LepodBleInterface).let {
+                        LepuBleLog.d(tag, "it as BtpBleInterface--burnFactoryInfo")
+                        it.burnFactoryInfo(config)
+                    }
+                }
+            }
             else -> LepuBleLog.d(tag, "burnFactoryInfo current model $model unsupported!!")
         }
     }

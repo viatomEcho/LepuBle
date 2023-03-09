@@ -320,12 +320,14 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
             } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BTP) {
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W) {
                 binding.info.text = "$it"
                 binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
                 binding.wifiConfig.visibility = View.VISIBLE
                 LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BTP) {
+                binding.info.text = "$it"
+                binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
             }
         }
         mainViewModel.er2Info.observe(viewLifecycleOwner) {
@@ -1688,6 +1690,39 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
             }
         //-----------------------btp-----------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetFileList)
+            .observe(this) {
+                val data = it.data as BtpBleResponse.FileList
+                for (file in data.fileNames) {
+                    fileNames.add(file)
+                }
+                binding.deviceInfo.text = fileNames.toString()
+                Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadingFileProgress)
+            .observe(this) { event ->
+                (event.data as Int).let {
+                    binding.process.text = "$readFileProcess$curFileName 读取进度: $it %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $it %"
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadFileComplete)
+            .observe(this) { event ->
+                (event.data as BtpBleResponse.BtpFile).let {
+                    binding.process.text = readFileProcess
+                    if (binding.fileName.text.toString().isEmpty()) {
+                        fileNames.removeAt(0)
+                        readFile()
+                    } else {
+                        mAlertDialog?.dismiss()
+                    }
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadFileError)
+            .observe(this) {
+                mAlertDialog?.dismiss()
+                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReset)
             .observe(this) {
                 val data = it.data as Boolean

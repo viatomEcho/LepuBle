@@ -2,6 +2,7 @@ package com.lepu.blepro.ble.cmd
 
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.HexString.trimStr
 
 object BtpBleResponse {
 
@@ -107,6 +108,104 @@ object BtpBleResponse {
                 isWearing : $isWearing
                 hrStatus : $hrStatus
                 tempStatus : $tempStatus
+                temp : $temp
+            """.trimIndent()
+        }
+    }
+
+    @ExperimentalUnsignedTypes
+    class FileList(val bytes: ByteArray) {
+        var fileSize: Int
+        var fileNames = mutableListOf<String>()
+        init {
+            var index = 0
+            fileSize = byte2UInt(bytes[index])
+            index++
+            for (i in 0 until fileSize) {
+                fileNames.add(trimStr(String(bytes.copyOfRange(index, index+16))))
+                index += 16
+            }
+        }
+
+        override fun toString(): String {
+            return """
+                FileList : 
+                fileSize : $fileSize
+                fileNames : $fileNames
+            """.trimIndent()
+        }
+    }
+
+    @ExperimentalUnsignedTypes
+    class BtpFile(val bytes: ByteArray) {
+        var fileVersion: Int  // 文件版本，0x01：V1
+        var fileType: Int     // 文件类型
+        // reserved 8
+        var magic: Int        // 幻数
+        var timestamp: Int    // 测量时间戳
+        var duration: Int     // 测量时长，单位：分钟
+        // reserved 4
+        var pointDatas = mutableListOf<PointData>()
+        init {
+            var index = 0
+            fileVersion = byte2UInt(bytes[index])
+            index++
+            fileType = byte2UInt(bytes[index])
+            index++
+            index += 8
+            magic = toUInt(bytes.copyOfRange(index, index+4))
+            index += 4
+            timestamp = toUInt(bytes.copyOfRange(index, index+4))
+            index += 4
+            duration = toUInt(bytes.copyOfRange(index, index+4))
+            index += 4
+            index += 8
+            val len = (bytes.size - index).div(10)
+            for (i in 0 until len) {
+                pointDatas.add(PointData(bytes.copyOfRange(index, index+10)))
+                index += 10
+            }
+        }
+        override fun toString(): String {
+            return """
+                BtpFile : 
+                fileVersion : $fileVersion
+                fileType : $fileType
+                magic : $magic
+                timestamp : $timestamp
+                duration : $duration
+                pointDatas : $pointDatas
+            """.trimIndent()
+        }
+    }
+
+    @ExperimentalUnsignedTypes
+    class PointData(val bytes: ByteArray) {
+        var timestamp: Int  // 每一分钟的时间点（可获取指定时间段，预留）
+        var hrEvent: Int    // 心率事件
+        var hr: Int         // 心率
+        var tempEvent: Int  // 温度事件
+        var temp: Float     // 温度，单位：摄氏度
+        // reserved 3
+        init {
+            var index = 0
+            timestamp = toUInt(bytes.copyOfRange(index, index+4))
+            index += 4
+            hrEvent = byte2UInt(bytes[index])
+            index++
+            hr = byte2UInt(bytes[index])
+            index++
+            tempEvent = byte2UInt(bytes[index])
+            index++
+            temp = toUInt(bytes.copyOfRange(index, index+2)).div(100f)
+        }
+        override fun toString(): String {
+            return """
+                PointData : 
+                timestamp : $timestamp
+                hrEvent : $hrEvent
+                hr : $hr
+                tempEvent : $tempEvent
                 temp : $temp
             """.trimIndent()
         }

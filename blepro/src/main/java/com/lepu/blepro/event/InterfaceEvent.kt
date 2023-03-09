@@ -721,22 +721,26 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface BTP {
         companion object {
-            const val EventBtpGetInfo = "com.lepu.ble.btp.get.info"                   // 设备信息 LepuDevice
-            const val EventBtpRtData = "com.lepu.ble.btp.rtData"                      // 实时数据 BtpBleResponse.RtData
-            const val EventBtpReset = "com.lepu.ble.btp.reset"                        // 复位 boolean
-            const val EventBtpFactoryReset = "com.lepu.ble.btp.factory.reset"         // 恢复出厂设置 boolean
-            const val EventBtpFactoryResetAll = "com.lepu.ble.btp.factory.reset.all"  // 恢复生产出厂状态 boolean
-            const val EventBtpGetBattery = "com.lepu.ble.btp.get.battery"             // 获取电量 KtBleBattery
-            const val EventBtpGetConfig = "com.lepu.ble.btp.get.config"               // 获取配置参数 BtpBleResponse.ConfigInfo
-            const val EventBtpGetConfigError = "com.lepu.ble.btp.get.config.error"    // 获取配置参数失败 boolean
-            const val EventBtpSetLowHr = "com.lepu.ble.btp.set.low.hr"                // 设置心率低阈值 boolean
-            const val EventBtpSetHighHr = "com.lepu.ble.btp.set.high.hr"              // 设置心率高阈值 boolean
-            const val EventBtpSetTempUnit = "com.lepu.ble.btp.set.temp.unit"          // 设置温度单位 boolean
-            const val EventBtpSetLowTemp = "com.lepu.ble.btp.set.low.temp"            // 设置温度低阈值 boolean
-            const val EventBtpSetHighTemp = "com.lepu.ble.btp.set.high.temp"          // 设置温度高阈值 boolean
-            const val EventBtpSetSystemSwitch = "com.lepu.ble.btp.set.system.switch"  // 设置系统开关 boolean
-            const val EventBtpSetTime = "com.lepu.ble.btp.set.time"                   // 同步时间 boolean
-            const val EventBtpBurnFactoryInfo = "com.lepu.ble.btp.burn.factory.info"  // 烧录出厂信息 boolean
+            const val EventBtpGetInfo = "com.lepu.ble.btp.get.info"                           // 设备信息 LepuDevice
+            const val EventBtpRtData = "com.lepu.ble.btp.rtData"                              // 实时数据 BtpBleResponse.RtData
+            const val EventBtpGetFileList = "com.lepu.ble.btp.get.file.list"                  // 获取文件列表 BtpBleResponse.FileList
+            const val EventBtpReadFileError = "com.lepu.ble.btp.read.file.error"              // 读文件出错 String(fileName)
+            const val EventBtpReadingFileProgress = "com.lepu.btp.bp2.reading.file.progress"  // 传输文件进度 Bp2FilePart
+            const val EventBtpReadFileComplete = "com.lepu.ble.btp.read.file.complete"        // 传输文件完成 Bp2BleFile
+            const val EventBtpReset = "com.lepu.ble.btp.reset"                                // 复位 boolean
+            const val EventBtpFactoryReset = "com.lepu.ble.btp.factory.reset"                 // 恢复出厂设置 boolean
+            const val EventBtpFactoryResetAll = "com.lepu.ble.btp.factory.reset.all"          // 恢复生产出厂状态 boolean
+            const val EventBtpGetBattery = "com.lepu.ble.btp.get.battery"                     // 获取电量 KtBleBattery
+            const val EventBtpGetConfig = "com.lepu.ble.btp.get.config"                       // 获取配置参数 BtpBleResponse.ConfigInfo
+            const val EventBtpGetConfigError = "com.lepu.ble.btp.get.config.error"            // 获取配置参数失败 boolean
+            const val EventBtpSetLowHr = "com.lepu.ble.btp.set.low.hr"                        // 设置心率低阈值 boolean
+            const val EventBtpSetHighHr = "com.lepu.ble.btp.set.high.hr"                      // 设置心率高阈值 boolean
+            const val EventBtpSetTempUnit = "com.lepu.ble.btp.set.temp.unit"                  // 设置温度单位 boolean
+            const val EventBtpSetLowTemp = "com.lepu.ble.btp.set.low.temp"                    // 设置温度低阈值 boolean
+            const val EventBtpSetHighTemp = "com.lepu.ble.btp.set.high.temp"                  // 设置温度高阈值 boolean
+            const val EventBtpSetSystemSwitch = "com.lepu.ble.btp.set.system.switch"          // 设置系统开关 boolean
+            const val EventBtpSetTime = "com.lepu.ble.btp.set.time"                           // 同步时间 boolean
+            const val EventBtpBurnFactoryInfo = "com.lepu.ble.btp.burn.factory.info"          // 烧录出厂信息 boolean
         }
     }
 
