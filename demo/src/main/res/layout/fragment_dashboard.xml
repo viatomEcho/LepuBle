@@ -714,8 +714,16 @@
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical">
                                 <TextView
+                                    android:id="@+id/er3_temp_info"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:textColor="@color/colorRed"
+                                    android:textSize="18sp"/>
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="15dp"
                                     android:textColor="@color/colorRed"
                                     android:gravity="center"
                                     android:text="V6"/>

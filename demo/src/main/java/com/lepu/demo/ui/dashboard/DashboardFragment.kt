@@ -1699,6 +1699,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val data = it.data as Er3BleResponse.RtData
                 Er3DataController.receive(data.wave.waveMvs)
                 Log.d("Er3Test", "data.wave.waveMvs.size ${data.wave.waveMvs.size}")
+                binding.er3TempInfo.text = "固件版本：${mainViewModel._er1Info.value?.fwV}\n" +
+                        "温度：${data.param.temp} ℃"
                 mainViewModel._battery.value = "${data.param.battery} %"
                 binding.deviceInfo.text = "心率：${data.param.hr} bpm\n" +
                         "体温：${data.param.temp} ℃\n" +

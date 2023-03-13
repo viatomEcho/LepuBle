@@ -1710,6 +1710,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this) { event ->
                 (event.data as BtpBleResponse.BtpFile).let {
                     binding.process.text = readFileProcess
+                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "$it"
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
                         readFile()

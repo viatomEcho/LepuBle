@@ -108,7 +108,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         }
         binding.needPair.isChecked = Constant.BluetoothConfig.needPair
         binding.needPair.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (Constant.BluetoothConfig.splitType == 10) {
+            if (Constant.BluetoothConfig.splitType >= 10) {
                 binding.needPair.isChecked = false
                 Toast.makeText(context, "该设备类型不支持配对连接！", Toast.LENGTH_SHORT).show()
                 return@setOnCheckedChangeListener
@@ -124,7 +124,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         }
         ArrayAdapter(requireContext(),
             android.R.layout.simple_list_item_1,
-            arrayListOf("全部", "BP2", "ER1", "VBeat", "HHM1", "DuoEK", "HHM2", "HHM3", "ER2", "O2", "PC")
+            arrayListOf("全部", "BP2", "ER1", "VBeat", "HHM1", "DuoEK", "HHM2", "HHM3", "ER2", "O2", "PC", "ER3")
         ).apply {
             binding.deviceTypeSpinner.adapter = this
         }
@@ -133,7 +133,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 Constant.BluetoothConfig.splitType = position
                 splitDevices(binding.bleSplit.text.toString())
-                if (position == 10) {
+                if (position >= 10) {
                     Constant.BluetoothConfig.needPair = false
                     binding.needPair.isChecked = false
                 }
@@ -255,6 +255,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
             8 -> "ER2"
             9 -> "O2"
             10 -> "PC"
+            11 -> "ER3"
             else -> ""
         }
     }
@@ -284,6 +285,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     || model == Bluetooth.MODEL_WEARO2
                     || model == Bluetooth.MODEL_KIDSO2
                     || model == Bluetooth.MODEL_O2M_WPS)
+            10 -> return model == Bluetooth.MODEL_ER3
             else -> return false
         }
     }
