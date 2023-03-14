@@ -2409,7 +2409,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.bp2Layout.modeSpinner.setSelection(config.avgMeasureMode)
                 Toast.makeText(context, "获取参数成功", Toast.LENGTH_SHORT).show()
             }
-        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2WifiScanning)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2WifiScanning)
             .observe(this) {
                 binding.content.text = "设备正在扫描wifi"
                 LpBleUtil.bp2GetWifiDevice(it.model)
@@ -2448,7 +2448,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 } else {
 //                    Toast.makeText(context, "尚未配置WiFi信息", Toast.LENGTH_SHORT).show()
                 }
-            }*/
+            }
         /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wGetFileListCrc)
             .observe(this) {
                 val data = it.data as FileListCrc

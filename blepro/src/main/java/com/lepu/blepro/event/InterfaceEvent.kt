@@ -196,10 +196,10 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventLpBp2wSetConfig = "com.lepu.ble.lp.bp2w.set.config"                       // 设置参数 boolean
             const val EventLpBp2wGetConfig = "com.lepu.ble.lp.bp2w.get.config"                       // 获取参数 com.lepu.blepro.ext.lpbp2w.LpBp2wConfig
             const val EventLpBp2wSyncUtcTime = "com.lepu.ble.lp.bp2w.sync.utc.time"                  // 同步UTC时间（带时区） boolean
-//            const val EventLpBp2WifiList = "com.lepu.ble.lp.bp2w.wifi.list"                          // 获取路由
-//            const val EventLpBp2WifiScanning = "com.lepu.ble.lp.bp2w.wifi.scanning"                  // 正在扫描路由 boolean
-//            const val EventLpBp2wGetWifiConfig = "com.lepu.ble.lp.bp2w.get.wifi.config"              // 获取WiFi配置
-//            const val EventLpBp2wSetWifiConfig = "com.lepu.ble.lp.bp2w.set.wifi.config"              // 设置WiFi boolean
+            const val EventLpBp2WifiList = "com.lepu.ble.lp.bp2w.wifi.list"                          // 获取路由
+            const val EventLpBp2WifiScanning = "com.lepu.ble.lp.bp2w.wifi.scanning"                  // 正在扫描路由 boolean
+            const val EventLpBp2wGetWifiConfig = "com.lepu.ble.lp.bp2w.get.wifi.config"              // 获取WiFi配置
+            const val EventLpBp2wSetWifiConfig = "com.lepu.ble.lp.bp2w.set.wifi.config"              // 设置WiFi boolean
             const val EventLpBp2wGetFileListCrc = "com.lepu.ble.lp.bp2w.get.file.list.crc"           // 获取文件列表CRC com.lepu.blepro.ext.lpbp2w.FileListCrc
             const val EventLpBp2wDeleteFile = "com.lepu.ble.lp.bp2w.delete.file"                     // 删除文件 boolean
         }

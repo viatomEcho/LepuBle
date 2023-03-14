@@ -192,4 +192,15 @@ object Constant {
             const val ECG_TYPE = 2
         }
     }
+
+    /**
+     * lp-bp2服务器类型
+     */
+    interface LpBp2wServer {
+        companion object {
+            const val HOST_BP2_PRO_TEST = "212.129.241.54"
+            const val HOST_BP2_PRO_ONLINE = "203.195.204.99"
+            const val HOST_BP2_PRO_PORT = 7200
+        }
+    }
 }
