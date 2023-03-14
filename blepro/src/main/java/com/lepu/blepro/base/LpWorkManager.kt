@@ -451,7 +451,7 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_R20 -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
                 R20BleInterface(m).apply {
                     vailFace.put(m, this)
                     return this

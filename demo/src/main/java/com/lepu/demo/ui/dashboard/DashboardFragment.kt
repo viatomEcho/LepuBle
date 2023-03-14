@@ -422,7 +422,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 LpBleUtil.startRtTask(it.modelNo, 2000)
                 LpBleUtil.btpGetConfig(it.modelNo)
             }
-            Bluetooth.MODEL_R20 -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
                 binding.wirelessDataLayout.root.visibility = View.VISIBLE
             }
         }

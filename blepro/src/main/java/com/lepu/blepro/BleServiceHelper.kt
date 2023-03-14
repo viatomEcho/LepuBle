@@ -3556,7 +3556,7 @@ class BleServiceHelper private constructor() {
     fun r20Echo(model: Int, data: ByteArray) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20 -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as LeResSBleInterface--leResSEcho")

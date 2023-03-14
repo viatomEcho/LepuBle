@@ -746,7 +746,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * R20BleInterface 发出的通知
-     * 包含model: MODEL_R20
+     * 包含model: MODEL_R20, MODEL_LERES
      */
     interface R20 {
         companion object {
