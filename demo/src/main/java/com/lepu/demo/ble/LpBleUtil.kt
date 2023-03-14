@@ -1084,6 +1084,9 @@ class LpBleUtil {
         fun btpSetSystemSwitch(model: Int, hrSwitch: Boolean, lightSwitch: Boolean, tempSwitch: Boolean) {
             BleServiceHelper.btpSetSystemSwitch(model, hrSwitch, lightSwitch, tempSwitch)
         }
+        fun r20Echo(model: Int, data: ByteArray) {
+            BleServiceHelper.r20Echo(model, data)
+        }
 
     }
 

@@ -122,6 +122,8 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_PC200_BLE = "PC-200-BLE";
     public static final String BT_NAME_BTP = "BTP";
     public static final String BT_NAME_S5_SCALE = "AAA026";
+//    public static final String BT_NAME_LERES_S = "LeRes-S";
+    public static final String BT_NAME_R20 = "R20";
 
     public static final int MODEL_UNRECOGNIZED = 0;
     public static final int MODEL_CHECKO2 = 1;
@@ -235,6 +237,7 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_PC200_BLE = 104;
     public static final int MODEL_BTP = 105;
     public static final int MODEL_S5_SCALE = 106;
+    public static final int MODEL_R20 = 107;
 
     @IntDef({MODEL_UNRECOGNIZED, MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_OXYRING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER1_N,
             MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL, MODEL_BABYO2, MODEL_OXYSMART,
@@ -248,7 +251,7 @@ public class Bluetooth implements Parcelable {
             MODEL_BIOLAND_BGM, MODEL_S6W1, MODEL_PF_10AW, MODEL_PF_10AW1, MODEL_PF_10BW, MODEL_PF_10BW1, MODEL_PF_20AW, MODEL_PF_20B,
             MODEL_CHECKME, MODEL_PC80B_BLE, MODEL_SP20_BLE, MODEL_PC300_BLE, MODEL_ER3, MODEL_LEPOD, MODEL_PC60NW_BLE,
             MODEL_PC60NW_WPS, MODEL_SP20_WPS, MODEL_AP20_WPS, MODEL_O2M_WPS, MODEL_PC80B_BLE2, MODEL_VTM01, MODEL_PC200_BLE,
-            MODEL_BTP, MODEL_S5_SCALE})
+            MODEL_BTP, MODEL_S5_SCALE, MODEL_R20})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 
@@ -489,6 +492,8 @@ public class Bluetooth implements Parcelable {
                 return MODEL_VTM01;
             case BT_NAME_BTP:
                 return MODEL_BTP;
+            case BT_NAME_R20:
+                return MODEL_R20;
             default:
                 return MODEL_UNRECOGNIZED;
         }
@@ -505,7 +510,7 @@ public class Bluetooth implements Parcelable {
             BT_NAME_BIOLAND_BGM, BT_NAME_S6W1, BT_NAME_PF_10AW, BT_NAME_PF_10AW1, BT_NAME_PF_10BW, BT_NAME_PF_10BW1, BT_NAME_PF_20AW, BT_NAME_PF_20B,
             BT_NAME_CHECKME, BT_NAME_PC80B_BLE, BT_NAME_SP20_BLE, BT_NAME_PC_300_BLE, BT_NAME_ER3, BT_NAME_LEPOD, BT_NAME_PC_60NW_BLE,
             BT_NAME_PC_60NW_WPS, BT_NAME_AP20_WPS, BT_NAME_SP20_WPS, BT_NAME_O2M_WPS, BT_NAME_PC80B_BLE2, BT_NAME_VTM01, BT_NAME_PC200_BLE,
-            BT_NAME_BTP, BT_NAME_S5_SCALE})
+            BT_NAME_BTP, BT_NAME_S5_SCALE, BT_NAME_R20})
     @Retention(RetentionPolicy.SOURCE)
     public @interface DEVICE_NAME {
 
@@ -724,6 +729,8 @@ public class Bluetooth implements Parcelable {
                 return BT_NAME_BTP;
             case MODEL_S5_SCALE:
                 return BT_NAME_S5_SCALE;
+            case MODEL_R20:
+                return BT_NAME_R20;
             default:
                 return "";
         }

@@ -744,4 +744,14 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * R20BleInterface 发出的通知
+     * 包含model: MODEL_R20
+     */
+    interface R20 {
+        companion object {
+            const val EventR20EchoData = "com.lepu.ble.r20.echo.data"  // 回显 byte[]
+        }
+    }
+
 }

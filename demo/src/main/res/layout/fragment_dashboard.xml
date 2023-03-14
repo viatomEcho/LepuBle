@@ -963,6 +963,13 @@
                             </LinearLayout>
                         </androidx.constraintlayout.widget.ConstraintLayout>
                     </androidx.cardview.widget.CardView>
+
+                    <!-- 无线共存测试 -->
+                    <include
+                        android:visibility="gone"
+                        android:id="@+id/wireless_data_layout"
+                        layout="@layout/wireless_data_dashboard"/>
+
                 </LinearLayout>
             </RelativeLayout>
             <TextView

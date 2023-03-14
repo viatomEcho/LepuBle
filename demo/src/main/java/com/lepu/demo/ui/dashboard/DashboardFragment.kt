@@ -1,5 +1,6 @@
 package com.lepu.demo.ui.dashboard
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -23,10 +24,12 @@ import com.lepu.blepro.utils.getTimeString
 import com.lepu.demo.DemoWidgetProvider
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
+import com.lepu.demo.WirelessDataActivity
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.data.DataController
 import com.lepu.demo.data.OxyDataController
+import com.lepu.demo.data.WirelessData
 import com.lepu.demo.data.entity.DeviceEntity
 import com.lepu.demo.databinding.FragmentDashboardBinding
 import com.lepu.demo.util.DataConvert
@@ -36,6 +39,7 @@ import com.lepu.demo.views.EcgBkg
 import com.lepu.demo.views.EcgView
 import com.lepu.demo.views.Er3EcgView
 import com.lepu.demo.views.OxyView
+import org.json.JSONObject
 import java.util.*
 import kotlin.math.floor
 
@@ -55,6 +59,36 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     private var stopCollectTime = 0
     private var collectBytesData = ByteArray(0)
     private var collectIntsData = mutableListOf<Int>()
+
+    // 无线共存
+    private var isStartWirelessTest = false
+    private var tempTime = 0
+    private var recordTime = 0L
+    private var sendSeqNo = 0
+    private var tempSeqNo = 0
+    private var wirelessData = WirelessData()
+    private var handler = Handler()
+    private var task = WirelessTask()
+    inner class WirelessTask : Runnable {
+        override fun run() {
+            LpBleUtil.r20Echo(Constant.BluetoothConfig.currentModel[0], ByteArray(12))
+            sendSeqNo++
+            wirelessData.totalBytes = sendSeqNo * 20
+            wirelessData.recordTime = (System.currentTimeMillis() - wirelessData.startTime).div(1000).toInt()
+            if ((wirelessData.recordTime - tempTime) != 0) {
+                tempTime = wirelessData.recordTime
+                wirelessData.speed = wirelessData.receiveBytes.div(wirelessData.recordTime*1.0)
+                wirelessData.throughput = wirelessData.receiveBytes.div(wirelessData.recordTime*1024.0).times(3600)
+                binding.wirelessDataLayout.speed.text = "测试时长：${DataConvert.getEcgTimeStr(wirelessData.recordTime)}\n" +
+                        "吞吐量：${String.format("%.3f", wirelessData.throughput)} kb/h\n" +
+                        "数据传输速度：${String.format("%.3f", wirelessData.speed)} b/s"
+            }
+            if (isStartWirelessTest) {
+                handler.postDelayed(task, 100)
+            }
+        }
+
+    }
 
     // 心电产品
     private lateinit var ecgBkg: EcgBkg
@@ -388,6 +422,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 LpBleUtil.startRtTask(it.modelNo, 2000)
                 LpBleUtil.btpGetConfig(it.modelNo)
             }
+            Bluetooth.MODEL_R20 -> {
+                binding.wirelessDataLayout.root.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -413,6 +450,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.oxyBleState.setImageResource(R.mipmap.bluetooth_error)
                     binding.er3BleState.setImageResource(R.mipmap.bluetooth_error)
                     binding.dashLayout.visibility = View.INVISIBLE
+                    isStartWirelessTest = false
                 }
             }
 
@@ -712,6 +750,57 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
             collectPpg(isChecked)
         }
+        binding.wirelessDataLayout.startTest.setOnClickListener {
+            if (isStartWirelessTest) return@setOnClickListener
+            isStartWirelessTest = true
+            tempTime = 0
+            recordTime = System.currentTimeMillis()
+            R20BleCmd.seqNo = 0
+            tempSeqNo = 0
+            sendSeqNo = 0
+            wirelessData = WirelessData()
+            wirelessData.startTime = System.currentTimeMillis()
+            handler.post(task)
+        }
+        binding.wirelessDataLayout.stopTest.setOnClickListener {
+            isStartWirelessTest = false
+        }
+        binding.wirelessDataLayout.saveTest.setOnClickListener {
+            if (binding.wirelessDataLayout.testData.text.isEmpty()) {
+                Toast.makeText(context, "无数据保存", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (isAlreadySaveWirelessData()) {
+                Toast.makeText(context, "数据已保存", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            isStartWirelessTest = false
+            FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/wireless_test.txt", wirelessData.toString(), true)
+            Toast.makeText(context, "保存成功，可在历史记录查看", Toast.LENGTH_SHORT).show()
+        }
+        binding.wirelessDataLayout.reviewTest.setOnClickListener {
+            if (isStartWirelessTest) {
+                Toast.makeText(context, "请先停止测试", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            startActivity(Intent(context, WirelessDataActivity::class.java))
+        }
+    }
+
+    private fun isAlreadySaveWirelessData() : Boolean {
+        val data = FileUtil.readFileToString(context, "wireless_test.txt")
+        val strs = data.split("WirelessData")
+        if (strs.isEmpty()) return false
+        for (str in strs) {
+            if (str.isEmpty()) continue
+            val temp = JSONObject(str)
+            val da = WirelessData()
+            da.startTime = temp.getLong("startTime")
+            if (wirelessData.startTime == da.startTime) {
+                return true
+            }
+        }
+        return false
     }
 
     private fun initEcgView() {
@@ -1909,6 +1998,36 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val data = it.data as BtpBleResponse.ConfigInfo
                 type = data.tempUnit
             }
+        // ----------------------R20-------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20EchoData)
+            .observe(this) {
+                val data = it.data as R20BleResponse.BleResponse
+                wirelessData.totalSize++
+                wirelessData.receiveBytes += data.bytes.size
+                wirelessData.oneDelay = System.currentTimeMillis() - recordTime
+                wirelessData.totalDelay += wirelessData.oneDelay
+                recordTime = System.currentTimeMillis()
+                if ((data.pkgNo != 0) && ((data.pkgNo - tempSeqNo) != 1)) {
+                    val pkg = if ((data.pkgNo > tempSeqNo)) {
+                        data.pkgNo - tempSeqNo
+                    } else {
+                        data.pkgNo - (255-tempSeqNo)
+                    }
+                    wirelessData.missSize += pkg
+                    wirelessData.errorBytes += pkg*20
+                }
+                wirelessData.errorPercent = wirelessData.errorBytes.div(wirelessData.totalBytes*1.0).times(100)
+                wirelessData.missPercent = wirelessData.missSize.div(sendSeqNo*1.0).times(100)
+                tempSeqNo = data.pkgNo
+                binding.wirelessDataLayout.testData.text = "数据总量：${wirelessData.totalBytes.div(1024.0)} kb\n" +
+                        "总包数：${wirelessData.totalSize}\n" +
+                        "丢包数：${wirelessData.missSize}\n" +
+                        "错误字节：${wirelessData.errorBytes}\n" +
+                        "单次时延：${wirelessData.oneDelay} ms\n" +
+                        "总时延：${wirelessData.totalDelay.div(wirelessData.totalSize)} ms\n" +
+                        "丢包率：${String.format("%.3f", wirelessData.missPercent)} %\n" +
+                        "误码率：${String.format("%.3f", wirelessData.errorPercent)} %"
+            }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -1937,6 +2056,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     override fun onDestroy() {
         LpBleUtil.stopRtTask()
         stopWave()
+        isStartWirelessTest = false
+        handler.removeCallbacks(task)
         super.onDestroy()
     }
 

@@ -3553,4 +3553,19 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    fun r20Echo(model: Int, data: ByteArray) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_R20 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as R20BleInterface).let {
+                        LepuBleLog.d(tag, "it as LeResSBleInterface--leResSEcho")
+                        it.echo(data)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "leResSEcho current model $model unsupported!!")
+        }
+    }
+
 }

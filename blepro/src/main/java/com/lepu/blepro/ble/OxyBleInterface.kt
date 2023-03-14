@@ -98,6 +98,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             // 添加包号校验，数据包有概率与协议包头一样
             // 除读文件数据包号递增，其他都是0
             val seqNo = toUInt(bytes.copyOfRange(i + 3, i + 5))
+            LepuBleLog.d(tag, "seqNo: $seqNo, OxyBleCmd.seqNo: ${OxyBleCmd.seqNo}")
             if (curCmd == OxyBleCmd.OXY_CMD_READ_CONTENT) {
                 if (seqNo != (OxyBleCmd.seqNo-1)) {
                     continue@loop
@@ -110,7 +111,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
             // need content length
             val len = toUInt(bytes.copyOfRange(i + 5, i + 7))
-//            Log.d(TAG, "want bytes length: $len")
+            LepuBleLog.d(tag, "want bytes length: $len")
             if (i + 8 + len > bytes.size) {
                 continue@loop
             }
@@ -121,7 +122,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             }
             if (temp.last() == BleCRC.calCRC8(temp)) {
                 val bleResponse = OxyBleResponse.OxyResponse(temp)
-//                Log.d(TAG, "get response: " + temp.toHex())
+//                LepuBleLog.d(TAG, "get response: " + temp.toHex())
                 onResponseReceived(bleResponse)
 
                 val tempBytes: ByteArray? = if (i + 8 + len == bytes.size) null else bytes.copyOfRange(i + 8 + len, bytes.size)

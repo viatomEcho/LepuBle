@@ -1,6 +1,8 @@
 package com.lepu.blepro.ble
 
+import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.util.Log
 import com.lepu.blepro.base.LpBleManager
 import com.lepu.blepro.utils.LepuBleLog
 import no.nordicsemi.android.ble.ConnectionPriorityRequest.CONNECTION_PRIORITY_HIGH
@@ -21,7 +23,14 @@ class OxyBleManager(context: Context): LpBleManager(context) {
     }
 
     override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {
-        requestQueue.add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
+        requestQueue.add(requestMtu(247)
+            .with { device: BluetoothDevice?, mtu: Int ->
+                log(Log.INFO, "OxyBleManager MTU set to $mtu")
+            }
+            .fail { device: BluetoothDevice?, status: Int ->
+                log(Log.WARN, "OxyBleManager Requested MTU not supported: $status")
+            })
+            .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
         LepuBleLog.d("OxyBleManager dealReqQueue")
         return requestQueue
     }
