@@ -33,7 +33,7 @@ import com.lepu.demo.data.WirelessData
 import com.lepu.demo.data.entity.DeviceEntity
 import com.lepu.demo.databinding.FragmentDashboardBinding
 import com.lepu.demo.util.DataConvert
-import com.lepu.demo.util.DateUtil
+import com.lepu.demo.util.DateUtil.stringFromDate
 import com.lepu.demo.util.FileUtil
 import com.lepu.demo.views.EcgBkg
 import com.lepu.demo.views.EcgView
@@ -55,8 +55,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     private var type = 0
     // 采集
     private var o2RtType = 0  // 0: rt param, 1: rt wave, 2: rt ppg
-    private var startCollectTime = 0
-    private var stopCollectTime = 0
+    private var startCollectTime = 0L
     private var collectBytesData = ByteArray(0)
     private var collectIntsData = mutableListOf<Int>()
 
@@ -419,6 +418,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 startWave(it.modelNo)
             }
             Bluetooth.MODEL_BTP -> {
+                binding.btpRecord.visibility = View.VISIBLE
                 LpBleUtil.startRtTask(it.modelNo, 2000)
                 LpBleUtil.btpGetConfig(it.modelNo)
             }
@@ -785,6 +785,14 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
             startActivity(Intent(context, WirelessDataActivity::class.java))
         }
+        binding.btpRecord.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                startCollectTime = System.currentTimeMillis()
+                buttonView.text = "结束录制"
+            } else {
+                buttonView.text = "开始录制"
+            }
+        }
     }
 
     private fun isAlreadySaveWirelessData() : Boolean {
@@ -938,13 +946,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
     private fun collectPpg(isCollect: Boolean) {
         if (isCollect) {
-            startCollectTime = (System.currentTimeMillis()/1000).toInt()
+            startCollectTime = System.currentTimeMillis()
             collectBytesData = ByteArray(0)
             collectIntsData.clear()
         } else {
-            stopCollectTime = (System.currentTimeMillis()/1000).toInt()
             val ppgFile = PpgFile()
-            ppgFile.sampleTime = startCollectTime
+            ppgFile.sampleTime = (startCollectTime/1000).toInt()
             ppgFile.sampleSize = collectBytesData.size.div(4)
             ppgFile.leadSize = 1
 //            ppgFile.leadSize = 2
@@ -957,7 +964,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             ppgFile.deviceType = 1
             ppgFile.sn = mainViewModel.oxyInfo.value?.sn!!
             ppgFile.sampleData = collectIntsData.toIntArray()
-            val fileName = "${DateUtil.stringFromDate(Date(startCollectTime*1000L), "yyyyMMddHHmmss")}.dat"
+            val fileName = "${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
             FileUtil.saveFile(context, ppgFile.getDataBytes(), fileName)
             Log.d(TAG, "collectIntsData: ${collectIntsData.joinToString(",")}")
             val file = PpgFile(FileUtil.readFileToByteArray(context, fileName))
@@ -1974,24 +1981,33 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 } else {
                     binding.deviceInfo.text = binding.deviceInfo.text.toString() + "温度：${data.temp} ℃\n"
                 }
-                binding.deviceInfo.text = binding.deviceInfo.text.toString() + "是否测量中：${data.isWearing}\n" +
-                        "心率可信度：${data.level}\n" +
-                        "心率状态${data.hrStatus}：${
-                            when (data.hrStatus) {
-                                0 -> "正常"
-                                1 -> "心率低异常"
-                                2 -> "心率高异常"
-                                else -> ""
-                            }
-                        }\n" +
-                        "温度状态${data.tempStatus}：${
-                            when (data.tempStatus) {
-                                0 -> "正常"
-                                3 -> "温度低异常"
-                                4 -> "温度高异常"
-                                else -> ""
-                            }
-                        }"
+                binding.deviceInfo.text = binding.deviceInfo.text.toString() + "测量中：${
+                    if (data.isWearing) {
+                        "是"
+                    } else {
+                        "否"
+                    }}\n" +
+                    "心率可信度：${data.level}\n" +
+                    "心率状态${data.hrStatus}：${
+                        when (data.hrStatus) {
+                            0 -> "正常"
+                            1 -> "心率低异常"
+                            2 -> "心率高异常"
+                            else -> ""
+                        }
+                    }\n" +
+                    "温度状态${data.tempStatus}：${
+                        when (data.tempStatus) {
+                            0 -> "正常"
+                            3 -> "温度低异常"
+                            4 -> "温度高异常"
+                            else -> ""
+                        }
+                    }"
+                if (binding.btpRecord.isChecked) {
+                    FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/btp_hr_${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.txt", "${data.hr},", true)
+                    FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/btp_temp_${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.txt", "${data.temp},", true)
+                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetConfig)
             .observe(this) {
