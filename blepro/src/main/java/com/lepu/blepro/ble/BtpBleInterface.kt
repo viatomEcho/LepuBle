@@ -6,6 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
@@ -126,6 +127,7 @@ class BtpBleInterface(model: Int): BleInterface(model) {
             }
             BtpBleCmd.FILE_READ_PKG -> {
                 offset += response.len
+                DownloadHelper.writeFile(model, "", fileName, "dat", response.content)
                 fileContent = add(fileContent, response.content)
                 val percent = offset*100/fileSize
                 LepuBleLog.d(tag, "model:$model,FILE_READ_PKG => fileId: $fileId, offset: $offset, fileSize: $fileSize")
@@ -144,9 +146,10 @@ class BtpBleInterface(model: Int): BleInterface(model) {
                 }
                 offset = 0
                 fileContent?.let {
-                    val data = BtpBleResponse.BtpFile(it)
-                    LepuBleLog.d(tag, "model:$model,FILE_READ_END => data: $data")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadFileComplete).post(InterfaceEvent(model, data))
+//                    val data = BtpBleResponse.BtpFile(it)
+//                    LepuBleLog.d(tag, "model:$model,FILE_READ_END => data: $data")
+                    LepuBleLog.d(tag, "model:$model,FILE_READ_END")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadFileComplete).post(InterfaceEvent(model, it))
                 } ?: kotlin.run {
                     LepuBleLog.d(tag, "model:$model,FILE_READ_END => error")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadFileError).post(InterfaceEvent(model, true))

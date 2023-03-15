@@ -178,6 +178,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .create()
         mainViewModel.downloadTip.observe(viewLifecycleOwner) {
             mAlertDialog?.setMessage("正在处理，请稍等... $it")
+            mAlertDialogCanCancel?.setMessage("正在处理，请稍等... $it")
         }
 
         LinearLayoutManager(context).apply {
@@ -562,7 +563,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         binding.readFile.setOnClickListener {
             readFileProcess = ""
             process = 0
-            mAlertDialog?.show()
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BTP) {
+                mAlertDialogCanCancel?.show()
+            } else {
+                mAlertDialog?.show()
+            }
             ecgList.clear()
             ecgAdapter.setNewInstance(ecgList)
             ecgAdapter.notifyDataSetChanged()
@@ -1709,20 +1714,20 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadFileComplete)
             .observe(this) { event ->
-                (event.data as BtpBleResponse.BtpFile).let {
+//                (event.data as BtpBleResponse.BtpFile).let {
                     binding.process.text = readFileProcess
-                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "$it"
+                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "\n${fileNames[0]} 100%"
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
                         readFile()
                     } else {
-                        mAlertDialog?.dismiss()
+                        mAlertDialogCanCancel?.dismiss()
                     }
-                }
+//                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadFileError)
             .observe(this) {
-                mAlertDialog?.dismiss()
+                mAlertDialogCanCancel?.dismiss()
                 Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReset)
@@ -1775,7 +1780,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             trimStr(binding.fileName.text.toString())
         } else {
             if (fileNames.size == 0) {
-                mAlertDialog?.dismiss()
+                if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BTP) {
+                    mAlertDialogCanCancel?.dismiss()
+                } else {
+                    mAlertDialog?.dismiss()
+                }
                 return
             }
             fileNames[0]

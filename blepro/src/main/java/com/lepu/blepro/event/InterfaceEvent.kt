@@ -726,8 +726,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBtpRtData = "com.lepu.ble.btp.rtData"                              // 实时数据 BtpBleResponse.RtData
             const val EventBtpGetFileList = "com.lepu.ble.btp.get.file.list"                  // 获取文件列表 BtpBleResponse.FileList
             const val EventBtpReadFileError = "com.lepu.ble.btp.read.file.error"              // 读文件出错 String(fileName)
-            const val EventBtpReadingFileProgress = "com.lepu.btp.bp2.reading.file.progress"  // 传输文件进度 Bp2FilePart
-            const val EventBtpReadFileComplete = "com.lepu.ble.btp.read.file.complete"        // 传输文件完成 Bp2BleFile
+            const val EventBtpReadingFileProgress = "com.lepu.btp.bp2.reading.file.progress"  // 传输文件进度 Int
+            const val EventBtpReadFileComplete = "com.lepu.ble.btp.read.file.complete"        // 传输文件完成 byte[]
             const val EventBtpReset = "com.lepu.ble.btp.reset"                                // 复位 boolean
             const val EventBtpFactoryReset = "com.lepu.ble.btp.factory.reset"                 // 恢复出厂设置 boolean
             const val EventBtpFactoryResetAll = "com.lepu.ble.btp.factory.reset.all"          // 恢复生产出厂状态 boolean
