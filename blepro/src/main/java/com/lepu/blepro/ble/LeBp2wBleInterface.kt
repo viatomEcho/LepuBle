@@ -161,6 +161,7 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                     return
                 }
 
+                curSize = 0
                 fileContent = null
                 fileSize = toUInt(bleResponse.content.copyOfRange(0, 4))
                 LepuBleLog.d(tag, "download file $fileName CMD_FILE_READ_START fileSize == $fileSize")
@@ -200,6 +201,10 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                 }
             }
             READ_FILE_END -> {
+                if (isCancelRF || isPausedRF){
+                    LepuBleLog.d(tag, "已经取消/暂停下载 isCancelRF = $isCancelRF, isPausedRF = $isPausedRF" )
+                    return
+                }
                 //检查返回是否异常
                 if (bleResponse.pkgType != 0x01.toByte()) {
                     LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, READ_FILE_END => error")
@@ -208,16 +213,10 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                 }
                 LepuBleLog.d(tag, "model:$model,READ_FILE_END => success")
 
-                curSize = 0
-                if (fileContent == null) fileContent = ByteArray(0)
-
-                if (isCancelRF || isPausedRF){
-                    LepuBleLog.d(tag, "已经取消/暂停下载 isCancelRF = $isCancelRF, isPausedRF = $isPausedRF" )
-                    return
-                }
-
                 fileContent?.let {
-                    if (it.isNotEmpty()) {
+                    if (curSize != fileSize) {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileError).post(InterfaceEvent(model, fileName))
+                    } else {
                         if (fileName.endsWith(".list")) {
                             val data = if (device.name == null) {
                                 Bp2BleFile(fileName, it, "")
@@ -233,17 +232,17 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                             }
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileComplete).post(InterfaceEvent(model, data))
                         }
-                    } else {
-                        if (fileName.endsWith(".list")) {
-                            val data = if (device.name == null) {
-                                Bp2BleFile(fileName, byteArrayOf(0, fileType.toByte(), 0, 0, 0, 0, 0, 0, 0, 0), "")
-                            } else {
-                                Bp2BleFile(fileName, byteArrayOf(0, fileType.toByte(), 0, 0, 0, 0, 0, 0, 0, 0), device.name)
-                            }
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFileList).post(InterfaceEvent(model, data))
+                    }
+                } ?: kotlin.run {
+                    if (fileName.endsWith(".list")) {
+                        val data = if (device.name == null) {
+                            Bp2BleFile(fileName, byteArrayOf(0, fileType.toByte(), 0, 0, 0, 0, 0, 0, 0, 0), "")
                         } else {
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileError).post(InterfaceEvent(model, fileName))
+                            Bp2BleFile(fileName, byteArrayOf(0, fileType.toByte(), 0, 0, 0, 0, 0, 0, 0, 0), device.name)
                         }
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFileList).post(InterfaceEvent(model, data))
+                    } else {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileError).post(InterfaceEvent(model, fileName))
                     }
                 }
             }

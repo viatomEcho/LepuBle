@@ -188,7 +188,12 @@ class Er2BleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FileList).post(InterfaceEvent(model, fileArray))
             }
             Er2BleCmd.CMD_START_READ_FILE -> {
-
+                //检查当前的下载状态
+                if (isCancelRF || isPausedRF) {
+                    sendCmd(Er2BleCmd.readFileEnd())
+                    LepuBleLog.d(tag, "CMD_START_READ_FILE isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
+                    return
+                }
                 LepuBleLog.d(tag, "model:$model,CMD_START_READ_FILE => success, $respPkg")
                 if (respPkg.pkgType == 0x01.toByte()) {
                     val fileSize = toUInt(respPkg.data)
@@ -207,16 +212,20 @@ class Er2BleInterface(model: Int): BleInterface(model) {
 
             }
             Er2BleCmd.CMD_READ_FILE_CONTENT -> {
+                //检查当前的下载状态
+                if (isCancelRF || isPausedRF) {
+                    sendCmd(Er2BleCmd.readFileEnd())
+                    LepuBleLog.d(tag, "CMD_READ_FILE_CONTENT isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
+                    return
+                }
+                if (respPkg.pkgType != 0x01.toByte()) {
+                    LepuBleLog.d(tag, "CMD_READ_FILE_CONTENT read file failed：${respPkg.pkgType}")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileError).post(InterfaceEvent(model, true))
+                    return
+                }
                 curFile?.apply {
 
                     LepuBleLog.d(tag, "CMD_READ_FILE_CONTENT: paused = $isPausedRF, cancel = $isCancelRF, offset =  ${offset}, index = ${this.index}")
-
-                    //检查当前的下载状态
-                    if (isCancelRF || isPausedRF) {
-                        sendCmd(Er1BleCmd.readFileEnd())
-                        LepuBleLog.d(tag, "CMD_READ_FILE_CONTENT isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
-                        return
-                    }
 
                     this.addContent(respPkg.data)
                     LepuBleLog.d(tag, "read file：${this.fileName}   => ${this.index + offset} / ${this.fileSize}")
@@ -236,15 +245,21 @@ class Er2BleInterface(model: Int): BleInterface(model) {
             Er2BleCmd.CMD_END_READ_FILE -> {
                 LepuBleLog.d(tag, "read file finished: ${curFile?.fileName} ==> ${curFile?.fileSize}")
                 LepuBleLog.d(tag, "read file finished: isCancel = $isCancelRF, isPause = $isPausedRF")
-
+                //检查当前的下载状态
+                if ((isCancelRF || isPausedRF)) {
+                    LepuBleLog.d(tag, "CMD_END_READ_FILE isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
+                    return
+                }
+                if (respPkg.pkgType != 0x01.toByte()) {
+                    LepuBleLog.d(tag, "CMD_END_READ_FILE read file failed：${respPkg.pkgType}")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileError).post(InterfaceEvent(model, true))
+                    return
+                }
                 curFileName = null// 一定要放在发通知之前
                 curFile?.let {
-                    if (it.index < it.fileSize){
-                        if ((isCancelRF || isPausedRF)) {
-                            LepuBleLog.d(tag, "CMD_END_READ_FILE isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
-                            return
-                        }
-                    }else {
+                    if (it.index != it.fileSize){
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileError).post(InterfaceEvent(model, true))
+                    } else {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileComplete).post(InterfaceEvent(model, it))
                     }
                 }?: kotlin.run {

@@ -298,16 +298,11 @@ class OxyBleResponse{
         }
 
         fun addContent(bytes: ByteArray) {
-            if (index >= fileSize) {
-                LepuBleLog.d("index > fileSize. 文件下载完成")
-                return
-            } else {
+            if ((index+bytes.size) <= fileSize) {
                 System.arraycopy(bytes, 0, fileContent, index, bytes.size)
-                DownloadHelper.writeFile(model, userId, fileName, "dat", bytes )
-
-                index += bytes.size
-
+//                DownloadHelper.writeFile(model, userId, fileName, "dat", bytes)
             }
+            index += bytes.size
         }
     }
 

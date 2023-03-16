@@ -180,15 +180,11 @@ object Er1BleResponse {
         }
 
         fun addContent(bytes: ByteArray) {
-            if (index >= fileSize) {
-                LepuBleLog.d("index >= fileSize index:$index, fileSize:$fileSize 已下载完成")
-                return // 已下载完成
-            } else {
+            if ((index+bytes.size) <= fileSize) {
                 System.arraycopy(bytes, 0, content, index, bytes.size)
                 DownloadHelper.writeFile(model, userId, fileName, "dat", bytes)
-
-                index += bytes.size
             }
+            index += bytes.size
             LepuBleLog.d("er1File, bytes size = ${bytes.size}, index = $index")
         }
     }

@@ -99,7 +99,8 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             // 除读文件数据包号递增，其他都是0
             val seqNo = toUInt(bytes.copyOfRange(i + 3, i + 5))
             LepuBleLog.d(tag, "seqNo: $seqNo, OxyBleCmd.seqNo: ${OxyBleCmd.seqNo}")
-            if (curCmd == OxyBleCmd.OXY_CMD_READ_CONTENT) {
+            // 客户出现下载文件卡死现象，问题未查出，暂不使用包号验证
+            /*if (curCmd == OxyBleCmd.OXY_CMD_READ_CONTENT) {
                 if (seqNo != (OxyBleCmd.seqNo-1)) {
                     continue@loop
                 }
@@ -107,7 +108,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 if (seqNo != OxyBleCmd.seqNo) {
                     continue@loop
                 }
-            }
+            }*/
 
             // need content length
             val len = toUInt(bytes.copyOfRange(i + 5, i + 7))
@@ -207,6 +208,18 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamData).post(InterfaceEvent(model, rtParam))
 
             }
+            OxyBleCmd.OXY_CMD_PPG_RT_DATA -> {
+                //ppg
+                clearTimeout()
+
+                if (response.content.size > 10) {
+                    val ppgData = OxyBleResponse.PPGData(response.content)
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData).post(InterfaceEvent(model, ppgData))
+                }else{
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgRes).post(InterfaceEvent(model, true))
+                }
+            }
+
             OxyBleCmd.OXY_CMD_READ_START -> {
                 clearTimeout()
 
@@ -229,18 +242,6 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model, 读文件失败：${response.content.toHex()}")
                 }
             }
-            OxyBleCmd.OXY_CMD_PPG_RT_DATA -> {
-                //ppg
-                clearTimeout()
-
-                if (response.content.size > 10) {
-                    val ppgData = OxyBleResponse.PPGData(response.content)
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData).post(InterfaceEvent(model, ppgData))
-                }else{
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgRes).post(InterfaceEvent(model, true))
-                }
-            }
-
             OxyBleCmd.OXY_CMD_READ_CONTENT -> {
                 clearTimeout()
                 if (response.state) {
@@ -272,10 +273,14 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
                 if (response.state) {
                     curFile?.let {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileComplete).post(InterfaceEvent(model, it))
+                        if (it.index != it.fileSize) {
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError).post(InterfaceEvent(model, true))
+                        } else {
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileComplete).post(InterfaceEvent(model, it))
+                        }
                     } ?: run {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError).post(InterfaceEvent(model, true))
-                        LepuBleLog.d(tag, "model:$model,  curFile error!!")
+                        LepuBleLog.d(tag, "model:$model, curFile error!!")
                     }
                 } else {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError).post(InterfaceEvent(model, true))
