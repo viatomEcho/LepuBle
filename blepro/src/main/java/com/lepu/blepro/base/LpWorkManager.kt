@@ -949,13 +949,6 @@ object LpWorkManager {
                         vailFace.get(b.model)?.connect(application!!, b.device, true, toConnectUpdater)
                         LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
                     }
-                } else {
-                    if (isReconnectScan) {
-                        LepuBleLog.d(tag, "找到了新蓝牙名设备， 去连接Updater${b.name}")
-                        if (b.name.contains("ER1 Updater")) { //如果扫描到的是新蓝牙名，连接
-                            LiveEventBus.get<Bluetooth>(EventMsgConst.Discovery.EventDeviceFound_ER1_UPDATE).post(b)
-                        }
-                    }
                 }
 
             }
