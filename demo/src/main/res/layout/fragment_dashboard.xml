@@ -652,7 +652,7 @@
                         </LinearLayout>
                         <CheckBox
                             android:visibility="gone"
-                            android:id="@+id/collect_ppg"
+                            android:id="@+id/collect_data"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             app:layout_constraintTop_toBottomOf="@id/ppg_type_layout"

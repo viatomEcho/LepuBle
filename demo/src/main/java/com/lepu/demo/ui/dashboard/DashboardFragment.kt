@@ -19,7 +19,7 @@ import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.ByteUtils
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
-import com.lepu.blepro.utils.add
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.getTimeString
 import com.lepu.demo.DemoWidgetProvider
 import com.lepu.demo.MainViewModel
@@ -56,7 +56,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     // 采集
     private var o2RtType = 0  // 0: rt param, 1: rt wave, 2: rt ppg
     private var startCollectTime = 0L
+    // ppg数据
     private var collectIntsData = IntArray(0)
+    // 脉搏波数据
+    private var collectBytesData = ByteArray(0)
 
     // 无线共存
     private var isStartWirelessTest = false
@@ -367,12 +370,13 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.o2RtTypeLayout.visibility = View.VISIBLE
                 binding.ppgTypeLayout.visibility = View.VISIBLE
-                binding.collectPpg.visibility = View.VISIBLE
+                binding.collectData.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.ecgLayout.visibility = View.GONE
                 binding.bpLayout.visibility = View.GONE
                 binding.o2RtTypeLayout.check(R.id.o2_rt_param)
                 binding.ppgIr.isChecked = true
+                o2RtType = 0
                 LpBleUtil.startRtTask()
                 startWave(it.modelNo)
             }
@@ -393,23 +397,29 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_PC60NW_BLE, Bluetooth.MODEL_PC60NW_WPS,
             Bluetooth.MODEL_PC_60NW_NO_SN -> {
                 binding.oxyLayout.visibility = View.VISIBLE
+                binding.collectData.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.ecgLayout.visibility = View.GONE
                 binding.bpLayout.visibility = View.GONE
+                o2RtType = 1
                 startWave(it.modelNo)
             }
             Bluetooth.MODEL_PC100 -> {
                 binding.bpLayout.visibility = View.VISIBLE
                 binding.oxyLayout.visibility = View.VISIBLE
+                binding.collectData.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.ecgLayout.visibility = View.GONE
+                o2RtType = 1
                 startWave(it.modelNo)
             }
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV -> {
                 binding.ecgLayout.visibility = View.VISIBLE
                 binding.oxyLayout.visibility = View.VISIBLE
+                binding.collectData.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.bpLayout.visibility = View.GONE
+                o2RtType = 1
                 startWave(it.modelNo)
             }
             Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
@@ -417,7 +427,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.ecgLayout.visibility = View.VISIBLE
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.bpLayout.visibility = View.VISIBLE
+                binding.collectData.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
+                o2RtType = 1
                 startWave(it.modelNo)
             }
             Bluetooth.MODEL_BTP -> {
@@ -731,7 +743,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             LpBleUtil.stopEcg(Constant.BluetoothConfig.currentModel[0])
         }
         binding.o2RtTypeLayout.setOnCheckedChangeListener { group, checkedId ->
-            if (binding.collectPpg.isChecked) {
+            if (binding.collectData.isChecked) {
                 when (o2RtType) {
                     0 -> binding.o2RtTypeLayout.check(R.id.o2_rt_param)
                     1 -> binding.o2RtTypeLayout.check(R.id.o2_rt_wave)
@@ -747,29 +759,22 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         }
         binding.ppgIr.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (binding.collectPpg.isChecked) {
+            if (binding.collectData.isChecked) {
                 binding.ppgIr.isChecked = !isChecked
                 Toast.makeText(context, "PPG数据采集中不能修改采集类型！", Toast.LENGTH_SHORT).show()
                 return@setOnCheckedChangeListener
             }
-            collectPpg(isChecked)
         }
         binding.ppgRed.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (binding.collectPpg.isChecked) {
+            if (binding.collectData.isChecked) {
                 binding.ppgRed.isChecked = !isChecked
                 Toast.makeText(context, "PPG数据采集中不能修改采集类型！", Toast.LENGTH_SHORT).show()
                 return@setOnCheckedChangeListener
             }
-            collectPpg(isChecked)
         }
-        binding.collectPpg.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (o2RtType != 2) {
-                binding.collectPpg.isChecked = !isChecked
-                Toast.makeText(context, "请先选择获取PPG数据，再进行PPG数据采集！", Toast.LENGTH_SHORT).show()
-                return@setOnCheckedChangeListener
-            }
-            if ((!binding.ppgIr.isChecked) && (!binding.ppgRed.isChecked)) {
-                binding.collectPpg.isChecked = !isChecked
+        binding.collectData.setOnCheckedChangeListener { buttonView, isChecked ->
+            if ((o2RtType == 2) && (!binding.ppgIr.isChecked) && (!binding.ppgRed.isChecked)) {
+                binding.collectData.isChecked = !isChecked
                 Toast.makeText(context, "请至少选择一种PPG数据类型进行采集！", Toast.LENGTH_SHORT).show()
                 return@setOnCheckedChangeListener
             }
@@ -972,39 +977,64 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     private fun collectPpg(isCollect: Boolean) {
         if (isCollect) {
             startCollectTime = System.currentTimeMillis()
+            collectBytesData = ByteArray(0)
             collectIntsData = IntArray(0)
         } else {
-            if (collectIntsData.isEmpty()) {
-                Toast.makeText(context, "未采集到PPG数据", Toast.LENGTH_SHORT).show()
-                return
-            }
-            // 需要传的参数：开始采集的时间戳s，采集通道数量，通道类型，采样率，设备类型，sn，采样点数据
-            val ppgFile = PpgFile()
-            ppgFile.sampleTime = (startCollectTime/1000).toInt()
-            if (binding.ppgIr.isChecked && binding.ppgRed.isChecked) {
-                ppgFile.leadSize = 2
-                ppgFile.leadConfig = arrayOf(ppgFile.DATA_TYPE_IR, ppgFile.DATA_TYPE_RED, 0, 0)
-            } else {
-                ppgFile.leadSize = 1
-                if (binding.ppgIr.isChecked) {
-                    ppgFile.leadConfig = arrayOf(ppgFile.DATA_TYPE_IR, 0, 0, 0)
-                } else {
-                    ppgFile.leadConfig = arrayOf(ppgFile.DATA_TYPE_RED, 0, 0, 0)
+            when (o2RtType) {
+                1 -> {
+                    if (collectBytesData.isEmpty()) {
+                        Toast.makeText(context, "未采集到PPG数据", Toast.LENGTH_SHORT).show()
+                    } else {
+                        saveWaveData()
+                    }
+                }
+                2 -> {
+                    if (collectIntsData.isEmpty()) {
+                        Toast.makeText(context, "未采集到脉搏波数据", Toast.LENGTH_SHORT).show()
+                    } else {
+                        savePpgData()
+                    }
                 }
             }
-            ppgFile.deviceType = when (Constant.BluetoothConfig.currentModel[0]) {
-                Bluetooth.MODEL_O2RING -> ppgFile.DEVICE_TYPE_O2RING
-                Bluetooth.MODEL_PC60FW -> ppgFile.DEVICE_TYPE_PC60FW
-                else -> 0
-            }
-            ppgFile.sn = mainViewModel.oxyInfo.value?.sn!!
-            ppgFile.sampleIntsData = collectIntsData
-            val fileName = "PPG${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
-            FileUtil.saveFile(context, ppgFile.getDataBytes(), fileName)
-            Log.d(TAG, "collectIntsData: ${collectIntsData.joinToString(",")}")
-            val file = PpgFile(FileUtil.readFileToByteArray(context, fileName))
-            Log.d(TAG, "file: $file")
         }
+    }
+
+    private fun saveWaveData() {
+        val fileName = "WAVE${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
+        FileUtil.saveFile(context, collectBytesData, fileName)
+        Log.d(TAG, "collectBytesData: ${bytesToHex(collectBytesData)}")
+        val bytes = FileUtil.readFileToByteArray(context, fileName)
+        Log.d(TAG, "file: ${bytesToHex(bytes)}")
+    }
+
+    private fun savePpgData() {
+        // 需要传的参数：开始采集的时间戳s，采集通道数量，通道类型，采样率，设备类型，sn，采样点数据
+        val ppgFile = PpgFile()
+        ppgFile.sampleTime = (startCollectTime/1000).toInt()
+        if (binding.ppgIr.isChecked && binding.ppgRed.isChecked) {
+            ppgFile.leadSize = 2
+            ppgFile.leadConfig = arrayOf(ppgFile.DATA_TYPE_IR, ppgFile.DATA_TYPE_RED, 0, 0)
+        } else {
+            ppgFile.leadSize = 1
+            if (binding.ppgIr.isChecked) {
+                ppgFile.leadConfig = arrayOf(ppgFile.DATA_TYPE_IR, 0, 0, 0)
+            } else {
+                ppgFile.leadConfig = arrayOf(ppgFile.DATA_TYPE_RED, 0, 0, 0)
+            }
+        }
+        ppgFile.deviceType = when (Constant.BluetoothConfig.currentModel[0]) {
+            Bluetooth.MODEL_O2RING -> ppgFile.DEVICE_TYPE_O2RING
+            Bluetooth.MODEL_PC60FW -> ppgFile.DEVICE_TYPE_PC60FW
+            else -> 0
+        }
+        ppgFile.sn = mainViewModel.oxyInfo.value?.sn!!
+        ppgFile.sampleIntsData = collectIntsData
+        val fileName = "PPG${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
+        FileUtil.saveFile(context, ppgFile.getDataBytes(), fileName)
+        Log.d(TAG, "collectIntsData: ${collectIntsData.joinToString(",")}")
+        Log.d(TAG, "bytes: ${bytesToHex(ppgFile.getDataBytes())}")
+        val file = PpgFile(FileUtil.readFileToByteArray(context, fileName))
+        Log.d(TAG, "file: $file")
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -1333,9 +1363,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             (event.data as OxyBleResponse.RtWave).let { data ->
                 activity?.let {
                     //接收数据 开始添加采集数据
-                    mainViewModel.checkStartCollect(it, data.waveByte)
-
-                    toPlayAlarm(data.pr)
+                    if (binding.collectData.isChecked) {
+                        collectBytesData = collectBytesData.plus(data.waveByte)
+                    }
                     OxyDataController.receive(data.wFs)
                     when (o2RtType) {
                         0 -> LpBleUtil.oxyGetRtParam(event.model)
@@ -1384,7 +1414,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 }
                 val ppgData = it.data as OxyBleResponse.PPGData
                 ppgData.let { data ->
-                    if (binding.collectPpg.isChecked) {
+                    if (binding.collectData.isChecked) {
                         if ((binding.ppgIr.isChecked) && (binding.ppgRed.isChecked)) {
                             collectIntsData = collectIntsData.plus(data.irRedArray)
                         } else if (binding.ppgIr.isChecked) {
@@ -1434,6 +1464,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val rtWave = it.data as PC60FwBleResponse.RtDataWave
                 OxyDataController.receive(rtWave.waveIntData)
                 Log.d("test12345", "" + Arrays.toString(rtWave.waveIntData))
+                if (binding.collectData.isChecked) {
+                    collectBytesData = collectBytesData.plus(rtWave.waveData)
+                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataParam)
             .observe(this) {
@@ -1451,6 +1484,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             .observe(this) {
                 val rtWave = it.data as Pc100BleResponse.RtBoWave
                 OxyDataController.receive(rtWave.waveIntData)
+                if (binding.collectData.isChecked) {
+                    collectBytesData = collectBytesData.plus(rtWave.waveData)
+                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BoRtParam)
             .observe(this) {
@@ -1494,6 +1530,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             .observe(this) {
                 val rtWave = it.data as Ap20BleResponse.RtBoWave
                 OxyDataController.receive(rtWave.waveIntData)
+                if (binding.collectData.isChecked) {
+                    collectBytesData = collectBytesData.plus(rtWave.waveData)
+                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBoParam)
             .observe(this) {
@@ -1536,12 +1575,18 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "ECG -note：${rtData.ecgNote}\n" +
                         "SpO2-pulse sound：${rtData.pulseSound}\n" +
                         "SpO2-note：${rtData.spo2Note}"
+                if (binding.collectData.isChecked) {
+                    collectBytesData = collectBytesData.plus(rtData.spo2Wave)
+                }
             }
         //------------------------------sp20------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20RtWave)
             .observe(this) {
                 val rtWave = it.data as Sp20BleResponse.RtWave
                 OxyDataController.receive(rtWave.waveIntData)
+                if (binding.collectData.isChecked) {
+                    collectBytesData = collectBytesData.plus(rtWave.waveData)
+                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20RtParam)
             .observe(this) {
@@ -1576,6 +1621,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             .observe(this) {
                 val rtWave = it.data as Pc68bBleResponse.RtWave
                 OxyDataController.receive(rtWave.waveIntData)
+                if (binding.collectData.isChecked) {
+                    collectBytesData = collectBytesData.plus(rtWave.waveData)
+                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bRtParam)
             .observe(this) {
@@ -1601,6 +1649,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "低灌注标记：${rtWave.isLowPi}\n" +
                         "棒图：${rtWave.barChart}\n" +
                         "包序号：${rtWave.seqNo}"
+                if (binding.collectData.isChecked) {
+                    collectBytesData = collectBytesData.plus(rtWave.wave.toByte())
+                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM20f.EventVTM20fRtParam)
             .observe(this) {
@@ -1668,12 +1719,18 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                                 else -> ""
                             }
                         }"
+                if (binding.collectData.isChecked) {
+                    collectBytesData = collectBytesData.plus(rtData.wave.waveByte)
+                }
             }
         //-------------------------pc300-------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtOxyWave)
             .observe(this) {
                 val data = it.data as Pc300BleResponse.RtOxyWave
                 OxyDataController.receive(data.waveIntData)
+                if (binding.collectData.isChecked) {
+                    collectBytesData = collectBytesData.plus(data.waveData)
+                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtOxyParam)
             .observe(this) {
@@ -2002,6 +2059,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         else -> ""
                     }
                 }"
+                if (binding.collectData.isChecked) {
+                    collectBytesData = collectBytesData.plus(data.wave)
+                }
             }
         //------------------------btp----------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpRtData)
