@@ -630,15 +630,35 @@
                                 android:textSize="16sp"
                                 android:text="PPG数据"/>
                         </RadioGroup>
+                        <LinearLayout
+                            android:visibility="gone"
+                            android:id="@+id/ppg_type_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintTop_toBottomOf="@id/o2_rt_type_layout"
+                            app:layout_constraintStart_toStartOf="parent">
+                            <CheckBox
+                                android:id="@+id/ppg_ir"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:text="红外"/>
+                            <CheckBox
+                                android:id="@+id/ppg_red"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:text="红光"/>
+                        </LinearLayout>
                         <CheckBox
                             android:visibility="gone"
                             android:id="@+id/collect_ppg"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            app:layout_constraintTop_toBottomOf="@id/o2_rt_type_layout"
+                            app:layout_constraintTop_toBottomOf="@id/ppg_type_layout"
                             app:layout_constraintStart_toStartOf="parent"
                             android:textSize="16sp"
-                            android:text="采集PPG"/>
+                            android:text="开始采集"/>
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <!-- ER3产品实时布局 -->

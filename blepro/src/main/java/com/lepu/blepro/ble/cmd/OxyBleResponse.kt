@@ -314,6 +314,7 @@ class OxyBleResponse{
 
         var rawDataArray = mutableListOf<PpgRawData>()
         var irRedArray: IntArray
+        var irRedByteArray = ByteArray(0)
         var irArray : IntArray
         var irByteArray = ByteArray(0)
         var redArray : IntArray
@@ -334,6 +335,8 @@ class OxyBleResponse{
                     rawDataArray.add(it)
                     irRedArray[i*2] = it.ir
                     irRedArray[i*2+1] = it.red
+                    irRedByteArray = irRedByteArray.plus(it.irBytes)
+                    irRedByteArray = irRedByteArray.plus(it.redBytes)
                     irArray[i] = it.ir
                     irByteArray = add(irByteArray, it.irBytes)
                     redArray[i] = it.red
@@ -360,7 +363,6 @@ class OxyBleResponse{
             redBytes = bytes.copyOfRange(4, 8)
             motion = byte2UInt(bytes[8])
         }
-
     }
 
 
