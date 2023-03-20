@@ -27,7 +27,7 @@ class TimeData() {
 
     fun getDataBytes(): ByteArray {
         val curTime = (System.currentTimeMillis() / 1000).toInt()
-        offsetTime = TimeZone.getDefault().rawOffset / 1000
+        offsetTime = TimeZone.getDefault().getOffset(System.currentTimeMillis()).div(1000)
         absTime = curTime - offsetTime
         Log.d("test12345", "curTime = $curTime")
         Log.d("test12345", "offsetTime = $offsetTime")

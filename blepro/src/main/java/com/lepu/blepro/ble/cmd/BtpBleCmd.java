@@ -187,7 +187,7 @@ public class BtpBleCmd {
         data[5] = (byte) (c.get(Calendar.MINUTE));
         data[6] = (byte) (c.get(Calendar.SECOND));
 
-        int timeZone = (int) (TimeZone.getDefault().getRawOffset()/360000f);
+        int timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / (3600*100);
         LepuBleLog.d("setUtcTime===" + timeZone);
 
         data[7] = (byte) timeZone;

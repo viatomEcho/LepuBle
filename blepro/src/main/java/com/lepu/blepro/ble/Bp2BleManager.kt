@@ -26,7 +26,21 @@ class Bp2BleManager(context: Context): LpBleManager(context) {
     }
 
     override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {
-        if (LpWorkManager.support2MPhy) {
+        // 部分手机设置PHY无响应，导致连接失败，暂不使用
+//        if (LpWorkManager.support2MPhy) {
+//            requestQueue.add(requestMtu(247)
+//                .with { device: BluetoothDevice?, mtu: Int ->
+//                    log(Log.INFO, "Bp2BleManager MTU set to $mtu")
+//                }
+//                .fail { device: BluetoothDevice?, status: Int ->
+//                    log(Log.WARN, "Bp2BleManager Requested MTU not supported: $status")
+//                })
+//                .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
+//                    .fail { device: BluetoothDevice?, status: Int ->
+//                        log(Log.WARN, "Bp2BleManager Requested PHY not supported: $status")
+//                    })
+//                .add(requestConnectionPriority(ConnectionPriorityRequest.CONNECTION_PRIORITY_HIGH))
+//        } else {
             requestQueue.add(requestMtu(247)
                 .with { device: BluetoothDevice?, mtu: Int ->
                     log(Log.INFO, "Bp2BleManager MTU set to $mtu")
@@ -34,21 +48,8 @@ class Bp2BleManager(context: Context): LpBleManager(context) {
                 .fail { device: BluetoothDevice?, status: Int ->
                     log(Log.WARN, "Bp2BleManager Requested MTU not supported: $status")
                 })
-                .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
-                    .fail { device: BluetoothDevice?, status: Int ->
-                        log(Log.WARN, "Bp2BleManager Requested PHY not supported: $status")
-                    })
                 .add(requestConnectionPriority(ConnectionPriorityRequest.CONNECTION_PRIORITY_HIGH))
-        } else {
-            requestQueue.add(requestMtu(247)
-                .with { device: BluetoothDevice?, mtu: Int ->
-                    log(Log.INFO, "Bp2BleManager MTU set to $mtu")
-                }
-                .fail { device: BluetoothDevice?, status: Int ->
-                    log(Log.WARN, "Bp2BleManager Requested MTU not supported: $status")
-                })
-                .add(requestConnectionPriority(ConnectionPriorityRequest.CONNECTION_PRIORITY_HIGH))
-        }
+//        }
         LepuBleLog.d("Bp2BleManager dealReqQueue ")
         return requestQueue
     }

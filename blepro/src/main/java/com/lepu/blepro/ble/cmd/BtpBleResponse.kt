@@ -156,7 +156,7 @@ object BtpBleResponse {
             index += 8
             magic = toUInt(bytes.copyOfRange(index, index+4))
             index += 4
-            timestamp = toUInt(bytes.copyOfRange(index, index+4)) - TimeZone.getDefault().rawOffset.div(1000)
+            timestamp = toUInt(bytes.copyOfRange(index, index+4)) - TimeZone.getDefault().getOffset(System.currentTimeMillis()).div(1000)
             index += 4
             duration = toUInt(bytes.copyOfRange(index, index+4))
             index += 4
@@ -191,7 +191,7 @@ object BtpBleResponse {
         // reserved 3
         init {
             var index = 0
-            timestamp = toUInt(bytes.copyOfRange(index, index+4)) - TimeZone.getDefault().rawOffset.div(1000)
+            timestamp = toUInt(bytes.copyOfRange(index, index+4)) - TimeZone.getDefault().getOffset(System.currentTimeMillis()).div(1000)
             index += 4
             hrEvent = byte2UInt(bytes[index])
             index++

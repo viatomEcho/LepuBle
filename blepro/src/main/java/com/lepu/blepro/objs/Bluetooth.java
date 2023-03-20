@@ -122,7 +122,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_VTM01 = "VTM01";
     public static final String BT_NAME_PC200_BLE = "PC-200-BLE";
     public static final String BT_NAME_BTP = "BTP";
-    public static final String BT_NAME_S5_SCALE = "AAA026";
+    public static final String BT_NAME_S5_SCALE = "Le S5";
     public static final String BT_NAME_R20 = "R20";
     public static final String BT_NAME_LERES = "LeRes";
 
