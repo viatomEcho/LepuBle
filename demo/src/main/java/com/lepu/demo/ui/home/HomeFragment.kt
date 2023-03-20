@@ -181,7 +181,12 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     activity?.lifecycle?.addObserver(BIOL(activity as MainActivity, Constant.BluetoothConfig.SUPPORT_MODELS))
 
                     mAlertDialog?.show()
-                    LpBleUtil.connect(it1, it)
+                    // 扫描到需要升级的设备
+                    if (it.name.contains("Updater")) {
+                        LpBleUtil.connect(it1, it, false, true)
+                    } else {
+                        LpBleUtil.connect(it1, it)
+                    }
                     ToastUtil.showToast(activity, "正在连接蓝牙")
                     LpBleUtil.stopScan()
                     binding.rcv.visibility = View.GONE
@@ -297,22 +302,6 @@ class HomeFragment : Fragment(R.layout.fragment_home){
 //                adapter.notifyDataSetChanged()
                 Constant.BluetoothConfig.splitText = binding.bleSplit.text.toString()
                 splitDevices(Constant.BluetoothConfig.splitText)
-
-                // 扫描到需要升级的设备，自动连接
-                if (it.name.contains("Updater")) {
-                    LpBleUtil.disconnect(false)
-                    if (singleConnect) currentModel[0] = it.model
-                    LpBleUtil.setInterface(it.model, singleConnect)
-                    activity?.lifecycle?.addObserver(BIOL(activity as MainActivity, Constant.BluetoothConfig.SUPPORT_MODELS))
-
-                    mAlertDialog?.show()
-                    LpBleUtil.connect(activity?.applicationContext!!, it, false, true)
-                    ToastUtil.showToast(activity, "正在连接蓝牙")
-                    LpBleUtil.stopScan()
-                    binding.rcv.visibility = View.GONE
-
-                    mainViewModel._curBluetooth.value = DeviceEntity(it.name, it.macAddr, it.model)
-                }
             }
         LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceDisconnectReason)
             .observe(this) {
@@ -345,7 +334,11 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     activity?.lifecycle?.addObserver(BIOL(activity as MainActivity, Constant.BluetoothConfig.SUPPORT_MODELS))
 
                     mAlertDialog?.show()
-                    LpBleUtil.connect(activity?.applicationContext!!, b)
+                    if (b.name.contains("Updater")) {
+                        LpBleUtil.connect(activity?.applicationContext!!, b, false, true)
+                    } else {
+                        LpBleUtil.connect(activity?.applicationContext!!, b)
+                    }
                     ToastUtil.showToast(activity, "正在连接蓝牙")
                     LpBleUtil.stopScan()
                     binding.rcv.visibility = View.GONE
