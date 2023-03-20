@@ -179,8 +179,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     LpBleUtil.bp2GetConfig(it.modelNo)
                 }
                 Bluetooth.MODEL_O2RING, Bluetooth.MODEL_BABYO2,
-                Bluetooth.MODEL_BBSM_S1, Bluetooth.MODEL_BBSM_S2,
-                Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_CHECKO2,
+                Bluetooth.MODEL_BBSM_S1, Bluetooth.MODEL_CHECKO2,
                 Bluetooth.MODEL_O2M, Bluetooth.MODEL_SLEEPO2,
                 Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
                 Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
@@ -189,6 +188,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_OXYU, Bluetooth.MODEL_AI_S100,
                 Bluetooth.MODEL_O2M_WPS -> {
                     setViewVisible(binding.o2Layout.root)
+                    LpBleUtil.getInfo(it.modelNo)
+                }
+                Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_BBSM_S2 -> {
+                    setViewVisible(binding.o2Layout.root)
+                    binding.o2Layout.o2S2Layout.visibility = View.VISIBLE
                     LpBleUtil.getInfo(it.modelNo)
                 }
                 Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_MY_SCALE,
