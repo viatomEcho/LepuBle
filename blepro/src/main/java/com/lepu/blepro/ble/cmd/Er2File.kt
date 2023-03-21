@@ -22,14 +22,11 @@ class Er2File(val model: Int, val name: String, val size: Int, private val userI
     }
 
     fun addContent(bytes: ByteArray) {
-        if (index >= fileSize) {
-            return // 已下载完成
-        } else {
+        if ((index+bytes.size) <= fileSize) {
             System.arraycopy(bytes, 0, content, index, bytes.size)
 //            DownloadHelper.writeFile(model, userId, fileName, "dat", bytes) //此设备不保存到本地
-
-            index += bytes.size
         }
+        index += bytes.size
         LepuBleLog.d("Er2File,bytes size = ${bytes.size}, index = $index")
     }
 }

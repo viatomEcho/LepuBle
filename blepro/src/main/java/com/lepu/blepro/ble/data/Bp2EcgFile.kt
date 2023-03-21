@@ -34,7 +34,7 @@ class Bp2EcgFile(val bytes: ByteArray) {
         index++
         fileType = byte2UInt(bytes[index])
         index++
-        val rawOffset = TimeZone.getDefault().rawOffset.div(1000)
+        val rawOffset = TimeZone.getDefault().getOffset(System.currentTimeMillis()).div(1000)
         val defaultTime = toUInt(bytes.copyOfRange(index, index+4))
         measureTime = defaultTime - rawOffset
         index += 4

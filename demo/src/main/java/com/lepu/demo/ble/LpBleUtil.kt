@@ -87,18 +87,19 @@ class LpBleUtil {
         fun initBle(application: Application) {
 
             val RAW_FOLDERS = SparseArray<String>()
-            RAW_FOLDERS.put(Bluetooth.MODEL_ER1, PathUtils.getExternalAppFilesPath() + "/demo/er1/")
-            RAW_FOLDERS.put(Bluetooth.MODEL_HHM1, PathUtils.getExternalAppFilesPath() + "/demo/hhm1/")
-            RAW_FOLDERS.put(Bluetooth.MODEL_HHM2, PathUtils.getExternalAppFilesPath() + "/demo/hhm2/")
-            RAW_FOLDERS.put(Bluetooth.MODEL_HHM3, PathUtils.getExternalAppFilesPath() + "/demo/hhm3/")
-            RAW_FOLDERS.put(Bluetooth.MODEL_LEW, PathUtils.getExternalAppFilesPath() + "/demo/lew/")
-            RAW_FOLDERS.put(Bluetooth.MODEL_W12C, PathUtils.getExternalAppFilesPath() + "/demo/w12c/")
-            RAW_FOLDERS.put(Bluetooth.MODEL_DUOEK, PathUtils.getExternalAppFilesPath() + "/demo/duoek/")
-            RAW_FOLDERS.put(Bluetooth.MODEL_ER2, PathUtils.getExternalAppFilesPath() + "/demo/er2/")
-            RAW_FOLDERS.put(Bluetooth.MODEL_LP_ER2, PathUtils.getExternalAppFilesPath() + "/demo/lper2/")
-            RAW_FOLDERS.put(Bluetooth.MODEL_BP2, PathUtils.getExternalAppFilesPath() + "/demo/bp2/")
-            RAW_FOLDERS.put(Bluetooth.MODEL_BP2A, PathUtils.getExternalAppFilesPath() + "/demo/bp2a/")
-            RAW_FOLDERS.put(Bluetooth.MODEL_BP2T, PathUtils.getExternalAppFilesPath() + "/demo/bp2t/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_ER1, PathUtils.getExternalAppFilesPath() + "/er1/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_HHM1, PathUtils.getExternalAppFilesPath() + "/hhm1/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_HHM2, PathUtils.getExternalAppFilesPath() + "/hhm2/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_HHM3, PathUtils.getExternalAppFilesPath() + "/hhm3/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_LEW, PathUtils.getExternalAppFilesPath() + "/lew/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_W12C, PathUtils.getExternalAppFilesPath() + "/w12c/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_DUOEK, PathUtils.getExternalAppFilesPath() + "/duoek/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_ER2, PathUtils.getExternalAppFilesPath() + "/er2/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_LP_ER2, PathUtils.getExternalAppFilesPath() + "/lper2/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_BP2, PathUtils.getExternalAppFilesPath() + "/bp2/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_BP2A, PathUtils.getExternalAppFilesPath() + "/bp2a/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_BP2T, PathUtils.getExternalAppFilesPath() + "/bp2t/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_BTP, PathUtils.getExternalAppFilesPath() + "/btp/")
 
             getServiceHelper()
                 .initLog(BuildConfig.DEBUG)
@@ -878,7 +879,8 @@ class LpBleUtil {
                     Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_S5W,
                     Bluetooth.MODEL_S6W, Bluetooth.MODEL_S7W,
                     Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S6W1,
-                    Bluetooth.MODEL_PC60NW_BLE, Bluetooth.MODEL_PC60NW_WPS -> {
+                    Bluetooth.MODEL_PC60NW_BLE, Bluetooth.MODEL_PC60NW_WPS,
+                    Bluetooth.MODEL_PC_60NW_NO_SN -> {
                         BleServiceHelper.pc60fwEnableRtData(model, type, enable)
                     }
                     Bluetooth.MODEL_PC_68B -> {
@@ -1035,6 +1037,35 @@ class LpBleUtil {
         fun vtm01SleepMode(model: Int, on: Boolean) {
             BleServiceHelper.vtm01SleepMode(model, on)
         }
+        // BTP
+        fun btpGetBattery(model: Int) {
+            BleServiceHelper.btpGetBattery(model)
+        }
+        fun btpGetConfig(model: Int) {
+            BleServiceHelper.btpGetConfig(model)
+        }
+        fun btpSetLowHr(model: Int, lowHr: Int) {
+            BleServiceHelper.btpSetLowHr(model, lowHr)
+        }
+        fun btpSetHighHr(model: Int, highHr: Int) {
+            BleServiceHelper.btpSetHighHr(model, highHr)
+        }
+        fun btpSetLowTemp(model: Int, lowTemp: Int) {
+            BleServiceHelper.btpSetLowTemp(model, lowTemp)
+        }
+        fun btpSetHighTemp(model: Int, highTemp: Int) {
+            BleServiceHelper.btpSetHighTemp(model, highTemp)
+        }
+        fun btpSetTempUnit(model: Int, unit: Int) {
+            BleServiceHelper.btpSetTempUnit(model, unit)
+        }
+        fun btpSetSystemSwitch(model: Int, hrSwitch: Boolean, lightSwitch: Boolean, tempSwitch: Boolean) {
+            BleServiceHelper.btpSetSystemSwitch(model, hrSwitch, lightSwitch, tempSwitch)
+        }
+        fun r20Echo(model: Int, data: ByteArray) {
+            BleServiceHelper.r20Echo(model, data)
+        }
+
     }
 
 }

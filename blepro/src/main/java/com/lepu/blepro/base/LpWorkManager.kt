@@ -232,7 +232,7 @@ object LpWorkManager {
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
             Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
-            Bluetooth.MODEL_PC60NW_WPS -> {
+            Bluetooth.MODEL_PC60NW_WPS, Bluetooth.MODEL_PC_60NW_NO_SN -> {
                 Pc60FwBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -266,7 +266,8 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE -> {
+            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE,
+            Bluetooth.MODEL_S5_SCALE -> {
                 F4ScaleBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -442,6 +443,18 @@ object LpWorkManager {
                     return this
                 }
             }
+            Bluetooth.MODEL_BTP -> {
+                BtpBleInterface(m).apply {
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+                R20BleInterface(m).apply {
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
 
             else -> {
                 return null
@@ -513,7 +526,7 @@ object LpWorkManager {
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
             Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
-            Bluetooth.MODEL_PC60NW_WPS -> {
+            Bluetooth.MODEL_PC60NW_WPS, Bluetooth.MODEL_PC_60NW_NO_SN -> {
                 Pc60FwBleManager(context).apply {
                     vailManager.put(m, this)
                     return this
@@ -539,7 +552,8 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE -> {
+            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE,
+            Bluetooth.MODEL_S5_SCALE -> {
                 F4ScaleBleManager(context).apply {
                     vailManager.put(m, this)
                     return this
@@ -931,13 +945,6 @@ object LpWorkManager {
                     } else {
                         vailFace.get(b.model)?.connect(application!!, b.device, true, toConnectUpdater)
                         LepuBleLog.d(tag, "发现需要重连的设备....去连接 model = ${b.model} name = ${b.name}  address = ${b.macAddr}")
-                    }
-                } else {
-                    if (isReconnectScan) {
-                        LepuBleLog.d(tag, "找到了新蓝牙名设备， 去连接Updater${b.name}")
-                        if (b.name.contains("ER1 Updater")) { //如果扫描到的是新蓝牙名，连接
-                            LiveEventBus.get<Bluetooth>(EventMsgConst.Discovery.EventDeviceFound_ER1_UPDATE).post(b)
-                        }
                     }
                 }
 

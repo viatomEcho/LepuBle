@@ -246,7 +246,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      *           MODEL_PF_20(PF-20_xxxx), MODEL_PF_20AW(PF-20AW_xxxx), MODEL_PF_20B(PF-20B_xxxx),
      *           MODEL_PC_60NW(PC-60NW_SNxxxxxx), MODEL_PC_60NW_1(PC-60NW-1_SNxxxx、PC-60NW-1_SNxxxxxx),
      *           MODEL_S5W(S5W_SNxxxxxx), MODEL_S6W(S6W_xxxx), MODEL_S7W(S7W_xxxx), MODEL_S7BW(S7BW_xxxx),
-     *           MODEL_S6W1(S6W1_xxxx), MODEL_PC60NW_BLE(PC-60NW_BLE), MODEL_PC60NW_WPS(PC-60NW-WPS)
+     *           MODEL_S6W1(S6W1_xxxx), MODEL_PC60NW_BLE(PC-60NW_BLE), MODEL_PC60NW_WPS(PC-60NW-WPS),
+     *           MODEL_PC_60NW_NO_SN(PC-60NW)
      * 功能：
      * 1.获取设备信息：BleServiceHelper.pc60fwGetInfo()
      * 2.实时血氧数据：设备测量时自动上发
@@ -798,6 +799,45 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventVtm01FactoryReset = "com.lepu.ble.vtm01.factory.reset"         // 恢复出厂设置 boolean
             const val EventVtm01SleepMode = "com.lepu.ble.vtm01.sleep.mode"               // 睡眠模式开关 boolean
             const val EventVtm01BurnFactoryInfo = "com.lepu.ble.vtm01.burn.factory.info"  // 烧录出厂信息 boolean
+        }
+    }
+
+    /**
+     * BtpBleInterface 发出的通知
+     * 包含model: MODEL_BTP
+     */
+    interface BTP {
+        companion object {
+            const val EventBtpGetInfo = "com.lepu.ble.btp.get.info"                           // 设备信息 LepuDevice
+            const val EventBtpRtData = "com.lepu.ble.btp.rtData"                              // 实时数据 BtpBleResponse.RtData
+            const val EventBtpGetFileList = "com.lepu.ble.btp.get.file.list"                  // 获取文件列表 BtpBleResponse.FileList
+            const val EventBtpReadFileError = "com.lepu.ble.btp.read.file.error"              // 读文件出错 String(fileName)
+            const val EventBtpReadingFileProgress = "com.lepu.btp.bp2.reading.file.progress"  // 传输文件进度 Int
+            const val EventBtpReadFileComplete = "com.lepu.ble.btp.read.file.complete"        // 传输文件完成 byte[]
+            const val EventBtpReset = "com.lepu.ble.btp.reset"                                // 复位 boolean
+            const val EventBtpFactoryReset = "com.lepu.ble.btp.factory.reset"                 // 恢复出厂设置 boolean
+            const val EventBtpFactoryResetAll = "com.lepu.ble.btp.factory.reset.all"          // 恢复生产出厂状态 boolean
+            const val EventBtpGetBattery = "com.lepu.ble.btp.get.battery"                     // 获取电量 KtBleBattery
+            const val EventBtpGetConfig = "com.lepu.ble.btp.get.config"                       // 获取配置参数 BtpBleResponse.ConfigInfo
+            const val EventBtpGetConfigError = "com.lepu.ble.btp.get.config.error"            // 获取配置参数失败 boolean
+            const val EventBtpSetLowHr = "com.lepu.ble.btp.set.low.hr"                        // 设置心率低阈值 boolean
+            const val EventBtpSetHighHr = "com.lepu.ble.btp.set.high.hr"                      // 设置心率高阈值 boolean
+            const val EventBtpSetTempUnit = "com.lepu.ble.btp.set.temp.unit"                  // 设置温度单位 boolean
+            const val EventBtpSetLowTemp = "com.lepu.ble.btp.set.low.temp"                    // 设置温度低阈值 boolean
+            const val EventBtpSetHighTemp = "com.lepu.ble.btp.set.high.temp"                  // 设置温度高阈值 boolean
+            const val EventBtpSetSystemSwitch = "com.lepu.ble.btp.set.system.switch"          // 设置系统开关 boolean
+            const val EventBtpSetTime = "com.lepu.ble.btp.set.time"                           // 同步时间 boolean
+            const val EventBtpBurnFactoryInfo = "com.lepu.ble.btp.burn.factory.info"          // 烧录出厂信息 boolean
+        }
+    }
+
+    /**
+     * R20BleInterface 发出的通知
+     * 包含model: MODEL_R20, MODEL_LERES
+     */
+    interface R20 {
+        companion object {
+            const val EventR20EchoData = "com.lepu.ble.r20.echo.data"  // 回显 byte[]
         }
     }
 

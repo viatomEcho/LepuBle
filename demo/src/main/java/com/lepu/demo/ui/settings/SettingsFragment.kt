@@ -100,6 +100,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.er3Layout.root.visibility = View.GONE
         binding.lepodLayout.root.visibility = View.GONE
         binding.vtm01Layout.root.visibility = View.GONE
+        binding.btpLayout.root.visibility = View.GONE
         binding.sendCmd.visibility = View.GONE
         binding.content.visibility = View.GONE
         if (v == null) return
@@ -180,8 +181,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     LpBleUtil.bp2GetConfig(it.modelNo)
                 }
                 Bluetooth.MODEL_O2RING, Bluetooth.MODEL_BABYO2,
-                Bluetooth.MODEL_BBSM_S1, Bluetooth.MODEL_BBSM_S2,
-                Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_CHECKO2,
+                Bluetooth.MODEL_BBSM_S1, Bluetooth.MODEL_CHECKO2,
                 Bluetooth.MODEL_O2M, Bluetooth.MODEL_SLEEPO2,
                 Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
                 Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK,
@@ -192,8 +192,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     setViewVisible(binding.o2Layout.root)
                     LpBleUtil.getInfo(it.modelNo)
                 }
+                Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_BBSM_S2 -> {
+                    setViewVisible(binding.o2Layout.root)
+                    binding.o2Layout.o2S2Layout.visibility = View.VISIBLE
+                    LpBleUtil.getInfo(it.modelNo)
+                }
                 Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_MY_SCALE,
-                Bluetooth.MODEL_F5_SCALE, Bluetooth.MODEL_F8_SCALE -> {
+                Bluetooth.MODEL_F5_SCALE, Bluetooth.MODEL_F8_SCALE,
+                Bluetooth.MODEL_S5_SCALE -> {
                     setViewVisible(binding.scaleLayout)
                 }
                 Bluetooth.MODEL_PC100 -> {
@@ -253,6 +259,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_VTM01 -> {
                     setViewVisible(binding.vtm01Layout.root)
                 }
+                Bluetooth.MODEL_BTP -> {
+                    setViewVisible(binding.btpLayout.root)
+                    LpBleUtil.btpGetConfig(it.modelNo)
+                }
                 else -> {
                     setViewVisible(null)
                 }
@@ -275,6 +285,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.vtm01Layout.version.setText("${it.hwV}")
                 binding.vtm01Layout.sn.setText("${it.sn}")
                 binding.vtm01Layout.code.setText("${it.branchCode}")
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BTP) {
+                binding.btpLayout.version.setText("${it.hwV}")
+                binding.btpLayout.sn.setText("${it.sn}")
+                binding.btpLayout.code.setText("${it.branchCode}")
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LEPOD) {
+                binding.lepodLayout.version.setText("${it.hwV}")
+                binding.lepodLayout.sn.setText("${it.sn}")
+                binding.lepodLayout.code.setText("${it.branchCode}")
             }
         }
         mainViewModel.er2Info.observe(viewLifecycleOwner) {
@@ -2096,6 +2114,45 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.lepodLayout.getRtParam.setOnClickListener {
             LpBleUtil.lepodGetRtParam(Constant.BluetoothConfig.currentModel[0])
         }
+        binding.lepodLayout.factoryConfig.setOnClickListener {
+            val config = FactoryConfig()
+            var enableVersion = true
+            val tempVersion = binding.lepodLayout.version.text
+            if (tempVersion.isNullOrEmpty()) {
+                enableVersion = false
+            } else if (tempVersion.length == 1 && isBigLetter(tempVersion.toString())) {
+                config.setHwVersion(tempVersion.first())
+            } else {
+                Toast.makeText(context, "硬件版本请输入A-Z字母", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            var enableSn = true
+            val tempSn = trimStr(binding.lepodLayout.sn.text.toString())
+            if (tempSn.isNullOrEmpty()) {
+                enableSn = false
+            } else if (tempSn.length == 10) {
+                config.setSnCode(tempSn)
+            } else {
+                Toast.makeText(context, "sn请输入10位", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            var enableCode = true
+            val tempCode = trimStr(binding.lepodLayout.code.text.toString())
+            if (tempCode.isNullOrEmpty()) {
+                enableCode = false
+            } else if (tempCode.length == 8) {
+                config.setBranchCode(tempCode)
+            } else {
+                Toast.makeText(context, "code请输入8位", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            config.setBurnFlag(enableSn, enableVersion, enableCode)
+            LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
+            deviceFactoryData.sn = tempSn
+            deviceFactoryData.code = tempCode
+            deviceFactoryData.time = DateUtil.stringFromDate(Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL)
+            FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
+        }
         // --------------------------vtm01--------------------------------
         binding.vtm01Layout.factoryConfig.setOnClickListener {
             val config = FactoryConfig()
@@ -2136,7 +2193,109 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             deviceFactoryData.time = DateUtil.stringFromDate(Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL)
             FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
         }
-
+        // --------------------------btp--------------------------------
+        binding.btpLayout.factoryConfig.setOnClickListener {
+            val config = FactoryConfig()
+            var enableVersion = true
+            val tempVersion = binding.btpLayout.version.text
+            if (tempVersion.isNullOrEmpty()) {
+                enableVersion = false
+            } else if (tempVersion.length == 1 && isBigLetter(tempVersion.toString())) {
+                config.setHwVersion(tempVersion.first())
+            } else {
+                Toast.makeText(context, "硬件版本请输入A-Z字母", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            var enableSn = true
+            val tempSn = trimStr(binding.btpLayout.sn.text.toString())
+            if (tempSn.isNullOrEmpty()) {
+                enableSn = false
+            } else if (tempSn.length == 10) {
+                config.setSnCode(tempSn)
+            } else {
+                Toast.makeText(context, "sn请输入10位", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            var enableCode = true
+            val tempCode = trimStr(binding.btpLayout.code.text.toString())
+            if (tempCode.isNullOrEmpty()) {
+                enableCode = false
+            } else if (tempCode.length == 8) {
+                config.setBranchCode(tempCode)
+            } else {
+                Toast.makeText(context, "code请输入8位", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            config.setBurnFlag(enableSn, enableVersion, enableCode)
+            LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
+            deviceFactoryData.sn = tempSn
+            deviceFactoryData.code = tempCode
+            deviceFactoryData.time = DateUtil.stringFromDate(Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL)
+            FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
+        }
+        binding.btpLayout.setHrSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (!this@SettingsFragment::config.isInitialized) return@setOnCheckedChangeListener
+            (config as BtpBleResponse.ConfigInfo).hrSwitch = isChecked
+            LpBleUtil.btpSetSystemSwitch(Constant.BluetoothConfig.currentModel[0],
+                (config as BtpBleResponse.ConfigInfo).hrSwitch,
+                (config as BtpBleResponse.ConfigInfo).lightSwitch,
+                (config as BtpBleResponse.ConfigInfo).tempSwitch)
+        }
+        binding.btpLayout.setLightSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (!this@SettingsFragment::config.isInitialized) return@setOnCheckedChangeListener
+            (config as BtpBleResponse.ConfigInfo).lightSwitch = isChecked
+            LpBleUtil.btpSetSystemSwitch(Constant.BluetoothConfig.currentModel[0],
+                (config as BtpBleResponse.ConfigInfo).hrSwitch,
+                (config as BtpBleResponse.ConfigInfo).lightSwitch,
+                (config as BtpBleResponse.ConfigInfo).tempSwitch)
+        }
+        binding.btpLayout.setTempSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (!this@SettingsFragment::config.isInitialized) return@setOnCheckedChangeListener
+            (config as BtpBleResponse.ConfigInfo).tempSwitch = isChecked
+            LpBleUtil.btpSetSystemSwitch(Constant.BluetoothConfig.currentModel[0],
+                (config as BtpBleResponse.ConfigInfo).hrSwitch,
+                (config as BtpBleResponse.ConfigInfo).lightSwitch,
+                (config as BtpBleResponse.ConfigInfo).tempSwitch)
+        }
+        binding.btpLayout.setTempUnit.setOnCheckedChangeListener { group, checkedId -> 
+            if (checkedId == R.id.unit_c) {
+                LpBleUtil.btpSetTempUnit(Constant.BluetoothConfig.currentModel[0], 0)
+            } else {
+                LpBleUtil.btpSetTempUnit(Constant.BluetoothConfig.currentModel[0], 1)
+            }
+        }
+        binding.btpLayout.setLowHr.setOnClickListener {
+            val temp = trimStr(binding.btpLayout.hrLowThr.text.toString())
+            if (temp.isEmpty() || !isNumber(temp)) {
+                Toast.makeText(context, "请输入正确阈值！", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            LpBleUtil.btpSetLowHr(Constant.BluetoothConfig.currentModel[0], temp.toInt())
+        }
+        binding.btpLayout.setHighHr.setOnClickListener {
+            val temp = trimStr(binding.btpLayout.hrHighThr.text.toString())
+            if (temp.isEmpty() || !isNumber(temp)) {
+                Toast.makeText(context, "请输入正确阈值！", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            LpBleUtil.btpSetHighHr(Constant.BluetoothConfig.currentModel[0], temp.toInt())
+        }
+        binding.btpLayout.setLowTemp.setOnClickListener {
+            val temp = trimStr(binding.btpLayout.tempLowThr.text.toString())
+            if (temp.isEmpty() || !isNumber(temp)) {
+                Toast.makeText(context, "请输入正确阈值！", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            LpBleUtil.btpSetLowTemp(Constant.BluetoothConfig.currentModel[0], temp.toInt())
+        }
+        binding.btpLayout.setHighTemp.setOnClickListener {
+            val temp = trimStr(binding.btpLayout.tempHighThr.text.toString())
+            if (temp.isEmpty() || !isNumber(temp)) {
+                Toast.makeText(context, "请输入正确阈值！", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            LpBleUtil.btpSetHighTemp(Constant.BluetoothConfig.currentModel[0], temp.toInt())
+        }
     }
 
     private fun setReceiveCmd(bytes: ByteArray) {
@@ -3130,6 +3289,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Toast.makeText(context, "获取mode成功", Toast.LENGTH_SHORT).show()
             }
         //------------------------lepod-------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodBurnFactoryInfo)
+            .observe(this) {
+
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodSetConfig)
             .observe(this) {
                 val data = it.data as Boolean
@@ -3222,6 +3385,94 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     Toast.makeText(context, "烧录失败", Toast.LENGTH_SHORT).show()
                 }
                 LpBleUtil.getInfo(it.model)
+            }
+        // --------------------------btp--------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpBurnFactoryInfo)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    Toast.makeText(context, "烧录成功", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "烧录失败", Toast.LENGTH_SHORT).show()
+                }
+                LpBleUtil.getInfo(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetConfig)
+            .observe(this) {
+                val config = it.data as BtpBleResponse.ConfigInfo
+                this.config = config
+                binding.btpLayout.setHrSwitch.isChecked = config.hrSwitch
+                binding.btpLayout.setLightSwitch.isChecked = config.lightSwitch
+                binding.btpLayout.setTempSwitch.isChecked = config.tempSwitch
+                if (config.tempUnit == 0) {
+                    binding.btpLayout.setTempUnit.check(R.id.unit_c)
+                } else {
+                    binding.btpLayout.setTempUnit.check(R.id.unit_f)
+                }
+                binding.btpLayout.hrLowThr.setText("${config.hrLowThr}")
+                binding.btpLayout.hrHighThr.setText("${config.hrHighThr}")
+                binding.btpLayout.tempLowThr.setText("${config.tempLowThr}")
+                binding.btpLayout.tempHighThr.setText("${config.tempHighThr}")
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetLowHr)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    Toast.makeText(context, "设置心率低阈值成功", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "设置心率低阈值失败", Toast.LENGTH_SHORT).show()
+                }
+                LpBleUtil.btpGetConfig(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetHighHr)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    Toast.makeText(context, "设置心率高阈值成功", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "设置心率高阈值失败", Toast.LENGTH_SHORT).show()
+                }
+                LpBleUtil.btpGetConfig(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetTempUnit)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    Toast.makeText(context, "设置温度单位成功", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "设置温度单位失败", Toast.LENGTH_SHORT).show()
+                }
+                LpBleUtil.btpGetConfig(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetLowTemp)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    Toast.makeText(context, "设置温度低阈值成功", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "设置温度低阈值失败", Toast.LENGTH_SHORT).show()
+                }
+                LpBleUtil.btpGetConfig(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetHighTemp)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    Toast.makeText(context, "设置温度高阈值成功", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "设置温度高阈值失败", Toast.LENGTH_SHORT).show()
+                }
+                LpBleUtil.btpGetConfig(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetSystemSwitch)
+            .observe(this) {
+                val data = it.data as Boolean
+                if (data) {
+                    Toast.makeText(context, "设置系统开关成功", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "设置系统开关失败", Toast.LENGTH_SHORT).show()
+                }
+                LpBleUtil.btpGetConfig(it.model)
             }
 
         //-----------------------------------

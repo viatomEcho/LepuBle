@@ -36,6 +36,7 @@ public class Pc60FwBleCmd {
     public static final int MSG_ENABLE_WAVE = 0x05;
     public static final int MSG_IR_RED_FREQ = 0x20;
     public static final int MSG_WORK_STATUS_DATA = 0x21;
+    public static final int CMD_ENABLE_PPG = 0x22;
 
     /**
      * 0：使能血氧参数
@@ -44,6 +45,7 @@ public class Pc60FwBleCmd {
     public static class EnableType {
         public static final int OXY_PARAM = 0;
         public static final int OXY_WAVE = 1;
+        public static final int OXY_PPG = 2;
     }
 
     /**
@@ -60,8 +62,10 @@ public class Pc60FwBleCmd {
         cmd[3] = (byte) 0x03;
         if (type == EnableType.OXY_PARAM) {
             cmd[4] = (byte) CMD_ENABLE_PARAM;
-        } else {
+        } else if (type == EnableType.OXY_WAVE) {
             cmd[4] = (byte) CMD_ENABLE_WAVE;
+        } else {
+            cmd[4] = (byte) CMD_ENABLE_PPG;
         }
         if (enable) {
             cmd[5] = (byte) 0x01;

@@ -194,7 +194,7 @@ public class UpdateActivity extends Activity {
 
         @Override
         public void onError(String deviceAddress, int error, int errorType, String message) {
-            Log.i("TEST", "onError: " + deviceAddress + ",message:" + message);
+            Log.i("TEST", "onError: " + deviceAddress + ",message:" + message + ",error:" + error + ",errorType:" + errorType);
             duringUpgradeTv.setVisibility(View.VISIBLE);
             duringUpgradeTv.setText(getString(R.string.update_successful));
             new AlertDialog.Builder(UpdateActivity.this)

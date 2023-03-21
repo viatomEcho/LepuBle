@@ -160,23 +160,26 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                     }
                     sendCmd(Er1BleCmd.readFileData(offset))
                 } else {
-                    LepuBleLog.d(tag, "read file failed：${response.pkgType}")
+                    LepuBleLog.d(tag, "READ_FILE_START read file failed：${response.pkgType}")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileError).post(InterfaceEvent(model, true))
-
                 }
             }
 
             Er1BleCmd.READ_FILE_DATA -> {
+                //检查当前的下载状态
+                if (isCancelRF || isPausedRF) {
+                    sendCmd(Er1BleCmd.readFileEnd())
+                    LepuBleLog.d(tag, "READ_FILE_DATA isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
+                    return
+                }
+                if (response.pkgType != 0x01.toByte()) {
+                    LepuBleLog.d(tag, "READ_FILE_DATA read file failed：${response.pkgType}")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileError).post(InterfaceEvent(model, true))
+                    return
+                }
                 curFile?.apply {
 
                     LepuBleLog.d(tag, "READ_FILE_DATA: paused = $isPausedRF, cancel = $isCancelRF, offset =  ${offset}, index = ${this.index}")
-
-                    //检查当前的下载状态
-                    if (isCancelRF || isPausedRF) {
-                        sendCmd(Er1BleCmd.readFileEnd())
-                        LepuBleLog.d(tag, "READ_FILE_DATA isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
-                        return
-                    }
 
                     this.addContent(response.content)
                     LepuBleLog.d(tag, "read file：${this.fileName}   => ${this.index } / ${this.fileSize}")
@@ -199,14 +202,20 @@ class Er1BleInterface(model: Int): BleInterface(model) {
             Er1BleCmd.READ_FILE_END -> {
                 LepuBleLog.d(tag, "read file finished: ${curFile?.fileName} ==> ${curFile?.fileSize}")
                 LepuBleLog.d(tag, "read file finished: isCancel = $isCancelRF, isPause = $isPausedRF")
-
+                //检查当前的下载状态
+                if ((isCancelRF || isPausedRF)) {
+                    LepuBleLog.d(tag, "READ_FILE_END isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
+                    return
+                }
+                if (response.pkgType != 0x01.toByte()) {
+                    LepuBleLog.d(tag, "READ_FILE_END read file failed：${response.pkgType}")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileError).post(InterfaceEvent(model, true))
+                    return
+                }
                 curFileName = null// 一定要放在发通知之前
                 curFile?.let {
-                    if (it.index < it.fileSize){
-                        if ((isCancelRF || isPausedRF)) {
-                            LepuBleLog.d(tag, "READ_FILE_END isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
-                            return
-                        }
+                    if (it.index != it.fileSize){
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileError).post(InterfaceEvent(model, true))
                     } else {
                         file.fileName = it.fileName
                         file.content = it.content

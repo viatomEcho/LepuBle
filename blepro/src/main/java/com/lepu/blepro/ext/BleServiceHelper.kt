@@ -263,7 +263,8 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_PC300_BLE, Bluetooth.MODEL_LPM311,
             Bluetooth.MODEL_POCTOR_M3102, Bluetooth.MODEL_BIOLAND_BGM,
             Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_BPM,
-            Bluetooth.MODEL_PC80B_BLE2, Bluetooth.MODEL_PC200_BLE -> false
+            Bluetooth.MODEL_PC80B_BLE2, Bluetooth.MODEL_PC200_BLE,
+            Bluetooth.MODEL_S5_SCALE -> false
             else -> true
         }
     }
@@ -526,7 +527,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
             Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
-            Bluetooth.MODEL_PC60NW_WPS -> {
+            Bluetooth.MODEL_PC60NW_WPS, Bluetooth.MODEL_PC_60NW_NO_SN -> {
                 return inter is Pc60FwBleInterface
             }
             Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE,
@@ -2203,7 +2204,8 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
 
         when(model){
-            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE -> {
+            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE,
+            Bluetooth.MODEL_S5_SCALE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as F4ScaleBleInterface).let {
                         LepuBleLog.d(tag, "it as F4ScaleBleInterface--setUserInfo")
@@ -2226,7 +2228,8 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
 
         when(model){
-            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE -> {
+            Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE,
+            Bluetooth.MODEL_S5_SCALE -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as F4ScaleBleInterface).let {
                         LepuBleLog.d(tag, "it as F4ScaleBleInterface--setUserList")
@@ -3157,6 +3160,135 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.d(tag, "vtm01SleepMode current model $model unsupported!!")
+        }
+    }
+
+    // BTP
+    fun btpGetBattery(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BTP -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as BtpBleInterface).let {
+                        LepuBleLog.d(tag, "it as BtpBleInterface--btpGetBattery")
+                        it.getBattery()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "btpGetBattery current model $model unsupported!!")
+        }
+    }
+    fun btpGetConfig(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BTP -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as BtpBleInterface).let {
+                        LepuBleLog.d(tag, "it as BtpBleInterface--btpGetConfig")
+                        it.getConfig()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "btpGetConfig current model $model unsupported!!")
+        }
+    }
+    fun btpSetLowHr(model: Int, lowHr: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BTP -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as BtpBleInterface).let {
+                        LepuBleLog.d(tag, "it as BtpBleInterface--btpSetLowHr")
+                        it.setLowHr(lowHr)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "btpSetLowHr current model $model unsupported!!")
+        }
+    }
+    fun btpSetHighHr(model: Int, highHr: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BTP -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as BtpBleInterface).let {
+                        LepuBleLog.d(tag, "it as BtpBleInterface--btpSetHighHr")
+                        it.setHighHr(highHr)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "btpSetHighHr current model $model unsupported!!")
+        }
+    }
+    fun btpSetLowTemp(model: Int, lowTemp: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BTP -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as BtpBleInterface).let {
+                        LepuBleLog.d(tag, "it as BtpBleInterface--btpSetLowTemp")
+                        it.setLowTemp(lowTemp)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "btpSetLowTemp current model $model unsupported!!")
+        }
+    }
+    fun btpSetHighTemp(model: Int, highTemp: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BTP -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as BtpBleInterface).let {
+                        LepuBleLog.d(tag, "it as BtpBleInterface--btpSetHighTemp")
+                        it.setHighTemp(highTemp)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "btpSetHighTemp current model $model unsupported!!")
+        }
+    }
+    fun btpSetTempUnit(model: Int, unit: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BTP -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as BtpBleInterface).let {
+                        LepuBleLog.d(tag, "it as BtpBleInterface--btpSetTempUnit")
+                        it.setTempUnit(unit)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "btpSetTempUnit current model $model unsupported!!")
+        }
+    }
+    fun btpSetSystemSwitch(model: Int, hrSwitch: Boolean, lightSwitch: Boolean, tempSwitch: Boolean) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_BTP -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as BtpBleInterface).let {
+                        LepuBleLog.d(tag, "it as BtpBleInterface--btpSetSystemSwitch")
+                        it.setSystemSwitch(hrSwitch, lightSwitch, tempSwitch)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "btpSetSystemSwitch current model $model unsupported!!")
+        }
+    }
+
+    fun r20Echo(model: Int, data: ByteArray) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as R20BleInterface).let {
+                        LepuBleLog.d(tag, "it as LeResSBleInterface--leResSEcho")
+                        it.echo(data)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "leResSEcho current model $model unsupported!!")
         }
     }
 

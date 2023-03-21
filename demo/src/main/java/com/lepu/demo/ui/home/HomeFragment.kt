@@ -107,13 +107,13 @@ class HomeFragment : Fragment(R.layout.fragment_home){
             }
         }
         binding.needPair.isChecked = Constant.BluetoothConfig.needPair
-        binding.needPair.setOnClickListener {
-            if (Constant.BluetoothConfig.splitType == 10) {
+        binding.needPair.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (Constant.BluetoothConfig.splitType >= 10) {
                 binding.needPair.isChecked = false
                 Toast.makeText(context, "该设备类型不支持配对连接！", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+                return@setOnCheckedChangeListener
             }
-            Constant.BluetoothConfig.needPair = binding.needPair.isChecked
+            Constant.BluetoothConfig.needPair = isChecked
             LpBleUtil.setNeedPair(Constant.BluetoothConfig.needPair)
         }
         binding.scanByName.setOnClickListener {
@@ -124,7 +124,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         }
         ArrayAdapter(requireContext(),
             android.R.layout.simple_list_item_1,
-            arrayListOf("全部", "BP2", "ER1", "VBeat", "HHM1", "DuoEK", "HHM2", "HHM3", "ER2", "O2", "PC")
+            arrayListOf("全部", "BP2", "ER1", "VBeat", "HHM1", "DuoEK", "HHM2", "HHM3", "ER2", "O2", "PC", "ER3")
         ).apply {
             binding.deviceTypeSpinner.adapter = this
         }
@@ -133,7 +133,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 Constant.BluetoothConfig.splitType = position
                 splitDevices(binding.bleSplit.text.toString())
-                if (position == 10) {
+                if (position >= 10) {
                     Constant.BluetoothConfig.needPair = false
                     binding.needPair.isChecked = false
                 }
@@ -181,7 +181,12 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     activity?.lifecycle?.addObserver(BIOL(activity as MainActivity, Constant.BluetoothConfig.SUPPORT_MODELS))
 
                     mAlertDialog?.show()
-                    LpBleUtil.connect(it1, it)
+                    // 扫描到需要升级的设备
+                    if (it.name.contains("Updater")) {
+                        LpBleUtil.connect(it1, it, false, true)
+                    } else {
+                        LpBleUtil.connect(it1, it)
+                    }
                     ToastUtil.showToast(activity, "正在连接蓝牙")
                     LpBleUtil.stopScan()
                     binding.rcv.visibility = View.GONE
@@ -255,6 +260,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
             8 -> "ER2"
             9 -> "O2"
             10 -> "PC"
+            11 -> "ER3"
             else -> ""
         }
     }
@@ -284,6 +290,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     || model == Bluetooth.MODEL_WEARO2
                     || model == Bluetooth.MODEL_KIDSO2
                     || model == Bluetooth.MODEL_O2M_WPS)
+            10 -> return model == Bluetooth.MODEL_ER3
             else -> return false
         }
     }
@@ -327,7 +334,11 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     activity?.lifecycle?.addObserver(BIOL(activity as MainActivity, Constant.BluetoothConfig.SUPPORT_MODELS))
 
                     mAlertDialog?.show()
-                    LpBleUtil.connect(activity?.applicationContext!!, b)
+                    if (b.name.contains("Updater")) {
+                        LpBleUtil.connect(activity?.applicationContext!!, b, false, true)
+                    } else {
+                        LpBleUtil.connect(activity?.applicationContext!!, b)
+                    }
                     ToastUtil.showToast(activity, "正在连接蓝牙")
                     LpBleUtil.stopScan()
                     binding.rcv.visibility = View.GONE

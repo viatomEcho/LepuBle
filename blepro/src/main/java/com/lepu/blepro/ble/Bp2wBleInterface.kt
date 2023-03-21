@@ -198,6 +198,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                     return
                 }
 
+                curSize = 0
                 fileContent = null
                 fileSize = toUInt(bleResponse.content)
                 LepuBleLog.d(tag, "download file $fileName CMD_FILE_READ_START fileSize == $fileSize")
@@ -237,6 +238,10 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 }
             }
             READ_FILE_END -> {
+                if (isCancelRF || isPausedRF){
+                    LepuBleLog.d(tag, "已经取消/暂停下载 isCancelRF = $isCancelRF, isPausedRF = $isPausedRF" )
+                    return
+                }
                 //检查返回是否异常
                 if (bleResponse.pkgType != 0x01.toByte()) {
                     LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, READ_FILE_END => error")
@@ -245,16 +250,10 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 }
                 LepuBleLog.d(tag, "model:$model,READ_FILE_END => success")
 
-                curSize = 0
-                if (fileContent == null) fileContent = ByteArray(0)
-
-                if (isCancelRF || isPausedRF){
-                    LepuBleLog.d(tag, "已经取消/暂停下载 isCancelRF = $isCancelRF, isPausedRF = $isPausedRF" )
-                    return
-                }
-
                 fileContent?.let {
-                    if (it.isNotEmpty()) {
+                    if (curSize != fileSize) {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileError).post(InterfaceEvent(model, fileName))
+                    } else {
                         val data = if (device.name == null) {
                             Bp2BleFile(fileName, it, "")
                         } else {
@@ -265,6 +264,8 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                         bp2wFile.content = data.content
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileComplete).post(InterfaceEvent(model, bp2wFile))
                     }
+                } ?: kotlin.run {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileError).post(InterfaceEvent(model, fileName))
                 }
             }
 

@@ -192,6 +192,7 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                     return
                 }
 
+                curSize = 0
                 fileContent = null
                 fileSize = toUInt(bleResponse.content.copyOfRange(0, 4))
                 LepuBleLog.d(tag, "download file $fileName CMD_FILE_READ_START fileSize == $fileSize")
@@ -231,6 +232,10 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                 }
             }
             READ_FILE_END -> {
+                if (isCancelRF || isPausedRF){
+                    LepuBleLog.d(tag, "已经取消/暂停下载 isCancelRF = $isCancelRF, isPausedRF = $isPausedRF" )
+                    return
+                }
                 //检查返回是否异常
                 if (bleResponse.pkgType != 0x01.toByte()) {
                     LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, READ_FILE_END => error")
@@ -239,16 +244,11 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                 }
                 LepuBleLog.d(tag, "model:$model,READ_FILE_END => success")
 
-                curSize = 0
-                if (fileContent == null) fileContent = ByteArray(0)
-
-                if (isCancelRF || isPausedRF){
-                    LepuBleLog.d(tag, "已经取消/暂停下载 isCancelRF = $isCancelRF, isPausedRF = $isPausedRF" )
-                    return
-                }
-
                 fileContent?.let {
-                    if (it.isNotEmpty()) {
+                    if (curSize != fileSize) {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wReadFileError)
+                            .post(InterfaceEvent(model, fileName))
+                    } else {
                         if (fileName.endsWith(".list")) {
                             val data = if (device.name == null) {
                                 Bp2BleFile(fileName, it, "")
@@ -274,7 +274,8 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                                         user.icon = icon
                                         users.add(user)
                                     }
-                                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wUserFileList).post(InterfaceEvent(model, users))
+                                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wUserFileList)
+                                        .post(InterfaceEvent(model, users))
                                 }
                                 FileType.BP_TYPE -> {
                                     for (r in LeBp2wBpList(data.content).bpFileList) {
@@ -291,7 +292,8 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                                         record.isMovement = r.isMovement
                                         bpRecords.add(record)
                                     }
-                                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wBpFileList).post(InterfaceEvent(model, bpRecords))
+                                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wBpFileList)
+                                        .post(InterfaceEvent(model, bpRecords))
                                 }
                                 FileType.ECG_TYPE -> {
                                     for (r in LeBp2wEcgList(data.content).ecgFileList) {
@@ -307,7 +309,8 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                                         record.qtc = r.qtc
                                         ecgRecords.add(record)
                                     }
-                                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wEcgFileList).post(InterfaceEvent(model, ecgRecords))
+                                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wEcgFileList)
+                                        .post(InterfaceEvent(model, ecgRecords))
                                 }
                             }
                         } else {
@@ -324,73 +327,74 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                             ecgFile.waveShortData = data.waveShortData
                             ecgFile.waveFloatData = data.waveFloatData
                             ecgFile.duration = data.duration
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wReadFileComplete).post(InterfaceEvent(model, ecgFile))
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wReadFileComplete)
+                                .post(InterfaceEvent(model, ecgFile))
+                        }
+                    }
+                } ?: kotlin.run {
+                    if (fileName.endsWith(".list")) {
+                        val data = if (device.name == null) {
+                            Bp2BleFile(fileName, byteArrayOf(0, fileType.toByte(), 0, 0, 0, 0, 0, 0, 0, 0), "")
+                        } else {
+                            Bp2BleFile(fileName, byteArrayOf(0, fileType.toByte(), 0, 0, 0, 0, 0, 0, 0, 0), device.name)
+                        }
+                        when (data.type) {
+                            FileType.USER_TYPE -> {
+                                for (u in LeBp2wUserList(data.content).userList) {
+                                    val user = UserInfo()
+                                    user.aid = u.aid
+                                    user.uid = u.uid
+                                    user.firstName = u.fName
+                                    user.lastName = u.name
+                                    user.birthday = u.birthday
+                                    user.height = u.height
+                                    user.weight = u.weight
+                                    user.gender = u.gender
+                                    val icon = UserInfo().Icon()
+                                    icon.width = u.icon.width
+                                    icon.height = u.icon.height
+                                    icon.icon = u.icon.icon
+                                    user.icon = icon
+                                    users.add(user)
+                                }
+                                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wUserFileList).post(InterfaceEvent(model, users))
+                            }
+                            FileType.BP_TYPE -> {
+                                for (r in LeBp2wBpList(data.content).bpFileList) {
+                                    val record = BpRecord()
+                                    record.startTime = r.time
+                                    record.fileName = r.fileName
+                                    record.uid = r.uid
+                                    record.measureMode = r.mode
+                                    record.sys = r.sys
+                                    record.dia = r.dia
+                                    record.mean = r.mean
+                                    record.pr = r.pr
+                                    record.isIrregular = r.isIrregular
+                                    record.isMovement = r.isMovement
+                                    bpRecords.add(record)
+                                }
+                                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wBpFileList).post(InterfaceEvent(model, bpRecords))
+                            }
+                            FileType.ECG_TYPE -> {
+                                for (r in LeBp2wEcgList(data.content).ecgFileList) {
+                                    val record = EcgRecord()
+                                    record.startTime = r.time
+                                    record.fileName = r.fileName
+                                    record.uid = r.uid
+                                    record.recordingTime = r.recordingTime
+                                    record.result = r.result
+                                    record.hr = r.hr
+                                    record.qrs = r.qrs
+                                    record.pvcs = r.pvcs
+                                    record.qtc = r.qtc
+                                    ecgRecords.add(record)
+                                }
+                                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wEcgFileList).post(InterfaceEvent(model, ecgRecords))
+                            }
                         }
                     } else {
-                        if (fileName.endsWith(".list")) {
-                            val data = if (device.name == null) {
-                                Bp2BleFile(fileName, byteArrayOf(0, fileType.toByte(), 0, 0, 0, 0, 0, 0, 0, 0), "")
-                            } else {
-                                Bp2BleFile(fileName, byteArrayOf(0, fileType.toByte(), 0, 0, 0, 0, 0, 0, 0, 0), device.name)
-                            }
-                            when (data.type) {
-                                FileType.USER_TYPE -> {
-                                    for (u in LeBp2wUserList(data.content).userList) {
-                                        val user = UserInfo()
-                                        user.aid = u.aid
-                                        user.uid = u.uid
-                                        user.firstName = u.fName
-                                        user.lastName = u.name
-                                        user.birthday = u.birthday
-                                        user.height = u.height
-                                        user.weight = u.weight
-                                        user.gender = u.gender
-                                        val icon = UserInfo().Icon()
-                                        icon.width = u.icon.width
-                                        icon.height = u.icon.height
-                                        icon.icon = u.icon.icon
-                                        user.icon = icon
-                                        users.add(user)
-                                    }
-                                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wUserFileList).post(InterfaceEvent(model, users))
-                                }
-                                FileType.BP_TYPE -> {
-                                    for (r in LeBp2wBpList(data.content).bpFileList) {
-                                        val record = BpRecord()
-                                        record.startTime = r.time
-                                        record.fileName = r.fileName
-                                        record.uid = r.uid
-                                        record.measureMode = r.mode
-                                        record.sys = r.sys
-                                        record.dia = r.dia
-                                        record.mean = r.mean
-                                        record.pr = r.pr
-                                        record.isIrregular = r.isIrregular
-                                        record.isMovement = r.isMovement
-                                        bpRecords.add(record)
-                                    }
-                                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wBpFileList).post(InterfaceEvent(model, bpRecords))
-                                }
-                                FileType.ECG_TYPE -> {
-                                    for (r in LeBp2wEcgList(data.content).ecgFileList) {
-                                        val record = EcgRecord()
-                                        record.startTime = r.time
-                                        record.fileName = r.fileName
-                                        record.uid = r.uid
-                                        record.recordingTime = r.recordingTime
-                                        record.result = r.result
-                                        record.hr = r.hr
-                                        record.qrs = r.qrs
-                                        record.pvcs = r.pvcs
-                                        record.qtc = r.qtc
-                                        ecgRecords.add(record)
-                                    }
-                                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wEcgFileList).post(InterfaceEvent(model, ecgRecords))
-                                }
-                            }
-                        } else {
-                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wReadFileError).post(InterfaceEvent(model, fileName))
-                        }
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wReadFileError).post(InterfaceEvent(model, fileName))
                     }
                 }
             }

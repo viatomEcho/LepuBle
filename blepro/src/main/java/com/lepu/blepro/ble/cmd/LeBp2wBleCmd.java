@@ -132,7 +132,8 @@ public class LeBp2wBleCmd {
         data[5] = (byte) (c.get(Calendar.MINUTE));
         data[6] = (byte) (c.get(Calendar.SECOND));
 
-        int timeZone = (int) (TimeZone.getDefault().getRawOffset()/360000f);
+        // GMT+8:00, timeZone: 80
+        int timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / (3600*100);
         LepuBleLog.d("setUtcTime===" + timeZone);
 
         data[7] = (byte) timeZone;

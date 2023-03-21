@@ -167,13 +167,11 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
                 //检查返回是否异常
                 if (bleResponse.type != 0x01.toByte()){
-
                     LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, CMD_FILE_READ_START => error")
-
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileError).post(InterfaceEvent(model, fileName))
                     return
                 }
-
+                curSize = 0
                 fileContent = null
                 fileSize = toUInt(bleResponse.content)
                 LepuBleLog.d(tag, "download file $fileName CMD_FILE_READ_START fileSize == $fileSize")
@@ -193,8 +191,12 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "FILE_READ_PKG isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
                     return
                 }
-
-
+                //检查返回是否异常
+                if (bleResponse.type != 0x01.toByte()){
+                    LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, CMD_FILE_READ_START => error")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileError).post(InterfaceEvent(model, fileName))
+                    return
+                }
                 curSize += bleResponse.len
                 val part = Bp2FilePart(fileName, fileSize, curSize)
                 fileContent = add(fileContent, bleResponse.content)
@@ -211,16 +213,20 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
             FILE_READ_END -> {
                 LepuBleLog.d(tag, "model:$model,CMD_FILE_READ_END => success")
 
-                curSize = 0
-                if (fileContent == null) fileContent = ByteArray(0)
-
                 if (isCancelRF || isPausedRF){
                     LepuBleLog.d(tag, "已经取消/暂停下载 isCancelRF = $isCancelRF, isPausedRF = $isPausedRF" )
                     return
                 }
-
+                //检查返回是否异常
+                if (bleResponse.type != 0x01.toByte()){
+                    LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, CMD_FILE_READ_START => error")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileError).post(InterfaceEvent(model, fileName))
+                    return
+                }
                 fileContent?.let {
-                    if (it.isNotEmpty()) {
+                    if (curSize != fileSize) {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileError).post(InterfaceEvent(model, true))
+                    } else {
                         val file = if (device.name == null) {
                             Bp2BleFile(fileName, it, "")
                         } else {
@@ -231,9 +237,9 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                         bp2File.content = file.content
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileComplete).post(InterfaceEvent(model, bp2File))
                     }
+                } ?: kotlin.run {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileError).post(InterfaceEvent(model, true))
                 }
-
-
             }
 
             //实时波形
