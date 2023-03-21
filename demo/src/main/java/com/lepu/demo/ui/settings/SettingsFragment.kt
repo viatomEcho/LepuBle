@@ -3289,10 +3289,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Toast.makeText(context, "获取mode成功", Toast.LENGTH_SHORT).show()
             }
         //------------------------lepod-------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodBurnFactoryInfo)
-            .observe(this) {
-
-            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodSetConfig)
             .observe(this) {
                 val data = it.data as Boolean

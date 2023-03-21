@@ -1260,19 +1260,38 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "lpBp2wDeleteFile current model $model unsupported!!")
         }
     }
-    fun lpBp2WriteUserList(model: Int, userList: ArrayList<com.lepu.blepro.ext.lpbp2w.UserInfo>) {
-        if (!checkService()) return
+    fun lpBp2WriteUserList(model: Int, userList: ArrayList<com.lepu.blepro.ext.lpbp2w.UserInfo>): ByteArray {
+        val users = LeBp2wUserList()
+        for (u in userList) {
+            val user = LeBp2wUserInfo()
+            user.aid = u.aid
+            user.uid = u.uid
+            user.fName = u.firstName
+            user.name = u.lastName
+            user.birthday = u.birthday
+            user.height = u.height
+            user.weight = u.weight
+            user.gender = u.gender
+            val icon = LeBp2wUserInfo.Icon()
+            icon.width = u.icon.width
+            icon.height = u.icon.height
+            icon.icon = u.icon.icon
+            user.icon = icon
+            users.userList.add(user)
+        }
+        if (!checkService()) return users.getDataBytes()
         when (model) {
             Bluetooth.MODEL_LP_BP2W -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as LpBp2wBleInterface).let {
                         LepuBleLog.d(tag, "it as LpBp2wBleInterface--lpBp2WriteUserList")
-                        it.writeUserList(userList)
+                        it.writeUserList(users)
                     }
                 }
             }
             else -> LepuBleLog.d(tag, "lpBp2WriteUserList current model $model unsupported!!")
         }
+        return users.getDataBytes()
     }
     /**
      * fileType: 0-2

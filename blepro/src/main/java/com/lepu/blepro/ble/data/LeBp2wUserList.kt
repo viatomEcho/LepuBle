@@ -6,7 +6,7 @@ import com.lepu.blepro.utils.toUInt
 class LeBp2wUserList() {
 
     var fileVersion: Int = 0
-    var fileType: Int = 0
+    var fileType: Int = 6
     lateinit var listContent: ByteArray
     var userList = mutableListOf<LeBp2wUserInfo>()
     var bytes = byteArrayOf(0)

@@ -778,32 +778,6 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "writeUserList... fileName == $fileName, fileSize == $fileSize")
     }
 
-    fun writeUserList(users: ArrayList<UserInfo>) {
-        val userList = LeBp2wUserList()
-        for (u in users) {
-            val user = LeBp2wUserInfo()
-            user.aid = u.aid
-            user.uid = u.uid
-            user.fName = u.firstName
-            user.name = u.lastName
-            user.birthday = u.birthday
-            user.height = u.height
-            user.weight = u.weight
-            user.gender = u.gender
-            val icon = LeBp2wUserInfo.Icon()
-            icon.width = u.icon.width
-            icon.height = u.icon.height
-            icon.icon = u.icon.icon
-            user.icon = icon
-            userList.userList.add(user)
-        }
-        this.userList = userList
-        fileSize = userList.getDataBytes().size
-        fileName = "user.list"
-        sendCmd(writeFileStart(fileName.toByteArray(), 0, fileSize))
-        LepuBleLog.d(tag, "writeUserList... fileName == $fileName, fileSize == $fileSize")
-    }
-
     override fun reset() {
         sendCmd(LeBp2wBleCmd.reset())
         LepuBleLog.d(tag, "reset...")
