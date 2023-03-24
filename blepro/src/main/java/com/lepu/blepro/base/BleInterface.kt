@@ -247,9 +247,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         ready = false
         connecting = false
 
-        if (toConnectUpdater)
-            LiveEventBus.get<BluetoothDevice>(EventMsgConst.Updater.EventBleConnected).post(device)
-
         // 广播名有可能为null
         device.name?.let {
             BleServiceHelper.removeReconnectName(it)
@@ -452,7 +449,11 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             || model == Bluetooth.MODEL_VTM01) { // 部分设备没有同步时间命令，发送此消息通知获取设备信息，进行绑定操作
             LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceReady).post(model)
         } else {
-            if (!manager.isUpdater) syncTime()
+            if (toConnectUpdater) {
+                LiveEventBus.get<BluetoothDevice>(EventMsgConst.Updater.EventBleConnected).post(device)
+            } else {
+                syncTime()
+            }
         }
     }
 

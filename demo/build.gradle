@@ -99,5 +99,7 @@ dependencies {
     implementation 'com.github.PhilJay:MPAndroidChart:v2.2.5'
     // excel
     implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'
+    // pdf
+    implementation 'com.github.barteksc:android-pdf-viewer:2.8.2'
 
 }

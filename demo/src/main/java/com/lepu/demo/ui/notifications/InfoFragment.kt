@@ -30,9 +30,11 @@ import com.lepu.demo.*
 import com.lepu.demo.ble.*
 import com.lepu.demo.cofig.Constant
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.ecgData
+import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.ecnData
 import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.oxyData
 import com.lepu.demo.data.BpData
 import com.lepu.demo.data.EcgData
+import com.lepu.demo.data.EcnData
 import com.lepu.demo.data.OxyData
 import com.lepu.demo.databinding.FragmentInfoBinding
 import com.lepu.demo.util.DataConvert
@@ -63,12 +65,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
     private lateinit var ecgAdapter: EcgAdapter
     var ecgList: ArrayList<EcgData> = arrayListOf()
-
     private lateinit var oxyAdapter: OxyAdapter
     var oxyList: ArrayList<OxyData> = arrayListOf()
-
     private lateinit var bpAdapter: BpAdapter
     var bpList: ArrayList<BpData> = arrayListOf()
+    private lateinit var ecnAdapter: EcnAdapter
+    var ecnList: ArrayList<EcnData> = arrayListOf()
 
     var mAlertDialog: AlertDialog? = null
     var mAlertDialogCanCancel: AlertDialog? = null
@@ -226,7 +228,22 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         bpAdapter = BpAdapter(R.layout.device_item, null).apply {
             binding.bpRcv.adapter = this
         }
-
+        LinearLayoutManager(context).apply {
+            this.orientation = LinearLayoutManager.VERTICAL
+            binding.ecnRcv.layoutManager = this
+        }
+        ecnAdapter = EcnAdapter(R.layout.device_item, null).apply {
+            binding.ecnRcv.adapter = this
+        }
+        ecnAdapter.setOnItemClickListener { adapter, view, position ->
+            if (adapter.data.size > 0) {
+                (adapter.getItem(position) as EcnData).let {
+                    ecnData.fileName = it.fileName
+                    ecnData.data = it.data
+                    startActivity(Intent(context, DocumentActivity::class.java))
+                }
+            }
+        }
         if (isReceive) {
             binding.bytesSwitch.text = "原始数据显示开"
         } else {
@@ -486,34 +503,14 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             binding.sendCmd.text = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])}"
             fileCount = 0
             fileNames.clear()
-            ecgList.clear()
-            ecgAdapter.setNewInstance(ecgList)
-            ecgAdapter.notifyDataSetChanged()
-            oxyList.clear()
-            oxyAdapter.setNewInstance(oxyList)
-            oxyAdapter.notifyDataSetChanged()
-            bpList.clear()
-            bpAdapter.setNewInstance(bpList)
-            bpAdapter.notifyDataSetChanged()
-            bp2wAdapter.setList(null)
-            bp2wAdapter.notifyDataSetChanged()
+            refreshUI()
         }
         // 获取文件列表
         binding.getFileList.setOnClickListener {
             fileCount = 0
             fileNames.clear()
             pc68bList.clear()
-            ecgList.clear()
-            ecgAdapter.setNewInstance(ecgList)
-            ecgAdapter.notifyDataSetChanged()
-            oxyList.clear()
-            oxyAdapter.setNewInstance(oxyList)
-            oxyAdapter.notifyDataSetChanged()
-            bpList.clear()
-            bpAdapter.setNewInstance(bpList)
-            bpAdapter.notifyDataSetChanged()
-            bp2wAdapter.setList(null)
-            bp2wAdapter.notifyDataSetChanged()
+            refreshUI()
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CMRING
@@ -563,22 +560,13 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         binding.readFile.setOnClickListener {
             readFileProcess = ""
             process = 0
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BTP) {
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BTP
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ECN) {
                 mAlertDialogCanCancel?.show()
             } else {
                 mAlertDialog?.show()
             }
-            ecgList.clear()
-            ecgAdapter.setNewInstance(ecgList)
-            ecgAdapter.notifyDataSetChanged()
-            oxyList.clear()
-            oxyAdapter.setNewInstance(oxyList)
-            oxyAdapter.notifyDataSetChanged()
-            bpList.clear()
-            bpAdapter.setNewInstance(bpList)
-            bpAdapter.notifyDataSetChanged()
-            bp2wAdapter.setList(null)
-            bp2wAdapter.notifyDataSetChanged()
+            refreshUI()
             readFile()
         }
         // 暂停读取文件
@@ -1275,7 +1263,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError)
             .observe(this) {
-                Toast.makeText(context, "读文件出错 ${fileNames[0]}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "读文件出错 $curFileName", Toast.LENGTH_SHORT).show()
                 if (binding.fileName.text.toString().isEmpty()) {
                     fileNames.removeAt(0)
                     readFile()
@@ -1716,7 +1704,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this) { event ->
 //                (event.data as BtpBleResponse.BtpFile).let {
                     binding.process.text = readFileProcess
-                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "\n${fileNames[0]} 100%"
+                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "\n$curFileName 100%"
                     if (binding.fileName.text.toString().isEmpty()) {
                         fileNames.removeAt(0)
                         readFile()
@@ -1757,6 +1745,63 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     Toast.makeText(context, "恢复生产状态失败", Toast.LENGTH_SHORT).show()
                 }
             }
+        //-----------------------ecn-----------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnGetFileList)
+            .observe(this) {
+                val data = it.data as EcnBleResponse.FileList
+                for (file in data.list) {
+                    fileNames.add(file.fileName)
+                }
+                binding.deviceInfo.text = fileNames.toString()
+                Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadingFileProgress)
+            .observe(this) { event ->
+                (event.data as Int).let {
+                    binding.process.text = "$readFileProcess$curFileName 读取进度: $it %"
+                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $it %"
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadFileComplete)
+            .observe(this) { event ->
+                val data = event.data as ByteArray
+                binding.process.text = readFileProcess
+                binding.deviceInfo.text = binding.deviceInfo.text.toString() + "\n$curFileName 100%"
+                val temp = EcnData()
+                temp.fileName = curFileName
+                temp.data = data
+                ecnList.add(temp)
+                ecnAdapter.setNewInstance(ecnList)
+                ecnAdapter.notifyDataSetChanged()
+                if (binding.fileName.text.toString().isEmpty()) {
+                    fileNames.removeAt(0)
+                    readFile()
+                } else {
+                    mAlertDialogCanCancel?.dismiss()
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadFileError)
+            .observe(this) {
+                mAlertDialogCanCancel?.dismiss()
+                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun refreshUI() {
+        ecgList.clear()
+        ecgAdapter.setNewInstance(ecgList)
+        ecgAdapter.notifyDataSetChanged()
+        oxyList.clear()
+        oxyAdapter.setNewInstance(oxyList)
+        oxyAdapter.notifyDataSetChanged()
+        bpList.clear()
+        bpAdapter.setNewInstance(bpList)
+        bpAdapter.notifyDataSetChanged()
+        bp2wAdapter.setList(null)
+        bp2wAdapter.notifyDataSetChanged()
+        ecnList.clear()
+        ecnAdapter.setNewInstance(ecnList)
+        ecnAdapter.notifyDataSetChanged()
     }
 
     private fun getEcgData(recordingTime: Long, fileName: String, wave: ByteArray, shortData: ShortArray, duration: Int) : EcgData {
@@ -1780,7 +1825,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             trimStr(binding.fileName.text.toString())
         } else {
             if (fileNames.size == 0) {
-                if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BTP) {
+                if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BTP
+                    || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ECN) {
                     mAlertDialogCanCancel?.dismiss()
                 } else {
                     mAlertDialog?.dismiss()

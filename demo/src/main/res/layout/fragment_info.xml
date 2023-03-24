@@ -234,6 +234,13 @@
                 android:layout_marginStart="@dimen/dp_10"
                 android:layout_marginTop="@dimen/dp_10"
                 android:layout_marginEnd="@dimen/dp_10"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/ecn_rcv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_10"
+                android:layout_marginTop="@dimen/dp_10"
+                android:layout_marginEnd="@dimen/dp_10"/>
 
             <TextView
                 android:layout_marginStart="@dimen/dp_10"

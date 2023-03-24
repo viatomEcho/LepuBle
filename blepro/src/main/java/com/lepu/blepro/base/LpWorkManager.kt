@@ -457,6 +457,12 @@ object LpWorkManager {
                     return this
                 }
             }
+            Bluetooth.MODEL_ECN -> {
+                EcnBleInterface(m).apply {
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
 
             else -> {
 //                return throw Exception("BleService initInterfaces() 未配置此model:$m")

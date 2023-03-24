@@ -726,7 +726,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBtpRtData = "com.lepu.ble.btp.rtData"                              // 实时数据 BtpBleResponse.RtData
             const val EventBtpGetFileList = "com.lepu.ble.btp.get.file.list"                  // 获取文件列表 BtpBleResponse.FileList
             const val EventBtpReadFileError = "com.lepu.ble.btp.read.file.error"              // 读文件出错 String(fileName)
-            const val EventBtpReadingFileProgress = "com.lepu.btp.bp2.reading.file.progress"  // 传输文件进度 Int
+            const val EventBtpReadingFileProgress = "com.lepu.ble.btp.reading.file.progress"  // 传输文件进度 Int
             const val EventBtpReadFileComplete = "com.lepu.ble.btp.read.file.complete"        // 传输文件完成 byte[]
             const val EventBtpReset = "com.lepu.ble.btp.reset"                                // 复位 boolean
             const val EventBtpFactoryReset = "com.lepu.ble.btp.factory.reset"                 // 恢复出厂设置 boolean
@@ -752,6 +752,19 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     interface R20 {
         companion object {
             const val EventR20EchoData = "com.lepu.ble.r20.echo.data"  // 回显 byte[]
+        }
+    }
+
+    /**
+     * EcnBleInterface 发出的通知
+     * 包含model: MODEL_ECN
+     */
+    interface ECN {
+        companion object {
+            const val EventEcnGetFileList = "com.lepu.ble.ecn.get.file.list"                  // 获取文件列表 EcnBleResponse.FileList
+            const val EventEcnReadFileError = "com.lepu.ble.ecn.read.file.error"              // 读文件出错 String(fileName)
+            const val EventEcnReadingFileProgress = "com.lepu.ble.ecn.reading.file.progress"  // 传输文件进度 Int
+            const val EventEcnReadFileComplete = "com.lepu.ble.ecn.read.file.complete"        // 传输文件完成 byte[]
         }
     }
 

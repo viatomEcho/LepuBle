@@ -4,6 +4,7 @@ import android.util.SparseArray
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.demo.data.BpData
 import com.lepu.demo.data.EcgData
+import com.lepu.demo.data.EcnData
 import com.lepu.demo.data.OxyData
 
 /**
@@ -119,6 +120,7 @@ class Constant{
             const val S5_SCALE_MODEL: Int = Bluetooth.MODEL_S5_SCALE
             const val R20_MODEL: Int = Bluetooth.MODEL_R20
             const val LERES_MODEL: Int = Bluetooth.MODEL_LERES
+            const val ECN_MODEL: Int = Bluetooth.MODEL_ECN
             const val PATIENT_DEVICE_JSON: Int = 1004
 
             val SUPPORT_MODELS = intArrayOf(ER1_MODEL, DUOEK_MODEL, ER2_MODEL, PC80B_MODEL, BP2_MODEL,
@@ -136,7 +138,7 @@ class Constant{
                 PF_10AW_MODEL, PF_10AW1_MODEL, PF_10BW_MODEL, PF_10BW1_MODEL, PF_20AW_MODEL, PF_20B_MODEL, CHECKME_MODEL,
                 PC80B_BLE_MODEL, SP20_BLE_MODEL, PC300_BLE_MODEL, ER3_MODEL, LEPOD_MODEL, PC60NW_BLE_MODEL,
                 SP20_WPS_MODEL, AP20_WPS_MODEL, PC60NW_WPS_MODEL, O2M_WPS_MODEL, PC80B_BLE2_MODEL, VTM01_MODEL,
-                PC200_BLE_MODEL, BTP_MODEL, S5_SCALE_MODEL, R20_MODEL, LERES_MODEL, PC60NW_NO_SN_MODEL
+                PC200_BLE_MODEL, BTP_MODEL, S5_SCALE_MODEL, R20_MODEL, LERES_MODEL, PC60NW_NO_SN_MODEL, ECN_MODEL
             )
 
             val SUPPORT_FACES = SparseArray<Int>().apply {
@@ -161,6 +163,7 @@ class Constant{
             var ecgData = EcgData()
             var oxyData = OxyData()
             var bpData = BpData()
+            var ecnData = EcnData()
 
             var splitText = ""
             var splitType = 0
