@@ -235,7 +235,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     setViewVisible(binding.ad5Layout)
                 }
                 Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
-                Bluetooth.MODEL_PC200_BLE -> {
+                Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
                     setViewVisible(binding.pc300Layout)
                 }
                 Bluetooth.MODEL_LEM -> {

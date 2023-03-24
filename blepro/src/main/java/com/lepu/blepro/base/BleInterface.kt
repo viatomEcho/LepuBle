@@ -445,6 +445,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             || model == Bluetooth.MODEL_BIOLAND_BGM
             || model == Bluetooth.MODEL_PC300
             || model == Bluetooth.MODEL_PC300_BLE
+            || model == Bluetooth.MODEL_GM_300SNT
             || model == Bluetooth.MODEL_PC200_BLE
             || model == Bluetooth.MODEL_VTM01) { // 部分设备没有同步时间命令，发送此消息通知获取设备信息，进行绑定操作
             LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceReady).post(model)

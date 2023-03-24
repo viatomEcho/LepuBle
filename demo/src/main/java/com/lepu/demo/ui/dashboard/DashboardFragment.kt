@@ -276,7 +276,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_CHECK_ADV, Bluetooth.MODEL_PC300_BLE,
-            Bluetooth.MODEL_PC200_BLE -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
                 waveHandler.post(EcgWaveTask())
                 waveHandler.post(OxyWaveTask())
             }
@@ -423,7 +423,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 startWave(it.modelNo)
             }
             Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
-            Bluetooth.MODEL_PC200_BLE -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
                 binding.ecgLayout.visibility = View.VISIBLE
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.bpLayout.visibility = View.VISIBLE
@@ -494,6 +494,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         binding.startRtEcg.setOnClickListener {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_GM_300SNT
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC200_BLE) {
                 LpBleUtil.startEcg(Constant.BluetoothConfig.currentModel[0])
             }
@@ -502,6 +503,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         binding.stopRtEcg.setOnClickListener {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_GM_300SNT
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC200_BLE) {
                 LpBleUtil.stopEcg(Constant.BluetoothConfig.currentModel[0])
             }
