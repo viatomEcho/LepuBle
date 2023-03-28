@@ -14,7 +14,7 @@ public class ByteUtils {
     /**
      * 转四个字节byte数组（小端模式）
      */
-    public static byte[] int4Bytes(int i) {
+    public static byte[] int4Bytes(long i) {
         byte[] b = new byte[4];
         b[0] = (byte) (i & 0xFF);
         b[1] = (byte) ((i >> 8) & 0xFF);

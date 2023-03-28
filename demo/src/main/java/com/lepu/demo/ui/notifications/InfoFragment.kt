@@ -16,6 +16,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.lew.*
+import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
@@ -148,7 +149,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .setCancelable(false)
             .setMessage("是否继续读取文件?")
             .setPositiveButton("确定") { _, _ ->
-                val offset = getOffset(Constant.BluetoothConfig.currentModel[0], "", curFileName)
+                val offset = DownloadHelper.readFile(Constant.BluetoothConfig.currentModel[0], "", curFileName)
                 LpBleUtil.continueReadFile(Constant.BluetoothConfig.currentModel[0], "", curFileName, offset.size)
                 mAlertDialog?.show()
             }
@@ -676,12 +677,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this) { event ->
                 (event.data as Er1BleResponse.Er1File).let {
                     if (event.model == Bluetooth.MODEL_ER1_N) {
-                        val data = VBeatHrFile(getOffset(it.model, "", it.fileName))
+                        val data = VBeatHrFile(DownloadHelper.readFile(it.model, "", it.fileName))
                         binding.info.text = "$data"
                         binding.deviceInfo.text = "$data"
                     } else {
                         if (it.fileName.contains("R")) {
-                            val data = Er1EcgFile(getOffset(it.model, "", it.fileName))
+                            val data = Er1EcgFile(DownloadHelper.readFile(it.model, "", it.fileName))
                             binding.info.text = "$data"
                             readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                             val recordingTime = DateUtil.getSecondTimestamp(it.fileName.replace("R", ""))
@@ -690,7 +691,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             ecgAdapter.setNewInstance(ecgList)
                             ecgAdapter.notifyDataSetChanged()
                         } else {
-                            val data = Er2AnalysisFile(getOffset(it.model, "", it.fileName))
+                            val data = Er2AnalysisFile(DownloadHelper.readFile(it.model, "", it.fileName))
                             binding.info.text = "$data"
                             readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
                         }
@@ -748,7 +749,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .observe(this) { event ->
                 (event.data as Er2File).let {
                     if (it.fileName.contains("R")) {
-                        val content = getOffset(it.model, "", it.fileName)
+                        val content = DownloadHelper.readFile(it.model, "", it.fileName)
                         val data = if (content.isEmpty()) {
                             Er1EcgFile(it.content)
                         } else {
@@ -762,7 +763,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         ecgAdapter.setNewInstance(ecgList)
                         ecgAdapter.notifyDataSetChanged()
                     } else {
-                        val content = getOffset(it.model, "", it.fileName)
+                        val content = DownloadHelper.readFile(it.model, "", it.fileName)
                         val data = if (content.isEmpty()) {
                             Er2AnalysisFile(it.content)
                         } else {
@@ -891,7 +892,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileComplete)
             .observe(this) { event ->
                 (event.data as Bp2BleFile).let {
-                    val content = getOffset(event.model, "", it.name)
+                    val content = DownloadHelper.readFile(event.model, "", it.name)
                     val file = if (content.isEmpty()) {
                         it
                     } else {
@@ -1836,27 +1837,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
             fileNames[0]
         }
-        val offset = getOffset(Constant.BluetoothConfig.currentModel[0], "", curFileName)
+        val offset = DownloadHelper.readFile(Constant.BluetoothConfig.currentModel[0], "", curFileName)
         LpBleUtil.readFile("", curFileName, Constant.BluetoothConfig.currentModel[0], offset.size)
         binding.sendCmd.text = LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-    }
-
-    private fun getOffset(model: Int, userId: String, fileName: String): ByteArray {
-        val trimStr = trimStr(fileName)
-        LpBleUtil.getRawFolder(model)?.let { s ->
-            val mFile = File(s, "$userId$trimStr.dat")
-            LogUtils.d("文件$fileName", if (mFile.exists()) "存在" else "不存在")
-            if (mFile.exists()) {
-                FileUtils.readFileToByteArray(mFile)?.let {
-                    LogUtils.d("get offset: ${it.size}")
-                    return it
-                }
-            } else {
-                LogUtils.d("get offset: 0")
-                return ByteArray(0)
-            }
-        }
-        return ByteArray(0)
     }
 
 }

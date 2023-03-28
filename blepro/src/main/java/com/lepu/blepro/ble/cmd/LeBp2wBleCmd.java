@@ -3,7 +3,7 @@ package com.lepu.blepro.ble.cmd;
 import com.lepu.blepro.utils.CrcUtil;
 import com.lepu.blepro.utils.LepuBleLog;
 import java.util.Calendar;
-import java.util.TimeZone;
+import com.lepu.blepro.utils.DateUtil;
 
 /**
  * @author chenyongfeng
@@ -133,7 +133,7 @@ public class LeBp2wBleCmd {
         data[6] = (byte) (c.get(Calendar.SECOND));
 
         // GMT+8:00, timeZone: 80
-        int timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / (3600*100);
+        int timeZone = DateUtil.getTimeZoneOffset() / (3600*100);
         LepuBleLog.d("setUtcTime===" + timeZone);
 
         data[7] = (byte) timeZone;

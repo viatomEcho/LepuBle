@@ -70,6 +70,7 @@ object EventMsgConst {
         companion object{
             const val EventCmdResponseTimeOut = "com.lepu.ble.cmd.response.timeout"  // 指令响应超时会发送
             const val EventCmdResponseContent = "com.lepu.ble.cmd.response.content"  // 指令响应
+            const val EventCmdResponseError = "com.lepu.ble.cmd.response.error"      // 指令异常
         }
     }
 

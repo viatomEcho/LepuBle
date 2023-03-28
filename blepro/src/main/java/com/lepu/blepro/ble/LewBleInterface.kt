@@ -866,7 +866,7 @@ class LewBleInterface(model: Int): BleInterface(model) {
         sendCmd(LewBleCmd.listFiles())
         LepuBleLog.d(tag, "getFileList")
     }
-    fun getFileList(type: Int, startTime: Int) {
+    fun getFileList(type: Int, startTime: Long) {
         when (type) {
             LewBleCmd.ListType.SPORT -> {
                 sendCmd(LewBleCmd.getSportList(startTime))

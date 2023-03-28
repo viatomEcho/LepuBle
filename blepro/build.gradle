@@ -66,6 +66,7 @@ dependencies {
     implementation 'io.github.jeremyliao:live-event-bus-x:1.8.0'
 
     implementation 'org.apache.commons:commons-lang3:3.8.1'
+    implementation 'commons-io:commons-io:2.6'
 
     compileOnly files('libs/ICBodyFatAlgorithms.aar')
 //    implementation files('libs/ICBodyFatAlgorithms.aar')

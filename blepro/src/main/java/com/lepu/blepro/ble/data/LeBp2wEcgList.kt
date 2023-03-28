@@ -1,5 +1,6 @@
 package com.lepu.blepro.ble.data
 
+import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
@@ -54,7 +55,7 @@ class LeBp2wEcgList(var bytes: ByteArray) {
 
         init {
             var index = 0
-            val rawOffset = TimeZone.getDefault().getOffset(System.currentTimeMillis()).div(1000)
+            val rawOffset = DateUtil.getTimeZoneOffset().div(1000)
             val defaultTime = toUInt(bytes.copyOfRange(index, index+4)).toLong()
             time = defaultTime - rawOffset
             fileName = stringFromDate(Date(time*1000), "yyyyMMddHHmmss")

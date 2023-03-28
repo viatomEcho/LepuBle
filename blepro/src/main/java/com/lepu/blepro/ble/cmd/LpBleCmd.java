@@ -3,12 +3,26 @@ package com.lepu.blepro.ble.cmd;
 import com.lepu.blepro.utils.CrcUtil;
 import com.lepu.blepro.utils.LepuBleLog;
 import java.util.Calendar;
+import com.lepu.blepro.utils.DateUtil;
 
 public class LpBleCmd {
 
     private static final int HEAD = 0xA5;
     private static final int TYPE_NORMAL_SEND = 0x00;
+    public static final int TYPE_NORMAL_RESPONSE = 0x01;
+    public static final int TYPE_FILE_NOT_FOUND = 0xE0;
+    public static final int TYPE_FILE_READ_FAILED = 0xE1;
+    public static final int TYPE_FILE_WRITE_FAILED = 0xE2;
+    public static final int TYPE_FIRMWARE_UPDATE_FAILED = 0xE3;
+    public static final int TYPE_LANGUAGE_UPDATE_FAILED = 0xE4;
+    public static final int TYPE_PARAM_ILLEGAL = 0xF1;
+    public static final int TYPE_PERMISSION_DENIED = 0xF2;
+    public static final int TYPE_DEVICE_BUSY = 0xFB;
+    public static final int TYPE_CMD_FORMAT_ERROR = 0xFC;
+    public static final int TYPE_CMD_NOT_SUPPORTED = 0xFD;
+    public static final int TYPE_NORMAL_ERROR = 0xFF;
 
+    public static final int SET_UTC_TIME = 0xC0;
     public static final int ECHO = 0xE0;
     public static final int GET_INFO = 0xE1;
     public static final int RESET = 0xE2;
@@ -32,6 +46,7 @@ public class LpBleCmd {
     public static final int DELETE_FILE = 0xF8;
     public static final int GET_USER_LIST = 0xF9;
     public static final int DFU_UPDATE_MODE = 0xFA;
+    public static final int ENCRYPT = 0xFF;
 
     private static int seqNo = 0;
     private static void addNo() {
@@ -39,6 +54,10 @@ public class LpBleCmd {
         if (seqNo >= 255) {
             seqNo = 0;
         }
+    }
+
+    public static byte[] echo(byte[] data) {
+        return getReq(ECHO, data);
     }
 
     public static byte[] setTime() {
@@ -59,6 +78,29 @@ public class LpBleCmd {
         return getReq(SET_TIME, data);
     }
 
+    public static byte[] setUtcTime() {
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(System.currentTimeMillis());
+
+        int len = 8;
+        byte[] data = new byte[len];
+        data[0] = (byte) (c.get(Calendar.YEAR));
+        data[1] = (byte) (c.get(Calendar.YEAR) >> 8);
+        data[2] = (byte) (c.get(Calendar.MONTH) + 1);
+        data[3] = (byte) (c.get(Calendar.DATE));
+        data[4] = (byte) (c.get(Calendar.HOUR_OF_DAY));
+        data[5] = (byte) (c.get(Calendar.MINUTE));
+        data[6] = (byte) (c.get(Calendar.SECOND));
+
+        // GMT+8:00, timeZone: 80
+        int timeZone = DateUtil.getTimeZoneOffset() / (3600*100);
+        LepuBleLog.d("setUtcTime===" + timeZone);
+
+        data[7] = (byte) timeZone;
+
+        return getReq(SET_UTC_TIME, data);
+    }
+
     public static byte[] getInfo() {
         return getReq(GET_INFO, new byte[0]);
     }
@@ -73,6 +115,10 @@ public class LpBleCmd {
 
     public static byte[] factoryResetAll() {
         return getReq(FACTORY_RESET_ALL, new byte[0]);
+    }
+
+    public static byte[] getBattery() {
+        return getReq(GET_BATTERY, new byte[0]);
     }
 
     public static byte[] burnFactoryInfo(byte[] config) {
@@ -155,6 +201,14 @@ public class LpBleCmd {
      */
     public static byte[] writeFileEnd() {
         return getReq(WRITE_FILE_END, new byte[0]);
+    }
+
+    /**
+     * 加密通讯
+     * @return
+     */
+    public static byte[] encrypt(byte[] data) {
+        return getReq(ENCRYPT, data);
     }
 
     private static byte[] getReq(int sendCmd, byte[] data) {

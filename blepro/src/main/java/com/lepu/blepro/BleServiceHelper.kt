@@ -709,7 +709,7 @@ class BleServiceHelper private constructor() {
      * @param startTime 起始时间戳 单位秒
      */
     @JvmOverloads
-    fun getFileList(model: Int, fileType: Int? = null, startTime: Int = 0){
+    fun getFileList(model: Int, fileType: Int? = null, startTime: Long = 0){
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_LE_BP2W -> {
@@ -739,7 +739,19 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as LewBleInterface).let {
-                        LepuBleLog.d(tag, "it as LewBleInterface--lewGetFileList")
+                        LepuBleLog.d(tag, "it as LewBleInterface--getFileList")
+                        if (fileType == null) {
+                            it.getFileList()
+                        } else {
+                            it.getFileList(fileType, startTime)
+                        }
+                    }
+                }
+            }
+            Bluetooth.MODEL_R20 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as R20BleInterface).let {
+                        LepuBleLog.d(tag, "it as R20BleInterface--getFileList")
                         if (fileType == null) {
                             it.getFileList()
                         } else {

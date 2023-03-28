@@ -7,6 +7,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.download.DownloadHelper
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
@@ -31,10 +32,11 @@ import kotlin.experimental.inv
 class BtpBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "BtpBleInterface"
 
+    private var userId = ""
     private var fileName = ""
     private var fileId = 0
     private var fileSize = 0
-    private var fileContent: ByteArray? = null
+    private var fileContent = ByteArray(0)
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         if (isManagerInitialized()) {
@@ -65,193 +67,172 @@ class BtpBleInterface(model: Int): BleInterface(model) {
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: BtpBleResponse.BleResponse) {
         LepuBleLog.d(tag, "onResponseReceived cmd: ${response.cmd}, bytes: ${bytesToHex(response.bytes)}")
-        when(response.cmd) {
-            BtpBleCmd.GET_INFO -> {
-                if (response.content.size < 38) {
-                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
-                    return
-                }
-                val data = LepuDevice(response.content)
+        if (response.pkgType != LpBleCmd.TYPE_NORMAL_RESPONSE) {
+            val data = ResponseError()
+            data.model = model
+            data.cmd = response.cmd
+            data.type = response.pkgType
+            LiveEventBus.get<ResponseError>(EventMsgConst.Cmd.EventCmdResponseError).post(data)
+            LepuBleLog.d(tag, "model:$model,ResponseError => $data")
+        } else {
+            when(response.cmd) {
+                BtpBleCmd.GET_INFO -> {
+                    if (response.len < 38) {
+                        LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                        return
+                    }
+                    val data = LepuDevice(response.content)
 
-                LepuBleLog.d(tag, "model:$model,GET_INFO => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetInfo).post(InterfaceEvent(model, data))
+                    LepuBleLog.d(tag, "model:$model,GET_INFO => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetInfo).post(InterfaceEvent(model, data))
 
-            }
+                }
 
-            BtpBleCmd.GET_BATTERY -> {
-                if (response.content.size < 4) {
-                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
-                    return
-                }
-                val data = KtBleBattery(response.content)
+                BtpBleCmd.GET_BATTERY -> {
+                    if (response.len < 4) {
+                        LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                        return
+                    }
+                    val data = KtBleBattery(response.content)
 
-                LepuBleLog.d(tag, "model:$model,GET_BATTERY => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetBattery).post(InterfaceEvent(model, data))
+                    LepuBleLog.d(tag, "model:$model,GET_BATTERY => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetBattery).post(InterfaceEvent(model, data))
 
-            }
+                }
 
-            BtpBleCmd.RT_DATA -> {
-                if (response.content.size < 10) {
-                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
-                    return
-                }
-                val data = BtpBleResponse.RtData(response.content)
+                BtpBleCmd.RT_DATA -> {
+                    if (response.len < 10) {
+                        LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                        return
+                    }
+                    val data = BtpBleResponse.RtData(response.content)
 
-                LepuBleLog.d(tag, "model:$model,RT_DATA => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpRtData).post(InterfaceEvent(model, data))
-            }
-            BtpBleCmd.GET_FILE_LIST -> {
-                if (response.content.isEmpty()) {
-                    LepuBleLog.e(tag, "response.size:${response.content.size} error")
-                    return
+                    LepuBleLog.d(tag, "model:$model,RT_DATA => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpRtData).post(InterfaceEvent(model, data))
                 }
-                val data = BtpBleResponse.FileList(response.content)
-                LepuBleLog.d(tag, "model:$model,GET_FILE_LIST => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetFileList).post(InterfaceEvent(model, data))
-            }
-            BtpBleCmd.FILE_READ_START -> {
-                if (response.content.size < 8 || response.pkgType != 0x01.toByte()) {
-                    sendCmd(BtpBleCmd.fileReadEnd())
-                    LepuBleLog.d(tag, "model:$model,FILE_READ_START => error")
-                    return
+                BtpBleCmd.GET_FILE_LIST -> {
+                    if (response.content.isEmpty()) {
+                        LepuBleLog.e(tag, "response.size:${response.content.size} error")
+                        return
+                    }
+                    val data = BtpBleResponse.FileList(response.content)
+                    LepuBleLog.d(tag, "model:$model,GET_FILE_LIST => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetFileList).post(InterfaceEvent(model, data))
                 }
-                fileContent = null
-                fileId = toUInt(response.content.copyOfRange(0, 4))
-                fileSize = toUInt(response.content.copyOfRange(4, 8))
-                if (fileSize <= 0) {
-                    sendCmd(BtpBleCmd.fileReadEnd())
-                } else {
-                    sendCmd(BtpBleCmd.fileReadPkg(fileId, offset, fileSize))
+                BtpBleCmd.FILE_READ_START -> {
+                    //检查当前的下载状态
+                    if (isCancelRF || isPausedRF) {
+                        sendCmd(BtpBleCmd.fileReadEnd())
+                        LepuBleLog.d(tag, "FILE_READ_START isCancelRF: $isCancelRF, isPausedRF: $isPausedRF")
+                        return
+                    }
+                    if (response.len < 8) {
+                        LepuBleLog.d(tag, "model:$model,FILE_READ_START => response.len < 8")
+                        return
+                    }
+                    fileContent = if (offset == 0) {
+                        ByteArray(0)
+                    } else {
+                        DownloadHelper.readFile(model, userId, fileName)
+                    }
+                    offset = fileContent.size
+                    fileId = toUInt(response.content.copyOfRange(0, 4))
+                    fileSize = toUInt(response.content.copyOfRange(4, 8))
+                    if (fileSize <= 0) {
+                        sendCmd(BtpBleCmd.fileReadEnd())
+                    } else {
+                        sendCmd(BtpBleCmd.fileReadPkg(fileId, offset, fileSize))
+                    }
+                    LepuBleLog.d(tag, "model:$model,FILE_READ_START => fileName: $fileName, fileId: $fileId, offset: $offset, fileSize: $fileSize")
                 }
-                LepuBleLog.d(tag, "model:$model,FILE_READ_START => fileName: $fileName, fileId: $fileId, offset: $offset, fileSize: $fileSize")
-            }
-            BtpBleCmd.FILE_READ_PKG -> {
-                offset += response.len
-                DownloadHelper.writeFile(model, "", fileName, "dat", response.content)
-                fileContent = add(fileContent, response.content)
-                val percent = offset*100/fileSize
-                LepuBleLog.d(tag, "model:$model,FILE_READ_PKG => fileId: $fileId, offset: $offset, fileSize: $fileSize")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadingFileProgress).post(InterfaceEvent(model, percent))
-                if (offset < fileSize) {
-                    sendCmd(BtpBleCmd.fileReadPkg(fileId, offset, fileSize))
-                } else {
-                    sendCmd(BtpBleCmd.fileReadEnd())
+                BtpBleCmd.FILE_READ_PKG -> {
+                    //检查当前的下载状态
+                    if (isCancelRF || isPausedRF) {
+                        sendCmd(BtpBleCmd.fileReadEnd())
+                        LepuBleLog.d(tag, "FILE_READ_START isCancelRF: $isCancelRF, isPausedRF: $isPausedRF")
+                        return
+                    }
+                    offset += response.len
+                    DownloadHelper.writeFile(model, "", fileName, "dat", response.content)
+                    fileContent = add(fileContent, response.content)
+                    val percent = offset*100/fileSize
+                    LepuBleLog.d(tag, "model:$model,FILE_READ_PKG => fileId: $fileId, offset: $offset, fileSize: $fileSize")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadingFileProgress).post(InterfaceEvent(model, percent))
+                    if (offset < fileSize) {
+                        sendCmd(BtpBleCmd.fileReadPkg(fileId, offset, fileSize))
+                    } else {
+                        sendCmd(BtpBleCmd.fileReadEnd())
+                    }
                 }
-            }
-            BtpBleCmd.FILE_READ_END -> {
-                if (offset != fileSize || response.pkgType != 0x01.toByte()) {
-                    LepuBleLog.d(tag, "model:$model,FILE_READ_END => error")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadFileError).post(InterfaceEvent(model, true))
-                    return
+                BtpBleCmd.FILE_READ_END -> {
+                    if (isCancelRF || isPausedRF) {
+                        LepuBleLog.d(tag, "FILE_READ_END isCancelRF: $isCancelRF, isPausedRF: $isPausedRF, offset: $offset, fileSize: $fileSize")
+                        return
+                    }
+                    if (fileContent.size < fileSize) {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadFileError).post(InterfaceEvent(model, true))
+                    } else {
+//                        val data = BtpBleResponse.BtpFile(fileContent)
+//                        LepuBleLog.d(tag, "model:$model,FILE_READ_END => data: $data")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadFileComplete).post(InterfaceEvent(model, fileContent))
+                    }
                 }
-                offset = 0
-                fileContent?.let {
-//                    val data = BtpBleResponse.BtpFile(it)
-//                    LepuBleLog.d(tag, "model:$model,FILE_READ_END => data: $data")
-                    LepuBleLog.d(tag, "model:$model,FILE_READ_END")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadFileComplete).post(InterfaceEvent(model, it))
-                } ?: kotlin.run {
-                    LepuBleLog.d(tag, "model:$model,FILE_READ_END => error")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadFileError).post(InterfaceEvent(model, true))
+                BtpBleCmd.GET_CONFIG -> {
+                    if (response.len < 9) {
+                        LepuBleLog.e(tag, "GET_CONFIG response.size:${response.content.size} error")
+                        return
+                    }
+                    val data = BtpBleResponse.ConfigInfo(response.content)
+                    LepuBleLog.d(tag, "model:$model,GET_CONFIG => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetConfig).post(InterfaceEvent(model, data))
                 }
-                fileContent = null
-            }
-            BtpBleCmd.GET_CONFIG -> {
-                if (response.pkgType != 0x01.toByte()) {
-                    LepuBleLog.d(tag, "model:$model,GET_CONFIG => error")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetConfigError).post(InterfaceEvent(model, true))
-                    return
-                }
-                val data = BtpBleResponse.ConfigInfo(response.content)
-                LepuBleLog.d(tag, "model:$model,GET_CONFIG => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetConfig).post(InterfaceEvent(model, data))
-            }
 
-            BtpBleCmd.RESET -> {
-                LepuBleLog.d(tag, "model:$model,RESET => success")
-                if (response.pkgType == 0x01.toByte()) {
+                BtpBleCmd.RESET -> {
+                    LepuBleLog.d(tag, "model:$model,RESET => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReset).post(InterfaceEvent(model, true))
-                } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReset).post(InterfaceEvent(model, false))
                 }
-            }
 
-            BtpBleCmd.FACTORY_RESET -> {
-                LepuBleLog.d(tag, "model:$model,CMD_FACTORY_RESET => success")
-                if (response.pkgType == 0x01.toByte()) {
+                BtpBleCmd.FACTORY_RESET -> {
+                    LepuBleLog.d(tag, "model:$model,CMD_FACTORY_RESET => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpFactoryReset).post(InterfaceEvent(model, true))
-                } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpFactoryReset).post(InterfaceEvent(model, false))
                 }
-            }
 
-            BtpBleCmd.FACTORY_RESET_ALL -> {
-                LepuBleLog.d(tag, "model:$model,FACTORY_RESET_ALL => success")
-                if (response.pkgType == 0x01.toByte()) {
+                BtpBleCmd.FACTORY_RESET_ALL -> {
+                    LepuBleLog.d(tag, "model:$model,FACTORY_RESET_ALL => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpFactoryResetAll).post(InterfaceEvent(model, true))
-                } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpFactoryResetAll).post(InterfaceEvent(model, false))
                 }
-            }
-            BtpBleCmd.SET_TIME -> {
-                LepuBleLog.d(tag, "model:$model,SET_TIME => success")
+                BtpBleCmd.SET_TIME -> {
+                    LepuBleLog.d(tag, "model:$model,SET_TIME => success")
 
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetTime).post(InterfaceEvent(model, true))
-            }
-            BtpBleCmd.BURN_FACTORY_INFO -> {
-                LepuBleLog.d(tag, "model:$model,BURN_FACTORY_INFO => success")
-                if (response.pkgType == 0x01.toByte()) {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetTime).post(InterfaceEvent(model, true))
+                }
+                BtpBleCmd.BURN_FACTORY_INFO -> {
+                    LepuBleLog.d(tag, "model:$model,BURN_FACTORY_INFO => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpBurnFactoryInfo).post(InterfaceEvent(model, true))
-                } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpBurnFactoryInfo).post(InterfaceEvent(model, false))
                 }
-            }
-            BtpBleCmd.SET_LOW_HR -> {
-                LepuBleLog.d(tag, "model:$model,SET_LOW_HR => success")
-                if (response.pkgType == 0x01.toByte()) {
+                BtpBleCmd.SET_LOW_HR -> {
+                    LepuBleLog.d(tag, "model:$model,SET_LOW_HR => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetLowHr).post(InterfaceEvent(model, true))
-                } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetLowHr).post(InterfaceEvent(model, false))
                 }
-            }
-            BtpBleCmd.SET_HIGH_HR -> {
-                LepuBleLog.d(tag, "model:$model,SET_HIGH_HR => success")
-                if (response.pkgType == 0x01.toByte()) {
+                BtpBleCmd.SET_HIGH_HR -> {
+                    LepuBleLog.d(tag, "model:$model,SET_HIGH_HR => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetHighHr).post(InterfaceEvent(model, true))
-                } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetHighHr).post(InterfaceEvent(model, false))
                 }
-            }
-            BtpBleCmd.SET_LOW_TEMP -> {
-                LepuBleLog.d(tag, "model:$model,SET_LOW_TEMP => success")
-                if (response.pkgType == 0x01.toByte()) {
+                BtpBleCmd.SET_LOW_TEMP -> {
+                    LepuBleLog.d(tag, "model:$model,SET_LOW_TEMP => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetLowTemp).post(InterfaceEvent(model, true))
-                } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetLowTemp).post(InterfaceEvent(model, false))
                 }
-            }
-            BtpBleCmd.SET_HIGH_TEMP -> {
-                LepuBleLog.d(tag, "model:$model,SET_HIGH_TEMP => success")
-                if (response.pkgType == 0x01.toByte()) {
+                BtpBleCmd.SET_HIGH_TEMP -> {
+                    LepuBleLog.d(tag, "model:$model,SET_HIGH_TEMP => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetHighTemp).post(InterfaceEvent(model, true))
-                } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetHighTemp).post(InterfaceEvent(model, false))
                 }
-            }
-            BtpBleCmd.SET_TEMP_UNIT -> {
-                LepuBleLog.d(tag, "model:$model,SET_TEMP_UNIT => success")
-                if (response.pkgType == 0x01.toByte()) {
+                BtpBleCmd.SET_TEMP_UNIT -> {
+                    LepuBleLog.d(tag, "model:$model,SET_TEMP_UNIT => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetTempUnit).post(InterfaceEvent(model, true))
-                } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetTempUnit).post(InterfaceEvent(model, false))
                 }
-            }
-            BtpBleCmd.SET_SYSTEM_SWITCH -> {
-                LepuBleLog.d(tag, "model:$model,SET_SYSTEM_SWITCH => success")
-                if (response.pkgType == 0x01.toByte()) {
+                BtpBleCmd.SET_SYSTEM_SWITCH -> {
+                    LepuBleLog.d(tag, "model:$model,SET_SYSTEM_SWITCH => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetSystemSwitch).post(InterfaceEvent(model, true))
-                } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetSystemSwitch).post(InterfaceEvent(model, false))
                 }
             }
         }
@@ -383,6 +364,7 @@ class BtpBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
+        this.userId = userId
         this.fileName = fileName
         sendCmd(BtpBleCmd.getFileStart(fileName.toByteArray(), 0))
         LepuBleLog.d(tag, "dealReadFile...")

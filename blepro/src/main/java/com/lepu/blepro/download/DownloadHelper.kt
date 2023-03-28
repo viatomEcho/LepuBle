@@ -3,7 +3,9 @@ package com.lepu.blepro.download
 import android.text.TextUtils
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.utils.HexString
+import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.LepuBleLog
+import org.apache.commons.io.FileUtils
 import java.io.File
 import java.io.RandomAccessFile
 
@@ -54,6 +56,23 @@ class DownloadHelper {
 
         }
 
+        fun readFile(model: Int, userId: String, fileName: String): ByteArray {
+            val trimStr = trimStr(fileName)
+            BleServiceHelper.BleServiceHelper.rawFolder?.get(model)?.let { s ->
+                val mFile = File(s, "$userId$trimStr.dat")
+                LepuBleLog.d("文件$fileName", if (mFile.exists()) "存在" else "不存在")
+                if (mFile.exists()) {
+                    FileUtils.readFileToByteArray(mFile)?.let {
+                        LepuBleLog.d("get offset: ${it.size}")
+                        return it
+                    }
+                } else {
+                    LepuBleLog.d("get offset: 0")
+                    return ByteArray(0)
+                }
+            }
+            return ByteArray(0)
+        }
 
     }
 }
