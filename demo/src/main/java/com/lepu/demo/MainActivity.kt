@@ -392,7 +392,15 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 (event.data as Pc100DeviceInfo).let {
                     Toast.makeText(this, "PC-100 获取设备信息成功", Toast.LENGTH_SHORT).show()
                     viewModel._pc100Info.value = it
-                    viewModel._battery.value = "${it.batLevel.times(25)} - ${(it.batLevel+1).times(25)} %"
+                    if (it.batStatus == 0) {
+                        viewModel._battery.value = "${it.batLevel.times(25)} - ${(it.batLevel+1).times(25)} %"
+                    } else {
+                        viewModel._battery.value = "${when (it.batStatus) {
+                            1 -> "充电中"
+                            2 -> "已充满"
+                            else -> ""
+                        }}"
+                    }
                 }
             }
         //-------------------------pc60fw pc6n---------------------------
@@ -527,7 +535,15 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 (event.data as Pc300DeviceInfo).let {
                     Toast.makeText(this, "PC_300SNT 获取设备信息成功", Toast.LENGTH_SHORT).show()
                     viewModel._pc300Info.value = it
-                    viewModel._battery.value = "${it.batLevel.times(25)} - ${(it.batLevel+1).times(25)} %"
+                    if (it.batStatus == 0) {
+                        viewModel._battery.value = "${it.batLevel.times(25)} - ${(it.batLevel+1).times(25)} %"
+                    } else {
+                        viewModel._battery.value = "${when (it.batStatus) {
+                            1 -> "充电中"
+                            2 -> "已充满"
+                            else -> ""
+                        }}"
+                    }
                 }
             }
         //-------------------------lem---------------------------

@@ -412,6 +412,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.ecgLayout.visibility = View.GONE
                 o2RtType = 1
                 startWave(it.modelNo)
+                LpBleUtil.getInfo(it.modelNo)
             }
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV -> {
                 binding.ecgLayout.visibility = View.VISIBLE
@@ -431,6 +432,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.er3Layout.visibility = View.GONE
                 o2RtType = 1
                 startWave(it.modelNo)
+                LpBleUtil.getInfo(it.modelNo)
             }
             Bluetooth.MODEL_BTP -> {
                 binding.btpRecord.visibility = View.VISIBLE

@@ -95,6 +95,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                         pc300Device.softwareV = data.softwareV
                         pc300Device.hardwareV = data.hardwareV
                         pc300Device.batLevel = data.batLevel
+                        pc300Device.batStatus = data.batStatus
                         LepuBleLog.d(tag, "model:$model,DEVICE_INFO_2 查询版本及电量等级 => success $data")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300DeviceInfo).post(InterfaceEvent(model, pc300Device))
                     }
@@ -107,6 +108,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                         pc300Device.softwareV = data.softwareV
                         pc300Device.hardwareV = data.hardwareV
                         pc300Device.batLevel = data.batLevel
+                        pc300Device.batStatus = data.batStatus
                         LepuBleLog.d(tag, "model:$model,DEVICE_INFO_4 查询版本及电量等级 => success $data")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300DeviceInfo).post(InterfaceEvent(model, pc300Device))
                     }
