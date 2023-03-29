@@ -4,7 +4,6 @@ import com.lepu.blepro.ble.data.Bp2Server
 import com.lepu.blepro.ble.data.Bp2Wifi
 import com.lepu.blepro.ble.data.Bp2WifiConfig
 
-
 /**
  * relay info
  */

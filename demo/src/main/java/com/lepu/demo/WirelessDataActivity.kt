@@ -6,7 +6,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.lepu.demo.ble.WirelessDataAdapter
+import com.lepu.demo.ui.adapter.WirelessDataAdapter
 import com.lepu.demo.data.WirelessData
 import com.lepu.demo.util.FileUtil
 import org.json.JSONObject

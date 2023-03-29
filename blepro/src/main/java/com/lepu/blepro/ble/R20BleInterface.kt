@@ -195,7 +195,7 @@ class R20BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,GET_WIFI_LIST => response.content.isEmpty()")
                         return
                     }
-                    val data = WifiList(response.bytes)
+                    val data = Bp2WifiDevice(response.bytes)
                     LepuBleLog.d(tag, "model:$model,GET_WIFI_LIST => success, data: $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetWifiList).post(InterfaceEvent(model, data))
                 }
@@ -208,7 +208,7 @@ class R20BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,GET_WIFI_CONFIG => response.content.isEmpty()")
                         return
                     }
-                    val data = WifiConfig(response.content)
+                    val data = Bp2WifiConfig(response.content)
                     LepuBleLog.d(tag, "model:$model,GET_WIFI_CONFIG => success, data: $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetWifiConfig).post(InterfaceEvent(model, data))
                 }
@@ -441,7 +441,7 @@ class R20BleInterface(model: Int): BleInterface(model) {
         sendCmd(R20BleCmd.getWifiList())
     }
     // 配置WiFi信息
-    fun setWifiConfig(data: WifiConfig) {
+    fun setWifiConfig(data: Bp2WifiConfig) {
         sendCmd(R20BleCmd.setWifiConfig(data.getDataBytes()))
     }
     // 获取WiFi信息

@@ -16,9 +16,9 @@ import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.lew.DeviceInfo
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.ble.LpBleUtil
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.O2RING_MODEL
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.currentModel
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.singleConnect
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.O2RING_MODEL
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.currentModel
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.singleConnect
 import com.lepu.demo.data.entity.DeviceEntity
 import com.lepu.demo.data.entity.PatientEntity
 import com.lepu.demo.data.entity.RecordEntity

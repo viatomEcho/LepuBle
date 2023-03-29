@@ -36,9 +36,9 @@ import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.demo.ble.LpBleUtil
-import com.lepu.demo.cofig.Constant
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.CHECK_BLE_REQUEST_CODE
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.SUPPORT_MODELS
+import com.lepu.demo.config.Constant
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.CHECK_BLE_REQUEST_CODE
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.SUPPORT_MODELS
 import com.lepu.demo.util.CollectUtil
 import com.permissionx.guolindev.PermissionX
 
@@ -603,6 +603,24 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 LpBleUtil.btpGetBattery(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetBattery)
+            .observe(this) { event ->
+                (event.data as KtBleBattery).let {
+                    viewModel._battery.value = "${it.percent} %"
+                }
+            }
+        //--------------------------R20--------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetUtcTime)
+            .observe(this) {
+                Toast.makeText(this, "R20 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetInfo)
+            .observe(this) {
+                Toast.makeText(this, "R20 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                viewModel._er1Info.value = it.data as LepuDevice
+                LpBleUtil.r20GetBattery(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetBattery)
             .observe(this) { event ->
                 (event.data as KtBleBattery).let {
                     viewModel._battery.value = "${it.percent} %"

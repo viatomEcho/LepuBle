@@ -3,7 +3,7 @@ package com.lepu.demo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.github.barteksc.pdfviewer.PDFView
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.ecnData
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.ecnData
 
 class DocumentActivity : AppCompatActivity() {
 

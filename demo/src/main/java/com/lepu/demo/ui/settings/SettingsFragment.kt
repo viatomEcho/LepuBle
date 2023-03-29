@@ -5,11 +5,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.lepu.demo.R
 import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -26,13 +24,10 @@ import com.lepu.blepro.utils.HexString.hexToBytes
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
-import com.lepu.blepro.vals.server
-import com.lepu.blepro.vals.wifi
-import com.lepu.blepro.vals.wifiConfig
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.ble.LpBleUtil
-import com.lepu.demo.ble.WifiAdapter
-import com.lepu.demo.cofig.Constant
+import com.lepu.demo.ui.adapter.WifiAdapter
+import com.lepu.demo.config.Constant
 import com.lepu.demo.data.DeviceFactoryData
 import com.lepu.demo.databinding.FragmentSettingsBinding
 import com.lepu.demo.util.DateUtil

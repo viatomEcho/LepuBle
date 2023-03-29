@@ -71,4 +71,6 @@ object EcnBleResponse {
             """.trimIndent()
         }
     }
+
+    class File(val content: ByteArray, val fileName: String)
 }

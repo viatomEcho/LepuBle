@@ -791,7 +791,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventEcnGetFileList = "com.lepu.ble.ecn.get.file.list"                  // 获取文件列表 EcnBleResponse.FileList
             const val EventEcnReadFileError = "com.lepu.ble.ecn.read.file.error"              // 读文件出错 String(fileName)
             const val EventEcnReadingFileProgress = "com.lepu.ble.ecn.reading.file.progress"  // 传输文件进度 Int
-            const val EventEcnReadFileComplete = "com.lepu.ble.ecn.read.file.complete"        // 传输文件完成 byte[]
+            const val EventEcnReadFileComplete = "com.lepu.ble.ecn.read.file.complete"        // 传输文件完成 EcnBleResponse.File
         }
     }
 

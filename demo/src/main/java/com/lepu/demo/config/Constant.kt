@@ -1,4 +1,4 @@
-package com.lepu.demo.cofig
+package com.lepu.demo.config
 
 import android.util.SparseArray
 import com.lepu.blepro.objs.Bluetooth

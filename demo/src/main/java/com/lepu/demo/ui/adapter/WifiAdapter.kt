@@ -1,4 +1,4 @@
-package com.lepu.demo.ble
+package com.lepu.demo.ui.adapter
 
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder

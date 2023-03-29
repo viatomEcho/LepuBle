@@ -1,4 +1,4 @@
-package com.lepu.demo.ble
+package com.lepu.demo.ui.adapter
 
 import android.widget.Button
 import com.chad.library.adapter.base.BaseQuickAdapter

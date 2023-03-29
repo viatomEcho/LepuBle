@@ -4,11 +4,9 @@ import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Shader
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.blankj.utilcode.util.LogUtils
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
@@ -20,7 +18,7 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.utils.ViewPortHandler
 import com.lepu.blepro.utils.DateUtil.stringFromDate
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.oxyData
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.oxyData
 import com.lepu.demo.views.*
 import java.util.*
 

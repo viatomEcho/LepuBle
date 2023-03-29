@@ -26,7 +26,7 @@ import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
 import com.lepu.demo.WirelessDataActivity
 import com.lepu.demo.ble.LpBleUtil
-import com.lepu.demo.cofig.Constant
+import com.lepu.demo.config.Constant
 import com.lepu.demo.data.DataController
 import com.lepu.demo.data.OxyDataController
 import com.lepu.demo.data.WirelessData

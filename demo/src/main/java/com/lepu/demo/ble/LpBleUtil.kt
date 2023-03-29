@@ -17,8 +17,7 @@ import com.lepu.blepro.ble.data.lew.TimeData
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.demo.BuildConfig
-import com.lepu.demo.cofig.Constant
-import com.lepu.demo.cofig.Constant.BluetoothConfig
+import com.lepu.demo.config.Constant.BluetoothConfig
 
 class LpBleUtil {
     interface State {
@@ -1086,10 +1085,13 @@ class LpBleUtil {
         fun btpSetSystemSwitch(model: Int, hrSwitch: Boolean, lightSwitch: Boolean, tempSwitch: Boolean) {
             BleServiceHelper.btpSetSystemSwitch(model, hrSwitch, lightSwitch, tempSwitch)
         }
+        // R20
         fun r20Echo(model: Int, data: ByteArray) {
             BleServiceHelper.r20Echo(model, data)
         }
-
+        fun r20GetBattery(model: Int) {
+            BleServiceHelper.r20GetBattery(model)
+        }
     }
 
 

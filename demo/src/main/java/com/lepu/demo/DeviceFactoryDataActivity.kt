@@ -9,7 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.lepu.demo.ble.DeviceFactoryDataAdapter
+import com.lepu.demo.ui.adapter.DeviceFactoryDataAdapter
 import com.lepu.demo.data.DeviceFactoryData
 import com.lepu.demo.util.DateUtil
 import com.lepu.demo.util.ExcelUtil

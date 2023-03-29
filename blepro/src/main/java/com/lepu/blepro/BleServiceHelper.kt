@@ -3565,18 +3565,33 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    // R20
     fun r20Echo(model: Int, data: ByteArray) {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
-                        LepuBleLog.d(tag, "it as LeResSBleInterface--leResSEcho")
+                        LepuBleLog.d(tag, "it as R20BleInterface--r20Echo")
                         it.echo(data)
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "leResSEcho current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "r20Echo current model $model unsupported!!")
+        }
+    }
+    fun r20GetBattery(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as R20BleInterface).let {
+                        LepuBleLog.d(tag, "it as R20BleInterface--r20GetBattery")
+                        it.getBattery()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "r20GetBattery current model $model unsupported!!")
         }
     }
 

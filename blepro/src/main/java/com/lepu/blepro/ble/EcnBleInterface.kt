@@ -16,8 +16,8 @@ import kotlin.experimental.inv
  */
 class EcnBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "EcnBleInterface"
-    private var fileName: String? = null
-    private var userId: String? = null
+    private var fileName = ""
+    private var userId = ""
     private var curSize = 0
     private var fileSize = 0
     private var fileContent = ByteArray(0)
@@ -121,7 +121,7 @@ class EcnBleInterface(model: Int): BleInterface(model) {
                 if (curSize != fileSize) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadFileError).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadFileComplete).post(InterfaceEvent(model, fileContent))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadFileComplete).post(InterfaceEvent(model, EcnBleResponse.File(fileContent, fileName)))
                 }
             }
         }

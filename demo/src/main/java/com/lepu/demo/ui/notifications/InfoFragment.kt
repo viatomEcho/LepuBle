@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import com.blankj.utilcode.util.LogUtils
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -12,42 +11,35 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hi.dhl.jdatabinding.binding
-import com.jeremyliao.liveeventbus.LiveEventBus
+import androidx.lifecycle.ViewModelProvider
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
-import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.download.DownloadHelper
-import com.lepu.blepro.event.EventMsgConst
-import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.HexString.trimStr
-import com.lepu.blepro.utils.bytesToHex
-import com.lepu.blepro.utils.getTimeString
 import com.lepu.blepro.vals.server
 import com.lepu.blepro.vals.wifiConfig
 import com.lepu.blepro.vals.wifi
 import com.lepu.demo.*
 import com.lepu.demo.ble.*
-import com.lepu.demo.cofig.Constant
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.ecgData
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.ecnData
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.oxyData
+import com.lepu.demo.config.Constant
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.ecgData
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.ecnData
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.oxyData
 import com.lepu.demo.data.BpData
 import com.lepu.demo.data.EcgData
 import com.lepu.demo.data.EcnData
 import com.lepu.demo.data.OxyData
 import com.lepu.demo.databinding.FragmentInfoBinding
-import com.lepu.demo.util.DataConvert
+import com.lepu.demo.ui.adapter.*
 import com.lepu.demo.util.FileUtil
-import com.lepu.demo.util.StringUtil
-import org.apache.commons.io.FileUtils
 import java.io.*
-
 
 class InfoFragment : Fragment(R.layout.fragment_info){
 
     private val mainViewModel: MainViewModel by activityViewModels()
+    lateinit var infoViewModel: InfoViewModel
 
     private val binding: FragmentInfoBinding by binding()
 
@@ -56,13 +48,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
     private var curFileName = ""
     private var readFileProcess = ""
     private var process = 0
-    private var fileCount = 0
 
     private var fileType = 0
 
     private var isReceive = false
-
-    private var pc68bList = mutableListOf<Pc68bBleResponse.Record>()
 
     private lateinit var ecgAdapter: EcgAdapter
     var ecgList: ArrayList<EcgData> = arrayListOf()
@@ -82,8 +71,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initView()
-        initEvent()
+        init()
 //        testEr3()
     }
 
@@ -135,7 +123,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         }
     }
 
-    private fun initView(){
+    private fun init() {
 
         mainViewModel.bleState.observe(viewLifecycleOwner) {
             if (it) {
@@ -259,6 +247,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
         }
         binding.getWifiRoute.setOnClickListener {
+            mAlertDialogCanCancel?.setMessage("正在处理，请稍等...")
             mAlertDialogCanCancel?.show()
             LpBleUtil.bp2GetWifiDevice(Constant.BluetoothConfig.currentModel[0])
         }
@@ -318,6 +307,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         adapter.setList(null)
                         adapter.notifyDataSetChanged()
                         popupWindow?.dismiss()
+                        mAlertDialogCanCancel?.setMessage("正在处理，请稍等...")
                         mAlertDialogCanCancel?.show()
                     }
                 }
@@ -326,192 +316,18 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 }
             }
         }
-        mainViewModel.er1Info.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1_N
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM1
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_DUOEK
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM3
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER3
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_VTM01
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LEPOD) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
-            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
-                binding.wifiConfig.visibility = View.VISIBLE
-                LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
-            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BTP) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
-            }
-        }
-        mainViewModel.er2Info.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_ER2) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.fwVersion}\nsn：${it.serialNum}\ncode：${it.branchCode}"
-            }
-        }
-        mainViewModel.pc80bInfo.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC80B
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC80B_BLE
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC80B_BLE2) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}"
-            }
-        }
-        mainViewModel.bp2Info.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2A
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2T) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fmV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
-            }
-        }
-        mainViewModel.bpmInfo.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BPM) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "版本：${it.getFwVersion()}"
-            }
-        }
-        mainViewModel.oxyInfo.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2M_WPS
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BABYO2N
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKO2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPO2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SNOREO2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_WEARO2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPU
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYLINK
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYFIT
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S1
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BBSM_S2
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYU
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CMRING
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_AI_S100) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}\ncode：${it.branchCode}\nfileList：${it.fileList}"
-            }
-        }
-        mainViewModel.pc100Info.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC100) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "设备名称：${it.deviceName}\n硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}\nsn：${it.sn}"
-            }
-        }
-        mainViewModel.boInfo.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC60FW
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC66B
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYSMART
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_POD_1W
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_POD2B
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC_60NW_1
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC_60B
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10AW
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10AW1
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10BW
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10BW1
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_20
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_20AW
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_20B
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC_60NW
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC_60NW_NO_SN
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC60NW_BLE
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC60NW_WPS
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC_68B
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_AP20
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_AP20_WPS
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SP20
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SP20_BLE
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SP20_WPS
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S5W
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S6W
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S6W1
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S7W
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_S7BW) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "设备名称：${it.deviceName}\n硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}\nsn：${it.sn}\ncode：${it.branchCode}"
-            }
-        }
-        mainViewModel.aoj20aInfo.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_AOJ20A) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "$it"
-            }
-        }
-        mainViewModel.checkmePodInfo.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECK_POD) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}\ncode：${it.branchCode}"
-            }
-        }
-        mainViewModel.pulsebitInfo.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PULSEBITEX
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM4
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKME) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}\ncode：${it.branchCode}"
-            }
-        }
-        mainViewModel.checkmeLeInfo.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKME_LE) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}"
-            }
-        }
-        mainViewModel.pc300Info.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_GM_300SNT
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC200_BLE) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "设备名称：${it.deviceName}\n硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}"
-            }
-        }
-        mainViewModel.lemInfo.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LEM) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "$it"
-            }
-        }
-        mainViewModel.lewInfo.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LEW
-                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_W12C) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "设备模式：${it.deviceModeMess}\n硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}"
-            }
-        }
-        mainViewModel.biolandInfo.observe(viewLifecycleOwner) {
-            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BIOLAND_BGM) {
-                binding.info.text = "$it"
-                binding.deviceInfo.text = "版本：${it.version}\n电量：${it.battery} %\nsn：${it.sn}"
-            }
-        }
 
         // 公共方法测试
         // 获取设备信息
         binding.getInfo.setOnClickListener {
             LpBleUtil.getInfo(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = "send : ${LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])}"
-            fileCount = 0
             fileNames.clear()
             refreshUI()
         }
         // 获取文件列表
         binding.getFileList.setOnClickListener {
-            fileCount = 0
             fileNames.clear()
-            pc68bList.clear()
             refreshUI()
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYRING
@@ -617,6 +433,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             bp2wAdapter.setList(null)
             bp2wAdapter.notifyDataSetChanged()
             if (wifi != null) {
+                mAlertDialogCanCancel?.setMessage("正在处理，请稍等...")
                 mAlertDialogCanCancel?.show()
                 if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W) {
                     server.addr = "34.209.148.123"
@@ -642,1151 +459,359 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             LpBleUtil.setBleMtu(Constant.BluetoothConfig.currentModel[0], mtu)
         }
 
-    }
+        when (Constant.BluetoothConfig.currentModel[0]) {
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M, Bluetooth.MODEL_O2M_WPS,
+            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_CHECKO2,
+            Bluetooth.MODEL_SLEEPO2, Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
+            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK, Bluetooth.MODEL_KIDSO2,
+            Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
+            Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU, Bluetooth.MODEL_CMRING,
+            Bluetooth.MODEL_AI_S100 -> {
+                infoViewModel = ViewModelProvider(this).get(OxyViewModel::class.java)
+                (infoViewModel as OxyViewModel).initEvent(this)
+                mainViewModel.oxyInfo.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}\ncode：${it.branchCode}\nfileList：${it.fileList}"
+                }
+            }
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1,
+            Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
+                infoViewModel = ViewModelProvider(this).get(Er1ViewModel::class.java)
+                (infoViewModel as Er1ViewModel).initEvent(this)
+                mainViewModel.er1Info.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
+                }
+            }
+            Bluetooth.MODEL_BPM -> {
+                infoViewModel = ViewModelProvider(this).get(BpmViewModel::class.java)
+                (infoViewModel as BpmViewModel).initEvent(this)
+                mainViewModel.bpmInfo.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "版本：${it.getFwVersion()}"
+                }
+            }
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
+                infoViewModel = ViewModelProvider(this).get(Bp2ViewModel::class.java)
+                (infoViewModel as Bp2ViewModel).initEvent(this)
+                mainViewModel.bp2Info.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fmV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
+                }
+            }
+            Bluetooth.MODEL_BP2W -> {
+                infoViewModel = ViewModelProvider(this).get(Bp2wViewModel::class.java)
+                (infoViewModel as Bp2wViewModel).initEvent(this)
+                mainViewModel.er1Info.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
+                    binding.wifiConfig.visibility = View.VISIBLE
+                    LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
+                }
+            }
+            Bluetooth.MODEL_LE_BP2W -> {
+                infoViewModel = ViewModelProvider(this).get(LpBp2wViewModel::class.java)
+                (infoViewModel as LpBp2wViewModel).initEvent(this)
+                mainViewModel.er1Info.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
+                    binding.wifiConfig.visibility = View.VISIBLE
+                    LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
+                }
+            }
+            Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
+                infoViewModel = ViewModelProvider(this).get(Er2ViewModel::class.java)
+                (infoViewModel as Er2ViewModel).initEvent(this)
+                mainViewModel.er2Info.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.fwVersion}\nsn：${it.serialNum}\ncode：${it.branchCode}"
+                }
+            }
+            Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B, Bluetooth.MODEL_OXYSMART,
+            Bluetooth.MODEL_POD_1W, Bluetooth.MODEL_POD2B, Bluetooth.MODEL_PC_60NW_1,
+            Bluetooth.MODEL_PC_60B, Bluetooth.MODEL_PF_10, Bluetooth.MODEL_PF_10AW,
+            Bluetooth.MODEL_PF_10AW1, Bluetooth.MODEL_PF_10BW, Bluetooth.MODEL_PF_10BW1,
+            Bluetooth.MODEL_PF_20, Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PF_20B,
+            Bluetooth.MODEL_PC_60NW, Bluetooth.MODEL_PC_60NW_NO_SN, Bluetooth.MODEL_PC60NW_BLE,
+            Bluetooth.MODEL_PC60NW_WPS, Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
+            Bluetooth.MODEL_S6W1, Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
+            Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS,
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS -> {
+                mainViewModel.boInfo.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "设备名称：${it.deviceName}\n硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}\nsn：${it.sn}\ncode：${it.branchCode}"
+                }
+            }
+            Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE, Bluetooth.MODEL_PC80B_BLE2 -> {
+                infoViewModel = ViewModelProvider(this).get(Pc80bViewModel::class.java)
+                (infoViewModel as Pc80bViewModel).initEvent(this)
+                mainViewModel.pc80bInfo.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}"
+                }
+            }
+            Bluetooth.MODEL_PC100 -> {
+                mainViewModel.pc100Info.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "设备名称：${it.deviceName}\n硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}\nsn：${it.sn}"
+                }
+            }
+            Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
+                infoViewModel = ViewModelProvider(this).get(LewViewModel::class.java)
+                (infoViewModel as LewViewModel).initEvent(this)
+                mainViewModel.lewInfo.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "设备模式：${it.deviceModeMess}\n硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}"
+                }
+            }
+            Bluetooth.MODEL_AOJ20A -> {
+                infoViewModel = ViewModelProvider(this).get(Aoj20aViewModel::class.java)
+                (infoViewModel as Aoj20aViewModel).initEvent(this)
+                mainViewModel.aoj20aInfo.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "$it"
+                }
+            }
+            Bluetooth.MODEL_CHECK_POD -> {
+                infoViewModel = ViewModelProvider(this).get(CheckmePodViewModel::class.java)
+                (infoViewModel as CheckmePodViewModel).initEvent(this)
+                mainViewModel.checkmePodInfo.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}\ncode：${it.branchCode}"
+                }
+            }
+            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4, Bluetooth.MODEL_CHECKME -> {
+                infoViewModel = ViewModelProvider(this).get(PulsebitViewModel::class.java)
+                (infoViewModel as PulsebitViewModel).initEvent(this)
+                mainViewModel.pulsebitInfo.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}\ncode：${it.branchCode}"
+                }
+            }
+            Bluetooth.MODEL_PC_68B -> {
+                infoViewModel = ViewModelProvider(this).get(Pc68bViewModel::class.java)
+                (infoViewModel as Pc68bViewModel).initEvent(this)
+                mainViewModel.boInfo.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "设备名称：${it.deviceName}\n硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}\nsn：${it.sn}\ncode：${it.branchCode}"
+                }
+            }
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE, Bluetooth.MODEL_GM_300SNT,
+            Bluetooth.MODEL_PC200_BLE -> {
+                mainViewModel.pc300Info.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "设备名称：${it.deviceName}\n硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}"
+                }
+            }
+            Bluetooth.MODEL_CHECKME_LE -> {
+                infoViewModel = ViewModelProvider(this).get(CheckmeLeViewModel::class.java)
+                (infoViewModel as CheckmeLeViewModel).initEvent(this)
+                mainViewModel.checkmeLeInfo.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}"
+                }
+            }
+            Bluetooth.MODEL_LEM -> {
+                mainViewModel.lemInfo.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "$it"
+                }
+            }
+            Bluetooth.MODEL_LES1 -> {
+                infoViewModel = ViewModelProvider(this).get(LeS1ViewModel::class.java)
+                (infoViewModel as LeS1ViewModel).initEvent(this)
+                mainViewModel.er1Info.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
+                }
+            }
+            Bluetooth.MODEL_LPM311 -> {
+                infoViewModel = ViewModelProvider(this).get(Lpm311ViewModel::class.java)
+                (infoViewModel as Lpm311ViewModel).initEvent(this)
+            }
+            Bluetooth.MODEL_POCTOR_M3102 -> {
+                infoViewModel = ViewModelProvider(this).get(PoctorM3102ViewModel::class.java)
+                (infoViewModel as PoctorM3102ViewModel).initEvent(this)
+            }
+            Bluetooth.MODEL_BIOLAND_BGM -> {
+                infoViewModel = ViewModelProvider(this).get(BiolandBgmViewModel::class.java)
+                (infoViewModel as BiolandBgmViewModel).initEvent(this)
+                mainViewModel.biolandInfo.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "版本：${it.version}\n电量：${it.battery} %\nsn：${it.sn}"
+                }
+            }
+            Bluetooth.MODEL_ER3 -> {
+                infoViewModel = ViewModelProvider(this).get(Er3ViewModel::class.java)
+                (infoViewModel as Er3ViewModel).initEvent(this)
+                mainViewModel.er1Info.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
+                }
+            }
+            Bluetooth.MODEL_LEPOD -> {
+                infoViewModel = ViewModelProvider(this).get(LepodViewModel::class.java)
+                (infoViewModel as LepodViewModel).initEvent(this)
+                mainViewModel.er1Info.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
+                }
+            }
+            Bluetooth.MODEL_VTM01 -> {
+                infoViewModel = ViewModelProvider(this).get(Vtm01ViewModel::class.java)
+                (infoViewModel as Vtm01ViewModel).initEvent(this)
+                mainViewModel.er1Info.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
+                }
+            }
+            Bluetooth.MODEL_BTP -> {
+                infoViewModel = ViewModelProvider(this).get(BtpViewModel::class.java)
+                (infoViewModel as BtpViewModel).initEvent(this)
+                mainViewModel.er1Info.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
+                }
+            }
+            Bluetooth.MODEL_ECN -> {
+                infoViewModel = ViewModelProvider(this).get(EcnViewModel::class.java)
+                (infoViewModel as EcnViewModel).initEvent(this)
+            }
+            Bluetooth.MODEL_R20 -> {
+                infoViewModel = ViewModelProvider(this).get(R20ViewModel::class.java)
+                (infoViewModel as R20ViewModel).initEvent(this)
+                mainViewModel.er1Info.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
+                }
+            }
+        }
 
-    private fun initEvent(){
-        LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseContent)
-            .observe(this) {
-                binding.responseCmd.text = "receive : ${bytesToHex(it)}"
+        //----------------------------------------------------------------------------
+        if (this@InfoFragment::infoViewModel.isInitialized) {
+            infoViewModel.info.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    binding.deviceInfo.text = it
+                }
             }
-        //--------------------------------er1 duoek-----------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1FileList)
-            .observe(this) { event ->
-                (event.data as String).let {
-                    binding.info.text = it
-                    for (fileName in it.split(",")) {
-//                        if (fileName.contains("R")) {
-                        if (fileName.isNotEmpty()) {
-                            fileNames.add(fileName)
-                        }
-//                        }
-                    }
-                    binding.deviceInfo.text = fileNames.toString()
+            infoViewModel.reset.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()
+                }
+            }
+            infoViewModel.factoryReset.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
+                }
+            }
+            infoViewModel.factoryResetAll.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    Toast.makeText(context, "恢复生产状态成功", Toast.LENGTH_SHORT).show()
+                }
+            }
+            infoViewModel.fileNames.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    fileNames = it
                     Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadingFileProgress)
-            .observe(this) { event ->
-                (event.data as Int).let {
-                    process = it / 10
-                    binding.process.text = "$readFileProcess $curFileName 读取进度: $process %"
+            infoViewModel.process.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    process = it
+                    if (process == 100) {
+                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
+                        binding.process.text = readFileProcess
+                    } else {
+                        binding.process.text = "$readFileProcess $curFileName 读取进度: $process %"
+                    }
                     mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileComplete)
-            .observe(this) { event ->
-                (event.data as Er1BleResponse.Er1File).let {
-                    if (event.model == Bluetooth.MODEL_ER1_N) {
-                        val data = VBeatHrFile(DownloadHelper.readFile(it.model, "", it.fileName))
-                        binding.info.text = "$data"
-                        binding.deviceInfo.text = "$data"
-                    } else {
-                        if (it.fileName.contains("R")) {
-                            val data = Er1EcgFile(DownloadHelper.readFile(it.model, "", it.fileName))
-                            binding.info.text = "$data"
-                            readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                            val recordingTime = DateUtil.getSecondTimestamp(it.fileName.replace("R", ""))
-                            val temp = getEcgData(recordingTime, it.fileName, data.waveData, DataConvert.getEr1ShortArray(data.waveData), data.recordingTime)
-                            ecgList.add(temp)
-                            ecgAdapter.setNewInstance(ecgList)
-                            ecgAdapter.notifyDataSetChanged()
-                        } else {
-                            val data = Er2AnalysisFile(DownloadHelper.readFile(it.model, "", it.fileName))
-                            binding.info.text = "$data"
-                            readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                        }
-                    }
-                    setReceiveCmd(it.content)
-                    binding.process.text = readFileProcess
-                    if (binding.fileName.text.toString().isEmpty()) {
-                        fileNames.removeAt(0)
-                        readFile()
-                    } else {
-                        mAlertDialog?.dismiss()
-                    }
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1Reset)
-            .observe(this) {
-                Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ResetFactory)
-            .observe(this) {
-                Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ResetFactoryAll)
-            .observe(this) {
-                Toast.makeText(context, "恢复生产状态成功", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1ReadFileError)
-            .observe(this) {
-                mAlertDialog?.dismiss()
-                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
-            }
-        //--------------------------------er2-----------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FileList)
-            .observe(this) { event ->
-                (event.data as Er2FileList).let {
-                    binding.info.text = "$it"
-                    for (fileName in it.fileNames) {
-                        if (fileName.contains("R")) {
-                            fileNames.add(fileName)
-                        }
-                    }
-                    binding.deviceInfo.text = fileNames.toString()
-                    Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadingFileProgress)
-            .observe(this) { event ->
-                (event.data as Int).let {
-                    process = it.div(10)
-                    binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileComplete)
-            .observe(this) { event ->
-                (event.data as Er2File).let {
-                    if (it.fileName.contains("R")) {
-                        val content = DownloadHelper.readFile(it.model, "", it.fileName)
-                        val data = if (content.isEmpty()) {
-                            Er1EcgFile(it.content)
-                        } else {
-                            Er1EcgFile(content)
-                        }
-                        binding.info.text = "$data"
-                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                        val recordingTime = DateUtil.getSecondTimestamp(it.fileName.replace("R", ""))
-                        val temp = getEcgData(recordingTime, it.fileName, data.waveData, DataConvert.getEr1ShortArray(data.waveData), data.recordingTime)
-                        ecgList.add(temp)
-                        ecgAdapter.setNewInstance(ecgList)
-                        ecgAdapter.notifyDataSetChanged()
-                    } else {
-                        val content = DownloadHelper.readFile(it.model, "", it.fileName)
-                        val data = if (content.isEmpty()) {
-                            Er2AnalysisFile(it.content)
-                        } else {
-                            Er2AnalysisFile(content)
-                        }
-                        binding.info.text = "$data"
-                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                    }
-                    binding.process.text = readFileProcess
-                    setReceiveCmd(it.content)
-                    if (binding.fileName.text.toString().isEmpty()) {
-                        fileNames.removeAt(0)
-                        readFile()
-                    } else {
-                        mAlertDialog?.dismiss()
-                    }
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2Reset)
-            .observe(this) {
-                Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FactoryReset)
-            .observe(this) {
-                Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2FactoryResetAll)
-            .observe(this) {
-                Toast.makeText(context, "恢复生产状态成功", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2ReadFileError)
-            .observe(this) {
-                mAlertDialog?.dismiss()
-                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
-            }
-        //--------------------------------lew-----------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewFileList)
-            .observe(this) {
-                val data = it.data as LewBleResponse.FileList
-                when (data.type) {
-                    LewBleCmd.ListType.SPORT -> {
-                        val list = SportList(data.listSize, data.content)
-                        binding.info.text = "$list"
-                        binding.deviceInfo.text = "$list"
-                        Toast.makeText(context, "获取运动列表成功", Toast.LENGTH_SHORT).show()
-                    }
-                    LewBleCmd.ListType.ECG -> {
-                        val list = EcgList(data.listSize, data.content)
-                        binding.info.text = "$list"
-                        for (item in list.items) {
-                            fileNames.add(item.name)
-                        }
-                        binding.deviceInfo.text = "$fileNames"
-                        Toast.makeText(context, "获取心电列表成功", Toast.LENGTH_SHORT).show()
-                    }
-                    LewBleCmd.ListType.HR -> {
-                        val list = HrList(data.listSize, data.content)
-                        binding.info.text = "$list"
-                        binding.deviceInfo.text = "$list"
-                        Toast.makeText(context, "获取心率列表成功", Toast.LENGTH_SHORT).show()
-                    }
-                    LewBleCmd.ListType.OXY -> {
-                        val list = OxyList(data.listSize, data.content)
-                        binding.info.text = "$list"
-                        binding.deviceInfo.text = "$list"
-                        Toast.makeText(context, "获取血氧列表成功", Toast.LENGTH_SHORT).show()
-                    }
-                    LewBleCmd.ListType.SLEEP -> {
-                        val list = SleepList(data.listSize, data.content)
-                        binding.info.text = "$list"
-                        binding.deviceInfo.text = "$list"
-                        Toast.makeText(context, "获取睡眠列表成功", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadingFileProgress)
-            .observe(this) { event ->
-                (event.data as Int).let {
-                    process = it.div(10)
-                    binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewReadFileComplete)
-            .observe(this) { event ->
-                (event.data as LewBleResponse.EcgFile).let {
-                    setReceiveCmd(it.content)
-                    val file = EcgFile(it.content)
-                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $file \n"
-                    binding.process.text = readFileProcess
-                    Toast.makeText(context, "获取心电文件$curFileName 成功", Toast.LENGTH_SHORT).show()
-                    if (binding.fileName.text.toString().isEmpty()) {
-                        fileNames.removeAt(0)
-                        readFile()
-                    } else {
-                        mAlertDialog?.dismiss()
-                    }
-                }
-            }
-        //--------------------------------bp2-----------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileError)
-            .observe(this) {
-                mAlertDialog?.dismiss()
-                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2FileList)
-            .observe(this) { event ->
-                (event.data as KtBleFileList).let {
-                    setReceiveCmd(it.bytes)
-                    binding.info.text = "$it"
-                    for (fileName in it.fileNameList) {
-                        fileNames.add(fileName)
-                    }
-                    Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                    binding.deviceInfo.text = fileNames.toString()
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadingFileProgress)
-            .observe(this) { event ->
-                (event.data as Bp2FilePart).let {
-                    process = (it.percent.times(100)).toInt()
-                    binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2ReadFileComplete)
-            .observe(this) { event ->
-                (event.data as Bp2BleFile).let {
-                    val content = DownloadHelper.readFile(event.model, "", it.name)
-                    val file = if (content.isEmpty()) {
-                        it
-                    } else {
-                        Bp2BleFile(it.name, content, it.deviceName)
-                    }
-                    if (file.type == 2) {
-                        val data = Bp2EcgFile(file.content)
-                        binding.info.text = "$data"
-                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                        val temp = getEcgData(data.measureTime.toLong(), it.name, data.waveData, DataConvert.getBp2ShortArray(data.waveData), data.recordingTime)
-                        ecgList.add(temp)
-                        ecgAdapter.setNewInstance(ecgList)
-                        ecgAdapter.notifyDataSetChanged()
-                    } else if (file.type == 1) {
-                        val data = Bp2BpFile(file.content)
-                        binding.info.text = "$data"
-                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                        val temp = BpData()
-                        temp.fileName = it.name
-                        temp.sys = data.sys
-                        temp.dia = data.dia
-                        temp.pr = data.pr
-                        temp.mean = data.mean
-                        bpList.add(temp)
-                        bpAdapter.setNewInstance(bpList)
-                        bpAdapter.notifyDataSetChanged()
-                    }
-                    binding.process.text = readFileProcess
-                    setReceiveCmd(it.content)
-                    if (binding.fileName.text.toString().isEmpty()) {
-                        fileNames.removeAt(0)
-                        readFile()
-                    } else {
-                        mAlertDialog?.dismiss()
-                    }
-                }
-            }
-        //--------------------------------bp2w-----------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileError)
-            .observe(this) {
-                mAlertDialog?.dismiss()
-                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wFileList)
-            .observe(this) { event ->
-                (event.data as KtBleFileList).let {
-                    setReceiveCmd(it.bytes)
-                    for (fileName in it.fileNameList) {
-                        fileNames.add(fileName)
-                    }
-                    Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                    binding.info.text = "$it"
-                    binding.deviceInfo.text = fileNames.toString()
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadingFileProgress)
-            .observe(this) { event ->
-                (event.data as Bp2FilePart).let {
-                    process = (it.percent.times(100)).toInt()
-                    binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileComplete)
-            .observe(this) { event ->
-                (event.data as Bp2BleFile).let {
-                    if (it.type == 2) {
-                        val data = Bp2EcgFile(it.content)
-                        binding.info.text = "$data"
-                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                        val temp = getEcgData(data.measureTime.toLong(), it.name, data.waveData, DataConvert.getBp2ShortArray(data.waveData), data.recordingTime)
-                        ecgList.add(temp)
-                        ecgAdapter.setNewInstance(ecgList)
-                        ecgAdapter.notifyDataSetChanged()
-                    } else if (it.type == 1) {
-                        val data = Bp2BpFile(it.content)
-                        binding.info.text = "$data"
-                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                        val temp = BpData()
-                        temp.fileName = it.name
-                        temp.sys = data.sys
-                        temp.dia = data.dia
-                        temp.pr = data.pr
-                        temp.mean = data.mean
-                        bpList.add(temp)
-                        bpAdapter.setNewInstance(bpList)
-                        bpAdapter.notifyDataSetChanged()
-                    }
-                    binding.process.text = readFileProcess
-                    setReceiveCmd(it.content)
-                    if (binding.fileName.text.toString().isEmpty()) {
-                        fileNames.removeAt(0)
-                        readFile()
-                    } else {
-                        mAlertDialog?.dismiss()
-                    }
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiScanning)
-            .observe(this) {
-                handler.postDelayed({
-                    LpBleUtil.bp2GetWifiDevice(it.model)
-                }, 1000)
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiDevice)
-            .observe(this) {
-                mAlertDialogCanCancel?.dismiss()
-                val data = it.data as Bp2WifiDevice
-                setReceiveCmd(data.bytes)
-                bp2wAdapter.setNewInstance(data.wifiList)
-                bp2wAdapter.notifyDataSetChanged()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSetWifiConfig)
-            .observe(this) {
-                val data = it.data as Boolean
-                if (data) {
-                    handler.postDelayed({
-                        LpBleUtil.bp2GetWifiConfig(it.model)
-                    }, 1000)
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wGetWifiConfig)
-            .observe(this) {
-                val data = it.data as Bp2WifiConfig
-                wifi?.let { w ->
-                    w.state = data.wifi.state
-                    binding.wifiInfo.text = "热点：${w.ssid}\n密码：${w.pwd}\n连接状态：${
-                        when (w.state) {
-                            0 -> "断开"
-                            1 -> "连接中"
-                            2 -> "已连接"
-                            0xff -> "密码错误"
-                            0xfd -> "找不到SSID"
-                            else -> "未配置WiFi"
-                        }
-                    }"
-                    if (((w.state == 0) && (data.wifi.ssid.isNotEmpty())) || w.state == 1) {
-                        handler.postDelayed({
-                            LpBleUtil.bp2GetWifiConfig(it.model)
-                        }, 1000)
-                    } else {
-                        mAlertDialogCanCancel?.dismiss()
-                    }
-                } ?: kotlin.run {
-                    binding.wifiInfo.text = "注意：请先完成首次配置WiFi，设置成功后连接其他设备可直接配置WiFi。"
-                }
-            }
-        //--------------------------------le bp2w-----------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wList)
-            .observe(this) {
-                val data = it.data as LeBp2wBleList
-                binding.info.text = "$data"
-                setReceiveCmd(data.bytes)
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileError)
-            .observe(this) {
-                mAlertDialog?.dismiss()
-                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFileList)
-            .observe(this) { event ->
-                (event.data as Bp2BleFile).let {
-                    setReceiveCmd(it.content)
-                    when (it.type) {
-                        LeBp2wBleCmd.FileType.ECG_TYPE -> {
-                            val data = LeBp2wEcgList(it.content)
-                            binding.info.text = "$data"
-                            if (data.ecgFileList.size != 0) {
-                                for (file in data.ecgFileList) {
-                                    fileNames.add(file.fileName)
-                                }
-                                Toast.makeText(context, "获取心电文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                            } else {
-                                Toast.makeText(context, "获取心电文件列表为空", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                        LeBp2wBleCmd.FileType.BP_TYPE -> {
-                            val data = LeBp2wBpList(it.content)
-                            binding.info.text = "$data"
-                            if (data.bpFileList.size != 0) {
-                                Toast.makeText(context, "获取血压文件列表成功 共有${data.bpFileList.size}个记录", Toast.LENGTH_SHORT).show()
-                            } else {
-                                Toast.makeText(context, "获取血压文件列表为空", Toast.LENGTH_SHORT).show()
-                            }
-                            for (file in data.bpFileList) {
-                                val temp = BpData()
-                                temp.fileName = file.fileName
-                                temp.sys = file.sys
-                                temp.dia = file.dia
-                                temp.pr = file.pr
-                                temp.mean = file.mean
-                                bpList.add(temp)
-                                bpAdapter.setNewInstance(bpList)
-                                bpAdapter.notifyDataSetChanged()
-                            }
-                        }
-                        LeBp2wBleCmd.FileType.USER_TYPE -> {
-                            val data = LeBp2wUserList(it.content)
-                            binding.info.text = "$data"
-                            if (data.userList.size != 0) {
-                                Toast.makeText(context, "获取用户文件列表成功 共有${data.userList.size}个用户", Toast.LENGTH_SHORT).show()
-                            } else {
-                                Toast.makeText(context, "获取用户文件列表为空", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                        else -> {
-                            binding.info.text = "$it"
-                        }
-                    }
-                    binding.deviceInfo.text = fileNames.toString()
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadingFileProgress)
-            .observe(this) { event ->
-                (event.data as Bp2FilePart).let {
-                    process = (it.percent.times(100)).toInt()
-                    binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileComplete)
-            .observe(this) { event ->
-                (event.data as LeBp2wEcgFile).let {
-                    setReceiveCmd(it.content)
-                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $it \n"
-                    binding.process.text = readFileProcess
-                    if (binding.fileName.text.toString().isEmpty()) {
-                        fileNames.removeAt(0)
-                        readFile()
-                    } else {
-                        mAlertDialog?.dismiss()
-                    }
-                    val temp = getEcgData(it.timestamp, it.fileName, it.waveData, DataConvert.getBp2ShortArray(it.waveData), it.duration)
-                    ecgList.add(temp)
+            infoViewModel.ecgData.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    ecgList.add(it)
                     ecgAdapter.setNewInstance(ecgList)
                     ecgAdapter.notifyDataSetChanged()
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2WifiScanning)
-            .observe(this) {
-                handler.postDelayed({
-                    LpBleUtil.bp2GetWifiDevice(it.model)
-                }, 1000)
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2WifiDevice)
-            .observe(this) {
-                mAlertDialogCanCancel?.dismiss()
-                val data = it.data as Bp2WifiDevice
-                setReceiveCmd(data.bytes)
-                bp2wAdapter.setNewInstance(data.wifiList)
-                bp2wAdapter.notifyDataSetChanged()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSetWifiConfig)
-            .observe(this) {
-                val data = it.data as Boolean
-                if (data) {
-                    handler.postDelayed({
-                        LpBleUtil.bp2GetWifiConfig(it.model)
-                    }, 1000)
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetWifiConfig)
-            .observe(this) {
-                val data = it.data as Bp2WifiConfig
-                wifi?.let { w ->
-                    w.state = data.wifi.state
-                    binding.wifiInfo.text = "热点：${w.ssid}\n密码：${w.pwd}\n连接状态：${
-                        when (w.state) {
-                            0 -> "断开"
-                            1 -> "连接中"
-                            2 -> "已连接"
-                            0xff -> "密码错误"
-                            0xfd -> "找不到SSID"
-                            else -> "未配置WiFi"
-                        }
-                    }"
-                    if (((w.state == 0) && (data.wifi.ssid.isNotEmpty())) || w.state == 1) {
-                        handler.postDelayed({
-                            LpBleUtil.bp2GetWifiConfig(it.model)
-                        }, 1000)
-                    } else {
-                        mAlertDialogCanCancel?.dismiss()
-                    }
-                } ?: kotlin.run {
-                    binding.wifiInfo.text = "注意：请先完成首次配置WiFi，设置成功后连接其他设备可直接配置WiFi。"
-                }
-            }
-        //------------------------------bpm--------------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordData)
-            .observe(this) { event ->
-                (event.data as BpmBleResponse.RecordData).let {
-                    setReceiveCmd(it.bytes)
-                    fileCount++
-                    readFileProcess += "${BpmBleResponse.RecordData(it.bytes)} fileCount : $fileCount \n\n"
-                    binding.info.text = readFileProcess
-                    val temp = BpData()
-                    temp.fileName = getTimeString(it.year, it.month, it.day, it.hour, it.minute, 0)
-                    temp.sys = it.sys
-                    temp.dia = it.dia
-                    temp.pr = it.pr
-                    bpList.add(temp)
-                    bpAdapter.setNewInstance(bpList)
-                    bpAdapter.notifyDataSetChanged()
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmRecordEnd)
-            .observe(this) { event ->
-                (event.data as Boolean).let {
-                    Toast.makeText(context, "获取用户文件列表完成", Toast.LENGTH_SHORT).show()
-                }
-            }
-        //------------------------------pc100--------------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpResult)
-            .observe(this) { event ->
-                (event.data as Pc100BleResponse.BpResult).let {
-                    setReceiveCmd(it.bytes)
-                    binding.info.text = "$it"
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpErrorResult)
-            .observe(this) { event ->
-                (event.data as Pc100BleResponse.BpResultError).let {
-                    setReceiveCmd(it.bytes)
-                    binding.info.text = "$it"
-                }
-            }
-        //------------------------------o2--------------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo)
-            .observe(this) { event ->
-                (event.data as OxyBleResponse.OxyInfo).let {
-                    setReceiveCmd(it.bytes)
-                    for (fileName in it.fileList.split(",")) {
-                        if (fileName.isNotEmpty()) {
-                            fileNames.add(fileName)
-                        }
-                    }
-                    Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                    binding.info.text = "$it"
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadingFileProgress)
-            .observe(this) { event ->
-                (event.data as Int).let {
-                    process = it.div(10)
-                    binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileComplete)
-            .observe(this) { event ->
-                (event.data as OxyBleResponse.OxyFile).let {
-                    val data = OxyBleFile(it.fileContent)
-                    binding.info.text = "$data"
-                    setReceiveCmd(it.fileContent)
-                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                    binding.process.text = readFileProcess
-                    if (binding.fileName.text.toString().isEmpty()) {
-                        fileNames.removeAt(0)
-                        readFile()
-                    } else {
-                        mAlertDialog?.dismiss()
-                    }
-                    val temp = OxyData()
-                    temp.fileName = getTimeString(data.year, data.month, data.day, data.hour, data.minute, data.second)
-                    temp.oxyBleFile = data
-                    oxyList.add(temp)
+            infoViewModel.oxyData.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    oxyList.add(it)
                     oxyAdapter.setNewInstance(oxyList)
                     oxyAdapter.notifyDataSetChanged()
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileError)
-            .observe(this) {
-                Toast.makeText(context, "读文件出错 $curFileName", Toast.LENGTH_SHORT).show()
-                if (binding.fileName.text.toString().isEmpty()) {
-                    fileNames.removeAt(0)
-                    readFile()
-                } else {
+            infoViewModel.bpData.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    bpList.add(it)
+                    bpAdapter.setNewInstance(bpList)
+                    bpAdapter.notifyDataSetChanged()
+                }
+            }
+            infoViewModel.ecnData.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    ecnList.add(it)
+                    ecnAdapter.setNewInstance(ecnList)
+                    ecnAdapter.notifyDataSetChanged()
+                }
+            }
+            infoViewModel.readNextFile.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    if (it) {
+                        infoViewModel._readNextFile.value = false
+                        if (binding.fileName.text.toString().isEmpty()) {
+                            if (fileNames.size == 0) {
+                                mAlertDialog?.dismiss()
+                            } else {
+                                fileNames.removeAt(0)
+                                readFile()
+                            }
+                        } else {
+                            mAlertDialog?.dismiss()
+                        }
+                    }
+                }
+            }
+            infoViewModel.readFileError.observe(viewLifecycleOwner) {
+                if (it != null) {
                     mAlertDialog?.dismiss()
+                    Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
                 }
             }
-        //---------------------------aoj20a-----------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempList)
-            .observe(this) {
-                val data = it.data as ArrayList<Aoj20aBleResponse.TempRecord>
-                binding.info.text = "$data"
-                var temp = ""
-                for (record in data) {
-                    temp += "时间 : ${getTimeString(record.year, record.month, record.day, record.hour, record.minute, 0)} ${record.temp} ℃\n\n"
-                }
-                binding.deviceInfo.text = temp
-                Toast.makeText(context, "获取文件列表成功 共有${data.size}个文件", Toast.LENGTH_SHORT).show()
-            }
-        //---------------------------checkme pod--------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListError)
-            .observe(this) {
-                val data = it.data as Boolean
-                binding.process.text = "EventCheckmePodGetFileListError $data"
-                mAlertDialog?.dismiss()
-                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodGetFileListProgress)
-            .observe(this) {
-                if (mAlertDialog?.isShowing == false) {
-                    mAlertDialog?.show()
-                }
-                val data = it.data as Int
-                binding.process.text = "读取进度: $data %"
-                mainViewModel._downloadTip.value = "读取进度: $data %"
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodFileList)
-            .observe(this) {
-                mAlertDialog?.dismiss()
-                val data = it.data as CheckmePodBleResponse.FileList
-                var temp = ""
-                for (record in data.list) {
-                    temp += "时间 : ${getTimeString(record.year, record.month, record.day, record.hour, record.minute, record.second)}\nSpO2 : ${record.spo2} %\nPR : ${record.pr}\nPI : ${record.pi}\nTemp : ${record.temp} ℃\n\n"
-                }
-                binding.deviceInfo.text = temp
-                Toast.makeText(context, "获取文件列表成功 共有${data.size}个文件", Toast.LENGTH_SHORT).show()
-                binding.info.text = "$data"
-            }
-        //---------------------------pc68b---------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bFileList)
-            .observe(this) {
-                val data = it.data as MutableList<String>
-                for (i in data) {
-                    fileNames.add(i)
-                }
-                Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                binding.info.text = fileNames.toString()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bReadFileComplete)
-            .observe(this) {
-                val data = it.data as Pc68bBleResponse.Record
-                pc68bList.add(data)
-                binding.info.text = pc68bList.toString()
-                if (binding.fileName.text.toString().isEmpty()) {
-                    fileNames.removeAt(0)
-                    readFile()
-                } else {
-                    mAlertDialog?.dismiss()
-                }
-                Toast.makeText(context, "接收文件成功 已接收${pc68bList.size}个文件, 还剩${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-            }
-        //---------------------------pc80b-----------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadFileError)
-            .observe(this) {
-                mAlertDialog?.dismiss()
-                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadingFileProgress)
-            .observe(this) {
-                if (mAlertDialog?.isShowing == false) {
-                    mAlertDialog?.show()
-                }
-                val data = it.data as Int
-                binding.process.text = "读取进度: $data %"
-                mainViewModel._downloadTip.value = "读取进度: $data %"
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bReadFileComplete)
-            .observe(this) {
-                mAlertDialog?.dismiss()
-                val data = it.data as PC80BleResponse.ScpEcgFile
-                binding.info.text = "$data"
-                val fileName = getTimeString(data.section1.year, data.section1.month, data.section1.day, data.section1.hour, data.section1.minute, data.section1.second)
-                for (file in ecgList) {
-                    if (file.fileName == fileName)
-                        return@observe
-                }
-                val temp = getEcgData(DateUtil.getSecondTimestamp(fileName), fileName, data.section6.ecgData.ecg, DataConvert.getPc80bShortArray(data.section6.ecgData.ecg), 30)
-                ecgList.add(temp)
-                ecgAdapter.setNewInstance(ecgList)
-                ecgAdapter.notifyDataSetChanged()
-            }
-        //---------------------------Pulsebit--------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileList)
-            .observe(this) {
-                val data = it.data as PulsebitBleResponse.FileList
-                for (file in data.list) {
-                    fileNames.add(file.recordName)
-                }
-                Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                binding.info.text = "$data"
-                binding.deviceInfo.text = fileNames.toString()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileListError)
-            .observe(this) {
-                val data = it.data as Boolean
-                binding.process.text = "EventPulsebitGetFileListError $data"
-                Toast.makeText(context, "读文件列表出错", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitGetFileListProgress)
-            .observe(this) {
-                val data = it.data as Int
-                binding.process.text = "读取进度: $data %"
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadFileComplete)
-            .observe(this) {
-                val data = it.data as PulsebitBleResponse.EcgFile
-                setReceiveCmd(data.bytes)
-                readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                binding.process.text = readFileProcess
-                if (binding.fileName.text.toString().isEmpty()) {
-                    fileNames.removeAt(0)
-                    readFile()
-                } else {
-                    mAlertDialog?.dismiss()
-                }
-                val temp = getEcgData(DateUtil.getSecondTimestamp(data.fileName), data.fileName, data.waveData, data.waveShortData, data.recordingTime)
-                ecgList.add(temp)
-                ecgAdapter.setNewInstance(ecgList)
-                ecgAdapter.notifyDataSetChanged()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadFileError)
-            .observe(this) {
-                mAlertDialog?.dismiss()
-                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pulsebit.EventPulsebitReadingFileProgress)
-            .observe(this) {
-                val data = it.data as Int
-                process = data
-                binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
-                mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
-            }
-
-        //---------------------------CheckmeLE--------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileList)
-            .observe(this) {
-                val data = it.data as CheckmeLeBleResponse.ListContent
-                when (data.type) {
-                    CheckmeLeBleCmd.ListType.DLC_TYPE -> {
-                        val list = CheckmeLeBleResponse.DlcList(data.content)
-                        for (file in list.list) {
-                            fileNames.add(file.recordName)
-                        }
-                        Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                        binding.info.text = "$list"
-                    }
-                    CheckmeLeBleCmd.ListType.TEMP_TYPE -> {
-                        val list = CheckmeLeBleResponse.TempList(data.content)
-                        for (file in list.list) {
-                            fileNames.add(file.recordName)
-                        }
-                        Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                        binding.info.text = "$list"
-                    }
-                    CheckmeLeBleCmd.ListType.ECG_TYPE -> {
-                        val list = CheckmeLeBleResponse.EcgList(data.content)
-                        for (file in list.list) {
-                            fileNames.add(file.recordName)
-                        }
-                        Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                        binding.info.text = "$list"
-                    }
-                    CheckmeLeBleCmd.ListType.OXY_TYPE -> {
-                        val list = CheckmeLeBleResponse.OxyList(data.content)
-                        for (file in list.list) {
-                            fileNames.add(file.recordName)
-                        }
-                        Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                        binding.info.text = "$list"
-                    }
-                }
-                binding.deviceInfo.text = fileNames.toString()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileListError)
-            .observe(this) {
-                val data = it.data as Boolean
-                binding.process.text = "EventCheckmeLeGetFileListError $data"
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileListProgress)
-            .observe(this) {
-                val data = it.data as Int
-                binding.process.text = "读取进度: $data %"
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadFileComplete)
-            .observe(this) {
-                val data = it.data as CheckmeLeBleResponse.EcgFile
-                setReceiveCmd(data.bytes)
-                readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $data \n"
-                binding.process.text = readFileProcess
-                if (binding.fileName.text.toString().isEmpty()) {
-                    fileNames.removeAt(0)
-                    readFile()
-                } else {
-                    mAlertDialog?.dismiss()
-                }
-                val temp = getEcgData(DateUtil.getSecondTimestamp(data.fileName), data.fileName, data.waveData, data.waveShortData, data.recordingTime)
-                ecgList.add(temp)
-                ecgAdapter.setNewInstance(ecgList)
-                ecgAdapter.notifyDataSetChanged()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadFileError)
-            .observe(this) {
-                mAlertDialog?.dismiss()
-                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeReadingFileProgress)
-            .observe(this) {
-                val data = it.data as Int
-                process = data
-                binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
-                mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
-            }
-
-        //--------------------------------le S1-----------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1NoFile)
-            .observe(this) { event ->
-                (event.data as Boolean).let {
-                    binding.info.text = "没有文件 $it"
-                    mAlertDialog?.dismiss()
-                    Toast.makeText(context, "没有文件", Toast.LENGTH_SHORT).show()
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1ReadingFileProgress)
-            .observe(this) { event ->
-                (event.data as Int).let {
-                    process = it.div(10)
-                    binding.process.text = "$readFileProcess$curFileName 读取进度: $process %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1ReadFileComplete)
-            .observe(this) { event ->
-                (event.data as LeS1BleResponse.BleFile).let {
-                    setReceiveCmd(it.bytes)
-                    readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n $it \n"
-                    binding.process.text = readFileProcess
-                    val temp = getEcgData(DateUtil.getSecondTimestamp("00000000000000"), "00000000000000", it.ecgData, it.ecgIntData, it.ecgResult?.recordingTime!!)
-                    ecgList.add(temp)
-                    ecgAdapter.setNewInstance(ecgList)
-                    ecgAdapter.notifyDataSetChanged()
-                }
-            }
-        //--------------------------------LPM311-----------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LPM311.EventLpm311Data)
-            .observe(this) {
-                val data = it.data as Lpm311Data
-                binding.info.text = "$data"
-                binding.deviceInfo.text = "user : ${data.user}\nCHOL : ${data.chol} （${data.cholStr}）\nTRIG : ${data.trig} （${data.trigStr}）\n" +
-                        "HDL : ${data.hdl} （${data.hdlStr}）\nLDL : ${data.ldl} （${data.ldlStr}）\n" +
-                        "CHOL/HDL : ${data.cholDivHdl} （${data.cholDivHdlStr}）\nUNIT : ${if (data.unit == 0) {"mmol/L"} else {"mg/dL"}}"
-            }
-        //------------------------------PoctorM3102--------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PoctorM3102.EventPoctorM3102Data)
-            .observe(this) {
-                val data = it.data as PoctorM3102Data
-                binding.info.text = "$data"
-                binding.deviceInfo.text = when (data.type) {
-                    0 -> "血糖 : ${if (data.normal) {"${data.result} mmol/L\n时间 : ${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
-                    1 -> "尿酸 : ${if (data.normal) {"${data.result} umol/L\n时间 : ${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
-                    3 -> "血酮 : ${if (data.normal) {"${data.result} mmol/L\n时间 : ${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
-                    else -> "数据出错 : \n$data"
-                }
-            }
-        //------------------------------Bioland-BGM--------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmCountDown)
-            .observe(this) {
-                val data = it.data as Int
-                binding.info.text = "$data"
-                binding.deviceInfo.text = "倒计时 : $data"
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmGluData)
-            .observe(this) {
-                val data = it.data as BiolandBgmBleResponse.GluData
-                binding.info.text = "$data"
-                binding.deviceInfo.text = "血糖 : ${data.resultMg} mg/dL ${data.resultMmol} mmol/L\n时间 : ${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmNoGluData)
-            .observe(this) {
-                val data = it.data as Boolean
-                binding.info.text = "$data"
-                Toast.makeText(context, "没有文件", Toast.LENGTH_SHORT).show()
-            }
-        //------------------------------ER3--------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FileList)
-            .observe(this) { event ->
-                (event.data as Er3BleResponse.FileList).let {
-                    binding.info.text = it.toString()
-                    for (fileName in it.fileList) {
-                        if (fileName.isNotEmpty()) {
-                            fileNames.add(fileName)
-                        }
-                    }
-                    binding.deviceInfo.text = fileNames.toString()
-                    Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3ReadingFileProgress)
-            .observe(this) { event ->
-                (event.data as Int).let {
-                    process = it
-                    binding.process.text = "$readFileProcess $curFileName 读取进度: $process %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3ReadFileComplete)
-            .observe(this) { event ->
-                (event.data as Er3BleResponse.Er3File).let {
-                    if (it.fileName.contains("T")) {
-                        val data = Er3DataFile(it.content)
-                        binding.info.text = "$data"
-                        binding.deviceInfo.text = "$data"
-                    } else if (it.fileName.contains("W")) {
-
-                    }
-                    setReceiveCmd(it.content)
-                    binding.process.text = readFileProcess
-                    if (binding.fileName.text.toString().isEmpty()) {
-                        fileNames.removeAt(0)
-                        readFile()
-                    } else {
-                        mAlertDialog?.dismiss()
-                    }
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3Reset)
-            .observe(this) {
-                Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FactoryReset)
-            .observe(this) {
-                Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FactoryResetAll)
-            .observe(this) {
-                Toast.makeText(context, "恢复生产状态成功", Toast.LENGTH_SHORT).show()
-            }
-        //------------------------------Lepod--------------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodFileList)
-            .observe(this) { event ->
-                (event.data as LepodBleResponse.FileList).let {
-                    binding.info.text = it.toString()
-                    for (fileName in it.fileList) {
-                        if (fileName.isNotEmpty()) {
-                            fileNames.add(fileName)
-                        }
-                    }
-                    binding.deviceInfo.text = fileNames.toString()
-                    Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodReadingFileProgress)
-            .observe(this) { event ->
-                (event.data as Int).let {
-                    process = it
-                    binding.process.text = "$readFileProcess $curFileName 读取进度: $process %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodReadFileComplete)
-            .observe(this) { event ->
-                (event.data as LepodBleResponse.BleFile).let {
-                    if (it.fileName.contains("T")) {
-                        val data = Er3DataFile(it.content)
-                        binding.info.text = "$data"
-                        binding.deviceInfo.text = "$data"
-                    } else if (it.fileName.contains("W")) {
-
-                    }
-                    setReceiveCmd(it.content)
-                    binding.process.text = readFileProcess
-                    if (binding.fileName.text.toString().isEmpty()) {
-                        fileNames.removeAt(0)
-                        readFile()
-                    } else {
-                        mAlertDialog?.dismiss()
-                    }
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodReset)
-            .observe(this) {
-                Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodFactoryReset)
-            .observe(this) {
-                Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodFactoryResetAll)
-            .observe(this) {
-                Toast.makeText(context, "恢复生产状态成功", Toast.LENGTH_SHORT).show()
-            }
-        //-----------------------vtm01-----------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01Reset)
-            .observe(this) {
-                Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01FactoryReset)
-            .observe(this) {
-                Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
-            }
-        //-----------------------btp-----------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetFileList)
-            .observe(this) {
-                val data = it.data as BtpBleResponse.FileList
-                for (file in data.fileNames) {
-                    fileNames.add(file)
-                }
-                binding.deviceInfo.text = fileNames.toString()
-                Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadingFileProgress)
-            .observe(this) { event ->
-                (event.data as Int).let {
-                    binding.process.text = "$readFileProcess$curFileName 读取进度: $it %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $it %"
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadFileComplete)
-            .observe(this) { event ->
-//                (event.data as BtpBleResponse.BtpFile).let {
-                    binding.process.text = readFileProcess
-                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "\n$curFileName 100%"
-                    if (binding.fileName.text.toString().isEmpty()) {
-                        fileNames.removeAt(0)
-                        readFile()
-                    } else {
-                        mAlertDialogCanCancel?.dismiss()
-                    }
-//                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReadFileError)
-            .observe(this) {
-                mAlertDialogCanCancel?.dismiss()
-                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpReset)
-            .observe(this) {
-                val data = it.data as Boolean
-                if (data) {
-                    Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(context, "复位失败", Toast.LENGTH_SHORT).show()
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpFactoryReset)
-            .observe(this) {
-                val data = it.data as Boolean
-                if (data) {
-                    Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(context, "恢复出厂设置失败", Toast.LENGTH_SHORT).show()
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpFactoryResetAll)
-            .observe(this) {
-                val data = it.data as Boolean
-                if (data) {
-                    Toast.makeText(context, "恢复生产状态成功", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(context, "恢复生产状态失败", Toast.LENGTH_SHORT).show()
-                }
-            }
-        //-----------------------ecn-----------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnGetFileList)
-            .observe(this) {
-                val data = it.data as EcnBleResponse.FileList
-                for (file in data.list) {
-                    fileNames.add(file.fileName)
-                }
-                binding.deviceInfo.text = fileNames.toString()
-                Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadingFileProgress)
-            .observe(this) { event ->
-                (event.data as Int).let {
-                    binding.process.text = "$readFileProcess$curFileName 读取进度: $it %"
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $it %"
-                }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadFileComplete)
-            .observe(this) { event ->
-                val data = event.data as ByteArray
-                binding.process.text = readFileProcess
-                binding.deviceInfo.text = binding.deviceInfo.text.toString() + "\n$curFileName 100%"
-                val temp = EcnData()
-                temp.fileName = curFileName
-                temp.data = data
-                ecnList.add(temp)
-                ecnAdapter.setNewInstance(ecnList)
-                ecnAdapter.notifyDataSetChanged()
-                if (binding.fileName.text.toString().isEmpty()) {
-                    fileNames.removeAt(0)
-                    readFile()
-                } else {
+            infoViewModel.wifiDevice.observe(viewLifecycleOwner) {
+                if (it != null) {
                     mAlertDialogCanCancel?.dismiss()
+                    bp2wAdapter.setNewInstance(it.wifiList)
+                    bp2wAdapter.notifyDataSetChanged()
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadFileError)
-            .observe(this) {
-                mAlertDialogCanCancel?.dismiss()
-                Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
+            infoViewModel.wifiConfig.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    wifi?.let { w ->
+                        w.state = it.wifi.state
+                        binding.wifiInfo.text = "热点：${w.ssid}\n密码：${w.pwd}\n连接状态：${
+                            when (w.state) {
+                                0 -> "断开"
+                                1 -> "连接中"
+                                2 -> "已连接"
+                                0xff -> "密码错误"
+                                0xfd -> "找不到SSID"
+                                else -> "未配置WiFi"
+                            }
+                        }"
+                        if (((w.state == 0) && (it.wifi.ssid.isNotEmpty())) || w.state == 1) {
+                            handler.postDelayed({
+                                LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
+                            }, 1000)
+                        } else {
+                            mAlertDialogCanCancel?.dismiss()
+                        }
+                    } ?: kotlin.run {
+                        binding.wifiInfo.text = "注意：请先完成首次配置WiFi，设置成功后连接其他设备可直接配置WiFi。"
+                    }
+                }
             }
+        }
     }
 
     private fun refreshUI() {
@@ -1814,12 +839,6 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         data.shortData = shortData
         data.duration = duration
         return data
-    }
-
-    private fun setReceiveCmd(bytes: ByteArray) {
-        if (isReceive) {
-            binding.receiveCmd.text = "receive : ${bytesToHex(bytes)}"
-        }
     }
 
     private fun readFile() {
