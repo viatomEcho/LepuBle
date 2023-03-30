@@ -6,12 +6,6 @@ import android.os.Handler
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
-import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_BATTERY_LEVEL
-import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_DEVICE_INFO
-import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_DEVICE_SN
-import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_SPO2_PARAM
-import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_SPO2_WAVE
-import com.lepu.blepro.ble.cmd.PC60FwBleResponse.PC60FwResponse.Companion.TYPE_WORKING_STATUS
 import com.lepu.blepro.ble.data.BoDeviceInfo
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
@@ -151,9 +145,9 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: PC60FwBleResponse.PC60FwResponse) {
         LepuBleLog.d(tag, "onResponseReceived bytes: ${bytesToHex(response.bytes)}")
-        if (response.token == TOKEN_EPI_F0) {
+        if (response.token == Pc60FwBleCmd.TOKEN_F0) {
             when (response.type) {
-                TYPE_BATTERY_LEVEL -> {
+                Pc60FwBleCmd.MSG_GET_BATTERY -> {
                     LepuBleLog.d(tag, "model:$model,EventPC60FwBattery => success")
                     if (response.content.isEmpty()) {
                         LepuBleLog.e(tag, "response.size:${response.content.size} error")
@@ -164,12 +158,12 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "it.batteryLevel == " + it.batteryLevel)
                     }
                 }
-                TYPE_DEVICE_SN -> {
+                Pc60FwBleCmd.MSG_GET_DEVICE_SN -> {
                     LepuBleLog.d(tag, "model:$model,TYPE_DEVICE_SN => success")
                     pc60FwDevice.sn = com.lepu.blepro.utils.toString(response.content)
                     LepuBleLog.d(tag, "toString == " + com.lepu.blepro.utils.toString(response.content))
                 }
-                TYPE_DEVICE_INFO -> {
+                Pc60FwBleCmd.MSG_GET_DEVICE_INFO_F0 -> {
                     LepuBleLog.d(tag, "model:$model,TYPE_DEVICE_INFO => success")
                     if (response.content.size < 3) {
                         LepuBleLog.e(tag, "response.size:${response.content.size} error")
@@ -188,14 +182,14 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo).post(InterfaceEvent(model, pc60FwDevice))
                     }
                 }
-                Pc60FwBleCmd.MSG_GET_CODE.toByte() -> {
+                Pc60FwBleCmd.MSG_GET_CODE -> {
                     LepuBleLog.d(tag, "model:$model,MSG_GET_CODE => success")
                     val data = com.lepu.blepro.utils.toString(response.content)
                     pc60FwDevice.branchCode = data
                     LepuBleLog.d(tag, "toString == $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwGetCode).post(InterfaceEvent(model, data))
                 }
-                Pc60FwBleCmd.MSG_SET_CODE.toByte() -> {
+                Pc60FwBleCmd.MSG_SET_CODE -> {
                     LepuBleLog.d(tag, "model:$model,MSG_SET_CODE => success")
                     if (toUInt(response.content) == 1) {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwSetCode).post(InterfaceEvent(model, true))
@@ -205,9 +199,9 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                 }
 
             }
-        } else if (response.token == TOKEN_PO_0F){
+        } else if (response.token == Pc60FwBleCmd.TOKEN_0F){
             when (response.type) {
-                Pc60FwBleCmd.MSG_GET_DEVICE_INFO_0F.toByte() -> {
+                Pc60FwBleCmd.MSG_GET_DEVICE_INFO_0F -> {
                     LepuBleLog.d(tag, "model:$model,MSG_GET_DEVICE_INFO_0F => success")
                     if (response.content.size < 2) {
                         LepuBleLog.e(tag, "response.size:${response.content.size} error")
@@ -226,7 +220,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo).post(InterfaceEvent(model, pc60FwDevice))
                     }
                 }
-                TYPE_SPO2_PARAM -> {
+                Pc60FwBleCmd.MSG_RT_PARAM -> {
                     LepuBleLog.d(tag, "model:$model,EventPC60FwRtDataParam => success")
                     if (response.content.size < 6) {
                         LepuBleLog.e(tag, "response.size:${response.content.size} error")
@@ -242,7 +236,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "it.battery == " + it.battery)
                     }
                 }
-                TYPE_SPO2_WAVE -> {
+                Pc60FwBleCmd.MSG_RT_WAVE -> {
                     LepuBleLog.d(tag, "model:$model,EventPC60FwRtDataWave => success")
                     LepuBleLog.d(tag, "model:$model,bytesToHex(response.content) == " + bytesToHex(response.content))
                     if (response.content.size < 5) {
@@ -253,7 +247,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataWave).post(InterfaceEvent(model, it))
                     }
                 }
-                TYPE_WORKING_STATUS -> {
+                Pc60FwBleCmd.MSG_WORK_STATUS_DATA -> {
                     if (response.content.size < 4) {
                         LepuBleLog.e(tag, "response.size:${response.content.size} error")
                         return
@@ -263,13 +257,13 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwWorkingStatus).post(InterfaceEvent(model, it))
                     }
                 }
-                Pc60FwBleCmd.MSG_ENABLE_PARAM.toByte() -> {
+                Pc60FwBleCmd.MSG_ENABLE_PARAM -> {
                     LepuBleLog.d(tag, "model:$model,MSG_ENABLE_PARAM => success ${bytesToHex(response.content)}")
                 }
-                Pc60FwBleCmd.MSG_ENABLE_WAVE.toByte() -> {
+                Pc60FwBleCmd.MSG_ENABLE_WAVE -> {
                     LepuBleLog.d(tag, "model:$model,MSG_ENABLE_WAVE => success ${bytesToHex(response.content)}")
                 }
-                Pc60FwBleCmd.MSG_IR_RED_FREQ.toByte() -> {
+                Pc60FwBleCmd.MSG_IR_RED_FREQ -> {
                     if (response.content.size < 4) {
                         LepuBleLog.e(tag, "response.size:${response.content.size} error")
                         return
@@ -279,7 +273,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwOriginalData).post(InterfaceEvent(model, it))
                     }
                 }
-                Pc60FwBleCmd.MSG_HEARTBEAT.toByte() -> {
+                Pc60FwBleCmd.MSG_HEARTBEAT -> {
                     LepuBleLog.d(tag, "model:$model,MSG_HEARTBEAT => success")
                     Handler().postDelayed({
                         sendHeartbeat()
