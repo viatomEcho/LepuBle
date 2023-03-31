@@ -93,7 +93,7 @@ class VentilationSetting() {
     }
     // 通气控制：压力
     class Pressure() {
-        var pressure = 0f  // 压力。范围：4-20 步进：0.5，单位：cmH2O。放大10倍
+        var pressure = 6f  // CPAP模式压力   默认值:60  步长:5 范围:40-200  单位0.1cmH2O
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0
@@ -106,7 +106,7 @@ class VentilationSetting() {
     }
     // 通气控制：最大压力
     class PressureMax() {
-        var max = 0f  // 最大压力。范围：Pmin-20 步进：0.5，单位：cmH2O。放大10倍
+        var max = 12f  // APAP模式压力最大值Pmax 默认值:120 步长:5 范围:Pmin-200  单位0.1cmH2O
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0
@@ -119,7 +119,7 @@ class VentilationSetting() {
     }
     // 通气控制：最小压力
     class PressureMin() {
-        var min = 0f  // 最小压力。范围：4-Pmax 步进：0.5，单位：cmH2O。放大10倍
+        var min = 4f  // APAP模式压力最小值Pmin 默认值:40  步长:5 范围:40-Pmax   单位0.1cmH2O
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0
@@ -130,22 +130,9 @@ class VentilationSetting() {
                 .plus(ByteArray(3))
         }
     }
-    // 通气控制：呼气压力
-    class PressureExhale() {
-        var exhale = 0f  // 呼气压力。范围：4-25（CE）6-25（CFDA），步进：0.5，单位：cmH2O。放大10倍
-        // reserved 3
-        constructor(bytes: ByteArray) : this() {
-            var index = 0
-            exhale = byte2UInt(bytes[index]).div(10f)
-        }
-        fun getDataBytes(): ByteArray {
-            return byteArrayOf(exhale.times(10).toInt().toByte())
-                .plus(ByteArray(3))
-        }
-    }
     // 通气控制：吸气压力
     class PressureInhale() {
-        var inhale = 0f  // 吸气压力。范围：4-25（CE）4-23（CFDA）， 步进：0.5，单位：cmH2O。放大10倍
+        var inhale = 10f  // 吸气压力 默认值:100  步长:5 范围:40-250   单位0.1cmH2O
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0
@@ -156,9 +143,22 @@ class VentilationSetting() {
                 .plus(ByteArray(3))
         }
     }
+    // 通气控制：呼气压力
+    class PressureExhale() {
+        var exhale = 6f  // 呼气压力 默认值:60   步长:5 范围:40-250   单位0.1cmH2O
+        // reserved 3
+        constructor(bytes: ByteArray) : this() {
+            var index = 0
+            exhale = byte2UInt(bytes[index]).div(10f)
+        }
+        fun getDataBytes(): ByteArray {
+            return byteArrayOf(exhale.times(10).toInt().toByte())
+                .plus(ByteArray(3))
+        }
+    }
     // 通气控制：吸气时间
     class InhaleDuration() {
-        var duration = 0f  // 吸气时间。范围：0.3s-4.0s, 步进：0.1s。放大10倍
+        var duration = 1f  // 吸气时间 默认值:10   步长:1 范围:3-40     单位0.1s
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0
@@ -171,7 +171,7 @@ class VentilationSetting() {
     }
     // 通气控制：呼吸频率
     class RespiratoryRate() {
-        var rate = 0  // 呼吸频率。范围：5-30
+        var rate = 5  // 呼吸频率。范围：5-30。 单位/min
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0
@@ -184,7 +184,7 @@ class VentilationSetting() {
     }
     // 通气控制：压力上升时间
     class PressureRaiseDuration() {
-        var duration = 0  // 压力上升时间。范围：100-900ms，步进：50ms
+        var duration = 100  // 压力上升时间。范围：100-900ms，步进：50ms
         // reserved 2
         constructor(bytes: ByteArray) : this() {
             var index = 0
@@ -195,9 +195,9 @@ class VentilationSetting() {
                 .plus(ByteArray(2))
         }
     }
-    // 通气控制：呼气触发灵敏度
-    class ExhaleSensitive() {
-        var sentive = 0  // 呼气触发灵敏度。范围：1-5。 0x10:自动
+    // 通气控制：吸气触发灵敏度
+    class InhaleSensitive() {
+        var sentive = 3  // 吸气触发灵敏度Inspiratory Trigger 默认值:3档  范围:0-5档   0:自动档
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0
@@ -208,9 +208,9 @@ class VentilationSetting() {
                 .plus(ByteArray(3))
         }
     }
-    // 通气控制：吸气触发灵敏度
-    class InhaleSensitive() {
-        var sentive = 0  // 吸气触发灵敏度。范围：1-5。 0x10:自动
+    // 通气控制：呼气触发灵敏度
+    class ExhaleSensitive() {
+        var sentive = 3  // 呼气触发灵敏度Expiratory Trigger  默认值:3档  范围:0-5档   0:自动档
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0

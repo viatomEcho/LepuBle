@@ -8,8 +8,8 @@ import java.nio.charset.StandardCharsets
 class UserInfo() {
     var aid: Int = 0                // 主账户id
     var uid: Int = 0                // 用户id
-    var fName: String = ""          // 姓
-    var name: String = ""           // 名
+    var fName: String = ""          // 姓,utf8格式
+    var name: String = ""           // 名,utf8格式
     var birthday: String = "0-0-0"  // 生日 "1997-01-01"
     var height: Int = 0             // 身高 cm (init 170cm -> cmdSend 1700)
     var weight: Float = 0f          // 体重 kg (init 75.5kg -> cmdSend 755)

@@ -14,6 +14,8 @@ import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
+import com.lepu.blepro.ble.data.r20.VentilationSetting
+import com.lepu.blepro.ble.data.r20.WarningSetting
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.demo.BuildConfig
@@ -1091,6 +1093,63 @@ class LpBleUtil {
         }
         fun r20GetBattery(model: Int) {
             BleServiceHelper.r20GetBattery(model)
+        }
+        fun r20DeviceBound(model: Int, bound: Boolean) {
+            BleServiceHelper.r20DeviceBound(model, bound)
+        }
+        fun r20SetUserInfo(model: Int, userInfo: com.lepu.blepro.ble.data.r20.UserInfo) {
+            BleServiceHelper.r20SetUserInfo(model, userInfo)
+        }
+        fun r20GetUserInfo(model: Int) {
+            BleServiceHelper.r20GetUserInfo(model)
+        }
+        fun r20DoctorMode(model: Int, pin: String, timestamp: Long) {
+            BleServiceHelper.r20DoctorMode(model, pin, timestamp)
+        }
+        fun r20GetWifiList(model: Int) {
+            BleServiceHelper.r20GetWifiList(model)
+        }
+        fun r20SetWifiConfig(model: Int, config: Bp2WifiConfig) {
+            BleServiceHelper.r20SetWifiConfig(model, config)
+        }
+        fun r20GetWifiConfig(model: Int) {
+            BleServiceHelper.r20GetWifiConfig(model)
+        }
+        fun r20GetVersionInfo(model: Int) {
+            BleServiceHelper.r20GetVersionInfo(model)
+        }
+        fun r20GetSystemSetting(model: Int) {
+            BleServiceHelper.r20GetSystemSetting(model)
+        }
+        fun r20SetSystemSetting(model: Int, setting: com.lepu.blepro.ble.data.r20.SystemSetting) {
+            BleServiceHelper.r20SetSystemSetting(model, setting)
+        }
+        fun r20GetMeasureSetting(model: Int) {
+            BleServiceHelper.r20GetMeasureSetting(model)
+        }
+        fun r20SetMeasureSetting(model: Int, setting: com.lepu.blepro.ble.data.r20.MeasureSetting) {
+            BleServiceHelper.r20SetMeasureSetting(model, setting)
+        }
+        fun r20MaskTest(model: Int, start: Boolean) {
+            BleServiceHelper.r20MaskTest(model, start)
+        }
+        fun r20GetVentilationSetting(model: Int) {
+            BleServiceHelper.r20GetVentilationSetting(model)
+        }
+        fun r20SetVentilationSetting(model: Int, setting: VentilationSetting) {
+            BleServiceHelper.r20SetVentilationSetting(model, setting)
+        }
+        fun r20GetWarningSetting(model: Int) {
+            BleServiceHelper.r20GetWarningSetting(model)
+        }
+        fun r20SetWarningSetting(model: Int, setting: WarningSetting) {
+            BleServiceHelper.r20SetWarningSetting(model, setting)
+        }
+        fun r20VentilationSwitch(model: Int, start: Boolean) {
+            BleServiceHelper.r20VentilationSwitch(model, start)
+        }
+        fun r20GetRtState(model: Int) {
+            BleServiceHelper.r20GetRtState(model)
         }
     }
 

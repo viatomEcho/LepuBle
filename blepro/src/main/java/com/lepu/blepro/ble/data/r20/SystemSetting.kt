@@ -23,6 +23,7 @@ class SystemSetting() {
         replacements = Replacements(bytes.copyOfRange(index, index+4))
         index += 4
         volumeSetting = VolumeSetting(bytes.copyOfRange(index, index+1))
+        // reserved 7
     }
 
     fun getDataBytes(): ByteArray {
@@ -80,8 +81,8 @@ class SystemSetting() {
         }
     }
     class ScreenSetting() {
-        var brightness = 0  // 屏幕亮度。5-100%，步进1%。默认60%
-        var autoOff = 0     // 自动息屏。0:常亮。其他有效值：30，60，90，120. 单位秒。默认30秒
+        var brightness = 60  // 屏幕亮度。5-100%，步进1%。默认60%
+        var autoOff = 30     // 自动息屏。0:常亮。其他有效值：30，60，90，120. 单位秒。默认30秒
         // reserved 2
         constructor(bytes: ByteArray) : this() {
             var index = 0
@@ -96,10 +97,10 @@ class SystemSetting() {
         }
     }
     class Replacements() {
-        var filter = 0  // 过滤棉。0：关闭；其他有效值1-12，单位月。默认1.
-        var mask = 0    // 面罩。0：关闭；其他有效值1-12，单位月。默认3.
-        var tube = 0    // 管路。0：关闭；其他有效值1-12，单位月。默认3.
-        var tank = 0    // 水箱。0：关闭；其他有效值1-12，单位月。默认6.
+        var filter = 1  // 过滤棉。0：关闭；其他有效值1-12，单位月。默认1.
+        var mask = 3    // 面罩。0：关闭；其他有效值1-12，单位月。默认3.
+        var tube = 3    // 管路。0：关闭；其他有效值1-12，单位月。默认3.
+        var tank = 6    // 水箱。0：关闭；其他有效值1-12，单位月。默认6.
         constructor(bytes: ByteArray) : this() {
             var index = 0
             filter = byte2UInt(bytes[index])
@@ -118,7 +119,7 @@ class SystemSetting() {
         }
     }
     class VolumeSetting() {
-        var volume = 0  // 音量, 0-100%，步进1%；默认30%
+        var volume = 30  // 音量, 0-100%，步进1%；默认30%
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0

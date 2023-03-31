@@ -640,6 +640,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             .observe(this) { event ->
                 (event.data as KtBleBattery).let {
                     viewModel._battery.value = "${it.percent} %"
+                    LpBleUtil.r20GetVersionInfo(event.model)
                 }
             }
     }

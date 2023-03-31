@@ -181,14 +181,14 @@ class R20BleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model,GET_USER_INFO => success, data: $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetUserInfo).post(InterfaceEvent(model, data))
                 }
-                R20BleCmd.INTO_DOCTOR_MODE -> {
+                R20BleCmd.DOCTOR_MODE -> {
                     if (response.len < 2) {
-                        LepuBleLog.d(tag, "model:$model,INTO_DOCTOR_MODE => response.len < 2")
+                        LepuBleLog.d(tag, "model:$model,DOCTOR_MODE => response.len < 2")
                         return
                     }
                     val data = R20BleResponse.DoctorModeResult(response.content)
-                    LepuBleLog.d(tag, "model:$model,INTO_DOCTOR_MODE => success, data: $data")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20IntoDoctorMode).post(InterfaceEvent(model, data))
+                    LepuBleLog.d(tag, "model:$model,DOCTOR_MODE => success, data: $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20DoctorMode).post(InterfaceEvent(model, data))
                 }
                 R20BleCmd.GET_WIFI_LIST -> {
                     if (response.content.isEmpty()) {
@@ -235,8 +235,8 @@ class R20BleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetSystemSetting).post(InterfaceEvent(model, true))
                 }
                 R20BleCmd.GET_MEASURE_SETTING -> {
-                    if (response.len < 9) {
-                        LepuBleLog.d(tag, "model:$model,GET_MEASURE_SETTING => response.len < 9")
+                    if (response.len < 10) {
+                        LepuBleLog.d(tag, "model:$model,GET_MEASURE_SETTING => response.len < 10")
                         return
                     }
                     val data = MeasureSetting(response.content)
@@ -323,6 +323,7 @@ class R20BleInterface(model: Int): BleInterface(model) {
                         return
                     }
                     offset += response.len
+                    DownloadHelper.writeFile(model, "", fileName, "dat", response.content)
                     fileContent = fileContent.plus(response.content)
                     LepuBleLog.d(tag, "READ_FILE_DATA offset: $offset, fileSize: $fileSize")
                     val percent = offset.times(100).div(fileSize)
@@ -343,6 +344,33 @@ class R20BleInterface(model: Int): BleInterface(model) {
                     } else {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20ReadFileComplete).post(InterfaceEvent(model, fileContent))
                     }
+                }
+                R20BleCmd.RT_STATE -> {
+                    if (response.len < 3) {
+                        LepuBleLog.d(tag, "model:$model,RT_STATE => response.len < 3")
+                        return
+                    }
+                    val data = R20BleResponse.RtState(response.content)
+                    LepuBleLog.d(tag, "model:$model,RT_STATE => success, data: $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20RtState).post(InterfaceEvent(model, data))
+                }
+                R20BleCmd.RT_PARAM -> {
+                    if (response.len < 24) {
+                        LepuBleLog.d(tag, "model:$model,RT_PARAM => response.len < 24")
+                        return
+                    }
+                    val data = R20BleResponse.RtParam(response.content)
+                    LepuBleLog.d(tag, "model:$model,RT_PARAM => success, data: $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20RtParam).post(InterfaceEvent(model, data))
+                }
+                R20BleCmd.EVENT -> {
+                    if (response.len < 8) {
+                        LepuBleLog.d(tag, "model:$model,EVENT => response.len < 24")
+                        return
+                    }
+                    val data = R20BleResponse.Event(response.content)
+                    LepuBleLog.d(tag, "model:$model,EVENT => success, data: $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20Event).post(InterfaceEvent(model, data))
                 }
             }
         }
@@ -379,6 +407,7 @@ class R20BleInterface(model: Int): BleInterface(model) {
      * get real-time data
      */
     override fun getRtData() {
+        sendCmd(R20BleCmd.getRtParam())
         LepuBleLog.d(tag, "getRtData...")
     }
 
@@ -433,20 +462,24 @@ class R20BleInterface(model: Int): BleInterface(model) {
         sendCmd(R20BleCmd.getUserInfo())
     }
     // 进入医生模式
-    fun intoDoctorMode(pin: String, timestamp: Long) {
-        sendCmd(R20BleCmd.intoDoctorMode(pin.toByteArray(), timestamp))
+    fun doctorMode(pin: String, timestamp: Long) {
+        if (pin.length > 6) {
+            sendCmd(R20BleCmd.doctorMode(pin.toByteArray().copyOfRange(0, 6), timestamp))
+        } else {
+            sendCmd(R20BleCmd.doctorMode(pin.toByteArray(), timestamp))
+        }
     }
     // 搜索WiFi列表
-    fun getWifiList() {
-        sendCmd(R20BleCmd.getWifiList())
+    fun getWifiList(deviceNum: Int) {
+        sendCmd(R20BleCmd.getWifiList(deviceNum))
     }
     // 配置WiFi信息
     fun setWifiConfig(data: Bp2WifiConfig) {
         sendCmd(R20BleCmd.setWifiConfig(data.getDataBytes()))
     }
     // 获取WiFi信息
-    fun getWifiConfig() {
-        sendCmd(R20BleCmd.getWifiConfig())
+    fun getWifiConfig(option: Int) {
+        sendCmd(R20BleCmd.getWifiConfig(option))
     }
     // 获取详细版本信息
     fun getVersionInfo() {
@@ -491,5 +524,9 @@ class R20BleInterface(model: Int): BleInterface(model) {
     // 启动/停止通气
     fun ventilationSwitch(start: Boolean) {
         sendCmd(R20BleCmd.ventilationSwitch(start))
+    }
+    // 实时状态获取
+    fun getRtState() {
+        sendCmd(R20BleCmd.getRtState())
     }
 }

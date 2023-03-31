@@ -757,11 +757,11 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventR20FactoryReset = "com.lepu.ble.r20.factory.reset"                     // 恢复出厂设置 boolean
             const val EventR20GetBattery = "com.lepu.ble.r20.get.battery"                         // 获取电量 KtBleBattery
             const val EventR20BurnFactoryInfo = "com.lepu.ble.r20.burn.factory.info"              // 烧录出厂信息 boolean
-            const val EventR20DeviceBound = "com.lepu.ble.r20.device.bound"                       // 绑定设备 int
+            const val EventR20DeviceBound = "com.lepu.ble.r20.device.bound"                       // 绑定设备 int (0成功, 1失败, 2超时)
             const val EventR20DeviceUnBound = "com.lepu.ble.r20.device.un.bound"                  // 解绑设备 boolean
             const val EventR20SetUserInfo = "com.lepu.ble.r20.set.user.info"                      // 设置账户信息 boolean
             const val EventR20GetUserInfo = "com.lepu.ble.r20.get.user.info"                      // 获取账户信息 UserInfo
-            const val EventR20IntoDoctorMode = "com.lepu.ble.r20.into.doctor.mode"                // 进入医生模式 R20BleResponse.DoctorModeResult
+            const val EventR20DoctorMode = "com.lepu.ble.r20.doctor.mode"                         // 进入医生模式 R20BleResponse.DoctorModeResult
             const val EventR20GetWifiList = "com.lepu.ble.r20.get.wifi.list"                      // 获取WiFi列表 WifiList
             const val EventR20SetWifiConfig = "com.lepu.ble.r20.set.wifi.config"                  // 配置WiFi信息 boolean
             const val EventR20GetWifiConfig = "com.lepu.ble.r20.get.wifi.config"                  // 获取WiFi信息 WifiConfig
@@ -779,6 +779,9 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventR20ReadFileError = "com.lepu.ble.r20.read.file.error"                  // 传输文件出错 boolean
             const val EventR20ReadingFileProgress = "com.lepu.ble.r20.reading.file.progress"      // 传输文件进度 int
             const val EventR20ReadFileComplete = "com.lepu.ble.r20.read.file.complete"            // 传输文件完成 byte[]
+            const val EventR20RtState = "com.lepu.ble.r20.rt.state"                               // 实时状态 R20BleResponse.RtState
+            const val EventR20RtParam = "com.lepu.ble.r20.rt.param"                               // 实时参数 R20BleResponse.RtParam
+            const val EventR20Event = "com.lepu.ble.r20.event"                                    // 事件上报 R20BleResponse.Event
         }
     }
 

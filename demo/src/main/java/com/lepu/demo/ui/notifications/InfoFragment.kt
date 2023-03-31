@@ -436,14 +436,24 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 mAlertDialogCanCancel?.setMessage("正在处理，请稍等...")
                 mAlertDialogCanCancel?.show()
                 if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W) {
+                    // 源动健康测试服
                     server.addr = "34.209.148.123"
                     server.port = 7100
+                    wifiConfig.server = server
+                    LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
                 } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W) {
+                    // 乐普健康测试服
                     server.addr = "212.129.241.54"
                     server.port = 7200
+                    wifiConfig.server = server
+                    LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
+                } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R20) {
+                    // 乐普健康测试服
+                    server.addr = "212.129.241.54"
+                    server.port = 7200
+                    wifiConfig.server = server
+                    LpBleUtil.r20SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
                 }
-                wifiConfig.server = server
-                LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
             } else {
                 Toast.makeText(context, "请先完成首次配置WiFi，设置成功后连接其他设备可直接配置WiFi。", Toast.LENGTH_SHORT).show()
             }
@@ -505,9 +515,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
-                    binding.wifiConfig.visibility = View.VISIBLE
-                    LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
                 }
+                binding.wifiConfig.visibility = View.VISIBLE
+                LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
             }
             Bluetooth.MODEL_LE_BP2W -> {
                 infoViewModel = ViewModelProvider(this).get(LpBp2wViewModel::class.java)
@@ -515,9 +525,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
-                    binding.wifiConfig.visibility = View.VISIBLE
-                    LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
                 }
+                binding.wifiConfig.visibility = View.VISIBLE
+                LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
             }
             Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2 -> {
                 infoViewModel = ViewModelProvider(this).get(Er2ViewModel::class.java)
@@ -682,8 +692,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as R20ViewModel).initEvent(this)
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
+                    binding.deviceInfo.text = "硬件版本：${it.hwV}，固件版本：${it.fwV}\nsn：${it.sn}，code：${it.branchCode}，电量：${mainViewModel._battery.value}"
                 }
+                binding.wifiConfig.visibility = View.VISIBLE
+                LpBleUtil.r20GetVersionInfo(Constant.BluetoothConfig.currentModel[0])
+                LpBleUtil.r20GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
             }
         }
 
@@ -801,7 +814,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         }"
                         if (((w.state == 0) && (it.wifi.ssid.isNotEmpty())) || w.state == 1) {
                             handler.postDelayed({
-                                LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
+                                when (Constant.BluetoothConfig.currentModel[0]) {
+                                    Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LE_BP2W -> LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
+                                    Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> LpBleUtil.r20GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
+                                }
                             }, 1000)
                         } else {
                             mAlertDialogCanCancel?.dismiss()
@@ -809,6 +825,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     } ?: kotlin.run {
                         binding.wifiInfo.text = "注意：请先完成首次配置WiFi，设置成功后连接其他设备可直接配置WiFi。"
                     }
+                }
+            }
+            infoViewModel.noWifi.observe(viewLifecycleOwner) {
+                if (it) {
+                    Toast.makeText(context, "未配置WiFi", Toast.LENGTH_SHORT).show()
                 }
             }
         }
