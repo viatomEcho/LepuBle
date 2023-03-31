@@ -152,7 +152,8 @@ object LpWorkManager {
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
             Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS,
-            Bluetooth.MODEL_CMRING -> {
+            Bluetooth.MODEL_CMRING, Bluetooth.MODEL_OXYFIT_WPS,
+            Bluetooth.MODEL_KIDSO2_WPS -> {
                 OxyBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
@@ -490,7 +491,8 @@ object LpWorkManager {
             Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4,
             Bluetooth.MODEL_CHECKME_LE, Bluetooth.MODEL_LES1,
             Bluetooth.MODEL_CHECKME, Bluetooth.MODEL_O2M_WPS,
-            Bluetooth.MODEL_CMRING -> {
+            Bluetooth.MODEL_CMRING, Bluetooth.MODEL_OXYFIT_WPS,
+            Bluetooth.MODEL_KIDSO2_WPS -> {
                 OxyBleManager(context).apply {
                     vailManager.put(m, this)
                     return this

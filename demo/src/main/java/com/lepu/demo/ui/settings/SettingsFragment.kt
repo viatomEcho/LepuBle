@@ -172,7 +172,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_OXYFIT,
                 Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_CMRING,
                 Bluetooth.MODEL_OXYU, Bluetooth.MODEL_AI_S100,
-                Bluetooth.MODEL_O2M_WPS -> {
+                Bluetooth.MODEL_O2M_WPS, Bluetooth.MODEL_OXYFIT_WPS,
+                Bluetooth.MODEL_KIDSO2_WPS -> {
                     setViewVisible(binding.o2Layout.root)
                     settingViewModel = ViewModelProvider(this).get(OxyViewModel::class.java)
                     (settingViewModel as OxyViewModel).initView(requireContext(), binding, it)

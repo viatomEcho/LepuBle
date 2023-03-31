@@ -289,6 +289,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     || model == Bluetooth.MODEL_SNOREO2
                     || model == Bluetooth.MODEL_WEARO2
                     || model == Bluetooth.MODEL_KIDSO2
+                    || model == Bluetooth.MODEL_KIDSO2_WPS
                     || model == Bluetooth.MODEL_O2M_WPS)
             10 -> return model == Bluetooth.MODEL_ER3
             else -> return false

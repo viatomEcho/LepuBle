@@ -345,7 +345,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPU
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYLINK
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2_WPS
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYFIT
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYFIT_WPS
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYU
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_AI_S100
             ) {
@@ -476,7 +478,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK, Bluetooth.MODEL_KIDSO2,
             Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU, Bluetooth.MODEL_CMRING,
-            Bluetooth.MODEL_AI_S100 -> {
+            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_OXYFIT_WPS, Bluetooth.MODEL_KIDSO2_WPS -> {
                 infoViewModel = ViewModelProvider(this).get(OxyViewModel::class.java)
                 (infoViewModel as OxyViewModel).initEvent(this)
                 mainViewModel.oxyInfo.observe(viewLifecycleOwner) {
