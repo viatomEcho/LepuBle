@@ -242,4 +242,48 @@ public class R20BleCmd {
         public static final int EVENT_DROPOFF = 609;             // 面罩摘下
         public static final int EVENT_SPONT = 610;               // 自主呼吸占比
     }
+
+    public static class SystemSetting {
+        public static final int ALL = 0;
+        public static final int UNIT = 1;         // 单位设置
+        public static final int LANGUAGE = 2;     // 语言设置
+        public static final int SCREEN = 3;       // 屏幕设置
+        public static final int REPLACEMENT = 4;  // 耗材设置
+        public static final int VOLUME = 5;       // 音量设置
+    }
+    public static class MeasureSetting {
+        public static final int ALL = 0;
+        public static final int HUMIDIFICATION = 1;   // 湿化等级
+        public static final int PRESSURE_REDUCE = 2;  // 呼吸压力释放
+        public static final int AUTO_SWITCH = 3;      // 自动启停
+        public static final int PRE_HEAT = 4;         // 预加热
+        public static final int RAMP = 5;             // 缓慢升压
+        public static final int TUBE_TYPE = 5;        // 管道类型
+        public static final int MASK = 5;             // 面罩
+    }
+    public static class VentilationSetting {
+        public static final int ALL = 0;
+        public static final int PRESSURE = 1;           // CPAP模式压力
+        public static final int PRESSURE_MAX = 2;       // APAP模式压力最大值Pmax
+        public static final int PRESSURE_MIN = 3;       // APAP模式压力最小值Pmin
+        public static final int PRESSURE_INHALE = 4;    // 吸气压力
+        public static final int PRESSURE_EXHALE = 5;    // 呼气压力
+        public static final int INHALE_DURATION = 6;    // 吸气时间
+        public static final int RESPIRATORY_RATE = 7;   // 呼吸频率
+        public static final int RAISE_DURATION = 8;     // 压力上升时间
+        public static final int INHALE_SENSITIVE = 9;   // 吸气触发灵敏度
+        public static final int EXHALE_SENSITIVE = 10;  // 呼气触发灵敏度
+    }
+    public static class WarningSetting {
+        public static final int ALL = 0;
+        public static final int LEAK_HIGH = 1;        // 漏气量高
+        public static final int LOW_VENTILATION = 2;  // 分钟通气量低
+        public static final int VT_LOW = 3;           // 潮气量低
+        public static final int RR_HIGH = 4;          // 呼吸频率高
+        public static final int RR_LOW = 5;           // 呼吸频率低
+        public static final int SPO2_LOW = 6;         // 血氧饱和度低
+        public static final int HR_HIGH = 7;          // 脉率/心率高
+        public static final int HR_LOW = 8;           // 脉率/心率低
+        public static final int APNEA = 9;            // 呼吸暂停
+    }
 }

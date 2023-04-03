@@ -24,8 +24,8 @@ class WarningSetting() {
         index++
         warningLeak = WarningLeak(bytes.copyOfRange(index, index+1))
         index++
-        warningVt = WarningVt(bytes.copyOfRange(index, index+1))
-        index++
+        warningVt = WarningVt(bytes.copyOfRange(index, index+2))
+        index += 2
         warningVentilation = WarningVentilation(bytes.copyOfRange(index, index+1))
         index++
         warningRrHigh = WarningRrHigh(bytes.copyOfRange(index, index+1))
@@ -139,7 +139,7 @@ class WarningSetting() {
     }
     // 报警提示：呼吸频率高
     class WarningRrHigh() {
-        var high = 0  // 0:Off 范围：1-60bmp；步进：1bpm；级别：中
+        var high = 0  // 0:Off 范围：1-60bpm；步进：1bpm；级别：中
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0
@@ -152,7 +152,7 @@ class WarningSetting() {
     }
     // 报警提示：呼吸频率低
     class WarningRrLow() {
-        var low = 0  // 0:Off 范围：1-60bmp；步进：1bpm；级别：中
+        var low = 0  // 0:Off 范围：1-60bpm；步进：1bpm；级别：中
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0
@@ -178,7 +178,7 @@ class WarningSetting() {
     }
     // 报警提示：脉率/心率高
     class WarningHrHigh() {
-        var high = 0  // 0:Off 范围：100-240bmp；步进：10bpm；级别：中
+        var high = 0  // 0:Off 范围：100-240bpm；步进：10bpm；级别：中
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0
@@ -191,7 +191,7 @@ class WarningSetting() {
     }
     // 报警提示：脉率/心率低
     class WarningHrLow() {
-        var low = 0  // 0:Off 范围：30-70bmp；步进：5bpm；级别：中
+        var low = 0  // 0:Off 范围：30-70bpm；步进：5bpm；级别：中
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0

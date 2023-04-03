@@ -270,7 +270,7 @@ class R20BleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetVentilationSetting).post(InterfaceEvent(model, true))
                 }
                 R20BleCmd.GET_WARNING_SETTING -> {
-                    if (response.len < 9) {
+                    if (response.len < 10) {
                         LepuBleLog.d(tag, "model:$model,GET_WARNING_SETTING => response.len < 9")
                         return
                     }

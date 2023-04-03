@@ -143,17 +143,17 @@ class MeasureSetting() {
     //参数设置：缓冲压力、时间
     class Ramp() {
         var pressure = 4f   // 缓冲压力 默认值40，步进5。单位：0.1cmH2O
-        var delayTime = 15  // 缓冲时间 延时， 0-60min，步进5min。默认15min. 0xff 自动
+        var time = 15  // 缓冲时间 延时， 0-60min，步进5min。默认15min. 0xff 自动
         // reserved 2
         constructor(bytes: ByteArray) : this() {
             var index = 0
             pressure = byte2UInt(bytes[index]).div(10f)
             index++
-            delayTime = byte2UInt(bytes[index])
+            time = byte2UInt(bytes[index])
         }
         fun getDataBytes(): ByteArray {
             return byteArrayOf(pressure.times(10).toInt().toByte())
-                .plus(delayTime.toByte())
+                .plus(time.toByte())
                 .plus(ByteArray(2))
         }
     }
