@@ -342,7 +342,7 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_CHECK_POD -> {
+            Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_CHECKME_POD_WPS -> {
                 CheckmePodBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -492,7 +492,7 @@ object LpWorkManager {
             Bluetooth.MODEL_CHECKME_LE, Bluetooth.MODEL_LES1,
             Bluetooth.MODEL_CHECKME, Bluetooth.MODEL_O2M_WPS,
             Bluetooth.MODEL_CMRING, Bluetooth.MODEL_OXYFIT_WPS,
-            Bluetooth.MODEL_KIDSO2_WPS -> {
+            Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_CHECKME_POD_WPS -> {
                 OxyBleManager(context).apply {
                     vailManager.put(m, this)
                     return this

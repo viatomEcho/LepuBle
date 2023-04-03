@@ -584,7 +584,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     binding.deviceInfo.text = "$it"
                 }
             }
-            Bluetooth.MODEL_CHECK_POD -> {
+            Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_CHECKME_POD_WPS -> {
                 infoViewModel = ViewModelProvider(this).get(CheckmePodViewModel::class.java)
                 (infoViewModel as CheckmePodViewModel).initEvent(this)
                 mainViewModel.checkmePodInfo.observe(viewLifecycleOwner) {

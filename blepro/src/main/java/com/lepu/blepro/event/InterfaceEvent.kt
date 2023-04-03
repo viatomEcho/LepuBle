@@ -468,7 +468,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * CheckmePodBleInterface 发出的通知
-     * 包含model: MODEL_CHECK_POD
+     * 包含model: MODEL_CHECK_POD, MODEL_CHECKME_POD_WPS
      */
     interface CheckmePod {
         companion object {
