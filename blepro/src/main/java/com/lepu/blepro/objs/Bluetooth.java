@@ -127,6 +127,9 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_BTP = "BTP";
     public static final String BT_NAME_S5_SCALE = "Le S5";
     public static final String BT_NAME_R20 = "R20";
+    public static final String BT_NAME_R21 = "R21";
+    public static final String BT_NAME_R10 = "R10";
+    public static final String BT_NAME_R11 = "R11";
     public static final String BT_NAME_LERES = "LeRes";
     public static final String BT_NAME_ECN = "ECN";
     public static final String BT_NAME_GM_300SNT = "GM_300SNT";
@@ -251,6 +254,9 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_OXYFIT_WPS = 112;
     public static final int MODEL_KIDSO2_WPS = 113;
     public static final int MODEL_CHECKME_POD_WPS = 114;
+    public static final int MODEL_R21 = 115;
+    public static final int MODEL_R10 = 116;
+    public static final int MODEL_R11 = 117;
 
     @IntDef({MODEL_UNRECOGNIZED, MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_OXYRING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER1_N,
             MODEL_DUOEK, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL, MODEL_BABYO2, MODEL_OXYSMART,
@@ -265,7 +271,7 @@ public class Bluetooth implements Parcelable {
             MODEL_CHECKME, MODEL_PC80B_BLE, MODEL_SP20_BLE, MODEL_PC300_BLE, MODEL_ER3, MODEL_LEPOD, MODEL_PC60NW_BLE,
             MODEL_PC60NW_WPS, MODEL_SP20_WPS, MODEL_AP20_WPS, MODEL_O2M_WPS, MODEL_PC80B_BLE2, MODEL_VTM01, MODEL_PC200_BLE,
             MODEL_BTP, MODEL_S5_SCALE, MODEL_R20, MODEL_LERES, MODEL_PC_60NW_NO_SN, MODEL_ECN, MODEL_GM_300SNT, MODEL_OXYFIT_WPS,
-            MODEL_KIDSO2_WPS, MODEL_CHECKME_POD_WPS})
+            MODEL_KIDSO2_WPS, MODEL_CHECKME_POD_WPS, MODEL_R21, MODEL_R10, MODEL_R11})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 
@@ -436,6 +442,14 @@ public class Bluetooth implements Parcelable {
             return MODEL_OXYFIT_WPS;
         } else if (deviceName.contains(BT_NAME_KIDS_O2_WPS)) {
             return MODEL_KIDSO2_WPS;
+        } else if (deviceName.contains(BT_NAME_R20)) {
+            return MODEL_R20;
+        } else if (deviceName.contains(BT_NAME_R21)) {
+            return MODEL_R21;
+        } else if (deviceName.contains(BT_NAME_R10)) {
+            return MODEL_R10;
+        } else if (deviceName.contains(BT_NAME_R11)) {
+            return MODEL_R11;
         }
 
         if (deviceName.split(" ").length == 0) {
@@ -520,8 +534,6 @@ public class Bluetooth implements Parcelable {
                 return MODEL_VTM01;
             case BT_NAME_BTP:
                 return MODEL_BTP;
-            case BT_NAME_R20:
-                return MODEL_R20;
             case BT_NAME_ECN:
                 return MODEL_ECN;
             default:
@@ -541,7 +553,7 @@ public class Bluetooth implements Parcelable {
             BT_NAME_CHECKME, BT_NAME_PC80B_BLE, BT_NAME_SP20_BLE, BT_NAME_PC_300_BLE, BT_NAME_ER3, BT_NAME_LEPOD, BT_NAME_PC_60NW_BLE,
             BT_NAME_PC_60NW_WPS, BT_NAME_AP20_WPS, BT_NAME_SP20_WPS, BT_NAME_O2M_WPS, BT_NAME_PC80B_BLE2, BT_NAME_VTM01, BT_NAME_PC200_BLE,
             BT_NAME_BTP, BT_NAME_S5_SCALE, BT_NAME_R20, BT_NAME_LERES, BT_NAME_PC_60NW_NO_SN, BT_NAME_ECN, BT_NAME_GM_300SNT, BT_NAME_OXYFIT_WPS,
-            BT_NAME_KIDS_O2_WPS, BT_NAME_CHECKME_POD_WPS})
+            BT_NAME_KIDS_O2_WPS, BT_NAME_CHECKME_POD_WPS, BT_NAME_R21, BT_NAME_R10, BT_NAME_R11})
     @Retention(RetentionPolicy.SOURCE)
     public @interface DEVICE_NAME {
 
@@ -770,6 +782,12 @@ public class Bluetooth implements Parcelable {
                 return BT_NAME_S5_SCALE;
             case MODEL_R20:
                 return BT_NAME_R20;
+            case MODEL_R21:
+                return BT_NAME_R21;
+            case MODEL_R10:
+                return BT_NAME_R10;
+            case MODEL_R11:
+                return BT_NAME_R11;
             case MODEL_LERES:
                 return BT_NAME_LERES;
             case MODEL_ECN:

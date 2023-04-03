@@ -266,7 +266,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     (settingViewModel as BtpViewModel).initEvent(this)
                     LpBleUtil.btpGetConfig(it)
                 }
-                Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+                Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+                Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+                Bluetooth.MODEL_LERES -> {
                     setViewVisible(binding.r20Layout.root)
                     settingViewModel = ViewModelProvider(this).get(R20ViewModel::class.java)
                     (settingViewModel as R20ViewModel).initView(requireContext(), binding, it)

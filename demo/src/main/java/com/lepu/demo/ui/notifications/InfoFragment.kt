@@ -449,7 +449,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     server.port = 7200
                     wifiConfig.server = server
                     LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
-                } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R20) {
+                } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R20
+                    || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R21
+                    || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R10
+                    || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R11
+                    || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LERES) {
                     // 乐普健康测试服
                     server.addr = "212.129.241.54"
                     server.port = 7200
@@ -689,7 +693,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 infoViewModel = ViewModelProvider(this).get(EcnViewModel::class.java)
                 (infoViewModel as EcnViewModel).initEvent(this)
             }
-            Bluetooth.MODEL_R20 -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 infoViewModel = ViewModelProvider(this).get(R20ViewModel::class.java)
                 (infoViewModel as R20ViewModel).initEvent(this)
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
@@ -818,7 +824,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             handler.postDelayed({
                                 when (Constant.BluetoothConfig.currentModel[0]) {
                                     Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LE_BP2W -> LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
-                                    Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> LpBleUtil.r20GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
+                                    Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+                                    Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+                                    Bluetooth.MODEL_LERES -> LpBleUtil.r20GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
                                 }
                             }, 1000)
                         } else {

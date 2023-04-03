@@ -751,7 +751,9 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
-            Bluetooth.MODEL_R20 -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--getFileList")
@@ -3578,7 +3580,9 @@ class BleServiceHelper private constructor() {
     fun r20Echo(model: Int, data: ByteArray) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20Echo")
@@ -3592,7 +3596,9 @@ class BleServiceHelper private constructor() {
     fun r20GetBattery(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20GetBattery")
@@ -3609,7 +3615,9 @@ class BleServiceHelper private constructor() {
     fun r20DeviceBound(model: Int, bound: Boolean) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20DeviceBound")
@@ -3623,7 +3631,9 @@ class BleServiceHelper private constructor() {
     fun r20SetUserInfo(model: Int, userInfo: com.lepu.blepro.ble.data.r20.UserInfo) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20SetUserInfo")
@@ -3637,7 +3647,9 @@ class BleServiceHelper private constructor() {
     fun r20GetUserInfo(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20GetUserInfo")
@@ -3655,7 +3667,9 @@ class BleServiceHelper private constructor() {
     fun r20DoctorMode(model: Int, pin: String, timestamp: Long) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20DoctorMode")
@@ -3674,7 +3688,9 @@ class BleServiceHelper private constructor() {
     fun r20GetWifiList(model: Int, deviceNum: Int = 0) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20GetWifiList")
@@ -3688,7 +3704,9 @@ class BleServiceHelper private constructor() {
     fun r20SetWifiConfig(model: Int, config: Bp2WifiConfig) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20SetWifiConfig")
@@ -3706,7 +3724,9 @@ class BleServiceHelper private constructor() {
     fun r20GetWifiConfig(model: Int, option: Int = 3) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20GetWifiConfig")
@@ -3720,7 +3740,9 @@ class BleServiceHelper private constructor() {
     fun r20GetVersionInfo(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20GetVersionInfo")
@@ -3734,7 +3756,9 @@ class BleServiceHelper private constructor() {
     fun r20GetSystemSetting(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20GetSystemSetting")
@@ -3748,7 +3772,9 @@ class BleServiceHelper private constructor() {
     fun r20SetSystemSetting(model: Int, setting: com.lepu.blepro.ble.data.r20.SystemSetting) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20SetSystemSetting")
@@ -3762,7 +3788,9 @@ class BleServiceHelper private constructor() {
     fun r20GetMeasureSetting(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20GetMeasureSetting")
@@ -3776,7 +3804,9 @@ class BleServiceHelper private constructor() {
     fun r20SetMeasureSetting(model: Int, setting: com.lepu.blepro.ble.data.r20.MeasureSetting) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20SetMeasureSetting")
@@ -3790,7 +3820,9 @@ class BleServiceHelper private constructor() {
     fun r20MaskTest(model: Int, start: Boolean) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20MaskTest")
@@ -3804,7 +3836,9 @@ class BleServiceHelper private constructor() {
     fun r20GetVentilationSetting(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20GetVentilationSetting")
@@ -3818,7 +3852,9 @@ class BleServiceHelper private constructor() {
     fun r20SetVentilationSetting(model: Int, setting: VentilationSetting) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20SetVentilationSetting")
@@ -3832,7 +3868,9 @@ class BleServiceHelper private constructor() {
     fun r20GetWarningSetting(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20GetWarningSetting")
@@ -3846,7 +3884,9 @@ class BleServiceHelper private constructor() {
     fun r20SetWarningSetting(model: Int, setting: WarningSetting) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20SetWarningSetting")
@@ -3860,7 +3900,9 @@ class BleServiceHelper private constructor() {
     fun r20VentilationSwitch(model: Int, start: Boolean) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20VentilationSwitch")
@@ -3874,7 +3916,9 @@ class BleServiceHelper private constructor() {
     fun r20GetRtState(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as R20BleInterface--r20GetRtState")
