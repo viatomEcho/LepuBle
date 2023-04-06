@@ -37,6 +37,9 @@
             <include
                 android:id="@+id/r20_layout"
                 layout="@layout/r20_settings"/>
+            <include
+                android:id="@+id/bp3_layout"
+                layout="@layout/bp3_settings"/>
             <LinearLayout
                 android:id="@+id/le_bp2w_layout"
                 android:layout_width="match_parent"

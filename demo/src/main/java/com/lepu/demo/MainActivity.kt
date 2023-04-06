@@ -634,13 +634,23 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             .observe(this) {
                 Toast.makeText(this, "R20 获取设备信息成功", Toast.LENGTH_SHORT).show()
                 viewModel._er1Info.value = it.data as LepuDevice
-                LpBleUtil.r20GetBattery(it.model)
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetBattery)
+        //--------------------------R20--------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3SetUtcTime)
+            .observe(this) {
+                Toast.makeText(this, "BP3 完成时间同步", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3GetInfo)
+            .observe(this) {
+                Toast.makeText(this, "BP3 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                viewModel._er1Info.value = it.data as LepuDevice
+                LpBleUtil.bp3GetBattery(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3GetBattery)
             .observe(this) { event ->
                 (event.data as KtBleBattery).let {
                     viewModel._battery.value = "${it.percent} %"
-                    LpBleUtil.r20GetVersionInfo(event.model)
                 }
             }
     }

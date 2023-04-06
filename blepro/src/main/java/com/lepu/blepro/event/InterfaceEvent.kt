@@ -798,4 +798,36 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * Bp3BleInterface 发出的通知
+     * 包含model: MODEL_LP_BP3W, MODEL_LP_BP3C
+     */
+    interface BP3 {
+        companion object {
+            const val EventBp3GetInfo = "com.lepu.ble.bp3.get.info"                           // 设备信息 LepuDevice
+            const val EventBp3GetBattery = "com.lepu.ble.bp3.get.battery"                     // 电池信息 KtBleBattery
+            const val EventBp3RtData = "com.lepu.ble.bp3.rt.data"                             // 实时数据 Bp2BleRtData
+            const val EventBp3RtPressure = "com.lepu.ble.bp3.rt.pressure"                     // 实时压 int
+            const val EventBp3CurPressure = "com.lepu.ble.bp3.cur.pressure"                   // 当前压力 int
+            const val EventBp3RtWave = "com.lepu.ble.bp3.rt.wave"                             // 实时波形 Bp2BleRtWave
+            const val EventBp3Reset = "com.lepu.ble.bp3.reset"                                // 复位 boolean
+            const val EventBp3FactoryReset = "com.lepu.ble.bp3.factory.reset"                 // 恢复出厂设置 boolean
+            const val EventBp3FactoryResetAll = "com.lepu.ble.bp3.factory.reset.all"          // 恢复生产出厂状态 boolean
+            const val EventBp3SetConfig = "com.lepu.ble.bp3.set.config"                       // 设置心跳音开关 boolean
+            const val EventBp3GetConfig = "com.lepu.ble.bp3.get.config"                       // 获取参数 Bp3Config
+            const val EventBp3SetUtcTime = "com.lepu.ble.bp3.set.utc.time"                    // 同步UTC时间 boolean
+            const val EventBp3GetWifiList = "com.lepu.ble.bp3.get.wifi.list"                  // 获取路由 Bp2WifiDevice
+            const val EventBp3GetWifiConfig = "com.lepu.ble.bp3.get.wifi.config"              // 获取WiFi配置 Bp2WifiConfig
+            const val EventBp3SetWifiConfig = "com.lepu.ble.bp3.set.wifi.config"              // 设置WiFi boolean
+            const val EventBp3BurnFactoryInfo = "com.lepu.ble.bp3.burn.factory.info"          // 烧录设备信息 boolean
+            const val EventBp3CalibrationZero = "com.lepu.ble.bp3.calibration.zero"           // 校零 int
+            const val EventBp3CalibrationSlope = "com.lepu.ble.bp3.calibration.slope"         // 校准 int
+            const val EventBp3PressureTest = "com.lepu.ble.bp3.pressure.test"                 // 血压测试 boolean
+            const val EventBp3SwitchTestMode = "com.lepu.ble.bp3.switch.test.mode"            // 切换测试模式 boolean
+            const val EventBp3SwitchBpUnit = "com.lepu.ble.bp3.switch.bp.unit"                // 切换血压单位 boolean
+            const val EventBp3SwitchValve = "com.lepu.ble.bp3.switch.valve"                   // 气阀开关 boolean
+            const val EventBp3SwitchWifi4g = "com.lepu.ble.bp3.switch.wifi.4g"                // WiFi/4g开关 boolean
+        }
+    }
+
 }

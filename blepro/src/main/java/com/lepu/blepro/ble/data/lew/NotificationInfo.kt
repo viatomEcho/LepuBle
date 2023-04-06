@@ -1,6 +1,7 @@
 package com.lepu.blepro.ble.data.lew
 
 import com.lepu.blepro.ble.cmd.LewBleCmd
+import com.lepu.blepro.utils.ByteUtils.int4Bytes
 import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.int4ByteArray
@@ -10,13 +11,13 @@ import java.util.*
 class NotificationInfo {
 
     var appId = 0          // LewBleCmd.AppId
-    var time = 0           // 时间戳s
+    var time = 0L          // 时间戳s
     // reserve 5
     var info: Any? = null
 
     fun getDataBytes(): ByteArray {
         var data = byteArrayOf(appId.toByte())
-            .plus(int4ByteArray(time))
+            .plus(int4Bytes(time))
         data = when (appId) {
             LewBleCmd.AppId.PHONE -> {
                 data.plus((info as NotiPhone).getDataBytes())
@@ -37,7 +38,7 @@ class NotificationInfo {
             bytes : ${bytesToHex(getDataBytes())}
             appId : $appId
             time : $time
-            timeStr : ${stringFromDate(Date(time*1000L), "yyyy-MM-dd HH:mm:ss")}
+            timeStr : ${stringFromDate(Date(time*1000), "yyyy-MM-dd HH:mm:ss")}
             info : ${when (appId) {
                 LewBleCmd.AppId.PHONE -> info as NotiPhone
                 LewBleCmd.AppId.MESSAGE -> info as NotiMessage

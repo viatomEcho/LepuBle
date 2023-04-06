@@ -989,7 +989,6 @@
                         android:visibility="gone"
                         android:id="@+id/wireless_data_layout"
                         layout="@layout/wireless_data_dashboard"/>
-
                 </LinearLayout>
             </RelativeLayout>
             <CheckBox
@@ -1000,9 +999,50 @@
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:text="开始录制"/>
-
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/r20_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <CheckBox
+                    android:id="@+id/r20_ventilation_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:text="通气"/>
+                <CheckBox
+                    android:id="@+id/r20_mask_test"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dp_10"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:text="面罩佩戴测试"/>
+            </LinearLayout>
             <TextView
                 android:id="@+id/device_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+            <TextView
+                android:id="@+id/r20_state"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+            <TextView
+                android:id="@+id/r20_mask_test_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+            <TextView
+                android:id="@+id/r20_event"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp_10"

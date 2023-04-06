@@ -161,7 +161,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 }
 
                 //检查返回是否异常
-                if (bleResponse.pkgType != 0x01.toByte()) {
+                if (bleResponse.pkgType != 0x01) {
                     LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, READ_FILE_START => error")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileError).post(InterfaceEvent(model, fileName))
                     return
@@ -188,7 +188,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                 }
 
                 //检查返回是否异常
-                if (bleResponse.pkgType != 0x01.toByte()) {
+                if (bleResponse.pkgType != 0x01) {
                     LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, READ_FILE_CONTENT => error")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileError).post(InterfaceEvent(model, fileName))
                     return
@@ -212,7 +212,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
                     return
                 }
                 //检查返回是否异常
-                if (bleResponse.pkgType != 0x01.toByte()) {
+                if (bleResponse.pkgType != 0x01) {
                     LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, READ_FILE_END => error")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReadFileError).post(InterfaceEvent(model, fileName))
                     return
@@ -248,7 +248,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             SET_CONFIG -> {
-                if (bleResponse.pkgType != 0x01.toByte()) {
+                if (bleResponse.pkgType != 0x01) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSetConfig).post(InterfaceEvent(model, false))
                     LepuBleLog.d(tag, "model:$model,SET_CONFIG => error")
                     return
@@ -270,7 +270,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             RESET -> {
-                if (bleResponse.pkgType != 0x01.toByte()) {
+                if (bleResponse.pkgType != 0x01) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wReset).post(InterfaceEvent(model, false))
                     LepuBleLog.d(tag, "model:$model,RESET => error")
                     return
@@ -281,7 +281,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             FACTORY_RESET -> {
-                if (bleResponse.pkgType != 0x01.toByte()) {
+                if (bleResponse.pkgType != 0x01) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wFactoryReset).post(InterfaceEvent(model, false))
                     LepuBleLog.d(tag, "model:$model,FACTORY_RESET => error")
                     return
@@ -292,7 +292,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             FACTORY_RESET_ALL -> {
-                if (bleResponse.pkgType != 0x01.toByte()) {
+                if (bleResponse.pkgType != 0x01) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wFactoryResetAll).post(InterfaceEvent(model, false))
                     LepuBleLog.d(tag, "model:$model,FACTORY_RESET_ALL => error")
                     return
@@ -303,7 +303,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             SWITCH_STATE ->{
-                if (bleResponse.pkgType != 0x01.toByte()) {
+                if (bleResponse.pkgType != 0x01) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSwitchState).post(InterfaceEvent(model, false))
                     LepuBleLog.d(tag, "model:$model,SWITCH_STATE => error")
                     return
@@ -317,7 +317,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
             GET_WIFI_ROUTE -> {
                 LepuBleLog.d(tag, "model:$model,GET_WIFI_ROUTE => success")
                 LepuBleLog.d(tag, "model:$model,bytesToHex == " + bytesToHex(bleResponse.content))
-                if (bleResponse.pkgType == 0xFF.toByte()) {
+                if (bleResponse.pkgType == 0xFF) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiScanning).post(InterfaceEvent(model, true))
                 } else {
                     val data = Bp2WifiDevice(bleResponse.content)
@@ -339,7 +339,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             SET_WIFI_CONFIG -> {
-                if (bleResponse.pkgType != 0x01.toByte()) {
+                if (bleResponse.pkgType != 0x01) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSetWifiConfig).post(InterfaceEvent(model, false))
                     LepuBleLog.d(tag, "model:$model,SET_WIFI_CONFIG => error")
                     return
@@ -349,7 +349,7 @@ class Bp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             DELETE_FILE -> {
-                if (bleResponse.pkgType != 0x01.toByte()) {
+                if (bleResponse.pkgType != 0x01) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wDeleteFile).post(InterfaceEvent(model, false))
                     LepuBleLog.d(tag, "model:$model,DELETE_FILE => error")
                     return

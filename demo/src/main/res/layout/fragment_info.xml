@@ -144,6 +144,7 @@
                         android:layout_height="wrap_content"
                         android:text="WIFI列表"/>
                     <Button
+                        android:visibility="gone"
                         android:id="@+id/set_wifi_config"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -159,6 +160,34 @@
                 </LinearLayout>
                 <TextView
                     android:id="@+id/wifi_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:textColor="@color/colorRed"/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/server_config"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/get_4g_server"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="服务器信息"/>
+                    <Button
+                        android:id="@+id/set_4g_server"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_10"
+                        android:text="配置服务器"/>
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/server_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"

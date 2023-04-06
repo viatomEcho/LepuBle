@@ -5,8 +5,10 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.Bp2WifiConfig
 import com.lepu.blepro.ble.data.Bp2WifiDevice
+import com.lepu.blepro.ble.data.r20.StatisticsFile
 import com.lepu.blepro.event.*
 import com.lepu.demo.ble.LpBleUtil
+import com.lepu.demo.data.EcnData
 import com.lepu.demo.util.DateUtil
 import java.util.*
 
@@ -18,7 +20,11 @@ class R20ViewModel : InfoViewModel() {
                 val data = it.data as R20BleResponse.RecordList
                 val names = arrayListOf<String>()
                 for (file in data.list) {
-                    names.add(DateUtil.stringFromDate(Date(file.measureTime*1000), "yyyyMMdd_HHmmss"))
+                    if (data.type == 1) {
+                        names.add("${DateUtil.stringFromDate(Date(file.measureTime*1000), "yyyyMMdd")}_day.stat")
+                    }/* else if (data.type == 2) {
+                        names.add("${DateUtil.stringFromDate(Date(file.measureTime*1000), "yyyyMMdd_HHmmss")}.stat")
+                    }*/
                 }
                 _fileNames.value = names
                 _info.value = names.toString()
@@ -33,6 +39,11 @@ class R20ViewModel : InfoViewModel() {
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20ReadFileComplete)
             .observe(owner) {
+                val data = it.data as StatisticsFile
+                val temp = EcnData()
+                temp.fileName = data.fileName
+                temp.data = data.bytes
+                _ecnData.value = temp
                 _readNextFile.value = true
             }
         LiveEventBus.get<ResponseError>(EventMsgConst.Cmd.EventCmdResponseError)
@@ -40,7 +51,7 @@ class R20ViewModel : InfoViewModel() {
                 when (it.cmd) {
                     R20BleCmd.GET_WIFI_LIST -> {
                         handler.postDelayed({
-                            LpBleUtil.r20GetWifiList(it.model)
+                            LpBleUtil.bp2GetWifiDevice(it.model)
                         }, 1000)
                     }
                     R20BleCmd.GET_WIFI_CONFIG -> {
@@ -63,7 +74,7 @@ class R20ViewModel : InfoViewModel() {
                 val data = it.data as Boolean
                 if (data) {
                     handler.postDelayed({
-                        LpBleUtil.r20GetWifiConfig(it.model)
+                        LpBleUtil.bp2GetWifiConfig(it.model)
                     }, 1000)
                 }
             }

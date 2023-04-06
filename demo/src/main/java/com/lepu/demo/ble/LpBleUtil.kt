@@ -12,6 +12,7 @@ import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.FactoryConfig
+import com.lepu.blepro.ble.data.bp3.Bp3Config
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
 import com.lepu.blepro.ble.data.r20.VentilationSetting
@@ -108,6 +109,11 @@ class LpBleUtil {
             RAW_FOLDERS.put(Bluetooth.MODEL_BP2A, PathUtils.getExternalAppFilesPath() + "/bp2a/")
             RAW_FOLDERS.put(Bluetooth.MODEL_BP2T, PathUtils.getExternalAppFilesPath() + "/bp2t/")
             RAW_FOLDERS.put(Bluetooth.MODEL_BTP, PathUtils.getExternalAppFilesPath() + "/btp/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_R20, PathUtils.getExternalAppFilesPath() + "/r20/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_R21, PathUtils.getExternalAppFilesPath() + "/r21/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_R10, PathUtils.getExternalAppFilesPath() + "/r10/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_R11, PathUtils.getExternalAppFilesPath() + "/r11/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_LERES, PathUtils.getExternalAppFilesPath() + "/leres/")
 
             getServiceHelper()
                 .initLog(BuildConfig.DEBUG)
@@ -1094,6 +1100,9 @@ class LpBleUtil {
         fun r20GetBattery(model: Int) {
             BleServiceHelper.r20GetBattery(model)
         }
+        fun r20GetFileList(model: Int, fileType: Int, timestamp: Long) {
+            BleServiceHelper.getFileList(model, fileType, timestamp)
+        }
         fun r20DeviceBound(model: Int, bound: Boolean) {
             BleServiceHelper.r20DeviceBound(model, bound)
         }
@@ -1150,6 +1159,58 @@ class LpBleUtil {
         }
         fun r20GetRtState(model: Int) {
             BleServiceHelper.r20GetRtState(model)
+        }
+        // BP3
+        fun bp3GetBattery(model: Int) {
+            BleServiceHelper.bp3GetBattery(model)
+        }
+        fun bp3GetConfig(model: Int) {
+            BleServiceHelper.bp3GetConfig(model)
+        }
+        fun bp3SetConfig(model: Int, config: Bp3Config) {
+            BleServiceHelper.bp3SetConfig(model, config)
+        }
+        fun bp3CalibrationZero(model: Int) {
+            BleServiceHelper.bp3CalibrationZero(model)
+        }
+        fun bp3CalibrationSlope(model: Int, pressure: Int) {
+            BleServiceHelper.bp3CalibrationSlope(model, pressure)
+        }
+        @JvmOverloads
+        fun bp3GetRtPressure(model: Int, rate: Int = 0) {
+            BleServiceHelper.bp3GetRtPressure(model, rate)
+        }
+        fun bp3GetRtWave(model: Int) {
+            BleServiceHelper.bp3GetRtWave(model)
+        }
+        fun bp3PressureTest(model: Int, pressure: Int) {
+            BleServiceHelper.bp3PressureTest(model, pressure)
+        }
+        fun bp3SwitchValve(model: Int, on: Boolean) {
+            BleServiceHelper.bp3SwitchValve(model, on)
+        }
+        fun bp3GetCurPressure(model: Int) {
+            BleServiceHelper.bp3GetCurPressure(model)
+        }
+        fun bp3SwitchTestMode(model: Int, mode: Int) {
+            BleServiceHelper.bp3SwitchTestMode(model, mode)
+        }
+        fun bp3SwitchBpUnit(model: Int, unit: Int) {
+            BleServiceHelper.bp3SwitchBpUnit(model, unit)
+        }
+        @JvmOverloads
+        fun bp3GetWifiList(model: Int, deviceNum: Int = 0) {
+            BleServiceHelper.bp3GetWifiList(model, deviceNum)
+        }
+        fun bp3SetWifiConfig(model: Int, config: Bp2WifiConfig) {
+            BleServiceHelper.bp3SetWifiConfig(model, config)
+        }
+        @JvmOverloads
+        fun bp3GetWifiConfig(model: Int, option: Int = 3) {
+            BleServiceHelper.bp3GetWifiConfig(model, option)
+        }
+        fun bp3SwitchWifi4g(model: Int, on: Boolean) {
+            BleServiceHelper.bp3SwitchWifi4g(model, on)
         }
     }
 

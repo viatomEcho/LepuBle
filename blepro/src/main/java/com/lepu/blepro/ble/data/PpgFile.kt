@@ -1,9 +1,11 @@
 package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.ByteUtils.int4Bytes
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.int2ByteArray
 import com.lepu.blepro.utils.int4ByteArray
+import com.lepu.blepro.utils.toLong
 import com.lepu.blepro.utils.toUInt
 
 class PpgFile() {
@@ -19,7 +21,7 @@ class PpgFile() {
     var fileType = 7                        // 文件类型。一个字节
     // reserved 8
     var configSize = 128                    // 描述信息长度，默认（128字节）。两个字节
-    var sampleTime = 0                      // 采样时间unix时间戳，精确到s。四个字节
+    var sampleTime = 0L                     // 采样时间unix时间戳，精确到s。四个字节
     var sampleRate = 150                    // 采样率。两个字节
     var sampleBytes = 4                     // 设备采样点字节数
     var sampleSize = 0                      // 采样个数，采样个数 = 采样时长（秒）* 采样率。四个字节
@@ -43,7 +45,7 @@ class PpgFile() {
         index += 8
         configSize = toUInt(bytes.copyOfRange(index, index+2))
         index += 2
-        sampleTime = toUInt(bytes.copyOfRange(index, index+4))
+        sampleTime = toLong(bytes.copyOfRange(index, index+4))
         index += 4
         sampleRate = toUInt(bytes.copyOfRange(index, index+2))
         index += 2
@@ -104,7 +106,7 @@ class PpgFile() {
             .plus(fileType.toByte())
             .plus(ByteArray(8))
             .plus(int2ByteArray(configSize))
-            .plus(int4ByteArray(sampleTime))
+            .plus(int4Bytes(sampleTime))
             .plus(int2ByteArray(sampleRate))
             .plus(int4ByteArray(sampleSize))
             .plus(leadSize.toByte())

@@ -20,14 +20,12 @@ class WarningSetting() {
 
     constructor(bytes: ByteArray) : this() {
         var index = 0
-        warningApnea = WarningApnea(bytes.copyOfRange(index, index+1))
-        index++
         warningLeak = WarningLeak(bytes.copyOfRange(index, index+1))
+        index++
+        warningVentilation = WarningVentilation(bytes.copyOfRange(index, index+1))
         index++
         warningVt = WarningVt(bytes.copyOfRange(index, index+2))
         index += 2
-        warningVentilation = WarningVentilation(bytes.copyOfRange(index, index+1))
-        index++
         warningRrHigh = WarningRrHigh(bytes.copyOfRange(index, index+1))
         index++
         warningRrLow = WarningRrLow(bytes.copyOfRange(index, index+1))
@@ -37,6 +35,8 @@ class WarningSetting() {
         warningHrHigh = WarningHrHigh(bytes.copyOfRange(index, index+1))
         index++
         warningHrLow = WarningHrLow(bytes.copyOfRange(index, index+1))
+        index++
+        warningApnea = WarningApnea(bytes.copyOfRange(index, index+1))
     }
 
     fun getDataBytes(): ByteArray {
@@ -44,42 +44,42 @@ class WarningSetting() {
             .plus(ByteArray(3))
         when (type) {
             0 -> {
-                data = data.plus(warningApnea.getDataBytes())
-                    .plus(warningLeak.getDataBytes())
-                    .plus(warningVt.getDataBytes())
+                data = data.plus(warningLeak.getDataBytes())
                     .plus(warningVentilation.getDataBytes())
+                    .plus(warningVt.getDataBytes())
                     .plus(warningRrHigh.getDataBytes())
                     .plus(warningRrLow.getDataBytes())
                     .plus(warningSpo2Low.getDataBytes())
                     .plus(warningHrHigh.getDataBytes())
                     .plus(warningHrLow.getDataBytes())
+                    .plus(warningApnea.getDataBytes())
             }
             1 -> {
-                data = data.plus(warningApnea.getDataBytes())
+                data = data.plus(warningLeak.getDataBytes())
             }
             2 -> {
-                data = data.plus(warningLeak.getDataBytes())
+                data = data.plus(warningVentilation.getDataBytes())
             }
             3 -> {
                 data = data.plus(warningVt.getDataBytes())
             }
             4 -> {
-                data = data.plus(warningVentilation.getDataBytes())
-            }
-            5 -> {
                 data = data.plus(warningRrHigh.getDataBytes())
             }
-            6 -> {
+            5 -> {
                 data = data.plus(warningRrLow.getDataBytes())
             }
-            7 -> {
+            6 -> {
                 data = data.plus(warningSpo2Low.getDataBytes())
             }
-            8 -> {
+            7 -> {
                 data = data.plus(warningHrHigh.getDataBytes())
             }
-            9 -> {
+            8 -> {
                 data = data.plus(warningHrLow.getDataBytes())
+            }
+            9 -> {
+                data = data.plus(warningApnea.getDataBytes())
             }
         }
         return data

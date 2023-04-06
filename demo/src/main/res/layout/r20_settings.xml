@@ -11,6 +11,7 @@
             android:orientation="vertical"
             android:layout_marginEnd="@dimen/dp_10">
             <TextView
+                android:visibility="gone"
                 android:id="@+id/factory_info"
                 android:layout_width="80dp"
                 android:layout_height="50dp"
@@ -24,7 +25,7 @@
                 android:layout_width="80dp"
                 android:layout_height="50dp"
                 android:gravity="center"
-                android:background="@drawable/dialog_hint_shape"
+                android:background="@drawable/string_selected"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:text="系统设置"/>
@@ -71,6 +72,7 @@
             android:background="@color/black"/>
         <!-- 烧录信息 -->
         <LinearLayout
+            android:visibility="gone"
             android:id="@+id/factory_info_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -140,7 +142,6 @@
         </LinearLayout>
         <!-- 系统设置 -->
         <LinearLayout
-            android:visibility="gone"
             android:id="@+id/system_setting_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -218,6 +219,13 @@
                     android:textSize="16sp"
                     android:text="60%"/>
             </RelativeLayout>
+            <TextView
+                android:id="@+id/brightness_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorRed"
+                android:textSize="@dimen/sp_14"
+                android:text="范围"/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -237,6 +245,7 @@
                     android:layout_toRightOf="@+id/filter_text"
                     android:layout_toLeftOf="@+id/filter_process"
                     android:progress="1"
+                    android:min="0"
                     android:max="12"/>
                 <TextView
                     android:id="@+id/filter_process"
@@ -245,8 +254,15 @@
                     android:layout_alignParentRight="true"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:text="1 月"/>
+                    android:text="1 个月"/>
             </RelativeLayout>
+            <TextView
+                android:id="@+id/filter_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorRed"
+                android:textSize="@dimen/sp_14"
+                android:text="范围："/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -266,6 +282,7 @@
                     android:layout_toRightOf="@+id/mask_text"
                     android:layout_toLeftOf="@+id/mask_process"
                     android:progress="3"
+                    android:min="0"
                     android:max="12"/>
                 <TextView
                     android:id="@+id/mask_process"
@@ -274,8 +291,15 @@
                     android:layout_alignParentRight="true"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:text="3 月"/>
+                    android:text="3 个月"/>
             </RelativeLayout>
+            <TextView
+                android:id="@+id/mask_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorRed"
+                android:textSize="@dimen/sp_14"
+                android:text="范围："/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -295,6 +319,7 @@
                     android:layout_toRightOf="@+id/tube_text"
                     android:layout_toLeftOf="@+id/tube_process"
                     android:progress="3"
+                    android:min="0"
                     android:max="12"/>
                 <TextView
                     android:id="@+id/tube_process"
@@ -303,8 +328,15 @@
                     android:layout_alignParentRight="true"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:text="3 月"/>
+                    android:text="3 个月"/>
             </RelativeLayout>
+            <TextView
+                android:id="@+id/tube_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorRed"
+                android:textSize="@dimen/sp_14"
+                android:text="范围："/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -324,6 +356,7 @@
                     android:layout_toRightOf="@+id/tank_text"
                     android:layout_toLeftOf="@+id/tank_process"
                     android:progress="6"
+                    android:min="0"
                     android:max="12"/>
                 <TextView
                     android:id="@+id/tank_process"
@@ -332,8 +365,15 @@
                     android:layout_alignParentRight="true"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:text="6 月"/>
+                    android:text="6 个月"/>
             </RelativeLayout>
+            <TextView
+                android:id="@+id/tank_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorRed"
+                android:textSize="@dimen/sp_14"
+                android:text="范围："/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -352,7 +392,9 @@
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/volume_text"
                     android:layout_toLeftOf="@+id/volume_process"
-                    android:progress="30"/>
+                    android:progress="30"
+                    android:min="0"
+                    android:max="100"/>
                 <TextView
                     android:id="@+id/volume_process"
                     android:layout_width="wrap_content"
@@ -362,6 +404,13 @@
                     android:textSize="16sp"
                     android:text="30%"/>
             </RelativeLayout>
+            <TextView
+                android:id="@+id/volume_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorRed"
+                android:textSize="@dimen/sp_14"
+                android:text="范围："/>
         </LinearLayout>
         <!-- 测量设置 -->
         <LinearLayout
@@ -387,6 +436,7 @@
                     android:layout_height="wrap_content"/>
             </LinearLayout>
             <LinearLayout
+                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
                 <TextView
@@ -470,8 +520,15 @@
                     android:layout_alignParentRight="true"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:text="15 min"/>
+                    android:text="10.0 cmH2O"/>
             </RelativeLayout>
+            <TextView
+                android:id="@+id/mask_pressure_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorRed"
+                android:textSize="@dimen/sp_14"
+                android:text="范围："/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -490,8 +547,9 @@
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/ramp_pressure_text"
                     android:layout_toLeftOf="@+id/ramp_pressure_process"
-                    android:progress="2"
-                    android:max="6"/>
+                    android:progress="8"
+                    android:min="6"
+                    android:max="26"/>
                 <TextView
                     android:id="@+id/ramp_pressure_process"
                     android:layout_width="wrap_content"
@@ -501,6 +559,13 @@
                     android:textSize="16sp"
                     android:text="4.0 cmH2O"/>
             </RelativeLayout>
+            <TextView
+                android:id="@+id/ramp_pressure_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorRed"
+                android:textSize="@dimen/sp_14"
+                android:text="范围："/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -520,6 +585,7 @@
                     android:layout_toRightOf="@+id/ramp_time_text"
                     android:layout_toLeftOf="@+id/ramp_time_process"
                     android:progress="3"
+                    android:min="0"
                     android:max="12"/>
                 <TextView
                     android:id="@+id/ramp_time_process"
@@ -530,6 +596,13 @@
                     android:textSize="16sp"
                     android:text="15 min"/>
             </RelativeLayout>
+            <TextView
+                android:id="@+id/ramp_time_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorRed"
+                android:textSize="@dimen/sp_14"
+                android:text="范围："/>
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -570,6 +643,7 @@
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp">
             <LinearLayout
+                android:id="@+id/i_trigger_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
                 <TextView
@@ -584,6 +658,7 @@
                     android:layout_height="wrap_content"/>
             </LinearLayout>
             <LinearLayout
+                android:id="@+id/e_trigger_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
                 <TextView
@@ -597,247 +672,350 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
             </LinearLayout>
-            <RelativeLayout
+            <LinearLayout
+                android:id="@+id/cpap_pressure_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_10">
-                <TextView
-                    android:id="@+id/cpap_pressure_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="CPAP压力:"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
-                <SeekBar
-                    android:id="@+id/cpap_pressure"
+                android:layout_marginTop="@dimen/dp_10"
+                android:orientation="vertical">
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/cpap_pressure_text"
-                    android:layout_toLeftOf="@+id/cpap_pressure_process"
-                    android:progress="12"
-                    android:min="8"
-                    android:max="40"/>
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/cpap_pressure_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CPAP压力:"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+                    <SeekBar
+                        android:id="@+id/cpap_pressure"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/cpap_pressure_text"
+                        android:layout_toLeftOf="@+id/cpap_pressure_process"
+                        android:progress="12"
+                        android:min="8"
+                        android:max="40"/>
+                    <TextView
+                        android:id="@+id/cpap_pressure_process"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:text="6.0 cmH2O"/>
+                </RelativeLayout>
                 <TextView
-                    android:id="@+id/cpap_pressure_process"
+                    android:id="@+id/cpap_pressure_range"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:text="6.0 cmH2O"/>
-            </RelativeLayout>
-            <RelativeLayout
+                    android:textColor="@color/colorRed"
+                    android:textSize="@dimen/sp_14"
+                    android:text="范围："/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/apap_pressure_max_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
-
-                <TextView
-                    android:id="@+id/apap_pressure_max_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="APAP MAX:"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
-                <SeekBar
-                    android:id="@+id/apap_pressure_max"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/apap_pressure_max_text"
-                    android:layout_toLeftOf="@+id/apap_pressure_max_process"
-                    android:progress="24"
-                    android:min="8"
-                    android:max="40"/>
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/apap_pressure_max_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="APAP MAX:"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+                    <SeekBar
+                        android:id="@+id/apap_pressure_max"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/apap_pressure_max_text"
+                        android:layout_toLeftOf="@+id/apap_pressure_max_process"
+                        android:progress="24"
+                        android:min="8"
+                        android:max="40"/>
+                    <TextView
+                        android:id="@+id/apap_pressure_max_process"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:text="12.0 cmH2O"/>
+                </RelativeLayout>
                 <TextView
-                    android:id="@+id/apap_pressure_max_process"
+                    android:id="@+id/apap_pressure_max_range"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:text="12.0 cmH2O"/>
-            </RelativeLayout>
-            <RelativeLayout
+                    android:textColor="@color/colorRed"
+                    android:textSize="@dimen/sp_14"
+                    android:text="范围："/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/apap_pressure_min_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
-                <TextView
-                    android:id="@+id/apap_pressure_min_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="APAP MIN:"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
-                <SeekBar
-                    android:id="@+id/apap_pressure_min"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/apap_pressure_min_text"
-                    android:layout_toLeftOf="@+id/apap_pressure_min_process"
-                    android:progress="8"
-                    android:min="8"
-                    android:max="40"/>
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/apap_pressure_min_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="APAP MIN:"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+                    <SeekBar
+                        android:id="@+id/apap_pressure_min"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/apap_pressure_min_text"
+                        android:layout_toLeftOf="@+id/apap_pressure_min_process"
+                        android:progress="8"
+                        android:min="8"
+                        android:max="40"/>
+                    <TextView
+                        android:id="@+id/apap_pressure_min_process"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:text="4.0 cmH2O"/>
+                </RelativeLayout>
                 <TextView
-                    android:id="@+id/apap_pressure_min_process"
+                    android:id="@+id/apap_pressure_min_range"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:text="4.0 cmH2O"/>
-            </RelativeLayout>
-            <RelativeLayout
+                    android:textColor="@color/colorRed"
+                    android:textSize="@dimen/sp_14"
+                    android:text="范围："/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ipap_pressure_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
-                <TextView
-                    android:id="@+id/ipap_pressure_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="吸气压力:"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
-                <SeekBar
-                    android:id="@+id/ipap_pressure"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/ipap_pressure_text"
-                    android:layout_toLeftOf="@+id/ipap_pressure_process"
-                    android:progress="8"
-                    android:min="8"
-                    android:max="50"/>
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/ipap_pressure_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="吸气压力:"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+                    <SeekBar
+                        android:id="@+id/ipap_pressure"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/ipap_pressure_text"
+                        android:layout_toLeftOf="@+id/ipap_pressure_process"
+                        android:progress="20"
+                        android:min="8"
+                        android:max="50"/>
+                    <TextView
+                        android:id="@+id/ipap_pressure_process"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:text="10.0 cmH2O"/>
+                </RelativeLayout>
                 <TextView
-                    android:id="@+id/ipap_pressure_process"
+                    android:id="@+id/ipap_pressure_range"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:text="10.0 cmH2O"/>
-            </RelativeLayout>
-            <RelativeLayout
+                    android:textColor="@color/colorRed"
+                    android:textSize="@dimen/sp_14"
+                    android:text="范围："/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/epap_pressure_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
-                <TextView
-                    android:id="@+id/epap_pressure_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="呼气压力:"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
-                <SeekBar
-                    android:id="@+id/epap_pressure"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/epap_pressure_text"
-                    android:layout_toLeftOf="@+id/epap_pressure_process"
-                    android:progress="8"
-                    android:min="8"
-                    android:max="50"/>
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/epap_pressure_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="呼气压力:"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+                    <SeekBar
+                        android:id="@+id/epap_pressure"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/epap_pressure_text"
+                        android:layout_toLeftOf="@+id/epap_pressure_process"
+                        android:progress="8"
+                        android:min="8"
+                        android:max="50"/>
+                    <TextView
+                        android:id="@+id/epap_pressure_process"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:text="6.0 cmH2O"/>
+                </RelativeLayout>
                 <TextView
-                    android:id="@+id/epap_pressure_process"
+                    android:id="@+id/epap_pressure_range"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:text="6.0 cmH2O"/>
-            </RelativeLayout>
-            <RelativeLayout
+                    android:textColor="@color/colorRed"
+                    android:textSize="@dimen/sp_14"
+                    android:text="范围："/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/inspiratory_time_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
-                <TextView
-                    android:id="@+id/inspiratory_time_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="吸气时间:"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
-                <SeekBar
-                    android:id="@+id/inspiratory_time"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/inspiratory_time_text"
-                    android:layout_toLeftOf="@+id/inspiratory_time_process"
-                    android:progress="10"
-                    android:min="3"
-                    android:max="40"/>
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/inspiratory_time_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="吸气时间:"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+                    <SeekBar
+                        android:id="@+id/inspiratory_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/inspiratory_time_text"
+                        android:layout_toLeftOf="@+id/inspiratory_time_process"
+                        android:progress="10"
+                        android:min="3"
+                        android:max="40"/>
+                    <TextView
+                        android:id="@+id/inspiratory_time_process"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:text="1.0 s"/>
+                </RelativeLayout>
                 <TextView
-                    android:id="@+id/inspiratory_time_process"
+                    android:id="@+id/inspiratory_time_range"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:text="1.0 s"/>
-            </RelativeLayout>
-            <RelativeLayout
+                    android:textColor="@color/colorRed"
+                    android:textSize="@dimen/sp_14"
+                    android:text="范围："/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/respiratory_frequency_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
-                <TextView
-                    android:id="@+id/respiratory_frequency_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="呼吸频率:"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
-                <SeekBar
-                    android:id="@+id/respiratory_frequency"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/respiratory_frequency_text"
-                    android:layout_toLeftOf="@+id/respiratory_frequency_process"
-                    android:progress="12"
-                    android:min="5"
-                    android:max="30"/>
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/respiratory_frequency_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="呼吸频率:"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+                    <SeekBar
+                        android:id="@+id/respiratory_frequency"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/respiratory_frequency_text"
+                        android:layout_toLeftOf="@+id/respiratory_frequency_process"
+                        android:progress="12"
+                        android:min="5"
+                        android:max="30"/>
+                    <TextView
+                        android:id="@+id/respiratory_frequency_process"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:text="12 bpm"/>
+                </RelativeLayout>
                 <TextView
-                    android:id="@+id/respiratory_frequency_process"
+                    android:id="@+id/respiratory_frequency_range"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:text="12 min"/>
-            </RelativeLayout>
-            <RelativeLayout
+                    android:textColor="@color/colorRed"
+                    android:textSize="@dimen/sp_14"
+                    android:text="范围："/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/raise_time_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
-                <TextView
-                    android:id="@+id/rise_time_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="上升时间:"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
-                <SeekBar
-                    android:id="@+id/raise_time"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/rise_time_text"
-                    android:layout_toLeftOf="@+id/rise_time_process"
-                    android:progress="4"
-                    android:min="2"
-                    android:max="18"/>
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/raise_time_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="压力上升时间:"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+                    <SeekBar
+                        android:id="@+id/raise_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/raise_time_text"
+                        android:layout_toLeftOf="@+id/raise_time_process"
+                        android:progress="4"
+                        android:min="2"
+                        android:max="18"/>
+                    <TextView
+                        android:id="@+id/raise_time_process"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:text="200 ms"/>
+                </RelativeLayout>
                 <TextView
-                    android:id="@+id/rise_time_process"
+                    android:id="@+id/raise_time_range"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:text="200 ms"/>
-            </RelativeLayout>
+                    android:textColor="@color/colorRed"
+                    android:textSize="@dimen/sp_14"
+                    android:text="范围："/>
+            </LinearLayout>
         </LinearLayout>
         <!-- 报警设置 -->
         <LinearLayout
@@ -876,115 +1054,174 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
             </LinearLayout>
-            <RelativeLayout
+            <LinearLayout
+                android:id="@+id/low_ventilation_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_10">
-                <TextView
-                    android:id="@+id/low_ventilation_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="分钟通气量低:"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
-                <SeekBar
-                    android:id="@+id/low_ventilation"
+                android:layout_marginTop="@dimen/dp_10"
+                android:orientation="vertical">
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/low_ventilation_text"
-                    android:layout_toLeftOf="@+id/low_ventilation_process"
-                    android:max="25"/>
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/low_ventilation_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="分钟通气量低:"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+                    <SeekBar
+                        android:id="@+id/low_ventilation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/low_ventilation_text"
+                        android:layout_toLeftOf="@+id/low_ventilation_process"
+                        android:progress="0"
+                        android:min="0"
+                        android:max="25"/>
+                    <TextView
+                        android:id="@+id/low_ventilation_process"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"/>
+                </RelativeLayout>
                 <TextView
-                    android:id="@+id/low_ventilation_process"
+                    android:id="@+id/low_ventilation_range"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"/>
-            </RelativeLayout>
-            <RelativeLayout
+                    android:textColor="@color/colorRed"
+                    android:textSize="@dimen/sp_14"
+                    android:text="范围："/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/vt_low_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
-                <TextView
-                    android:id="@+id/vt_low_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="潮气量低:"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
-                <SeekBar
-                    android:id="@+id/vt_low"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/vt_low_text"
-                    android:layout_toLeftOf="@+id/vt_low_process"
-                    android:min="19"
-                    android:max="200"/>
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/vt_low_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="潮气量低:"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+                    <SeekBar
+                        android:id="@+id/vt_low"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/vt_low_text"
+                        android:layout_toLeftOf="@+id/vt_low_process"
+                        android:progress="0"
+                        android:min="19"
+                        android:max="200"/>
+                    <TextView
+                        android:id="@+id/vt_low_process"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"/>
+                </RelativeLayout>
                 <TextView
-                    android:id="@+id/vt_low_process"
+                    android:id="@+id/vt_low_range"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"/>
-            </RelativeLayout>
-            <RelativeLayout
+                    android:textColor="@color/colorRed"
+                    android:textSize="@dimen/sp_14"
+                    android:text="范围："/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/rr_high_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
-                <TextView
-                    android:id="@+id/rr_high_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="呼吸频率高:"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
-                <SeekBar
-                    android:id="@+id/rr_high"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/rr_high_text"
-                    android:layout_toLeftOf="@+id/rr_high_process"
-                    android:max="60"/>
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/rr_high_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="呼吸频率高:"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+                    <SeekBar
+                        android:id="@+id/rr_high"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/rr_high_text"
+                        android:layout_toLeftOf="@+id/rr_high_process"
+                        android:progress="0"
+                        android:min="0"
+                        android:max="60"/>
+                    <TextView
+                        android:id="@+id/rr_high_process"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"/>
+                </RelativeLayout>
                 <TextView
-                    android:id="@+id/rr_high_process"
+                    android:id="@+id/rr_high_range"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"/>
-            </RelativeLayout>
-            <RelativeLayout
+                    android:textColor="@color/colorRed"
+                    android:textSize="@dimen/sp_14"
+                    android:text="范围："/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/rr_low_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
-                <TextView
-                    android:id="@+id/rr_low_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="呼吸频率低:"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
-                <SeekBar
-                    android:id="@+id/rr_low"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/rr_low_text"
-                    android:layout_toLeftOf="@+id/rr_low_process"
-                    android:max="60"/>
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/rr_low_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="呼吸频率低:"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+                    <SeekBar
+                        android:id="@+id/rr_low"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/rr_low_text"
+                        android:layout_toLeftOf="@+id/rr_low_process"
+                        android:progress="0"
+                        android:min="0"
+                        android:max="60"/>
+                    <TextView
+                        android:id="@+id/rr_low_process"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"/>
+                </RelativeLayout>
                 <TextView
-                    android:id="@+id/rr_low_process"
+                    android:id="@+id/rr_low_range"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"/>
-            </RelativeLayout>
+                    android:textColor="@color/colorRed"
+                    android:textSize="@dimen/sp_14"
+                    android:text="范围："/>
+            </LinearLayout>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -1003,6 +1240,7 @@
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/spo2_low_text"
                     android:layout_toLeftOf="@+id/spo2_low_process"
+                    android:progress="0"
                     android:min="79"
                     android:max="95"/>
                 <TextView
@@ -1013,6 +1251,13 @@
                     android:textColor="@color/black"
                     android:textSize="16sp"/>
             </RelativeLayout>
+            <TextView
+                android:id="@+id/spo2_low_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorRed"
+                android:textSize="@dimen/sp_14"
+                android:text="范围："/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -1031,6 +1276,7 @@
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/hr_high_text"
                     android:layout_toLeftOf="@+id/hr_high_process"
+                    android:progress="0"
                     android:min="9"
                     android:max="24"/>
                 <TextView
@@ -1041,6 +1287,13 @@
                     android:textColor="@color/black"
                     android:textSize="16sp"/>
             </RelativeLayout>
+            <TextView
+                android:id="@+id/hr_high_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorRed"
+                android:textSize="@dimen/sp_14"
+                android:text="范围："/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -1059,6 +1312,7 @@
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/hr_low_text"
                     android:layout_toLeftOf="@+id/hr_low_process"
+                    android:progress="0"
                     android:min="5"
                     android:max="14"/>
                 <TextView
@@ -1069,6 +1323,13 @@
                     android:textColor="@color/black"
                     android:textSize="16sp"/>
             </RelativeLayout>
+            <TextView
+                android:id="@+id/hr_low_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorRed"
+                android:textSize="@dimen/sp_14"
+                android:text="范围："/>
         </LinearLayout>
         <!-- 其他设置 -->
         <LinearLayout

@@ -21,9 +21,6 @@ import kotlin.experimental.inv
  * 1.同步时间/UTC时间
  * 2.获取设备信息
  * 3.获取实时数据
- * 4.设置系统开关
- * 5.设置心率、温度高低阈值
- * 6.设置温度单位
  * 7.复位
  * 8.恢复出厂设置
  * 9.恢复生产状态
@@ -111,6 +108,9 @@ class R20BleInterface(model: Int): BleInterface(model) {
             data.type = response.pkgType
             LiveEventBus.get<ResponseError>(EventMsgConst.Cmd.EventCmdResponseError).post(data)
             LepuBleLog.d(tag, "model:$model,ResponseError => $data")
+            if (response.cmd == LpBleCmd.ECHO) {
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20EchoData).post(InterfaceEvent(model, response))
+            }
         } else {
             when(response.cmd) {
                 LpBleCmd.ECHO -> {
@@ -195,7 +195,7 @@ class R20BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,GET_WIFI_LIST => response.content.isEmpty()")
                         return
                     }
-                    val data = Bp2WifiDevice(response.bytes)
+                    val data = Bp2WifiDevice(response.content)
                     LepuBleLog.d(tag, "model:$model,GET_WIFI_LIST => success, data: $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetWifiList).post(InterfaceEvent(model, data))
                 }
@@ -271,7 +271,7 @@ class R20BleInterface(model: Int): BleInterface(model) {
                 }
                 R20BleCmd.GET_WARNING_SETTING -> {
                     if (response.len < 10) {
-                        LepuBleLog.d(tag, "model:$model,GET_WARNING_SETTING => response.len < 9")
+                        LepuBleLog.d(tag, "model:$model,GET_WARNING_SETTING => response.len < 10")
                         return
                     }
                     val data = WarningSetting(response.content)
@@ -342,7 +342,8 @@ class R20BleInterface(model: Int): BleInterface(model) {
                     if (fileContent.size < fileSize) {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20ReadFileError).post(InterfaceEvent(model, true))
                     } else {
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20ReadFileComplete).post(InterfaceEvent(model, fileContent))
+                        val data = StatisticsFile(fileName, fileContent)
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20ReadFileComplete).post(InterfaceEvent(model, data))
                     }
                 }
                 R20BleCmd.RT_STATE -> {
@@ -380,26 +381,27 @@ class R20BleInterface(model: Int): BleInterface(model) {
      * get device info
      */
     override fun getInfo() {
-        LpBleCmd.getInfo()
+        sendCmd(LpBleCmd.getInfo())
         LepuBleLog.d(tag, "getInfo...")
     }
 
     override fun syncTime() {
-        LpBleCmd.setUtcTime()
+        sendCmd(LpBleCmd.setUtcTime())
         LepuBleLog.d(tag, "syncTime...")
     }
 
     override fun reset() {
-        LpBleCmd.reset()
+        sendCmd(LpBleCmd.reset())
         LepuBleLog.d(tag, "reset...")
     }
 
     override fun factoryReset() {
-        LpBleCmd.factoryReset()
+        sendCmd(LpBleCmd.factoryReset())
         LepuBleLog.d(tag, "factoryReset...")
     }
 
     override fun factoryResetAll() {
+        sendCmd(LpBleCmd.factoryResetAll())
         LepuBleLog.d(tag, "factoryResetAll...")
     }
 
@@ -407,6 +409,7 @@ class R20BleInterface(model: Int): BleInterface(model) {
      * get real-time data
      */
     override fun getRtData() {
+        sendCmd(R20BleCmd.getRtState())
         sendCmd(R20BleCmd.getRtParam())
         LepuBleLog.d(tag, "getRtData...")
     }

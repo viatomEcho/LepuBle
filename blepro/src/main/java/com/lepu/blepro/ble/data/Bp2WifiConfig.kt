@@ -16,28 +16,81 @@ class Bp2WifiConfig() {
         var index = 0
         option = (bytes[index].toUInt() and 0xFFu).toInt()
         index++
-        wifi = Bp2Wifi(index, bytes)
-        index += wifi.length
-        server = Bp2Server(index, bytes)
-        index += server.length
+        when (option) {
+            1 -> {
+                wifi = Bp2Wifi(index, bytes)
+                index += wifi.length
+            }
+            2, 8 -> {
+                server = Bp2Server(index, bytes)
+                index += server.length
+            }
+            3 -> {
+                wifi = Bp2Wifi(index, bytes)
+                index += wifi.length
+                server = Bp2Server(index, bytes)
+                index += server.length
+            }
+        }
         length = index
     }
 
     fun getDataBytes(): ByteArray {
         val data = byteArrayOf(option.toByte())
-        return data.plus(wifi.getDataBytes())
-            .plus(server.getDataBytes())
+        if (isWifiInitialized() && isServerInitialized()) {
+            return data.plus(wifi.getDataBytes())
+                .plus(server.getDataBytes())
+        } else if (isWifiInitialized()) {
+            return data.plus(wifi.getDataBytes())
+        } else if (isServerInitialized()) {
+            return data.plus(server.getDataBytes())
+        }
+        return data
+    }
+
+    fun isServerInitialized(): Boolean {
+        return this::server.isInitialized
+    }
+    fun isWifiInitialized(): Boolean {
+        return this::wifi.isInitialized
     }
 
     override fun toString(): String {
+        if (isWifiInitialized() && isServerInitialized()) {
+            return """
+                Bp2WifiConfig : 
+                bytes : ${bytesToHex(bytes)}
+                getDataBytes : ${bytesToHex(getDataBytes())}
+                length : $length
+                option : $option
+                wifi : $wifi
+                server : $server
+            """.trimIndent()
+        } else if (isWifiInitialized()) {
+            return """
+                Bp2WifiConfig : 
+                bytes : ${bytesToHex(bytes)}
+                getDataBytes : ${bytesToHex(getDataBytes())}
+                length : $length
+                option : $option
+                wifi : $wifi
+            """.trimIndent()
+        } else if (isServerInitialized()) {
+            return """
+                Bp2WifiConfig : 
+                bytes : ${bytesToHex(bytes)}
+                getDataBytes : ${bytesToHex(getDataBytes())}
+                length : $length
+                option : $option
+                server : $server
+            """.trimIndent()
+        }
         return """
             Bp2WifiConfig : 
             bytes : ${bytesToHex(bytes)}
             getDataBytes : ${bytesToHex(getDataBytes())}
             length : $length
             option : $option
-            wifi : $wifi
-            server : $server
         """.trimIndent()
     }
 

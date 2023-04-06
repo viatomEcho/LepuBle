@@ -94,6 +94,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.vtm01Layout.root.visibility = View.GONE
         binding.btpLayout.root.visibility = View.GONE
         binding.r20Layout.root.visibility = View.GONE
+        binding.bp3Layout.root.visibility = View.GONE
         binding.sendCmd.visibility = View.GONE
         binding.content.visibility = View.GONE
         if (v == null) return
@@ -275,9 +276,16 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     (settingViewModel as R20ViewModel).initEvent(this)
                     LpBleUtil.r20GetRtState(it)
                     LpBleUtil.r20GetSystemSetting(it)
-                    LpBleUtil.r20GetMeasureSetting(it)
                     LpBleUtil.r20GetVentilationSetting(it)
+                    LpBleUtil.r20GetMeasureSetting(it)
                     LpBleUtil.r20GetWarningSetting(it)
+                }
+                Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                    setViewVisible(binding.bp3Layout.root)
+                    settingViewModel = ViewModelProvider(this).get(Bp3ViewModel::class.java)
+                    (settingViewModel as Bp3ViewModel).initView(requireContext(), binding, it)
+                    (settingViewModel as Bp3ViewModel).initEvent(this)
+                    LpBleUtil.bp3GetConfig(it)
                 }
                 else -> {
                     setViewVisible(null)
@@ -320,6 +328,19 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.lepodLayout.version.setText("${it.hwV}")
                 binding.lepodLayout.sn.setText("${it.sn}")
                 binding.lepodLayout.code.setText("${it.branchCode}")
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R20
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R21
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R10
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R11
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LERES) {
+                binding.r20Layout.version.setText("${it.hwV}")
+                binding.r20Layout.sn.setText("${it.sn}")
+                binding.r20Layout.code.setText("${it.branchCode}")
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP3W
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP3C) {
+                binding.bp3Layout.version.setText("${it.hwV}")
+                binding.bp3Layout.sn.setText("${it.sn}")
+                binding.bp3Layout.code.setText("${it.branchCode}")
             }
         }
         mainViewModel.er2Info.observe(viewLifecycleOwner) {

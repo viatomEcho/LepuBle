@@ -258,8 +258,8 @@ public class R20BleCmd {
         public static final int AUTO_SWITCH = 3;      // 自动启停
         public static final int PRE_HEAT = 4;         // 预加热
         public static final int RAMP = 5;             // 缓慢升压
-        public static final int TUBE_TYPE = 5;        // 管道类型
-        public static final int MASK = 5;             // 面罩
+        public static final int TUBE_TYPE = 6;        // 管道类型
+        public static final int MASK = 7;             // 面罩
     }
     public static class VentilationSetting {
         public static final int ALL = 0;

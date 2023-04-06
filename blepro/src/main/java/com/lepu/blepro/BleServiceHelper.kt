@@ -14,6 +14,7 @@ import com.lepu.blepro.base.LpWorkManager
 import com.lepu.blepro.ble.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.FactoryConfig
+import com.lepu.blepro.ble.data.bp3.Bp3Config
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
 import com.lepu.blepro.ble.data.r20.VentilationSetting
@@ -709,6 +710,7 @@ class BleServiceHelper private constructor() {
      * @param fileType LeBp2w获取文件列表类型（LeBp2wBleCmd.FileType.ECG_TYPE, BP_TYPE, USER_TYPE）
      * @param fileType CheckmeLe获取文件列表类型（CheckmeLeBleCmd.ListType.ECG_TYPE, OXY_TYPE, DLC_TYPE）
      * @param fileType 4G手表获取文件列表类型（LewBleCmd.ListType.SPORT, ECG, HR, OXY, SLEEP）
+     * @param fileType 呼吸机获取文件列表类型（0：当天统计，1：单次统计）
      * @param startTime 起始时间戳 单位秒
      */
     @JvmOverloads
@@ -1032,10 +1034,28 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
-            Bluetooth.MODEL_LEPOD -> {
+            Bluetooth.MODEL_LEPOD, Bluetooth.MODEL_ER3 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as LepodBleInterface).let {
+                        LepuBleLog.d(tag, "it as LepodBleInterface--burnFactoryInfo")
+                        it.burnFactoryInfo(config)
+                    }
+                }
+            }
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as R20BleInterface).let {
                         LepuBleLog.d(tag, "it as BtpBleInterface--burnFactoryInfo")
+                        it.burnFactoryInfo(config)
+                    }
+                }
+            }
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--burnFactoryInfo")
                         it.burnFactoryInfo(config)
                     }
                 }
@@ -1444,6 +1464,24 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as R20BleInterface).let {
+                        LepuBleLog.d(tag, "it as R20BleInterface--r20GetWifiList")
+                        it.getWifiList(0)
+                    }
+                }
+            }
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp2GetWifiDevice")
+                        it.getWifiList(0)
+                    }
+                }
+            }
             else -> LepuBleLog.d(tag, "bp2GetWifiDevice current model $model unsupported!!")
         }
     }
@@ -1466,6 +1504,24 @@ class BleServiceHelper private constructor() {
                 getInterface(model)?.let { it1 ->
                     (it1 as LeBp2wBleInterface).let {
                         LepuBleLog.d(tag, "it as LeBp2wBleInterface--bp2SetWifiConfig")
+                        it.setWifiConfig(config)
+                    }
+                }
+            }
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as R20BleInterface).let {
+                        LepuBleLog.d(tag, "it as R20BleInterface--r20GetWifiList")
+                        it.setWifiConfig(config)
+                    }
+                }
+            }
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3SetWifiConfig")
                         it.setWifiConfig(config)
                     }
                 }
@@ -1493,6 +1549,32 @@ class BleServiceHelper private constructor() {
                     (it1 as LeBp2wBleInterface).let {
                         LepuBleLog.d(tag, "it as LeBp2wBleInterface--bp2GetWifiConfig")
                         it.getWifiConfig()
+                    }
+                }
+            }
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as R20BleInterface).let {
+                        LepuBleLog.d(tag, "it as R20BleInterface--r20GetWifiList")
+                        it.getWifiConfig(3)
+                    }
+                }
+            }
+            Bluetooth.MODEL_LP_BP3W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3GetWifiConfig")
+                        it.getWifiConfig(3)
+                    }
+                }
+            }
+            Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3GetWifiConfig")
+                        it.getWifiConfig(8)
                     }
                 }
             }
@@ -3927,6 +4009,241 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.d(tag, "r20GetRtState current model $model unsupported!!")
+        }
+    }
+    // BP3
+    fun bp3GetBattery(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3GetBattery")
+                        it.getBattery()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp3GetBattery current model $model unsupported!!")
+        }
+    }
+    fun bp3GetConfig(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3GetConfig")
+                        it.getConfig()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp3GetConfig current model $model unsupported!!")
+        }
+    }
+    fun bp3SetConfig(model: Int, config: Bp3Config) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3SetConfig")
+                        it.setConfig(config)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp3SetConfig current model $model unsupported!!")
+        }
+    }
+    fun bp3CalibrationZero(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3CalibrationZero")
+                        it.calibrationZero()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp3CalibrationZero current model $model unsupported!!")
+        }
+    }
+    fun bp3CalibrationSlope(model: Int, pressure: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3CalibrationSlope")
+                        it.calibrationSlope(pressure)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp3CalibrationSlope current model $model unsupported!!")
+        }
+    }
+    @JvmOverloads
+    fun bp3GetRtPressure(model: Int, rate: Int = 0) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3GetRtPressure")
+                        it.getRtPressure(rate)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp3GetRtPressure current model $model unsupported!!")
+        }
+    }
+    fun bp3GetRtWave(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3GetRtWave")
+                        it.getRtWave()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp3GetRtWave current model $model unsupported!!")
+        }
+    }
+    fun bp3PressureTest(model: Int, pressure: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3PressureTest")
+                        it.pressureTest(pressure)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp3PressureTest current model $model unsupported!!")
+        }
+    }
+    fun bp3SwitchValve(model: Int, on: Boolean) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3SwitchValve")
+                        it.switchValve(on)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp3SwitchValve current model $model unsupported!!")
+        }
+    }
+    fun bp3GetCurPressure(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3GetCurPressure")
+                        it.getCurPressure()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp3GetCurPressure current model $model unsupported!!")
+        }
+    }
+    fun bp3SwitchTestMode(model: Int, mode: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3SwitchTestMode")
+                        it.switchTestMode(mode)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp3SwitchTestMode current model $model unsupported!!")
+        }
+    }
+    fun bp3SwitchBpUnit(model: Int, unit: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3SwitchBpUnit")
+                        it.switchBpUnit(unit)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp3SwitchBpUnit current model $model unsupported!!")
+        }
+    }
+    /**
+     * deviceNum: 所需设备个数
+     * 默认0，发送搜索到的所有WiFi
+     */
+    @JvmOverloads
+    fun bp3GetWifiList(model: Int, deviceNum: Int = 0) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3GetWifiList")
+                        it.getWifiList(deviceNum)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp3GetWifiList current model $model unsupported!!")
+        }
+    }
+    fun bp3SetWifiConfig(model: Int, config: Bp2WifiConfig) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3SetWifiConfig")
+                        it.setWifiConfig(config)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp3SetWifiConfig current model $model unsupported!!")
+        }
+    }
+    /**
+     * option: Bit0:wifi Bit1:server Bit2:device
+     * 默认3，WiFi+Server
+     */
+    fun bp3GetWifiConfig(model: Int, option: Int = 3) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3GetWifiConfig")
+                        it.getWifiConfig(option)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp3GetWifiConfig current model $model unsupported!!")
+        }
+    }
+    fun bp3SwitchWifi4g(model: Int, on: Boolean) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3SwitchWifi4g")
+                        it.switchWifi4g(on)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "bp3SwitchWifi4g current model $model unsupported!!")
         }
     }
 }

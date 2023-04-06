@@ -466,7 +466,12 @@ object LpWorkManager {
                     return this
                 }
             }
-
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                Bp3BleInterface(m).apply {
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
             else -> {
 //                return throw Exception("BleService initInterfaces() 未配置此model:$m")
                 return null

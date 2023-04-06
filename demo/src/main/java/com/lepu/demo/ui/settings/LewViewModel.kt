@@ -320,7 +320,7 @@ class LewViewModel : SettingViewModel() {
         binding.lewLayout.lewPhoneNoti.setOnClickListener {
             val noti = NotificationInfo()
             noti.appId = LewBleCmd.AppId.PHONE
-            noti.time = System.currentTimeMillis().div(1000).toInt()
+            noti.time = System.currentTimeMillis().div(1000)
 
             val phone = NotificationInfo.NotiPhone()
             phone.name = "张三里abc123"
@@ -338,7 +338,7 @@ class LewViewModel : SettingViewModel() {
         binding.lewLayout.lewMessageNoti.setOnClickListener {
             val noti = NotificationInfo()
             noti.appId = LewBleCmd.AppId.MESSAGE
-            noti.time = System.currentTimeMillis().div(1000).toInt()
+            noti.time = System.currentTimeMillis().div(1000)
 
             val mess = NotificationInfo.NotiMessage()
             mess.name = "张三里abc123"
@@ -357,7 +357,7 @@ class LewViewModel : SettingViewModel() {
         binding.lewLayout.lewOtherNoti.setOnClickListener {
             val noti = NotificationInfo()
             noti.appId = LewBleCmd.AppId.OTHER
-            noti.time = System.currentTimeMillis().div(1000).toInt()
+            noti.time = System.currentTimeMillis().div(1000)
 
             val other = NotificationInfo.NotiOther()
             other.name = "张三里abc123"

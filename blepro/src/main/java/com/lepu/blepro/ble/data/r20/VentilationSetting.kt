@@ -27,9 +27,9 @@ class VentilationSetting() {
         index++
         pressureMin = PressureMin(bytes.copyOfRange(index, index+1))
         index++
-        pressureExhale = PressureExhale(bytes.copyOfRange(index, index+1))
-        index++
         pressureInhale = PressureInhale(bytes.copyOfRange(index, index+1))
+        index++
+        pressureExhale = PressureExhale(bytes.copyOfRange(index, index+1))
         index++
         inhaleDuration = InhaleDuration(bytes.copyOfRange(index, index+1))
         index++
@@ -37,9 +37,9 @@ class VentilationSetting() {
         index++
         pressureRaiseDuration = PressureRaiseDuration(bytes.copyOfRange(index, index+2))
         index += 2
-        exhaleSensitive = ExhaleSensitive(bytes.copyOfRange(index, index+1))
-        index++
         inhaleSensitive = InhaleSensitive(bytes.copyOfRange(index, index+1))
+        index++
+        exhaleSensitive = ExhaleSensitive(bytes.copyOfRange(index, index+1))
     }
 
     fun getDataBytes(): ByteArray {
@@ -50,13 +50,13 @@ class VentilationSetting() {
                 data = data.plus(pressure.getDataBytes())
                     .plus(pressureMax.getDataBytes())
                     .plus(pressureMin.getDataBytes())
-                    .plus(pressureExhale.getDataBytes())
                     .plus(pressureInhale.getDataBytes())
+                    .plus(pressureExhale.getDataBytes())
                     .plus(inhaleDuration.getDataBytes())
                     .plus(respiratoryRate.getDataBytes())
                     .plus(pressureRaiseDuration.getDataBytes())
-                    .plus(exhaleSensitive.getDataBytes())
                     .plus(inhaleSensitive.getDataBytes())
+                    .plus(exhaleSensitive.getDataBytes())
             }
             1 -> {
                 data = data.plus(pressure.getDataBytes())
@@ -68,10 +68,10 @@ class VentilationSetting() {
                 data = data.plus(pressureMin.getDataBytes())
             }
             4 -> {
-                data = data.plus(pressureExhale.getDataBytes())
+                data = data.plus(pressureInhale.getDataBytes())
             }
             5 -> {
-                data = data.plus(pressureInhale.getDataBytes())
+                data = data.plus(pressureExhale.getDataBytes())
             }
             6 -> {
                 data = data.plus(inhaleDuration.getDataBytes())
@@ -83,10 +83,10 @@ class VentilationSetting() {
                 data = data.plus(pressureRaiseDuration.getDataBytes())
             }
             9 -> {
-                data = data.plus(exhaleSensitive.getDataBytes())
+                data = data.plus(inhaleSensitive.getDataBytes())
             }
             10 -> {
-                data = data.plus(inhaleSensitive.getDataBytes())
+                data = data.plus(exhaleSensitive.getDataBytes())
             }
         }
         return data
@@ -171,7 +171,7 @@ class VentilationSetting() {
     }
     // 通气控制：呼吸频率
     class RespiratoryRate() {
-        var rate = 5  // 呼吸频率。范围：5-30。 单位/min
+        var rate = 5  // 呼吸频率。范围：5-30。 单位/min bpm
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0
