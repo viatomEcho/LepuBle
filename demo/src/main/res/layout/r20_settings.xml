@@ -1077,7 +1077,7 @@
                         android:layout_centerVertical="true"
                         android:layout_toRightOf="@+id/low_ventilation_text"
                         android:layout_toLeftOf="@+id/low_ventilation_process"
-                        android:progress="0"
+                        android:progress="1"
                         android:min="0"
                         android:max="25"/>
                     <TextView
@@ -1119,7 +1119,7 @@
                         android:layout_centerVertical="true"
                         android:layout_toRightOf="@+id/vt_low_text"
                         android:layout_toLeftOf="@+id/vt_low_process"
-                        android:progress="0"
+                        android:progress="20"
                         android:min="19"
                         android:max="200"/>
                     <TextView
@@ -1161,7 +1161,7 @@
                         android:layout_centerVertical="true"
                         android:layout_toRightOf="@+id/rr_high_text"
                         android:layout_toLeftOf="@+id/rr_high_process"
-                        android:progress="0"
+                        android:progress="1"
                         android:min="0"
                         android:max="60"/>
                     <TextView
@@ -1203,7 +1203,7 @@
                         android:layout_centerVertical="true"
                         android:layout_toRightOf="@+id/rr_low_text"
                         android:layout_toLeftOf="@+id/rr_low_process"
-                        android:progress="0"
+                        android:progress="1"
                         android:min="0"
                         android:max="60"/>
                     <TextView
@@ -1240,7 +1240,7 @@
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/spo2_low_text"
                     android:layout_toLeftOf="@+id/spo2_low_process"
-                    android:progress="0"
+                    android:progress="80"
                     android:min="79"
                     android:max="95"/>
                 <TextView
@@ -1276,7 +1276,7 @@
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/hr_high_text"
                     android:layout_toLeftOf="@+id/hr_high_process"
-                    android:progress="0"
+                    android:progress="10"
                     android:min="9"
                     android:max="24"/>
                 <TextView
@@ -1312,7 +1312,7 @@
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/hr_low_text"
                     android:layout_toLeftOf="@+id/hr_low_process"
-                    android:progress="0"
+                    android:progress="6"
                     android:min="5"
                     android:max="14"/>
                 <TextView

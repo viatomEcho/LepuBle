@@ -950,6 +950,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             }
                         }"
                     }
+                    if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP3W) {
+                        binding.wifiInfo.visibility = View.GONE
+                    }
                 }
             }
             infoViewModel.noWifi.observe(viewLifecycleOwner) {
