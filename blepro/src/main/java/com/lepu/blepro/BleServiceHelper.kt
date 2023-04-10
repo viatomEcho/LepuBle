@@ -1513,7 +1513,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as R20BleInterface).let {
-                        LepuBleLog.d(tag, "it as R20BleInterface--r20GetWifiList")
+                        LepuBleLog.d(tag, "it as R20BleInterface--bp2SetWifiConfig")
                         it.setWifiConfig(config)
                     }
                 }

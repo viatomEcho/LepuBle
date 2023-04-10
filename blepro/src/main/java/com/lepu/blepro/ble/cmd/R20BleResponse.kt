@@ -107,7 +107,8 @@ object R20BleResponse {
         var list = mutableListOf<Record>()
         init {
             var index = 0
-            startTime = toLong(bytes.copyOfRange(index, index+4))
+            val rawOffset = DateUtil.getTimeZoneOffset().div(1000)
+            startTime = toLong(bytes.copyOfRange(index, index+4)) - rawOffset
             index += 4
             type = byte2UInt(bytes[index])
             index++
@@ -136,9 +137,10 @@ object R20BleResponse {
         // reserved 2
         init {
             var index = 0
-            measureTime = toLong(bytes.copyOfRange(index, index+4))
+            val rawOffset = DateUtil.getTimeZoneOffset().div(1000)
+            measureTime = toLong(bytes.copyOfRange(index, index+4)) - rawOffset
             index += 4
-            updateTime = toLong(bytes.copyOfRange(index, index+4))
+            updateTime = toLong(bytes.copyOfRange(index, index+4)) - rawOffset
         }
         override fun toString(): String {
             return """
@@ -241,7 +243,8 @@ object R20BleResponse {
         // reserved 1
         init {
             var index = 0
-            timestamp = toLong(bytes.copyOfRange(index, index+4))
+            val rawOffset = DateUtil.getTimeZoneOffset().div(1000)
+            timestamp = toLong(bytes.copyOfRange(index, index+4)) - rawOffset
             index += 4
             alarm = byte2UInt(bytes[index]) == 1
             index++

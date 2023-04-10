@@ -13,7 +13,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/colorRed"
-            android:text="软件版本：乐普设备测试软件 V0.0.2"
+            android:text="软件版本：乐普设备测试软件 V0.0.3"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
         <RelativeLayout

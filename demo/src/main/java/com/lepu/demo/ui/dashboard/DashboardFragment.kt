@@ -15,6 +15,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.lew.RtData
+import com.lepu.blepro.ble.data.r20.SystemSetting
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
@@ -451,6 +452,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.wirelessDataLayout.root.visibility = View.GONE
                 binding.r20Switch.visibility = View.VISIBLE
                 LpBleUtil.startRtTask(it.modelNo, 1000)
+                LpBleUtil.r20GetSystemSetting(it.modelNo)
             }
         }
     }
@@ -2238,22 +2240,26 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     }
                 }"
             }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetSystemSetting)
+            .observe(this) {
+                val data = it.data as SystemSetting
+                type = data.unitSetting.pressureUnit
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20RtParam)
             .observe(this) {
                 val data = it.data as R20BleResponse.RtParam
-                binding.deviceInfo.text = "实时参数：\n实时压：${data.pressure}\n" +
-                        "实时压：${data.pressure}\n" +
-                        "吸气压力：${data.ipap}\n" +
-                        "呼气压力：${data.epap}\n" +
-                        "潮气量：${data.vt}\n" +
-                        "分钟通气量：${data.mv}\n" +
-                        "漏气量：${data.leak}\n" +
-                        "呼吸率：${data.rr}\n" +
-                        "吸气时间：${data.ti}\n" +
+                binding.deviceInfo.text = "实时参数：\n实时压：${data.pressure} ${if (type == 0) "cmH2O" else "hPa"}\n" +
+                        "吸气压力：${data.ipap} ${if (type == 0) "cmH2O" else "hPa"}\n" +
+                        "呼气压力：${data.epap} ${if (type == 0) "cmH2O" else "hPa"}\n" +
+                        "潮气量：${data.vt} ml\n" +
+                        "分钟通气量：${data.mv} L/min\n" +
+                        "漏气量：${data.leak} L/min\n" +
+                        "呼吸率：${data.rr} bpm\n" +
+                        "吸气时间：${data.ti} s\n" +
                         "呼吸比：${data.ie}\n" +
-                        "血氧：${data.spo2}\n" +
-                        "脉率：${data.pr}\n" +
-                        "心率：${data.hr}"
+                        "血氧：${data.spo2} %\n" +
+                        "脉率：${data.pr} bpm\n" +
+                        "心率：${data.hr} bpm"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20Event)
             .observe(this) {

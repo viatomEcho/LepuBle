@@ -150,7 +150,7 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3BurnFactoryInfo).post(InterfaceEvent(model, true))
                 }
                 Bp3BleCmd.GET_CONFIG -> {
-                    if (response.len < 46) {
+                    if (response.len < 35) {
                         LepuBleLog.d(tag, "model:$model,GET_CONFIG => response.len < 46")
                         return
                     }
