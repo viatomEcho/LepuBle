@@ -122,7 +122,7 @@ class PpgFile() {
             .plus(deviceType.toByte())
             .plus(tempSn)
             .plus(ByteArray(64))
-        val acc = if (accuracy == 0xffff) {
+        val acc = if (sampleBytes > 2) {
             256
         } else {
             1

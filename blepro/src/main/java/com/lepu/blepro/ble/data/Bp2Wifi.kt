@@ -62,19 +62,19 @@ class Bp2Wifi(i: Int, val bytes: ByteArray) {
 
     fun getDataBytes(): ByteArray {
         val data = byteArrayOf(state.toByte())
-        return data.plus(ssidLen.toByte())
+        return data.plus(ssid.toByteArray(Charset.defaultCharset()).size.toByte())
             .plus(ssid.toByteArray(Charset.defaultCharset()))
             .plus(type.toByte())
             .plus(rssi.toByte())
-            .plus(pwd.length.toByte())
+            .plus(pwd.toByteArray(Charset.defaultCharset()).size.toByte())
             .plus(pwd.toByteArray(Charset.defaultCharset()))
             .plus(hexToBytes(macAddr))
             .plus(ipType.toByte())
             .plus(ipLen.toByte())
             .plus(ipAddr.toByteArray(Charset.defaultCharset()))
-            .plus(netmaskLen.toByte())
+            .plus(netmaskAddr.toByteArray(Charset.defaultCharset()).size.toByte())
             .plus(netmaskAddr.toByteArray(Charset.defaultCharset()))
-            .plus(gatewayLen.toByte())
+            .plus(gatewayAddr.toByteArray(Charset.defaultCharset()).size.toByte())
             .plus(gatewayAddr.toByteArray(Charset.defaultCharset()))
     }
 

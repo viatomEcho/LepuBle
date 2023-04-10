@@ -114,6 +114,7 @@ class LpBleUtil {
             RAW_FOLDERS.put(Bluetooth.MODEL_R10, PathUtils.getExternalAppFilesPath() + "/r10/")
             RAW_FOLDERS.put(Bluetooth.MODEL_R11, PathUtils.getExternalAppFilesPath() + "/r11/")
             RAW_FOLDERS.put(Bluetooth.MODEL_LERES, PathUtils.getExternalAppFilesPath() + "/leres/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_O2RING, PathUtils.getExternalAppFilesPath() + "/o2/")
 
             getServiceHelper()
                 .initLog(BuildConfig.DEBUG)

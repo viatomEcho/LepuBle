@@ -45,7 +45,7 @@ class Bp2Server() {
     fun getDataBytes(): ByteArray {
         val data = byteArrayOf(state.toByte())
         return data.plus(addrType.toByte())
-            .plus(addr.length.toByte())
+            .plus(addr.toByteArray(Charset.defaultCharset()).size.toByte())
             .plus(addr.toByteArray(Charset.defaultCharset()))
             .plus(int2ByteArray(port))
     }

@@ -17,9 +17,14 @@ import com.github.mikephil.charting.formatter.YAxisValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.utils.ViewPortHandler
+import com.lepu.blepro.BleServiceHelper
+import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.demo.config.Constant.BluetoothConfig.Companion.oxyData
+import com.lepu.demo.util.DataConvert
+import com.lepu.demo.util.FileUtil
 import com.lepu.demo.views.*
+import java.io.File
 import java.util.*
 
 class OxyDataActivity : AppCompatActivity() {
@@ -27,6 +32,7 @@ class OxyDataActivity : AppCompatActivity() {
     private lateinit var mSpO2Chart: SpO2Chart
     private lateinit var mHrChart: HrChart
     private lateinit var mMovementChart: MovementChart
+    private lateinit var sleepText: TextView
     private var minHr = 35
     private var height = 0
     private var bound = 0f
@@ -40,9 +46,11 @@ class OxyDataActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_oxy_data)
         initView()
+        sleepAlg()
     }
 
     private fun initView() {
+        sleepText = findViewById(R.id.sleep_text)
         findViewById<TextView>(R.id.avg_spo2_val).text = "${oxyData.oxyBleFile.avgSpo2}"
         findViewById<TextView>(R.id.min_spo2_val).text = "${oxyData.oxyBleFile.minSpo2}"
         findViewById<TextView>(R.id.drops_3_val).text = "${oxyData.oxyBleFile.dropsTimes3Percent}"
@@ -499,6 +507,48 @@ class OxyDataActivity : AppCompatActivity() {
             xVals.add(stringFromDate(Date(startTime), "HH:mm"))
             //血氧、心率时分秒
             timeList.add(stringFromDate(Date(startTime), "dd日 HH:mm:ss"))
+        }
+    }
+
+    // 睡眠算法
+    private fun sleepAlg() {
+        DataConvert.sleep_alg_init_0_25Hz()
+        val statuses = mutableListOf<Int>()
+        val filePath = "${BleServiceHelper.BleServiceHelper.rawFolder?.get(Bluetooth.MODEL_O2RING)}/sleep_result_${oxyData.fileName}.txt"
+        val isSave = File(filePath).exists()
+        for (data in oxyData.oxyBleFile.data) {
+            val status = DataConvert.sleep_alg_main_pro_0_25Hz(data.pr.toShort(), data.vector)
+            statuses.add(status)
+            if (!isSave) {
+                FileUtil.saveTextFile(
+                    filePath,
+                    "脉率: ${data.pr}，三轴值: ${data.vector}，睡眠状态: ${when (status) {
+                        0 -> "深睡眠"
+                        1 -> "浅睡眠"
+                        2 -> "快速眼动"
+                        3 -> "清醒"
+                        else -> "未得出结果"
+                    }}\n",
+                    true)
+            }
+        }
+        val result = DataConvert.sleep_alg_get_res_0_25Hz()
+        sleepText.text = "睡眠状态(0深睡眠,1浅睡眠,2快速眼动,3清醒,4无结果)：" +
+                "${statuses.toIntArray().joinToString(",")}\n" +
+                "总睡眠时间: ${DataConvert.getEcgTimeStr(result[0])}\n" +
+                "深睡时间: ${DataConvert.getEcgTimeStr(result[1])}\n" +
+                "浅睡时间: ${DataConvert.getEcgTimeStr(result[2])}\n" +
+                "快速眼动时间: ${DataConvert.getEcgTimeStr(result[3])}\n" +
+                "清醒次数: ${result[4]}"
+        if (!isSave) {
+            FileUtil.saveTextFile(
+                filePath,
+                "总睡眠时间: ${DataConvert.getEcgTimeStr(result[0])}\n" +
+                        "深睡时间: ${DataConvert.getEcgTimeStr(result[1])}\n" +
+                        "浅睡时间: ${DataConvert.getEcgTimeStr(result[2])}\n" +
+                        "快速眼动时间: ${DataConvert.getEcgTimeStr(result[3])}\n" +
+                        "清醒次数: ${result[4]}",
+                true)
         }
     }
 

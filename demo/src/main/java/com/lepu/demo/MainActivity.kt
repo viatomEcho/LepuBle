@@ -15,7 +15,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
@@ -25,6 +24,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.afollestad.materialdialogs.DialogAction
 import com.afollestad.materialdialogs.MaterialDialog
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
@@ -35,12 +35,19 @@ import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
+import com.lepu.blepro.utils.isNumber
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.config.Constant
 import com.lepu.demo.config.Constant.BluetoothConfig.Companion.CHECK_BLE_REQUEST_CODE
 import com.lepu.demo.config.Constant.BluetoothConfig.Companion.SUPPORT_MODELS
 import com.lepu.demo.util.CollectUtil
+import com.lepu.demo.util.DataConvert
+import com.lepu.demo.util.FileUtil
 import com.permissionx.guolindev.PermissionX
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileReader
+import java.io.IOException
 
 
 class MainActivity : AppCompatActivity() , BleChangeObserver {
@@ -77,6 +84,44 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 //        split()
 
     }
+
+    private fun readCsvFile(context: Context, filename: String?) {
+        var file = File(context.getExternalFilesDir(null)!!.absolutePath)
+        file = File(file, filename)
+        var br: BufferedReader? = null
+        val pr = mutableListOf<Short>()
+        val acc = mutableListOf<Int>()
+        try {
+            var sCurrentLine = ""
+            br = BufferedReader(FileReader(file))
+            while (br.readLine().also { if (it != null) sCurrentLine = it } != null) {
+                val str = sCurrentLine.split(",").toTypedArray()
+                if (isNumber(str[3])) {
+                    pr.add(str[3].toInt().toShort())
+                    acc.add(str[4].toInt())
+                }
+            }
+            DataConvert.sleep_alg_init_0_25Hz()
+            val status = mutableListOf<Int>()
+            for (i in 0 until pr.size) {
+                status.add(DataConvert.sleep_alg_main_pro_0_25Hz(pr[i], acc[i]))
+            }
+            val result = DataConvert.sleep_alg_get_res_0_25Hz()
+            FileUtil.saveTextFile("${getExternalFilesDir(null)?.absolutePath}/sleep_result_20230225000057.txt", "data pr: ${pr.joinToString(",")}", true)
+            FileUtil.saveTextFile("${getExternalFilesDir(null)?.absolutePath}/sleep_result_20230225000057.txt", "\n\ndata acc: ${acc.joinToString(",")}", true)
+            FileUtil.saveTextFile("${getExternalFilesDir(null)?.absolutePath}/sleep_result_20230225000057.txt", "\n\nsleep_alg_main_pro_0_25Hz status: ${status.joinToString(",")}", true)
+            FileUtil.saveTextFile("${getExternalFilesDir(null)?.absolutePath}/sleep_result_20230225000057.txt", "\n\nsleep_alg_get_res_0_25Hz result: ${result.joinToString(",")}", true)
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } finally {
+            try {
+                br?.close()
+            } catch (ex: IOException) {
+                ex.printStackTrace()
+            }
+        }
+    }
+
 
     //创建菜单
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

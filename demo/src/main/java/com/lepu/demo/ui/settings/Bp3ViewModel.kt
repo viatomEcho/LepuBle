@@ -121,6 +121,7 @@ class Bp3ViewModel : SettingViewModel() {
                 val config = it.data as Bp3Config
                 binding.bp3Layout.calibrationSlopeText.setText("${config.slopePressure}")
                 binding.bp3Layout.pressureTestText.setText("${config.bpTestTargetPressure}")
+                binding.bp3Layout.switchWifi4g.isChecked = config.wifi4gSwitch
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3SwitchValve)
             .observe(owner) {

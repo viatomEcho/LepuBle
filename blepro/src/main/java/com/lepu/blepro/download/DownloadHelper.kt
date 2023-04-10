@@ -29,7 +29,7 @@ class DownloadHelper {
          * @param data ByteArray
          */
         fun writeFile(model: Int, userId: String, fileName: String,suffix: String,  data: ByteArray){
-            val trimStr = HexString.trimStr(fileName)
+            val trimStr = trimStr(fileName)
             val folder = BleServiceHelper.BleServiceHelper.rawFolder?.get(model)
 
             LepuBleLog.d(tag, "$folder, $trimStr, userId=$userId")

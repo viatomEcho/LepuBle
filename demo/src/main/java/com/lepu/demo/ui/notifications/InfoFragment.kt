@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -12,6 +13,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hi.dhl.jdatabinding.binding
 import androidx.lifecycle.ViewModelProvider
+import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.download.DownloadHelper
@@ -33,6 +35,7 @@ import com.lepu.demo.data.EcnData
 import com.lepu.demo.data.OxyData
 import com.lepu.demo.databinding.FragmentInfoBinding
 import com.lepu.demo.ui.adapter.*
+import com.lepu.demo.util.DataConvert
 import com.lepu.demo.util.FileUtil
 import java.io.*
 
@@ -267,7 +270,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 }
                 popupWindow?.let { v ->
                     v.width = ViewGroup.LayoutParams.MATCH_PARENT
-                    v.height = 800
+                    v.height = 1000
                     v.contentView = popupView
                     v.isFocusable = true
                     v.showAsDropDown(view)
@@ -507,7 +510,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
             popupWindow?.let { v ->
                 v.width = ViewGroup.LayoutParams.MATCH_PARENT
-                v.height = 800
+                v.height = 1000
                 v.contentView = popupView
                 v.isFocusable = true
                 v.showAsDropDown(view)
@@ -919,25 +922,54 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 if (it != null) {
                     wifi?.let { w ->
                         w.state = it.wifi.state
-                        binding.wifiInfo.text = "热点：${w.ssid}\n密码：${w.pwd}\n连接状态：${
-                            when (w.state) {
-                                0 -> "断开"
-                                1 -> "连接中"
-                                2 -> "已连接"
-                                0xff -> "密码错误"
-                                0xfd -> "找不到SSID"
-                                else -> "未配置WiFi"
-                            }
-                        }"
-                        if (((w.state == 0) && (it.wifi.ssid.isNotEmpty())) || w.state == 1) {
-                            handler.postDelayed({
-                                LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
-                            }, 1000)
-                        } else {
+                        if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP3W) {
                             mAlertDialogCanCancel?.dismiss()
+                            binding.wifiInfo.text = "热点：${w.ssid}\n密码：${w.pwd}\n连接状态：${when (w.state) {
+                                    0 -> "断开"
+                                    1 -> "连接中"
+                                    2 -> "已连接"
+                                    0xff -> "密码错误"
+                                    0xfd -> "找不到SSID"
+                                    else -> "未配置WiFi"
+                                }}"
+                            if (it.isServerInitialized()) {
+                                binding.wifiInfo.text = binding.wifiInfo.text.toString() + "\n服务器地址：${it.server.addr}\n端口号：${it.server.port}\n连接状态：${
+                                    when (it.server.state) {
+                                        0 -> "断开"
+                                        1 -> "连接中"
+                                        2 -> "已连接"
+                                        0xff -> "无法连接"
+                                        else -> "连接错误"
+                                    }
+                                }"
+                            } else {
+                                binding.wifiInfo.text = binding.wifiInfo.text.toString() + "\n无服务器信息"
+                            }
+                        } else {
+                            binding.wifiInfo.text = "热点：${w.ssid}\n密码：${w.pwd}\n连接状态：${
+                                when (w.state) {
+                                    0 -> "断开"
+                                    1 -> "连接中"
+                                    2 -> "已连接"
+                                    0xff -> "密码错误"
+                                    0xfd -> "找不到SSID"
+                                    else -> "未配置WiFi"
+                                }
+                            }"
+                            if (((w.state == 0) && (it.wifi.ssid.isNotEmpty())) || w.state == 1) {
+                                handler.postDelayed({
+                                    LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
+                                }, 1000)
+                            } else {
+                                mAlertDialogCanCancel?.dismiss()
+                            }
                         }
                     } ?: kotlin.run {
-                        binding.wifiInfo.text = "注意：请先完成首次配置WiFi，设置成功后连接其他设备可直接配置WiFi。"
+                        if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP3W) {
+                            binding.wifiInfo.text = "注意：请先配置WiFi"
+                        } else {
+                            binding.wifiInfo.text = "注意：请先完成首次配置WiFi，设置成功后连接其他设备可直接配置WiFi。"
+                        }
                     }
                     if (it.isServerInitialized()) {
                         binding.serverInfo.text = "服务器地址：${it.server.addr}\n端口号：${it.server.port}\n连接状态：${
@@ -949,9 +981,6 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                                 else -> "连接错误"
                             }
                         }"
-                    }
-                    if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP3W) {
-                        binding.wifiInfo.visibility = View.GONE
                     }
                 }
             }
@@ -967,6 +996,39 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     }
                 }
             }
+        }
+    }
+
+    // 睡眠算法
+    private fun sleepAlg(oxyData: OxyData) {
+        DataConvert.sleep_alg_init_0_25Hz()
+        val filePath = "${BleServiceHelper.BleServiceHelper.rawFolder?.get(Bluetooth.MODEL_O2RING)}/sleep_result_${oxyData.fileName}.txt"
+        val isSave = File(filePath).exists()
+        for (data in oxyData.oxyBleFile.data) {
+            val status = DataConvert.sleep_alg_main_pro_0_25Hz(data.pr.toShort(), data.vector)
+            if (!isSave) {
+                FileUtil.saveTextFile(
+                    filePath,
+                    "脉率: ${data.pr}，三轴值: ${data.vector}，睡眠状态: ${when (status) {
+                        0 -> "深睡眠"
+                        1 -> "浅睡眠"
+                        2 -> "快速眼动"
+                        3 -> "清醒"
+                        else -> "未得出结果"
+                    }}\n",
+                    true)
+            }
+        }
+        val result = DataConvert.sleep_alg_get_res_0_25Hz()
+        if (!isSave) {
+            FileUtil.saveTextFile(
+                filePath,
+                "总睡眠时间: ${DataConvert.getEcgTimeStr(result[0])}\n" +
+                        "深睡时间: ${DataConvert.getEcgTimeStr(result[1])}\n" +
+                        "浅睡时间: ${DataConvert.getEcgTimeStr(result[2])}\n" +
+                        "快速眼动时间: ${DataConvert.getEcgTimeStr(result[3])}\n" +
+                        "清醒次数: ${result[4]}",
+                true)
         }
     }
 
@@ -1002,6 +1064,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             trimStr(binding.fileName.text.toString())
         } else {
             if (fileNames.size == 0) {
+                for (data in oxyList) {
+                    sleepAlg(data)
+                }
                 if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BTP
                     || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ECN) {
                     mAlertDialogCanCancel?.dismiss()

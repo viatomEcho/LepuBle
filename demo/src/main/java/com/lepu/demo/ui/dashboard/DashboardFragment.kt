@@ -794,7 +794,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Toast.makeText(context, "请至少选择一种PPG数据类型进行采集！", Toast.LENGTH_SHORT).show()
                 return@setOnCheckedChangeListener
             }
-            collectPpg(isChecked)
+            collectO2Data(isChecked)
         }
         binding.wirelessDataLayout.startTest.setOnClickListener {
             if (isStartWirelessTest) return@setOnClickListener
@@ -996,7 +996,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         viewModel.dataOxySrc.value = OxyDataController.iniDataSrc(index)
     }
 
-    private fun collectPpg(isCollect: Boolean) {
+    private fun collectO2Data(isCollect: Boolean) {
         if (isCollect) {
             startCollectTime = System.currentTimeMillis()
             collectBytesData = ByteArray(0)
@@ -1030,8 +1030,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     }
 
     private fun savePpgData() {
-        // 需要传的参数：开始采集的时间戳s，采集通道数量，通道类型，采样率，设备类型，sn，采样点数据
+        // 需要传的参数：开始采集的时间戳s，采集通道数量，通道类型，采样率，采样点字节数，设备类型，sn，采样点数据
         val ppgFile = PpgFile()
+        ppgFile.sampleBytes = 4
+        ppgFile.sampleRate = 150
         ppgFile.sampleTime = startCollectTime/1000
         if (binding.ppgIr.isChecked && binding.ppgRed.isChecked) {
             ppgFile.leadSize = 2
