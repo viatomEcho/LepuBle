@@ -8,9 +8,11 @@ import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.Bp3BleCmd
+import com.lepu.blepro.ble.cmd.LpBleCmd
 import com.lepu.blepro.ble.cmd.ResponseError
 import com.lepu.blepro.ble.data.FactoryConfig
-import com.lepu.blepro.ble.data.bp3.Bp3Config
+import com.lepu.blepro.ble.data.Bp2Config
+import com.lepu.blepro.ble.data.LeBp2wUserList
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.HexString.trimStr
@@ -110,6 +112,9 @@ class Bp3ViewModel : SettingViewModel() {
                 LpBleUtil.bp3CalibrationSlope(model, data.toInt())
             }
         }
+        binding.bp3Layout.readUser.setOnClickListener {
+            LpBleUtil.readFile("", "user.list", model)
+        }
     }
     fun initEvent(owner: LifecycleOwner) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3BurnFactoryInfo)
@@ -118,7 +123,7 @@ class Bp3ViewModel : SettingViewModel() {
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3GetConfig)
             .observe(owner) {
-                val config = it.data as Bp3Config
+                val config = it.data as Bp2Config
                 binding.bp3Layout.calibrationSlopeText.setText("${config.slopePressure}")
                 binding.bp3Layout.pressureTestText.setText("${config.bpTestTargetPressure}")
                 binding.bp3Layout.switchWifi4g.isChecked = config.wifi4gSwitch
@@ -150,6 +155,34 @@ class Bp3ViewModel : SettingViewModel() {
                 val data = it.data as Int
                 binding.deviceInfo.text = "校准斜率值：$data\n5368<=slope<=7000 136.3LSB/mmHg-170.4LSB/mmHg"
             }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3WritingFileProgress)
+            .observe(owner) {
+                val data = it.data as Int
+                binding.deviceInfo.text = binding.deviceInfo.text.toString() + "\n写文件进度：$data %"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3WriteFileComplete)
+            .observe(owner) {
+                val crc = it.data as Int
+                _toast.value = "写文件成功"
+                binding.deviceInfo.text = binding.deviceInfo.text.toString() + "\n接收到设备返回CRC: $crc"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3ReadFileError)
+            .observe(owner) {
+                _toast.value = "读文件错误"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3ReadingFileProgress)
+            .observe(owner) {
+                val data = it.data as Int
+                binding.deviceInfo.text = "读文件进度：$data %"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3ReadFileComplete)
+            .observe(owner) {
+                val data = it.data as LeBp2wUserList
+                for (user in data.userList) {
+                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "\n用户名: ${user.fName}${user.name}"
+                }
+                _toast.value = "读文件成功"
+            }
         LiveEventBus.get<ResponseError>(EventMsgConst.Cmd.EventCmdResponseError)
             .observe(owner) {
                 when (it.cmd) {
@@ -160,6 +193,9 @@ class Bp3ViewModel : SettingViewModel() {
                     Bp3BleCmd.CALIBRATION_SLOPE -> {
                         _toast.value = "校准失败"
                         binding.deviceInfo.text = "校准斜率值：5368<=slope<=7000 136.3LSB/mmHg-170.4LSB/mmHg\n校准失败"
+                    }
+                    LpBleCmd.WRITE_FILE_START, LpBleCmd.WRITE_FILE_DATA, LpBleCmd.WRITE_FILE_END -> {
+                        _toast.value = "写文件失败"
                     }
                 }
             }

@@ -22,9 +22,9 @@ class R20ViewModel : InfoViewModel() {
                 for (file in data.list) {
                     if (data.type == 1) {
                         names.add("${DateUtil.stringFromDate(Date(file.measureTime*1000), "yyyyMMdd")}_day.stat")
-                    }/* else if (data.type == 2) {
+                    } else if (data.type == 2) {
                         names.add("${DateUtil.stringFromDate(Date(file.measureTime*1000), "yyyyMMdd_HHmmss")}.stat")
-                    }*/
+                    }
                 }
                 _fileNames.value = names
                 _info.value = names.toString()
@@ -52,7 +52,7 @@ class R20ViewModel : InfoViewModel() {
                     R20BleCmd.GET_WIFI_LIST -> {
                         handler.postDelayed({
                             LpBleUtil.bp2GetWifiDevice(it.model)
-                        }, 1000)
+                        }, 5000)
                     }
                     R20BleCmd.GET_WIFI_CONFIG -> {
                         noWifi.value = true

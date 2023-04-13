@@ -814,7 +814,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBp3FactoryReset = "com.lepu.ble.bp3.factory.reset"                 // 恢复出厂设置 boolean
             const val EventBp3FactoryResetAll = "com.lepu.ble.bp3.factory.reset.all"          // 恢复生产出厂状态 boolean
             const val EventBp3SetConfig = "com.lepu.ble.bp3.set.config"                       // 设置心跳音开关 boolean
-            const val EventBp3GetConfig = "com.lepu.ble.bp3.get.config"                       // 获取参数 Bp3Config
+            const val EventBp3GetConfig = "com.lepu.ble.bp3.get.config"                       // 获取参数 Bp2Config
             const val EventBp3SetUtcTime = "com.lepu.ble.bp3.set.utc.time"                    // 同步UTC时间 boolean
             const val EventBp3GetWifiList = "com.lepu.ble.bp3.get.wifi.list"                  // 获取路由 Bp2WifiDevice
             const val EventBp3GetWifiConfig = "com.lepu.ble.bp3.get.wifi.config"              // 获取WiFi配置 Bp2WifiConfig
@@ -827,6 +827,12 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBp3SwitchBpUnit = "com.lepu.ble.bp3.switch.bp.unit"                // 切换血压单位 boolean
             const val EventBp3SwitchValve = "com.lepu.ble.bp3.switch.valve"                   // 气阀开关 boolean
             const val EventBp3SwitchWifi4g = "com.lepu.ble.bp3.switch.wifi.4g"                // WiFi/4g开关 boolean
+            const val EventBp3WritingFileProgress = "com.lepu.ble.bp3.writing.file.progress"  // 写文件进度 int
+            const val EventBp3WriteFileComplete = "com.lepu.ble.bp3.write.file.complete"      // 写文件完成 int
+            const val EventBp3GetFileList = "com.lepu.ble.bp3.get.file.list"                  // 获取文件列表 KtBleFileList
+            const val EventBp3ReadFileError = "com.lepu.ble.bp3.read.file.error"              // 读文件错误 boolean
+            const val EventBp3ReadingFileProgress = "com.lepu.ble.bp3.reading.file.process"   // 读文件进度 int
+            const val EventBp3ReadFileComplete = "com.lepu.ble.bp3.read.file.complete"        // 读文件完成 LeBp2wUserList
         }
     }
 

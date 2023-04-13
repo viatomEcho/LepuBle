@@ -2,6 +2,7 @@ package com.lepu.demo.ui.notifications
 
 import androidx.lifecycle.LifecycleOwner
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.OxyBleFile
 import com.lepu.blepro.download.DownloadHelper
@@ -9,6 +10,7 @@ import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.getTimeString
 import com.lepu.demo.data.OxyData
+import java.io.File
 
 class OxyViewModel : InfoViewModel() {
 
@@ -36,7 +38,11 @@ class OxyViewModel : InfoViewModel() {
                 (event.data as OxyBleResponse.OxyFile).let {
                     val data = OxyBleFile(it.fileContent)
                     val fileName = getTimeString(data.year, data.month, data.day, data.hour, data.minute, data.second)
-                    DownloadHelper.writeFile(Bluetooth.MODEL_O2RING, "", fileName, "dat", data.bytes)
+                    val filePath = "${BleServiceHelper.BleServiceHelper.rawFolder?.get(Bluetooth.MODEL_O2RING)}/$fileName.dat"
+                    val isSave = File(filePath).exists()
+                    if (!isSave) {
+                        DownloadHelper.writeFile(Bluetooth.MODEL_O2RING, "", fileName, "dat", data.bytes)
+                    }
                     val temp = OxyData()
                     temp.fileName = fileName
                     temp.oxyBleFile = data

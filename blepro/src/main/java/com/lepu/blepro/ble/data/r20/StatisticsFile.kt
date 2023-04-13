@@ -24,7 +24,7 @@ class StatisticsFile(val fileName: String, val bytes: ByteArray) {
     var pbCount: Int  // 周期性呼吸次数
     var takeOffCount: Int  // 摘下次数
     var llTime: Int  // 大漏气量时间
-    // reserved 1
+    // reserved 4
     // 监测参数统计项
     var pressure = IntArray(5)  // 实时压
     var ipap = IntArray(5)      // 吸气压力
@@ -75,6 +75,7 @@ class StatisticsFile(val fileName: String, val bytes: ByteArray) {
         takeOffCount = toUInt(bytes.copyOfRange(index, index+4))
         index += 4
         llTime = toUInt(bytes.copyOfRange(index, index+4))
+        index += 4
         index += 4
         for (i in pressure.indices) {
             pressure[i] = toUInt(bytes.copyOfRange(index, index+4))

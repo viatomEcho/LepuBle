@@ -374,7 +374,7 @@ class OxyBleInterface(model: Int): BleInterface(model) {
         } else {
             sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.updateSetting(type, data))
         }
-        LepuBleLog.e(tag, "updateSetting type:$type")
+        LepuBleLog.e(tag, "updateSetting type:$type, data:$data")
     }
     fun updateSetting(type: Array<String>, value: IntArray) {
         settingType = type

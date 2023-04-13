@@ -347,8 +347,8 @@ class R20BleInterface(model: Int): BleInterface(model) {
                     }
                 }
                 R20BleCmd.RT_STATE -> {
-                    if (response.len < 3) {
-                        LepuBleLog.d(tag, "model:$model,RT_STATE => response.len < 3")
+                    if (response.len < 4) {
+                        LepuBleLog.d(tag, "model:$model,RT_STATE => response.len < 4")
                         return
                     }
                     val data = R20BleResponse.RtState(response.content)

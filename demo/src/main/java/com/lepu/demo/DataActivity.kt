@@ -31,11 +31,13 @@ class DataActivity : AppCompatActivity() {
                 pdfView.fromBytes(ecnData.data).load()
             }
             Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
             Bluetooth.MODEL_LERES -> {
                 pdfView.visibility = View.GONE
                 val data = StatisticsFile(ecnData.fileName, ecnData.data)
-                textView.text = "使用设备天数：${data.usageDays}天\n" +
+                textView.text = "文件名：${data.fileName}\n" +
+                        "使用设备天数：${data.usageDays}天\n" +
+                        "使用天数：1天\n" +
                         "不小于4小时天数：${data.moreThan4hDays}天\n" +
                         "总使用时间：${DataConvert.getEcgTimeStr(data.duration)}\n" +
                         "平均每天使用时间：${DataConvert.getEcgTimeStr(data.meanSecond)}\n" +

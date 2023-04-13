@@ -149,7 +149,7 @@ class BtpBleInterface(model: Int): BleInterface(model) {
                     //检查当前的下载状态
                     if (isCancelRF || isPausedRF) {
                         sendCmd(BtpBleCmd.fileReadEnd())
-                        LepuBleLog.d(tag, "FILE_READ_START isCancelRF: $isCancelRF, isPausedRF: $isPausedRF")
+                        LepuBleLog.d(tag, "FILE_READ_PKG isCancelRF: $isCancelRF, isPausedRF: $isPausedRF")
                         return
                     }
                     offset += response.len

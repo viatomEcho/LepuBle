@@ -3,6 +3,7 @@ package com.lepu.blepro.ble.cmd
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.HexString.trimStr
+import java.util.*
 
 object R20BleResponse {
 
@@ -145,21 +146,24 @@ object R20BleResponse {
         override fun toString(): String {
             return """
                 Record : 
-                measureTime : $measureTime
-                updateTime : $updateTime
+                measureTime : ${DateUtil.stringFromDate(Date(measureTime.times(1000)), "yyyyMMdd:HHmmss")}
+                updateTime : ${DateUtil.stringFromDate(Date(updateTime.times(1000)), "yyyyMMdd:HHmmss")}
             """.trimIndent()
         }
     }
 
     @ExperimentalUnsignedTypes
     class RtState(val bytes: ByteArray) {
-        var ventilationMode: Int  // 通气模式 0:CPAP  1:APAP  2:S   3:S/T   4:T
-        var deviceMode: Int       // 0:普通模式；1：设备端医生模式；2：蓝牙医生模式；3：socket端医生模式
-        var standard: Int         // CE/FDA, 0:CE;1:FDA
-        // reserved 5
+        var ventilationMode: Int   // 通气模式 0:CPAP  1:APAP  2:S   3:S/T   4:T
+        var isVentilated: Boolean  // 是否通气 0:0ff;1:on
+        var deviceMode: Int        // 0:患者模式；1：设备端医生模式；2：BLE端医生模式；3：Socket端医生模式
+        var standard: Int          // CE/FDA, 0:CE;1:FDA
+        // reserved 4
         init {
             var index = 0
             ventilationMode = byte2UInt(bytes[index])
+            index++
+            isVentilated = byte2UInt(bytes[index]) == 1
             index++
             deviceMode = byte2UInt(bytes[index])
             index++
@@ -169,6 +173,7 @@ object R20BleResponse {
             return """
                 RtState : 
                 ventilationMode : $ventilationMode
+                isVentilated : $isVentilated
                 deviceMode : $deviceMode
                 standard : $standard
             """.trimIndent()

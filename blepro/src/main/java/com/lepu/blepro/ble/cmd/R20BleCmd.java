@@ -83,7 +83,11 @@ public class R20BleCmd {
         return getReq(DOCTOR_MODE, data);
     }
     public static byte[] getWifiList(int deviceNum) {
-        return getReq(GET_WIFI_LIST, new byte[]{(byte)deviceNum});
+        if (deviceNum == 0) {
+            return getReq(GET_WIFI_LIST, new byte[0]);
+        } else {
+            return getReq(GET_WIFI_LIST, new byte[]{(byte)deviceNum});
+        }
     }
     public static byte[] setWifiConfig(byte[] config) {
         return getReq(SET_WIFI_CONFIG, config);

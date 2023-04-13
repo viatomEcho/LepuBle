@@ -4,16 +4,15 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
-import com.lepu.blepro.ble.cmd.Bp3BleCmd
-import com.lepu.blepro.ble.cmd.LepuBleResponse
-import com.lepu.blepro.ble.cmd.LpBleCmd
-import com.lepu.blepro.ble.cmd.ResponseError
+import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
-import com.lepu.blepro.ble.data.bp3.Bp3Config
+import com.lepu.blepro.ble.data.Bp2Config
+import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.CrcUtil.calCRC8
 import com.lepu.blepro.utils.LepuBleLog
+import com.lepu.blepro.utils.add
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 import kotlin.experimental.inv
@@ -37,6 +36,13 @@ import kotlin.experimental.inv
  */
 class Bp3BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Bp3BleInterface"
+
+    private var fileName = ""
+    private var fileSize: Int = 0
+    private var curSize: Int = 0
+    private var fileContent = ByteArray(0)
+    private var userList: LeBp2wUserList? = null
+    private var chunkSize: Int = 200  // 每次写文件大小
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         if (isManagerInitialized()) {
@@ -151,10 +157,10 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
                 }
                 Bp3BleCmd.GET_CONFIG -> {
                     if (response.len < 35) {
-                        LepuBleLog.d(tag, "model:$model,GET_CONFIG => response.len < 46")
+                        LepuBleLog.d(tag, "model:$model,GET_CONFIG => response.len < 35")
                         return
                     }
-                    val data = Bp3Config(response.content)
+                    val data = Bp2Config(response.content)
                     LepuBleLog.d(tag, "model:$model,GET_CONFIG => success, data: $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3GetConfig).post(InterfaceEvent(model, data))
                 }
@@ -258,6 +264,116 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model,SWITCH_WIFI_4G => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3SwitchWifi4g).post(InterfaceEvent(model, true))
                 }
+                //--------------------------写文件--------------------------
+                LpBleCmd.WRITE_FILE_START -> {
+                    //检查返回是否异常
+                    LepuBleLog.d(tag, "model:$model,WRITE_FILE_START => success")
+                    if (fileSize <= 0) {
+                        sendCmd(LpBleCmd.writeFileEnd())
+                    } else {
+                        curSize = if (fileSize < chunkSize) { sendCmd(LpBleCmd.writeFileData(userList?.getDataBytes()?.copyOfRange(0, fileSize)))
+                            fileSize
+                        } else {
+                            sendCmd(LpBleCmd.writeFileData(userList?.getDataBytes()?.copyOfRange(0, chunkSize)))
+                            chunkSize
+                        }
+                    }
+                }
+                LpBleCmd.WRITE_FILE_DATA -> {
+                    //检查返回是否异常
+                    LepuBleLog.d(tag, "model:$model,WRITE_FILE_DATA => success")
+                    if (curSize < fileSize) {
+                        if (fileSize - curSize < chunkSize) {
+                            sendCmd(LpBleCmd.writeFileData(userList?.getDataBytes()?.copyOfRange(curSize, fileSize)))
+                            curSize = fileSize
+                        } else {
+                            sendCmd(LpBleCmd.writeFileData(userList?.getDataBytes()?.copyOfRange(curSize, curSize + chunkSize)))
+                            curSize += chunkSize
+                        }
+
+                    } else {
+                        sendCmd(LpBleCmd.writeFileEnd())
+                    }
+                    val percent = curSize*100/fileSize
+                    LepuBleLog.d(tag, "write file $fileName WRITE_FILE_DATA curSize == $curSize | fileSize == $fileSize")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3WritingFileProgress).post(InterfaceEvent(model, percent))
+                }
+                LpBleCmd.WRITE_FILE_END -> {
+                    //检查返回是否异常
+                    LepuBleLog.d(tag, "model:$model, WRITE_FILE_END => success")
+                    val crc = toUInt(response.content)
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3WriteFileComplete).post(InterfaceEvent(model, crc))
+                    curSize = 0
+                }
+                LpBleCmd.GET_FILE_LIST -> {
+                    if (response.len < 1) {
+                        LepuBleLog.d(tag, "model:$model,READ_FILE_START => response.len < 1")
+                        return
+                    }
+                    val data = if (device.name == null) {
+                        KtBleFileList(response.content, "")
+                    } else {
+                        KtBleFileList(response.content, device.name)
+                    }
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3GetFileList).post(InterfaceEvent(model, data))
+                }
+                LpBleCmd.READ_FILE_START -> {
+                    //检查当前的下载状态
+                    if (isCancelRF || isPausedRF) {
+                        sendCmd(LpBleCmd.readFileEnd())
+                        LepuBleLog.d(tag, "READ_FILE_START isCancelRF: $isCancelRF, isPausedRF: $isPausedRF")
+                        return
+                    }
+                    if (response.len < 4) {
+                        LepuBleLog.d(tag, "model:$model,READ_FILE_START => response.len < 4")
+                        return
+                    }
+                    fileContent = if (offset == 0) {
+                        ByteArray(0)
+                    } else {
+                        DownloadHelper.readFile(model, "", fileName)
+                    }
+                    offset = fileContent.size
+                    fileSize = toUInt(response.content)
+                    if (fileSize <= 0) {
+                        sendCmd(LpBleCmd.readFileEnd())
+                    } else {
+                        sendCmd(LpBleCmd.readFileData(offset))
+                    }
+                    LepuBleLog.d(tag, "model:$model,READ_FILE_START => fileName: $fileName, offset: $offset, fileSize: $fileSize")
+                }
+                LpBleCmd.READ_FILE_DATA -> {
+                    //检查当前的下载状态
+                    if (isCancelRF || isPausedRF) {
+                        sendCmd(LpBleCmd.readFileEnd())
+                        LepuBleLog.d(tag, "READ_FILE_DATA isCancelRF: $isCancelRF, isPausedRF: $isPausedRF")
+                        return
+                    }
+                    offset += response.len
+                    DownloadHelper.writeFile(model, "", fileName, "dat", response.content)
+                    fileContent = add(fileContent, response.content)
+                    val percent = offset*100/fileSize
+                    LepuBleLog.d(tag, "model:$model,READ_FILE_DATA => offset: $offset, fileSize: $fileSize")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3ReadingFileProgress).post(InterfaceEvent(model, percent))
+                    if (offset < fileSize) {
+                        sendCmd(LpBleCmd.readFileData(offset))
+                    } else {
+                        sendCmd(LpBleCmd.readFileEnd())
+                    }
+                }
+                LpBleCmd.READ_FILE_END -> {
+                    if (isCancelRF || isPausedRF) {
+                        LepuBleLog.d(tag, "READ_FILE_END isCancelRF: $isCancelRF, isPausedRF: $isPausedRF, offset: $offset, fileSize: $fileSize")
+                        return
+                    }
+                    if (fileContent.size < fileSize) {
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3ReadFileError).post(InterfaceEvent(model, true))
+                    } else {
+                        val data = LeBp2wUserList(fileContent)
+                        LepuBleLog.d(tag, "model:$model,READ_FILE_END => data: $data")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3ReadFileComplete).post(InterfaceEvent(model, fileContent))
+                    }
+                }
             }
         }
 
@@ -279,6 +395,8 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "getFileList...")
     }
     override fun dealReadFile(userId: String, fileName: String) {
+        this.fileName = fileName
+        sendCmd(LpBleCmd.readFileStart(fileName.toByteArray(), 0))
         LepuBleLog.d(tag, "dealReadFile... userId:$userId, fileName == $fileName")
     }
     override fun dealContinueRF(userId: String, fileName: String) {
@@ -304,7 +422,7 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
         sendCmd(LpBleCmd.getBattery())
         LepuBleLog.d(tag, "getBattery...")
     }
-    fun setConfig(config: Bp3Config){
+    fun setConfig(config: Bp2Config){
         sendCmd(Bp3BleCmd.setConfig(config.getDataBytes()))
         LepuBleLog.d(tag, "setConfig...$config")
     }
@@ -363,5 +481,12 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
     fun switchWifi4g(on: Boolean) {
         sendCmd(Bp3BleCmd.switchWifi4g(on))
         LepuBleLog.d(tag, "switchWifi4g...")
+    }
+    fun writeUserList(userList: LeBp2wUserList) {
+        this.userList = userList
+        fileSize = userList.getDataBytes().size
+        fileName = "user.list"
+        sendCmd(LpBleCmd.writeFileStart(fileName.toByteArray(), 0, fileSize))
+        LepuBleLog.d(tag, "writeUserList... fileName == $fileName, fileSize == $fileSize")
     }
 }

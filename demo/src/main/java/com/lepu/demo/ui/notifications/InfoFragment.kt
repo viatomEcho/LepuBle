@@ -293,7 +293,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 val sure = popupView.findViewById<Button>(R.id.sure)
                 val cancel = popupView.findViewById<Button>(R.id.cancel)
                 ssid.text = "WiFi：${it.ssid}"
-                if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP3W) {
+                if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP3W
+                    || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R20
+                    || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R21
+                    || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R10
+                    || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R11
+                    || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LERES) {
                     sure.setOnClickListener { it1 ->
                         val pass = trimStr(password.text.toString())
                         val addr = trimStr(serverAddr.text.toString())
@@ -337,17 +342,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W) {
                                 server.addr = "212.129.241.54"
                                 server.port = 7200
-                            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R20
-                                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R21
-                                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R10
-                                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R11
-                                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LERES) {
-                                server.addr = "112.125.89.8"
-                                server.port = 33724
                             }
                             wifiConfig.server = server
                             LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
-                            Log.d("11111111111111", "$wifiConfig")
                             adapter.setList(null)
                             adapter.notifyDataSetChanged()
                             popupWindow?.dismiss()
@@ -421,11 +418,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R10
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R11
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LERES) {
-                /*fileType++
+                fileType++
                 if (fileType > 2) {
                     fileType = 1
-                }*/
-                LpBleUtil.r20GetFileList(Constant.BluetoothConfig.currentModel[0], 1, 0)
+                }
+                LpBleUtil.r20GetFileList(Constant.BluetoothConfig.currentModel[0], fileType, 0)
             } else {
                 LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0])
             }
@@ -501,17 +498,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     // 乐普健康测试服
                     server.addr = "212.129.241.54"
                     server.port = 7200
-                } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R20
-                    || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R21
-                    || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R10
-                    || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R11
-                    || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LERES) {
-                    server.addr = "112.125.89.8"
-                    server.port = 33724
                 }
                 wifiConfig.server = server
                 LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
-                Log.d("11111111111111", "$wifiConfig")
             } else {
                 Toast.makeText(context, "请先完成首次配置WiFi，设置成功后连接其他设备可直接配置WiFi。", Toast.LENGTH_SHORT).show()
             }
@@ -805,6 +794,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
                 }
                 binding.wifiConfig.visibility = View.VISIBLE
+                binding.setWifiConfig.visibility = View.GONE
+                binding.getWifiConfig.visibility = View.VISIBLE
                 LpBleUtil.r20GetVersionInfo(Constant.BluetoothConfig.currentModel[0])
                 LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
             }
@@ -932,7 +923,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
             infoViewModel.wifiConfig.observe(viewLifecycleOwner) {
                 if (it != null) {
-                    if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP3W) {
+                    if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP3W
+                        || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R20
+                        || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R21
+                        || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R10
+                        || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R11
+                        || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LERES) {
                         mAlertDialogCanCancel?.dismiss()
                         if (it.isWifiInitialized()) {
                             binding.wifiInfo.text = "热点：${it.wifi.ssid}\n密码：${it.wifi.pwd}\n连接状态：${when (it.wifi.state) {
@@ -980,14 +976,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                                 mAlertDialogCanCancel?.dismiss()
                             }
                         } ?: kotlin.run {
-                            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP3W) {
-                                binding.wifiInfo.text = "注意：请先配置WiFi"
-                            } else {
-                                binding.wifiInfo.text = "注意：请先完成首次配置WiFi，设置成功后连接其他设备可直接配置WiFi。"
-                            }
+                            binding.wifiInfo.text = "注意：请先完成首次配置WiFi，设置成功后连接其他设备可直接配置WiFi。"
                         }
                     }
-
                     if (it.isServerInitialized()) {
                         binding.serverInfo.text = "服务器地址：${it.server.addr}\n端口号：${it.server.port}\n连接状态：${
                             when (it.server.state) {

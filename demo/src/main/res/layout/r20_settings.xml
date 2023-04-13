@@ -21,11 +21,20 @@
                 android:textSize="16sp"
                 android:text="烧录信息"/>
             <TextView
-                android:id="@+id/system_setting"
+                android:id="@+id/other_setting"
                 android:layout_width="80dp"
                 android:layout_height="50dp"
                 android:gravity="center"
                 android:background="@drawable/string_selected"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:text="其他设置"/>
+            <TextView
+                android:id="@+id/system_setting"
+                android:layout_width="80dp"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:background="@drawable/dialog_hint_shape"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:text="系统设置"/>
@@ -56,15 +65,6 @@
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:text="报警设置"/>
-            <TextView
-                android:id="@+id/other"
-                android:layout_width="80dp"
-                android:layout_height="50dp"
-                android:gravity="center"
-                android:background="@drawable/dialog_hint_shape"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:text="其他"/>
         </LinearLayout>
         <View
             android:layout_width="1dp"
@@ -142,6 +142,7 @@
         </LinearLayout>
         <!-- 系统设置 -->
         <LinearLayout
+            android:visibility="gone"
             android:id="@+id/system_setting_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -451,6 +452,7 @@
                     android:layout_height="wrap_content"/>
             </LinearLayout>
             <LinearLayout
+                android:id="@+id/epr_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
                 <TextView
@@ -458,7 +460,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:text="呼气压力释放:"/>
+                    android:text="呼气降压等级:"/>
                 <Spinner
                     android:id="@+id/epr"
                     android:layout_width="wrap_content"
@@ -1333,7 +1335,6 @@
         </LinearLayout>
         <!-- 其他设置 -->
         <LinearLayout
-            android:visibility="gone"
             android:id="@+id/other_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -1361,8 +1362,41 @@
                     android:id="@+id/pin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textSize="16sp"
                     android:hint=" 密码:默认0319"/>
             </LinearLayout>
+            <TextView
+                android:id="@+id/device_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:text="设备模式"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp">
+                <Button
+                    android:id="@+id/set_user"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="设置用户"/>
+                <Button
+                    android:id="@+id/get_user"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dp_10"
+                    android:text="获取用户"/>
+            </LinearLayout>
+            <TextView
+                android:id="@+id/user_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:text="无用户信息"/>
         </LinearLayout>
     </LinearLayout>
 </layout>

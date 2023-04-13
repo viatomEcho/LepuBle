@@ -842,7 +842,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         }
         binding.r20VentilationSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
-            LpBleUtil.r20VentilationSwitch(Constant.BluetoothConfig.currentModel[0], isChecked)
+            if (buttonView.isPressed) {
+                LpBleUtil.r20VentilationSwitch(Constant.BluetoothConfig.currentModel[0], isChecked)
+            }
         }
         binding.r20MaskTest.setOnCheckedChangeListener { buttonView, isChecked ->
             LpBleUtil.r20MaskTest(Constant.BluetoothConfig.currentModel[0], isChecked)
@@ -2219,18 +2221,20 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20RtState)
             .observe(this) {
                 val data = it.data as R20BleResponse.RtState
-                binding.r20State.text = "设备状态：\n通气模式：${when (data.ventilationMode) {
+                binding.r20VentilationSwitch.isChecked = data.isVentilated
+                binding.r20State.text = "设备实时状态：\n通气模式：${when (data.ventilationMode) {
                     0 -> "CPAP"
                     1 -> "APAP"
                     2 -> "S"
                     3 -> "S/T"
                     4 -> "T"
                     else -> "无"
-                }}\n设备模式：${when (data.deviceMode) {
-                        0 -> "普通模式"
+                }}\n通气状态：${if (data.isVentilated) "是" else "否"}\n" +
+                "设备模式：${when (data.deviceMode) {
+                        0 -> "患者模式"
                         1 -> "设备端医生模式"
-                        2 -> "蓝牙医生模式"
-                        3 -> "socket端医生模式"
+                        2 -> "BLE端医生模式"
+                        3 -> "Socket端医生模式"
                         else -> "无"
                     }
                 }\n标准：${when (data.deviceMode) {

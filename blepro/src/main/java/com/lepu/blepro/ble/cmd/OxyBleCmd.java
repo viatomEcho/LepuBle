@@ -123,7 +123,7 @@ public class OxyBleCmd {
     public static byte[] updateSetting(String type, int value) {
         JSONObject j = new JSONObject();
         try {
-            LepuBleLog.d("syncData type="+type+"value="+value);
+            LepuBleLog.d("syncData type="+type+", value="+value);
             j.put(type, value+"");
         } catch (JSONException e) {
             e.printStackTrace();

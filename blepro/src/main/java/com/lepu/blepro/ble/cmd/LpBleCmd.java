@@ -202,6 +202,9 @@ public class LpBleCmd {
     public static byte[] writeFileEnd() {
         return getReq(WRITE_FILE_END, new byte[0]);
     }
+    public static byte[] getUserList() {
+        return getReq(GET_USER_LIST, new byte[0]);
+    }
 
     /**
      * 加密通讯

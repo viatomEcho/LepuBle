@@ -14,7 +14,7 @@ import com.lepu.blepro.base.LpWorkManager
 import com.lepu.blepro.ble.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.FactoryConfig
-import com.lepu.blepro.ble.data.bp3.Bp3Config
+import com.lepu.blepro.ble.data.Bp2Config
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
 import com.lepu.blepro.ble.data.r20.VentilationSetting
@@ -1611,6 +1611,14 @@ class BleServiceHelper private constructor() {
                 getInterface(model)?.let { it1 ->
                     (it1 as LeBp2wBleInterface).let {
                         LepuBleLog.d(tag, "it as LeBp2wBleInterface--bp2WriteUserList")
+                        it.writeUserList(userList)
+                    }
+                }
+            }
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp2WriteUserList")
                         it.writeUserList(userList)
                     }
                 }
@@ -4040,7 +4048,7 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "bp3GetConfig current model $model unsupported!!")
         }
     }
-    fun bp3SetConfig(model: Int, config: Bp3Config) {
+    fun bp3SetConfig(model: Int, config: Bp2Config) {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {

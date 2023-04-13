@@ -33,22 +33,15 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
+import com.lepu.blepro.utils.EncryptUtil
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
-import com.lepu.blepro.utils.isNumber
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.config.Constant
 import com.lepu.demo.config.Constant.BluetoothConfig.Companion.CHECK_BLE_REQUEST_CODE
 import com.lepu.demo.config.Constant.BluetoothConfig.Companion.SUPPORT_MODELS
 import com.lepu.demo.util.CollectUtil
-import com.lepu.demo.util.DataConvert
-import com.lepu.demo.util.FileUtil
 import com.permissionx.guolindev.PermissionX
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileReader
-import java.io.IOException
-
 
 class MainActivity : AppCompatActivity() , BleChangeObserver {
     private val TAG: String = "MainActivity"
@@ -83,45 +76,16 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         initLiveEvent()
 //        split()
 
+        val timestamp = System.currentTimeMillis().div(1000)
+        val string = EncryptUtil.initKeyAes("20230412${timestamp}1745")
+        Log.d("111111111111111", "timestamp: $timestamp")
+        Log.d("111111111111111", "string: $string")
+        Log.d("111111111111111", "EncryptUtil.initKeyAes: ${EncryptUtil.initKeyAes()}")
+//        Key:20230412
+//        时间:1681292771
+//        随机数:1745
+//        Secret:+/PB1vLWq4riPX+U4rgeGA==
     }
-
-    private fun readCsvFile(context: Context, filename: String?) {
-        var file = File(context.getExternalFilesDir(null)!!.absolutePath)
-        file = File(file, filename)
-        var br: BufferedReader? = null
-        val pr = mutableListOf<Short>()
-        val acc = mutableListOf<Int>()
-        try {
-            var sCurrentLine = ""
-            br = BufferedReader(FileReader(file))
-            while (br.readLine().also { if (it != null) sCurrentLine = it } != null) {
-                val str = sCurrentLine.split(",").toTypedArray()
-                if (isNumber(str[3])) {
-                    pr.add(str[3].toInt().toShort())
-                    acc.add(str[4].toInt())
-                }
-            }
-            DataConvert.sleep_alg_init_0_25Hz()
-            val status = mutableListOf<Int>()
-            for (i in 0 until pr.size) {
-                status.add(DataConvert.sleep_alg_main_pro_0_25Hz(pr[i], acc[i]))
-            }
-            val result = DataConvert.sleep_alg_get_res_0_25Hz()
-            FileUtil.saveTextFile("${getExternalFilesDir(null)?.absolutePath}/sleep_result_20230225000057.txt", "data pr: ${pr.joinToString(",")}", true)
-            FileUtil.saveTextFile("${getExternalFilesDir(null)?.absolutePath}/sleep_result_20230225000057.txt", "\n\ndata acc: ${acc.joinToString(",")}", true)
-            FileUtil.saveTextFile("${getExternalFilesDir(null)?.absolutePath}/sleep_result_20230225000057.txt", "\n\nsleep_alg_main_pro_0_25Hz status: ${status.joinToString(",")}", true)
-            FileUtil.saveTextFile("${getExternalFilesDir(null)?.absolutePath}/sleep_result_20230225000057.txt", "\n\nsleep_alg_get_res_0_25Hz result: ${result.joinToString(",")}", true)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        } finally {
-            try {
-                br?.close()
-            } catch (ex: IOException) {
-                ex.printStackTrace()
-            }
-        }
-    }
-
 
     //创建菜单
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

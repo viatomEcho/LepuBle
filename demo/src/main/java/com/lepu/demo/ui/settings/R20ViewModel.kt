@@ -12,10 +12,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.R20BleCmd
 import com.lepu.blepro.ble.cmd.R20BleResponse
 import com.lepu.blepro.ble.data.FactoryConfig
-import com.lepu.blepro.ble.data.r20.MeasureSetting
-import com.lepu.blepro.ble.data.r20.SystemSetting
-import com.lepu.blepro.ble.data.r20.VentilationSetting
-import com.lepu.blepro.ble.data.r20.WarningSetting
+import com.lepu.blepro.ble.data.r20.*
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.demo.R
@@ -35,6 +32,7 @@ class R20ViewModel : SettingViewModel() {
     private var ventilationSetting = VentilationSetting()
     private var warningSetting = WarningSetting()
     private lateinit var rtState: R20BleResponse.RtState
+    private var spinnerSet = true
 
     fun initView(context: Context, binding: FragmentSettingsBinding, model: Int) {
         this.context = context
@@ -45,7 +43,7 @@ class R20ViewModel : SettingViewModel() {
             binding.r20Layout.measureSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
             binding.r20Layout.ventilationSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
             binding.r20Layout.warningSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.other.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.r20Layout.otherSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
             binding.r20Layout.factoryInfoLayout.visibility = View.VISIBLE
             binding.r20Layout.systemSettingLayout.visibility = View.GONE
             binding.r20Layout.measureSettingLayout.visibility = View.GONE
@@ -59,13 +57,14 @@ class R20ViewModel : SettingViewModel() {
             binding.r20Layout.measureSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
             binding.r20Layout.ventilationSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
             binding.r20Layout.warningSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.other.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.r20Layout.otherSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
             binding.r20Layout.systemSettingLayout.visibility = View.VISIBLE
             binding.r20Layout.factoryInfoLayout.visibility = View.GONE
             binding.r20Layout.measureSettingLayout.visibility = View.GONE
             binding.r20Layout.ventilationSettingLayout.visibility = View.GONE
             binding.r20Layout.warningSettingLayout.visibility = View.GONE
             binding.r20Layout.otherLayout.visibility = View.GONE
+            spinnerSet = false
             LpBleUtil.r20GetSystemSetting(model)
         }
         binding.r20Layout.measureSetting.setOnClickListener {
@@ -74,13 +73,14 @@ class R20ViewModel : SettingViewModel() {
             binding.r20Layout.systemSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
             binding.r20Layout.ventilationSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
             binding.r20Layout.warningSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.other.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.r20Layout.otherSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
             binding.r20Layout.measureSettingLayout.visibility = View.VISIBLE
             binding.r20Layout.factoryInfoLayout.visibility = View.GONE
             binding.r20Layout.systemSettingLayout.visibility = View.GONE
             binding.r20Layout.ventilationSettingLayout.visibility = View.GONE
             binding.r20Layout.warningSettingLayout.visibility = View.GONE
             binding.r20Layout.otherLayout.visibility = View.GONE
+            spinnerSet = false
             LpBleUtil.r20GetMeasureSetting(model)
         }
         binding.r20Layout.ventilationSetting.setOnClickListener {
@@ -89,7 +89,7 @@ class R20ViewModel : SettingViewModel() {
             binding.r20Layout.systemSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
             binding.r20Layout.measureSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
             binding.r20Layout.warningSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.other.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.r20Layout.otherSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
             binding.r20Layout.ventilationSettingLayout.visibility = View.VISIBLE
             binding.r20Layout.factoryInfoLayout.visibility = View.GONE
             binding.r20Layout.systemSettingLayout.visibility = View.GONE
@@ -105,17 +105,18 @@ class R20ViewModel : SettingViewModel() {
             binding.r20Layout.systemSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
             binding.r20Layout.measureSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
             binding.r20Layout.ventilationSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.other.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.r20Layout.otherSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
             binding.r20Layout.warningSettingLayout.visibility = View.VISIBLE
             binding.r20Layout.factoryInfoLayout.visibility = View.GONE
             binding.r20Layout.systemSettingLayout.visibility = View.GONE
             binding.r20Layout.measureSettingLayout.visibility = View.GONE
             binding.r20Layout.ventilationSettingLayout.visibility = View.GONE
             binding.r20Layout.otherLayout.visibility = View.GONE
+            spinnerSet = false
             LpBleUtil.r20GetWarningSetting(model)
         }
-        binding.r20Layout.other.setOnClickListener {
-            binding.r20Layout.other.background = context.getDrawable(R.drawable.string_selected)
+        binding.r20Layout.otherSetting.setOnClickListener {
+            binding.r20Layout.otherSetting.background = context.getDrawable(R.drawable.string_selected)
             binding.r20Layout.factoryInfo.background = context.getDrawable(R.drawable.dialog_hint_shape)
             binding.r20Layout.systemSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
             binding.r20Layout.measureSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
@@ -174,13 +175,15 @@ class R20ViewModel : SettingViewModel() {
         }
         // 进入医生模式
         binding.r20Layout.doctorMode.setOnCheckedChangeListener { buttonView, isChecked ->
-            var pin = binding.r20Layout.pin.text.toString()
-            pin = if (pin == "") {
-                "0319"
-            } else {
-                pin
+            if (buttonView.isPressed) {
+                var pin = binding.r20Layout.pin.text.toString()
+                pin = if (pin == "") {
+                    "0319"
+                } else {
+                    pin
+                }
+                LpBleUtil.r20DoctorMode(model, pin, System.currentTimeMillis().div(1000))
             }
-            LpBleUtil.r20DoctorMode(model, pin, System.currentTimeMillis().div(1000))
         }
         // 系统设置
         // 单位设置
@@ -189,9 +192,11 @@ class R20ViewModel : SettingViewModel() {
         }
         binding.r20Layout.unit.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                systemSetting.type = R20BleCmd.SystemSetting.UNIT
-                systemSetting.unitSetting.pressureUnit = position
-                LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                if (spinnerSet) {
+                    systemSetting.type = R20BleCmd.SystemSetting.UNIT
+                    systemSetting.unitSetting.pressureUnit = position
+                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -202,9 +207,11 @@ class R20ViewModel : SettingViewModel() {
         }
         binding.r20Layout.language.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                systemSetting.type = R20BleCmd.SystemSetting.LANGUAGE
-                systemSetting.languageSetting.language = position
-                LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                if (spinnerSet) {
+                    systemSetting.type = R20BleCmd.SystemSetting.LANGUAGE
+                    systemSetting.languageSetting.language = position
+                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -212,9 +219,11 @@ class R20ViewModel : SettingViewModel() {
         // 屏幕设置：屏幕亮度
         binding.r20Layout.brightness.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                systemSetting.type = R20BleCmd.SystemSetting.SCREEN
-                systemSetting.screenSetting.brightness = progress
-                LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                if (fromUser) {
+                    systemSetting.type = R20BleCmd.SystemSetting.SCREEN
+                    systemSetting.screenSetting.brightness = progress
+                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                }
                 binding.r20Layout.brightnessProcess.text = "$progress %"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     binding.r20Layout.brightnessRange.text = "范围：${binding.r20Layout.brightness.min}% - ${binding.r20Layout.brightness.max}%"
@@ -231,9 +240,11 @@ class R20ViewModel : SettingViewModel() {
         }
         binding.r20Layout.screenOff.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                systemSetting.type = R20BleCmd.SystemSetting.SCREEN
-                systemSetting.screenSetting.autoOff = position.times(30)
-                LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                if (spinnerSet) {
+                    systemSetting.type = R20BleCmd.SystemSetting.SCREEN
+                    systemSetting.screenSetting.autoOff = position.times(30)
+                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -241,9 +252,11 @@ class R20ViewModel : SettingViewModel() {
         // 耗材设置：过滤棉
         binding.r20Layout.filter.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
-                systemSetting.replacements.filter = progress
-                LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                if (fromUser) {
+                    systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
+                    systemSetting.replacements.filter = progress
+                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                }
                 binding.r20Layout.filterProcess.text = if (progress == 0) {
                     "关"
                 } else {
@@ -259,9 +272,11 @@ class R20ViewModel : SettingViewModel() {
         // 耗材设置：面罩
         binding.r20Layout.mask.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
-                systemSetting.replacements.mask = progress
-                LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                if (fromUser) {
+                    systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
+                    systemSetting.replacements.mask = progress
+                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                }
                 binding.r20Layout.maskProcess.text = if (progress == 0) {
                     "关"
                 } else {
@@ -277,9 +292,11 @@ class R20ViewModel : SettingViewModel() {
         // 耗材设置：管道
         binding.r20Layout.tube.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
-                systemSetting.replacements.tube = progress
-                LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                if (fromUser) {
+                    systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
+                    systemSetting.replacements.tube = progress
+                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                }
                 binding.r20Layout.tubeProcess.text = if (progress == 0) {
                     "关"
                 } else {
@@ -295,9 +312,11 @@ class R20ViewModel : SettingViewModel() {
         // 耗材设置：水箱
         binding.r20Layout.tank.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
-                systemSetting.replacements.tank = progress
-                LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                if (fromUser) {
+                    systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
+                    systemSetting.replacements.tank = progress
+                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                }
                 binding.r20Layout.tankProcess.text = if (progress == 0) {
                     "关闭"
                 } else {
@@ -313,9 +332,11 @@ class R20ViewModel : SettingViewModel() {
         // 音量设置
         binding.r20Layout.volume.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                systemSetting.type = R20BleCmd.SystemSetting.VOLUME
-                systemSetting.volumeSetting.volume = progress
-                LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                if (fromUser) {
+                    systemSetting.type = R20BleCmd.SystemSetting.VOLUME
+                    systemSetting.volumeSetting.volume = progress
+                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                }
                 binding.r20Layout.volumeProcess.text = "$progress %"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     binding.r20Layout.volumeRange.text = "范围：${binding.r20Layout.volume.min}% - ${binding.r20Layout.volume.max}%"
@@ -333,13 +354,15 @@ class R20ViewModel : SettingViewModel() {
         }
         binding.r20Layout.humidification.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                measureSetting.type = R20BleCmd.MeasureSetting.HUMIDIFICATION
-                if (position == 6) {
-                    measureSetting.humidification.humidification = 0x10
-                } else {
-                    measureSetting.humidification.humidification = position
+                if (spinnerSet) {
+                    measureSetting.type = R20BleCmd.MeasureSetting.HUMIDIFICATION
+                    if (position == 6) {
+                        measureSetting.humidification.humidification = 0x10
+                    } else {
+                        measureSetting.humidification.humidification = position
+                    }
+                    LpBleUtil.r20SetMeasureSetting(model, measureSetting)
                 }
-                LpBleUtil.r20SetMeasureSetting(model, measureSetting)
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -350,9 +373,11 @@ class R20ViewModel : SettingViewModel() {
         }
         binding.r20Layout.ipr.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                measureSetting.type = R20BleCmd.MeasureSetting.PRESSURE_REDUCE
-                measureSetting.pressureReduce.ipr = position
-                LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                if (spinnerSet) {
+                    measureSetting.type = R20BleCmd.MeasureSetting.PRESSURE_REDUCE
+                    measureSetting.pressureReduce.ipr = position
+                    LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -363,43 +388,55 @@ class R20ViewModel : SettingViewModel() {
         }
         binding.r20Layout.epr.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                measureSetting.type = R20BleCmd.MeasureSetting.PRESSURE_REDUCE
-                measureSetting.pressureReduce.epr = position
-                LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                if (spinnerSet) {
+                    measureSetting.type = R20BleCmd.MeasureSetting.PRESSURE_REDUCE
+                    measureSetting.pressureReduce.epr = position
+                    LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
         // 自动启停：自动启动
         binding.r20Layout.autoStart.setOnCheckedChangeListener { buttonView, isChecked ->
-            measureSetting.type = R20BleCmd.MeasureSetting.AUTO_SWITCH
-            measureSetting.autoSwitch.autoStart = isChecked
-            LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+            if (buttonView.isPressed) {
+                measureSetting.type = R20BleCmd.MeasureSetting.AUTO_SWITCH
+                measureSetting.autoSwitch.autoStart = isChecked
+                LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+            }
         }
         // 自动启停：自动停止
         binding.r20Layout.autoEnd.setOnCheckedChangeListener { buttonView, isChecked ->
-            measureSetting.type = R20BleCmd.MeasureSetting.AUTO_SWITCH
-            measureSetting.autoSwitch.autoEnd = isChecked
-            LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+            if (buttonView.isPressed) {
+                measureSetting.type = R20BleCmd.MeasureSetting.AUTO_SWITCH
+                measureSetting.autoSwitch.autoEnd = isChecked
+                LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+            }
         }
         // 自动启停：自动停止
         binding.r20Layout.autoEnd.setOnCheckedChangeListener { buttonView, isChecked ->
-            measureSetting.type = R20BleCmd.MeasureSetting.AUTO_SWITCH
-            measureSetting.autoSwitch.autoEnd = isChecked
-            LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+            if (buttonView.isPressed) {
+                measureSetting.type = R20BleCmd.MeasureSetting.AUTO_SWITCH
+                measureSetting.autoSwitch.autoEnd = isChecked
+                LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+            }
         }
         // 自动启停：自动停止
         binding.r20Layout.preHeat.setOnCheckedChangeListener { buttonView, isChecked ->
-            measureSetting.type = R20BleCmd.MeasureSetting.PRE_HEAT
-            measureSetting.preHeat.on = isChecked
-            LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+            if (buttonView.isPressed) {
+                measureSetting.type = R20BleCmd.MeasureSetting.PRE_HEAT
+                measureSetting.preHeat.on = isChecked
+                LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+            }
         }
         // 缓冲压力
         binding.r20Layout.rampPressure.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                measureSetting.type = R20BleCmd.MeasureSetting.RAMP
-                measureSetting.ramp.pressure = progress.times(0.5f)
-                LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                if (fromUser) {
+                    measureSetting.type = R20BleCmd.MeasureSetting.RAMP
+                    measureSetting.ramp.pressure = progress.times(0.5f)
+                    LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                }
                 binding.r20Layout.rampPressureProcess.text = "${measureSetting.ramp.pressure}${if (systemSetting.unitSetting.pressureUnit == 0) {
                     "cmH2O"
                 } else {
@@ -421,9 +458,11 @@ class R20ViewModel : SettingViewModel() {
         // 缓冲时间
         binding.r20Layout.rampTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                measureSetting.type = R20BleCmd.MeasureSetting.RAMP
-                measureSetting.ramp.time = progress.times(5)
-                LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                if (fromUser) {
+                    measureSetting.type = R20BleCmd.MeasureSetting.RAMP
+                    measureSetting.ramp.time = progress.times(5)
+                    LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                }
                 binding.r20Layout.rampTimeProcess.text = "${measureSetting.ramp.time}min"
                 binding.r20Layout.rampTimeRange.text = "范围：关 - ${binding.r20Layout.rampTime.max.times(5)}min"
             }
@@ -438,9 +477,11 @@ class R20ViewModel : SettingViewModel() {
         }
         binding.r20Layout.tubeType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                measureSetting.type = R20BleCmd.MeasureSetting.TUBE_TYPE
-                measureSetting.tubeType.type = position+1
-                LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                if (spinnerSet) {
+                    measureSetting.type = R20BleCmd.MeasureSetting.TUBE_TYPE
+                    measureSetting.tubeType.type = position + 1
+                    LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -451,9 +492,11 @@ class R20ViewModel : SettingViewModel() {
         }
         binding.r20Layout.maskType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                measureSetting.type = R20BleCmd.MeasureSetting.MASK
-                measureSetting.mask.type = position+1
-                LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                if (spinnerSet) {
+                    measureSetting.type = R20BleCmd.MeasureSetting.MASK
+                    measureSetting.mask.type = position + 1
+                    LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -461,9 +504,11 @@ class R20ViewModel : SettingViewModel() {
         // 面罩佩戴匹配测试压力
         binding.r20Layout.maskPressure.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                measureSetting.type = R20BleCmd.MeasureSetting.MASK
-                measureSetting.mask.pressure = progress.toFloat()
-                LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                if (fromUser) {
+                    measureSetting.type = R20BleCmd.MeasureSetting.MASK
+                    measureSetting.mask.pressure = progress.toFloat()
+                    LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                }
                 binding.r20Layout.maskPressureProcess.text = "${measureSetting.mask.pressure}${if (systemSetting.unitSetting.pressureUnit == 0) {
                     "cmH2O"
                 } else {
@@ -486,9 +531,11 @@ class R20ViewModel : SettingViewModel() {
         // CPAP模式压力
         binding.r20Layout.cpapPressure.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE
-                ventilationSetting.pressure.pressure = progress.times(0.5f)
-                LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                if (fromUser) {
+                    ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE
+                    ventilationSetting.pressure.pressure = progress.times(0.5f)
+                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                }
                 binding.r20Layout.cpapPressureProcess.text = "${ventilationSetting.pressure.pressure}${if (systemSetting.unitSetting.pressureUnit == 0) {
                     "cmH2O"
                 } else {
@@ -510,9 +557,11 @@ class R20ViewModel : SettingViewModel() {
         // APAP模式压力最大值Pmax
         binding.r20Layout.apapPressureMax.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_MAX
-                ventilationSetting.pressureMax.max = progress.times(0.5f)
-                LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                if (fromUser) {
+                    ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_MAX
+                    ventilationSetting.pressureMax.max = progress.times(0.5f)
+                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                }
                 binding.r20Layout.apapPressureMaxProcess.text = "${ventilationSetting.pressureMax.max}${if (systemSetting.unitSetting.pressureUnit == 0) {
                     "cmH2O"
                 } else {
@@ -534,9 +583,11 @@ class R20ViewModel : SettingViewModel() {
         // APAP模式压力最小值Pmin
         binding.r20Layout.apapPressureMin.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_MIN
-                ventilationSetting.pressureMin.min = progress.times(0.5f)
-                LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                if (fromUser) {
+                    ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_MIN
+                    ventilationSetting.pressureMin.min = progress.times(0.5f)
+                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                }
                 binding.r20Layout.apapPressureMinProcess.text = "${ventilationSetting.pressureMin.min}${if (systemSetting.unitSetting.pressureUnit == 0) {
                     "cmH2O"
                 } else {
@@ -558,9 +609,11 @@ class R20ViewModel : SettingViewModel() {
         // 吸气压力
         binding.r20Layout.ipapPressure.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_INHALE
-                ventilationSetting.pressureInhale.inhale = progress.times(0.5f)
-                LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                if (fromUser) {
+                    ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_INHALE
+                    ventilationSetting.pressureInhale.inhale = progress.times(0.5f)
+                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                }
                 binding.r20Layout.ipapPressureProcess.text = "${ventilationSetting.pressureInhale.inhale}${if (systemSetting.unitSetting.pressureUnit == 0) {
                     "cmH2O"
                 } else {
@@ -582,9 +635,11 @@ class R20ViewModel : SettingViewModel() {
         // 呼气压力
         binding.r20Layout.epapPressure.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_EXHALE
-                ventilationSetting.pressureExhale.exhale = progress.times(0.5f)
-                LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                if (fromUser) {
+                    ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_EXHALE
+                    ventilationSetting.pressureExhale.exhale = progress.times(0.5f)
+                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                }
                 binding.r20Layout.epapPressureProcess.text = "${ventilationSetting.pressureExhale.exhale}${if (systemSetting.unitSetting.pressureUnit == 0) {
                     "cmH2O"
                 } else {
@@ -606,9 +661,11 @@ class R20ViewModel : SettingViewModel() {
         // 吸气时间
         binding.r20Layout.inspiratoryTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                ventilationSetting.type = R20BleCmd.VentilationSetting.INHALE_DURATION
-                ventilationSetting.inhaleDuration.duration = progress.div(10f)
-                LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                if (fromUser) {
+                    ventilationSetting.type = R20BleCmd.VentilationSetting.INHALE_DURATION
+                    ventilationSetting.inhaleDuration.duration = progress.div(10f)
+                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                }
                 binding.r20Layout.inspiratoryTimeProcess.text = "${ventilationSetting.inhaleDuration.duration}s"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     binding.r20Layout.inspiratoryTimeRange.text = "范围：${String.format("%.1f", binding.r20Layout.inspiratoryTime.min.times(0.1f))} - ${String.format("%.1f", binding.r20Layout.inspiratoryTime.max.times(0.1f))}s"
@@ -622,9 +679,11 @@ class R20ViewModel : SettingViewModel() {
         // 呼吸频率
         binding.r20Layout.respiratoryFrequency.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                ventilationSetting.type = R20BleCmd.VentilationSetting.RESPIRATORY_RATE
-                ventilationSetting.respiratoryRate.rate = progress
-                LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                if (fromUser) {
+                    ventilationSetting.type = R20BleCmd.VentilationSetting.RESPIRATORY_RATE
+                    ventilationSetting.respiratoryRate.rate = progress
+                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                }
                 binding.r20Layout.respiratoryFrequencyProcess.text = "$progress bpm"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     binding.r20Layout.respiratoryFrequencyRange.text = "范围：${binding.r20Layout.respiratoryFrequency.min} - ${binding.r20Layout.respiratoryFrequency.max}bpm"
@@ -638,9 +697,11 @@ class R20ViewModel : SettingViewModel() {
         // 压力上升时间
         binding.r20Layout.raiseTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                ventilationSetting.type = R20BleCmd.VentilationSetting.RAISE_DURATION
-                ventilationSetting.pressureRaiseDuration.duration = progress.times(50)
-                LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                if (fromUser) {
+                    ventilationSetting.type = R20BleCmd.VentilationSetting.RAISE_DURATION
+                    ventilationSetting.pressureRaiseDuration.duration = progress.times(50)
+                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                }
                 binding.r20Layout.raiseTimeProcess.text = "${ventilationSetting.pressureRaiseDuration.duration}ms"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     binding.r20Layout.raiseTimeRange.text = "范围：${binding.r20Layout.raiseTime.min.times(50)} - ${binding.r20Layout.raiseTime.max.times(50)}ms"
@@ -657,9 +718,11 @@ class R20ViewModel : SettingViewModel() {
         }
         binding.r20Layout.iTrigger.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                ventilationSetting.type = R20BleCmd.VentilationSetting.INHALE_SENSITIVE
-                ventilationSetting.inhaleSensitive.sentive = position
-                LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                if (spinnerSet) {
+                    ventilationSetting.type = R20BleCmd.VentilationSetting.INHALE_SENSITIVE
+                    ventilationSetting.inhaleSensitive.sentive = position
+                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -670,9 +733,11 @@ class R20ViewModel : SettingViewModel() {
         }
         binding.r20Layout.eTrigger.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                ventilationSetting.type = R20BleCmd.VentilationSetting.EXHALE_SENSITIVE
-                ventilationSetting.exhaleSensitive.sentive = position
-                LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                if (spinnerSet) {
+                    ventilationSetting.type = R20BleCmd.VentilationSetting.EXHALE_SENSITIVE
+                    ventilationSetting.exhaleSensitive.sentive = position
+                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -684,9 +749,11 @@ class R20ViewModel : SettingViewModel() {
         }
         binding.r20Layout.leakHigh.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                warningSetting.type = R20BleCmd.WarningSetting.LEAK_HIGH
-                warningSetting.warningLeak.high = position.times(15)
-                LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                if (spinnerSet) {
+                    warningSetting.type = R20BleCmd.WarningSetting.LEAK_HIGH
+                    warningSetting.warningLeak.high = position.times(15)
+                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -697,9 +764,11 @@ class R20ViewModel : SettingViewModel() {
         }
         binding.r20Layout.apnea.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                warningSetting.type = R20BleCmd.WarningSetting.APNEA
-                warningSetting.warningApnea.apnea = position.times(10)
-                LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                if (spinnerSet) {
+                    warningSetting.type = R20BleCmd.WarningSetting.APNEA
+                    warningSetting.warningApnea.apnea = position.times(10)
+                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -707,13 +776,15 @@ class R20ViewModel : SettingViewModel() {
         // 潮气量低
         binding.r20Layout.vtLow.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                warningSetting.type = R20BleCmd.WarningSetting.VT_LOW
-                warningSetting.warningVt.low = if (progress == 19) {
-                    0
-                } else {
-                    progress.times(10)
+                if (fromUser) {
+                    warningSetting.type = R20BleCmd.WarningSetting.VT_LOW
+                    warningSetting.warningVt.low = if (progress == 19) {
+                        0
+                    } else {
+                        progress.times(10)
+                    }
+                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
                 }
-                LpBleUtil.r20SetWarningSetting(model, warningSetting)
                 binding.r20Layout.vtLowProcess.text = if (progress == 19) {
                     "关"
                 } else {
@@ -729,9 +800,11 @@ class R20ViewModel : SettingViewModel() {
         // 分钟通气量低
         binding.r20Layout.lowVentilation.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                warningSetting.type = R20BleCmd.WarningSetting.LOW_VENTILATION
-                warningSetting.warningVentilation.low = progress
-                LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                if (fromUser) {
+                    warningSetting.type = R20BleCmd.WarningSetting.LOW_VENTILATION
+                    warningSetting.warningVentilation.low = progress
+                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                }
                 binding.r20Layout.lowVentilationProcess.text = if (progress == 0) {
                     "关"
                 } else {
@@ -747,9 +820,11 @@ class R20ViewModel : SettingViewModel() {
         // 呼吸频率高
         binding.r20Layout.rrHigh.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                warningSetting.type = R20BleCmd.WarningSetting.RR_HIGH
-                warningSetting.warningRrHigh.high = progress
-                LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                if (fromUser) {
+                    warningSetting.type = R20BleCmd.WarningSetting.RR_HIGH
+                    warningSetting.warningRrHigh.high = progress
+                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                }
                 binding.r20Layout.rrHighProcess.text = if (progress == 0) {
                     "关"
                 } else {
@@ -765,9 +840,11 @@ class R20ViewModel : SettingViewModel() {
         // 呼吸频率低
         binding.r20Layout.rrLow.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                warningSetting.type = R20BleCmd.WarningSetting.RR_LOW
-                warningSetting.warningRrLow.low = progress
-                LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                if (fromUser) {
+                    warningSetting.type = R20BleCmd.WarningSetting.RR_LOW
+                    warningSetting.warningRrLow.low = progress
+                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                }
                 binding.r20Layout.rrLowProcess.text = if (progress == 0) {
                     "关"
                 } else {
@@ -783,13 +860,15 @@ class R20ViewModel : SettingViewModel() {
         // 血氧饱和度低
         binding.r20Layout.spo2Low.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                warningSetting.type = R20BleCmd.WarningSetting.SPO2_LOW
-                warningSetting.warningSpo2Low.low = if (progress == 79) {
-                    0
-                } else {
-                    progress
+                if (fromUser) {
+                    warningSetting.type = R20BleCmd.WarningSetting.SPO2_LOW
+                    warningSetting.warningSpo2Low.low = if (progress == 79) {
+                        0
+                    } else {
+                        progress
+                    }
+                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
                 }
-                LpBleUtil.r20SetWarningSetting(model, warningSetting)
                 binding.r20Layout.spo2LowProcess.text = if (progress == 79) {
                     "关"
                 } else {
@@ -805,13 +884,15 @@ class R20ViewModel : SettingViewModel() {
         // 脉率/心率高
         binding.r20Layout.hrHigh.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                warningSetting.type = R20BleCmd.WarningSetting.HR_HIGH
-                warningSetting.warningHrHigh.high = if (progress == 9) {
-                    0
-                } else {
-                    progress.times(10)
+                if (fromUser) {
+                    warningSetting.type = R20BleCmd.WarningSetting.HR_HIGH
+                    warningSetting.warningHrHigh.high = if (progress == 9) {
+                        0
+                    } else {
+                        progress.times(10)
+                    }
+                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
                 }
-                LpBleUtil.r20SetWarningSetting(model, warningSetting)
                 binding.r20Layout.hrHighProcess.text = if (progress == 9) {
                     "关"
                 } else {
@@ -827,13 +908,15 @@ class R20ViewModel : SettingViewModel() {
         // 脉率/心率低
         binding.r20Layout.hrLow.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                warningSetting.type = R20BleCmd.WarningSetting.HR_LOW
-                warningSetting.warningHrLow.low = if (progress == 5) {
-                    0
-                } else {
-                    progress.times(5)
+                if (fromUser) {
+                    warningSetting.type = R20BleCmd.WarningSetting.HR_LOW
+                    warningSetting.warningHrLow.low = if (progress == 5) {
+                        0
+                    } else {
+                        progress.times(5)
+                    }
+                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
                 }
-                LpBleUtil.r20SetWarningSetting(model, warningSetting)
                 binding.r20Layout.hrLowProcess.text = if (progress == 5) {
                     "关"
                 } else {
@@ -846,6 +929,22 @@ class R20ViewModel : SettingViewModel() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
+        // 设置用户
+        binding.r20Layout.setUser.setOnClickListener {
+            val data = UserInfo()
+            data.aid = 1133
+            data.uid = 2233
+            data.fName = "测试"
+            data.name = "一"
+            data.birthday = "1999-06-04"
+            data.height = 155
+            data.weight = 40.5f
+            data.gender = 1
+            LpBleUtil.r20SetUserInfo(model, data)
+        }
+        binding.r20Layout.getUser.setOnClickListener {
+            LpBleUtil.r20GetUserInfo(model)
+        }
     }
 
     fun initEvent(owner: LifecycleOwner) {
@@ -869,11 +968,11 @@ class R20ViewModel : SettingViewModel() {
                 _toast.value = if (data.success) {
                     "进入医生模式成功"
                 } else {
-                    "进入医生模式失败${when (data.errCode) {
+                    "进入医生模式失败, ${when (data.errCode) {
                         1 -> "设备处于医生模式"
                         2 -> "设备处于医生模式（BLE）"
-                        3 -> "，设备处于医生模式（Socket）"
-                        4 -> "，密码错误"
+                        3 -> "设备处于医生模式（Socket）"
+                        4 -> "密码错误"
                         else -> ""
                     }}"
                 }
@@ -884,14 +983,23 @@ class R20ViewModel : SettingViewModel() {
                 val data = it.data as R20BleResponse.RtState
                 rtState = data
                 binding.r20Layout.doctorMode.isChecked = data.deviceMode != 0
+                binding.r20Layout.deviceMode.text = "${when (data.deviceMode) {
+                    0 -> "(设备处于患者模式)"
+                    1 -> "(设备端医生模式)"
+                    2 -> "(BLE端医生模式)"
+                    3 -> "(Socket端医生模式)"
+                    else -> ""
+                }}"
                 layoutGone()
                 when (data.ventilationMode) {
                     // CPAP
                     0 -> {
+                        binding.r20Layout.eprLayout.visibility = View.VISIBLE
                         binding.r20Layout.cpapPressureLayout.visibility = View.VISIBLE
                     }
                     // APAP
                     1 -> {
+                        binding.r20Layout.eprLayout.visibility = View.VISIBLE
                         binding.r20Layout.apapPressureMaxLayout.visibility = View.VISIBLE
                         binding.r20Layout.apapPressureMinLayout.visibility = View.VISIBLE
                     }
@@ -950,9 +1058,17 @@ class R20ViewModel : SettingViewModel() {
                         binding.r20Layout.epapPressure.max = 46
                     }
                 }
+                if (data.deviceMode == 2) {
+                    binding.r20Layout.ventilationSetting.visibility = View.VISIBLE
+                    binding.r20Layout.warningSetting.visibility = View.VISIBLE
+                } else {
+                    binding.r20Layout.ventilationSetting.visibility = View.GONE
+                    binding.r20Layout.warningSetting.visibility = View.GONE
+                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetSystemSetting)
             .observe(owner) {
+                spinnerSet = false
                 systemSetting = it.data as SystemSetting
                 binding.r20Layout.unit.setSelection(systemSetting.unitSetting.pressureUnit)
                 binding.r20Layout.language.setSelection(systemSetting.languageSetting.language)
@@ -963,6 +1079,7 @@ class R20ViewModel : SettingViewModel() {
                 binding.r20Layout.tube.progress = systemSetting.replacements.tube
                 binding.r20Layout.tank.progress = systemSetting.replacements.tank
                 binding.r20Layout.volume.progress = systemSetting.volumeSetting.volume
+                spinnerSet = true
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetSystemSetting)
             .observe(owner) {
@@ -971,6 +1088,7 @@ class R20ViewModel : SettingViewModel() {
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetMeasureSetting)
             .observe(owner) {
+                spinnerSet = false
                 measureSetting = it.data as MeasureSetting
                 if (measureSetting.humidification.humidification == 0x10) {
                     binding.r20Layout.humidification.setSelection(6)
@@ -1007,6 +1125,7 @@ class R20ViewModel : SettingViewModel() {
                 binding.r20Layout.tubeType.setSelection(measureSetting.tubeType.type-1)
                 binding.r20Layout.maskType.setSelection(measureSetting.mask.type-1)
                 binding.r20Layout.maskPressure.progress = measureSetting.mask.pressure.toInt()
+                spinnerSet = true
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetMeasureSetting)
             .observe(owner) {
@@ -1015,6 +1134,7 @@ class R20ViewModel : SettingViewModel() {
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetVentilationSetting)
             .observe(owner) {
+                spinnerSet = false
                 ventilationSetting = it.data as VentilationSetting
                 binding.r20Layout.cpapPressure.progress = ventilationSetting.pressure.pressure.div(0.5).toInt()
                 binding.r20Layout.apapPressureMax.progress = ventilationSetting.pressureMax.max.div(0.5).toInt()
@@ -1087,6 +1207,7 @@ class R20ViewModel : SettingViewModel() {
                 binding.r20Layout.respiratoryFrequency.max = min((60/(ventilationSetting.inhaleDuration.duration/2*3).toInt()),30)
                 binding.r20Layout.iTrigger.setSelection(ventilationSetting.inhaleSensitive.sentive)
                 binding.r20Layout.eTrigger.setSelection(ventilationSetting.exhaleSensitive.sentive)
+                spinnerSet = true
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetVentilationSetting)
             .observe(owner) {
@@ -1095,6 +1216,7 @@ class R20ViewModel : SettingViewModel() {
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetWarningSetting)
             .observe(owner) {
+                spinnerSet = false
                 warningSetting = it.data as WarningSetting
                 binding.r20Layout.leakHigh.setSelection(warningSetting.warningLeak.high.div(15))
                 binding.r20Layout.lowVentilation.progress = warningSetting.warningVentilation.low
@@ -1121,15 +1243,26 @@ class R20ViewModel : SettingViewModel() {
                     warningSetting.warningHrLow.low.div(5)
                 }
                 binding.r20Layout.apnea.setSelection(warningSetting.warningApnea.apnea.div(10))
+                spinnerSet = true
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetWarningSetting)
             .observe(owner) {
                 _toast.value = "警告设置成功"
                 LpBleUtil.r20GetWarningSetting(it.model)
             }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetUserInfo)
+            .observe(owner) {
+                _toast.value = "用户设置成功"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetUserInfo)
+            .observe(owner) {
+                val data = it.data as UserInfo
+                binding.r20Layout.userInfo.text = "$data"
+            }
     }
 
     private fun layoutGone() {
+        binding.r20Layout.eprLayout.visibility = View.GONE
         binding.r20Layout.cpapPressureLayout.visibility = View.GONE
         binding.r20Layout.apapPressureMaxLayout.visibility = View.GONE
         binding.r20Layout.apapPressureMinLayout.visibility = View.GONE

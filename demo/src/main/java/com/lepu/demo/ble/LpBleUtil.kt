@@ -12,7 +12,7 @@ import com.lepu.blepro.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.FactoryConfig
-import com.lepu.blepro.ble.data.bp3.Bp3Config
+import com.lepu.blepro.ble.data.Bp2Config
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
 import com.lepu.blepro.ble.data.r20.VentilationSetting
@@ -1168,7 +1168,7 @@ class LpBleUtil {
         fun bp3GetConfig(model: Int) {
             BleServiceHelper.bp3GetConfig(model)
         }
-        fun bp3SetConfig(model: Int, config: Bp3Config) {
+        fun bp3SetConfig(model: Int, config: Bp2Config) {
             BleServiceHelper.bp3SetConfig(model, config)
         }
         fun bp3CalibrationZero(model: Int) {
