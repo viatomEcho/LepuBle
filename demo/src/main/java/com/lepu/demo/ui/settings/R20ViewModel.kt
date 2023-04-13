@@ -1065,6 +1065,13 @@ class R20ViewModel : SettingViewModel() {
                     binding.r20Layout.ventilationSetting.visibility = View.GONE
                     binding.r20Layout.warningSetting.visibility = View.GONE
                 }
+                if (data.isVentilated) {
+                    binding.r20Layout.systemSetting.visibility = View.GONE
+                    binding.r20Layout.measureSetting.visibility = View.GONE
+                } else {
+                    binding.r20Layout.systemSetting.visibility = View.VISIBLE
+                    binding.r20Layout.measureSetting.visibility = View.VISIBLE
+                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetSystemSetting)
             .observe(owner) {

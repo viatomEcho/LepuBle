@@ -2,6 +2,7 @@ package com.lepu.demo.util;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -45,5 +46,14 @@ public class DateUtil {
     public static String stringFromDate(Date date, String formatString) {
         DateFormat df = new SimpleDateFormat(formatString);
         return df.format(date);
+    }
+
+    public static long getDayTimestamp(){
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return (cal.getTimeInMillis()/1000);
     }
 }

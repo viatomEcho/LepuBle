@@ -847,7 +847,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         }
         binding.r20MaskTest.setOnCheckedChangeListener { buttonView, isChecked ->
-            LpBleUtil.r20MaskTest(Constant.BluetoothConfig.currentModel[0], isChecked)
+            if (buttonView.isPressed) {
+                LpBleUtil.r20MaskTest(Constant.BluetoothConfig.currentModel[0], isChecked)
+            }
         }
     }
 
@@ -2222,6 +2224,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             .observe(this) {
                 val data = it.data as R20BleResponse.RtState
                 binding.r20VentilationSwitch.isChecked = data.isVentilated
+                if (data.isVentilated) {
+                    binding.r20MaskTest.visibility = View.GONE
+                } else {
+                    binding.r20MaskTest.visibility = View.VISIBLE
+                }
                 binding.r20State.text = "设备实时状态：\n通气模式：${when (data.ventilationMode) {
                     0 -> "CPAP"
                     1 -> "APAP"
@@ -2337,6 +2344,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20MaskTest)
             .observe(this) {
                 val data = it.data as R20BleResponse.MaskTestResult
+                if (data.status == 1) {
+                    binding.r20MaskTest.isChecked = true
+                }
                 binding.r20MaskTestText.text = "佩戴测试：\n设备状态：${when (data.status) {
                         0 -> "未在测试状态"
                         1 -> "测试中"

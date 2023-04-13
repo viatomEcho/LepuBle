@@ -422,7 +422,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 if (fileType > 2) {
                     fileType = 1
                 }
-                LpBleUtil.r20GetFileList(Constant.BluetoothConfig.currentModel[0], fileType, 0)
+                // 获取当天统计数据
+                val timestamp = com.lepu.demo.util.DateUtil.getDayTimestamp()
+//                LpBleUtil.r20GetFileList(Constant.BluetoothConfig.currentModel[0], 1, timestamp)
+                LpBleUtil.r20GetFileList(Constant.BluetoothConfig.currentModel[0], 1, 0)
             } else {
                 LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0])
             }

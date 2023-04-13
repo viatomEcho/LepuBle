@@ -180,11 +180,16 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     settingViewModel = ViewModelProvider(this).get(OxyViewModel::class.java)
                     (settingViewModel as OxyViewModel).initView(requireContext(), binding, it)
                     (settingViewModel as OxyViewModel).initEvent(this)
+                    setSoundVibration(it)
                     LpBleUtil.getInfo(it)
                 }
                 Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_BBSM_S2 -> {
                     setViewVisible(binding.o2Layout.root)
+                    settingViewModel = ViewModelProvider(this).get(OxyViewModel::class.java)
+                    (settingViewModel as OxyViewModel).initView(requireContext(), binding, it)
+                    (settingViewModel as OxyViewModel).initEvent(this)
                     binding.o2Layout.o2S2Layout.visibility = View.VISIBLE
+                    setSoundVibration(it)
                     LpBleUtil.getInfo(it)
                 }
                 Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_MY_SCALE,
@@ -939,6 +944,52 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     deviceFactoryData.code = it.code
                     deviceFactoryData.time = DateUtil.stringFromDate(Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL)
                     FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
+                }
+            }
+        }
+    }
+
+    private fun setSoundVibration(model: Int) {
+        when (model) {
+            // 震动
+            Bluetooth.MODEL_O2RING, Bluetooth.MODEL_OXYRING,
+            Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SNOREO2,
+            Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYU,
+            Bluetooth.MODEL_CMRING, Bluetooth.MODEL_SLEEPO2,
+            Bluetooth.MODEL_AI_S100 -> {
+                binding.o2Layout.o2MotorText.text = "震动强度："
+                binding.o2Layout.text01000.visibility = View.VISIBLE
+                binding.o2Layout.text0100100.visibility = View.VISIBLE
+            }
+            // 声音
+            Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_OXYFIT_WPS,
+            Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_KIDSO2_WPS,
+            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BBSM_S1,
+            Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_BBSM_S2,
+            Bluetooth.MODEL_OXYLINK -> {
+                binding.o2Layout.o2MotorText.text = "声音强度："
+                binding.o2Layout.text0350.visibility = View.VISIBLE
+                binding.o2Layout.text03535.visibility = View.VISIBLE
+            }
+            // 震动+声音
+            Bluetooth.MODEL_O2M, Bluetooth.MODEL_O2M_WPS -> {
+                binding.o2Layout.o2MotorText.text = "震动强度："
+                binding.o2Layout.text01000.visibility = View.VISIBLE
+                binding.o2Layout.text0100100.visibility = View.VISIBLE
+                binding.o2Layout.o2BuzzerLayout.visibility = View.VISIBLE
+            }
+            // "25010000" //PO1，震动版本，国内外
+            // "25020000" //PO1B，蜂鸣版本，国内外
+            // "25013001" //PO1B，蜂鸣版本，国内电商专用（新增心率阈值越限提醒）
+            Bluetooth.MODEL_WEARO2 -> {
+                if (mainViewModel.oxyInfo.value?.branchCode == "25010000") {
+                    binding.o2Layout.o2MotorText.text = "震动强度："
+                    binding.o2Layout.text01000.visibility = View.VISIBLE
+                    binding.o2Layout.text0100100.visibility = View.VISIBLE
+                } else {
+                    binding.o2Layout.o2MotorText.text = "声音强度："
+                    binding.o2Layout.text0350.visibility = View.VISIBLE
+                    binding.o2Layout.text03535.visibility = View.VISIBLE
                 }
             }
         }
