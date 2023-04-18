@@ -1094,15 +1094,18 @@ class LpBleUtil {
         fun btpSetSystemSwitch(model: Int, hrSwitch: Boolean, lightSwitch: Boolean, tempSwitch: Boolean) {
             BleServiceHelper.btpSetSystemSwitch(model, hrSwitch, lightSwitch, tempSwitch)
         }
-        // R20
-        fun r20Echo(model: Int, data: ByteArray) {
-            BleServiceHelper.r20Echo(model, data)
+        fun echo(model: Int, data: ByteArray) {
+            BleServiceHelper.echo(model, data)
         }
+        // R20
         fun r20GetBattery(model: Int) {
             BleServiceHelper.r20GetBattery(model)
         }
         fun r20GetFileList(model: Int, fileType: Int, timestamp: Long) {
             BleServiceHelper.getFileList(model, fileType, timestamp)
+        }
+        fun r20Encrypt(model: Int, id: String) {
+            BleServiceHelper.r20Encrypt(model, id)
         }
         fun r20DeviceBound(model: Int, bound: Boolean) {
             BleServiceHelper.r20DeviceBound(model, bound)

@@ -1034,10 +1034,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         if (!isSave) {
             FileUtil.saveTextFile(
                 filePath,
-                "总睡眠时间: ${DataConvert.getEcgTimeStr(result[0])}\n" +
-                        "深睡时间: ${DataConvert.getEcgTimeStr(result[1])}\n" +
-                        "浅睡时间: ${DataConvert.getEcgTimeStr(result[2])}\n" +
-                        "快速眼动时间: ${DataConvert.getEcgTimeStr(result[3])}\n" +
+                "总睡眠时间: ${DataConvert.getEcgTimeStr(result[0]*4)}\n" +
+                        "深睡时间: ${DataConvert.getEcgTimeStr(result[1]*4)}\n" +
+                        "浅睡时间: ${DataConvert.getEcgTimeStr(result[2]*4)}\n" +
+                        "快速眼动时间: ${DataConvert.getEcgTimeStr(result[3]*4)}\n" +
                         "清醒次数: ${result[4]}",
                 true)
         }

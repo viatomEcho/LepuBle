@@ -78,15 +78,15 @@ object R20BleResponse {
     @ExperimentalUnsignedTypes
     class MaskTestResult(val bytes: ByteArray) {
         var status: Int  // 0:未在测试状态；1：测试中；2：测试结束
-        var leak: Int    // 实时漏气量。 单位L/min
+        var leak: Float  // 实时漏气量(0~120L/min),单位0.1L/min,e.g.10:1L/min[0,1200]
         var result: Int  // 0:测试未完成；1：不合适；2：合适
-        // reserved 3
+        // reserved 2
         init {
             var index = 0
             status = byte2UInt(bytes[index])
             index++
-            leak = byte2UInt(bytes[index])
-            index++
+            leak = toUInt(bytes.copyOfRange(index, index+2)).div(10f)
+            index += 2
             result = byte2UInt(bytes[index])
         }
         override fun toString(): String {
@@ -189,7 +189,7 @@ object R20BleResponse {
         var leak: Float      // 漏气量(0~120L/min),单位0.1L/min,e.g.10:1L/min[0,1200],0.5Hz
         var rr: Int          // 呼吸率(0~60),单位1bpm,e.g.10:10bpm[0,60],0.5Hz
         var ti: Float        // 吸气时间(0.1-4s),单位0.1s,e.g.10:1s[1,40],0.5Hz
-        var ie: Int          // 呼吸比(1:50.0-3.0:1),单位0.0001,e.g.10:1:49.75[0,30000],0.5Hz ??????
+        var ie: Float        // 呼吸比(1:50.0-3.0:1),单位0.0001,e.g.10000:1[200,30000],0.5Hz
         var spo2: Int        // 血氧(70-100%),单位1%,e.g.10:10%[70,100],1Hz
         var pr: Int          // 脉率(30-250bpm),单位1bpm,e.g.10:10bpm[30,250],1Hz
         var hr: Int          // 心率(30-250bpm),单位1bpm,e.g.10:10bpm[30,250],1Hz
@@ -212,7 +212,7 @@ object R20BleResponse {
             index += 2
             ti = toUInt(bytes.copyOfRange(index, index+2)).div(10f)
             index += 2
-            ie = toUInt(bytes.copyOfRange(index, index+2))
+            ie = toUInt(bytes.copyOfRange(index, index+2)).div(10000f)
             index += 2
             spo2 = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
@@ -264,6 +264,31 @@ object R20BleResponse {
                 alarm : $alarm
                 alarmLevel : $alarmLevel
                 eventId : $eventId
+            """.trimIndent()
+        }
+    }
+
+    @ExperimentalUnsignedTypes
+    class EncryptInfo(val bytes: ByteArray) {
+        var type: Int       // 0：未加密，1：AES加密，2：MD5 加密
+        var len: Int        // 加密密钥长度
+        // reserved 2
+        var key: ByteArray  // 加密通讯密钥AES key
+        init {
+            var index = 0
+            type = byte2UInt(bytes[index])
+            index++
+            len = byte2UInt(bytes[index])
+            index++
+            index += 2
+            key = trimStr(String(bytes.copyOfRange(index, index+len))).toByteArray()
+        }
+        override fun toString(): String {
+            return """
+                EncryptInfo : 
+                type : $type
+                len : $len
+                key : $key
             """.trimIndent()
         }
     }

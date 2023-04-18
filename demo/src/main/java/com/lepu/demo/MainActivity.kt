@@ -75,16 +75,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         checkServer()
         initLiveEvent()
 //        split()
-
-        val timestamp = System.currentTimeMillis().div(1000)
-        val string = EncryptUtil.initKeyAes("20230412${timestamp}1745")
-        Log.d("111111111111111", "timestamp: $timestamp")
-        Log.d("111111111111111", "string: $string")
-        Log.d("111111111111111", "EncryptUtil.initKeyAes: ${EncryptUtil.initKeyAes()}")
-//        Key:20230412
-//        时间:1681292771
-//        随机数:1745
-//        Secret:+/PB1vLWq4riPX+U4rgeGA==
     }
 
     //创建菜单
@@ -257,7 +247,15 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceReady)
             .observe(this) {
                 Toast.makeText(this, "EventBleDeviceReady 连接成功", Toast.LENGTH_SHORT).show()
-                LpBleUtil.getInfo(it)
+                if (it == Bluetooth.MODEL_R20
+                    || it == Bluetooth.MODEL_R21
+                    || it == Bluetooth.MODEL_R11
+                    || it == Bluetooth.MODEL_R10
+                    || it == Bluetooth.MODEL_LERES) {
+                    LpBleUtil.r20Encrypt(it, "0001")
+                } else {
+                    LpBleUtil.getInfo(it)
+                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bDeviceInfo)
             .observe(this) { event ->

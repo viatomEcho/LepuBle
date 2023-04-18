@@ -75,8 +75,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     private var task = WirelessTask()
     inner class WirelessTask : Runnable {
         override fun run() {
-            LpBleUtil.r20Echo(Constant.BluetoothConfig.currentModel[0], ByteArray(12))
+//            LpBleUtil.echo(Constant.BluetoothConfig.currentModel[0], ByteArray(236))
+//            LpBleUtil.echo(Constant.BluetoothConfig.currentModel[0], ByteArray(32))
+            LpBleUtil.echo(Constant.BluetoothConfig.currentModel[0], ByteArray(12))
             sendSeqNo++
+//            wirelessData.totalBytes = sendSeqNo * 244
+//            wirelessData.totalBytes = sendSeqNo * 40
             wirelessData.totalBytes = sendSeqNo * 20
             wirelessData.recordTime = (System.currentTimeMillis() - wirelessData.startTime).div(1000).toInt()
             if ((wirelessData.recordTime - tempTime) != 0) {
@@ -313,6 +317,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
             Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2,
             Bluetooth.MODEL_LES1 -> {
+//                binding.wirelessDataLayout.root.visibility = View.VISIBLE
                 binding.ecgLayout.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.bpLayout.visibility = View.GONE
@@ -450,8 +455,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
             Bluetooth.MODEL_LERES -> {
                 binding.wirelessDataLayout.root.visibility = View.GONE
+//                binding.wirelessDataLayout.root.visibility = View.VISIBLE
                 binding.r20Switch.visibility = View.VISIBLE
-                LpBleUtil.startRtTask(it.modelNo, 1000)
+//                binding.r20Switch.visibility = View.GONE
+                LpBleUtil.r20GetRtState(it.modelNo)
                 LpBleUtil.r20GetSystemSetting(it.modelNo)
             }
         }
@@ -803,7 +810,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             isStartWirelessTest = true
             tempTime = 0
             recordTime = System.currentTimeMillis()
-            R20BleCmd.seqNo = 0
+            LpBleCmd.seqNo = 0
             tempSeqNo = 0
             sendSeqNo = 0
             wirelessData = WirelessData()
@@ -847,6 +854,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         }
         binding.r20MaskTest.setOnCheckedChangeListener { buttonView, isChecked ->
+            LpBleUtil.stopRtTask(Constant.BluetoothConfig.currentModel[0])
             if (buttonView.isPressed) {
                 LpBleUtil.r20MaskTest(Constant.BluetoothConfig.currentModel[0], isChecked)
             }
@@ -1867,7 +1875,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             .observe(this) {
                 val data = it.data as Pc300BleResponse.GluResult
                 binding.dataStr.text = "$data"
-                binding.deviceInfo.text = "血糖结果类型${data.result}：${data.resultMess} ℃\n" +
+                binding.deviceInfo.text = "血糖结果类型${data.result}：${data.resultMess}\n" +
                         "血糖单位${data.unit}：${
                             when (data.unit) {
                                 0 -> "mmol/L"
@@ -1876,6 +1884,16 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                             }
                         }\n" +
                         "血糖值：${data.data}"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300UaResult)
+            .observe(this) {
+                val data = it.data as Float
+                binding.deviceInfo.text = "尿酸结果：$data mg/dL"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300CholResult)
+            .observe(this) {
+                val data = it.data as Int
+                binding.deviceInfo.text = "总胆固醇结果：$data mg/dL"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300EcgStart)
             .observe(this) {
@@ -2191,9 +2209,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 type = data.tempUnit
             }
         // ----------------------R20-------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20EchoData)
+        LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseEchoData)
             .observe(this) {
-                val data = it.data as R20BleResponse.BleResponse
+                val data = LepuBleResponse.BleResponse(it)
                 wirelessData.totalSize++
                 wirelessData.receiveBytes += data.bytes.size
                 wirelessData.oneDelay = System.currentTimeMillis() - recordTime
@@ -2223,12 +2241,15 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20RtState)
             .observe(this) {
                 val data = it.data as R20BleResponse.RtState
-                binding.r20VentilationSwitch.isChecked = data.isVentilated
+                binding.r20State.visibility = View.VISIBLE
                 if (data.isVentilated) {
-                    binding.r20MaskTest.visibility = View.GONE
+                    binding.r20VentilationSwitch.isChecked = true
+                    LpBleUtil.startRtTask(it.model, 1000)
                 } else {
-                    binding.r20MaskTest.visibility = View.VISIBLE
+                    binding.r20VentilationSwitch.isChecked = false
+                    LpBleUtil.stopRtTask()
                 }
+                binding.r20MaskTest.isEnabled = !data.isVentilated
                 binding.r20State.text = "设备实时状态：\n通气模式：${when (data.ventilationMode) {
                     0 -> "CPAP"
                     1 -> "APAP"
@@ -2259,6 +2280,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20RtParam)
             .observe(this) {
                 val data = it.data as R20BleResponse.RtParam
+                binding.deviceInfo.visibility = View.VISIBLE
+                binding.r20MaskTestText.visibility = View.GONE
                 binding.deviceInfo.text = "实时参数：\n实时压：${data.pressure} ${if (type == 0) "cmH2O" else "hPa"}\n" +
                         "吸气压力：${data.ipap} ${if (type == 0) "cmH2O" else "hPa"}\n" +
                         "呼气压力：${data.epap} ${if (type == 0) "cmH2O" else "hPa"}\n" +
@@ -2272,10 +2295,32 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "脉率：${data.pr} bpm\n" +
                         "心率：${data.hr} bpm"
             }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20MaskTest)
+            .observe(this) {
+                val data = it.data as R20BleResponse.MaskTestResult
+                binding.r20MaskTest.isChecked = data.status == 1
+                binding.r20VentilationSwitch.isEnabled = data.status != 1
+                binding.r20MaskTestText.visibility = View.VISIBLE
+                binding.deviceInfo.visibility = View.GONE
+                binding.r20Event.visibility = View.GONE
+                binding.r20MaskTestText.text = "佩戴测试：\n设备状态：${when (data.status) {
+                    0 -> "未在测试状态"
+                    1 -> "测试中"
+                    2 -> "测试结束"
+                    else -> "无"
+                }}\n实时漏气量：${data.leak} L/min\n测量结果：${when (data.result) {
+                    0 -> "测试未完成"
+                    1 -> "不合适"
+                    2 -> "合适"
+                    else -> "无"
+                }
+                }"
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20Event)
             .observe(this) {
                 val data = it.data as R20BleResponse.Event
-                binding.r20Event.text = "事件上报：\n时间：${stringFromDate(Date(data.timestamp*1000), "yyyyMMdd:HHmmss")}\n" +
+                binding.r20Event.visibility = View.VISIBLE
+                binding.r20Event.text = "事件上报：\n时间：${stringFromDate(Date(data.timestamp*1000), "yyyy-MM-dd HH:mm:ss")}\n" +
                         "警告状态：${if (data.alarm) {"告警中"} else {"取消告警"}}\n" +
                         "警告等级：${when (data.alarmLevel) {
                             0 -> "正常"
@@ -2339,25 +2384,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                             610 -> "自主呼吸占比"
                             else -> "无"
                         }
-                }"
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20MaskTest)
-            .observe(this) {
-                val data = it.data as R20BleResponse.MaskTestResult
-                if (data.status == 1) {
-                    binding.r20MaskTest.isChecked = true
-                }
-                binding.r20MaskTestText.text = "佩戴测试：\n设备状态：${when (data.status) {
-                        0 -> "未在测试状态"
-                        1 -> "测试中"
-                        2 -> "测试结束"
-                        else -> "无"
-                    }}\n实时漏气量：${data.status} L/min\n测量结果：${when (data.result) {
-                        0 -> "测试未完成"
-                        1 -> "不合适"
-                        2 -> "合适"
-                        else -> "无"
-                    }
                 }"
             }
         LiveEventBus.get<ResponseError>(EventMsgConst.Cmd.EventCmdResponseError)

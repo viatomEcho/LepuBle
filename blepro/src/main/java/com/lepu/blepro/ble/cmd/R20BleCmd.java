@@ -1,5 +1,7 @@
 package com.lepu.blepro.ble.cmd;
 
+import com.lepu.blepro.utils.EncryptUtil;
+
 /**
  * @author chenyongfeng
  */
@@ -35,7 +37,7 @@ public class R20BleCmd {
     public static final int RT_PARAM = 0x36;
     public static final int EVENT = 0x37;
 
-    public static int seqNo = 0;
+    private static int seqNo = 0;
     private static void addNo() {
         seqNo++;
         if (seqNo >= 255) {
@@ -43,8 +45,15 @@ public class R20BleCmd {
         }
     }
 
-    private static byte[] getReq(int sendCmd, byte[] data) {
-        int len = data.length;
+    private static byte[] getReq(int sendCmd, byte[] data, byte[] key) {
+        int len;
+        byte[] encryptData = new byte[0];
+        if (key.length == 0) {
+            len = data.length;
+        } else {
+            encryptData = EncryptUtil.AesEncrypt(data, key);
+            len = encryptData.length;
+        }
         byte[] cmd = new byte[8+len];
         cmd[0] = (byte) HEAD;
         cmd[1] = (byte) sendCmd;
@@ -53,7 +62,11 @@ public class R20BleCmd {
         cmd[4] = (byte) seqNo;
         cmd[5] = (byte) len;
         cmd[6] = (byte) (len << 8);
-        System.arraycopy(data, 0, cmd, 7, len);
+        if (key.length == 0) {
+            System.arraycopy(data, 0, cmd, 7, len);
+        } else {
+            System.arraycopy(encryptData, 0, cmd, 7, len);
+        }
         cmd[cmd.length-1] = BleCRC.calCRC8(cmd);
 
         addNo();
@@ -62,79 +75,79 @@ public class R20BleCmd {
 
     public static byte[] deviceBound(boolean bound) {
         if (bound) {
-            return getReq(DEVICE_BOUND, new byte[0]);
+            return getReq(DEVICE_BOUND, new byte[0], new byte[0]);
         } else {
-            return getReq(DEVICE_UNBOUND, new byte[0]);
+            return getReq(DEVICE_UNBOUND, new byte[0], new byte[0]);
         }
     }
     public static byte[] setUserInfo(byte[] data) {
-        return getReq(SET_USER_INFO, data);
+        return getReq(SET_USER_INFO, data, new byte[0]);
     }
     public static byte[] getUserInfo() {
-        return getReq(GET_USER_INFO, new byte[0]);
+        return getReq(GET_USER_INFO, new byte[0], new byte[0]);
     }
-    public static byte[] doctorMode(byte[] pin, long timestamp) {
+    public static byte[] doctorMode(byte[] pin, long timestamp, byte[] key) {
         byte[] data = new byte[10];
         System.arraycopy(pin, 0, data, 0, pin.length);
         data[6] = (byte) timestamp;
         data[7] = (byte) (timestamp >> 8);
         data[8] = (byte) (timestamp >> 16);
         data[9] = (byte) (timestamp >> 24);
-        return getReq(DOCTOR_MODE, data);
+        return getReq(DOCTOR_MODE, data, key);
     }
     public static byte[] getWifiList(int deviceNum) {
         if (deviceNum == 0) {
-            return getReq(GET_WIFI_LIST, new byte[0]);
+            return getReq(GET_WIFI_LIST, new byte[0], new byte[0]);
         } else {
-            return getReq(GET_WIFI_LIST, new byte[]{(byte)deviceNum});
+            return getReq(GET_WIFI_LIST, new byte[]{(byte)deviceNum}, new byte[0]);
         }
     }
     public static byte[] setWifiConfig(byte[] config) {
-        return getReq(SET_WIFI_CONFIG, config);
+        return getReq(SET_WIFI_CONFIG, config, new byte[0]);
     }
     public static byte[] getWifiConfig(int option) {
-        return getReq(GET_WIFI_CONFIG, new byte[]{(byte)option});
+        return getReq(GET_WIFI_CONFIG, new byte[]{(byte)option}, new byte[0]);
     }
     public static byte[] getVersionInfo() {
-        return getReq(GET_VERSION_INFO, new byte[0]);
+        return getReq(GET_VERSION_INFO, new byte[0], new byte[0]);
     }
     public static byte[] getSystemSetting() {
-        return getReq(GET_SYSTEM_SETTING, new byte[0]);
+        return getReq(GET_SYSTEM_SETTING, new byte[0], new byte[0]);
     }
     public static byte[] setSystemSetting(byte[] data) {
-        return getReq(SET_SYSTEM_SETTING, data);
+        return getReq(SET_SYSTEM_SETTING, data, new byte[0]);
     }
     public static byte[] getMeasureSetting() {
-        return getReq(GET_MEASURE_SETTING, new byte[0]);
+        return getReq(GET_MEASURE_SETTING, new byte[0], new byte[0]);
     }
     public static byte[] setMeasureSetting(byte[] data) {
-        return getReq(SET_MEASURE_SETTING, data);
+        return getReq(SET_MEASURE_SETTING, data, new byte[0]);
     }
     public static byte[] maskTest(boolean start) {
         int temp = 0;
         if (start) {
             temp = 1;
         }
-        return getReq(MASK_TEST, new byte[]{(byte)temp,0,0,0});
+        return getReq(MASK_TEST, new byte[]{(byte)temp,0,0,0}, new byte[0]);
     }
-    public static byte[] getVentilationSetting() {
-        return getReq(GET_VENTILATION_SETTING, new byte[0]);
+    public static byte[] getVentilationSetting(byte[] key) {
+        return getReq(GET_VENTILATION_SETTING, new byte[0], key);
     }
-    public static byte[] setVentilationSetting(byte[] data) {
-        return getReq(SET_VENTILATION_SETTING, data);
+    public static byte[] setVentilationSetting(byte[] data, byte[] key) {
+        return getReq(SET_VENTILATION_SETTING, data, key);
     }
-    public static byte[] getWarningSetting() {
-        return getReq(GET_WARNING_SETTING, new byte[0]);
+    public static byte[] getWarningSetting(byte[] key) {
+        return getReq(GET_WARNING_SETTING, new byte[0], key);
     }
-    public static byte[] setWarningSetting(byte[] data) {
-        return getReq(SET_WARNING_SETTING, data);
+    public static byte[] setWarningSetting(byte[] data, byte[] key) {
+        return getReq(SET_WARNING_SETTING, data, key);
     }
-    public static byte[] ventilationSwitch(boolean start) {
+    public static byte[] ventilationSwitch(boolean start, byte[] key) {
         int temp = 0;
         if (start) {
             temp = 1;
         }
-        return getReq(VENTILATION_SWITCH, new byte[]{(byte)temp,0,0,0});
+        return getReq(VENTILATION_SWITCH, new byte[]{(byte)temp,0,0,0}, key);
     }
     public static byte[] getFileList(long startTime, int recordType) {
         byte[] data = new byte[10];
@@ -143,7 +156,7 @@ public class R20BleCmd {
         data[2] = (byte) (startTime >> 16);
         data[3] = (byte) (startTime >> 24);
         data[4] = (byte) recordType;
-        return getReq(GET_FILE_LIST, data);
+        return getReq(GET_FILE_LIST, data, new byte[0]);
     }
     public static byte[] readFileStart(byte[] fileName, int offset) {
         byte[] data = new byte[36];
@@ -152,7 +165,7 @@ public class R20BleCmd {
         data[33] = (byte) (offset >> 8);
         data[34] = (byte) (offset >> 16);
         data[35] = (byte) (offset >> 24);
-        return getReq(READ_FILE_START, data);
+        return getReq(READ_FILE_START, data, new byte[0]);
     }
     public static byte[] readFileData(int offset) {
         byte[] data = new byte[4];
@@ -160,16 +173,16 @@ public class R20BleCmd {
         data[1] = (byte) (offset >> 8);
         data[2] = (byte) (offset >> 16);
         data[3] = (byte) (offset >> 24);
-        return getReq(READ_FILE_DATA, data);
+        return getReq(READ_FILE_DATA, data, new byte[0]);
     }
     public static byte[] readFileEnd() {
-        return getReq(READ_FILE_END, new byte[0]);
+        return getReq(READ_FILE_END, new byte[0], new byte[0]);
     }
     public static byte[] getRtState() {
-        return getReq(RT_STATE, new byte[0]);
+        return getReq(RT_STATE, new byte[0], new byte[0]);
     }
     public static byte[] getRtParam() {
-        return getReq(RT_PARAM, new byte[0]);
+        return getReq(RT_PARAM, new byte[0], new byte[0]);
     }
 
     public static class AlarmLevel {

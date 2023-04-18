@@ -79,26 +79,29 @@ class DataActivity : AppCompatActivity() {
                         "血氧：${file.spo2.joinToString(",")}\n" +
                         "脉率：${file.pr.joinToString(",")}\n" +
                         "心率：${file.hr.joinToString(",")}"
+                val time = file.duration.div(3600f)
                 textView.text = "文件名：${file.fileName}\n" +
                         "使用天数：1天\n" +
-                        "不小于4小时天数：${file.moreThan4hDays}天\n" +
-                        "总使用时间：${String.format("%.1f", file.duration.div(3600f))}小时\n" +
-                        "平均使用时间：${String.format("%.1f", file.duration.div(3600f))}小时\n" +
+                        "不小于4小时天数：${if (time > 4) 1 else 0}天\n" +
+                        "总使用时间：${String.format("%.1f", time)}小时\n" +
+                        "平均使用时间：${String.format("%.1f", time)}小时\n" +
                         "压力：${file.pressure[4].div(10f)}${if (unit == 0) "cmH2O" else "hPa"}\n" +
                         "呼气压力：${file.epap[4].div(10f)}${if (unit == 0) "cmH2O" else "hPa"}\n" +
                         "吸气压力：${file.ipap[4].div(10f)}${if (unit == 0) "cmH2O" else "hPa"}\n" +
-                        "AHI：${String.format("%.1f", file.ahiCount.times(3600f).div(file.duration))}小时\n" +
-                        "AI：${String.format("%.1f", file.aiCount.times(3600f).div(file.duration))}小时\n" +
-                        "HI：${String.format("%.1f", file.hiCount.times(3600f).div(file.duration))}小时\n" +
-                        "CAI：${String.format("%.1f", file.caiCount.times(3600f).div(file.duration))}小时\n" +
-                        "OAI：${String.format("%.1f", file.oaiCount.times(3600f).div(file.duration))}小时\n" +
-                        "RERA：${String.format("%.1f", file.rearCount.times(3600f).div(file.duration))}小时\n" +
+                        "AHI：${String.format("%.1f", file.ahiCount.times(3600f).div(file.duration))}/小时\n" +
+                        "AI：${String.format("%.1f", file.aiCount.times(3600f).div(file.duration))}/小时\n" +
+                        "HI：${String.format("%.1f", file.hiCount.times(3600f).div(file.duration))}/小时\n" +
+                        "CAI：${String.format("%.1f", file.caiCount.times(3600f).div(file.duration))}/小时\n" +
+                        "OAI：${String.format("%.1f", file.oaiCount.times(3600f).div(file.duration))}/小时\n" +
+                        "RERA：${String.format("%.1f", file.rearCount.times(3600f).div(file.duration))}/小时\n" +
                         "潮气量：${if (file.vt[3] < 0 || file.vt[3] > 3000) "**" else file.vt[3]}mL\n" +
                         "漏气量：${if (file.leak[4] < 0 || file.leak[4] > 1200) "**" else file.leak[4].div(10f)}L/min\n" +
                         "分钟通气量：${if (file.mv[3] < 0 || file.mv[3] > 600) "**" else file.mv[3].div(10f)}L/min\n" +
                         "呼吸频率：${if (file.rr[3] < 0 || file.rr[3] > 60) "**" else file.rr[3]}bpm\n" +
                         "吸气时间：${if (file.ti[3] < 0 || file.ti[3] > 40) "--" else file.ti[3].div(10f)}s\n" +
-                        "吸呼比：${if (file.ie[3] < 0 || file.ie[3] > 30000) "--" else file.ie[3].div(1000f)}\n" +
+                        "吸呼比：${if (file.ie[3] < 200 || file.ie[3] > 30000) "--" else {
+                            "1:" + String.format("%.1f", 1.div(1.div(file.ie[3].div(10000f))))
+                        }}\n" +
                         "自主呼吸占比：${if (file.spont < 0 || file.spont > 100) "**" else file.spont}%\n" +
                         "血氧：${if (file.spo2[0] < 70 || file.spo2[0] > 100) "**" else file.spo2[0]}%\n" +
                         "脉率：${if (file.pr[2] < 30 || file.pr[2] > 250) "**" else file.pr[2]}bpm\n" +

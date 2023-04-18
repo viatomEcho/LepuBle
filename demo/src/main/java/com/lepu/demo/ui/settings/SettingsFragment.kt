@@ -86,7 +86,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.aoj20aLayout.visibility = View.GONE
         binding.pc68bLayout.visibility = View.GONE
         binding.ad5Layout.visibility = View.GONE
-        binding.pc300Layout.visibility = View.GONE
+        binding.pc300Layout.root.visibility = View.GONE
         binding.lemLayout.root.visibility = View.GONE
         binding.bpmLayout.visibility = View.GONE
         binding.pc60fwLayout.visibility = View.GONE
@@ -245,7 +245,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
                 Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
                 Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
-                    setViewVisible(binding.pc300Layout)
+                    setViewVisible(binding.pc300Layout.root)
+                    settingViewModel = ViewModelProvider(this).get(Pc300ViewModel::class.java)
+                    (settingViewModel as Pc300ViewModel).initView(requireContext(), binding, it)
+                    (settingViewModel as Pc300ViewModel).initEvent(this)
+                    LpBleUtil.pc300GetGlucometerType(it)
                 }
                 Bluetooth.MODEL_LEM -> {
                     setViewVisible(binding.lemLayout.root)
@@ -670,78 +674,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
 
         //----------------------pc300--------------------
-        binding.pc300SetDigit.setOnClickListener {
-            // 1:8bit 2:12bit
-            state++
-            if (state > 2) {
-                state = 1
-            }
-            LpBleUtil.pc300SetEcgDataDigit(Constant.BluetoothConfig.currentModel[0], state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        /*binding.pc300SetGluUnit.setOnClickListener {
-            state++
-            if (state > Pc300BleCmd.GluUnit.MG_DL) {
-                state = Pc300BleCmd.GluUnit.MMOL_L
-            }
-            LpBleUtil.pc300SetGluUnit(Constant.BluetoothConfig.currentModel[0], state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.pc300SetId.setOnClickListener {
-            state++
-            LpBleUtil.pc300SetDeviceId(Constant.BluetoothConfig.currentModel[0], state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.pc300GetId.setOnClickListener {
-            LpBleUtil.pc300GetDeviceId(Constant.BluetoothConfig.currentModel[0])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }*/
-        binding.pc300SetBsType.setOnClickListener {
-            state++
-            if (state > Pc300BleCmd.GlucometerType.ON_CALL_SURE_SYNC) {
-                state = Pc300BleCmd.GlucometerType.AI_AO_LE
-            }
-            LpBleUtil.pc300SetGlucometerType(Constant.BluetoothConfig.currentModel[0], state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.pc300GetBsType.setOnClickListener {
-            LpBleUtil.pc300GetGlucometerType(Constant.BluetoothConfig.currentModel[0])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        /*binding.pc300SetTempMode.setOnClickListener {
-                state++
-                if (state > Pc300BleCmd.TempMode.OBJECT_F) {
-                state = Pc300BleCmd.TempMode.EAR_C
-            }
-            LpBleUtil.pc300SetTempMode(Constant.BluetoothConfig.currentModel[0], state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.pc300GetTempMode.setOnClickListener {
-            LpBleUtil.pc300GetTempMode(Constant.BluetoothConfig.currentModel[0])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.pc300SetBpMode.setOnClickListener {
-            state++
-            if (state > Pc300BleCmd.BpMode.CHILD_MODE) {
-                state = Pc300BleCmd.BpMode.ADULT_MODE
-            }
-            LpBleUtil.pc300SetBpMode(Constant.BluetoothConfig.currentModel[0], state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }
-        binding.pc300GetBpMode.setOnClickListener {
-            LpBleUtil.pc300GetBpMode(Constant.BluetoothConfig.currentModel[0])
-            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-            binding.sendCmd.text = cmdStr
-        }*/
 
         // ---------------------------lem---------------------------
         binding.lemLayout.lemDeviceSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -960,6 +892,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.o2Layout.o2MotorText.text = "震动强度："
                 binding.o2Layout.text01000.visibility = View.VISIBLE
                 binding.o2Layout.text0100100.visibility = View.VISIBLE
+                binding.o2Layout.text0350.visibility = View.GONE
+                binding.o2Layout.text03535.visibility = View.GONE
             }
             // 声音
             Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_OXYFIT_WPS,
@@ -970,6 +904,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.o2Layout.o2MotorText.text = "声音强度："
                 binding.o2Layout.text0350.visibility = View.VISIBLE
                 binding.o2Layout.text03535.visibility = View.VISIBLE
+                binding.o2Layout.text01000.visibility = View.GONE
+                binding.o2Layout.text0100100.visibility = View.GONE
             }
             // 震动+声音
             Bluetooth.MODEL_O2M, Bluetooth.MODEL_O2M_WPS -> {
@@ -977,6 +913,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.o2Layout.text01000.visibility = View.VISIBLE
                 binding.o2Layout.text0100100.visibility = View.VISIBLE
                 binding.o2Layout.o2BuzzerLayout.visibility = View.VISIBLE
+                binding.o2Layout.text0350.visibility = View.GONE
+                binding.o2Layout.text03535.visibility = View.GONE
             }
             // "25010000" //PO1，震动版本，国内外
             // "25020000" //PO1B，蜂鸣版本，国内外
@@ -986,10 +924,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     binding.o2Layout.o2MotorText.text = "震动强度："
                     binding.o2Layout.text01000.visibility = View.VISIBLE
                     binding.o2Layout.text0100100.visibility = View.VISIBLE
+                    binding.o2Layout.text0350.visibility = View.GONE
+                    binding.o2Layout.text03535.visibility = View.GONE
                 } else {
                     binding.o2Layout.o2MotorText.text = "声音强度："
                     binding.o2Layout.text0350.visibility = View.VISIBLE
                     binding.o2Layout.text03535.visibility = View.VISIBLE
+                    binding.o2Layout.text01000.visibility = View.GONE
+                    binding.o2Layout.text0100100.visibility = View.GONE
                 }
             }
         }

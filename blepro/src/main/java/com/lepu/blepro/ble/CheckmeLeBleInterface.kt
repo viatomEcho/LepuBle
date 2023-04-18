@@ -54,13 +54,20 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
             .enqueue()
     }
 
-    private fun sendOxyCmd(cmd: Int, bs: ByteArray){
+    private fun sendOxyCmd(cmd: Int){
         LepuBleLog.d(tag, "sendOxyCmd $cmd")
 
         if (curCmd != -1) {
             // busy
             LepuBleLog.d(tag, "busy: " + cmd.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
             return
+        }
+        val bs: ByteArray = when (cmd) {
+            CheckmeLeBleCmd.OXY_CMD_READ_END -> CheckmeLeBleCmd.readFileEnd()
+            CheckmeLeBleCmd.OXY_CMD_READ_CONTENT -> CheckmeLeBleCmd.readFileContent()
+            CheckmeLeBleCmd.OXY_CMD_PARA_SYNC -> CheckmeLeBleCmd.syncTime()
+            CheckmeLeBleCmd.OXY_CMD_INFO -> CheckmeLeBleCmd.getInfo()
+            else -> return
         }
         sendCmd(bs)
         curCmd = cmd
@@ -135,9 +142,9 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
                     fileContent = null
                     LepuBleLog.d(tag, "model:$model, 文件大小：${fileSize}  文件名：$curFileName")
                     if (fileSize <= 0) {
-                        sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_READ_END, CheckmeLeBleCmd.readFileEnd())
+                        sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_READ_END)
                     } else {
-                        sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_READ_CONTENT, CheckmeLeBleCmd.readFileContent())
+                        sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_READ_CONTENT)
                     }
 
                 } else {
@@ -162,9 +169,9 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model, 读文件中：$curFileName   => $curSize / $fileSize ${curSize*100/fileSize}")
 
                 if (curSize < fileSize) {
-                    sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_READ_CONTENT, CheckmeLeBleCmd.readFileContent())
+                    sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_READ_CONTENT)
                 } else {
-                    sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_READ_END, CheckmeLeBleCmd.readFileEnd())
+                    sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_READ_END)
                 }
             }
             CheckmeLeBleCmd.OXY_CMD_READ_END -> {
@@ -217,29 +224,41 @@ class CheckmeLeBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
+        if (curCmd != -1) {
+            // busy
+            LepuBleLog.d(tag, "busy: " + CheckmeLeBleCmd.OXY_CMD_READ_START.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
+            return
+        }
         this.curFileName = fileName
-        sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_READ_START, CheckmeLeBleCmd.readFileStart(fileName))
+        sendCmd(CheckmeLeBleCmd.readFileStart(fileName))
+        curCmd = CheckmeLeBleCmd.OXY_CMD_READ_START
         LepuBleLog.d(tag, "dealReadFile userId:$userId 将要读取文件 $curFileName")
     }
 
     override fun syncTime() {
-        sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_PARA_SYNC, CheckmeLeBleCmd.syncTime())
+        sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_PARA_SYNC)
         LepuBleLog.e(tag, "syncTime")
     }
 
     fun getFileList(type: Int) {
+        if (curCmd != -1) {
+            // busy
+            LepuBleLog.d(tag, "busy: " + CheckmeLeBleCmd.OXY_CMD_READ_START.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
+            return
+        }
         when (type) {
             CheckmeLeBleCmd.ListType.ECG_TYPE -> curFileName = "ecg.dat"
             CheckmeLeBleCmd.ListType.OXY_TYPE -> curFileName = "oxi.dat"
             CheckmeLeBleCmd.ListType.DLC_TYPE -> curFileName = "2dlc.dat"
             CheckmeLeBleCmd.ListType.TEMP_TYPE -> curFileName = "temp.dat"
         }
-        sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_READ_START, CheckmeLeBleCmd.readFileStart(curFileName))
-        LepuBleLog.e(tag, "getFileList type:$type")
+        sendCmd(CheckmeLeBleCmd.readFileStart(curFileName))
+        curCmd = CheckmeLeBleCmd.OXY_CMD_READ_START
+        LepuBleLog.e(tag, "getFileList type:$type, curFileName:$curFileName")
     }
 
     override fun getInfo() {
-        sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_INFO, CheckmeLeBleCmd.getInfo())
+        sendOxyCmd(CheckmeLeBleCmd.OXY_CMD_INFO)
         LepuBleLog.e(tag, "getInfo")
     }
 

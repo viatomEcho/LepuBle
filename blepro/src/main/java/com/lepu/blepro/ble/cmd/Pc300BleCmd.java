@@ -158,6 +158,7 @@ public class Pc300BleCmd {
         public static final int AI_AO_LE = 1;
         public static final int BAI_JIE = 2;
         public static final int ON_CALL_SURE_SYNC = 3;
+        public static final int CE = 4;
     }
     public static byte[] setGlucometerType(int type) {
         return getReq(TOKEN_0XE3, type, new byte[]{0});

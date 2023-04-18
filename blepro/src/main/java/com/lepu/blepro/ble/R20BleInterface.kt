@@ -11,6 +11,9 @@ import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.ble.data.r20.*
 import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.event.EventMsgConst
+import com.lepu.blepro.utils.EncryptUtil
+import com.lepu.blepro.utils.EncryptUtil.LepuEncrypt
+import com.lepu.blepro.utils.EncryptUtil.getAccessToken
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
 import kotlin.experimental.inv
@@ -100,7 +103,7 @@ class R20BleInterface(model: Int): BleInterface(model) {
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: R20BleResponse.BleResponse) {
-        LepuBleLog.d(tag, "onResponseReceived cmd: ${response.cmd}, bytes: ${bytesToHex(response.bytes)}")
+        LepuBleLog.d(tag, "onResponseReceived len: ${response.len} cmd: ${response.cmd}, bytes: ${bytesToHex(response.bytes)}")
         if (response.pkgType != LpBleCmd.TYPE_NORMAL_RESPONSE) {
             val data = ResponseError()
             data.model = model
@@ -109,13 +112,13 @@ class R20BleInterface(model: Int): BleInterface(model) {
             LiveEventBus.get<ResponseError>(EventMsgConst.Cmd.EventCmdResponseError).post(data)
             LepuBleLog.d(tag, "model:$model,ResponseError => $data")
             if (response.cmd == LpBleCmd.ECHO) {
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20EchoData).post(InterfaceEvent(model, response))
+                LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseEchoData).post(response.bytes)
             }
         } else {
             when(response.cmd) {
                 LpBleCmd.ECHO -> {
                     LepuBleLog.d(tag, "model:$model,ECHO => success ${bytesToHex(response.content)}")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20EchoData).post(InterfaceEvent(model, response))
+                    LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseEchoData).post(response.bytes)
                 }
                 LpBleCmd.SET_UTC_TIME -> {
                     LepuBleLog.d(tag, "model:$model,SET_UTC_TIME => success")
@@ -152,7 +155,15 @@ class R20BleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20BurnFactoryInfo).post(InterfaceEvent(model, true))
                 }
                 LpBleCmd.ENCRYPT -> {
-                    LepuBleLog.d(tag, "model:$model,ENCRYPT => success")
+                    if (response.len < 4) {
+                        LepuBleLog.d(tag, "model:$model,ENCRYPT => response.len < 4")
+                        return
+                    }
+                    val data = EncryptUtil.LepuDecrypt(response.content, lepuEncryptKey)
+//                    val data = R20BleResponse.EncryptInfo()
+                    LepuBleLog.d(tag, "model:$model,ENCRYPT => success ${bytesToHex(data)}")
+//                    aesEncryptKey = data.key
+                    syncTime()
                 }
                 R20BleCmd.DEVICE_BOUND -> {
                     if (response.content.isEmpty()) {
@@ -186,6 +197,7 @@ class R20BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,DOCTOR_MODE => response.len < 2")
                         return
                     }
+//                    val data = R20BleResponse.DoctorModeResult(EncryptUtil.AesEncrypt(response.content, aesEncryptKey))
                     val data = R20BleResponse.DoctorModeResult(response.content)
                     LepuBleLog.d(tag, "model:$model,DOCTOR_MODE => success, data: $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20DoctorMode).post(InterfaceEvent(model, data))
@@ -261,6 +273,7 @@ class R20BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,GET_VENTILATION_SETTING => response.len < 10")
                         return
                     }
+//                    val data = VentilationSetting(EncryptUtil.AesEncrypt(response.content, aesEncryptKey))
                     val data = VentilationSetting(response.content)
                     LepuBleLog.d(tag, "model:$model,GET_VENTILATION_SETTING => success, data: $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetVentilationSetting).post(InterfaceEvent(model, data))
@@ -274,6 +287,7 @@ class R20BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,GET_WARNING_SETTING => response.len < 10")
                         return
                     }
+//                    val data = WarningSetting(EncryptUtil.AesEncrypt(response.content, aesEncryptKey))
                     val data = WarningSetting(response.content)
                     LepuBleLog.d(tag, "model:$model,GET_WARNING_SETTING => success, data: $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetWarningSetting).post(InterfaceEvent(model, data))
@@ -281,6 +295,9 @@ class R20BleInterface(model: Int): BleInterface(model) {
                 R20BleCmd.SET_WARNING_SETTING -> {
                     LepuBleLog.d(tag, "model:$model,SET_WARNING_SETTING => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetWarningSetting).post(InterfaceEvent(model, true))
+                }
+                R20BleCmd.VENTILATION_SWITCH -> {
+                    LepuBleLog.d(tag, "model:$model,VENTILATION_SWITCH => success")
                 }
                 R20BleCmd.GET_FILE_LIST -> {
                     if (response.len < 12) {
@@ -449,8 +466,14 @@ class R20BleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "burnFactoryInfo...config: $config")
     }
     // 密钥交换
-    fun encrypt() {
-        sendCmd(LpBleCmd.encrypt(ByteArray(0)))
+    fun encrypt(id: String) {
+        encryptMode = true
+        val encrypt = LepuEncrypt(getAccessToken(id), lepuEncryptKey)
+        sendCmd(LpBleCmd.encrypt(encrypt))
+        LepuBleLog.d(tag, "encrypt...lepuEncryptKey: ${bytesToHex(lepuEncryptKey)}")
+        LepuBleLog.d(tag, "encrypt...encrypt: ${bytesToHex(encrypt)}")
+        val decrypt = EncryptUtil.LepuDecrypt(encrypt, lepuEncryptKey)
+        LepuBleLog.d(tag, "encrypt...decrypt: ${bytesToHex(decrypt)}")
     }
     // 绑定/解绑
     fun deviceBound(bound: Boolean) {
@@ -467,9 +490,9 @@ class R20BleInterface(model: Int): BleInterface(model) {
     // 进入医生模式
     fun doctorMode(pin: String, timestamp: Long) {
         if (pin.length > 6) {
-            sendCmd(R20BleCmd.doctorMode(pin.toByteArray().copyOfRange(0, 6), timestamp))
+            sendCmd(R20BleCmd.doctorMode(pin.toByteArray().copyOfRange(0, 6), timestamp, aesEncryptKey))
         } else {
-            sendCmd(R20BleCmd.doctorMode(pin.toByteArray(), timestamp))
+            sendCmd(R20BleCmd.doctorMode(pin.toByteArray(), timestamp, aesEncryptKey))
         }
     }
     // 搜索WiFi列表
@@ -510,23 +533,23 @@ class R20BleInterface(model: Int): BleInterface(model) {
     }
     // 获取通气控制参数
     fun getVentilationSetting() {
-        sendCmd(R20BleCmd.getVentilationSetting())
+        sendCmd(R20BleCmd.getVentilationSetting(aesEncryptKey))
     }
     // 配置通气控制参数
     fun setVentilationSetting(data: VentilationSetting) {
-        sendCmd(R20BleCmd.setVentilationSetting(data.getDataBytes()))
+        sendCmd(R20BleCmd.setVentilationSetting(data.getDataBytes(), aesEncryptKey))
     }
     // 获取报警提示参数
     fun getWarningSetting() {
-        sendCmd(R20BleCmd.getWarningSetting())
+        sendCmd(R20BleCmd.getWarningSetting(aesEncryptKey))
     }
     // 配置报警提示参数
     fun setWarningSetting(data: WarningSetting) {
-        sendCmd(R20BleCmd.setWarningSetting(data.getDataBytes()))
+        sendCmd(R20BleCmd.setWarningSetting(data.getDataBytes(), aesEncryptKey))
     }
     // 启动/停止通气
     fun ventilationSwitch(start: Boolean) {
-        sendCmd(R20BleCmd.ventilationSwitch(start))
+        sendCmd(R20BleCmd.ventilationSwitch(start, aesEncryptKey))
     }
     // 实时状态获取
     fun getRtState() {

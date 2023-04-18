@@ -6,6 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
@@ -67,6 +68,10 @@ class Er1BleInterface(model: Int): BleInterface(model) {
     private fun onResponseReceived(response: Er1BleResponse.Er1Response) {
         LepuBleLog.d(tag, "onResponseReceived cmd: ${response.cmd}, bytes: ${bytesToHex(response.bytes)}")
         when(response.cmd) {
+            LpBleCmd.ECHO -> {
+                LepuBleLog.d(tag, "model:$model,ECHO => success ${bytesToHex(response.content)}")
+                LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseEchoData).post(response.bytes)
+            }
             Er1BleCmd.GET_INFO -> {
                 if (response.content.size < 38) {
                     LepuBleLog.e(tag, "response.size:${response.content.size} error")
@@ -293,6 +298,11 @@ class Er1BleInterface(model: Int): BleInterface(model) {
         }
 
         return bytesLeft
+    }
+
+    fun echo(data: ByteArray) {
+        sendCmd(LpBleCmd.echo(data))
+        LepuBleLog.d(tag, "echo...")
     }
 
     /**

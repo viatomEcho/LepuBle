@@ -3666,10 +3666,17 @@ class BleServiceHelper private constructor() {
         }
     }
 
-    // R20
-    fun r20Echo(model: Int, data: ByteArray) {
+    fun echo(model: Int, data: ByteArray) {
         if (!checkService()) return
         when (model) {
+            Bluetooth.MODEL_ER1 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Er1BleInterface).let {
+                        LepuBleLog.d(tag, "it as Er1BleInterface--r20Echo")
+                        it.echo(data)
+                    }
+                }
+            }
             Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
             Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
             Bluetooth.MODEL_LERES -> {
@@ -3683,6 +3690,7 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "r20Echo current model $model unsupported!!")
         }
     }
+    // R20
     fun r20GetBattery(model: Int) {
         if (!checkService()) return
         when (model) {
@@ -3697,6 +3705,25 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.d(tag, "r20GetBattery current model $model unsupported!!")
+        }
+    }
+    /**
+     * 加密通讯
+     */
+    fun r20Encrypt(model: Int, id: String) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as R20BleInterface).let {
+                        LepuBleLog.d(tag, "it as R20BleInterface--r20Encrypt")
+                        it.encrypt(id)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "r20Encrypt current model $model unsupported!!")
         }
     }
     /**

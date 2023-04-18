@@ -535,18 +535,18 @@ class OxyDataActivity : AppCompatActivity() {
         val result = DataConvert.sleep_alg_get_res_0_25Hz()
         sleepText.text = "睡眠状态(0深睡眠,1浅睡眠,2快速眼动,3清醒,4无结果)：" +
                 "${statuses.toIntArray().joinToString(",")}\n" +
-                "总睡眠时间: ${DataConvert.getEcgTimeStr(result[0])}\n" +
-                "深睡时间: ${DataConvert.getEcgTimeStr(result[1])}\n" +
-                "浅睡时间: ${DataConvert.getEcgTimeStr(result[2])}\n" +
-                "快速眼动时间: ${DataConvert.getEcgTimeStr(result[3])}\n" +
+                "总睡眠时间: ${DataConvert.getEcgTimeStr(result[0]*4)}\n" +
+                "深睡时间: ${DataConvert.getEcgTimeStr(result[1]*4)}\n" +
+                "浅睡时间: ${DataConvert.getEcgTimeStr(result[2]*4)}\n" +
+                "快速眼动时间: ${DataConvert.getEcgTimeStr(result[3]*4)}\n" +
                 "清醒次数: ${result[4]}"
         if (!isSave) {
             FileUtil.saveTextFile(
                 filePath,
-                "总睡眠时间: ${DataConvert.getEcgTimeStr(result[0])}\n" +
-                        "深睡时间: ${DataConvert.getEcgTimeStr(result[1])}\n" +
-                        "浅睡时间: ${DataConvert.getEcgTimeStr(result[2])}\n" +
-                        "快速眼动时间: ${DataConvert.getEcgTimeStr(result[3])}\n" +
+                "总睡眠时间: ${DataConvert.getEcgTimeStr(result[0]*4)}\n" +
+                        "深睡时间: ${DataConvert.getEcgTimeStr(result[1]*4)}\n" +
+                        "浅睡时间: ${DataConvert.getEcgTimeStr(result[2]*4)}\n" +
+                        "快速眼动时间: ${DataConvert.getEcgTimeStr(result[3]*4)}\n" +
                         "清醒次数: ${result[4]}",
                 true)
         }

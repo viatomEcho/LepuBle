@@ -48,7 +48,7 @@ public class LpBleCmd {
     public static final int DFU_UPDATE_MODE = 0xFA;
     public static final int ENCRYPT = 0xFF;
 
-    private static int seqNo = 0;
+    public static int seqNo = 0;
     private static void addNo() {
         seqNo++;
         if (seqNo >= 255) {

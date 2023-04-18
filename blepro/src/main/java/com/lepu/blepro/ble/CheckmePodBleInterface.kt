@@ -56,13 +56,21 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
             .enqueue()
     }
 
-    private fun sendOxyCmd(cmd: Int, bs: ByteArray){
+    private fun sendOxyCmd(cmd: Int){
         LepuBleLog.d(tag, "sendOxyCmd $cmd")
 
         if (curCmd != -1) {
             // busy
             LepuBleLog.d(tag, "busy: " + cmd.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
             return
+        }
+        val bs: ByteArray = when (cmd) {
+            CheckmePodBleCmd.OXY_CMD_READ_END -> CheckmePodBleCmd.readFileEnd()
+            CheckmePodBleCmd.OXY_CMD_READ_CONTENT -> CheckmePodBleCmd.readFileContent()
+            CheckmePodBleCmd.OXY_CMD_RT_DATA -> CheckmePodBleCmd.getRtData()
+            CheckmePodBleCmd.OXY_CMD_PARA_SYNC -> CheckmePodBleCmd.syncTime()
+            CheckmePodBleCmd.OXY_CMD_INFO -> CheckmePodBleCmd.getInfo()
+            else -> return
         }
         sendCmd(bs)
         curCmd = cmd
@@ -136,13 +144,13 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
                     val fileSize = toUInt(response.content)
                     LepuBleLog.d(tag, "model:$model, 文件大小：${fileSize}  文件名：$curFileName")
                     if (fileSize <= 0) {
-                        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_READ_END, CheckmePodBleCmd.readFileEnd())
+                        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_READ_END)
                         return
                     }
                     curFileName?.let {
 
                         curFile = CheckmePodBleResponse.OxiTFile(it, fileSize)
-                        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_READ_CONTENT, CheckmePodBleCmd.readFileContent())
+                        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_READ_CONTENT)
                     }
 
                 } else {
@@ -172,9 +180,9 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model, 读文件中：${this.fileName}   => ${this.index} / ${this.fileSize}")
 
                     if (this.index < this.fileSize) {
-                        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_READ_CONTENT, CheckmePodBleCmd.readFileContent())
+                        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_READ_CONTENT)
                     } else {
-                        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_READ_END, CheckmePodBleCmd.readFileEnd())
+                        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_READ_END)
                     }
                 } ?: kotlin.run {
                     LepuBleLog.d(tag, "model:$model,  curFile error!!")
@@ -211,19 +219,25 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getRtData() {
-        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_RT_DATA, CheckmePodBleCmd.getRtData())
+        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_RT_DATA)
         LepuBleLog.e(tag, "getRtData")
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
+        if (curCmd != -1) {
+            // busy
+            LepuBleLog.d(tag, "busy: " + CheckmePodBleCmd.OXY_CMD_READ_START.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
+            return
+        }
         this.curFileName = fileName
         LepuBleLog.d(tag, "$userId 将要读取文件 $curFileName")
-        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_READ_START, CheckmePodBleCmd.readFileStart(fileName))
+        sendCmd(CheckmePodBleCmd.readFileStart(fileName))
+        curCmd = CheckmePodBleCmd.OXY_CMD_READ_START
         LepuBleLog.e(tag, "dealReadFile userId:$userId, fileName:$fileName")
     }
 
     override fun syncTime() {
-        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_PARA_SYNC, CheckmePodBleCmd.syncTime())
+        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_PARA_SYNC)
         LepuBleLog.e(tag, "syncTime")
     }
 
@@ -233,7 +247,7 @@ class CheckmePodBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getInfo() {
-        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_INFO, CheckmePodBleCmd.getInfo())
+        sendOxyCmd(CheckmePodBleCmd.OXY_CMD_INFO)
         LepuBleLog.e(tag, "getInfo")
     }
 

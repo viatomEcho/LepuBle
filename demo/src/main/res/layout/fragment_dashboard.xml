@@ -1021,14 +1021,15 @@
                     android:text="面罩佩戴测试"/>
             </LinearLayout>
             <TextView
-                android:id="@+id/device_info"
+                android:visibility="gone"
+                android:id="@+id/r20_state"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp_10"
                 android:textColor="@color/black"
                 android:textSize="18sp"/>
             <TextView
-                android:id="@+id/r20_state"
+                android:id="@+id/device_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp_10"
