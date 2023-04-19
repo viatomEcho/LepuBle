@@ -281,14 +281,14 @@ object R20BleResponse {
             len = byte2UInt(bytes[index])
             index++
             index += 2
-            key = trimStr(String(bytes.copyOfRange(index, index+len))).toByteArray()
+            key = bytes.copyOfRange(index, index+len)
         }
         override fun toString(): String {
             return """
                 EncryptInfo : 
                 type : $type
                 len : $len
-                key : $key
+                key : ${bytesToHex(key)}
             """.trimIndent()
         }
     }

@@ -992,10 +992,10 @@ class LpBleUtil {
         fun pc300SetEcgDataDigit(model: Int, digit: Int) {
             BleServiceHelper.pc300SetEcgDataDigit(model, digit)
         }
-        /*fun pc300SetGluUnit(model: Int, unit: Int) {
-            BleServiceHelper.pc300SetGluUnit(model, unit)
+        fun pc300SetGluUnit(model: Int, unit: Int) {
+//            BleServiceHelper.pc300SetGluUnit(model, unit)
         }
-        fun pc300SetDeviceId(model: Int, id: Int) {
+        /*fun pc300SetDeviceId(model: Int, id: Int) {
             BleServiceHelper.pc300SetDeviceId(model, id)
         }
         fun pc300GetDeviceId(model: Int) {

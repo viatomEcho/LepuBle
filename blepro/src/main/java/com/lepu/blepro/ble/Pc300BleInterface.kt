@@ -155,6 +155,10 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                             LepuBleLog.d(tag, "BP_RESULT response.content.isEmpty()")
                             return
                         }
+                        if (DateUtil.isReceiveDouble()) {
+                            LepuBleLog.d(tag, "BP_RESULT isReceiveDouble()")
+                            return
+                        }
                         val data = Pc300BleResponse.BpResult(response.content)
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300BpResult).post(InterfaceEvent(model, data))
                         LepuBleLog.d(tag, "model:$model,BP_RESULT 血压测量结果 => success $data")
@@ -233,6 +237,10 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                             LepuBleLog.d(tag, "TEMP_RESULT response.content.isEmpty()")
                             return
                         }
+                        if (DateUtil.isReceiveDouble()) {
+                            LepuBleLog.d(tag, "TEMP_RESULT isReceiveDouble()")
+                            return
+                        }
                         val data = Pc300BleResponse.TempResult(response.content)
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300TempResult).post(InterfaceEvent(model, data))
                         LepuBleLog.d(tag, "model:$model,TEMP_RESULT 体温测量结果 => success $data")
@@ -250,6 +258,10 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "TOKEN_0X73 response.content.isEmpty()")
                     return
                 }
+                if (DateUtil.isReceiveDouble()) {
+                    LepuBleLog.d(tag, "TOKEN_0X73 isReceiveDouble()")
+                    return
+                }
                 val data = Pc300BleResponse.GluResult(response.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300GluResult).post(InterfaceEvent(model, data))
                 LepuBleLog.d(tag, "model:$model,TOKEN_0X73 血糖结果 => success $data")
@@ -265,6 +277,10 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
             TOKEN_0XE2 -> {
                 if (response.content.isEmpty() || response.content.size < 2) {
                     LepuBleLog.d(tag, "TOKEN_0XE2 response.content.isEmpty()")
+                    return
+                }
+                if (DateUtil.isReceiveDouble()) {
+                    LepuBleLog.d(tag, "TOKEN_0XE2 isReceiveDouble()")
                     return
                 }
                 // unit: mg/dL
@@ -350,6 +366,10 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
             TOKEN_0X33 -> {
                 if (response.content.isEmpty() || response.content.size < 3) {
                     LepuBleLog.d(tag, "TOKEN_0X33 response.content.isEmpty()")
+                    return
+                }
+                if (DateUtil.isReceiveDouble()) {
+                    LepuBleLog.d(tag, "TOKEN_0X33 isReceiveDouble()")
                     return
                 }
                 val data = Pc300BleResponse.EcgResult(response.content)

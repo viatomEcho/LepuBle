@@ -159,10 +159,9 @@ class R20BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,ENCRYPT => response.len < 4")
                         return
                     }
-                    val data = EncryptUtil.LepuDecrypt(response.content, lepuEncryptKey)
-//                    val data = R20BleResponse.EncryptInfo()
-                    LepuBleLog.d(tag, "model:$model,ENCRYPT => success ${bytesToHex(data)}")
-//                    aesEncryptKey = data.key
+                    val data = R20BleResponse.EncryptInfo(EncryptUtil.LepuDecrypt(response.content, lepuEncryptKey))
+                    aesEncryptKey = data.key
+                    LepuBleLog.d(tag, "model:$model,ENCRYPT => success, data: $data")
                     syncTime()
                 }
                 R20BleCmd.DEVICE_BOUND -> {
@@ -197,9 +196,9 @@ class R20BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,DOCTOR_MODE => response.len < 2")
                         return
                     }
-//                    val data = R20BleResponse.DoctorModeResult(EncryptUtil.AesEncrypt(response.content, aesEncryptKey))
-                    val data = R20BleResponse.DoctorModeResult(response.content)
-                    LepuBleLog.d(tag, "model:$model,DOCTOR_MODE => success, data: $data")
+                    val decrypt = EncryptUtil.AesDecrypt(response.content, aesEncryptKey)
+                    LepuBleLog.d(tag, "model:$model,DOCTOR_MODE => success, data: ${bytesToHex(decrypt)}")
+                    val data = R20BleResponse.DoctorModeResult(decrypt)
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20DoctorMode).post(InterfaceEvent(model, data))
                 }
                 R20BleCmd.GET_WIFI_LIST -> {
@@ -273,9 +272,10 @@ class R20BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,GET_VENTILATION_SETTING => response.len < 10")
                         return
                     }
-//                    val data = VentilationSetting(EncryptUtil.AesEncrypt(response.content, aesEncryptKey))
-                    val data = VentilationSetting(response.content)
-                    LepuBleLog.d(tag, "model:$model,GET_VENTILATION_SETTING => success, data: $data")
+                    val decrypt = EncryptUtil.AesDecrypt(response.content, aesEncryptKey)
+                    LepuBleLog.d(tag, "model:$model,GET_VENTILATION_SETTING => success, data: ${bytesToHex(decrypt)}")
+                    val data = VentilationSetting(decrypt)
+                    LepuBleLog.d(tag, "model:$model, => success, data: $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetVentilationSetting).post(InterfaceEvent(model, data))
                 }
                 R20BleCmd.SET_VENTILATION_SETTING -> {
@@ -287,9 +287,9 @@ class R20BleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model,GET_WARNING_SETTING => response.len < 10")
                         return
                     }
-//                    val data = WarningSetting(EncryptUtil.AesEncrypt(response.content, aesEncryptKey))
-                    val data = WarningSetting(response.content)
-                    LepuBleLog.d(tag, "model:$model,GET_WARNING_SETTING => success, data: $data")
+                    val decrypt = EncryptUtil.AesDecrypt(response.content, aesEncryptKey)
+                    LepuBleLog.d(tag, "model:$model,GET_WARNING_SETTING => success, data: ${bytesToHex(decrypt)}")
+                    val data = WarningSetting(decrypt)
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetWarningSetting).post(InterfaceEvent(model, data))
                 }
                 R20BleCmd.SET_WARNING_SETTING -> {
@@ -297,7 +297,7 @@ class R20BleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetWarningSetting).post(InterfaceEvent(model, true))
                 }
                 R20BleCmd.VENTILATION_SWITCH -> {
-                    LepuBleLog.d(tag, "model:$model,VENTILATION_SWITCH => success")
+                    LepuBleLog.d(tag, "model:$model,VENTILATION_SWITCH => success, data : ${bytesToHex(EncryptUtil.AesDecrypt(response.content, aesEncryptKey))}")
                 }
                 R20BleCmd.GET_FILE_LIST -> {
                     if (response.len < 12) {

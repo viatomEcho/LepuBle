@@ -30,16 +30,18 @@ class Pc300ViewModel : SettingViewModel() {
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
-        /*binding.pc300Layout.setGluUnit.setOnClickListener {
-            state++
-            if (state > Pc300BleCmd.GluUnit.MG_DL) {
-                state = Pc300BleCmd.GluUnit.MMOL_L
-            }
-            LpBleUtil.pc300Layout.setGluUnit(model, state)
-            cmdStr = "send : " + LpBleUtil.getSendCmd(model)
-            binding.sendCmd.text = cmdStr
+        ArrayAdapter(context, R.layout.simple_list_item_1, arrayListOf("mmol/L", "mg/dL")).apply {
+            binding.pc300Layout.gluUnit.adapter = this
         }
-        binding.pc300Layout.setId.setOnClickListener {
+        binding.pc300Layout.gluUnit.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                // 0:mmol/L 1:mg/dL
+                LpBleUtil.pc300SetGluUnit(model, position)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+        /*binding.pc300Layout.setId.setOnClickListener {
             state++
             LpBleUtil.pc300SetDeviceId(model, state)
             cmdStr = "send : " + LpBleUtil.getSendCmd(model)

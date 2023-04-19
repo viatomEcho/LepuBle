@@ -1,5 +1,7 @@
 package com.lepu.blepro.ble.cmd;
 
+import static com.lepu.blepro.utils.HexString.bytesToHex;
+import android.util.Log;
 import com.lepu.blepro.utils.EncryptUtil;
 
 /**
@@ -48,11 +50,16 @@ public class R20BleCmd {
     private static byte[] getReq(int sendCmd, byte[] data, byte[] key) {
         int len;
         byte[] encryptData = new byte[0];
+        Log.d("1111111111", "sendCmd: "+ sendCmd +", data: "+bytesToHex(data));
+        Log.d("1111111111", "key: "+bytesToHex(key));
         if (key.length == 0) {
             len = data.length;
         } else {
             encryptData = EncryptUtil.AesEncrypt(data, key);
             len = encryptData.length;
+            Log.d("1111111111", "encryptData: "+bytesToHex(encryptData));
+            byte[] decryptData = EncryptUtil.AesDecrypt(encryptData, key);
+            Log.d("1111111111", "decryptData: "+bytesToHex(decryptData));
         }
         byte[] cmd = new byte[8+len];
         cmd[0] = (byte) HEAD;

@@ -1063,11 +1063,15 @@ class R20ViewModel : SettingViewModel() {
                     binding.r20Layout.warningSetting.visibility = View.VISIBLE
                 } else {
                     binding.r20Layout.ventilationSetting.visibility = View.GONE
+                    binding.r20Layout.ventilationSettingLayout.visibility = View.GONE
                     binding.r20Layout.warningSetting.visibility = View.GONE
+                    binding.r20Layout.warningSettingLayout.visibility = View.GONE
                 }
                 if (data.isVentilated) {
                     binding.r20Layout.systemSetting.visibility = View.GONE
+                    binding.r20Layout.systemSettingLayout.visibility = View.GONE
                     binding.r20Layout.measureSetting.visibility = View.GONE
+                    binding.r20Layout.measureSettingLayout.visibility = View.GONE
                 } else {
                     binding.r20Layout.systemSetting.visibility = View.VISIBLE
                     binding.r20Layout.measureSetting.visibility = View.VISIBLE

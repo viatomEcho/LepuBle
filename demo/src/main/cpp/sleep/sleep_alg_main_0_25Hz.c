@@ -98,7 +98,7 @@ SLEEP_ALG_STATUS sleep_alg_main_pro_0_25Hz(sleep_alg_input_t  *input) {
 		m_sleep_alg_acc_high_sign = 0;
 		m_sleep_alg_acc_high_count = 0;
 	}
-	if (m_sleep_alg_acc >= 16) {//动作过大认为清醒
+	if (m_sleep_alg_acc >= 23) {//动作过大认为清醒  16
 		m_sleep_alg_rem_count = 0;
 		m_sleep_alg_rem_flag = 0;
 		m_sleep_alg_fall_sleep_flag = 0;
@@ -205,7 +205,7 @@ SLEEP_ALG_STATUS sleep_alg_main_pro_0_25Hz(sleep_alg_input_t  *input) {
 	}
 
 	//=======================心率跳动过大认为清醒=======================
-	if (m_sleep_alg_pr >= m_sleep_alg_pr_base * 115 / 100 
+	if (m_sleep_alg_pr >= m_sleep_alg_pr_base * 117 / 100  // 115
 		&& m_sleep_alg_acc_high_sign
 		//&& m_sleep_alg_count > SLEEP_ALG_SAMPLE_0_25_HZ * 60 * 30	//半小时前的心率跳动认为是快速眼动
 		&& m_sleep_alg_pr >= 75) {

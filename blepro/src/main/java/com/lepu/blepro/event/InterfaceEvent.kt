@@ -560,9 +560,9 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventPc300EcgResult = "com.lepu.ble.pc300.ecg.result"                   // 心电实时结果 Pc300BleResponse.EcgResult
             const val EventPc300GluResult = "com.lepu.ble.pc300.glu.result"                   // 血糖结果 Pc300BleResponse.GluResult
             const val EventPc300UaResult = "com.lepu.ble.pc300.ua.result"                     // 尿酸结果 float
-            const val EventPc300CholResult = "com.lepu.ble.pc300.chol.result"                 // 胆固醇结果 int
+            const val EventPc300CholResult = "com.lepu.ble.pc300.chol.result"                 // 总胆固醇结果 int
             const val EventPc300TempResult = "com.lepu.ble.pc300.temp.result"                 // 温度结果 Pc300BleResponse.TempResult
-            const val EventPc300GetGlucometerType = "com.lepu.ble.pc300.get.glucometer.type"  // 血糖仪类型 int
+            const val EventPc300GetGlucometerType = "com.lepu.ble.pc300.get.glucometer.type"  // 获取血糖仪类型 int
             const val EventPc300SetGlucometerType = "com.lepu.ble.pc300.set.glucometer.type"  // 设置血糖仪类型 boolean
         }
     }

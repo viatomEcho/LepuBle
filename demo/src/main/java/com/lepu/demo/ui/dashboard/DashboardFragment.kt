@@ -2265,7 +2265,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         3 -> "Socket端医生模式"
                         else -> "无"
                     }
-                }\n标准：${when (data.deviceMode) {
+                }\n标准：${when (data.standard) {
                         0 -> "CE"
                         1 -> "FDA"
                         else -> "无"
