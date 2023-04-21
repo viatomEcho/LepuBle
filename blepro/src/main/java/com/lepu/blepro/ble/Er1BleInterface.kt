@@ -301,7 +301,7 @@ class Er1BleInterface(model: Int): BleInterface(model) {
     }
 
     fun echo(data: ByteArray) {
-        sendCmd(LpBleCmd.echo(data))
+        sendCmd(LpBleCmd.echo(data, ByteArray(0)))
         LepuBleLog.d(tag, "echo...")
     }
 

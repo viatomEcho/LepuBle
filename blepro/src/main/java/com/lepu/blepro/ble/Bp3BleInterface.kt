@@ -269,12 +269,12 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
                     //检查返回是否异常
                     LepuBleLog.d(tag, "model:$model,WRITE_FILE_START => success")
                     if (fileSize <= 0) {
-                        sendCmd(LpBleCmd.writeFileEnd())
+                        sendCmd(LpBleCmd.writeFileEnd(aesEncryptKey))
                     } else {
-                        curSize = if (fileSize < chunkSize) { sendCmd(LpBleCmd.writeFileData(userList?.getDataBytes()?.copyOfRange(0, fileSize)))
+                        curSize = if (fileSize < chunkSize) { sendCmd(LpBleCmd.writeFileData(userList?.getDataBytes()?.copyOfRange(0, fileSize), aesEncryptKey))
                             fileSize
                         } else {
-                            sendCmd(LpBleCmd.writeFileData(userList?.getDataBytes()?.copyOfRange(0, chunkSize)))
+                            sendCmd(LpBleCmd.writeFileData(userList?.getDataBytes()?.copyOfRange(0, chunkSize), aesEncryptKey))
                             chunkSize
                         }
                     }
@@ -284,15 +284,15 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model,WRITE_FILE_DATA => success")
                     if (curSize < fileSize) {
                         if (fileSize - curSize < chunkSize) {
-                            sendCmd(LpBleCmd.writeFileData(userList?.getDataBytes()?.copyOfRange(curSize, fileSize)))
+                            sendCmd(LpBleCmd.writeFileData(userList?.getDataBytes()?.copyOfRange(curSize, fileSize), aesEncryptKey))
                             curSize = fileSize
                         } else {
-                            sendCmd(LpBleCmd.writeFileData(userList?.getDataBytes()?.copyOfRange(curSize, curSize + chunkSize)))
+                            sendCmd(LpBleCmd.writeFileData(userList?.getDataBytes()?.copyOfRange(curSize, curSize + chunkSize), aesEncryptKey))
                             curSize += chunkSize
                         }
 
                     } else {
-                        sendCmd(LpBleCmd.writeFileEnd())
+                        sendCmd(LpBleCmd.writeFileEnd(aesEncryptKey))
                     }
                     val percent = curSize*100/fileSize
                     LepuBleLog.d(tag, "write file $fileName WRITE_FILE_DATA curSize == $curSize | fileSize == $fileSize")
@@ -320,7 +320,7 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
                 LpBleCmd.READ_FILE_START -> {
                     //检查当前的下载状态
                     if (isCancelRF || isPausedRF) {
-                        sendCmd(LpBleCmd.readFileEnd())
+                        sendCmd(LpBleCmd.readFileEnd(aesEncryptKey))
                         LepuBleLog.d(tag, "READ_FILE_START isCancelRF: $isCancelRF, isPausedRF: $isPausedRF")
                         return
                     }
@@ -336,16 +336,16 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
                     offset = fileContent.size
                     fileSize = toUInt(response.content)
                     if (fileSize <= 0) {
-                        sendCmd(LpBleCmd.readFileEnd())
+                        sendCmd(LpBleCmd.readFileEnd(aesEncryptKey))
                     } else {
-                        sendCmd(LpBleCmd.readFileData(offset))
+                        sendCmd(LpBleCmd.readFileData(offset, aesEncryptKey))
                     }
                     LepuBleLog.d(tag, "model:$model,READ_FILE_START => fileName: $fileName, offset: $offset, fileSize: $fileSize")
                 }
                 LpBleCmd.READ_FILE_DATA -> {
                     //检查当前的下载状态
                     if (isCancelRF || isPausedRF) {
-                        sendCmd(LpBleCmd.readFileEnd())
+                        sendCmd(LpBleCmd.readFileEnd(aesEncryptKey))
                         LepuBleLog.d(tag, "READ_FILE_DATA isCancelRF: $isCancelRF, isPausedRF: $isPausedRF")
                         return
                     }
@@ -356,9 +356,9 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model,READ_FILE_DATA => offset: $offset, fileSize: $fileSize")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3ReadingFileProgress).post(InterfaceEvent(model, percent))
                     if (offset < fileSize) {
-                        sendCmd(LpBleCmd.readFileData(offset))
+                        sendCmd(LpBleCmd.readFileData(offset, aesEncryptKey))
                     } else {
-                        sendCmd(LpBleCmd.readFileEnd())
+                        sendCmd(LpBleCmd.readFileEnd(aesEncryptKey))
                     }
                 }
                 LpBleCmd.READ_FILE_END -> {
@@ -379,11 +379,11 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
 
     }
     override fun getInfo() {
-        sendCmd(LpBleCmd.getInfo())
+        sendCmd(LpBleCmd.getInfo(aesEncryptKey))
         LepuBleLog.d(tag, "getInfo...")
     }
     override fun syncTime() {
-        sendCmd(LpBleCmd.setUtcTime())
+        sendCmd(LpBleCmd.setUtcTime(aesEncryptKey))
         LepuBleLog.d(tag, "syncTime...")
     }
     override fun getRtData() {
@@ -391,35 +391,35 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "getRtData ...")
     }
     override fun getFileList() {
-        sendCmd(LpBleCmd.getFileList())
+        sendCmd(LpBleCmd.getFileList(aesEncryptKey))
         LepuBleLog.d(tag, "getFileList...")
     }
     override fun dealReadFile(userId: String, fileName: String) {
         this.fileName = fileName
-        sendCmd(LpBleCmd.readFileStart(fileName.toByteArray(), 0))
+        sendCmd(LpBleCmd.readFileStart(fileName.toByteArray(), 0, aesEncryptKey))
         LepuBleLog.d(tag, "dealReadFile... userId:$userId, fileName == $fileName")
     }
     override fun dealContinueRF(userId: String, fileName: String) {
         LepuBleLog.e(tag, "dealContinueRF not yet implemented")
     }
     override fun reset() {
-        sendCmd(LpBleCmd.reset())
+        sendCmd(LpBleCmd.reset(aesEncryptKey))
         LepuBleLog.d(tag, "reset...")
     }
     override fun factoryReset() {
-        sendCmd(LpBleCmd.factoryReset())
+        sendCmd(LpBleCmd.factoryReset(aesEncryptKey))
         LepuBleLog.d(tag, "factoryReset...")
     }
     override fun factoryResetAll() {
-        sendCmd(LpBleCmd.factoryResetAll())
+        sendCmd(LpBleCmd.factoryResetAll(aesEncryptKey))
         LepuBleLog.d(tag, "factoryResetAll...")
     }
     fun burnFactoryInfo(config: FactoryConfig) {
-        sendCmd(LpBleCmd.burnFactoryInfo(config.convert2Data()))
+        sendCmd(LpBleCmd.burnFactoryInfo(config.convert2Data(), aesEncryptKey))
         LepuBleLog.d(tag, "burnFactoryInfo...")
     }
     fun getBattery(){
-        sendCmd(LpBleCmd.getBattery())
+        sendCmd(LpBleCmd.getBattery(aesEncryptKey))
         LepuBleLog.d(tag, "getBattery...")
     }
     fun setConfig(config: Bp2Config){
@@ -486,7 +486,7 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
         this.userList = userList
         fileSize = userList.getDataBytes().size
         fileName = "user.list"
-        sendCmd(LpBleCmd.writeFileStart(fileName.toByteArray(), 0, fileSize))
+        sendCmd(LpBleCmd.writeFileStart(fileName.toByteArray(), 0, fileSize, aesEncryptKey))
         LepuBleLog.d(tag, "writeUserList... fileName == $fileName, fileSize == $fileSize")
     }
 }

@@ -110,8 +110,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     var cmdTimeout: Job? = null
 
     var curCmd = -1
-    // 加密通讯
-    var encryptMode = false
+    // 加密模式通讯
+    var isEncryptMode = false
     val lepuEncryptKey = EncryptUtil.getSecretKey()
     var aesEncryptKey = ByteArray(0)
 
@@ -303,7 +303,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         state = false
         ready = false
         connecting = false
-        encryptMode = false
+        isEncryptMode = false
         aesEncryptKey = ByteArray(0)
         stopRtTask()
 //        LpWorkManager.vailManager.remove(model)
@@ -341,7 +341,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         state = false
         ready = false
         connecting = false
-        encryptMode = false
+        isEncryptMode = false
         aesEncryptKey = ByteArray(0)
         publish()
 
@@ -356,7 +356,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         state = false
         ready = false
         connecting = false
-        encryptMode = false
+        isEncryptMode = false
         aesEncryptKey = ByteArray(0)
         publish()
         LepuBleLog.d(tag, "onDeviceFailedToConnect==reason:${reason}===isAutoReconnect:$isAutoReconnect")

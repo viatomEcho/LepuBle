@@ -1,6 +1,9 @@
 package com.lepu.blepro.ble.cmd;
 
+import static com.lepu.blepro.utils.HexString.bytesToHex;
+import android.util.Log;
 import com.lepu.blepro.utils.CrcUtil;
+import com.lepu.blepro.utils.EncryptUtil;
 import com.lepu.blepro.utils.LepuBleLog;
 import java.util.Calendar;
 import com.lepu.blepro.utils.DateUtil;
@@ -56,11 +59,11 @@ public class LpBleCmd {
         }
     }
 
-    public static byte[] echo(byte[] data) {
-        return getReq(ECHO, data);
+    public static byte[] echo(byte[] data, byte[] key) {
+        return getReq(ECHO, data, key);
     }
 
-    public static byte[] setTime() {
+    public static byte[] setTime(byte[] key) {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(System.currentTimeMillis());
 
@@ -75,10 +78,10 @@ public class LpBleCmd {
         data[6] = (byte) (c.get(Calendar.SECOND));
 
         LepuBleLog.d("setTime===");
-        return getReq(SET_TIME, data);
+        return getReq(SET_TIME, data, key);
     }
 
-    public static byte[] setUtcTime() {
+    public static byte[] setUtcTime(byte[] key) {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(System.currentTimeMillis());
 
@@ -98,35 +101,35 @@ public class LpBleCmd {
 
         data[7] = (byte) timeZone;
 
-        return getReq(SET_UTC_TIME, data);
+        return getReq(SET_UTC_TIME, data, key);
     }
 
-    public static byte[] getInfo() {
-        return getReq(GET_INFO, new byte[0]);
+    public static byte[] getInfo(byte[] key) {
+        return getReq(GET_INFO, new byte[0], key);
     }
 
-    public static byte[] reset() {
-        return getReq(RESET, new byte[0]);
+    public static byte[] reset(byte[] key) {
+        return getReq(RESET, new byte[0], key);
     }
 
-    public static byte[] factoryReset() {
-        return getReq(FACTORY_RESET, new byte[0]);
+    public static byte[] factoryReset(byte[] key) {
+        return getReq(FACTORY_RESET, new byte[0], key);
     }
 
-    public static byte[] factoryResetAll() {
-        return getReq(FACTORY_RESET_ALL, new byte[0]);
+    public static byte[] factoryResetAll(byte[] key) {
+        return getReq(FACTORY_RESET_ALL, new byte[0], key);
     }
 
-    public static byte[] getBattery() {
-        return getReq(GET_BATTERY, new byte[0]);
+    public static byte[] getBattery(byte[] key) {
+        return getReq(GET_BATTERY, new byte[0], key);
     }
 
-    public static byte[] burnFactoryInfo(byte[] config) {
-        return getReq(BURN_FACTORY_INFO, config);
+    public static byte[] burnFactoryInfo(byte[] config, byte[] key) {
+        return getReq(BURN_FACTORY_INFO, config, key);
     }
 
     //文件下载开始
-    public static byte[] readFileStart(byte[] fileName,byte offset){
+    public static byte[] readFileStart(byte[] fileName, byte offset, byte[] key){
         // filename = 16, offset = 4
         int len = 20;
 
@@ -134,41 +137,41 @@ public class LpBleCmd {
         int l = Math.min(fileName.length, 16);
         System.arraycopy(fileName, 0, data, 0, l);
 
-        data[len-4] = (byte) offset;
+        data[len-4] = offset;
         data[len-3] = (byte) (offset >> 8);
         data[len-2] = (byte) (offset >> 16);
         data[len-1] = (byte) (offset >> 24);
-        return getReq(READ_FILE_START, data);
+        return getReq(READ_FILE_START, data, key);
     }
 
     //文件下载结束
-    public static byte[] readFileEnd() {
-        return getReq(READ_FILE_END, new byte[0]);
+    public static byte[] readFileEnd(byte[] key) {
+        return getReq(READ_FILE_END, new byte[0], key);
     }
 
     //文件下载中途
-    public static byte[] readFileData(int addrOffset) {
+    public static byte[] readFileData(int addrOffset, byte[] key) {
         int len = 4;
         byte[] data = new byte[len];
         data[0] = (byte) addrOffset;
         data[1] = (byte) (addrOffset >> 8);
         data[2] = (byte) (addrOffset >> 16);
         data[3] = (byte) (addrOffset >> 24);
-        return getReq(READ_FILE_DATA, data);
+        return getReq(READ_FILE_DATA, data, key);
     }
 
-    public static byte[] getFileList() {
-        return getReq(GET_FILE_LIST, new byte[0]);
+    public static byte[] getFileList(byte[] key) {
+        return getReq(GET_FILE_LIST, new byte[0], key);
     }
 
-    public static byte[] deleteFile() {
-        return getReq(DELETE_FILE, new byte[]{0});
+    public static byte[] deleteFile(byte[] key) {
+        return getReq(DELETE_FILE, new byte[]{0}, key);
     }
 
     /**
      * 写文件开始
      */
-    public static byte[] writeFileStart(byte[] fileName, int offset, int fileSize) {
+    public static byte[] writeFileStart(byte[] fileName, int offset, int fileSize, byte[] key) {
         // filename = 16, offset = 4, fileSize = 4
         int len = 24;
 
@@ -186,36 +189,48 @@ public class LpBleCmd {
         data[len-2] = (byte) (fileSize >> 16);
         data[len-1] = (byte) (fileSize >> 24);
 
-        return getReq(WRITE_FILE_START, data);
+        return getReq(WRITE_FILE_START, data, key);
     }
 
     /**
      * 写文件内容
      */
-    public static byte[] writeFileData(byte[] data) {
-        return getReq(WRITE_FILE_DATA, data);
+    public static byte[] writeFileData(byte[] data, byte[] key) {
+        return getReq(WRITE_FILE_DATA, data, key);
     }
 
     /**
      * 写文件结束
      */
-    public static byte[] writeFileEnd() {
-        return getReq(WRITE_FILE_END, new byte[0]);
+    public static byte[] writeFileEnd(byte[] key) {
+        return getReq(WRITE_FILE_END, new byte[0], key);
     }
-    public static byte[] getUserList() {
-        return getReq(GET_USER_LIST, new byte[0]);
+    public static byte[] getUserList(byte[] key) {
+        return getReq(GET_USER_LIST, new byte[0], key);
     }
 
     /**
      * 加密通讯
      * @return
      */
-    public static byte[] encrypt(byte[] data) {
-        return getReq(ENCRYPT, data);
+    public static byte[] encrypt(byte[] data, byte[] key) {
+        return getReq(ENCRYPT, data, key);
     }
 
-    private static byte[] getReq(int sendCmd, byte[] data) {
-        int len = data.length;
+    private static byte[] getReq(int sendCmd, byte[] data, byte[] key) {
+        int len;
+        byte[] encryptData = new byte[0];
+        Log.d("1111111111", "sendCmd: "+ sendCmd +", data: "+bytesToHex(data));
+        Log.d("1111111111", "key: "+bytesToHex(key));
+        if (key.length == 0) {
+            len = data.length;
+        } else {
+            encryptData = EncryptUtil.AesEncrypt(data, key);
+            len = encryptData.length;
+            Log.d("1111111111", "encryptData: "+bytesToHex(encryptData));
+            byte[] decryptData = EncryptUtil.AesDecrypt(encryptData, key);
+            Log.d("1111111111", "decryptData: "+bytesToHex(decryptData));
+        }
         byte[] cmd = new byte[8+len];
 
         cmd[0] = (byte) HEAD;
@@ -226,8 +241,11 @@ public class LpBleCmd {
         // length
         cmd[5] = (byte) len;
         cmd[6] = (byte) (len>>8);
-
-        System.arraycopy(data, 0, cmd, 7, data.length);
+        if (key.length == 0) {
+            System.arraycopy(data, 0, cmd, 7, len);
+        } else {
+            System.arraycopy(encryptData, 0, cmd, 7, len);
+        }
         cmd[cmd.length-1] = CrcUtil.calCRC8(cmd);
 
         addNo();

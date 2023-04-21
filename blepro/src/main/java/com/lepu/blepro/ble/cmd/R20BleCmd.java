@@ -80,18 +80,18 @@ public class R20BleCmd {
         return cmd;
     }
 
-    public static byte[] deviceBound(boolean bound) {
+    public static byte[] deviceBound(boolean bound, byte[] key) {
         if (bound) {
-            return getReq(DEVICE_BOUND, new byte[0], new byte[0]);
+            return getReq(DEVICE_BOUND, new byte[0], key);
         } else {
-            return getReq(DEVICE_UNBOUND, new byte[0], new byte[0]);
+            return getReq(DEVICE_UNBOUND, new byte[0], key);
         }
     }
-    public static byte[] setUserInfo(byte[] data) {
-        return getReq(SET_USER_INFO, data, new byte[0]);
+    public static byte[] setUserInfo(byte[] data, byte[] key) {
+        return getReq(SET_USER_INFO, data, key);
     }
-    public static byte[] getUserInfo() {
-        return getReq(GET_USER_INFO, new byte[0], new byte[0]);
+    public static byte[] getUserInfo(byte[] key) {
+        return getReq(GET_USER_INFO, new byte[0], key);
     }
     public static byte[] doctorMode(byte[] pin, long timestamp, byte[] key) {
         byte[] data = new byte[10];
@@ -102,40 +102,40 @@ public class R20BleCmd {
         data[9] = (byte) (timestamp >> 24);
         return getReq(DOCTOR_MODE, data, key);
     }
-    public static byte[] getWifiList(int deviceNum) {
+    public static byte[] getWifiList(int deviceNum, byte[] key) {
         if (deviceNum == 0) {
-            return getReq(GET_WIFI_LIST, new byte[0], new byte[0]);
+            return getReq(GET_WIFI_LIST, new byte[0], key);
         } else {
-            return getReq(GET_WIFI_LIST, new byte[]{(byte)deviceNum}, new byte[0]);
+            return getReq(GET_WIFI_LIST, new byte[]{(byte)deviceNum}, key);
         }
     }
-    public static byte[] setWifiConfig(byte[] config) {
-        return getReq(SET_WIFI_CONFIG, config, new byte[0]);
+    public static byte[] setWifiConfig(byte[] config, byte[] key) {
+        return getReq(SET_WIFI_CONFIG, config, key);
     }
-    public static byte[] getWifiConfig(int option) {
-        return getReq(GET_WIFI_CONFIG, new byte[]{(byte)option}, new byte[0]);
+    public static byte[] getWifiConfig(int option, byte[] key) {
+        return getReq(GET_WIFI_CONFIG, new byte[]{(byte)option}, key);
     }
-    public static byte[] getVersionInfo() {
-        return getReq(GET_VERSION_INFO, new byte[0], new byte[0]);
+    public static byte[] getVersionInfo(byte[] key) {
+        return getReq(GET_VERSION_INFO, new byte[0], key);
     }
-    public static byte[] getSystemSetting() {
-        return getReq(GET_SYSTEM_SETTING, new byte[0], new byte[0]);
+    public static byte[] getSystemSetting(byte[] key) {
+        return getReq(GET_SYSTEM_SETTING, new byte[0], key);
     }
-    public static byte[] setSystemSetting(byte[] data) {
-        return getReq(SET_SYSTEM_SETTING, data, new byte[0]);
+    public static byte[] setSystemSetting(byte[] data, byte[] key) {
+        return getReq(SET_SYSTEM_SETTING, data, key);
     }
-    public static byte[] getMeasureSetting() {
-        return getReq(GET_MEASURE_SETTING, new byte[0], new byte[0]);
+    public static byte[] getMeasureSetting(byte[] key) {
+        return getReq(GET_MEASURE_SETTING, new byte[0], key);
     }
-    public static byte[] setMeasureSetting(byte[] data) {
-        return getReq(SET_MEASURE_SETTING, data, new byte[0]);
+    public static byte[] setMeasureSetting(byte[] data, byte[] key) {
+        return getReq(SET_MEASURE_SETTING, data, key);
     }
-    public static byte[] maskTest(boolean start) {
+    public static byte[] maskTest(boolean start, byte[] key) {
         int temp = 0;
         if (start) {
             temp = 1;
         }
-        return getReq(MASK_TEST, new byte[]{(byte)temp,0,0,0}, new byte[0]);
+        return getReq(MASK_TEST, new byte[]{(byte)temp,0,0,0}, key);
     }
     public static byte[] getVentilationSetting(byte[] key) {
         return getReq(GET_VENTILATION_SETTING, new byte[0], key);
@@ -156,40 +156,40 @@ public class R20BleCmd {
         }
         return getReq(VENTILATION_SWITCH, new byte[]{(byte)temp,0,0,0}, key);
     }
-    public static byte[] getFileList(long startTime, int recordType) {
+    public static byte[] getFileList(long startTime, int recordType, byte[] key) {
         byte[] data = new byte[10];
         data[0] = (byte) startTime;
         data[1] = (byte) (startTime >> 8);
         data[2] = (byte) (startTime >> 16);
         data[3] = (byte) (startTime >> 24);
         data[4] = (byte) recordType;
-        return getReq(GET_FILE_LIST, data, new byte[0]);
+        return getReq(GET_FILE_LIST, data, key);
     }
-    public static byte[] readFileStart(byte[] fileName, int offset) {
+    public static byte[] readFileStart(byte[] fileName, int offset, byte[] key) {
         byte[] data = new byte[36];
         System.arraycopy(fileName, 0, data, 0, fileName.length);
         data[32] = (byte) offset;
         data[33] = (byte) (offset >> 8);
         data[34] = (byte) (offset >> 16);
         data[35] = (byte) (offset >> 24);
-        return getReq(READ_FILE_START, data, new byte[0]);
+        return getReq(READ_FILE_START, data, key);
     }
-    public static byte[] readFileData(int offset) {
+    public static byte[] readFileData(int offset, byte[] key) {
         byte[] data = new byte[4];
         data[0] = (byte) offset;
         data[1] = (byte) (offset >> 8);
         data[2] = (byte) (offset >> 16);
         data[3] = (byte) (offset >> 24);
-        return getReq(READ_FILE_DATA, data, new byte[0]);
+        return getReq(READ_FILE_DATA, data, key);
     }
-    public static byte[] readFileEnd() {
-        return getReq(READ_FILE_END, new byte[0], new byte[0]);
+    public static byte[] readFileEnd(byte[] key) {
+        return getReq(READ_FILE_END, new byte[0], key);
     }
-    public static byte[] getRtState() {
-        return getReq(RT_STATE, new byte[0], new byte[0]);
+    public static byte[] getRtState(byte[] key) {
+        return getReq(RT_STATE, new byte[0], key);
     }
-    public static byte[] getRtParam() {
-        return getReq(RT_PARAM, new byte[0], new byte[0]);
+    public static byte[] getRtParam(byte[] key) {
+        return getReq(RT_PARAM, new byte[0], key);
     }
 
     public static class AlarmLevel {
