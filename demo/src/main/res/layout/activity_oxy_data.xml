@@ -231,7 +231,7 @@
         android:layout_marginStart="@dimen/dp_10"
         android:layout_marginEnd="@dimen/dp_10"
         android:textColor="@color/colorRed"
-        android:text="睡眠分析结果文件保存在sdcard/Android/data/com.lepu.blepro.demo/files/o2文件夹下"/>
+        android:text="@string/sleep_result_path"/>
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="100dp"

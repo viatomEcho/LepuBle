@@ -25,9 +25,11 @@ import com.lepu.demo.util.StringUtil
 class Bp3ViewModel : SettingViewModel() {
 
     private lateinit var binding: FragmentSettingsBinding
+    private lateinit var context: Context
 
     fun initView(context: Context, binding: FragmentSettingsBinding, model: Int) {
         this.binding = binding
+        this.context = context
         binding.bp3Layout.factoryConfig.setOnClickListener {
             val config = FactoryConfig()
             var enableVersion = true
@@ -119,7 +121,7 @@ class Bp3ViewModel : SettingViewModel() {
     fun initEvent(owner: LifecycleOwner) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3BurnFactoryInfo)
             .observe(owner) {
-                _toast.value = "烧录成功"
+                _toast.value = context.getString(R.string.burn_info_success)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3GetConfig)
             .observe(owner) {

@@ -10,17 +10,17 @@ import com.lepu.demo.util.DataConvert
 class WirelessDataAdapter(layoutResId: Int, data: MutableList<WirelessData>?) : BaseQuickAdapter<WirelessData, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(holder: BaseViewHolder, item: WirelessData) {
-        holder.setText(R.id.text_1, "测量时长:${DataConvert.getEcgTimeStr(item.recordTime)}")
-        holder.setText(R.id.text_2, "数据总量:${String.format("%.3f", item.totalBytes.div(1024.0))} kb")
-        holder.setText(R.id.text_3, "总包数:${item.totalSize}")
-        holder.setText(R.id.text_4, "丢包数:${item.missSize}")
-        holder.setText(R.id.text_5, "错误字节:${item.errorBytes}")
-        holder.setText(R.id.text_6, "丢包率:${String.format("%.3f", item.missPercent)} %")
-        holder.setText(R.id.text_7, "误码率:${String.format("%.3f", item.errorPercent)} %")
-        holder.setText(R.id.text_8, "单次延迟:${item.oneDelay} ms")
-        holder.setText(R.id.text_9, "总延迟:${item.totalDelay.div(item.totalSize)} ms")
-        holder.setText(R.id.text_10, "吞吐量:${String.format("%.3f", item.throughput)} kb/h")
-        holder.setText(R.id.text_11, "数据传输速度:${String.format("%.3f", item.speed)} b/s")
+        holder.setText(R.id.text_1, "${context.getString(R.string.duration)}${DataConvert.getEcgTimeStr(item.recordTime)}")
+        holder.setText(R.id.text_2, "${context.getString(R.string.total_bytes)}${String.format("%.3f", item.totalBytes.div(1024.0))} kb")
+        holder.setText(R.id.text_3, "${context.getString(R.string.total_size)}${item.totalSize}")
+        holder.setText(R.id.text_4, "${context.getString(R.string.miss_size)}${item.missSize}")
+        holder.setText(R.id.text_5, "${context.getString(R.string.error_bytes)}${item.errorBytes}")
+        holder.setText(R.id.text_6, "${context.getString(R.string.miss_percent)}${String.format("%.3f", item.missPercent)} %")
+        holder.setText(R.id.text_7, "${context.getString(R.string.error_percent)}${String.format("%.3f", item.errorPercent)} %")
+        holder.setText(R.id.text_8, "${context.getString(R.string.one_delay)}${item.oneDelay} ms")
+        holder.setText(R.id.text_9, "${context.getString(R.string.total_delay)}${item.totalDelay.div(item.totalSize)} ms")
+        holder.setText(R.id.text_10, "${context.getString(R.string.throughput)}${String.format("%.3f", item.throughput)} kb/h")
+        holder.setText(R.id.text_11, "${context.getString(R.string.speed)}${String.format("%.3f", item.speed)} b/s")
         holder.getView<Button>(R.id.record_delete).setOnClickListener {
             mOnItemDeleteListener?.onDeleteClick(getItemPosition(item))
         }

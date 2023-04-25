@@ -37,6 +37,7 @@ import com.lepu.demo.databinding.FragmentInfoBinding
 import com.lepu.demo.ui.adapter.*
 import com.lepu.demo.util.DataConvert
 import com.lepu.demo.util.FileUtil
+import com.lepu.demo.util.LogcatHelper
 import java.io.*
 
 class InfoFragment : Fragment(R.layout.fragment_info){
@@ -138,13 +139,13 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
         mCancelDialog = AlertDialog.Builder(requireContext())
             .setCancelable(false)
-            .setMessage("是否继续读取文件?")
-            .setPositiveButton("确定") { _, _ ->
+            .setMessage(context?.getString(R.string.whether_continue_read))
+            .setPositiveButton(context?.getString(R.string.confirm)) { _, _ ->
                 val offset = DownloadHelper.readFile(Constant.BluetoothConfig.currentModel[0], "", curFileName)
                 LpBleUtil.continueReadFile(Constant.BluetoothConfig.currentModel[0], "", curFileName, offset.size)
                 mAlertDialog?.show()
             }
-            .setNegativeButton("取消") { _, _ ->
+            .setNegativeButton(context?.getString(R.string.cancel)) { _, _ ->
                 LpBleUtil.cancelReadFile(Constant.BluetoothConfig.currentModel[0])
             }
             .create()
@@ -154,8 +155,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM1) {
             mAlertDialog = AlertDialog.Builder(requireContext())
                 .setCancelable(false)
-                .setMessage("正在处理，请稍等...")
-                .setNegativeButton("暂停") { _, _ ->
+                .setMessage(context?.getString(R.string.handling))
+                .setNegativeButton(context?.getString(R.string.pause)) { _, _ ->
                     LpBleUtil.pauseReadFile(Constant.BluetoothConfig.currentModel[0])
                     mCancelDialog?.show()
                 }
@@ -163,16 +164,16 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         } else {
             mAlertDialog = AlertDialog.Builder(requireContext())
                 .setCancelable(false)
-                .setMessage("正在处理，请稍等...")
+                .setMessage(context?.getString(R.string.handling))
                 .create()
         }
         mAlertDialogCanCancel = AlertDialog.Builder(requireContext())
             .setCancelable(true)
-            .setMessage("正在处理，请稍等...")
+            .setMessage(context?.getString(R.string.handling))
             .create()
         mainViewModel.downloadTip.observe(viewLifecycleOwner) {
-            mAlertDialog?.setMessage("正在处理，请稍等... $it")
-            mAlertDialogCanCancel?.setMessage("正在处理，请稍等... $it")
+            mAlertDialog?.setMessage("${context?.getString(R.string.handling)} $it")
+            mAlertDialogCanCancel?.setMessage("${context?.getString(R.string.handling)} $it")
         }
 
         LinearLayoutManager(context).apply {
@@ -250,7 +251,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
         }
         binding.getWifiRoute.setOnClickListener {
-            mAlertDialogCanCancel?.setMessage("正在处理，请稍等...")
+            mAlertDialogCanCancel?.setMessage(context?.getString(R.string.handling))
             mAlertDialogCanCancel?.show()
             LpBleUtil.bp2GetWifiDevice(Constant.BluetoothConfig.currentModel[0])
         }
@@ -304,7 +305,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         val addr = trimStr(serverAddr.text.toString())
                         val port = trimStr(serverPort.text.toString())
                         if (pass.isNullOrEmpty() || addr.isNullOrEmpty() || port.isNullOrEmpty()) {
-                            Toast.makeText(context, "请输入完整信息", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context?.getString(R.string.input_tips), Toast.LENGTH_SHORT).show()
                             return@setOnClickListener
                         } else {
                             wifiConfig.option = 3
@@ -318,7 +319,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             adapter.setList(null)
                             adapter.notifyDataSetChanged()
                             popupWindow?.dismiss()
-                            mAlertDialogCanCancel?.setMessage("正在处理，请稍等...")
+                            mAlertDialogCanCancel?.setMessage(context?.getString(R.string.handling))
                             mAlertDialogCanCancel?.show()
                         }
                     }
@@ -329,7 +330,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     sure.setOnClickListener { it1 ->
                         val pass = trimStr(password.text.toString())
                         if (pass.isNullOrEmpty()) {
-                            Toast.makeText(context, "请输入完整信息", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context?.getString(R.string.input_tips), Toast.LENGTH_SHORT).show()
                             return@setOnClickListener
                         } else {
                             wifiConfig.option = 3
@@ -348,7 +349,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             adapter.setList(null)
                             adapter.notifyDataSetChanged()
                             popupWindow?.dismiss()
-                            mAlertDialogCanCancel?.setMessage("正在处理，请稍等...")
+                            mAlertDialogCanCancel?.setMessage(context?.getString(R.string.handling))
                             mAlertDialogCanCancel?.show()
                         }
                     }
@@ -433,6 +434,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         }
         // 读文件
         binding.readFile.setOnClickListener {
+            LogcatHelper.getInstance(context).stop()
+            LogcatHelper.getInstance(context).start()
             readFileProcess = ""
             process = 0
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BTP
@@ -455,13 +458,6 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         // 取消读取文件
         binding.cancelRf.setOnClickListener {
 
-        }
-        //  dfu升级
-        binding.upgrade.setOnClickListener {
-            val intent = Intent(context, UpdateActivity::class.java)
-            intent.putExtra("macAddr", mainViewModel._curBluetooth.value?.deviceMacAddress)
-            intent.putExtra("bleName", mainViewModel._curBluetooth.value?.deviceName)
-            startActivity(intent)
         }
         binding.scanCode.setOnClickListener {
             startActivity(Intent(context, ScanCodeActivity::class.java))
@@ -490,7 +486,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             bp2wAdapter.setList(null)
             bp2wAdapter.notifyDataSetChanged()
             if (wifi != null) {
-                mAlertDialogCanCancel?.setMessage("正在处理，请稍等...")
+                mAlertDialogCanCancel?.setMessage(context?.getString(R.string.handling))
                 mAlertDialogCanCancel?.show()
                 wifiConfig.option = 3
                 if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W) {
@@ -505,7 +501,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 wifiConfig.server = server
                 LpBleUtil.bp2SetWifiConfig(Constant.BluetoothConfig.currentModel[0], wifiConfig)
             } else {
-                Toast.makeText(context, "请先完成首次配置WiFi，设置成功后连接其他设备可直接配置WiFi。", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context?.getString(R.string.wifi_tips), Toast.LENGTH_SHORT).show()
             }
         }
         binding.set4gServer.setOnClickListener {
@@ -540,7 +536,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 val addr = trimStr(serverAddr.text.toString())
                 val port = trimStr(serverPort.text.toString())
                 if (addr.isNullOrEmpty() || port.isNullOrEmpty()) {
-                    Toast.makeText(context, "请输入完整信息", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context?.getString(R.string.input_tips), Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 } else {
                     wifiConfig.option = 8
@@ -581,7 +577,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as OxyViewModel).initEvent(this)
                 mainViewModel.oxyInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}\ncode：${it.branchCode}\nfileList：${it.fileList}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwVersion}\n" +
+                            "${context?.getString(R.string.software_version)}${it.swVersion}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}\nfileList：${it.fileList}"
                 }
             }
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1,
@@ -590,7 +588,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as Er1ViewModel).initEvent(this)
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.fwV}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}"
                 }
             }
             Bluetooth.MODEL_BPM -> {
@@ -598,7 +598,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as BpmViewModel).initEvent(this)
                 mainViewModel.bpmInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "版本：${it.getFwVersion()}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.software_version)}${it.getFwVersion()}"
                 }
             }
             Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T -> {
@@ -606,7 +606,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as Bp2ViewModel).initEvent(this)
                 mainViewModel.bp2Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fmV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.fmV}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}\n" +
+                            "${context?.getString(R.string.battery)}${mainViewModel._battery.value}"
                 }
             }
             Bluetooth.MODEL_BP2W -> {
@@ -614,7 +617,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as Bp2wViewModel).initEvent(this)
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.fwV}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}\n" +
+                            "${context?.getString(R.string.battery)}${mainViewModel._battery.value}"
                 }
                 binding.wifiConfig.visibility = View.VISIBLE
                 LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
@@ -624,7 +630,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as LpBp2wViewModel).initEvent(this)
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.fwV}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}\n" +
+                            "${context?.getString(R.string.battery)}${mainViewModel._battery.value}"
                 }
                 binding.wifiConfig.visibility = View.VISIBLE
                 LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
@@ -634,7 +643,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as Er2ViewModel).initEvent(this)
                 mainViewModel.er2Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.fwVersion}\nsn：${it.serialNum}\ncode：${it.branchCode}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwVersion}\n" +
+                            "${context?.getString(R.string.software_version)}${it.fwVersion}\n" +
+                            "sn：${it.serialNum}\ncode：${it.branchCode}"
                 }
             }
             Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC66B, Bluetooth.MODEL_OXYSMART,
@@ -649,7 +660,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS -> {
                 mainViewModel.boInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "设备名称：${it.deviceName}\n硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}\nsn：${it.sn}\ncode：${it.branchCode}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.device_name)}${it.deviceName}\n" +
+                            "${context?.getString(R.string.hardware_version)}${it.hardwareV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.softwareV}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}"
                 }
             }
             Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE, Bluetooth.MODEL_PC80B_BLE2 -> {
@@ -657,13 +671,17 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as Pc80bViewModel).initEvent(this)
                 mainViewModel.pc80bInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hardwareV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.softwareV}"
                 }
             }
             Bluetooth.MODEL_PC100 -> {
                 mainViewModel.pc100Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "设备名称：${it.deviceName}\n硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}\nsn：${it.sn}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.device_name)}${it.deviceName}\n" +
+                            "${context?.getString(R.string.hardware_version)}${it.hardwareV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.softwareV}\n" +
+                            "sn：${it.sn}"
                 }
             }
             Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
@@ -671,7 +689,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as LewViewModel).initEvent(this)
                 mainViewModel.lewInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "设备模式：${it.deviceModeMess}\n硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.device_mode)}${it.deviceModeMess}\n" +
+                            "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.fwV}\n" +
+                            "sn：${it.sn}"
                 }
             }
             Bluetooth.MODEL_AOJ20A -> {
@@ -687,7 +708,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as CheckmePodViewModel).initEvent(this)
                 mainViewModel.checkmePodInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}\ncode：${it.branchCode}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwVersion}\n" +
+                            "${context?.getString(R.string.software_version)}${it.swVersion}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}"
                 }
             }
             Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4, Bluetooth.MODEL_CHECKME -> {
@@ -695,7 +718,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as PulsebitViewModel).initEvent(this)
                 mainViewModel.pulsebitInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}\ncode：${it.branchCode}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwVersion}\n" +
+                            "${context?.getString(R.string.software_version)}${it.swVersion}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}"
                 }
             }
             Bluetooth.MODEL_PC_68B -> {
@@ -703,14 +728,19 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as Pc68bViewModel).initEvent(this)
                 mainViewModel.boInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "设备名称：${it.deviceName}\n硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}\nsn：${it.sn}\ncode：${it.branchCode}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.device_name)}${it.deviceName}\n" +
+                            "${context?.getString(R.string.hardware_version)}${it.hardwareV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.softwareV}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}"
                 }
             }
             Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE, Bluetooth.MODEL_GM_300SNT,
             Bluetooth.MODEL_PC200_BLE -> {
                 mainViewModel.pc300Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "设备名称：${it.deviceName}\n硬件版本：${it.hardwareV}\n固件版本：${it.softwareV}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.device_name)}${it.deviceName}\n" +
+                            "${context?.getString(R.string.hardware_version)}${it.hardwareV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.softwareV}"
                 }
             }
             Bluetooth.MODEL_CHECKME_LE -> {
@@ -718,7 +748,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as CheckmeLeViewModel).initEvent(this)
                 mainViewModel.checkmeLeInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwVersion}\n固件版本：${it.swVersion}\nsn：${it.sn}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwVersion}\n" +
+                            "${context?.getString(R.string.software_version)}${it.swVersion}\n" +
+                            "sn：${it.sn}"
                 }
             }
             Bluetooth.MODEL_LEM -> {
@@ -732,7 +764,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as LeS1ViewModel).initEvent(this)
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.fwV}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}"
                 }
             }
             Bluetooth.MODEL_LPM311 -> {
@@ -748,7 +782,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as BiolandBgmViewModel).initEvent(this)
                 mainViewModel.biolandInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "版本：${it.version}\n电量：${it.battery} %\nsn：${it.sn}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.software_version)}${it.version}\n" +
+                            "${context?.getString(R.string.battery)}${it.battery} %\nsn：${it.sn}"
                 }
             }
             Bluetooth.MODEL_ER3 -> {
@@ -756,7 +791,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as Er3ViewModel).initEvent(this)
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.fwV}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}"
                 }
             }
             Bluetooth.MODEL_LEPOD -> {
@@ -764,7 +801,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as LepodViewModel).initEvent(this)
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.fwV}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}"
                 }
             }
             Bluetooth.MODEL_VTM01 -> {
@@ -772,7 +811,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as Vtm01ViewModel).initEvent(this)
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.fwV}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}"
                 }
             }
             Bluetooth.MODEL_BTP -> {
@@ -780,7 +821,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as BtpViewModel).initEvent(this)
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.fwV}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}\n" +
+                            "${context?.getString(R.string.battery)}${mainViewModel._battery.value}"
                 }
             }
             Bluetooth.MODEL_ECN -> {
@@ -794,7 +838,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as R20ViewModel).initEvent(this)
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.fwV}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}"
                 }
                 binding.wifiConfig.visibility = View.VISIBLE
                 binding.setWifiConfig.visibility = View.GONE
@@ -807,7 +853,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as Bp3ViewModel).initEvent(this)
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.fwV}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}\n" +
+                            "${context?.getString(R.string.battery)}${mainViewModel._battery.value}"
                 }
                 binding.wifiConfig.visibility = View.VISIBLE
                 binding.setWifiConfig.visibility = View.GONE
@@ -819,7 +868,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (infoViewModel as Bp3ViewModel).initEvent(this)
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
-                    binding.deviceInfo.text = "硬件版本：${it.hwV}\n固件版本：${it.fwV}\nsn：${it.sn}\ncode：${it.branchCode}\n电量：${mainViewModel._battery.value}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.fwV}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}\n" +
+                            "${context?.getString(R.string.battery)}${mainViewModel._battery.value}"
                 }
                 binding.serverConfig.visibility = View.VISIBLE
                 LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
@@ -835,35 +887,35 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
             infoViewModel.reset.observe(viewLifecycleOwner) {
                 if (it != null) {
-                    Toast.makeText(context, "复位成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context?.getString(R.string.reset_success), Toast.LENGTH_SHORT).show()
                 }
             }
             infoViewModel.factoryReset.observe(viewLifecycleOwner) {
                 if (it != null) {
-                    Toast.makeText(context, "恢复出厂设置成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context?.getString(R.string.factory_reset_success), Toast.LENGTH_SHORT).show()
                 }
             }
             infoViewModel.factoryResetAll.observe(viewLifecycleOwner) {
                 if (it != null) {
-                    Toast.makeText(context, "恢复生产状态成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context?.getString(R.string.factory_reset_all_success), Toast.LENGTH_SHORT).show()
                 }
             }
             infoViewModel.fileNames.observe(viewLifecycleOwner) {
                 if (it != null) {
                     fileNames = it
-                    Toast.makeText(context, "获取文件列表成功 共有${fileNames.size}个文件", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "${context?.getString(R.string.get_file_list)} ${fileNames.size} ${context?.getString(R.string.files)}", Toast.LENGTH_SHORT).show()
                 }
             }
             infoViewModel.process.observe(viewLifecycleOwner) {
                 if (it != null) {
                     process = it
                     if (process == 100) {
-                        readFileProcess = "$readFileProcess$curFileName 读取进度:100% \n"
+                        readFileProcess = "$readFileProcess$curFileName ${context?.getString(R.string.process)}100% \n"
                         binding.process.text = readFileProcess
                     } else {
-                        binding.process.text = "$readFileProcess $curFileName 读取进度: $process %"
+                        binding.process.text = "$readFileProcess $curFileName ${context?.getString(R.string.process)}$process %"
                     }
-                    mainViewModel._downloadTip.value = "还剩${fileNames.size}个文件 \n$curFileName  \n读取进度: $process %"
+                    mainViewModel._downloadTip.value = "${context?.getString(R.string.still_left)} ${fileNames.size} ${context?.getString(R.string.files)}\n$curFileName  \n${context?.getString(R.string.process)}$process %"
                 }
             }
             infoViewModel.ecgData.observe(viewLifecycleOwner) {
@@ -914,7 +966,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             infoViewModel.readFileError.observe(viewLifecycleOwner) {
                 if (it != null) {
                     mAlertDialog?.dismiss()
-                    Toast.makeText(context, "读文件出错", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context?.getString(R.string.read_error), Toast.LENGTH_SHORT).show()
                 }
             }
             infoViewModel.wifiDevice.observe(viewLifecycleOwner) {
@@ -934,43 +986,45 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LERES) {
                         mAlertDialogCanCancel?.dismiss()
                         if (it.isWifiInitialized()) {
-                            binding.wifiInfo.text = "热点：${it.wifi.ssid}\n密码：${it.wifi.pwd}\n连接状态：${when (it.wifi.state) {
-                                0 -> "断开"
-                                1 -> "连接中"
-                                2 -> "已连接"
-                                0xff -> "密码错误"
-                                0xfd -> "找不到SSID"
-                                else -> "未配置WiFi"
-                            }}"
+                            binding.wifiInfo.text = "${context?.getString(R.string.wifi)}${it.wifi.ssid}\n" +
+                                    "${context?.getString(R.string.wifi_password)}${it.wifi.pwd}\n" +
+                                    "${context?.getString(R.string.connect_state)}${when (it.wifi.state) {
+                                        0 -> context?.getString(R.string.disconnect)
+                                        1 -> context?.getString(R.string.connecting)
+                                        2 -> context?.getString(R.string.connected)
+                                        0xff -> context?.getString(R.string.password_error)
+                                        0xfd -> context?.getString(R.string.not_found_ssid)
+                                        else -> context?.getString(R.string.no_wifi)
+                                    }}"
                         } else {
-                            binding.wifiInfo.text = "无WiFi信息"
+                            binding.wifiInfo.text = context?.getString(R.string.no_wifi)
                         }
                         if (it.isServerInitialized()) {
-                            binding.wifiInfo.text = binding.wifiInfo.text.toString() + "\n服务器地址：${it.server.addr}\n端口号：${it.server.port}\n连接状态：${
-                                when (it.server.state) {
-                                    0 -> "断开"
-                                    1 -> "连接中"
-                                    2 -> "已连接"
-                                    0xff -> "无法连接"
-                                    else -> "连接错误"
-                                }
-                            }"
+                            binding.wifiInfo.text = binding.wifiInfo.text.toString() + "\n${context?.getString(R.string.server_address)}${it.server.addr}\n" +
+                                    "${context?.getString(R.string.server_port)}${it.server.port}\n" +
+                                    "${context?.getString(R.string.connect_state)}${when (it.server.state) {
+                                        0 -> context?.getString(R.string.disconnect)
+                                        1 -> context?.getString(R.string.connecting)
+                                        2 -> context?.getString(R.string.connected)
+                                        0xff -> context?.getString(R.string.cannot_connect)
+                                        else -> context?.getString(R.string.connect_error)
+                                    }}"
                         } else {
-                            binding.wifiInfo.text = binding.wifiInfo.text.toString() + "\n无服务器信息"
+                            binding.wifiInfo.text = binding.wifiInfo.text.toString() + "\n${context?.getString(R.string.no_server)}"
                         }
                     } else {
                         wifi?.let { w ->
                             w.state = it.wifi.state
-                            binding.wifiInfo.text = "热点：${w.ssid}\n密码：${w.pwd}\n连接状态：${
-                                when (w.state) {
-                                    0 -> "断开"
-                                    1 -> "连接中"
-                                    2 -> "已连接"
-                                    0xff -> "密码错误"
-                                    0xfd -> "找不到SSID"
-                                    else -> "未配置WiFi"
-                                }
-                            }"
+                            binding.wifiInfo.text = "${context?.getString(R.string.wifi)}${w.ssid}\n" +
+                                    "${context?.getString(R.string.wifi_password)}${w.pwd}\n" +
+                                    "${context?.getString(R.string.connect_state)}${when (w.state) {
+                                        0 -> context?.getString(R.string.disconnect)
+                                        1 -> context?.getString(R.string.connecting)
+                                        2 -> context?.getString(R.string.connected)
+                                        0xff -> context?.getString(R.string.password_error)
+                                        0xfd -> context?.getString(R.string.not_found_ssid)
+                                        else -> context?.getString(R.string.no_wifi)
+                                    }}"
                             if (((w.state == 0) && (it.wifi.ssid.isNotEmpty())) || w.state == 1) {
                                 handler.postDelayed({
                                     LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
@@ -979,31 +1033,31 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                                 mAlertDialogCanCancel?.dismiss()
                             }
                         } ?: kotlin.run {
-                            binding.wifiInfo.text = "注意：请先完成首次配置WiFi，设置成功后连接其他设备可直接配置WiFi。"
+                            binding.wifiInfo.text = context?.getString(R.string.wifi_tips)
                         }
                     }
                     if (it.isServerInitialized()) {
-                        binding.serverInfo.text = "服务器地址：${it.server.addr}\n端口号：${it.server.port}\n连接状态：${
-                            when (it.server.state) {
-                                0 -> "断开"
-                                1 -> "连接中"
-                                2 -> "已连接"
-                                0xff -> "无法连接"
-                                else -> "连接错误"
-                            }
-                        }"
+                        binding.serverInfo.text = "${context?.getString(R.string.server_address)}${it.server.addr}\n" +
+                                "${context?.getString(R.string.server_port)}${it.server.port}\n" +
+                                "${context?.getString(R.string.connect_state)}${when (it.server.state) {
+                                    0 -> context?.getString(R.string.disconnect)
+                                    1 -> context?.getString(R.string.connecting)
+                                    2 -> context?.getString(R.string.connected)
+                                    0xff -> context?.getString(R.string.cannot_connect)
+                                    else -> context?.getString(R.string.connect_error)
+                                }}"
                     }
                 }
             }
             infoViewModel.noWifi.observe(viewLifecycleOwner) {
                 if (it) {
                     if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP3C) {
-                        Toast.makeText(context, "未配置服务器", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context?.getString(R.string.no_server), Toast.LENGTH_SHORT).show()
                     } else {
-                        Toast.makeText(context, "未配置WiFi", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context?.getString(R.string.no_wifi), Toast.LENGTH_SHORT).show()
                     }
                     if (wifi == null) {
-                        binding.wifiInfo.text = "注意：请先完成首次配置WiFi，设置成功后连接其他设备可直接配置WiFi。"
+                        binding.wifiInfo.text = context?.getString(R.string.wifi_tips)
                     }
                 }
             }
@@ -1084,6 +1138,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 } else {
                     mAlertDialog?.dismiss()
                 }
+                LogcatHelper.getInstance(context).stop()
                 return
             }
             fileNames[0]

@@ -100,7 +100,11 @@ class DataActivity : AppCompatActivity() {
                         "呼吸频率：${if (file.rr[3] < 0 || file.rr[3] > 60) "**" else file.rr[3]}bpm\n" +
                         "吸气时间：${if (file.ti[3] < 0 || file.ti[3] > 40) "--" else file.ti[3].div(10f)}s\n" +
                         "吸呼比：${if (file.ie[3] < 200 || file.ie[3] > 30000) "--" else {
-                            "1:" + String.format("%.1f", 1.div(1.div(file.ie[3].div(10000f))))
+                            if (file.ie[3] < 10000) {
+                                "1:" + String.format("%.1f", 10000f/file.ie[3])
+                            } else {
+                                String.format("%.1f", file.ie[3].div(10000f)) + ":1"
+                            }
                         }}\n" +
                         "自主呼吸占比：${if (file.spont < 0 || file.spont > 100) "**" else file.spont}%\n" +
                         "血氧：${if (file.spo2[0] < 70 || file.spo2[0] > 100) "**" else file.spo2[0]}%\n" +

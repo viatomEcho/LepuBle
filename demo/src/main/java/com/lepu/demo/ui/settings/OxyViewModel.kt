@@ -1,6 +1,5 @@
 package com.lepu.demo.ui.settings
 
-import android.R
 import android.content.Context
 import android.view.View
 import android.widget.AdapterView
@@ -12,6 +11,7 @@ import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.HexString
+import com.lepu.demo.R
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.data.DeviceFactoryData
 import com.lepu.demo.databinding.FragmentSettingsBinding
@@ -96,7 +96,7 @@ class OxyViewModel : SettingViewModel() {
             }
         }
         ArrayAdapter(context,
-            R.layout.simple_list_item_1,
+            android.R.layout.simple_list_item_1,
             arrayListOf("Standard模式", "Always Off模式", "Always On模式")
         ).apply {
             binding.o2Layout.lightModeSpinner.adapter = this
@@ -141,7 +141,7 @@ class OxyViewModel : SettingViewModel() {
             }
         }
         ArrayAdapter(context,
-            R.layout.simple_list_item_1,
+            android.R.layout.simple_list_item_1,
             arrayListOf("低", "中", "高")
         ).apply {
             binding.o2Layout.lightLevelSpinner.adapter = this
@@ -198,7 +198,7 @@ class OxyViewModel : SettingViewModel() {
     fun initEvent(owner: LifecycleOwner) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBurnFactoryInfo)
             .observe(owner) {
-                _toast.value = "烧录成功"
+                _toast.value = context.getString(R.string.burn_info_success)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo)
             .observe(owner) {

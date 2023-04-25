@@ -184,7 +184,7 @@ class OxyDataActivity : AppCompatActivity() {
                 vibrate.add(Entry(70f, i, PhoneGlobal.MARK_VIBRATE))
             }
         }
-        val lineDataSet1 = LineDataSet(yVals, "氧含量（%）")
+        val lineDataSet1 = LineDataSet(yVals, getString(R.string.spo2))
         lineDataSet1.axisDependency = YAxis.AxisDependency.LEFT
         lineDataSet1.color = resources.getColor(R.color.color_ecg_bkg)
         lineDataSet1.setCircleColor(resources.getColor(R.color.color_ecg_bkg))
@@ -339,7 +339,7 @@ class OxyDataActivity : AppCompatActivity() {
             }
         }
 
-        val lineDataSet1 = LineDataSet(yVals1, "脉率")
+        val lineDataSet1 = LineDataSet(yVals1, getString(R.string.pr))
         lineDataSet1.axisDependency = YAxis.AxisDependency.RIGHT
         lineDataSet1.color = resources.getColor(R.color.teal_200)
         lineDataSet1.setCircleColor(resources.getColor(R.color.teal_200))
@@ -462,7 +462,7 @@ class OxyDataActivity : AppCompatActivity() {
         for (i in o2List.indices) {
             yVals.add(BarEntry((if (o2List[i] < 0) 0 else o2List[i]).toFloat(), i))
         }
-        val barDataSet = BarDataSet(yVals, "体动")
+        val barDataSet = BarDataSet(yVals, getString(R.string.motion))
         barDataSet.color = resources.getColor(R.color.colorOrange)
         barDataSet.barSpacePercent = 5f
         barDataSet.setDrawValues(false)
@@ -533,13 +533,13 @@ class OxyDataActivity : AppCompatActivity() {
             }
         }
         val result = DataConvert.sleep_alg_get_res_0_25Hz()
-        sleepText.text = "睡眠状态(0深睡眠,1浅睡眠,2快速眼动,3清醒,4无结果)：" +
+        sleepText.text = "${getString(R.string.sleep_status_tips)}" +
                 "${statuses.toIntArray().joinToString(",")}\n" +
-                "总睡眠时间: ${DataConvert.getEcgTimeStr(result[0]*4)}\n" +
-                "深睡时间: ${DataConvert.getEcgTimeStr(result[1]*4)}\n" +
-                "浅睡时间: ${DataConvert.getEcgTimeStr(result[2]*4)}\n" +
-                "快速眼动时间: ${DataConvert.getEcgTimeStr(result[3]*4)}\n" +
-                "清醒次数: ${result[4]}"
+                "${getString(R.string.sleep_time_total)}${DataConvert.getEcgTimeStr(result[0]*4)}\n" +
+                "${getString(R.string.deep_sleep_time)}${DataConvert.getEcgTimeStr(result[1]*4)}\n" +
+                "${getString(R.string.light_sleep_time)}${DataConvert.getEcgTimeStr(result[2]*4)}\n" +
+                "${getString(R.string.rapid_eye_time)}${DataConvert.getEcgTimeStr(result[3]*4)}\n" +
+                "${getString(R.string.awake_time)}${result[4]}"
         if (!isSave) {
             FileUtil.saveTextFile(
                 filePath,

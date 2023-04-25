@@ -72,7 +72,7 @@ class MeasureSetting() {
 
     // 参数设置：湿化等级
     class Humidification() {
-        var humidification = 0  // 湿化等级。0：关闭；1-5档；0x10：自动；
+        var humidification = 0  // 湿化等级。0：关闭；1-5档；0xff：自动；
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0
@@ -159,7 +159,7 @@ class MeasureSetting() {
     }
     // 设置：管道类型
     class TubeType() {
-        var type = 1  // 1: 15mm; 2:19mm（显示为22mm）。15（单水平机型）19（双水平机型）
+        var type = 1  // 0: 15mm; 1:19mm（显示为22mm）。15（单水平机型）19（双水平机型）
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0
@@ -172,7 +172,7 @@ class MeasureSetting() {
     }
     // 设置：面罩
     class Mask() {
-        var type = 1        // 1: 口鼻罩(full face), 2: 鼻罩(nasal), 3:鼻枕(pillow)
+        var type = 0        // 0: 口鼻罩(full face), 1: 鼻罩(nasal), 2:鼻枕(pillow)
         var pressure = 10f  // 面罩佩戴匹配测试压力 默认值:100   步长:10 范围:60-180   单位0.1cmH2O
         // reserved 2
         constructor(bytes: ByteArray) : this() {

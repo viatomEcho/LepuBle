@@ -40,7 +40,7 @@ class WirelessDataActivity : AppCompatActivity() {
                 val mDialog = AlertDialog.Builder(this@WirelessDataActivity)
                     .setCancelable(false)
                     .setMessage("是否删除记录?")
-                    .setPositiveButton("确定") { _, _ ->
+                    .setPositiveButton(getString(R.string.confirm)) { _, _ ->
                         records.remove(records[position])
                         recordAdapter.setNewInstance(records)
                         recordAdapter.notifyDataSetChanged()
@@ -51,7 +51,7 @@ class WirelessDataActivity : AppCompatActivity() {
                         }
                         FileUtil.saveTextFile("${getExternalFilesDir(null)?.absolutePath}/wireless_test.txt", temp, false)
                     }
-                    .setNegativeButton("取消") { _, _ ->
+                    .setNegativeButton(getString(R.string.cancel)) { _, _ ->
                     }
                     .create()
                 mDialog.show()

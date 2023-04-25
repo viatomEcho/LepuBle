@@ -28,13 +28,13 @@
                     android:id="@+id/get_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="获取设备信息"/>
+                    android:text="@string/get_info"/>
 
                 <Button
                     android:id="@+id/get_file_list"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1.获取文件列表"
+                    android:text="@string/get_file_list1"
                     android:layout_marginStart="@dimen/dp_10"/>
 
             </LinearLayout>
@@ -43,13 +43,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:textColor="@color/colorRed"
-                android:text="1.获取文件列表 2.读文件"/>
+                android:text="@string/get_file_list1_read_file2"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:textColor="@color/colorRed"
-                android:text="(文件名为空则读取列表所有文件)"/>
+                android:text="@string/file_name_tips"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -58,12 +58,12 @@
                     android:id="@+id/read_file"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2.读文件"/>
+                    android:text="@string/read_file2"/>
                 <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/file_name"
-                    android:hint="文件名"
+                    android:hint="@string/file_name"
                     android:textSize="18sp"
                     android:layout_marginStart="@dimen/dp_10"
                     android:layout_marginEnd="@dimen/dp_10"/>
@@ -76,59 +76,63 @@
                     android:id="@+id/pause_rf"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="暂停"/>
+                    android:text="@string/pause"/>
                 <Button
                     android:id="@+id/continue_rf"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="继续"
+                    android:text="@string/continue_read"
                     android:layout_marginStart="20dp"/>
                 <Button
                     android:id="@+id/cancel_rf"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="取消"
+                    android:text="@string/cancel"
                     android:layout_marginStart="20dp"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <Button
-                    android:id="@+id/reset"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="复位"/>
-                <Button
-                    android:id="@+id/factory"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="恢复出厂"
-                    android:layout_marginStart="@dimen/dp_10"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/reset"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/reset"/>
+                    <Button
+                        android:id="@+id/factory"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/factory_reset"
+                        android:layout_marginStart="@dimen/dp_10"/>
+                </LinearLayout>
                 <Button
                     android:id="@+id/factory_all"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="生产状态"
-                    android:layout_marginStart="@dimen/dp_10"/>
+                    android:text="@string/factory_reset_all"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reset_tips"
+                    android:textColor="@color/colorRed"
+                    android:layout_marginStart="10dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/factory_reset_tips"
+                    android:textColor="@color/colorRed"
+                    android:layout_marginStart="10dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/factory_reset_all_tips"
+                    android:textColor="@color/colorRed"
+                    android:layout_marginStart="10dp"/>
             </LinearLayout>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="复位：设备重启，不会删除设备数据"
-                android:textColor="@color/colorRed"
-                android:layout_marginStart="10dp"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="恢复出厂：清空设备数据并重启"
-                android:textColor="@color/colorRed"
-                android:layout_marginStart="10dp"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="生产状态：清空设备数据并关机，充电激活设备启动"
-                android:textColor="@color/colorRed"
-                android:layout_marginStart="10dp"/>
             <LinearLayout
                 android:id="@+id/wifi_config"
                 android:visibility="gone"
@@ -142,20 +146,20 @@
                         android:id="@+id/get_wifi_route"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="WIFI列表"/>
+                        android:text="@string/get_wifi_list"/>
                     <Button
                         android:id="@+id/set_wifi_config"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/dp_10"
-                        android:text="配置WIFI"/>
+                        android:text="@string/set_wifi"/>
                     <Button
                         android:visibility="gone"
                         android:id="@+id/get_wifi_config"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/dp_10"
-                        android:text="WIFI信息"/>
+                        android:text="@string/get_wifi"/>
                 </LinearLayout>
                 <TextView
                     android:id="@+id/wifi_info"
@@ -177,13 +181,13 @@
                         android:id="@+id/get_4g_server"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="服务器信息"/>
+                        android:text="@string/get_server"/>
                     <Button
                         android:id="@+id/set_4g_server"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/dp_10"
-                        android:text="配置服务器"/>
+                        android:text="@string/set_server"/>
                 </LinearLayout>
                 <TextView
                     android:id="@+id/server_info"
@@ -223,16 +227,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp">
                 <Button
-                    android:id="@+id/upgrade"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="固件升级" />
-                <Button
                     android:id="@+id/scan_code"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="扫描二维码"
-                    android:layout_marginLeft="20dp"/>
+                    android:text="扫描二维码"/>
             </LinearLayout>
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/wifi_rcv"

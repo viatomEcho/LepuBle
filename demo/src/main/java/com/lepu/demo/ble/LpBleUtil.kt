@@ -117,7 +117,8 @@ class LpBleUtil {
             RAW_FOLDERS.put(Bluetooth.MODEL_O2RING, PathUtils.getExternalAppFilesPath() + "/o2/")
 
             getServiceHelper()
-                .initLog(BuildConfig.DEBUG)
+                .initLog(true)
+//                .initLog(BuildConfig.DEBUG)
 //                .initModelConfig(Constant.BluetoothConfig.SUPPORT_FACES) // 配置要支持的设备
                 .initRawFolder(RAW_FOLDERS)
                 .initService(

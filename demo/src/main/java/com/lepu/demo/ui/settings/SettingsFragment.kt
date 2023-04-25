@@ -273,7 +273,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_BTP -> {
                     setViewVisible(binding.btpLayout.root)
                     settingViewModel = ViewModelProvider(this).get(BtpViewModel::class.java)
-                    (settingViewModel as BtpViewModel).initView(binding, it)
+                    (settingViewModel as BtpViewModel).initView(requireContext(), binding, it)
                     (settingViewModel as BtpViewModel).initEvent(this)
                     LpBleUtil.btpGetConfig(it)
                 }
@@ -920,18 +920,19 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             // "25020000" //PO1B，蜂鸣版本，国内外
             // "25013001" //PO1B，蜂鸣版本，国内电商专用（新增心率阈值越限提醒）
             Bluetooth.MODEL_WEARO2 -> {
-                if (mainViewModel.oxyInfo.value?.branchCode == "25010000") {
-                    binding.o2Layout.o2MotorText.text = "震动强度："
-                    binding.o2Layout.text01000.visibility = View.VISIBLE
-                    binding.o2Layout.text0100100.visibility = View.VISIBLE
-                    binding.o2Layout.text0350.visibility = View.GONE
-                    binding.o2Layout.text03535.visibility = View.GONE
-                } else {
+                if (mainViewModel.oxyInfo.value?.branchCode == "25020000"
+                    || mainViewModel.oxyInfo.value?.branchCode == "25013001") {
                     binding.o2Layout.o2MotorText.text = "声音强度："
                     binding.o2Layout.text0350.visibility = View.VISIBLE
                     binding.o2Layout.text03535.visibility = View.VISIBLE
                     binding.o2Layout.text01000.visibility = View.GONE
                     binding.o2Layout.text0100100.visibility = View.GONE
+                } else {
+                    binding.o2Layout.o2MotorText.text = "震动强度："
+                    binding.o2Layout.text01000.visibility = View.VISIBLE
+                    binding.o2Layout.text0100100.visibility = View.VISIBLE
+                    binding.o2Layout.text0350.visibility = View.GONE
+                    binding.o2Layout.text03535.visibility = View.GONE
                 }
             }
         }
@@ -1026,7 +1027,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         //----------------------------er1/duoek-----------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnFactoryInfo)
             .observe(this) {
-                Toast.makeText(context, "烧录成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context?.getString(R.string.burn_info_success), Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetSwitcherState)
             .observe(this) {
@@ -1098,7 +1099,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         //-----------------------------er2------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2BurnFactoryInfo)
             .observe(this) {
-                Toast.makeText(context, "烧录成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context?.getString(R.string.burn_info_success), Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetSwitcherState)
             .observe(this) {
@@ -1244,11 +1245,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.content.text = "$data"
                 if (data.wifi.ssid.isNotEmpty()) {
                     binding.deviceInfo.text = "WiFi：${data.wifi.ssid}\n" +
-                            "密码：${data.wifi.pwd}\n" +
+                            "${context?.getString(R.string.wifi_password)}${data.wifi.pwd}\n" +
                             "WiFi连接状态：${data.wifi.state}\n" +
                             "(0:断开 1:连接中 2:已连接 0xff:密码错误 0xfd:找不到SSID)\n" +
-                            "服务器地址：${data.server.addr}\n" +
-                            "端口号：${data.server.port}\n" +
+                            "${context?.getString(R.string.server_address)}${data.server.addr}\n" +
+                            "${context?.getString(R.string.server_port)}${data.server.port}\n" +
                             "服务器连接状态：${data.server.state}\n" +
                             "(0:断开 1:连接中 2:已连接 0xff:服务器无法连接)"
                 } else {
@@ -1314,12 +1315,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 setReceiveCmd(data.bytes)
                 binding.content.text = "$data"
                 if (data.wifi.ssid.isNotEmpty()) {
-                    binding.deviceInfo.text = "WiFi：${data.wifi.ssid}\n" +
-                            "密码：${data.wifi.pwd}\n" +
+                    binding.deviceInfo.text = "${context?.getString(R.string.wifi)}${data.wifi.ssid}\n" +
+                            "${context?.getString(R.string.wifi_password)}${data.wifi.pwd}\n" +
                             "WiFi连接状态：${data.wifi.state}\n" +
                             "(0:断开 1:连接中 2:已连接 0xff:密码错误 0xfd:找不到SSID)\n" +
-                            "服务器地址：${data.server.addr}\n" +
-                            "端口号：${data.server.port}\n" +
+                            "${context?.getString(R.string.server_address)}${data.server.addr}\n" +
+                            "${context?.getString(R.string.server_port)}${data.server.port}\n" +
                             "服务器连接状态：${data.server.state}\n" +
                             "(0:断开 1:连接中 2:已连接 0xff:服务器无法连接)"
                 } else {
@@ -1485,10 +1486,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                         "呼吸率：${data.respRate}\n" +
                         "电池状态${data.batteryStatus}：${
                             when (data.batteryStatus) {
-                                0 -> "正常使用"
-                                1 -> "充电中"
-                                2 -> "充满"
-                                3 -> "低电量"
+                                0 -> context?.getString(R.string.no_charge)
+                                1 -> context?.getString(R.string.charging)
+                                2 -> context?.getString(R.string.full)
+                                3 -> context?.getString(R.string.low_battery)
                                 else -> ""
                             }
                         }\n" +
@@ -1503,7 +1504,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                             }
                         }\n" +
                         "体温状态：${data.isInsertTemp}\n" +
-                        "测量状态${data.measureStatus}：${
+                        "${context?.getString(R.string.measure_state)}${data.measureStatus}：${
                             when (data.measureStatus) {
                                 0 -> "空闲"
                                 1 -> "检测导联"
@@ -1512,8 +1513,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                                 else -> ""
                             }
                         }\n" +
-                        "已记录时长：${data.recordTime}\n" +
-                        "开始测量时间：${data.year}-${data.month}-${data.day} ${data.hour}:${data.minute}:${data.second}\n" +
+                        "${context?.getString(R.string.duration)}${data.recordTime}\n" +
+                        "${context?.getString(R.string.start_time)}${data.year}-${data.month}-${data.day} ${data.hour}:${data.minute}:${data.second}\n" +
                         "导联类型${data.leadType}：${
                             when (data.leadType) {
                                 0 -> "LEAD_12，12导"
@@ -1545,7 +1546,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this) {
                 val data = it.data as Boolean
                 if (data) {
-                    Toast.makeText(context, "烧录成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context?.getString(R.string.burn_info_success), Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(context, "烧录失败", Toast.LENGTH_SHORT).show()
                 }

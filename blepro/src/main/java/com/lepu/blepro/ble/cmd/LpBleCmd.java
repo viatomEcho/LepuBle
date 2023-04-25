@@ -20,6 +20,7 @@ public class LpBleCmd {
     public static final int TYPE_LANGUAGE_UPDATE_FAILED = 0xE4;
     public static final int TYPE_PARAM_ILLEGAL = 0xF1;
     public static final int TYPE_PERMISSION_DENIED = 0xF2;
+    public static final int TYPE_DECRYPT_FAILED = 0xF3;
     public static final int TYPE_DEVICE_BUSY = 0xFB;
     public static final int TYPE_CMD_FORMAT_ERROR = 0xFC;
     public static final int TYPE_CMD_NOT_SUPPORTED = 0xFD;

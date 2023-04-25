@@ -19,5 +19,6 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
--keep class com.lepu.blepro.**{*;}
--keep interface com.lepu.blepro.**{*;}
+
+#-keep class com.lepu.blepro.**{*;}
+#-keep interface com.lepu.blepro.**{*;}

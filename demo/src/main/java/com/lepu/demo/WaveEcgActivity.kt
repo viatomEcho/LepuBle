@@ -27,7 +27,7 @@ class WaveEcgActivity : AppCompatActivity() {
 
         mAlertDialog = AlertDialog.Builder(this)
             .setCancelable(false)
-            .setMessage("正在处理，请稍等...")
+            .setMessage(getString(R.string.handling))
             .create()
         mAlertDialog?.show()
 

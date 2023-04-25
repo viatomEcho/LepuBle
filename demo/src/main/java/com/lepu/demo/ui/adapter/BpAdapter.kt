@@ -8,6 +8,8 @@ import com.lepu.demo.data.BpData
 class BpAdapter(layoutResId: Int, data: MutableList<BpData>?) : BaseQuickAdapter<BpData, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(holder: BaseViewHolder, item: BpData) {
-        holder.setText(R.id.name, "血压文件：${item.fileName}\n收缩压：${item.sys} 舒张压：${item.dia}\n平均压：${item.mean} 脉率：${item.pr}")
+        holder.setText(R.id.name, "${context.getString(R.string.bp_files)}${item.fileName}\n" +
+                "${context.getString(R.string.sys)}${item.sys} ${context.getString(R.string.dia)}${item.dia}\n" +
+                "${context.getString(R.string.mean)}${item.mean} ${context.getString(R.string.pr)}：${item.pr}")
     }
 }

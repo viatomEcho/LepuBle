@@ -1,5 +1,6 @@
 package com.lepu.demo.ui.settings
 
+import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
@@ -7,6 +8,7 @@ import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.HexString
+import com.lepu.demo.R
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.data.DeviceFactoryData
 import com.lepu.demo.databinding.FragmentSettingsBinding
@@ -15,9 +17,11 @@ import com.lepu.demo.util.StringUtil
 class Er1ViewModel : SettingViewModel() {
 
     private lateinit var binding: FragmentSettingsBinding
+    private lateinit var context: Context
 
-    fun initView(binding: FragmentSettingsBinding, model: Int) {
+    fun initView(context: Context, binding: FragmentSettingsBinding, model: Int) {
         this.binding = binding
+        this.context = context
         binding.er1Layout.er1FactoryConfig.setOnClickListener {
             val config = FactoryConfig()
             var enableVersion = true
@@ -92,7 +96,7 @@ class Er1ViewModel : SettingViewModel() {
     fun initEvent(owner: LifecycleOwner) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnFactoryInfo)
             .observe(owner) {
-                _toast.value = "烧录成功"
+                _toast.value = context.getString(R.string.burn_info_success)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetSwitcherState)
             .observe(owner) {

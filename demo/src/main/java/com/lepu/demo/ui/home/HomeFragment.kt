@@ -59,7 +59,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
 
         mAlertDialog = AlertDialog.Builder(requireContext())
             .setCancelable(false)
-            .setMessage("正在处理，请稍等...")
+            .setMessage(context?.getString(R.string.handling))
             .create()
 
         activity?.let {  activity ->
@@ -110,7 +110,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         binding.needPair.setOnCheckedChangeListener { buttonView, isChecked ->
             if (Constant.BluetoothConfig.splitType >= 10) {
                 binding.needPair.isChecked = false
-                Toast.makeText(context, "该设备类型不支持配对连接！", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context?.getString(R.string.cannot_pair_connect), Toast.LENGTH_SHORT).show()
                 return@setOnCheckedChangeListener
             }
             Constant.BluetoothConfig.needPair = isChecked
@@ -124,7 +124,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         }
         ArrayAdapter(requireContext(),
             android.R.layout.simple_list_item_1,
-            arrayListOf("全部", "BP2", "ER1", "VBeat", "HHM1", "DuoEK", "HHM2", "HHM3", "ER2", "O2", "PC", "ER3")
+            arrayListOf(context?.getString(R.string.all), "BP2", "ER1", "VBeat", "HHM1", "DuoEK", "HHM2", "HHM3", "ER2", "O2", "PC", "ER3")
         ).apply {
             binding.deviceTypeSpinner.adapter = this
         }
@@ -145,7 +145,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
             binding.numberLayout.layoutManager = this
         }
         numberAdapter = StringAdapter(R.layout.string_item,
-            arrayListOf("0", "1", "2", "3", "4", "删除", "5", "6", "7", "8", "9", "清空")
+            arrayListOf("0", "1", "2", "3", "4", "${context?.getString(R.string.delete)}", "5", "6", "7", "8", "9", "${context?.getString(R.string.clear)}")
         ).apply {
             binding.numberLayout.adapter = this
         }
@@ -187,7 +187,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     } else {
                         LpBleUtil.connect(it1, it)
                     }
-                    ToastUtil.showToast(activity, "正在连接蓝牙")
+                    ToastUtil.showToast(activity, context?.getString(R.string.connecting))
                     LpBleUtil.stopScan()
                     binding.rcv.visibility = View.GONE
 
@@ -213,18 +213,30 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         binding.rssiFilterValue.text = "$bleRssi dBm"
         mainViewModel.bleState.observe(viewLifecycleOwner) {
             if (it) {
-                binding.bleState.text = "连接状态：已连接"
+                binding.bleState.text = context?.getString(R.string.state_connect)
             } else {
-                binding.bleState.text = "连接状态：未连接"
+                binding.bleState.text = context?.getString(R.string.state_disconnect)
             }
             if (it) {
                 mAlertDialog?.dismiss()
             }
         }
         mainViewModel.curBluetooth.observe(viewLifecycleOwner) {
-            binding.bleDevice.text = "蓝牙名：${it!!.deviceName}\n蓝牙地址：${it.deviceMacAddress}"
+            binding.bleDevice.text = "${context?.getString(R.string.bluetooth_name)}${it!!.deviceName}\n" +
+                    "${context?.getString(R.string.bluetooth_address)}${it.deviceMacAddress}"
         }
         binding.bleSplit.setText(Constant.BluetoothConfig.splitText)
+        /*mainViewModel.oxyInfo.observe(viewLifecycleOwner) {
+            if (it.branchCode == "2B010100") {
+                if (binding.bleDevice.text.contains("code")) {
+                    binding.bleDevice.text = binding.bleDevice.text.toString() + "\n${context?.getString(R.string.device_new_code)}${it.branchCode}"
+                } else {
+                    binding.bleDevice.text = binding.bleDevice.text.toString() + "\n${context?.getString(R.string.device_code)}${it.branchCode}"
+                }
+            } else {
+                binding.bleDevice.text = binding.bleDevice.text.toString() + "\n${context?.getString(R.string.device_old_code)}${it.branchCode}"
+            }
+        }*/
     }
 
     var splitDevice: ArrayList<Bluetooth> = arrayListOf()
@@ -340,7 +352,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     } else {
                         LpBleUtil.connect(activity?.applicationContext!!, b)
                     }
-                    ToastUtil.showToast(activity, "正在连接蓝牙")
+                    ToastUtil.showToast(activity, context?.getString(R.string.connecting))
                     LpBleUtil.stopScan()
                     binding.rcv.visibility = View.GONE
 

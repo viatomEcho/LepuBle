@@ -1,5 +1,6 @@
 package com.lepu.demo.ui.settings
 
+import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.BtpBleResponse
@@ -15,9 +16,11 @@ import com.lepu.demo.util.StringUtil
 class BtpViewModel : SettingViewModel() {
     
     private lateinit var binding: FragmentSettingsBinding
+    private lateinit var context: Context
 
-    fun initView(binding: FragmentSettingsBinding, model: Int) {
+    fun initView(context: Context, binding: FragmentSettingsBinding, model: Int) {
         this.binding = binding
+        this.context = context
         binding.btpLayout.factoryConfig.setOnClickListener {
             val config = FactoryConfig()
             var enableVersion = true
@@ -129,7 +132,7 @@ class BtpViewModel : SettingViewModel() {
             .observe(owner) {
                 val data = it.data as Boolean
                 if (data) {
-                    _toast.value = "烧录成功"
+                    _toast.value = context.getString(R.string.burn_info_success)
                 } else {
                     _toast.value = "烧录失败"
                 }

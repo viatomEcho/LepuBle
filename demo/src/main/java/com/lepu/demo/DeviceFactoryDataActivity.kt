@@ -34,7 +34,7 @@ class DeviceFactoryDataActivity : AppCompatActivity() {
         initData()
         mAlertDialog = AlertDialog.Builder(this)
             .setCancelable(false)
-            .setMessage("正在处理，请稍等...")
+            .setMessage(getString(R.string.handling))
             .create()
     }
 
@@ -52,7 +52,7 @@ class DeviceFactoryDataActivity : AppCompatActivity() {
                 val mDialog = AlertDialog.Builder(this@DeviceFactoryDataActivity)
                     .setCancelable(false)
                     .setMessage("是否删除记录?")
-                    .setPositiveButton("确定") { _, _ ->
+                    .setPositiveButton(getString(R.string.confirm)) { _, _ ->
                         records.removeAt(position)
                         recordAdapter.setNewInstance(records)
                         recordAdapter.notifyDataSetChanged()
@@ -64,7 +64,7 @@ class DeviceFactoryDataActivity : AppCompatActivity() {
                         FileUtil.saveTextFile("${getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", temp, false)
                         Toast.makeText(this@DeviceFactoryDataActivity, "删除成功", Toast.LENGTH_SHORT).show()
                     }
-                    .setNegativeButton("取消") { _, _ ->
+                    .setNegativeButton(getString(R.string.cancel)) { _, _ ->
                     }
                     .create()
                 mDialog.show()

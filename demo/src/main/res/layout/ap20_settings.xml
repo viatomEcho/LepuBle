@@ -44,7 +44,7 @@
                     android:id="@+id/set_low_spo2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="确定"
+                    android:text="@string/confirm"
                     android:layout_alignParentRight="true"/>
             </RelativeLayout>
         </LinearLayout>
@@ -71,7 +71,7 @@
                     android:id="@+id/set_low_hr"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="确定"
+                    android:text="@string/confirm"
                     android:layout_alignParentRight="true"/>
             </RelativeLayout>
         </LinearLayout>
@@ -98,7 +98,7 @@
                     android:id="@+id/set_high_hr"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="确定"
+                    android:text="@string/confirm"
                     android:layout_alignParentRight="true"/>
             </RelativeLayout>
         </LinearLayout>
