@@ -627,6 +627,7 @@
                     android:layout_height="wrap_content"/>
             </LinearLayout>
             <LinearLayout
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_10">
@@ -647,6 +648,7 @@
                     android:text="10.0 cmH2O"/>
             </LinearLayout>
             <RelativeLayout
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_10">
@@ -679,6 +681,7 @@
                     android:text="十"/>
             </RelativeLayout>
             <TextView
+                android:visibility="gone"
                 android:id="@+id/mask_pressure_range"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

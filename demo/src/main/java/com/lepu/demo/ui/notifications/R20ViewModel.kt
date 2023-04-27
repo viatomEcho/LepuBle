@@ -58,6 +58,23 @@ class R20ViewModel : InfoViewModel() {
                         noWifi.value = true
                     }
                 }
+                when (it.type) {
+                    LpBleCmd.TYPE_FILE_NOT_FOUND -> _toast.value = "找不到文件"
+                    LpBleCmd.TYPE_FILE_READ_FAILED -> _toast.value = "读文件失败"
+                    LpBleCmd.TYPE_FILE_WRITE_FAILED -> _toast.value = "写文件失败"
+                    LpBleCmd.TYPE_FIRMWARE_UPDATE_FAILED -> _toast.value = "固件升级失败"
+                    LpBleCmd.TYPE_LANGUAGE_UPDATE_FAILED -> _toast.value = "语言包升级失败"
+                    LpBleCmd.TYPE_PARAM_ILLEGAL -> _toast.value = "参数不合法"
+                    LpBleCmd.TYPE_PERMISSION_DENIED -> _toast.value = "权限不足"
+                    LpBleCmd.TYPE_DECRYPT_FAILED -> {
+                        _toast.value = "解密失败，断开连接"
+                        LpBleUtil.disconnect(false)
+                    }
+                    LpBleCmd.TYPE_DEVICE_BUSY -> _toast.value = "设备资源被占用/设备忙"
+                    LpBleCmd.TYPE_CMD_FORMAT_ERROR -> _toast.value = "指令格式错误"
+                    LpBleCmd.TYPE_CMD_NOT_SUPPORTED -> _toast.value = "不支持指令"
+                    LpBleCmd.TYPE_NORMAL_ERROR -> _toast.value = "通用错误"
+                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetWifiList)
             .observe(owner) {

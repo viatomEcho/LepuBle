@@ -1061,6 +1061,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     }
                 }
             }
+            infoViewModel.toast.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 

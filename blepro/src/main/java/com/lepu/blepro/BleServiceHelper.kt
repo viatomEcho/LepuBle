@@ -3228,6 +3228,14 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
+            Bluetooth.MODEL_ER3 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Er3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Er3BleInterface--stopEcg")
+                        it.stopEcg()
+                    }
+                }
+            }
             else -> LepuBleLog.d(tag, "stopEcg current model $model unsupported!!")
         }
     }

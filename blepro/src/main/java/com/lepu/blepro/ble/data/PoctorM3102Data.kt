@@ -13,7 +13,7 @@ class PoctorM3102Data(val bytes: ByteArray) {
     var hour = 0
     var minute = 0
     var result: Int       // normal=false(0是低值Lo,1是高值Hi),血糖、血酮的结果四位最后一位为小数点后一位数据
-//    var unit: Int         // 尿酸：umol/L，血糖、血酮：mmol/L
+//    var unit: Int         // 尿酸：umol/L，血糖、血酮：mmol/L（设备固定上发1，该字段注释不使用）
 
     init {
         val data = String(bytes).split(",")

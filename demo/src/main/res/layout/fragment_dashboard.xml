@@ -649,6 +649,13 @@
                                 android:layout_height="wrap_content"
                                 android:textSize="16sp"
                                 android:text="红光"/>
+                            <TextView
+                                android:id="@+id/ppg_tips"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/dp_10"
+                                android:textColor="@color/colorRed"
+                                android:textSize="16sp"/>
                         </LinearLayout>
                         <CheckBox
                             android:visibility="gone"
@@ -659,6 +666,17 @@
                             app:layout_constraintStart_toStartOf="parent"
                             android:textSize="16sp"
                             android:text="开始采集"/>
+                        <Chronometer
+                            android:visibility="gone"
+                            android:id="@+id/collect_data_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/dp_10"
+                            android:layout_marginTop="13dp"
+                            android:format="00:00:00"
+                            app:layout_constraintTop_toBottomOf="@id/ppg_type_layout"
+                            app:layout_constraintStart_toEndOf="@id/collect_data"
+                            android:textSize="16sp"/>
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <!-- ER3产品实时布局 -->

@@ -69,6 +69,11 @@ open class InfoViewModel : ViewModel() {
     var wifiConfig: LiveData<Bp2WifiConfig> = _wifiConfig
     var noWifi = MutableLiveData<Boolean>()
 
+    val _toast = MutableLiveData<String>().apply {
+        value = null
+    }
+    var toast: LiveData<String> = _toast
+
     fun getEcgData(recordingTime: Long, fileName: String, wave: ByteArray, shortData: ShortArray, duration: Int) : EcgData {
         val data = EcgData()
         data.recordingTime = recordingTime

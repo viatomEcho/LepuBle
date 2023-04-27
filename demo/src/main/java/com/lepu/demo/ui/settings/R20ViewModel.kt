@@ -1156,7 +1156,7 @@ class R20ViewModel : SettingViewModel() {
                 } else {
                     "${progress.times(10)}bpm"
                 }
-                binding.r20Layout.hrHighRange.text = "范围：关 - ${binding.r20Layout.hrHigh.max}bpm"
+                binding.r20Layout.hrHighRange.text = "范围：关 - ${binding.r20Layout.hrHigh.max.times(10)}bpm"
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
@@ -1192,7 +1192,7 @@ class R20ViewModel : SettingViewModel() {
                 } else {
                     "${progress.times(5)}bpm"
                 }
-                binding.r20Layout.hrLowRange.text = "范围：关 - ${binding.r20Layout.hrLow.max}bpm"
+                binding.r20Layout.hrLowRange.text = "范围：关 - ${binding.r20Layout.hrLow.max.times(5)}bpm"
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
@@ -1564,7 +1564,10 @@ class R20ViewModel : SettingViewModel() {
                     LpBleCmd.TYPE_LANGUAGE_UPDATE_FAILED -> _toast.value = "语言包升级失败"
                     LpBleCmd.TYPE_PARAM_ILLEGAL -> _toast.value = "参数不合法"
                     LpBleCmd.TYPE_PERMISSION_DENIED -> _toast.value = "权限不足"
-                    LpBleCmd.TYPE_DECRYPT_FAILED -> _toast.value = "解密失败"
+                    LpBleCmd.TYPE_DECRYPT_FAILED -> {
+                        _toast.value = "解密失败，断开连接"
+                        LpBleUtil.disconnect(false)
+                    }
                     LpBleCmd.TYPE_DEVICE_BUSY -> _toast.value = "设备资源被占用/设备忙"
                     LpBleCmd.TYPE_CMD_FORMAT_ERROR -> _toast.value = "指令格式错误"
                     LpBleCmd.TYPE_CMD_NOT_SUPPORTED -> _toast.value = "不支持指令"

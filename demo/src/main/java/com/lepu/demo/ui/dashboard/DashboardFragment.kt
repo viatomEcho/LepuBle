@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.SystemClock
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -381,8 +382,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_CHECKME_POD_WPS -> {
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.o2RtTypeLayout.visibility = View.VISIBLE
-                binding.ppgTypeLayout.visibility = View.VISIBLE
-                binding.collectData.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.ecgLayout.visibility = View.GONE
                 binding.bpLayout.visibility = View.GONE
@@ -410,6 +409,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_PC_60NW_NO_SN -> {
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.collectData.visibility = View.VISIBLE
+                binding.collectDataTime.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.ecgLayout.visibility = View.GONE
                 binding.bpLayout.visibility = View.GONE
@@ -420,6 +420,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.bpLayout.visibility = View.VISIBLE
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.collectData.visibility = View.VISIBLE
+                binding.collectDataTime.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.ecgLayout.visibility = View.GONE
                 o2RtType = 1
@@ -430,6 +431,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.ecgLayout.visibility = View.VISIBLE
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.collectData.visibility = View.VISIBLE
+                binding.collectDataTime.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.bpLayout.visibility = View.GONE
                 o2RtType = 1
@@ -441,6 +443,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.bpLayout.visibility = View.VISIBLE
                 binding.collectData.visibility = View.VISIBLE
+                binding.collectDataTime.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 o2RtType = 1
                 startWave(it.modelNo)
@@ -778,9 +781,24 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 return@setOnCheckedChangeListener
             }
             when (checkedId) {
-                R.id.o2_rt_param -> o2RtType = 0
-                R.id.o2_rt_wave -> o2RtType = 1
-                R.id.o2_rt_ppg -> o2RtType = 2
+                R.id.o2_rt_param -> {
+                    o2RtType = 0
+                    binding.ppgTypeLayout.visibility = View.GONE
+                    binding.collectData.visibility = View.GONE
+                    binding.collectDataTime.visibility = View.GONE
+                }
+                R.id.o2_rt_wave -> {
+                    o2RtType = 1
+                    binding.ppgTypeLayout.visibility = View.GONE
+                    binding.collectData.visibility = View.VISIBLE
+                    binding.collectDataTime.visibility = View.VISIBLE
+                }
+                R.id.o2_rt_ppg -> {
+                    o2RtType = 2
+                    binding.ppgTypeLayout.visibility = View.VISIBLE
+                    binding.collectData.visibility = View.VISIBLE
+                    binding.collectDataTime.visibility = View.VISIBLE
+                }
             }
         }
         binding.ppgIr.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -1015,7 +1033,13 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             startCollectTime = System.currentTimeMillis()
             collectBytesData = ByteArray(0)
             collectIntsData = IntArray(0)
+            // 显示计时
+            binding.collectDataTime.base = SystemClock.elapsedRealtime()
+            val hour = (SystemClock.elapsedRealtime() - binding.collectDataTime.base) / 1000 / 60
+            binding.collectDataTime.format = "0${hour}:%s"
+            binding.collectDataTime.start()
         } else {
+            binding.collectDataTime.stop()
             when (o2RtType) {
                 1 -> {
                     if (collectBytesData.isEmpty()) {
@@ -1547,6 +1571,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         // o2ring ppg
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
             .observe(this) {
+                binding.ppgTips.text = "(设备有上发PPG)"
                 when (o2RtType) {
                     0 -> LpBleUtil.oxyGetRtParam(it.model)
                     1 -> LpBleUtil.oxyGetRtWave(it.model)
@@ -1573,6 +1598,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     1 -> LpBleUtil.oxyGetRtWave(it.model)
                     2 -> LpBleUtil.oxyGetPpgRt(it.model)
                 }
+                binding.ppgTips.text = "(设备没有上发PPG)"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtWaveRes)
             .observe(this) {
@@ -2297,6 +2323,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.r20VentilationSwitch.isChecked = false
                     LpBleUtil.stopRtTask()
                 }
+                // BLE医生模式下
+                state = data.deviceMode == 2
+                binding.r20VentilationSwitch.isEnabled = state
                 binding.r20MaskTest.isEnabled = !data.isVentilated
                 binding.r20State.text = "设备实时状态：\n通气模式：${when (data.ventilationMode) {
                     0 -> "CPAP"
@@ -2349,13 +2378,16 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         }}\n" +
                         "血氧：${if (data.spo2 < 70 || data.spo2 > 100) "**" else data.spo2} %\n" +
                         "脉率：${if (data.pr < 30 || data.pr > 250) "**" else data.pr} bpm\n" +
-                        "心率：${if (data.pr < 30 || data.pr > 250) "**" else data.hr} bpm"
+                        "心率：${if (data.hr < 30 || data.hr > 250) "**" else data.hr} bpm"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20MaskTest)
             .observe(this) {
                 val data = it.data as R20BleResponse.MaskTestResult
                 binding.r20MaskTest.isChecked = data.status == 1
-                binding.r20VentilationSwitch.isEnabled = data.status != 1
+                // BLE医生模式下
+                if (state) {
+                    binding.r20VentilationSwitch.isEnabled = data.status != 1
+                }
                 binding.r20MaskTestText.visibility = View.VISIBLE
                 binding.deviceInfo.visibility = View.GONE
                 binding.r20Event.visibility = View.GONE
@@ -2444,10 +2476,22 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
         LiveEventBus.get<ResponseError>(EventMsgConst.Cmd.EventCmdResponseError)
             .observe(this) {
-                when (it.cmd) {
-                    R20BleCmd.MASK_TEST -> {
-                        Toast.makeText(context, "佩戴测试错误", Toast.LENGTH_SHORT).show()
+                when (it.type) {
+                    LpBleCmd.TYPE_FILE_NOT_FOUND -> Toast.makeText(context, "找不到文件", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FILE_READ_FAILED -> Toast.makeText(context, "读文件失败", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FILE_WRITE_FAILED -> Toast.makeText(context, "写文件失败", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FIRMWARE_UPDATE_FAILED -> Toast.makeText(context, "固件升级失败", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_LANGUAGE_UPDATE_FAILED -> Toast.makeText(context, "语言包升级失败", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_PARAM_ILLEGAL -> Toast.makeText(context, "参数不合法", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_PERMISSION_DENIED -> Toast.makeText(context, "权限不足", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_DECRYPT_FAILED -> {
+                    Toast.makeText(context, "解密失败，断开连接", Toast.LENGTH_SHORT).show()
+                        LpBleUtil.disconnect(false)
                     }
+                    LpBleCmd.TYPE_DEVICE_BUSY -> Toast.makeText(context, "设备资源被占用/设备忙", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_CMD_FORMAT_ERROR -> Toast.makeText(context, "指令格式错误", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_CMD_NOT_SUPPORTED -> Toast.makeText(context, "不支持指令", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_NORMAL_ERROR -> Toast.makeText(context, "通用错误", Toast.LENGTH_SHORT).show()
                 }
             }
     }

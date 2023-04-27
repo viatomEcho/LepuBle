@@ -33,7 +33,6 @@ import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
-import com.lepu.blepro.utils.EncryptUtil
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.demo.ble.LpBleUtil
@@ -653,7 +652,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 Toast.makeText(this, "R20 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                 viewModel._er1Info.value = it.data as LepuDevice
             }
-        //--------------------------R20--------------------------
+        //--------------------------Bp3--------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3SetUtcTime)
             .observe(this) {
                 Toast.makeText(this, "BP3 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()

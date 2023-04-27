@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.ble.cmd.LpBleCmd
+import com.lepu.blepro.ble.cmd.ResponseError
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
@@ -357,6 +359,41 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     binding.rcv.visibility = View.GONE
 
                     mainViewModel._curBluetooth.value = DeviceEntity(b.name, b.macAddr, b.model)
+                }
+            }
+        LiveEventBus.get<ResponseError>(EventMsgConst.Cmd.EventCmdResponseError)
+            .observe(this) {
+                when (it.type) {
+                    LpBleCmd.TYPE_FILE_NOT_FOUND -> Toast.makeText(context, "找不到文件", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FILE_READ_FAILED -> Toast.makeText(context, "读文件失败", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FILE_WRITE_FAILED -> Toast.makeText(context, "写文件失败", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FIRMWARE_UPDATE_FAILED -> Toast.makeText(context, "固件升级失败", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_LANGUAGE_UPDATE_FAILED -> Toast.makeText(context, "语言包升级失败", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_PARAM_ILLEGAL -> Toast.makeText(context, "参数不合法", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_PERMISSION_DENIED -> Toast.makeText(context, "权限不足", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_DECRYPT_FAILED -> {
+                        Toast.makeText(context, "解密失败，断开连接", Toast.LENGTH_SHORT).show()
+                        LpBleUtil.disconnect(false)
+                    }
+                    LpBleCmd.TYPE_DEVICE_BUSY -> Toast.makeText(context, "设备资源被占用/设备忙", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_CMD_FORMAT_ERROR -> Toast.makeText(context, "指令格式错误", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_CMD_NOT_SUPPORTED -> Toast.makeText(context, "不支持指令", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_NORMAL_ERROR -> {
+                        if (it.model == Bluetooth.MODEL_LERES
+                            || it.model == Bluetooth.MODEL_R10
+                            || it.model == Bluetooth.MODEL_R11
+                            || it.model == Bluetooth.MODEL_R21
+                            || it.model == Bluetooth.MODEL_R20) {
+                            if (it.cmd == LpBleCmd.ENCRYPT) {
+                                Toast.makeText(context, "密钥校验失败，断开连接", Toast.LENGTH_SHORT).show()
+                                LpBleUtil.disconnect(false)
+                            } else {
+                                Toast.makeText(context, "通用错误", Toast.LENGTH_SHORT).show()
+                            }
+                        } else {
+                            Toast.makeText(context, "通用错误", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             }
     }
