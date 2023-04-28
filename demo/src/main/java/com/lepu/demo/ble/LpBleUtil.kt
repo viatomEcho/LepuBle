@@ -1217,6 +1217,25 @@ class LpBleUtil {
         fun bp3SwitchWifi4g(model: Int, on: Boolean) {
             BleServiceHelper.bp3SwitchWifi4g(model, on)
         }
+        // ECN
+        fun ecnStartCollect(model: Int) {
+            BleServiceHelper.ecnStartCollect(model)
+        }
+        fun ecnStopCollect(model: Int) {
+            BleServiceHelper.ecnStopCollect(model)
+        }
+        fun ecnStartRtData(model: Int) {
+            BleServiceHelper.ecnStartRtData(model)
+        }
+        fun ecnStopRtData(model: Int) {
+            BleServiceHelper.ecnStopRtData(model)
+        }
+        fun ecnGetRtState(model: Int) {
+            BleServiceHelper.ecnGetRtState(model)
+        }
+        fun ecnGetDiagnosisResult(model: Int) {
+            BleServiceHelper.ecnGetDiagnosisResult(model)
+        }
     }
 
 

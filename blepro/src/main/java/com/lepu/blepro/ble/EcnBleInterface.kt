@@ -70,7 +70,7 @@ class EcnBleInterface(model: Int): BleInterface(model) {
                 }
                 if (response.pkgType != 0x01.toByte()) {
                     LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, READ_FILE_START => error")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadFileError).post(InterfaceEvent(model, true))
+                    sendCmd(EcnBleCmd.readFileEnd())
                     return
                 }
                 fileSize = toUInt(response.content)
@@ -91,7 +91,7 @@ class EcnBleInterface(model: Int): BleInterface(model) {
                 }
                 if (response.pkgType != 0x01.toByte()) {
                     LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, READ_FILE_DATA => error")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadFileError).post(InterfaceEvent(model, true))
+                    sendCmd(EcnBleCmd.readFileEnd())
                     return
                 }
                 fileContent = fileContent.plus(response.content)
@@ -114,6 +114,7 @@ class EcnBleInterface(model: Int): BleInterface(model) {
                 }
                 if (response.pkgType != 0x01.toByte()) {
                     LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, READ_FILE_END => error")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadFileError).post(InterfaceEvent(model, true))
                     return
                 }
                 val data = bytesToHex(fileContent)
@@ -123,6 +124,65 @@ class EcnBleInterface(model: Int): BleInterface(model) {
                 } else {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadFileComplete).post(InterfaceEvent(model, EcnBleResponse.File(fileContent, fileName)))
                 }
+            }
+            EcnBleCmd.RT_STATUS -> {
+                if (response.len < 3) {
+                    LepuBleLog.d(tag, "model:$model, RT_STATUS => error, response.len < 3")
+                    return
+                }
+                val data = EcnBleResponse.RtState(response.content)
+                LepuBleLog.d(tag, "model:$model,RT_STATUS => success data: $data")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnGetRtState).post(InterfaceEvent(model, data))
+            }
+            EcnBleCmd.RT_DATA -> {
+                if (response.len < 10) {
+                    LepuBleLog.d(tag, "model:$model, RT_DATA => error, response.len < 10")
+                    return
+                }
+                val data = EcnBleResponse.RtData(response.content)
+                LepuBleLog.d(tag, "model:$model,RT_DATA => success data: $data")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnRtData).post(InterfaceEvent(model, data))
+            }
+            EcnBleCmd.START_RT_DATA -> {
+                if (response.pkgType != 0x01.toByte()) {
+                    LepuBleLog.d(tag, "model:$model,START_RT_DATA => failed")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStartRtData).post(InterfaceEvent(model, false))
+                } else {
+                    LepuBleLog.d(tag, "model:$model,START_RT_DATA => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStartRtData).post(InterfaceEvent(model, true))
+                }
+            }
+            EcnBleCmd.STOP_RT_DATA -> {
+                if (response.pkgType != 0x01.toByte()) {
+                    LepuBleLog.d(tag, "model:$model,STOP_RT_DATA => failed")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStopRtData).post(InterfaceEvent(model, false))
+                } else {
+                    LepuBleLog.d(tag, "model:$model,STOP_RT_DATA => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStopRtData).post(InterfaceEvent(model, true))
+                }
+            }
+            EcnBleCmd.START_COLLECT -> {
+                if (response.pkgType != 0x01.toByte()) {
+                    LepuBleLog.d(tag, "model:$model,START_COLLECT => failed")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStartCollect).post(InterfaceEvent(model, false))
+                } else {
+                    LepuBleLog.d(tag, "model:$model,START_COLLECT => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStartCollect).post(InterfaceEvent(model, true))
+                }
+            }
+            EcnBleCmd.STOP_COLLECT -> {
+                if (response.pkgType != 0x01.toByte()) {
+                    LepuBleLog.d(tag, "model:$model,STOP_COLLECT => failed")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStopCollect).post(InterfaceEvent(model, false))
+                } else {
+                    LepuBleLog.d(tag, "model:$model,STOP_COLLECT => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStopCollect).post(InterfaceEvent(model, true))
+                }
+            }
+            EcnBleCmd.DIAGNOSIS_RESULT -> {
+                val data = EcnBleResponse.DiagnosisResult(response.content)
+                LepuBleLog.d(tag, "model:$model,DIAGNOSIS_RESULT => success, data: $data")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnDiagnosisResult).post(InterfaceEvent(model, data))
             }
         }
     }
@@ -214,4 +274,28 @@ class EcnBleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "getFileList...")
     }
 
+    fun startCollect() {
+        sendCmd(EcnBleCmd.startCollect())
+        LepuBleLog.d(tag, "startCollect...")
+    }
+    fun stopCollect() {
+        sendCmd(EcnBleCmd.stopCollect())
+        LepuBleLog.d(tag, "stopCollect...")
+    }
+    fun startRtData() {
+        sendCmd(EcnBleCmd.startRtData())
+        LepuBleLog.d(tag, "startRtData...")
+    }
+    fun stopRtData() {
+        sendCmd(EcnBleCmd.stopRtData())
+        LepuBleLog.d(tag, "stopRtData...")
+    }
+    fun getRtState() {
+        sendCmd(EcnBleCmd.getRtStatus())
+        LepuBleLog.d(tag, "getRtState...")
+    }
+    fun getDiagnosisResult() {
+        sendCmd(EcnBleCmd.getDiagnosisResult())
+        LepuBleLog.d(tag, "getDiagnosisResult...")
+    }
 }

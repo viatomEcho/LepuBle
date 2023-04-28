@@ -4289,4 +4289,89 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "bp3SwitchWifi4g current model $model unsupported!!")
         }
     }
+    // ECN
+    fun ecnStartCollect(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_ECN -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as EcnBleInterface).let {
+                        LepuBleLog.d(tag, "it as EcnBleInterface--ecnStartCollect")
+                        it.startCollect()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "ecnStartCollect current model $model unsupported!!")
+        }
+    }
+    fun ecnStopCollect(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_ECN -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as EcnBleInterface).let {
+                        LepuBleLog.d(tag, "it as EcnBleInterface--ecnStopCollect")
+                        it.stopCollect()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "ecnStopCollect current model $model unsupported!!")
+        }
+    }
+    fun ecnStartRtData(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_ECN -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as EcnBleInterface).let {
+                        LepuBleLog.d(tag, "it as EcnBleInterface--ecnStartRtData")
+                        it.startRtData()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "ecnStartRtData current model $model unsupported!!")
+        }
+    }
+    fun ecnStopRtData(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_ECN -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as EcnBleInterface).let {
+                        LepuBleLog.d(tag, "it as EcnBleInterface--ecnStopRtData")
+                        it.stopRtData()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "ecnStopRtData current model $model unsupported!!")
+        }
+    }
+    fun ecnGetRtState(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_ECN -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as EcnBleInterface).let {
+                        LepuBleLog.d(tag, "it as EcnBleInterface--ecnGetRtState")
+                        it.getRtState()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "ecnGetRtState current model $model unsupported!!")
+        }
+    }
+    fun ecnGetDiagnosisResult(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_ECN -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as EcnBleInterface).let {
+                        LepuBleLog.d(tag, "it as EcnBleInterface--ecnGetDiagnosisResult")
+                        it.getDiagnosisResult()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "ecnGetDiagnosisResult current model $model unsupported!!")
+        }
+    }
 }

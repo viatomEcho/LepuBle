@@ -464,6 +464,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 LpBleUtil.r20GetRtState(it.modelNo)
                 LpBleUtil.r20GetSystemSetting(it.modelNo)
             }
+            Bluetooth.MODEL_ECN -> {
+                binding.ecnLayout.visibility = View.VISIBLE
+                LpBleUtil.ecnGetRtState(it.modelNo)
+            }
         }
     }
 
@@ -823,6 +827,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
             collectO2Data(isChecked)
         }
+        //--------------------无线共存--------------------------
         binding.wirelessDataLayout.startTest.setOnClickListener {
             if (isStartWirelessTest) return@setOnClickListener
             isStartWirelessTest = true
@@ -858,6 +863,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
             startActivity(Intent(context, WirelessDataActivity::class.java))
         }
+        //--------------------btp--------------------------
         binding.btpRecord.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
                 startCollectTime = System.currentTimeMillis()
@@ -866,6 +872,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 buttonView.text = context?.getString(R.string.start_record)
             }
         }
+        //--------------------r20--------------------------
         binding.r20VentilationSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             if (buttonView.isPressed) {
                 LpBleUtil.r20VentilationSwitch(Constant.BluetoothConfig.currentModel[0], isChecked)
@@ -876,6 +883,31 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             if (buttonView.isPressed) {
                 LpBleUtil.r20MaskTest(Constant.BluetoothConfig.currentModel[0], isChecked)
             }
+        }
+        //--------------------ECN--------------------------
+        binding.ecnRtData.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (buttonView.isPressed) {
+                if (isChecked) {
+                    LpBleUtil.ecnStartRtData(Constant.BluetoothConfig.currentModel[0])
+                } else {
+                    LpBleUtil.ecnStopRtData(Constant.BluetoothConfig.currentModel[0])
+                }
+            }
+        }
+        binding.ecnCollect.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (buttonView.isPressed) {
+                if (isChecked) {
+                    LpBleUtil.ecnStartCollect(Constant.BluetoothConfig.currentModel[0])
+                } else {
+                    LpBleUtil.ecnStopCollect(Constant.BluetoothConfig.currentModel[0])
+                }
+            }
+        }
+        binding.ecnRtState.setOnClickListener {
+            LpBleUtil.ecnGetRtState(Constant.BluetoothConfig.currentModel[0])
+        }
+        binding.ecnResult.setOnClickListener {
+            LpBleUtil.ecnGetDiagnosisResult(Constant.BluetoothConfig.currentModel[0])
         }
     }
 
@@ -2493,6 +2525,46 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     LpBleCmd.TYPE_CMD_NOT_SUPPORTED -> Toast.makeText(context, "不支持指令", Toast.LENGTH_SHORT).show()
                     LpBleCmd.TYPE_NORMAL_ERROR -> Toast.makeText(context, "通用错误", Toast.LENGTH_SHORT).show()
                 }
+            }
+        //--------------------ECN---------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStartRtData)
+            .observe(this) {
+                val data = it.data as Boolean
+                Toast.makeText(context, "开始上发实时数据$data", Toast.LENGTH_SHORT).show()
+                binding.ecnInfo.text = "开始上发实时数据$data"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStopRtData)
+            .observe(this) {
+                val data = it.data as Boolean
+                Toast.makeText(context, "停止上发实时数据$data", Toast.LENGTH_SHORT).show()
+                binding.ecnInfo.text = "停止上发实时数据$data"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStartCollect)
+            .observe(this) {
+                val data = it.data as Boolean
+                Toast.makeText(context, "开始采集实时数据$data", Toast.LENGTH_SHORT).show()
+                binding.ecnInfo.text = "开始采集实时数据$data"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStopCollect)
+            .observe(this) {
+                val data = it.data as Boolean
+                Toast.makeText(context, "停止采集实时数据$data", Toast.LENGTH_SHORT).show()
+                binding.ecnInfo.text = "停止采集实时数据$data"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnRtData)
+            .observe(this) {
+                val data = it.data as EcnBleResponse.RtData
+                binding.ecnInfo.text = "$data"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnGetRtState)
+            .observe(this) {
+                val data = it.data as EcnBleResponse.RtState
+                binding.ecnInfo.text = "$data"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnDiagnosisResult)
+            .observe(this) {
+                val data = it.data as EcnBleResponse.DiagnosisResult
+                binding.ecnInfo.text = "$data"
             }
     }
 

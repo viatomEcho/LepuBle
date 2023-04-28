@@ -7,6 +7,14 @@ public class EcnBleCmd {
     private static final int HEAD = 0xA5;
     private static final int TYPE_NORMAL_SEND = 0x00;
 
+    public static final int START_RT_DATA = 0x01;
+    public static final int STOP_RT_DATA = 0x02;
+    public static final int RT_STATUS = 0x03;
+    public static final int START_COLLECT = 0x04;
+    public static final int STOP_COLLECT = 0x05;
+    public static final int RT_DATA = 0x06;
+    public static final int DIAGNOSIS_RESULT = 0x07;
+
     public static final int GET_FILE_LIST = 0xF1;
     public static final int READ_FILE_START = 0xF2;
     public static final int READ_FILE_DATA = 0xF3;
@@ -18,6 +26,25 @@ public class EcnBleCmd {
         if (seqNo >= 255) {
             seqNo = 0;
         }
+    }
+
+    public static byte[] getRtStatus() {
+        return getReq(RT_STATUS, new byte[0]);
+    }
+    public static byte[] getDiagnosisResult() {
+        return getReq(DIAGNOSIS_RESULT, new byte[0]);
+    }
+    public static byte[] startRtData() {
+        return getReq(START_RT_DATA, new byte[0]);
+    }
+    public static byte[] stopRtData() {
+        return getReq(STOP_RT_DATA, new byte[0]);
+    }
+    public static byte[] startCollect() {
+        return getReq(START_COLLECT, new byte[0]);
+    }
+    public static byte[] stopCollect() {
+        return getReq(STOP_COLLECT, new byte[0]);
     }
 
     //文件下载开始

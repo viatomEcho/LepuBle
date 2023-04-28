@@ -2,7 +2,9 @@ package com.lepu.blepro.ble.cmd
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.HexString.trimStr
+import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
+import org.json.JSONObject
 
 object EcnBleResponse {
 
@@ -73,4 +75,64 @@ object EcnBleResponse {
     }
 
     class File(val content: ByteArray, val fileName: String)
+
+    class RtState(val bytes: ByteArray) {
+        var state: Int
+        var duration: Int
+        // reserved 7
+        init {
+            var index = 0
+            state = byte2UInt(bytes[index])
+            index++
+            duration = toUInt(bytes.copyOfRange(index, index+2))
+        }
+        override fun toString(): String {
+            return """
+                RtState : 
+                state : $state
+                duration : $duration
+            """.trimIndent()
+        }
+    }
+
+    class RtData(val bytes: ByteArray) {
+        var status: RtState
+        var wave: ByteArray
+        init {
+            var index = 0
+            status = RtState(bytes.copyOfRange(index, index+10))
+            index += 10
+            wave = bytes.copyOfRange(index, bytes.size)
+        }
+        override fun toString(): String {
+            return """
+                RtData : 
+                status : $status
+                wave : ${bytesToHex(wave)}
+            """.trimIndent()
+        }
+    }
+
+    class DiagnosisResult(val bytes: ByteArray) {
+        var infoStr: JSONObject
+        var result = mutableListOf<String>()
+        init {
+            val data = String(bytes)
+            infoStr = if (data.contains("{") && data.contains("}")) {
+                JSONObject(data)
+            } else {
+                JSONObject()
+            }
+            val array = infoStr.getJSONArray("DiagnosisResult")
+            for (i in 0 until array.length()) {
+                result.add(array[i].toString())
+            }
+        }
+        override fun toString(): String {
+            return """
+                DiagnosisResult : 
+                result : $result
+            """.trimIndent()
+        }
+    }
 }

@@ -797,8 +797,15 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         companion object {
             const val EventEcnGetFileList = "com.lepu.ble.ecn.get.file.list"                  // 获取文件列表 EcnBleResponse.FileList
             const val EventEcnReadFileError = "com.lepu.ble.ecn.read.file.error"              // 读文件出错 String(fileName)
-            const val EventEcnReadingFileProgress = "com.lepu.ble.ecn.reading.file.progress"  // 传输文件进度 Int
+            const val EventEcnReadingFileProgress = "com.lepu.ble.ecn.reading.file.progress"  // 传输文件进度 int
             const val EventEcnReadFileComplete = "com.lepu.ble.ecn.read.file.complete"        // 传输文件完成 EcnBleResponse.File
+            const val EventEcnGetRtState = "com.lepu.ble.ecn.get.rt.state"                    // 获取实时状态 EcnBleResponse.RtState
+            const val EventEcnRtData = "com.lepu.ble.ecn.rt.data"                             // 实时数据 EcnBleResponse.RtData
+            const val EventEcnStartRtData = "com.lepu.ble.ecn.start.rt.data"                  // 开始上发实时数据 boolean
+            const val EventEcnStopRtData = "com.lepu.ble.ecn.stop.rt.data"                    // 停止上发实时数据 boolean
+            const val EventEcnStartCollect = "com.lepu.ble.ecn.start.collect"                 // 开始采集 boolean
+            const val EventEcnStopCollect = "com.lepu.ble.ecn.stop.collect"                   // 停止采集 boolean
+            const val EventEcnDiagnosisResult = "com.lepu.ble.ecn.diagnosis.result"           // 诊断结论 EcnBleResponse.DiagnosisResult
         }
     }
 

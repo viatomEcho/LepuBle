@@ -23,7 +23,7 @@ class EcnBleManager(context: Context): LpBleManager(context) {
     }
 
     override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {
-        // 设置PHY会降低传输速率
+        // 口袋心电图机Android7.0系统设置PHY会降低传输速率
         requestQueue.add(requestMtu(247)
             .with { device: BluetoothDevice?, mtu: Int ->
                 log(Log.INFO, "EcnBleManager MTU set to $mtu")
