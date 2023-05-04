@@ -108,7 +108,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                         pc300Device.softwareV = data.softwareV
                         pc300Device.hardwareV = data.hardwareV
                         pc300Device.batLevel = data.batLevel
-
+                        pc300Device.batStatus = data.batStatus
                         deviceInfo.softwareV = pc300Device.softwareV
                         deviceInfo.hardwareV = pc300Device.hardwareV
                         deviceInfo.batLevel = pc300Device.batLevel
@@ -125,7 +125,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                         pc300Device.softwareV = data.softwareV
                         pc300Device.hardwareV = data.hardwareV
                         pc300Device.batLevel = data.batLevel
-
+                        pc300Device.batStatus = data.batStatus
                         deviceInfo.softwareV = pc300Device.softwareV
                         deviceInfo.hardwareV = pc300Device.hardwareV
                         deviceInfo.batLevel = pc300Device.batLevel
@@ -175,6 +175,10 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                     BP_RESULT -> {
                         if (response.content.isEmpty() || response.content.size < 5) {
                             LepuBleLog.d(tag, "BP_RESULT response.content.isEmpty()")
+                            return
+                        }
+                        if (DateUtil.isReceiveDouble()) {
+                            LepuBleLog.d(tag, "BP_RESULT isReceiveDouble()")
                             return
                         }
                         val data = Pc300BleResponse.BpResult(response.content)
@@ -278,6 +282,10 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                             LepuBleLog.d(tag, "TEMP_RESULT response.content.isEmpty()")
                             return
                         }
+                        if (DateUtil.isReceiveDouble()) {
+                            LepuBleLog.d(tag, "TEMP_RESULT isReceiveDouble()")
+                            return
+                        }
                         val data = Pc300BleResponse.TempResult(response.content)
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300TempResult).post(InterfaceEvent(model, data.temp))
                         LepuBleLog.d(tag, "model:$model,TEMP_RESULT 体温测量结果 => success $data")
@@ -293,6 +301,10 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
             TOKEN_0X73 -> {
                 if (response.content.isEmpty()) {
                     LepuBleLog.d(tag, "TOKEN_0X73 response.content.isEmpty()")
+                    return
+                }
+                if (DateUtil.isReceiveDouble()) {
+                    LepuBleLog.d(tag, "TOKEN_0X73 isReceiveDouble()")
                     return
                 }
                 val data = Pc300BleResponse.GluResult(response.content)
@@ -318,25 +330,38 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "TOKEN_0XE2 response.content.isEmpty()")
                     return
                 }
-                val data = bytes2UIntBig(response.content[0], response.content[1])
+                if (DateUtil.isReceiveDouble()) {
+                    LepuBleLog.d(tag, "TOKEN_0XE2 isReceiveDouble()")
+                    return
+                }
+                // unit: mg/dL
+                val data = bytes2UIntBig(response.content[1], response.content[2])
                 LepuBleLog.d(tag, "model:$model,TOKEN_0XE2 => success ${response.type}")
                 when (response.type) {
                     GLU_RESULT -> {
                         LepuBleLog.d(tag, "model:$model,GLU_RESULT 血糖 => success $data")
+                        val data = Pc300BleResponse.GluResult(response.content)
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300GluResult).post(InterfaceEvent(model, data))
                     }
                     UA_RESULT -> {
                         LepuBleLog.d(tag, "model:$model,UA_RESULT 尿酸 => success $data")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300UaResult).post(InterfaceEvent(model, data.div(10f)))
                     }
                     CHOL_RESULT -> {
                         LepuBleLog.d(tag, "model:$model,CHOL_RESULT 总胆固醇 => success $data")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300CholResult).post(InterfaceEvent(model, data))
                     }
                 }
             }
             TOKEN_0XE3 -> {
-                LepuBleLog.d(tag, "model:$model,TOKEN_0XE3 设置下位机血糖仪类型 => success ${response.type}")
+                val data = response.type == 1
+                LepuBleLog.d(tag, "model:$model,TOKEN_0XE3 设置下位机血糖仪类型 => $data")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300SetGlucometerType).post(InterfaceEvent(model, data))
             }
             TOKEN_0XE4 -> {
-                LepuBleLog.d(tag, "model:$model,TOKEN_0XE4 查询下位机当前配置的血糖仪类型 => success ${response.type}")
+                val data = response.type
+                LepuBleLog.d(tag, "model:$model,TOKEN_0XE4 查询下位机当前配置的血糖仪类型 => $data")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300GetGlucometerType).post(InterfaceEvent(model, data))
             }
             TOKEN_0XE5 -> {
                 LepuBleLog.d(tag, "model:$model,TOKEN_0XE5 清除血糖历史数据 => success ${bytesToHex(response.content)}")
@@ -402,6 +427,10 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "TOKEN_0X33 response.content.isEmpty()")
                     return
                 }
+                if (DateUtil.isReceiveDouble()) {
+                    LepuBleLog.d(tag, "TOKEN_0X33 isReceiveDouble()")
+                    return
+                }
                 val data = Pc300BleResponse.EcgResult(response.content)
 
                 ecgResult.hr = data.hr
@@ -465,14 +494,12 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
         sendCmd(getDeviceName())
         sendCmd(getDeviceInfoFf2())
         sendCmd(getDeviceInfoFf4())
-        setGlucometerType(GlucometerType.AI_AO_LE)
         setEcgDataDigit(2)
         LepuBleLog.e(tag, "getInfo")
     }
 
     override fun syncTime() {
         sendCmd(setTime())
-        setGlucometerType(GlucometerType.AI_AO_LE)
         setEcgDataDigit(2)
         LepuBleLog.e(tag, "syncTime")
     }

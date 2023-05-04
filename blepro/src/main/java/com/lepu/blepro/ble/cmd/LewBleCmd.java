@@ -317,17 +317,17 @@ public class LewBleCmd {
         public static final int SPIN = 33;                    // 旋转
         public static final int WALKING_MACHINE = 34;         // 走步机
     }
-    public static byte[] getSportList(int time) { return getReq(GET_SPORT_LIST, int4Bytes(time)); }
+    public static byte[] getSportList(long time) { return getReq(GET_SPORT_LIST, int4Bytes(time)); }
     public static class SleepType {
         public static final int SOBER = 0;        // 清醒
         public static final int REM = 1;          // REM，快速眼动
         public static final int LIGHT_SLEEP = 2;  // 浅睡
         public static final int DEEP_SLEEP = 3;   // 深睡
     }
-    public static byte[] getSleepList(int time) { return getReq(GET_SLEEP_LIST, int4Bytes(time)); }
-    public static byte[] getEcgList(int time) { return getReq(GET_ECG_LIST, int4Bytes(time)); }
-    public static byte[] getHrList(int time) { return getReq(GET_HR_LIST, int4Bytes(time)); }
-    public static byte[] getOxyList(int time) { return getReq(GET_OXY_LIST, int4Bytes(time)); }
+    public static byte[] getSleepList(long time) { return getReq(GET_SLEEP_LIST, int4Bytes(time)); }
+    public static byte[] getEcgList(long time) { return getReq(GET_ECG_LIST, int4Bytes(time)); }
+    public static byte[] getHrList(long time) { return getReq(GET_HR_LIST, int4Bytes(time)); }
+    public static byte[] getOxyList(long time) { return getReq(GET_OXY_LIST, int4Bytes(time)); }
     public static byte[] getHrThreshold() { return getReq(HR_THRESHOLD, new byte[0]); }
     public static byte[] setHrThreshold(byte[] threshold) { return getReq(HR_THRESHOLD, threshold); }
     public static byte[] getOxyThreshold() { return getReq(OXY_THRESHOLD, new byte[0]); }

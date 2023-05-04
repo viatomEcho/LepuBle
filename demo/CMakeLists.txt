@@ -46,8 +46,22 @@ add_library(
         src/main/cpp/offline/bp-lib.cpp
 
 )
-
-
+add_library(
+        sleep-alg
+        SHARED
+        src/main/cpp/sleep/sleep-alg.cpp
+)
+#add_library(
+#        sleep_alg_main_0_25Hz
+#        STATIC
+#        IMPORTED
+#)
+#set_target_properties(
+#        sleep_alg_main_0_25Hz
+#        PROPERTIES
+#        IMPORTED_LOCATION
+#        ${CMAKE_CURRENT_SOURCE_DIR}/src/main/cpp/sleep/libsleep_alg_main_0_25Hz.a
+#)
 #add_library(
 #
 #        filter
@@ -102,5 +116,10 @@ target_link_libraries( # Specifies the target library.
 target_link_libraries(
         offline-lib
 
+        ${log-lib}
+)
+target_link_libraries(
+        sleep-alg
+#        sleep_alg_main_0_25Hz
         ${log-lib}
 )

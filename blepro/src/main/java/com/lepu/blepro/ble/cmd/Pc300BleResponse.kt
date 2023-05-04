@@ -27,6 +27,7 @@ object Pc300BleResponse {
         var softwareV: String  // 固件版本
         var hardwareV: String  // 硬件版本
         var batLevel: Int      // 电量等级 级数越高，电量越多（0-3）
+        var batStatus: Int     // 充电状态，0：正常，1：充电中，2：已充满
 
         init {
             var index = 0
@@ -39,10 +40,12 @@ object Pc300BleResponse {
             }
             hardwareV = "" + ((byte2UInt(bytes[index]) and 0xF0) shr 4) + "." + (byte2UInt(bytes[index]) and 0x0F)
             index++
-            batLevel = if (bytes.size < 3) {
-                0
+            if (bytes.size < 3) {
+                batLevel = 0
+                batStatus = 0
             } else {
-                byte2UInt(bytes[index])
+                batLevel = byte2UInt(bytes[index]) and 0x0F
+                batStatus = (byte2UInt(bytes[index]) and 0xF0) shr 4
             }
         }
 
@@ -52,6 +55,7 @@ object Pc300BleResponse {
                 softwareV : $softwareV
                 hardwareV : $hardwareV
                 batLevel : $batLevel
+                batStatus : $batStatus
             """.trimIndent()
         }
     }

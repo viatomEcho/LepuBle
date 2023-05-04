@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class DateUtil {
 
@@ -40,5 +41,26 @@ public class DateUtil {
         }
         return 0;
     }
+    /**
+     * 获取时区
+     */
+    public static int getTimeZoneOffset() {
+        return TimeZone.getDefault().getOffset(System.currentTimeMillis());
+    }
 
+    /**
+     * 短时间内接收多次数据
+     */
+    private static long laskClickTime = 0;
+    private static long DIFF = 1000;
+
+    public static boolean isReceiveDouble() {
+        long time = System.currentTimeMillis();
+        long temp = time - laskClickTime;
+        if (laskClickTime > 0 && temp < DIFF) {
+            return true;
+        }
+        laskClickTime = time;
+        return false;
+    }
 }

@@ -6,7 +6,7 @@ import android.os.Handler
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.lepu.blepro.objs.Bluetooth
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.ecgData
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.ecgData
 import com.lepu.demo.views.WaveEcgView
 
 class WaveEcgActivity : AppCompatActivity() {
@@ -27,7 +27,7 @@ class WaveEcgActivity : AppCompatActivity() {
 
         mAlertDialog = AlertDialog.Builder(this)
             .setCancelable(false)
-            .setMessage("正在处理，请稍等...")
+            .setMessage(getString(R.string.handling))
             .create()
         mAlertDialog?.show()
 

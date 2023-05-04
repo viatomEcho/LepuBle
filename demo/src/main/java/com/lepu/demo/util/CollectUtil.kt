@@ -5,8 +5,8 @@ import android.util.Log
 import android.util.SparseArray
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.demo.BuildConfig
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.O2RING_MODEL
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.PATIENT_DEVICE_JSON
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.O2RING_MODEL
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.PATIENT_DEVICE_JSON
 import com.lepu.demo.data.entity.BleDevice
 import com.lepu.demo.data.entity.PatientAndDevice
 import com.lepu.demo.data.entity.PatientEntity

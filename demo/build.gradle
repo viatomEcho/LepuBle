@@ -18,10 +18,16 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         buildConfigField ("String","APP_VERSION","\"${rootProject.versionName}\"")
-
+        ndk {
+            abiFilters 'arm64-v8a'
+        }
     }
     buildTypes {
         release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -99,5 +105,7 @@ dependencies {
     implementation 'com.github.PhilJay:MPAndroidChart:v2.2.5'
     // excel
     implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'
+    // pdf
+    implementation 'com.github.barteksc:android-pdf-viewer:2.8.2'
 
 }

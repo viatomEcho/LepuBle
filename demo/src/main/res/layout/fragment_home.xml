@@ -13,7 +13,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/colorRed"
-            android:text="软件版本：乐普设备测试软件 V0.0.2"
+            android:text="@string/app_version"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
         <RelativeLayout
@@ -29,7 +29,7 @@
                 android:layout_centerVertical="true"
                 android:textColor="@color/black"
                 android:textSize="16sp"
-                android:text="设备类型："/>
+                android:text="@string/device_type"/>
             <Spinner
                 android:id="@+id/device_type_spinner"
                 android:layout_width="match_parent"
@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layoutDirection="rtl"
-                android:text="配对连接" />
+                android:text="@string/pair_connect" />
         </RelativeLayout>
         <Button
             android:id="@+id/scan"
@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@+id/device_type_layout"
             app:layout_constraintEnd_toEndOf="parent"
-            android:text="扫描"/>
+            android:text="@string/scan"/>
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -113,7 +113,7 @@
             app:layout_constraintBottom_toBottomOf="@id/ble_split"
             app:layout_constraintStart_toEndOf="@id/ble_split"
             android:layout_marginStart="20dp"
-            android:text="确定"/>
+            android:text="@string/confirm"/>
 
         <Button
             android:visibility="gone"
@@ -122,7 +122,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/scan"
             app:layout_constraintStart_toStartOf="parent"
-            android:text="断开"/>
+            android:text="@string/disconnect"/>
 
         <Button
             android:visibility="gone"
@@ -151,7 +151,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/scan_name"
-            android:hint="蓝牙名"
+            android:hint="@string/bluetooth_name"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/reconnect_by_name"
             android:layout_marginTop="20dp"
@@ -173,7 +173,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/scan_address"
-            android:hint="蓝牙地址"
+            android:hint="@string/bluetooth_address"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/scan_name"
             android:layout_marginTop="20dp"
@@ -194,7 +194,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/ble_device"
-            android:text="蓝牙设备"
+            android:text="@string/bluetooth_device"
             android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/rssi"
@@ -205,7 +205,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/ble_state"
-            android:text="连接状态"
+            android:text="@string/connect_state"
             android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ble_device"
@@ -218,13 +218,13 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/ble_device"
             app:layout_constraintEnd_toEndOf="parent"
-            android:text="断开"/>
+            android:text="@string/disconnect"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/home_tip"
-            android:text="(设备连接成功后，即可到界面二、三、四操作测试)"
+            android:text="@string/home_tips"
             android:textColor="@color/colorRed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ble_state"

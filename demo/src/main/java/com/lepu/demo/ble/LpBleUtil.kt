@@ -12,15 +12,17 @@ import com.lepu.blepro.ext.BleServiceHelper.Companion.BleServiceHelper
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.FactoryConfig
+import com.lepu.blepro.ble.data.Bp2Config
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
+import com.lepu.blepro.ble.data.r20.VentilationSetting
+import com.lepu.blepro.ble.data.r20.WarningSetting
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.ext.er1.Er1Config
 import com.lepu.blepro.ext.er2.Er2Config
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.demo.BuildConfig
-import com.lepu.demo.cofig.Constant
-import com.lepu.demo.cofig.Constant.BluetoothConfig
+import com.lepu.demo.config.Constant.BluetoothConfig
 
 class LpBleUtil {
     interface State {
@@ -100,9 +102,16 @@ class LpBleUtil {
             RAW_FOLDERS.put(Bluetooth.MODEL_BP2A, PathUtils.getExternalAppFilesPath() + "/bp2a/")
             RAW_FOLDERS.put(Bluetooth.MODEL_BP2T, PathUtils.getExternalAppFilesPath() + "/bp2t/")
             RAW_FOLDERS.put(Bluetooth.MODEL_BTP, PathUtils.getExternalAppFilesPath() + "/btp/")
+//            RAW_FOLDERS.put(Bluetooth.MODEL_R20, PathUtils.getExternalAppFilesPath() + "/r20/")
+//            RAW_FOLDERS.put(Bluetooth.MODEL_R21, PathUtils.getExternalAppFilesPath() + "/r21/")
+//            RAW_FOLDERS.put(Bluetooth.MODEL_R10, PathUtils.getExternalAppFilesPath() + "/r10/")
+//            RAW_FOLDERS.put(Bluetooth.MODEL_R11, PathUtils.getExternalAppFilesPath() + "/r11/")
+//            RAW_FOLDERS.put(Bluetooth.MODEL_LERES, PathUtils.getExternalAppFilesPath() + "/leres/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_O2RING, PathUtils.getExternalAppFilesPath() + "/o2/")
 
             getServiceHelper()
-                .initLog(BuildConfig.DEBUG)
+                .initLog(true)
+//                .initLog(BuildConfig.DEBUG)
 //                .initModelConfig(Constant.BluetoothConfig.SUPPORT_FACES) // 配置要支持的设备
                 .initRawFolder(RAW_FOLDERS)
                 .initService(application) //必须在initModelConfig initRawFolder之后调用
@@ -796,7 +805,7 @@ class LpBleUtil {
         fun lewGetRtData(model: Int) {
             BleServiceHelper.lewGetRtData(model)
         }
-        fun lewGetFileList(model: Int, type: Int, startTime: Int) {
+        fun lewGetFileList(model: Int, type: Int, startTime: Long) {
 //            BleServiceHelper.getFileList(model, type, startTime)
         }
         fun lewGetHrThreshold(model: Int) {
@@ -960,10 +969,10 @@ class LpBleUtil {
         fun pc300SetEcgDataDigit(model: Int, digit: Int) {
 //            BleServiceHelper.pc300SetEcgDataDigit(model, digit)
         }
-        /*fun pc300SetGluUnit(model: Int, unit: Int) {
-            BleServiceHelper.pc300SetGluUnit(model, unit)
+        fun pc300SetGluUnit(model: Int, unit: Int) {
+//            BleServiceHelper.pc300SetGluUnit(model, unit)
         }
-        fun pc300SetDeviceId(model: Int, id: Int) {
+        /*fun pc300SetDeviceId(model: Int, id: Int) {
             BleServiceHelper.pc300SetDeviceId(model, id)
         }
         fun pc300GetDeviceId(model: Int) {
@@ -1062,10 +1071,147 @@ class LpBleUtil {
         fun btpSetSystemSwitch(model: Int, hrSwitch: Boolean, lightSwitch: Boolean, tempSwitch: Boolean) {
             BleServiceHelper.btpSetSystemSwitch(model, hrSwitch, lightSwitch, tempSwitch)
         }
-        fun r20Echo(model: Int, data: ByteArray) {
-            BleServiceHelper.r20Echo(model, data)
+        fun echo(model: Int, data: ByteArray) {
+            BleServiceHelper.echo(model, data)
         }
-
+        // R20
+        fun r20GetBattery(model: Int) {
+            BleServiceHelper.r20GetBattery(model)
+        }
+        fun r20GetFileList(model: Int, fileType: Int, timestamp: Long) {
+            BleServiceHelper.getFileList(model, fileType, timestamp)
+        }
+        fun r20Encrypt(model: Int, id: String) {
+            BleServiceHelper.r20Encrypt(model, id)
+        }
+        fun r20DeviceBound(model: Int, bound: Boolean) {
+            BleServiceHelper.r20DeviceBound(model, bound)
+        }
+        fun r20SetUserInfo(model: Int, userInfo: com.lepu.blepro.ble.data.r20.UserInfo) {
+            BleServiceHelper.r20SetUserInfo(model, userInfo)
+        }
+        fun r20GetUserInfo(model: Int) {
+            BleServiceHelper.r20GetUserInfo(model)
+        }
+        fun r20DoctorMode(model: Int, pin: String, timestamp: Long) {
+            BleServiceHelper.r20DoctorMode(model, pin, timestamp)
+        }
+        fun r20GetWifiList(model: Int) {
+            BleServiceHelper.r20GetWifiList(model)
+        }
+        fun r20SetWifiConfig(model: Int, config: Bp2WifiConfig) {
+            BleServiceHelper.r20SetWifiConfig(model, config)
+        }
+        fun r20GetWifiConfig(model: Int) {
+            BleServiceHelper.r20GetWifiConfig(model)
+        }
+        fun r20GetVersionInfo(model: Int) {
+            BleServiceHelper.r20GetVersionInfo(model)
+        }
+        fun r20GetSystemSetting(model: Int) {
+            BleServiceHelper.r20GetSystemSetting(model)
+        }
+        fun r20SetSystemSetting(model: Int, setting: com.lepu.blepro.ble.data.r20.SystemSetting) {
+            BleServiceHelper.r20SetSystemSetting(model, setting)
+        }
+        fun r20GetMeasureSetting(model: Int) {
+            BleServiceHelper.r20GetMeasureSetting(model)
+        }
+        fun r20SetMeasureSetting(model: Int, setting: com.lepu.blepro.ble.data.r20.MeasureSetting) {
+            BleServiceHelper.r20SetMeasureSetting(model, setting)
+        }
+        fun r20MaskTest(model: Int, start: Boolean) {
+            BleServiceHelper.r20MaskTest(model, start)
+        }
+        fun r20GetVentilationSetting(model: Int) {
+            BleServiceHelper.r20GetVentilationSetting(model)
+        }
+        fun r20SetVentilationSetting(model: Int, setting: VentilationSetting) {
+            BleServiceHelper.r20SetVentilationSetting(model, setting)
+        }
+        fun r20GetWarningSetting(model: Int) {
+            BleServiceHelper.r20GetWarningSetting(model)
+        }
+        fun r20SetWarningSetting(model: Int, setting: WarningSetting) {
+            BleServiceHelper.r20SetWarningSetting(model, setting)
+        }
+        fun r20VentilationSwitch(model: Int, start: Boolean) {
+            BleServiceHelper.r20VentilationSwitch(model, start)
+        }
+        fun r20GetRtState(model: Int) {
+            BleServiceHelper.r20GetRtState(model)
+        }
+        // BP3
+        fun bp3GetBattery(model: Int) {
+            BleServiceHelper.bp3GetBattery(model)
+        }
+        fun bp3GetConfig(model: Int) {
+            BleServiceHelper.bp3GetConfig(model)
+        }
+        fun bp3SetConfig(model: Int, config: Bp2Config) {
+            BleServiceHelper.bp3SetConfig(model, config)
+        }
+        fun bp3CalibrationZero(model: Int) {
+            BleServiceHelper.bp3CalibrationZero(model)
+        }
+        fun bp3CalibrationSlope(model: Int, pressure: Int) {
+            BleServiceHelper.bp3CalibrationSlope(model, pressure)
+        }
+        @JvmOverloads
+        fun bp3GetRtPressure(model: Int, rate: Int = 0) {
+            BleServiceHelper.bp3GetRtPressure(model, rate)
+        }
+        fun bp3GetRtWave(model: Int) {
+            BleServiceHelper.bp3GetRtWave(model)
+        }
+        fun bp3PressureTest(model: Int, pressure: Int) {
+            BleServiceHelper.bp3PressureTest(model, pressure)
+        }
+        fun bp3SwitchValve(model: Int, on: Boolean) {
+            BleServiceHelper.bp3SwitchValve(model, on)
+        }
+        fun bp3GetCurPressure(model: Int) {
+            BleServiceHelper.bp3GetCurPressure(model)
+        }
+        fun bp3SwitchTestMode(model: Int, mode: Int) {
+            BleServiceHelper.bp3SwitchTestMode(model, mode)
+        }
+        fun bp3SwitchBpUnit(model: Int, unit: Int) {
+            BleServiceHelper.bp3SwitchBpUnit(model, unit)
+        }
+        @JvmOverloads
+        fun bp3GetWifiList(model: Int, deviceNum: Int = 0) {
+            BleServiceHelper.bp3GetWifiList(model, deviceNum)
+        }
+        fun bp3SetWifiConfig(model: Int, config: Bp2WifiConfig) {
+            BleServiceHelper.bp3SetWifiConfig(model, config)
+        }
+        @JvmOverloads
+        fun bp3GetWifiConfig(model: Int, option: Int = 3) {
+            BleServiceHelper.bp3GetWifiConfig(model, option)
+        }
+        fun bp3SwitchWifi4g(model: Int, on: Boolean) {
+            BleServiceHelper.bp3SwitchWifi4g(model, on)
+        }
+        // ECN
+        fun ecnStartCollect(model: Int) {
+            BleServiceHelper.ecnStartCollect(model)
+        }
+        fun ecnStopCollect(model: Int) {
+            BleServiceHelper.ecnStopCollect(model)
+        }
+        fun ecnStartRtData(model: Int) {
+            BleServiceHelper.ecnStartRtData(model)
+        }
+        fun ecnStopRtData(model: Int) {
+            BleServiceHelper.ecnStopRtData(model)
+        }
+        fun ecnGetRtState(model: Int) {
+            BleServiceHelper.ecnGetRtState(model)
+        }
+        fun ecnGetDiagnosisResult(model: Int) {
+            BleServiceHelper.ecnGetDiagnosisResult(model)
+        }
     }
 
 }

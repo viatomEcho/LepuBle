@@ -16,7 +16,9 @@ public class Pc80BleCmd {
     public static final int TRANS_SET = 0x55;
     public static final int VERSION_SET = 0x66;
     public static final int GET_RATE = 0x77;
+    // 传输文件
     public static final int DATA_MESS = 0xAA;
+    // 实时数据
     public static final int TRACK_DATA_MESS = 0xDD;
     public static final int HEARTBEAT = 0xFF;
 

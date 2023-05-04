@@ -17,7 +17,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      *           MODEL_OXYLINK(Oxylink xxxx), MODEL_KIDSO2(KidsO2 xxxx), MODEL_OXYFIT(Oxyfit xxxx),
      *           MODEL_OXYRING(OxyRing xxxx), MODEL_BBSM_S1(BBSM S1 xxxx), MODEL_BBSM_S2(BBSM S2 xxxx),
      *           MODEL_OXYU(OxyU xxxx), MODEL_AI_S100(AI S100 xxxx), MODEL_O2M_WPS(O2M-WPS xxxx),
-     *           MODEL_CMRING(CMRing xxxx)
+     *           MODEL_CMRING(CMRingS xxxx), MODEL_OXYFIT_WPS(Oxyfit-WPS xxxx), MODEL_KIDSO2_WPS(KidsO2-WPS xxxx)
      * 功能：
      * 1.同步设置参数：BleServiceHelper.oxyUpdateSetting()
      * 2.获取设备信息：BleServiceHelper.oxyGetInfo()
@@ -478,20 +478,25 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface PC300 {
         companion object {
-            const val EventPc300DeviceInfo = "com.lepu.ble.pc300.device.info"         // 设备信息 com.lepu.blepro.ext.pc303.DeviceInfo
-            const val EventPc300BpStart = "com.lepu.ble.pc300.bp.start"               // 血压开始测量 boolean
-            const val EventPc300BpStop = "com.lepu.ble.pc300.bp.stop"                 // 血压停止测量 boolean
-            const val EventPc300BpResult = "com.lepu.ble.pc300.bp.result"             // 血压测量结果 com.lepu.blepro.ext.pc303.BpResult
-            const val EventPc300BpErrorResult = "com.lepu.ble.pc300.bp.error.result"  // 血压测量错误结果 com.lepu.blepro.ext.pc303.BpResultError
-            const val EventPc300RtBpData = "com.lepu.ble.pc300.bp.rtdata"             // 血压实时测量值 int
-            const val EventPc300RtOxyWave = "com.lepu.ble.pc300.oxy.rtwave"           // 血氧实时波形包 com.lepu.blepro.ext.pc303.RtOxyWave
-            const val EventPc300RtOxyParam = "com.lepu.ble.pc300.oxy.rtparam"         // 血氧实时参数包 com.lepu.blepro.ext.pc303.RtOxyParam
-            const val EventPc300EcgStart = "com.lepu.ble.pc300.ecg.start"             // 心电开始测量 boolean
-            const val EventPc300EcgStop = "com.lepu.ble.pc300.ecg.stop"               // 心电停止测量 boolean
-            const val EventPc300RtEcgWave = "com.lepu.ble.pc300.ecg.rtwave"           // 心电实时波形包 com.lepu.blepro.ext.pc303.RtEcgWave
-            const val EventPc300EcgResult = "com.lepu.ble.pc300.ecg.result"           // 心电结果 com.lepu.blepro.ext.pc303.EcgResult
-            const val EventPc300GluResult = "com.lepu.ble.pc300.glu.result"           // 血糖结果 com.lepu.blepro.ext.pc303.GluResult
-            const val EventPc300TempResult = "com.lepu.ble.pc300.temp.result"         // 温度结果 float
+            const val EventPc300DeviceInfo = "com.lepu.ble.pc300.device.info"                 // 设备信息 com.lepu.blepro.ext.pc303.DeviceInfo
+            const val EventPc300BpStart = "com.lepu.ble.pc300.bp.start"                       // 血压开始测量 boolean
+            const val EventPc300BpStop = "com.lepu.ble.pc300.bp.stop"                         // 血压停止测量 boolean
+            const val EventPc300BpResult = "com.lepu.ble.pc300.bp.result"                     // 血压测量结果 com.lepu.blepro.ext.pc303.BpResult
+            const val EventPc300BpErrorResult = "com.lepu.ble.pc300.bp.error.result"          // 血压测量错误结果 com.lepu.blepro.ext.pc303.BpResultError
+            const val EventPc300RtBpData = "com.lepu.ble.pc300.bp.rtdata"                     // 血压实时测量值 int
+            const val EventPc300RtOxyWave = "com.lepu.ble.pc300.oxy.rtwave"                   // 血氧实时波形包 com.lepu.blepro.ext.pc303.RtOxyWave
+            const val EventPc300RtOxyParam = "com.lepu.ble.pc300.oxy.rtparam"                 // 血氧实时参数包 com.lepu.blepro.ext.pc303.RtOxyParam
+            const val EventPc300EcgStart = "com.lepu.ble.pc300.ecg.start"                     // 心电开始测量 boolean
+            const val EventPc300EcgStop = "com.lepu.ble.pc300.ecg.stop"                       // 心电停止测量 boolean
+            const val EventPc300RtEcgWave = "com.lepu.ble.pc300.ecg.rtwave"                   // 心电实时波形包 com.lepu.blepro.ext.pc303.RtEcgWave
+            const val EventPc300EcgResult = "com.lepu.ble.pc300.ecg.result"                   // 心电结果 com.lepu.blepro.ext.pc303.EcgResult
+            const val EventPc300GluResult = "com.lepu.ble.pc300.glu.result"                   // 血糖结果 com.lepu.blepro.ext.pc303.GluResult
+            const val EventPc300TempResult = "com.lepu.ble.pc300.temp.result"                 // 温度结果 float
+            const val EventPc300UaResult = "com.lepu.ble.pc300.ua.result"                     // 尿酸结果 float
+            const val EventPc300CholResult = "com.lepu.ble.pc300.chol.result"                 // 总胆固醇结果 int
+            const val EventPc300TempResult = "com.lepu.ble.pc300.temp.result"                 // 温度结果 float
+            const val EventPc300GetGlucometerType = "com.lepu.ble.pc300.get.glucometer.type"  // 获取血糖仪类型 int
+            const val EventPc300SetGlucometerType = "com.lepu.ble.pc300.set.glucometer.type"  // 设置血糖仪类型 boolean
         }
     }
 
@@ -606,6 +611,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventEr3GetConfigError = "com.lepu.ble.er3.get.config.error"            // 获取配置参数失败 boolean
             const val EventEr3SetConfig = "com.lepu.ble.er3.set.config"                       // 设置模式 boolean
             const val EventEr3SetTime = "com.lepu.ble.er3.set.time"                           // 同步时间 boolean
+            const val EventEr3EcgStop = "com.lepu.ble.er3.ecg.stop"                           // 退出测量模式 boolean
         }
     }
 
@@ -812,14 +818,13 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBtpRtData = "com.lepu.ble.btp.rtData"                              // 实时数据 BtpBleResponse.RtData
             const val EventBtpGetFileList = "com.lepu.ble.btp.get.file.list"                  // 获取文件列表 BtpBleResponse.FileList
             const val EventBtpReadFileError = "com.lepu.ble.btp.read.file.error"              // 读文件出错 String(fileName)
-            const val EventBtpReadingFileProgress = "com.lepu.btp.bp2.reading.file.progress"  // 传输文件进度 Int
+            const val EventBtpReadingFileProgress = "com.lepu.ble.btp.reading.file.progress"  // 传输文件进度 int
             const val EventBtpReadFileComplete = "com.lepu.ble.btp.read.file.complete"        // 传输文件完成 byte[]
             const val EventBtpReset = "com.lepu.ble.btp.reset"                                // 复位 boolean
             const val EventBtpFactoryReset = "com.lepu.ble.btp.factory.reset"                 // 恢复出厂设置 boolean
             const val EventBtpFactoryResetAll = "com.lepu.ble.btp.factory.reset.all"          // 恢复生产出厂状态 boolean
             const val EventBtpGetBattery = "com.lepu.ble.btp.get.battery"                     // 获取电量 KtBleBattery
             const val EventBtpGetConfig = "com.lepu.ble.btp.get.config"                       // 获取配置参数 BtpBleResponse.ConfigInfo
-            const val EventBtpGetConfigError = "com.lepu.ble.btp.get.config.error"            // 获取配置参数失败 boolean
             const val EventBtpSetLowHr = "com.lepu.ble.btp.set.low.hr"                        // 设置心率低阈值 boolean
             const val EventBtpSetHighHr = "com.lepu.ble.btp.set.high.hr"                      // 设置心率高阈值 boolean
             const val EventBtpSetTempUnit = "com.lepu.ble.btp.set.temp.unit"                  // 设置温度单位 boolean
@@ -833,11 +838,101 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * R20BleInterface 发出的通知
-     * 包含model: MODEL_R20, MODEL_LERES
+     * 包含model: MODEL_R20, MODEL_R21,
+     *           MODEL_R10, MODEL_R11,
+     *           MODEL_LERES
      */
     interface R20 {
         companion object {
-            const val EventR20EchoData = "com.lepu.ble.r20.echo.data"  // 回显 byte[]
+            const val EventR20SetUtcTime = "com.lepu.ble.r20.set.utc.time"                        // 同步UTC时间 boolean
+            const val EventR20GetInfo = "com.lepu.ble.r20.get.info"                               // 获取设备信息 LepuDevice
+            const val EventR20Reset = "com.lepu.ble.r20.reset"                                    // 复位 boolean
+            const val EventR20FactoryReset = "com.lepu.ble.r20.factory.reset"                     // 恢复出厂设置 boolean
+            const val EventR20GetBattery = "com.lepu.ble.r20.get.battery"                         // 获取电量 KtBleBattery
+            const val EventR20BurnFactoryInfo = "com.lepu.ble.r20.burn.factory.info"              // 烧录出厂信息 boolean
+            const val EventR20DeviceBound = "com.lepu.ble.r20.device.bound"                       // 绑定设备 int (0成功, 1失败, 2超时)
+            const val EventR20DeviceUnBound = "com.lepu.ble.r20.device.un.bound"                  // 解绑设备 boolean
+            const val EventR20SetUserInfo = "com.lepu.ble.r20.set.user.info"                      // 设置账户信息 boolean
+            const val EventR20GetUserInfo = "com.lepu.ble.r20.get.user.info"                      // 获取账户信息 UserInfo
+            const val EventR20DoctorMode = "com.lepu.ble.r20.doctor.mode"                         // 进入医生模式 R20BleResponse.DoctorModeResult
+            const val EventR20GetWifiList = "com.lepu.ble.r20.get.wifi.list"                      // 获取WiFi列表 WifiList
+            const val EventR20SetWifiConfig = "com.lepu.ble.r20.set.wifi.config"                  // 配置WiFi信息 boolean
+            const val EventR20GetWifiConfig = "com.lepu.ble.r20.get.wifi.config"                  // 获取WiFi信息 WifiConfig
+            const val EventR20GetVersionInfo = "com.lepu.ble.r20.get.version.info"                // 获取详细版本信息 R20BleResponse.VersionInfo
+            const val EventR20GetSystemSetting = "com.lepu.ble.r20.get.system.setting"            // 获取系统设置 SystemSetting
+            const val EventR20SetSystemSetting = "com.lepu.ble.r20.set.system.setting"            // 配置系统设置 boolean
+            const val EventR20GetMeasureSetting = "com.lepu.ble.r20.get.measure.setting"          // 获取测量设置 MeasureSetting
+            const val EventR20SetMeasureSetting = "com.lepu.ble.r20.set.measure.setting"          // 配置测量设置 boolean
+            const val EventR20MaskTest = "com.lepu.ble.r20.mask.test"                             // 佩戴测试 R20BleResponse.MaskTestResult
+            const val EventR20GetVentilationSetting = "com.lepu.ble.r20.get.ventilation.setting"  // 获取通气控制参数 VentilationSetting
+            const val EventR20SetVentilationSetting = "com.lepu.ble.r20.set.ventilation.setting"  // 配置通气控制参数 boolean
+            const val EventR20GetWarningSetting = "com.lepu.ble.r20.get.warning.setting"          // 获取报警提示参数 WarningSetting
+            const val EventR20SetWarningSetting = "com.lepu.ble.r20.set.warning.setting"          // 配置报警提示参数 boolean
+            const val EventR20GetFileList = "com.lepu.ble.r20.get.file.list"                      // 获取记录列表 R20BleResponse.RecordList
+            const val EventR20ReadFileError = "com.lepu.ble.r20.read.file.error"                  // 传输文件出错 boolean
+            const val EventR20ReadingFileProgress = "com.lepu.ble.r20.reading.file.progress"      // 传输文件进度 int
+            const val EventR20ReadFileComplete = "com.lepu.ble.r20.read.file.complete"            // 传输文件完成 byte[]
+            const val EventR20RtState = "com.lepu.ble.r20.rt.state"                               // 实时状态 R20BleResponse.RtState
+            const val EventR20RtParam = "com.lepu.ble.r20.rt.param"                               // 实时参数 R20BleResponse.RtParam
+            const val EventR20Event = "com.lepu.ble.r20.event"                                    // 事件上报 R20BleResponse.Event
+        }
+    }
+
+    /**
+     * EcnBleInterface 发出的通知
+     * 包含model: MODEL_ECN
+     */
+    interface ECN {
+        companion object {
+            const val EventEcnGetFileList = "com.lepu.ble.ecn.get.file.list"                  // 获取文件列表 EcnBleResponse.FileList
+            const val EventEcnReadFileError = "com.lepu.ble.ecn.read.file.error"              // 读文件出错 String(fileName)
+            const val EventEcnReadingFileProgress = "com.lepu.ble.ecn.reading.file.progress"  // 传输文件进度 int
+            const val EventEcnReadFileComplete = "com.lepu.ble.ecn.read.file.complete"        // 传输文件完成 EcnBleResponse.File
+            const val EventEcnGetRtState = "com.lepu.ble.ecn.get.rt.state"                    // 获取实时状态 EcnBleResponse.RtState
+            const val EventEcnRtData = "com.lepu.ble.ecn.rt.data"                             // 实时数据 EcnBleResponse.RtData
+            const val EventEcnStartRtData = "com.lepu.ble.ecn.start.rt.data"                  // 开始上发实时数据 boolean
+            const val EventEcnStopRtData = "com.lepu.ble.ecn.stop.rt.data"                    // 停止上发实时数据 boolean
+            const val EventEcnStartCollect = "com.lepu.ble.ecn.start.collect"                 // 开始采集 boolean
+            const val EventEcnStopCollect = "com.lepu.ble.ecn.stop.collect"                   // 停止采集 boolean
+            const val EventEcnDiagnosisResult = "com.lepu.ble.ecn.diagnosis.result"           // 诊断结论 EcnBleResponse.DiagnosisResult
+        }
+    }
+
+    /**
+     * Bp3BleInterface 发出的通知
+     * 包含model: MODEL_LP_BP3W, MODEL_LP_BP3C
+     */
+    interface BP3 {
+        companion object {
+            const val EventBp3GetInfo = "com.lepu.ble.bp3.get.info"                           // 设备信息 LepuDevice
+            const val EventBp3GetBattery = "com.lepu.ble.bp3.get.battery"                     // 电池信息 KtBleBattery
+            const val EventBp3RtData = "com.lepu.ble.bp3.rt.data"                             // 实时数据 Bp2BleRtData
+            const val EventBp3RtPressure = "com.lepu.ble.bp3.rt.pressure"                     // 实时压 int
+            const val EventBp3CurPressure = "com.lepu.ble.bp3.cur.pressure"                   // 当前压力 int
+            const val EventBp3RtWave = "com.lepu.ble.bp3.rt.wave"                             // 实时波形 Bp2BleRtWave
+            const val EventBp3Reset = "com.lepu.ble.bp3.reset"                                // 复位 boolean
+            const val EventBp3FactoryReset = "com.lepu.ble.bp3.factory.reset"                 // 恢复出厂设置 boolean
+            const val EventBp3FactoryResetAll = "com.lepu.ble.bp3.factory.reset.all"          // 恢复生产出厂状态 boolean
+            const val EventBp3SetConfig = "com.lepu.ble.bp3.set.config"                       // 设置心跳音开关 boolean
+            const val EventBp3GetConfig = "com.lepu.ble.bp3.get.config"                       // 获取参数 Bp2Config
+            const val EventBp3SetUtcTime = "com.lepu.ble.bp3.set.utc.time"                    // 同步UTC时间 boolean
+            const val EventBp3GetWifiList = "com.lepu.ble.bp3.get.wifi.list"                  // 获取路由 Bp2WifiDevice
+            const val EventBp3GetWifiConfig = "com.lepu.ble.bp3.get.wifi.config"              // 获取WiFi配置 Bp2WifiConfig
+            const val EventBp3SetWifiConfig = "com.lepu.ble.bp3.set.wifi.config"              // 设置WiFi boolean
+            const val EventBp3BurnFactoryInfo = "com.lepu.ble.bp3.burn.factory.info"          // 烧录设备信息 boolean
+            const val EventBp3CalibrationZero = "com.lepu.ble.bp3.calibration.zero"           // 校零 int
+            const val EventBp3CalibrationSlope = "com.lepu.ble.bp3.calibration.slope"         // 校准 int
+            const val EventBp3PressureTest = "com.lepu.ble.bp3.pressure.test"                 // 血压测试 boolean
+            const val EventBp3SwitchTestMode = "com.lepu.ble.bp3.switch.test.mode"            // 切换测试模式 boolean
+            const val EventBp3SwitchBpUnit = "com.lepu.ble.bp3.switch.bp.unit"                // 切换血压单位 boolean
+            const val EventBp3SwitchValve = "com.lepu.ble.bp3.switch.valve"                   // 气阀开关 boolean
+            const val EventBp3SwitchWifi4g = "com.lepu.ble.bp3.switch.wifi.4g"                // WiFi/4g开关 boolean
+            const val EventBp3WritingFileProgress = "com.lepu.ble.bp3.writing.file.progress"  // 写文件进度 int
+            const val EventBp3WriteFileComplete = "com.lepu.ble.bp3.write.file.complete"      // 写文件完成 int
+            const val EventBp3GetFileList = "com.lepu.ble.bp3.get.file.list"                  // 获取文件列表 KtBleFileList
+            const val EventBp3ReadFileError = "com.lepu.ble.bp3.read.file.error"              // 读文件错误 boolean
+            const val EventBp3ReadingFileProgress = "com.lepu.ble.bp3.reading.file.process"   // 读文件进度 int
+            const val EventBp3ReadFileComplete = "com.lepu.ble.bp3.read.file.complete"        // 读文件完成 LeBp2wUserList
         }
     }
 

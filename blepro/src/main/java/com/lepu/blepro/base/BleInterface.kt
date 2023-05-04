@@ -11,6 +11,7 @@ import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
+import com.lepu.blepro.utils.EncryptUtil
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
 import com.lepu.blepro.utils.bytesToHex
@@ -20,7 +21,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
-import kotlin.collections.ArrayList
 
 /**
  * author: wujuan
@@ -61,7 +61,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      */
     var connecting = false
 
-
     /**
      *  断开连接后是否重新开启扫描操作重连
      *  interface实例此参数默认false
@@ -83,7 +82,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     private val rtHandler = Handler(Looper.getMainLooper())
     private var rTask: RtTask = RtTask()
 
-
     /**
      * 获取实时的间隔
      * 默认： 500 ms
@@ -95,13 +93,11 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      */
     var isRtStop: Boolean = true
 
-
     /**
      * 初始化后是否在第一次获取设备信息后立即执行实时任务
      * 默认：false
      */
     var runRtImmediately: Boolean = false
-
 
     /**
      * 记录本次连接是否来自Updater
@@ -114,7 +110,10 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     var cmdTimeout: Job? = null
 
     var curCmd = -1
-
+    // 加密模式通讯
+    var isEncryptMode = false
+    val lepuEncryptKey = EncryptUtil.getSecretKey()
+    var aesEncryptKey = ByteArray(0)
 
     inner class RtTask : Runnable {
         override fun run() {
@@ -128,7 +127,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
         }
     }
-
 
     /**
      * 是否暂停读文件
@@ -247,9 +245,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         ready = false
         connecting = false
 
-        if (toConnectUpdater)
-            LiveEventBus.get<BluetoothDevice>(EventMsgConst.Updater.EventBleConnected).post(device)
-
         // 广播名有可能为null
         device.name?.let {
             BleServiceHelper.removeReconnectName(it)
@@ -299,6 +294,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         state = false
         ready = false
         connecting = false
+        isEncryptMode = false
+        aesEncryptKey = ByteArray(0)
         stopRtTask()
 //        LpWorkManager.vailManager.remove(model)
         publish()
@@ -335,7 +332,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         state = false
         ready = false
         connecting = false
-
+        isEncryptMode = false
+        aesEncryptKey = ByteArray(0)
         publish()
 
         device.name?.let {
@@ -349,6 +347,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         state = false
         ready = false
         connecting = false
+        isEncryptMode = false
+        aesEncryptKey = ByteArray(0)
         publish()
         LepuBleLog.d(tag, "onDeviceFailedToConnect==reason:${reason}===isAutoReconnect:$isAutoReconnect")
         LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceDisconnectReason).post(reason)
@@ -439,11 +439,21 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             || model == Bluetooth.MODEL_BIOLAND_BGM
             || model == Bluetooth.MODEL_PC300
             || model == Bluetooth.MODEL_PC300_BLE
+            || model == Bluetooth.MODEL_GM_300SNT
             || model == Bluetooth.MODEL_PC200_BLE
+            || model == Bluetooth.MODEL_R20
+            || model == Bluetooth.MODEL_R21
+            || model == Bluetooth.MODEL_R11
+            || model == Bluetooth.MODEL_R10
+            || model == Bluetooth.MODEL_LERES
             || model == Bluetooth.MODEL_VTM01) { // 部分设备没有同步时间命令，发送此消息通知获取设备信息，进行绑定操作
             LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceReady).post(model)
         } else {
-            if (!manager.isUpdater) syncTime()
+            if (toConnectUpdater) {
+                LiveEventBus.get<BluetoothDevice>(EventMsgConst.Updater.EventBleConnected).post(device)
+            } else {
+                syncTime()
+            }
         }
     }
 
@@ -522,7 +532,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
         }
     }
 
-
     /**
      * 获取设置信息
      */
@@ -541,9 +550,6 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
      * 获取文件列表
      */
     abstract fun getFileList()
-
-
-
 
     /**
      * 读文件
@@ -577,13 +583,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
     fun continueRf(userId: String, fileName: String, offset: Int){
         this.offset = offset
         dealContinueRF(userId, fileName)
-
     }
 
     abstract fun dealContinueRF(userId: String, fileName: String)
-
-
-
-
 
 }

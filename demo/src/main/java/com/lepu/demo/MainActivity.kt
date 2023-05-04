@@ -15,7 +15,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
@@ -25,6 +24,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.afollestad.materialdialogs.DialogAction
 import com.afollestad.materialdialogs.MaterialDialog
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
@@ -36,9 +36,9 @@ import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.demo.ble.LpBleUtil
-import com.lepu.demo.cofig.Constant
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.CHECK_BLE_REQUEST_CODE
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.SUPPORT_MODELS
+import com.lepu.demo.config.Constant
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.CHECK_BLE_REQUEST_CODE
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.SUPPORT_MODELS
 import com.lepu.demo.util.CollectUtil
 import com.permissionx.guolindev.PermissionX
 
@@ -74,7 +74,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         checkServer()
         initLiveEvent()
 //        split()
-
     }
 
     //创建菜单
@@ -96,7 +95,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     intent.putExtra("bleName", viewModel._curBluetooth.value?.deviceName)
                     startActivity(intent)
                 } else {
-                    Toast.makeText(this, "请先连接需要升级的设备！", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.cannot_upgrade), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -146,24 +145,24 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             .observe(this) {
                 when (it.model) {
                     Bluetooth.MODEL_ER1 -> {
-                        Toast.makeText(this, "ER1 完成时间同步", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "ER1 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
                     Bluetooth.MODEL_ER1_N -> {
-                        Toast.makeText(this, "VBeat 完成时间同步", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "VBeat ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
                     Bluetooth.MODEL_HHM1 -> {
-                        Toast.makeText(this, "HHM1 完成时间同步", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "HHM1 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
                     Bluetooth.MODEL_DUOEK -> {
-                        Toast.makeText(this, "DuoEK 完成时间同步", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "DuoEK ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
                     Bluetooth.MODEL_HHM2 -> {
-                        Toast.makeText(this, "HHM2 完成时间同步", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "HHM2 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
                     Bluetooth.MODEL_HHM3 -> {
-                        Toast.makeText(this, "HHM3 完成时间同步", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "HHM3 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
-                    else -> Toast.makeText(this, "ER1 完成时间同步", Toast.LENGTH_SHORT).show()
+                    else -> Toast.makeText(this, "ER1 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 }
                 LpBleUtil.getInfo(it.model)
             }
@@ -172,24 +171,24 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 (event.data as LepuDevice).let {
                     when (event.model) {
                         Bluetooth.MODEL_ER1 -> {
-                            Toast.makeText(this, "ER1 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "ER1 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
                         Bluetooth.MODEL_ER1_N -> {
-                            Toast.makeText(this, "VBeat 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "VBeat ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
                         Bluetooth.MODEL_HHM1 -> {
-                            Toast.makeText(this, "HHM1 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "HHM1 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
                         Bluetooth.MODEL_DUOEK -> {
-                            Toast.makeText(this, "DuoEK 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "DuoEK ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
                         Bluetooth.MODEL_HHM2 -> {
-                            Toast.makeText(this, "HHM2 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "HHM2 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
                         Bluetooth.MODEL_HHM3 -> {
-                            Toast.makeText(this, "HHM3 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "HHM3 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
-                        else -> Toast.makeText(this, "ER1 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                        else -> Toast.makeText(this, "ER1 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     }
                     viewModel._er1Info.value = it
                 }
@@ -199,12 +198,12 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             .observe(this) {
                 when (it.model) {
                     Bluetooth.MODEL_ER2 -> {
-                        Toast.makeText(this, "ER2 完成时间同步", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "ER2 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
                     Bluetooth.MODEL_LP_ER2 -> {
-                        Toast.makeText(this, "LP ER2 完成时间同步", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "LP ER2 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
-                    else -> Toast.makeText(this, "ER2 完成时间同步", Toast.LENGTH_SHORT).show()
+                    else -> Toast.makeText(this, "ER2 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 }
                 LpBleUtil.getInfo(it.model)
             }
@@ -213,12 +212,12 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 (event.data as Er2DeviceInfo).let {
                     when (event.model) {
                         Bluetooth.MODEL_ER2 -> {
-                            Toast.makeText(this, "ER2 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "ER2 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
                         Bluetooth.MODEL_LP_ER2 -> {
-                            Toast.makeText(this, "LP ER2 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "LP ER2 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
-                        else -> Toast.makeText(this, "ER2 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                        else -> Toast.makeText(this, "ER2 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     }
                     viewModel._er2Info.value = it
                 }
@@ -226,13 +225,13 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         //-------------------------lew---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewSetTime)
             .observe(this) {
-                Toast.makeText(this, "4G手表 完成时间同步", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "W12c ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lew.EventLewDeviceInfo)
             .observe(this) { event ->
                 (event.data as DeviceInfo).let {
-                    Toast.makeText(this, "4G手表 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "W12c ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._lewInfo.value = it
                 }
             }
@@ -241,13 +240,21 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         //-------------------------pc80b---------------------------
         LiveEventBus.get<Int>(EventMsgConst.Ble.EventBleDeviceReady)
             .observe(this) {
-                Toast.makeText(this, "EventBleDeviceReady 连接成功 model $it", Toast.LENGTH_SHORT).show()
-                LpBleUtil.getInfo(it)
+                Toast.makeText(this, "EventBleDeviceReady", Toast.LENGTH_SHORT).show()
+                if (it == Bluetooth.MODEL_R20
+                    || it == Bluetooth.MODEL_R21
+                    || it == Bluetooth.MODEL_R11
+                    || it == Bluetooth.MODEL_R10
+                    || it == Bluetooth.MODEL_LERES) {
+                    LpBleUtil.r20Encrypt(it, "0001")
+                } else {
+                    LpBleUtil.getInfo(it)
+                }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bDeviceInfo)
             .observe(this) { event ->
                 (event.data as com.lepu.blepro.ext.pc80b.DeviceInfo).let {
-                    Toast.makeText(this, "PC80B 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "PC80B ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._pc80bInfo.value = it
                 }
             }
@@ -257,15 +264,15 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             .observe(this) {
                 when (it.model) {
                     Bluetooth.MODEL_BP2 -> {
-                        Toast.makeText(this, "BP2 完成时间同步", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "BP2 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
                     Bluetooth.MODEL_BP2A -> {
-                        Toast.makeText(this, "BP2A 完成时间同步", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "BP2A ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
                     Bluetooth.MODEL_BP2T -> {
-                        Toast.makeText(this, "BP2T 完成时间同步", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "BP2T ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
-                    else -> Toast.makeText(this, "BP2 完成时间同步", Toast.LENGTH_SHORT).show()
+                    else -> Toast.makeText(this, "BP2 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 }
                 LpBleUtil.getInfo(it.model)
                 LpBleUtil.bp2GetRtState(it.model)
@@ -276,15 +283,15 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 (event.data as Bp2DeviceInfo).let {
                     when (event.model) {
                         Bluetooth.MODEL_BP2 -> {
-                            Toast.makeText(this, "BP2 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "BP2 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
                         Bluetooth.MODEL_BP2A -> {
-                            Toast.makeText(this, "BP2A 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "BP2A ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
                         Bluetooth.MODEL_BP2T -> {
-                            Toast.makeText(this, "BP2T 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "BP2T ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
-                        else -> Toast.makeText(this, "BP2 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                        else -> Toast.makeText(this, "BP2 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     }
                     viewModel._bp2Info.value = it
                 }
@@ -298,7 +305,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         //-------------------------bp2w---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSyncTime)
             .observe(this) {
-                Toast.makeText(this, "BP2W 完成时间同步", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "BP2W ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
                 LpBleUtil.bp2GetRtState(it.model)
                 LpBleUtil.bp2GetWifiConfig(it.model)
@@ -306,7 +313,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wInfo)
             .observe(this) { event ->
                 (event.data as LepuDevice).let {
-                    Toast.makeText(this, "BP2W 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "BP2W ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._er1Info.value = it
                 }
             }
@@ -319,7 +326,14 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         //-------------------------LeBp2w---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wSyncUtcTime)
             .observe(this) {
-                Toast.makeText(this, "LP-BP2W 完成UTC时间同步", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "LP-BP2W ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+                LpBleUtil.bp2GetRtState(it.model)
+                LpBleUtil.bp2GetWifiConfig(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wSyncUtcTime)
+            .observe(this) {
+                Toast.makeText(this, "LP-BP2W ${getString(R.string.sync_utc_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
                 LpBleUtil.bp2GetRtState(it.model)
                 LpBleUtil.bp2GetWifiConfig(it.model)
@@ -327,7 +341,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wInfo)
             .observe(this) { event ->
                 (event.data as LepuDevice).let {
-                    Toast.makeText(this, "LP-BP2W 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "LP-BP2W ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._er1Info.value = it
                 }
             }
@@ -340,13 +354,13 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         //-------------------------bpm---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmSyncTime)
             .observe(this) {
-                Toast.makeText(this, "BPM 完成时间同步", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "BPM ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmInfo)
             .observe(this) { event ->
                 (event.data as BpmDeviceInfo).let {
-                    Toast.makeText(this, "BPM 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "BPM ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._bpmInfo.value = it
                 }
             }
@@ -354,105 +368,124 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         // o2ring 同步时间
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxySyncDeviceInfo)
             .observe(this) {
-                Toast.makeText(this, "O2系列 完成时间同步 ${it.data}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "O2 ${getString(R.string.sync_time)} ${it.data}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
-
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo)
             .observe(this) { event ->
             (event.data as OxyBleResponse.OxyInfo).let {
                 viewModel._oxyInfo.value = it
                 viewModel._battery.value = it.batteryValue
-                Toast.makeText(this, "O2系列 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "O2 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                 if (event.model == Bluetooth.MODEL_BABYO2N) {
                     LpBleUtil.oxyGetBoxInfo(event.model)
-                }
+                }/* else if (event.model == Bluetooth.MODEL_O2M) {
+                    if (it.branchCode != "2B010100") {
+                        val config = FactoryConfig()
+                        config.setBranchCode("2B010100")
+                        config.setBurnFlag(false, false, true)
+                        LpBleUtil.burnFactoryInfo(event.model, config)
+                    }
+                }*/
             }
         }
         /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBoxInfo).observe(this) { event ->
             (event.data as LepuDevice).let {
-                Toast.makeText(this, "BABYO2N 获取盒子信息成功 $it", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "BABYO2N ${getString(R.string.get_box_info)} $it", Toast.LENGTH_SHORT).show()
             }
         }*/
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBurnFactoryInfo)
+            .observe(this) {
+                Toast.makeText(this, "O2M ${getString(R.string.burn_info_success)}", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            }
         //-------------------------pc100---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100DeviceInfo)
             .observe(this) { event ->
                 (event.data as com.lepu.blepro.ext.pc102.DeviceInfo).let {
-                    Toast.makeText(this, "PC-100 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "PC-100 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._pc100Info.value = it
-                    viewModel._battery.value = "${it.batLevel.times(25)} - ${(it.batLevel+1).times(25)} %"
+                    if (it.batStatus == 0) {
+                        viewModel._battery.value = "${it.batLevel.times(25)} - ${(it.batLevel+1).times(25)} %"
+                    } else {
+                        viewModel._battery.value = "${when (it.batStatus) {
+                            1 -> getString(R.string.charging)
+                            2 -> getString(R.string.full)
+                            else -> ""
+                        }}"
+                    }
                 }
             }
         //-------------------------pc60fw pc6n---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwDeviceInfo)
             .observe(this) { event ->
                 (event.data as com.lepu.blepro.ext.pc60fw.DeviceInfo).let {
-                    Toast.makeText(this, "指甲血氧 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "PC60FW ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._pc60fwInfo.value = it
                 }
             }
         //-------------------------ap20---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20SetTime)
             .observe(this) {
-                Toast.makeText(this, "AP-20 完成时间同步", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "AP-20 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20DeviceInfo)
             .observe(this) { event ->
                 (event.data as com.lepu.blepro.ext.ap20.DeviceInfo).let {
-                    Toast.makeText(this, "AP-20 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "AP-20 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._ap20Info.value = it
                 }
             }
         //-------------------------sp20---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20SetTime)
             .observe(this) {
-                Toast.makeText(this, "SP-20 完成时间同步", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "SP-20 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20DeviceInfo)
             .observe(this) { event ->
                 (event.data as BoDeviceInfo).let {
-                    Toast.makeText(this, "SP-20 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "SP-20 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._boInfo.value = it
                 }
             }
         //-------------------------aoj20a---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aSetTime)
             .observe(this) {
-                Toast.makeText(this, "AOJ-20A 完成时间同步", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "AOJ-20A ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aDeviceData)
             .observe(this) { event ->
                 (event.data as Aoj20aBleResponse.DeviceData).let {
-                    Toast.makeText(this, "AOJ-20A 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "AOJ-20A ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._aoj20aInfo.value = it
                 }
             }
         //-------------------------checkme pod-------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodSetTime)
             .observe(this) {
-                Toast.makeText(this, "Checkme Pod 完成时间同步", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Checkme Pod ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodDeviceInfo)
             .observe(this) { event ->
                 (event.data as CheckmePodBleResponse.DeviceInfo).let {
-                    Toast.makeText(this, "Checkme Pod 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Checkme Pod ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._checkmePodInfo.value = it
                 }
             }
         //-------------------------pc68b---------------------------
         /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bSetTime)
-            .observe(this, {
-                Toast.makeText(this, "pc68b 完成时间同步", Toast.LENGTH_SHORT).show()
+            .observe(this) {
+                Toast.makeText(this, "PC-68B ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             })*/
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bDeviceInfo)
             .observe(this) { event ->
                 (event.data as BoDeviceInfo).let {
-                    Toast.makeText(this, "PC-68B 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "PC-68B ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._boInfo.value = it
                     LpBleUtil.pc68bGetTime(event.model)
                 }
@@ -462,16 +495,16 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             .observe(this) {
                 when (it.model) {
                     Bluetooth.MODEL_PULSEBITEX -> {
-                        Toast.makeText(this, "Pulsebit 完成时间同步", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Pulsebit ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
                     Bluetooth.MODEL_HHM4 -> {
-                        Toast.makeText(this, "HHM4 完成时间同步", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "HHM4 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
                     Bluetooth.MODEL_CHECKME -> {
-                        Toast.makeText(this, "Checkme 完成时间同步", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Checkme ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
                     else -> {
-                        Toast.makeText(this, "Pulsebit 完成时间同步", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Pulsebit ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
                 }
                 LpBleUtil.getInfo(it.model)
@@ -481,16 +514,16 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 (event.data as PulsebitBleResponse.DeviceInfo).let {
                     when (event.model) {
                         Bluetooth.MODEL_PULSEBITEX -> {
-                            Toast.makeText(this, "Pulsebit 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "Pulsebit ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
                         Bluetooth.MODEL_HHM4 -> {
-                            Toast.makeText(this, "HHM4 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "HHM4 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
                         Bluetooth.MODEL_CHECKME -> {
-                            Toast.makeText(this, "Checkme 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "Checkme ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
                         else -> {
-                            Toast.makeText(this, "Pulsebit 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "Pulsebit ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
                     }
                     viewModel._pulsebitInfo.value = it
@@ -499,13 +532,13 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         //-------------------------CheckmeLE-------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeSetTime)
             .observe(this) {
-                Toast.makeText(this, "CheckmeLE 完成时间同步", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "CheckmeLE ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeDeviceInfo)
             .observe(this) { event ->
                 (event.data as CheckmeLeBleResponse.DeviceInfo).let {
-                    Toast.makeText(this, "CheckmeLE 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "CheckmeLE ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._checkmeLeInfo.value = it
                 }
             }
@@ -513,35 +546,43 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300DeviceInfo)
             .observe(this) { event ->
                 (event.data as Pc300DeviceInfo).let {
-                    Toast.makeText(this, "PC_300SNT 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "PC_300SNT ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._pc300Info.value = it
-                    viewModel._battery.value = "${it.batLevel.times(25)} - ${(it.batLevel+1).times(25)} %"
+                    if (it.batStatus == 0) {
+                        viewModel._battery.value = "${it.batLevel.times(25)} - ${(it.batLevel+1).times(25)} %"
+                    } else {
+                        viewModel._battery.value = "${when (it.batStatus) {
+                            1 -> getString(R.string.charging)
+                            2 -> getString(R.string.full)
+                            else -> ""
+                        }}"
+                    }
                 }
             }
         //-------------------------lem---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LEM.EventLemDeviceInfo)
             .observe(this) { event ->
                 (event.data as LemBleResponse.DeviceInfo).let {
-                    Toast.makeText(this, "LEM1 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "LEM1 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._lemInfo.value = it
                 }
             }
         //-------------------------le S1---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1SetTime)
             .observe(this) {
-                Toast.makeText(this, "le S1 完成时间同步", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "le S1 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1Info)
             .observe(this) { event ->
                 (event.data as LepuDevice).let {
-                    Toast.makeText(this, "le S1 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "le S1 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._er1Info.value = it
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmDeviceInfo)
             .observe(this) {
-                Toast.makeText(this, "Bioland-BGM 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Bioland-BGM ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                 val data = it.data as BiolandBgmBleResponse.DeviceInfo
                 viewModel._biolandInfo.value = data
                 viewModel._battery.value = "${data.battery} %"
@@ -549,48 +590,77 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         //-------------------------er3---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3SetTime)
             .observe(this) {
-                Toast.makeText(this, "ER3 完成时间同步", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "ER3 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3Info)
             .observe(this) { event ->
                 (event.data as LepuDevice).let {
-                    Toast.makeText(this, "ER3 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "ER3 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._er1Info.value = it
                 }
             }
         //-------------------------lepod---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodSetTime)
             .observe(this) {
-                Toast.makeText(this, "Lepod 完成时间同步", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Lepod ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodInfo)
             .observe(this) { event ->
                 (event.data as LepuDevice).let {
-                    Toast.makeText(this, "Lepod 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Lepod ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._er1Info.value = it
                 }
             }
         //--------------------------vtm01--------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01Info)
             .observe(this) {
-                Toast.makeText(this, "VTM01 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "VTM01 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                 viewModel._er1Info.value = it.data as LepuDevice
             }
         //--------------------------btp--------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpSetTime)
             .observe(this) {
-                Toast.makeText(this, "BTP 完成时间同步", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "BTP ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetInfo)
             .observe(this) {
-                Toast.makeText(this, "BTP 获取设备信息成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "BTP ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                 viewModel._er1Info.value = it.data as LepuDevice
                 LpBleUtil.btpGetBattery(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetBattery)
+            .observe(this) { event ->
+                (event.data as KtBleBattery).let {
+                    viewModel._battery.value = "${it.percent} %"
+                }
+            }
+        //--------------------------R20--------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetUtcTime)
+            .observe(this) {
+                Toast.makeText(this, "R20 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetInfo)
+            .observe(this) {
+                Toast.makeText(this, "R20 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
+                viewModel._er1Info.value = it.data as LepuDevice
+            }
+        //--------------------------Bp3--------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3SetUtcTime)
+            .observe(this) {
+                Toast.makeText(this, "BP3 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3GetInfo)
+            .observe(this) {
+                Toast.makeText(this, "BP3 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
+                viewModel._er1Info.value = it.data as LepuDevice
+                LpBleUtil.bp3GetBattery(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3GetBattery)
             .observe(this) { event ->
                 (event.data as KtBleBattery).let {
                     viewModel._battery.value = "${it.percent} %"
@@ -687,7 +757,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         }
         if (!gpsEnabled && !networkEnabled) {
             val dialog: AlertDialog.Builder = AlertDialog.Builder(this)
-            dialog.setMessage("开启位置服务")
+            dialog.setMessage(getString(R.string.location_service))
             dialog.setPositiveButton(getString(R.string.confirm)) { _, _ ->
                 val myIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                 startActivity(myIntent)

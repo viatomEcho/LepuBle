@@ -39,6 +39,7 @@
         <activity android:name=".OxyDataActivity"/>
         <activity android:name=".DeviceFactoryDataActivity"/>
         <activity android:name=".WirelessDataActivity"/>
+        <activity android:name=".DataActivity"/>
         <service  android:name=".dfu.DfuService"
             android:exported="true">
             <intent-filter>

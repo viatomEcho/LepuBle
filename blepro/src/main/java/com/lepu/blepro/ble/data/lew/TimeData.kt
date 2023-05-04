@@ -5,7 +5,7 @@ import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.int4ByteArray
 import com.lepu.blepro.utils.toUInt
-import java.util.*
+import com.lepu.blepro.utils.DateUtil
 
 class TimeData() {
 
@@ -27,7 +27,7 @@ class TimeData() {
 
     fun getDataBytes(): ByteArray {
         val curTime = (System.currentTimeMillis() / 1000).toInt()
-        offsetTime = TimeZone.getDefault().getOffset(System.currentTimeMillis()).div(1000)
+        offsetTime = DateUtil.getTimeZoneOffset().div(1000)
         absTime = curTime - offsetTime
         Log.d("test12345", "curTime = $curTime")
         Log.d("test12345", "offsetTime = $offsetTime")

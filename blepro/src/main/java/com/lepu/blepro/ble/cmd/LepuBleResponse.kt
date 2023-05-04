@@ -10,14 +10,14 @@ class LepuBleResponse {
     @Parcelize
     class BleResponse constructor(var bytes: ByteArray) : Parcelable {
         var cmd: Int
-        var pkgType: Byte
+        var pkgType: Int
         var pkgNo: Int
         var len: Int
         var content: ByteArray
 
         init {
             cmd = (bytes[1].toUInt() and 0xFFu).toInt()
-            pkgType = bytes[3]
+            pkgType = (bytes[3].toUInt() and 0xFFu).toInt()
             pkgNo = (bytes[4].toUInt() and 0xFFu).toInt()
             len = toUInt(bytes.copyOfRange(5, 7))
             content = bytes.copyOfRange(7, 7+len)

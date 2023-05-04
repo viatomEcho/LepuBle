@@ -11,6 +11,7 @@ class Pc300DeviceInfo : Parcelable {
     var softwareV = ""
     var hardwareV = ""
     var batLevel = 0     // 电量等级 0-3
+    var batStatus = 0    // 充电状态 0：正常，1：充电中，2：已充满
 
     override fun toString(): String {
         return """
@@ -20,6 +21,7 @@ class Pc300DeviceInfo : Parcelable {
             softwareV : $softwareV
             hardwareV : $hardwareV
             batLevel : $batLevel
+            batStatus : $batStatus
         """.trimIndent()
     }
 }

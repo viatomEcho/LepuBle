@@ -34,6 +34,12 @@
             <include
                 android:id="@+id/btp_layout"
                 layout="@layout/btp_settings"/>
+            <include
+                android:id="@+id/r20_layout"
+                layout="@layout/r20_settings"/>
+            <include
+                android:id="@+id/bp3_layout"
+                layout="@layout/bp3_settings"/>
             <LinearLayout
                 android:id="@+id/le_bp2w_layout"
                 android:layout_width="match_parent"
@@ -173,87 +179,9 @@
                     android:layout_height="wrap_content"
                     android:text="使能开关"/>
             </LinearLayout>
-            <LinearLayout
+            <include
                 android:id="@+id/pc300_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <Button
-                        android:id="@+id/pc300_set_digit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="设置波形数据位数"/>
-                    <Button
-                        android:id="@+id/pc300_set_glu_unit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="设置血糖单位"
-                        android:layout_marginStart="@dimen/dp_10"/>
-                </LinearLayout>
-                <!--<LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <Button
-                        android:id="@+id/pc300_set_id"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="设置ID"/>
-                    <Button
-                        android:id="@+id/pc300_get_id"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="获取ID"
-                        android:layout_marginStart="20dp"/>
-                </LinearLayout>-->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <Button
-                        android:id="@+id/pc300_set_bs_type"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="设置血糖仪类型"/>
-                    <Button
-                        android:id="@+id/pc300_get_bs_type"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="获取血糖仪类型"
-                        android:layout_marginStart="@dimen/dp_10"/>
-                </LinearLayout>
-                <!--<LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <Button
-                        android:id="@+id/pc300_set_temp_mode"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="设置温度模式"/>
-                    <Button
-                        android:id="@+id/pc300_get_temp_mode"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="获取温度模式"
-                        android:layout_marginStart="20dp"/>
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <Button
-                        android:id="@+id/pc300_set_bp_mode"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="设置血压类型"/>
-                    <Button
-                        android:id="@+id/pc300_get_bp_mode"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="获取血压类型"
-                        android:layout_marginStart="20dp"/>
-                </LinearLayout>-->
-            </LinearLayout>
+                layout="@layout/pc300_settings"/>
             <include
                 android:id="@+id/lem_layout"
                 layout="@layout/lem_settings"/>

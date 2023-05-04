@@ -150,7 +150,8 @@ object LpWorkManager {
             Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU,
             Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_O2M_WPS,
-            Bluetooth.MODEL_CMRING -> {
+            Bluetooth.MODEL_CMRING, Bluetooth.MODEL_OXYFIT_WPS,
+            Bluetooth.MODEL_KIDSO2_WPS -> {
                 OxyBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
                     vailFace.put(m, this)
@@ -339,7 +340,7 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_CHECK_POD -> {
+            Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_CHECKME_POD_WPS -> {
                 CheckmePodBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -356,7 +357,7 @@ object LpWorkManager {
                 }
             }
             Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
-            Bluetooth.MODEL_PC200_BLE -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
                 Pc300BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -449,13 +450,26 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
                 R20BleInterface(m).apply {
                     vailFace.put(m, this)
                     return this
                 }
             }
-
+            Bluetooth.MODEL_ECN -> {
+                EcnBleInterface(m).apply {
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                Bp3BleInterface(m).apply {
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
             else -> {
                 return null
             }
@@ -481,7 +495,8 @@ object LpWorkManager {
             Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4,
             Bluetooth.MODEL_CHECKME_LE, Bluetooth.MODEL_LES1,
             Bluetooth.MODEL_CHECKME, Bluetooth.MODEL_O2M_WPS,
-            Bluetooth.MODEL_CMRING -> {
+            Bluetooth.MODEL_CMRING, Bluetooth.MODEL_OXYFIT_WPS,
+            Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_CHECKME_POD_WPS -> {
                 OxyBleManager(context).apply {
                     vailManager.put(m, this)
                     return this
@@ -566,7 +581,8 @@ object LpWorkManager {
                 }
             }
             Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC300,
-            Bluetooth.MODEL_PC300_BLE, Bluetooth.MODEL_PC200_BLE -> {
+            Bluetooth.MODEL_PC300_BLE, Bluetooth.MODEL_PC200_BLE,
+            Bluetooth.MODEL_GM_300SNT -> {
                 Pc100BleManager(context).apply {
                     vailManager.put(m, this)
                     return this

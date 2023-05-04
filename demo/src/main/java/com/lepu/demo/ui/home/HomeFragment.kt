@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hi.dhl.jdatabinding.binding
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.ble.cmd.LpBleCmd
+import com.lepu.blepro.ble.cmd.ResponseError
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.objs.BluetoothController
@@ -20,13 +22,13 @@ import com.lepu.blepro.vals.bleRssi
 import com.lepu.demo.MainActivity
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
-import com.lepu.demo.ble.DeviceAdapter
+import com.lepu.demo.ui.adapter.DeviceAdapter
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.ble.PairDevice
-import com.lepu.demo.ble.StringAdapter
-import com.lepu.demo.cofig.Constant
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.singleConnect
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.currentModel
+import com.lepu.demo.ui.adapter.StringAdapter
+import com.lepu.demo.config.Constant
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.singleConnect
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.currentModel
 import com.lepu.demo.data.entity.DeviceEntity
 import com.lepu.demo.databinding.FragmentHomeBinding
 import com.lepu.demo.util.CollectUtil
@@ -59,7 +61,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
 
         mAlertDialog = AlertDialog.Builder(requireContext())
             .setCancelable(false)
-            .setMessage("正在处理，请稍等...")
+            .setMessage(context?.getString(R.string.handling))
             .create()
 
         activity?.let {  activity ->
@@ -110,7 +112,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         binding.needPair.setOnCheckedChangeListener { buttonView, isChecked ->
             if (Constant.BluetoothConfig.splitType >= 10) {
                 binding.needPair.isChecked = false
-                Toast.makeText(context, "该设备类型不支持配对连接！", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context?.getString(R.string.cannot_pair_connect), Toast.LENGTH_SHORT).show()
                 return@setOnCheckedChangeListener
             }
             Constant.BluetoothConfig.needPair = isChecked
@@ -124,7 +126,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         }
         ArrayAdapter(requireContext(),
             android.R.layout.simple_list_item_1,
-            arrayListOf("全部", "BP2", "ER1", "VBeat", "HHM1", "DuoEK", "HHM2", "HHM3", "ER2", "O2", "PC", "ER3")
+            arrayListOf(context?.getString(R.string.all), "BP2", "ER1", "VBeat", "HHM1", "DuoEK", "HHM2", "HHM3", "ER2", "O2", "PC", "ER3")
         ).apply {
             binding.deviceTypeSpinner.adapter = this
         }
@@ -145,7 +147,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
             binding.numberLayout.layoutManager = this
         }
         numberAdapter = StringAdapter(R.layout.string_item,
-            arrayListOf("0", "1", "2", "3", "4", "删除", "5", "6", "7", "8", "9", "清空")
+            arrayListOf("0", "1", "2", "3", "4", "${context?.getString(R.string.delete)}", "5", "6", "7", "8", "9", "${context?.getString(R.string.clear)}")
         ).apply {
             binding.numberLayout.adapter = this
         }
@@ -187,7 +189,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     } else {
                         LpBleUtil.connect(it1, it)
                     }
-                    ToastUtil.showToast(activity, "正在连接蓝牙")
+                    ToastUtil.showToast(activity, context?.getString(R.string.connecting))
                     LpBleUtil.stopScan()
                     binding.rcv.visibility = View.GONE
 
@@ -213,18 +215,30 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         binding.rssiFilterValue.text = "$bleRssi dBm"
         mainViewModel.bleState.observe(viewLifecycleOwner) {
             if (it) {
-                binding.bleState.text = "连接状态：已连接"
+                binding.bleState.text = context?.getString(R.string.state_connect)
             } else {
-                binding.bleState.text = "连接状态：未连接"
+                binding.bleState.text = context?.getString(R.string.state_disconnect)
             }
             if (it) {
                 mAlertDialog?.dismiss()
             }
         }
         mainViewModel.curBluetooth.observe(viewLifecycleOwner) {
-            binding.bleDevice.text = "蓝牙名：${it!!.deviceName}\n蓝牙地址：${it.deviceMacAddress}"
+            binding.bleDevice.text = "${context?.getString(R.string.bluetooth_name)}${it!!.deviceName}\n" +
+                    "${context?.getString(R.string.bluetooth_address)}${it.deviceMacAddress}"
         }
         binding.bleSplit.setText(Constant.BluetoothConfig.splitText)
+        /*mainViewModel.oxyInfo.observe(viewLifecycleOwner) {
+            if (it.branchCode == "2B010100") {
+                if (binding.bleDevice.text.contains("code")) {
+                    binding.bleDevice.text = binding.bleDevice.text.toString() + "\n${context?.getString(R.string.device_new_code)}${it.branchCode}"
+                } else {
+                    binding.bleDevice.text = binding.bleDevice.text.toString() + "\n${context?.getString(R.string.device_code)}${it.branchCode}"
+                }
+            } else {
+                binding.bleDevice.text = binding.bleDevice.text.toString() + "\n${context?.getString(R.string.device_old_code)}${it.branchCode}"
+            }
+        }*/
     }
 
     var splitDevice: ArrayList<Bluetooth> = arrayListOf()
@@ -289,6 +303,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     || model == Bluetooth.MODEL_SNOREO2
                     || model == Bluetooth.MODEL_WEARO2
                     || model == Bluetooth.MODEL_KIDSO2
+                    || model == Bluetooth.MODEL_KIDSO2_WPS
                     || model == Bluetooth.MODEL_O2M_WPS)
             10 -> return model == Bluetooth.MODEL_ER3
             else -> return false
@@ -339,11 +354,46 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     } else {
                         LpBleUtil.connect(activity?.applicationContext!!, b)
                     }
-                    ToastUtil.showToast(activity, "正在连接蓝牙")
+                    ToastUtil.showToast(activity, context?.getString(R.string.connecting))
                     LpBleUtil.stopScan()
                     binding.rcv.visibility = View.GONE
 
                     mainViewModel._curBluetooth.value = DeviceEntity(b.name, b.macAddr, b.model)
+                }
+            }
+        LiveEventBus.get<ResponseError>(EventMsgConst.Cmd.EventCmdResponseError)
+            .observe(this) {
+                when (it.type) {
+                    LpBleCmd.TYPE_FILE_NOT_FOUND -> Toast.makeText(context, "找不到文件", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FILE_READ_FAILED -> Toast.makeText(context, "读文件失败", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FILE_WRITE_FAILED -> Toast.makeText(context, "写文件失败", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FIRMWARE_UPDATE_FAILED -> Toast.makeText(context, "固件升级失败", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_LANGUAGE_UPDATE_FAILED -> Toast.makeText(context, "语言包升级失败", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_PARAM_ILLEGAL -> Toast.makeText(context, "参数不合法", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_PERMISSION_DENIED -> Toast.makeText(context, "权限不足", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_DECRYPT_FAILED -> {
+                        Toast.makeText(context, "解密失败，断开连接", Toast.LENGTH_SHORT).show()
+                        LpBleUtil.disconnect(false)
+                    }
+                    LpBleCmd.TYPE_DEVICE_BUSY -> Toast.makeText(context, "设备资源被占用/设备忙", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_CMD_FORMAT_ERROR -> Toast.makeText(context, "指令格式错误", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_CMD_NOT_SUPPORTED -> Toast.makeText(context, "不支持指令", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_NORMAL_ERROR -> {
+                        if (it.model == Bluetooth.MODEL_LERES
+                            || it.model == Bluetooth.MODEL_R10
+                            || it.model == Bluetooth.MODEL_R11
+                            || it.model == Bluetooth.MODEL_R21
+                            || it.model == Bluetooth.MODEL_R20) {
+                            if (it.cmd == LpBleCmd.ENCRYPT) {
+                                Toast.makeText(context, "密钥校验失败，断开连接", Toast.LENGTH_SHORT).show()
+                                LpBleUtil.disconnect(false)
+                            } else {
+                                Toast.makeText(context, "通用错误", Toast.LENGTH_SHORT).show()
+                            }
+                        } else {
+                            Toast.makeText(context, "通用错误", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             }
     }

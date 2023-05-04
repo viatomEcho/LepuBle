@@ -257,11 +257,12 @@
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp">
             <TextView
+                android:id="@+id/o2_motor_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
                 android:textSize="16sp"
-                android:text="震动强度："/>
+                android:text="震动/声音强度："/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -278,85 +279,88 @@
             </RelativeLayout>
         </LinearLayout>
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:textColor="@color/colorRed"
-            android:text="KidsO2、Oxylink："/>
-        <TextView
+            android:visibility="gone"
+            android:id="@+id/text_0_35_0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:textColor="@color/colorRed"
             android:text="最低：0-5，低：5-10，中：10-17"/>
         <TextView
+            android:visibility="gone"
+            android:id="@+id/text_0_35_35"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:textColor="@color/colorRed"
             android:text="高：17-22，最高：22-35" />
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:textColor="@color/colorRed"
-            android:text="O2Ring：" />
-        <TextView
+            android:visibility="gone"
+            android:id="@+id/text_0_100_0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:textColor="@color/colorRed"
             android:text="最低：0-20，低：20-40，中：40-60"/>
         <TextView
+            android:visibility="gone"
+            android:id="@+id/text_0_100_100"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:textColor="@color/colorRed"
             android:text="高：60-80，最高：80-100" />
         <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/o2_buzzer_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp">
+            android:layout_marginEnd="5dp"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:text="声音强度："/>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/o2_buzzer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                    <Button
+                        android:id="@+id/o2_set_buzzer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置"
+                        android:layout_alignParentRight="true"/>
+                </RelativeLayout>
+            </LinearLayout>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:text="声音强度："/>
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <EditText
-                    android:id="@+id/o2_buzzer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-                <Button
-                    android:id="@+id/o2_set_buzzer"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="设置"
-                    android:layout_alignParentRight="true"/>
-            </RelativeLayout>
+                android:layout_marginStart="5dp"
+                android:textColor="@color/colorRed"
+                android:text="CheckO2Plus：" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:textColor="@color/colorRed"
+                android:text="最低：0-20，低：20-40，中：40-60"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:textColor="@color/colorRed"
+                android:text="高：60-80，最高：80-100" />
         </LinearLayout>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:textColor="@color/colorRed"
-            android:text="CheckO2Plus：" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:textColor="@color/colorRed"
-            android:text="最低：0-20，低：20-40，中：40-60"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:textColor="@color/colorRed"
-            android:text="高：60-80，最高：80-100" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -390,6 +394,7 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
         <LinearLayout
+            android:visibility="gone"
             android:id="@+id/o2_s2_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

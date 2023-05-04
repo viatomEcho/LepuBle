@@ -65,13 +65,20 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
             .enqueue()
     }
 
-    private fun sendOxyCmd(cmd: Int, bs: ByteArray){
+    private fun sendOxyCmd(cmd: Int) {
         LepuBleLog.d(tag, "sendOxyCmd $cmd")
 
         if (curCmd != -1) {
             // busy
             LepuBleLog.d(tag, "busy: " + cmd.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
             return
+        }
+        val bs: ByteArray = when (cmd) {
+            PulsebitBleCmd.OXY_CMD_READ_END -> PulsebitBleCmd.readFileEnd()
+            PulsebitBleCmd.OXY_CMD_READ_CONTENT -> PulsebitBleCmd.readFileContent()
+            PulsebitBleCmd.OXY_CMD_PARA_SYNC -> PulsebitBleCmd.syncTime()
+            PulsebitBleCmd.OXY_CMD_INFO -> PulsebitBleCmd.getInfo()
+            else -> return
         }
         sendCmd(bs)
         curCmd = cmd
@@ -158,9 +165,9 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
                     fileContent = null
                     LepuBleLog.d(tag, "model:$model, 文件大小：${fileSize}  文件名：$curFileName")
                     if (fileSize <= 0) {
-                        sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_END, PulsebitBleCmd.readFileEnd())
+                        sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_END)
                     } else {
-                        sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_CONTENT, PulsebitBleCmd.readFileContent())
+                        sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_CONTENT)
                     }
                 } else {
                     if (curFileName.contains(".dat")) {
@@ -184,9 +191,9 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model, 读文件中：$curFileName   => $curSize / $fileSize ${curSize*100/fileSize}")
 
                 if (curSize < fileSize) {
-                    sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_CONTENT, PulsebitBleCmd.readFileContent())
+                    sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_CONTENT)
                 } else {
-                    sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_END, PulsebitBleCmd.readFileEnd())
+                    sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_END)
                 }
             }
             PulsebitBleCmd.OXY_CMD_READ_END -> {
@@ -274,26 +281,39 @@ class PulsebitBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
+        if (curCmd != -1) {
+            // busy
+            LepuBleLog.d(tag, "busy: " + PulsebitBleCmd.OXY_CMD_READ_START.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
+            return
+        }
         this.curFileName = fileName
         LepuBleLog.d(tag, "$userId 将要读取文件 $curFileName")
-        sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_START, PulsebitBleCmd.readFileStart(fileName))
+        sendCmd(PulsebitBleCmd.readFileStart(fileName))
+        curCmd = PulsebitBleCmd.OXY_CMD_READ_START
         LepuBleLog.e(tag, "dealReadFile")
     }
 
     override fun syncTime() {
-        sendOxyCmd(PulsebitBleCmd.OXY_CMD_PARA_SYNC, PulsebitBleCmd.syncTime())
+        sendOxyCmd(PulsebitBleCmd.OXY_CMD_PARA_SYNC)
         LepuBleLog.e(tag, "syncTime")
     }
 
     override fun getFileList() {
+        if (curCmd != -1) {
+            // busy
+            LepuBleLog.d(tag, "busy: " + PulsebitBleCmd.OXY_CMD_READ_START.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
+            return
+        }
         this.curFileName = "1dlc.dat"
         fileList.clear()
-        sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_START, PulsebitBleCmd.readFileStart(curFileName))
+        LepuBleLog.d(tag, "将要读取文件 $curFileName")
+        sendCmd(PulsebitBleCmd.readFileStart(curFileName))
+        curCmd = PulsebitBleCmd.OXY_CMD_READ_START
         LepuBleLog.e(tag, "getFileList")
     }
 
     override fun getInfo() {
-        sendOxyCmd(PulsebitBleCmd.OXY_CMD_INFO, PulsebitBleCmd.getInfo())
+        sendOxyCmd(PulsebitBleCmd.OXY_CMD_INFO)
         LepuBleLog.e(tag, "getInfo")
     }
 

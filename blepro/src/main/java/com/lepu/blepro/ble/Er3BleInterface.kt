@@ -274,6 +274,14 @@ class Er3BleInterface(model: Int): BleInterface(model) {
 //                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3BurnLockFlash).post(InterfaceEvent(model, false))
                 }
             }
+            Er3BleCmd.STOP_ECG -> {
+                LepuBleLog.d(tag, "model:$model,STOP_ECG => success")
+                if (response.pkgType == 0x01.toByte()) {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3EcgStop).post(InterfaceEvent(model, true))
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3EcgStop).post(InterfaceEvent(model, false))
+                }
+            }
         }
     }
 
@@ -365,6 +373,11 @@ class Er3BleInterface(model: Int): BleInterface(model) {
     override fun getFileList() {
         sendCmd(Er3BleCmd.getFileList())
         LepuBleLog.d(tag, "getFileList...")
+    }
+
+    fun stopEcg() {
+        sendCmd(Er3BleCmd.stopEcg())
+        LepuBleLog.d(tag, "stopEcg...")
     }
 
     fun getConfig(){

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.SystemClock
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -15,14 +16,16 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.lew.RtData
+import com.lepu.blepro.ble.data.r20.SystemSetting
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.pc102.BpResultError
 import com.lepu.blepro.ext.ap20.*
 import com.lepu.blepro.ext.pc102.*
 import com.lepu.blepro.ext.pc60fw.*
 import com.lepu.blepro.ext.pc80b.*
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.ByteUtils
-import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.getTimeString
 import com.lepu.demo.DemoWidgetProvider
@@ -30,13 +33,14 @@ import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
 import com.lepu.demo.WirelessDataActivity
 import com.lepu.demo.ble.LpBleUtil
-import com.lepu.demo.cofig.Constant
+import com.lepu.demo.config.Constant
 import com.lepu.demo.data.DataController
 import com.lepu.demo.data.OxyDataController
 import com.lepu.demo.data.WirelessData
 import com.lepu.demo.data.entity.DeviceEntity
 import com.lepu.demo.databinding.FragmentDashboardBinding
 import com.lepu.demo.util.DataConvert
+import com.lepu.demo.util.DateUtil
 import com.lepu.demo.util.DateUtil.stringFromDate
 import com.lepu.demo.util.FileUtil
 import com.lepu.demo.views.EcgBkg
@@ -76,17 +80,21 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     private var task = WirelessTask()
     inner class WirelessTask : Runnable {
         override fun run() {
-            LpBleUtil.r20Echo(Constant.BluetoothConfig.currentModel[0], ByteArray(12))
+//            LpBleUtil.echo(Constant.BluetoothConfig.currentModel[0], ByteArray(236))
+//            LpBleUtil.echo(Constant.BluetoothConfig.currentModel[0], ByteArray(32))
+            LpBleUtil.echo(Constant.BluetoothConfig.currentModel[0], ByteArray(12))
             sendSeqNo++
+//            wirelessData.totalBytes = sendSeqNo * 244
+//            wirelessData.totalBytes = sendSeqNo * 40
             wirelessData.totalBytes = sendSeqNo * 20
             wirelessData.recordTime = (System.currentTimeMillis() - wirelessData.startTime).div(1000).toInt()
             if ((wirelessData.recordTime - tempTime) != 0) {
                 tempTime = wirelessData.recordTime
                 wirelessData.speed = wirelessData.receiveBytes.div(wirelessData.recordTime*1.0)
                 wirelessData.throughput = wirelessData.receiveBytes.div(wirelessData.recordTime*1024.0).times(3600)
-                binding.wirelessDataLayout.speed.text = "测试时长：${DataConvert.getEcgTimeStr(wirelessData.recordTime)}\n" +
-                        "吞吐量：${String.format("%.3f", wirelessData.throughput)} kb/h\n" +
-                        "数据传输速度：${String.format("%.3f", wirelessData.speed)} b/s"
+                binding.wirelessDataLayout.speed.text = "${context?.getString(R.string.duration)}${DataConvert.getEcgTimeStr(wirelessData.recordTime)}\n" +
+                        "${context?.getString(R.string.throughput)}${String.format("%.3f", wirelessData.throughput)} kb/h\n" +
+                        "${context?.getString(R.string.speed)}${String.format("%.3f", wirelessData.speed)} b/s"
             }
             if (isStartWirelessTest) {
                 handler.postDelayed(task, 100)
@@ -246,7 +254,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_W12C, Bluetooth.MODEL_HHM1,
             Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
             Bluetooth.MODEL_LP_ER2, Bluetooth.MODEL_PC80B_BLE,
-            Bluetooth.MODEL_PC80B_BLE2 -> waveHandler.post(EcgWaveTask())
+            Bluetooth.MODEL_PC80B_BLE2, Bluetooth.MODEL_LP_BP3W,
+            Bluetooth.MODEL_LP_BP3C -> waveHandler.post(EcgWaveTask())
 
             Bluetooth.MODEL_ER3, Bluetooth.MODEL_LEPOD -> waveHandler.post(Er3EcgWaveTask())
 
@@ -276,11 +285,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_S6W1, Bluetooth.MODEL_SP20_BLE,
             Bluetooth.MODEL_PC60NW_BLE, Bluetooth.MODEL_PC60NW_WPS,
             Bluetooth.MODEL_O2M_WPS, Bluetooth.MODEL_VTM01,
-            Bluetooth.MODEL_PC_60NW_NO_SN -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_PC_60NW_NO_SN, Bluetooth.MODEL_OXYFIT_WPS,
+            Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_CHECKME_POD_WPS -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_CHECK_ADV, Bluetooth.MODEL_PC300_BLE,
-            Bluetooth.MODEL_PC200_BLE -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
                 waveHandler.post(EcgWaveTask())
                 waveHandler.post(OxyWaveTask())
             }
@@ -312,6 +322,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
             Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2,
             Bluetooth.MODEL_LES1 -> {
+//                binding.wirelessDataLayout.root.visibility = View.VISIBLE
                 binding.ecgLayout.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.bpLayout.visibility = View.GONE
@@ -338,7 +349,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.oxyLayout.visibility = View.GONE
                 startWave(it.modelNo)
             }
-            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LP_BP2W -> {
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2W, Bluetooth.MODEL_LP_BP2W,
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
                 binding.bpLayout.visibility = View.VISIBLE
                 binding.ecgLayout.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
@@ -370,11 +382,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_OXYRING,
             Bluetooth.MODEL_CMRING, Bluetooth.MODEL_OXYU,
             Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_O2M_WPS,
-            Bluetooth.MODEL_VTM01 -> {
+            Bluetooth.MODEL_VTM01, Bluetooth.MODEL_OXYFIT_WPS,
+            Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_CHECKME_POD_WPS -> {
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.o2RtTypeLayout.visibility = View.VISIBLE
-                binding.ppgTypeLayout.visibility = View.VISIBLE
-                binding.collectData.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.ecgLayout.visibility = View.GONE
                 binding.bpLayout.visibility = View.GONE
@@ -402,6 +413,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_PC_60NW_NO_SN -> {
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.collectData.visibility = View.VISIBLE
+                binding.collectDataTime.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.ecgLayout.visibility = View.GONE
                 binding.bpLayout.visibility = View.GONE
@@ -412,37 +424,53 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.bpLayout.visibility = View.VISIBLE
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.collectData.visibility = View.VISIBLE
+                binding.collectDataTime.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.ecgLayout.visibility = View.GONE
                 o2RtType = 1
                 startWave(it.modelNo)
+                LpBleUtil.getInfo(it.modelNo)
             }
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV -> {
                 binding.ecgLayout.visibility = View.VISIBLE
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.collectData.visibility = View.VISIBLE
+                binding.collectDataTime.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 binding.bpLayout.visibility = View.GONE
                 o2RtType = 1
                 startWave(it.modelNo)
             }
             Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
-            Bluetooth.MODEL_PC200_BLE -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
                 binding.ecgLayout.visibility = View.VISIBLE
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.bpLayout.visibility = View.VISIBLE
                 binding.collectData.visibility = View.VISIBLE
+                binding.collectDataTime.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
                 o2RtType = 1
                 startWave(it.modelNo)
+                LpBleUtil.getInfo(it.modelNo)
             }
             Bluetooth.MODEL_BTP -> {
                 binding.btpRecord.visibility = View.VISIBLE
                 LpBleUtil.startRtTask(it.modelNo, 2000)
                 LpBleUtil.btpGetConfig(it.modelNo)
             }
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_LERES -> {
-                binding.wirelessDataLayout.root.visibility = View.VISIBLE
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
+                binding.wirelessDataLayout.root.visibility = View.GONE
+//                binding.wirelessDataLayout.root.visibility = View.VISIBLE
+                binding.r20Switch.visibility = View.VISIBLE
+//                binding.r20Switch.visibility = View.GONE
+                LpBleUtil.r20GetRtState(it.modelNo)
+                LpBleUtil.r20GetSystemSetting(it.modelNo)
+            }
+            Bluetooth.MODEL_ECN -> {
+                binding.ecnLayout.visibility = View.VISIBLE
+                LpBleUtil.ecnGetRtState(it.modelNo)
             }
         }
     }
@@ -475,10 +503,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
         }
         mainViewModel.battery.observe(viewLifecycleOwner) {
-            binding.bleBattery.text = "电量：$it"
-            binding.bpBleBattery.text = "电量：$it"
-            binding.oxyBleBattery.text = "电量：$it"
-            binding.er3BleBattery.text = "电量：$it"
+            binding.bleBattery.text = "${context?.getString(R.string.battery)}$it"
+            binding.bpBleBattery.text = "${context?.getString(R.string.battery)}$it"
+            binding.oxyBleBattery.text = "${context?.getString(R.string.battery)}$it"
+            binding.er3BleBattery.text = "${context?.getString(R.string.battery)}$it"
         }
 
         //------------------------------ecg------------------------------
@@ -498,6 +526,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         binding.startRtEcg.setOnClickListener {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_GM_300SNT
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC200_BLE) {
                 LpBleUtil.startEcg(Constant.BluetoothConfig.currentModel[0])
             }
@@ -506,6 +535,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         binding.stopRtEcg.setOnClickListener {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_GM_300SNT
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC200_BLE) {
                 LpBleUtil.stopEcg(Constant.BluetoothConfig.currentModel[0])
             }
@@ -679,7 +709,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SNOREO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYFIT
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYFIT_WPS
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2_WPS
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYLINK
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYU
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_AI_S100
@@ -753,43 +785,59 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     1 -> binding.o2RtTypeLayout.check(R.id.o2_rt_wave)
                     2 -> binding.o2RtTypeLayout.check(R.id.o2_rt_ppg)
                 }
-                Toast.makeText(context, "请先停止采集PPG数据！", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context?.getString(R.string.stop_collect_ppg), Toast.LENGTH_SHORT).show()
                 return@setOnCheckedChangeListener
             }
             when (checkedId) {
-                R.id.o2_rt_param -> o2RtType = 0
-                R.id.o2_rt_wave -> o2RtType = 1
-                R.id.o2_rt_ppg -> o2RtType = 2
+                R.id.o2_rt_param -> {
+                    o2RtType = 0
+                    binding.ppgTypeLayout.visibility = View.GONE
+                    binding.collectData.visibility = View.GONE
+                    binding.collectDataTime.visibility = View.GONE
+                }
+                R.id.o2_rt_wave -> {
+                    o2RtType = 1
+                    binding.ppgTypeLayout.visibility = View.GONE
+                    binding.collectData.visibility = View.VISIBLE
+                    binding.collectDataTime.visibility = View.VISIBLE
+                }
+                R.id.o2_rt_ppg -> {
+                    o2RtType = 2
+                    binding.ppgTypeLayout.visibility = View.VISIBLE
+                    binding.collectData.visibility = View.VISIBLE
+                    binding.collectDataTime.visibility = View.VISIBLE
+                }
             }
         }
         binding.ppgIr.setOnCheckedChangeListener { buttonView, isChecked ->
             if (binding.collectData.isChecked) {
                 binding.ppgIr.isChecked = !isChecked
-                Toast.makeText(context, "PPG数据采集中不能修改采集类型！", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context?.getString(R.string.cannot_change_collect_type), Toast.LENGTH_SHORT).show()
                 return@setOnCheckedChangeListener
             }
         }
         binding.ppgRed.setOnCheckedChangeListener { buttonView, isChecked ->
             if (binding.collectData.isChecked) {
                 binding.ppgRed.isChecked = !isChecked
-                Toast.makeText(context, "PPG数据采集中不能修改采集类型！", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context?.getString(R.string.cannot_change_collect_type), Toast.LENGTH_SHORT).show()
                 return@setOnCheckedChangeListener
             }
         }
         binding.collectData.setOnCheckedChangeListener { buttonView, isChecked ->
             if ((o2RtType == 2) && (!binding.ppgIr.isChecked) && (!binding.ppgRed.isChecked)) {
                 binding.collectData.isChecked = !isChecked
-                Toast.makeText(context, "请至少选择一种PPG数据类型进行采集！", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context?.getString(R.string.select_collect_type), Toast.LENGTH_SHORT).show()
                 return@setOnCheckedChangeListener
             }
-            collectPpg(isChecked)
+            collectO2Data(isChecked)
         }
+        //--------------------无线共存--------------------------
         binding.wirelessDataLayout.startTest.setOnClickListener {
             if (isStartWirelessTest) return@setOnClickListener
             isStartWirelessTest = true
             tempTime = 0
             recordTime = System.currentTimeMillis()
-            R20BleCmd.seqNo = 0
+            LpBleCmd.seqNo = 0
             tempSeqNo = 0
             sendSeqNo = 0
             wirelessData = WirelessData()
@@ -801,31 +849,69 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         }
         binding.wirelessDataLayout.saveTest.setOnClickListener {
             if (binding.wirelessDataLayout.testData.text.isEmpty()) {
-                Toast.makeText(context, "无数据保存", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context?.getString(R.string.no_data_save), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             if (isAlreadySaveWirelessData()) {
-                Toast.makeText(context, "数据已保存", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context?.getString(R.string.data_already_saved), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             isStartWirelessTest = false
             FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/wireless_test.txt", wirelessData.toString(), true)
-            Toast.makeText(context, "保存成功，可在历史记录查看", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context?.getString(R.string.data_saved_success), Toast.LENGTH_SHORT).show()
         }
         binding.wirelessDataLayout.reviewTest.setOnClickListener {
             if (isStartWirelessTest) {
-                Toast.makeText(context, "请先停止测试", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context?.getString(R.string.stop_test), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             startActivity(Intent(context, WirelessDataActivity::class.java))
         }
+        //--------------------btp--------------------------
         binding.btpRecord.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
                 startCollectTime = System.currentTimeMillis()
-                buttonView.text = "结束录制"
+                buttonView.text = context?.getString(R.string.stop_record)
             } else {
-                buttonView.text = "开始录制"
+                buttonView.text = context?.getString(R.string.start_record)
             }
+        }
+        //--------------------r20--------------------------
+        binding.r20VentilationSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (buttonView.isPressed) {
+                LpBleUtil.r20VentilationSwitch(Constant.BluetoothConfig.currentModel[0], isChecked)
+            }
+        }
+        binding.r20MaskTest.setOnCheckedChangeListener { buttonView, isChecked ->
+            LpBleUtil.stopRtTask(Constant.BluetoothConfig.currentModel[0])
+            if (buttonView.isPressed) {
+                LpBleUtil.r20MaskTest(Constant.BluetoothConfig.currentModel[0], isChecked)
+            }
+        }
+        //--------------------ECN--------------------------
+        binding.ecnRtData.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (buttonView.isPressed) {
+                if (isChecked) {
+                    LpBleUtil.ecnStartRtData(Constant.BluetoothConfig.currentModel[0])
+                } else {
+                    LpBleUtil.ecnStopRtData(Constant.BluetoothConfig.currentModel[0])
+                }
+            }
+        }
+        binding.ecnCollect.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (buttonView.isPressed) {
+                if (isChecked) {
+                    LpBleUtil.ecnStartCollect(Constant.BluetoothConfig.currentModel[0])
+                } else {
+                    LpBleUtil.ecnStopCollect(Constant.BluetoothConfig.currentModel[0])
+                }
+            }
+        }
+        binding.ecnRtState.setOnClickListener {
+            LpBleUtil.ecnGetRtState(Constant.BluetoothConfig.currentModel[0])
+        }
+        binding.ecnResult.setOnClickListener {
+            LpBleUtil.ecnGetDiagnosisResult(Constant.BluetoothConfig.currentModel[0])
         }
     }
 
@@ -978,23 +1064,29 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         viewModel.dataOxySrc.value = OxyDataController.iniDataSrc(index)
     }
 
-    private fun collectPpg(isCollect: Boolean) {
+    private fun collectO2Data(isCollect: Boolean) {
         if (isCollect) {
             startCollectTime = System.currentTimeMillis()
             collectBytesData = ByteArray(0)
             collectIntsData = IntArray(0)
+            // 显示计时
+            binding.collectDataTime.base = SystemClock.elapsedRealtime()
+            val hour = (SystemClock.elapsedRealtime() - binding.collectDataTime.base) / 1000 / 60
+            binding.collectDataTime.format = "0${hour}:%s"
+            binding.collectDataTime.start()
         } else {
+            binding.collectDataTime.stop()
             when (o2RtType) {
                 1 -> {
                     if (collectBytesData.isEmpty()) {
-                        Toast.makeText(context, "未采集到PPG数据", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context?.getString(R.string.collect_no_ppg_data), Toast.LENGTH_SHORT).show()
                     } else {
                         saveWaveData()
                     }
                 }
                 2 -> {
                     if (collectIntsData.isEmpty()) {
-                        Toast.makeText(context, "未采集到脉搏波数据", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context?.getString(R.string.collect_no_wave_data), Toast.LENGTH_SHORT).show()
                     } else {
                         savePpgData()
                     }
@@ -1012,9 +1104,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     }
 
     private fun savePpgData() {
-        // 需要传的参数：开始采集的时间戳s，采集通道数量，通道类型，采样率，设备类型，sn，采样点数据
+        // 需要传的参数：开始采集的时间戳s，采集通道数量，通道类型，采样率，采样点字节数，设备类型，sn，采样点数据
         val ppgFile = PpgFile()
-        ppgFile.sampleTime = (startCollectTime/1000).toInt()
+        ppgFile.sampleBytes = 4
+        ppgFile.sampleRate = 150
+        ppgFile.sampleTime = startCollectTime/1000
         if (binding.ppgIr.isChecked && binding.ppgRed.isChecked) {
             ppgFile.leadSize = 2
             ppgFile.leadConfig = arrayOf(ppgFile.DATA_TYPE_IR, ppgFile.DATA_TYPE_RED, 0, 0)
@@ -1065,17 +1159,17 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.dataStr.text = data.param.toString()
                     viewModel.ecgHr.value = data.param.hr
                     binding.measureDuration.text = " ${data.param.recordTime} s"
-                    binding.deviceInfo.text = "导联状态：${data.param.leadOn}\n" +
-                            "测量状态${data.param.curStatus}：${
+                    binding.deviceInfo.text = "${context?.getString(R.string.lead_state)}${data.param.leadOn}\n" +
+                            "${context?.getString(R.string.measure_state)}${data.param.curStatus}：${
                                 when (data.param.curStatus) {
-                                    0 -> "空闲待机(导联脱落)"
-                                    1 -> "测量准备(主机丢弃前段波形阶段)"
-                                    2 -> "记录中"
-                                    3 -> "分析存储中"
-                                    4 -> "已存储成功(满时间测量结束后一直停留此状态直到回空闲状态)"
-                                    5 -> "记录小于30s(记录中状态直接切换至此状态)"
-                                    6 -> "重测已达6次，进入待机"
-                                    7 -> "导联断开"
+                                    0 -> context?.getString(R.string.er1_status_0)
+                                    1 -> context?.getString(R.string.er1_status_1)
+                                    2 -> context?.getString(R.string.er1_status_2)
+                                    3 -> context?.getString(R.string.er1_status_3)
+                                    4 -> context?.getString(R.string.er1_status_4)
+                                    5 -> context?.getString(R.string.er1_status_5)
+                                    6 -> context?.getString(R.string.er1_status_6)
+                                    7 -> context?.getString(R.string.er1_status_7)
                                     else -> ""
                                 } 
                             }"
@@ -1102,16 +1196,16 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.dataStr.text = data.rtParam.toString()
                     viewModel.ecgHr.value = data.hr
                     binding.measureDuration.text = " ${data.rtParam.recordTime} s"
-                    binding.deviceInfo.text = "测量状态${data.rtParam.currentState}：${
+                    binding.deviceInfo.text = "${context?.getString(R.string.measure_state)}${data.rtParam.currentState}：${
                         when (data.rtParam.currentState) {
-                            0 -> "空闲待机(导联脱落)"
-                            1 -> "测量准备(主机丢弃前段波形阶段)"
-                            2 -> "记录中"
-                            3 -> "分析存储中"
-                            4 -> "已存储成功(满时间测量结束后一直停留此状态直到回空闲状态)"
-                            5 -> "记录小于30s(记录中状态直接切换至此状态)"
-                            6 -> "重测已达6次，进入待机"
-                            7 -> "导联断开"
+                            0 -> context?.getString(R.string.er1_status_0)
+                            1 -> context?.getString(R.string.er1_status_1)
+                            2 -> context?.getString(R.string.er1_status_2)
+                            3 -> context?.getString(R.string.er1_status_3)
+                            4 -> context?.getString(R.string.er1_status_4)
+                            5 -> context?.getString(R.string.er1_status_5)
+                            6 -> context?.getString(R.string.er1_status_6)
+                            7 -> context?.getString(R.string.er1_status_7)
                             else -> ""
                         }
                     }"
@@ -1130,15 +1224,17 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 rtData.ecgData?.ecgFloats.let { data ->
                     DataController.receive(data)
                     binding.dataStr.text = data.toString()
-                    binding.deviceInfo.text = "导联状态：${if (rtData.isLeadOff) "脱落" else "正常"}\n" +
-                            "测量状态${rtData.measureStage}：${
+                    binding.deviceInfo.text = "${context?.getString(R.string.lead_state)}${
+                        if (rtData.isLeadOff == 1) context?.getString(R.string.lead_off) 
+                        else context?.getString(R.string.normal)}\n" +
+                            "${context?.getString(R.string.measure_state)}${rtData.measureStage}：${
                                 when (rtData.measureStage) {
-                                    0 -> "正在检测通道"
-                                    1 -> "正在准备测量"
-                                    2 -> "测量进行中"
-                                    3 -> "开始分析"
-                                    4 -> "报告测量结果"
-                                    5 -> "跟踪停止"
+                                    0 -> context?.getString(R.string.pc80b_status_0)
+                                    1 -> context?.getString(R.string.pc80b_status_1)
+                                    2 -> context?.getString(R.string.pc80b_status_2)
+                                    3 -> context?.getString(R.string.pc80b_status_3)
+                                    4 -> context?.getString(R.string.pc80b_status_4)
+                                    5 -> context?.getString(R.string.pc80b_status_5)
                                     else -> ""
                                 }
                             }"
@@ -1153,12 +1249,14 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         DataController.receive(it)
                     }
                     binding.dataStr.text = data.toString()
-                    binding.deviceInfo.text = "导联状态：${if (data.isLeadOff) "脱落" else "正常"}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.lead_state)}${
+                        if (data.isLeadOff) context?.getString(R.string.lead_off) 
+                        else context?.getString(R.string.normal)}"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC80B.EventPc80bContinuousDataEnd)
             .observe(this) {
-                Toast.makeText(context, "测量已终止", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context?.getString(R.string.stop_measure), Toast.LENGTH_SHORT).show()
             }
         //------------------------------bp2 bp2a bp2t------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2RtData)
@@ -1171,8 +1269,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         data = Bp2DataBpIng(bp2Rt.rtWave.waveData)
                         viewModel.ps.value = data.pressure
                         viewModel.bpPr.value = data.pr
-                        binding.deviceInfo.text = "放气：${if (data.isDeflate) "是" else "否"}\n" +
-                                "脉搏波：${if (data.isPulse) "有" else "没有"}"
+                        binding.deviceInfo.text = "${context?.getString(R.string.deflate)}${
+                            if (data.isDeflate) context?.getString(R.string.yes) 
+                            else context?.getString(R.string.no)}\n" +
+                            "${context?.getString(R.string.pulse_signal)}${
+                                if (data.isPulse) context?.getString(R.string.yes) 
+                                else context?.getString(R.string.no)}"
                     }
                     1 -> {
                         data = Bp2DataBpResult(bp2Rt.rtWave.waveData)
@@ -1181,23 +1283,29 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         viewModel.dia.value = data.dia
                         viewModel.mean.value = data.mean
                         viewModel.bpPr.value = data.pr
-                        binding.deviceInfo.text = "放气：${if (data.isDeflate) "是" else "否"}\n" +
-                                "测量结果${data.code}：${
-                                    when (data.code) {
-                                        0 -> "正常"
-                                        1 -> "无法分析（袖套绑的太松，充气慢，缓慢漏气，气容大）"
-                                        2 -> "波形混乱（打气过程中检测到胳膊有动作或者有其他干扰）"
-                                        3 -> "信号弱，检测不到脉搏波（有干扰袖套的衣物）"
-                                        else -> "设备错误（堵阀，血压测量超量程，袖套漏气严重，软件系统异常，硬件系统错误，以及其他异常）"
-                                    }
-                                }"
+                        binding.deviceInfo.text = "${context?.getString(R.string.deflate)}${
+                            if (data.isDeflate) context?.getString(R.string.yes) 
+                            else context?.getString(R.string.no)}\n" +
+                            "${context?.getString(R.string.measure_result)}${data.code}：${
+                                when (data.code) {
+                                    0 -> context?.getString(R.string.normal)
+                                    1 -> context?.getString(R.string.bp2_result_1)
+                                    2 -> context?.getString(R.string.bp2_result_2)
+                                    3 -> context?.getString(R.string.bp2_result_3)
+                                    else -> context?.getString(R.string.bp2_result_other)
+                                }
+                            }"
                     }
                     2 -> {
                         data = Bp2DataEcgIng(bp2Rt.rtWave.waveData)
                         viewModel.ecgHr.value = data.hr
                         binding.measureDuration.text = " ${data.curDuration} s"
-                        binding.deviceInfo.text = "导联状态：${if (data.isLeadOff) "脱落" else "正常"}\n" +
-                                "信号弱：${if (data.isPoolSignal) "是" else "否"}"
+                        binding.deviceInfo.text = "${context?.getString(R.string.lead_state)}${
+                            if (data.isLeadOff) context?.getString(R.string.lead_off) 
+                            else context?.getString(R.string.normal)}\n" +
+                            "${context?.getString(R.string.poor_signal)}${
+                                if (data.isPoolSignal) context?.getString(R.string.yes)
+                                else context?.getString(R.string.no)}"
 
                         val mvs = ByteUtils.bytes2mvs(bp2Rt.rtWave.waveform)
                         val len = mvs.size
@@ -1215,7 +1323,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     3 -> {
                         data = Bp2DataEcgResult(bp2Rt.rtWave.waveData)
                         viewModel.ecgHr.value = data.hr
-                        binding.deviceInfo.text = "测量结果：${data.diagnosis.resultMess}\n" +
+                        binding.deviceInfo.text = "${context?.getString(R.string.measure_result)}：${data.diagnosis.resultMess}\n" +
                                 "qrs：${data.qrs}\n" +
                                 "pvcs：${data.pvcs}\n" +
                                 "qtc：${data.qtc}"
@@ -1237,8 +1345,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         data1 = Bp2DataBpIng(bp2Rt.rtWave.waveData)
                         viewModel.ps.value = data1.pressure
                         viewModel.bpPr.value = data1.pr
-                        binding.deviceInfo.text = "放气：${if (data1.isDeflate) "是" else "否"}\n" +
-                                "脉搏波：${if (data1.isPulse) "有" else "没有"}"
+                        binding.deviceInfo.text = "${context?.getString(R.string.deflate)}${
+                            if (data1.isDeflate) context?.getString(R.string.yes) 
+                            else context?.getString(R.string.no)}\n" +
+                            "${context?.getString(R.string.pulse_signal)}${
+                                if (data1.isPulse) context?.getString(R.string.yes) 
+                                else context?.getString(R.string.no)}"
                     }
                     1 -> {
                         data1 = Bp2DataBpResult(bp2Rt.rtWave.waveData)
@@ -1247,28 +1359,34 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         viewModel.dia.value = data1.dia
                         viewModel.mean.value = data1.mean
                         viewModel.bpPr.value = data1.pr
-                        binding.deviceInfo.text = "放气：${if (data1.isDeflate) "是" else "否"}\n" +
-                                "测量结果${data1.code}：${
-                                    when (data1.code) {
-                                        0 -> "正常"
-                                        1 -> "无法分析（袖套绑的太松，充气慢，缓慢漏气，气容大）"
-                                        2 -> "波形混乱（打气过程中检测到胳膊有动作或者有其他干扰）"
-                                        3 -> "信号弱，检测不到脉搏波（有干扰袖套的衣物）"
-                                        else -> "设备错误（堵阀，血压测量超量程，袖套漏气严重，软件系统异常，硬件系统错误，以及其他异常）"
-                                    }
-                                }"
+                        binding.deviceInfo.text = "${context?.getString(R.string.deflate)}${
+                            if (data1.isDeflate) context?.getString(R.string.yes) 
+                            else context?.getString(R.string.no)}\n" +
+                            "${context?.getString(R.string.measure_result)}${data1.code}：${
+                                when (data1.code) {
+                                    0 -> context?.getString(R.string.normal)
+                                    1 -> context?.getString(R.string.bp2_result_1)
+                                    2 -> context?.getString(R.string.bp2_result_2)
+                                    3 -> context?.getString(R.string.bp2_result_3)
+                                    else -> context?.getString(R.string.bp2_result_other)
+                                }
+                            }"
                     }
                     2 -> {
                         data1 = Bp2DataEcgIng(bp2Rt.rtWave.waveData)
                         viewModel.ecgHr.value = data1.hr
                         binding.measureDuration.text = " ${data1.curDuration} s"
-                        binding.deviceInfo.text = "导联状态：${if (data1.isLeadOff) "脱落" else "正常"}\n" +
-                                "信号弱：${if (data1.isPoolSignal) "是" else "否"}"
+                        binding.deviceInfo.text = "${context?.getString(R.string.lead_state)}${
+                            if (data1.isLeadOff) context?.getString(R.string.lead_off) 
+                            else context?.getString(R.string.normal)}\n" +
+                            "${context?.getString(R.string.poor_signal)}${
+                                if (data1.isPoolSignal) context?.getString(R.string.yes) 
+                                else context?.getString(R.string.no)}"
                     }
                     3 -> {
                         data1 = Bp2DataEcgResult(bp2Rt.rtWave.waveData)
                         viewModel.ecgHr.value = data1.hr
-                        binding.deviceInfo.text = "测量结果：${data1.diagnosis.resultMess}\n" +
+                        binding.deviceInfo.text = "${context?.getString(R.string.measure_result)}：${data1.diagnosis.resultMess}\n" +
                                 "qrs：${data1.qrs}\n" +
                                 "pvcs：${data1.pvcs}\n" +
                                 "qtc：${data1.qtc}"
@@ -1291,8 +1409,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         data2 = Bp2DataBpIng(bp2Rt.rtWave.waveData)
                         viewModel.ps.value = data2.pressure
                         viewModel.bpPr.value = data2.pr
-                        binding.deviceInfo.text = "放气：${if (data2.isDeflate) "是" else "否"}\n" +
-                                "脉搏波：${if (data2.isPulse) "有" else "没有"}"
+                        binding.deviceInfo.text = "${context?.getString(R.string.deflate)}${
+                            if (data2.isDeflate) context?.getString(R.string.yes) 
+                            else context?.getString(R.string.no)}\n" +
+                            "${context?.getString(R.string.pulse_signal)}${
+                                if (data2.isPulse) context?.getString(R.string.yes) 
+                                else context?.getString(R.string.no)}"
                     }
                     1 -> {
                         data2 = Bp2DataBpResult(bp2Rt.rtWave.waveData)
@@ -1301,28 +1423,98 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         viewModel.dia.value = data2.dia
                         viewModel.mean.value = data2.mean
                         viewModel.bpPr.value = data2.pr
-                        binding.deviceInfo.text = "放气：${if (data2.isDeflate) "是" else "否"}\n" +
-                                "测量结果${data2.code}：${
-                                    when (data2.code) {
-                                        0 -> "正常"
-                                        1 -> "无法分析（袖套绑的太松，充气慢，缓慢漏气，气容大）"
-                                        2 -> "波形混乱（打气过程中检测到胳膊有动作或者有其他干扰）"
-                                        3 -> "信号弱，检测不到脉搏波（有干扰袖套的衣物）"
-                                        else -> "设备错误（堵阀，血压测量超量程，袖套漏气严重，软件系统异常，硬件系统错误，以及其他异常）"
-                                    }
-                                }"
+                        binding.deviceInfo.text = "${context?.getString(R.string.deflate)}${
+                            if (data2.isDeflate) context?.getString(R.string.yes) 
+                            else context?.getString(R.string.no)}\n" +
+                            "${context?.getString(R.string.measure_result)}${data2.code}：${
+                                when (data2.code) {
+                                    0 -> context?.getString(R.string.normal)
+                                    1 -> context?.getString(R.string.bp2_result_1)
+                                    2 -> context?.getString(R.string.bp2_result_2)
+                                    3 -> context?.getString(R.string.bp2_result_3)
+                                    else -> context?.getString(R.string.bp2_result_other)
+                                }
+                            }"
                     }
                     2 -> {
                         data2 = Bp2DataEcgIng(bp2Rt.rtWave.waveData)
                         viewModel.ecgHr.value = data2.hr
                         binding.measureDuration.text = " ${data2.curDuration} s"
-                        binding.deviceInfo.text = "导联状态：${if (data2.isLeadOff) "脱落" else "正常"}\n" +
-                                "信号弱：${if (data2.isPoolSignal) "是" else "否"}"
+                        binding.deviceInfo.text = "${context?.getString(R.string.lead_state)}${
+                            if (data2.isLeadOff) context?.getString(R.string.lead_off) 
+                            else context?.getString(R.string.normal)}\n" +
+                            "${context?.getString(R.string.poor_signal)}${
+                                if (data2.isPoolSignal) context?.getString(R.string.yes) 
+                                else context?.getString(R.string.no)}"
                     }
                     3 -> {
                         data2 = Bp2DataEcgResult(bp2Rt.rtWave.waveData)
                         viewModel.ecgHr.value = data2.hr
-                        binding.deviceInfo.text = "测量结果：${data2.diagnosis.resultMess}\n" +
+                        binding.deviceInfo.text = "${context?.getString(R.string.measure_result)}：${data2.diagnosis.resultMess}\n" +
+                                "qrs：${data2.qrs}\n" +
+                                "pvcs：${data2.pvcs}\n" +
+                                "qtc：${data2.qtc}"
+                    }
+                    else -> data2 = ""
+                }
+                val mvs = ByteUtils.bytes2mvs(bp2Rt.rtWave.waveform)
+                DataController.receive(mvs)
+                mainViewModel._battery.value = "${bp2Rt.rtState.battery.percent} %"
+                binding.dataStr.text = "dataType: " + bp2Rt.rtWave.waveDataType + " " + data2.toString() + "----rtState--" + bp2Rt.rtState.toString()
+            }
+        //------------------------------le bp2w------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3RtData)
+            .observe(this) {
+                val bp2Rt = it.data as Bp2BleRtData
+
+                val data2: Any
+                when (bp2Rt.rtWave.waveDataType) {
+                    0 -> {
+                        data2 = Bp2DataBpIng(bp2Rt.rtWave.waveData)
+                        viewModel.ps.value = data2.pressure
+                        viewModel.bpPr.value = data2.pr
+                        binding.deviceInfo.text = "${context?.getString(R.string.deflate)}${
+                            if (data2.isDeflate) context?.getString(R.string.yes) 
+                            else context?.getString(R.string.no)}\n" +
+                            "${context?.getString(R.string.pulse_signal)}${
+                                if (data2.isPulse) context?.getString(R.string.yes) 
+                                else context?.getString(R.string.no)}"
+                    }
+                    1 -> {
+                        data2 = Bp2DataBpResult(bp2Rt.rtWave.waveData)
+                        viewModel.ps.value = data2.pressure
+                        viewModel.sys.value = data2.sys
+                        viewModel.dia.value = data2.dia
+                        viewModel.mean.value = data2.mean
+                        viewModel.bpPr.value = data2.pr
+                        binding.deviceInfo.text = "${context?.getString(R.string.deflate)}${
+                            if (data2.isDeflate) context?.getString(R.string.yes) 
+                            else context?.getString(R.string.no)}\n" +
+                            "${context?.getString(R.string.measure_result)}${data2.code}：${
+                                when (data2.code) {
+                                    0 -> context?.getString(R.string.normal)
+                                    1 -> context?.getString(R.string.bp2_result_1)
+                                    2 -> context?.getString(R.string.bp2_result_2)
+                                    3 -> context?.getString(R.string.bp2_result_3)
+                                    else -> context?.getString(R.string.bp2_result_other)
+                                }
+                            }"
+                    }
+                    2 -> {
+                        data2 = Bp2DataEcgIng(bp2Rt.rtWave.waveData)
+                        viewModel.ecgHr.value = data2.hr
+                        binding.measureDuration.text = " ${data2.curDuration} s"
+                        binding.deviceInfo.text = "${context?.getString(R.string.lead_state)}${
+                            if (data2.isLeadOff) context?.getString(R.string.lead_off) 
+                            else context?.getString(R.string.normal)}\n" +
+                            "${context?.getString(R.string.poor_signal)}${
+                                if (data2.isPoolSignal) context?.getString(R.string.yes) 
+                                else context?.getString(R.string.no)}"
+                    }
+                    3 -> {
+                        data2 = Bp2DataEcgResult(bp2Rt.rtWave.waveData)
+                        viewModel.ecgHr.value = data2.hr
+                        binding.deviceInfo.text = "${context?.getString(R.string.measure_result)}：${data2.diagnosis.resultMess}\n" +
                                 "qrs：${data2.qrs}\n" +
                                 "pvcs：${data2.pvcs}\n" +
                                 "qtc：${data2.qtc}"
@@ -1347,16 +1539,18 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.dia.value = rtData.dia
                 viewModel.bpPr.value = rtData.pr
                 binding.dataStr.text = "$rtData"
-                binding.deviceInfo.text = "测量时间：${getTimeString(rtData.year, rtData.month, rtData.day, rtData.hour, rtData.minute, 0)}\n" +
-                        "测量结果：${if (rtData.regularHrFlag) "心率不齐" else "心率正常"}\n" +
-                        "用户id：${rtData.deviceUserId}\n" +
-                        "记录序号：${rtData.storeId}"
+                binding.deviceInfo.text = "${context?.getString(R.string.start_time)}${getTimeString(rtData.year, rtData.month, rtData.day, rtData.hour, rtData.minute, 0)}\n" +
+                        "${context?.getString(R.string.measure_result)}：${
+                            if (rtData.regularHrFlag) context?.getString(R.string.arrhythmia) 
+                            else context?.getString(R.string.hr_normal)}\n" +
+                        "${context?.getString(R.string.user_id)}${rtData.deviceUserId}\n" +
+                        "${context?.getString(R.string.record_id)}${rtData.storeId}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BPM.EventBpmMeasureErrorResult)
             .observe(this) {
                 val rtData = it.data as BpmBleResponse.ErrorResult
                 binding.dataStr.text = "$rtData"
-                binding.deviceInfo.text = "测量结果错误：${rtData.resultMessZh}"
+                binding.deviceInfo.text = "${context?.getString(R.string.error_result)}${rtData.resultMessZh}"
             }
 
         //------------------------------oxy------------------------------
@@ -1393,14 +1587,16 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     2 -> LpBleUtil.oxyGetPpgRt(it.model)
                 }
                 binding.dataStr.text = data.toString()
-                binding.deviceInfo.text = "体动：${data.vector}\n" +
-                        "导联状态：${if (data.state == 0) "脱落" else "正常"}\n" +
-                        "导联脱落倒计时：${data.countDown}\n" +
-                        "充电状态${data.batteryState}：${
+                binding.deviceInfo.text = "${context?.getString(R.string.motion)}：${data.vector}\n" +
+                        "${context?.getString(R.string.lead_state)}${
+                            if (data.state == 0) context?.getString(R.string.lead_off) 
+                            else context?.getString(R.string.normal)}\n" +
+                        "${context?.getString(R.string.lead_off_countdown)}${data.countDown}\n" +
+                        "${context?.getString(R.string.battery_state)}${data.batteryState}：${
                             when (data.batteryState) {
-                                0 -> "没有充电"
-                                1 -> "充电中"
-                                2 -> "充电完成"
+                                0 -> context?.getString(R.string.no_charge)
+                                1 -> context?.getString(R.string.charging)
+                                2 -> context?.getString(R.string.full)
                                 else -> ""
                             }
                         }"
@@ -1408,6 +1604,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         // o2ring ppg
         /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
             .observe(this) {
+                binding.ppgTips.text = "(设备有上发PPG)"
                 when (o2RtType) {
                     0 -> LpBleUtil.oxyGetRtParam(it.model)
                     1 -> LpBleUtil.oxyGetRtWave(it.model)
@@ -1434,6 +1631,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     1 -> LpBleUtil.oxyGetRtWave(it.model)
                     2 -> LpBleUtil.oxyGetPpgRt(it.model)
                 }
+                binding.ppgTips.text = "(设备没有上发PPG)"
             }*/
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtWaveRes)
             .observe(this) {
@@ -1470,8 +1668,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.spo2.value = rtData.spo2
                 viewModel.pi.value = rtData.pi
                 binding.dataStr.text = rtData.toString()
-                binding.deviceInfo.text = "探头脱落，手指未接入：${rtData.isProbeOff}\n" +
-                        "脉搏检测：${rtData.isPulseSearching}"
+                mainViewModel._battery.value = "${rtData.battery.times(25)} - ${(rtData.battery+1).times(25)} %"
+                binding.deviceInfo.text = "${context?.getString(R.string.no_probe_finger)}${rtData.isProbeOff}\n" +
+                        "${context?.getString(R.string.pulse_search)}${rtData.isPulseSearching}"
             }
         //------------------------------pc100------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100RtOxyWave)
@@ -1484,8 +1683,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.oxyPr.value = rtData.pr
                 viewModel.spo2.value = rtData.spo2
                 viewModel.pi.value = rtData.pi
-                binding.deviceInfo.text = "血氧探头检测中：${rtData.isDetecting}\n" +
-                        "血氧脉搏扫描中：${rtData.isScanning}"
+                binding.deviceInfo.text = "${context?.getString(R.string.finger_search)}${rtData.isDetecting}\n" +
+                        "${context?.getString(R.string.pulse_search)}${rtData.isScanning}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100RtBpData)
             .observe(this) {
@@ -1504,7 +1703,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     viewModel.mean.value = data.map
                     viewModel.bpPr.value = data.pr
                     binding.dataStr.text = rtData.toString()
-                    binding.deviceInfo.text = "血压测量结果：${rtData.resultMess}"
+                    binding.deviceInfo.text = "${context?.getString(R.string.measure_result)}：${rtData.resultMess}"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100BpErrorResult)
@@ -1513,8 +1712,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 rtData.let { data ->
                     binding.dataStr.text = rtData.toString()
                 }
-                binding.deviceInfo.text = "血压错误结果：${rtData.errorMess}\n" +
-                        "血压错误编码号：${rtData.errorNum}"
+                binding.deviceInfo.text = "${context?.getString(R.string.error_result)}${rtData.errorMess}\n" +
+                        "${context?.getString(R.string.error_number)}${rtData.errorNum}"
             }
         //------------------------------ap20------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtOxyWave)
@@ -1533,8 +1732,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.pi.value = rtData.pi
                 binding.dataStr.text = rtData.toString()
                 mainViewModel._battery.value = "${rtData.battery.times(25)} - ${(rtData.battery+1).times(25)} %"
-                binding.deviceInfo.text = "探头脱落，手指未接入：${rtData.isProbeOff}\n" +
-                        "脉搏检测：${rtData.isPulseSearching}"
+                binding.deviceInfo.text = "${context?.getString(R.string.no_probe_finger)}${rtData.isProbeOff}\n" +
+                        "${context?.getString(R.string.pulse_search)}${rtData.isPulseSearching}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBreathWave)
             .observe(this) {
@@ -1590,22 +1789,22 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.pi.value = rtData.pi.div(10f)
                 binding.dataStr.text = rtData.toString()
                 mainViewModel._battery.value = "${rtData.battery.times(25)} - ${(rtData.battery+1).times(25)} %"
-                binding.deviceInfo.text = "探头脱落，手指未接入：${rtData.isProbeOff}\n" +
-                        "脉搏检测：${rtData.isPulseSearching}\n" +
-                        "探头故障或使用不当：${rtData.isCheckProbe}"
+                binding.deviceInfo.text = "${context?.getString(R.string.no_probe_finger)}${rtData.isProbeOff}\n" +
+                        "${context?.getString(R.string.pulse_search)}${rtData.isPulseSearching}\n" +
+                        "${context?.getString(R.string.abnormal_use)}${rtData.isCheckProbe}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20TempData)
             .observe(this) {
                 val data = it.data as Sp20BleResponse.TempData
                 val result = if (data.result == 1) {
-                    "体温过低"
+                    context?.getString(R.string.low_temp)
                 } else if (data.result == 2) {
-                    "体温过高"
+                    context?.getString(R.string.high_temp)
                 } else {
                     if (data.unit == 1) {
-                        "体温 ：${data.value} ℉"
+                        "${context?.getString(R.string.temp)}${data.value} ℉"
                     } else {
-                        "体温 ：${data.value} ℃"
+                        "${context?.getString(R.string.temp)}${data.value} ℃"
                     }
                 }
                 Toast.makeText(context, result, Toast.LENGTH_SHORT).show()
@@ -1627,9 +1826,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.pi.value = rtData.pi
                 binding.dataStr.text = rtData.toString()
                 mainViewModel._battery.value = "${rtData.battery.times(25)} - ${(rtData.battery+1).times(25)} %"
-                binding.deviceInfo.text = "探头脱落，手指未接入：${rtData.isProbeOff}\n" +
-                        "脉搏检测：${rtData.isPulseSearching}\n" +
-                        "探头故障或使用不当：${rtData.isCheckProbe}"
+                binding.deviceInfo.text = "${context?.getString(R.string.no_probe_finger)}${rtData.isProbeOff}\n" +
+                        "${context?.getString(R.string.pulse_search)}${rtData.isPulseSearching}\n" +
+                        "${context?.getString(R.string.abnormal_use)}${rtData.isCheckProbe}"
             }
         //--------------------------vtm20f----------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM20f.EventVTM20fRtWave)
@@ -1637,12 +1836,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val rtWave = it.data as Vtm20fBleResponse.RtWave
                 OxyDataController.receive(intArrayOf(rtWave.wave))
                 binding.dataStr.text = rtWave.toString()
-                binding.deviceInfo.text = "脉搏波音标记：${rtWave.pulseSound}\n" +
-                        "导连脱落标志：${rtWave.isSensorOff}\n" +
-                        "干扰状态标记：${rtWave.isDisturb}\n" +
-                        "低灌注标记：${rtWave.isLowPi}\n" +
-                        "棒图：${rtWave.barChart}\n" +
-                        "包序号：${rtWave.seqNo}"
+                binding.deviceInfo.text = "${context?.getString(R.string.pulse_signal)}${rtWave.pulseSound}\n" +
+                        "${context?.getString(R.string.lead_off)}${rtWave.isSensorOff}\n" +
+                        "${context?.getString(R.string.disturb_signal)}${rtWave.isDisturb}\n" +
+                        "${context?.getString(R.string.low_pi_signal)}${rtWave.isLowPi}\n" +
+                        "${context?.getString(R.string.bar_chart)}${rtWave.barChart}\n" +
+                        "${context?.getString(R.string.seq_no)}${rtWave.seqNo}"
                 if (binding.collectData.isChecked) {
                     collectBytesData = collectBytesData.plus(rtWave.wave.toByte())
                 }
@@ -1658,13 +1857,13 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempRtData)
             .observe(this) {
                 val data = it.data as Aoj20aBleResponse.TempRtData
-                binding.deviceInfo.text = "测温模式${data.mode}：${data.modeMsg}\n" +
-                        "温度：${data.temp} ℃"
+                binding.deviceInfo.text = "${context?.getString(R.string.temp_mode)}${data.mode}：${data.modeMsg}\n" +
+                        "${context?.getString(R.string.temp)}${data.temp} ℃"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AOJ20a.EventAOJ20aTempErrorMsg)
             .observe(this) {
                 val data = it.data as Aoj20aBleResponse.ErrorMsg
-                binding.deviceInfo.text = "错误结果${data.code}：${data.codeMsg}"
+                binding.deviceInfo.text = "${context?.getString(R.string.error_result)}${data.code}：${data.codeMsg}"
             }
         //-------------------------checkme pod------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmePod.EventCheckmePodRtDataError)
@@ -1680,36 +1879,36 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 OxyDataController.receive(rtData.wave.wFs)
                 binding.dataStr.text = "$rtData"
                 mainViewModel._battery.value = "${rtData.param.battery} %"
-                binding.deviceInfo.text = "温度：${rtData.param.temp} ℃\n" +
-                        "血氧探头状态${rtData.param.oxyState}：${
+                binding.deviceInfo.text = "${context?.getString(R.string.temp)}${rtData.param.temp} ℃\n" +
+                        "${context?.getString(R.string.oxy_probe_state)}${rtData.param.oxyState}：${
                             when (rtData.param.oxyState) {
-                                0 -> "未接入血氧电缆"
-                                1 -> "未接入手指"
-                                2 -> "接入手指"
+                                0 -> context?.getString(R.string.no_probe)
+                                1 -> context?.getString(R.string.no_finger)
+                                2 -> context?.getString(R.string.insert_finger)
                                 else -> ""
                             }
                         }\n" +
-                        "体温探头状态${rtData.param.tempState}：${
+                        "${context?.getString(R.string.temp_probe_state)}${rtData.param.tempState}：${
                             when (rtData.param.tempState) {
-                                0 -> "未接入"
-                                1 -> "接入"
+                                0 -> context?.getString(R.string.no_probe)
+                                1 -> context?.getString(R.string.insert_probe)
                                 else -> ""
                             }
                         }\n" +
-                        "充电状态${rtData.param.batteryState}：${
+                        "${context?.getString(R.string.battery_state)}${rtData.param.batteryState}：${
                             when (rtData.param.batteryState) {
-                                0 -> "没有充电"
-                                1 -> "充电中"
-                                2 -> "充电完成"
-                                3 -> "低电量"
+                                0 -> context?.getString(R.string.no_charge)
+                                1 -> context?.getString(R.string.charging)
+                                2 -> context?.getString(R.string.full)
+                                3 -> context?.getString(R.string.low_battery)
                                 else -> ""
                             }
                         }\n" +
-                        "运行状态${rtData.param.runStatus}：${
+                        "${context?.getString(R.string.run_state)}${rtData.param.runStatus}：${
                             when (rtData.param.runStatus) {
-                                0 -> "空闲"
-                                1 -> "测量准备"
-                                2 -> "测量中"
+                                0 -> context?.getString(R.string.idle_state)
+                                1 -> context?.getString(R.string.measure_prepare_state)
+                                2 -> context?.getString(R.string.measuring_state)
                                 else -> ""
                             }
                         }"
@@ -1732,23 +1931,23 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.oxyPr.value = data.pr
                 viewModel.spo2.value = data.spo2
                 viewModel.pi.value = data.pi
-                binding.deviceInfo.text = "血氧探头脱落，手指未接入：${data.isProbeOff}\n" +
-                        "血氧脉搏检测：${data.isPulseSearching}"
+                binding.deviceInfo.text = "${context?.getString(R.string.no_probe_finger)}${data.isProbeOff}\n" +
+                        "${context?.getString(R.string.pulse_search)}${data.isPulseSearching}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtEcgWave)
             .observe(this) {
                 val data = it.data as Pc300BleResponse.RtEcgWave
                 DataController.receive(data.wFs)
-                binding.deviceInfo.text = "心电包号：${data.seqNo}\n" +
-                        "心电采样点位数类型：${data.digit}\n" +
-                        "心电导联脱落：${data.isProbeOff}"
+                binding.deviceInfo.text = "${context?.getString(R.string.seq_no)}${data.seqNo}\n" +
+                        "${context?.getString(R.string.ecg_digit)}${data.digit}\n" +
+                        "${context?.getString(R.string.lead_off)}${data.isProbeOff}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300EcgResult)
             .observe(this) {
                 val data = it.data as Pc300BleResponse.EcgResult
                 viewModel.ecgHr.value = data.hr
-                binding.deviceInfo.text = "心率：${data.hr}\n" +
-                        "测量结果${data.result}：${data.resultMess}"
+                binding.deviceInfo.text = "${context?.getString(R.string.hr)}${data.hr}\n" +
+                        "${context?.getString(R.string.measure_result)}${data.result}：${data.resultMess}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtBpData)
             .observe(this) {
@@ -1763,29 +1962,39 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.mean.value = data.map
                 viewModel.bpPr.value = data.plus
                 binding.dataStr.text = "$data"
-                binding.deviceInfo.text = "血压测量结果${data.result}：${data.resultMess}"
+                binding.deviceInfo.text = "${context?.getString(R.string.measure_result)}${data.result}：${data.resultMess}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300BpErrorResult)
             .observe(this) {
                 val data = it.data as Pc300BleResponse.BpResultError
                 binding.dataStr.text = "$data"
-                binding.deviceInfo.text = "血压错误结果：${data.errorMess}\n" +
-                        "血压错误编码类型：${data.errorType}\n" +
-                        "血压错误编码号：${data.errorNum}"
+                binding.deviceInfo.text = "${context?.getString(R.string.error_result)}${data.errorMess}\n" +
+                        "${context?.getString(R.string.error_type)}${data.errorType}\n" +
+                        "${context?.getString(R.string.error_number)}${data.errorNum}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300GluResult)
             .observe(this) {
                 val data = it.data as Pc300BleResponse.GluResult
                 binding.dataStr.text = "$data"
-                binding.deviceInfo.text = "血糖结果类型${data.result}：${data.resultMess} ℃\n" +
-                        "血糖单位${data.unit}：${
+                binding.deviceInfo.text = "${context?.getString(R.string.glu_reault_type)}${data.result}：${data.resultMess}\n" +
+                        "${context?.getString(R.string.glu_reault_unit)}${data.unit}：${
                             when (data.unit) {
                                 0 -> "mmol/L"
                                 1 -> "mg/dL"
                                 else -> ""
                             }
                         }\n" +
-                        "血糖值：${data.data}"
+                        "${context?.getString(R.string.glu_reault)}${data.data}"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300UaResult)
+            .observe(this) {
+                val data = it.data as Float
+                binding.deviceInfo.text = "${context?.getString(R.string.ua_reault)}$data mg/dL"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300CholResult)
+            .observe(this) {
+                val data = it.data as Int
+                binding.deviceInfo.text = "${context?.getString(R.string.chol_reault)}$data mg/dL"
             }
         /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300EcgStart)
             .observe(this) {
@@ -1801,16 +2010,16 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     binding.dataStr.text = data.param.toString()
                     viewModel.ecgHr.value = data.param.hr
                     binding.measureDuration.text = " ${data.param.recordTime} s"
-                    binding.deviceInfo.text = "运行状态${data.param.runStatus}：${
+                    binding.deviceInfo.text = "${context?.getString(R.string.run_state)}${data.param.runStatus}：${
                                 when (data.param.runStatus) {
-                                    0 -> "待机"
-                                    1 -> "称端测量中"
-                                    2 -> "称端测量结束"
-                                    3 -> "心电准备阶段"
-                                    4 -> "心电测量中"
-                                    5 -> "心电正常结束"
-                                    6 -> "带阻抗心电异常结束"
-                                    7 -> "不带阻抗异常结束"
+                                    0 -> context?.getString(R.string.les1_state_0)
+                                    1 -> context?.getString(R.string.les1_state_1)
+                                    2 -> context?.getString(R.string.les1_state_2)
+                                    3 -> context?.getString(R.string.les1_state_3)
+                                    4 -> context?.getString(R.string.les1_state_4)
+                                    5 -> context?.getString(R.string.les1_state_5)
+                                    6 -> context?.getString(R.string.les1_state_6)
+                                    7 -> context?.getString(R.string.les1_state_7)
                                     else -> ""
                                 }
                             }\n" +
@@ -1839,7 +2048,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             .observe(this) {
                 val data = it.data as FhrBleResponse.DeviceInfo
                 binding.dataStr.text = "$data"
-                binding.deviceInfo.text = "设备名称：${data.deviceName}\n" +
+                binding.deviceInfo.text = "${context?.getString(R.string.device_name)}${data.deviceName}\n" +
                         "心率数据：${data.hr}\n" +
                         "音量数据：${data.volume}\n" +
                         "心音强度数据：${data.strength}\n" +
@@ -1878,7 +2087,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val data = it.data as Er3BleResponse.RtData
                 Er3DataController.receive(data.wave.waveMvs)
                 Log.d("Er3Test", "data.wave.waveMvs.size ${data.wave.waveMvs.size}")
-                binding.er3TempInfo.text = "固件版本：${mainViewModel._er1Info.value?.fwV}\n" +
+                binding.er3TempInfo.text = "${context?.getString(R.string.software_version)}${mainViewModel._er1Info.value?.fwV}\n" +
                         "温度：${data.param.temp} ℃"
                 mainViewModel._battery.value = "${data.param.battery} %"
                 binding.deviceInfo.text = "心率：${data.param.hr} bpm\n" +
@@ -1889,10 +2098,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "呼吸率：${data.param.respRate}\n" +
                         "电池状态${data.param.batteryStatus}：${
                             when (data.param.batteryStatus) {
-                                0 -> "正常使用"
-                                1 -> "充电中"
-                                2 -> "充满"
-                                3 -> "低电量"
+                                0 -> context?.getString(R.string.no_charge)
+                                1 -> context?.getString(R.string.charging)
+                                2 -> context?.getString(R.string.full)
+                                3 -> context?.getString(R.string.low_battery)
                                 else -> ""
                             }
                         }\n" +
@@ -1907,7 +2116,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                             }
                         }\n" +
                         "体温状态：${data.param.isInsertTemp}\n" +
-                        "测量状态${data.param.measureStatus}：${
+                        "${context?.getString(R.string.measure_state)}${data.param.measureStatus}：${
                             when (data.param.measureStatus) {
                                 0 -> "空闲"
                                 1 -> "准备状态"
@@ -1919,8 +2128,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "测量中是否有配置体温设备：${data.param.isHasTemp}\n" +
                         "测量中是否有配置血氧设备：${data.param.isHasOxy}\n" +
                         "测量中是否有配置呼吸设备：${data.param.isHasRespRate}\n" +
-                        "已记录时长：${data.param.recordTime}\n" +
-                        "开始测量时间：${data.param.year}-${data.param.month}-${data.param.day} ${data.param.hour}:${data.param.minute}:${data.param.second}\n" +
+                        "${context?.getString(R.string.duration)}${data.param.recordTime}\n" +
+                        "${context?.getString(R.string.start_time)}${data.param.year}-${data.param.month}-${data.param.day} ${data.param.hour}:${data.param.minute}:${data.param.second}\n" +
                         "导联类型${data.param.leadType}：${
                             when (data.param.leadType) {
                                 0 -> "LEAD_12，12导"
@@ -1965,10 +2174,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "呼吸率：${data.param.respRate}\n" +
                         "电池状态${data.param.batteryStatus}：${
                             when (data.param.batteryStatus) {
-                                0 -> "正常使用"
-                                1 -> "充电中"
-                                2 -> "充满"
-                                3 -> "低电量"
+                                0 -> context?.getString(R.string.no_charge)
+                                1 -> context?.getString(R.string.charging)
+                                2 -> context?.getString(R.string.full)
+                                3 -> context?.getString(R.string.low_battery)
                                 else -> ""
                             }
                         }\n" +
@@ -1983,7 +2192,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                             }
                         }\n" +
                         "体温状态：${data.param.isInsertTemp}\n" +
-                        "测量状态${data.param.measureStatus}：${
+                        "${context?.getString(R.string.measure_state)}${data.param.measureStatus}：${
                             when (data.param.measureStatus) {
                                 0 -> "空闲"
                                 1 -> "检测导联"
@@ -1992,8 +2201,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                                 else -> ""
                             }
                         }\n" +
-                        "已记录时长：${data.param.recordTime}\n" +
-                        "开始测量时间：${data.param.year}-${data.param.month}-${data.param.day} ${data.param.hour}:${data.param.minute}:${data.param.second}\n" +
+                        "${context?.getString(R.string.duration)}${data.param.recordTime}\n" +
+                        "${context?.getString(R.string.start_time)}${data.param.year}-${data.param.month}-${data.param.day} ${data.param.hour}:${data.param.minute}:${data.param.second}\n" +
                         "导联类型${data.param.leadType}：${
                             when (data.param.leadType) {
                                 0 -> "LEAD_12，12导"
@@ -2069,14 +2278,14 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 }
                 binding.deviceInfo.text = binding.deviceInfo.text.toString() + "测量中：${
                     if (data.isWearing) {
-                        "是"
+                        context?.getString(R.string.yes)
                     } else {
-                        "否"
+                        context?.getString(R.string.no)
                     }}\n" +
                     "心率可信度：${data.level}\n" +
                     "心率状态${data.hrStatus}：${
                         when (data.hrStatus) {
-                            0 -> "正常"
+                            0 -> context?.getString(R.string.normal)
                             1 -> "心率低异常"
                             2 -> "心率高异常"
                             else -> ""
@@ -2084,7 +2293,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     }\n" +
                     "温度状态${data.tempStatus}：${
                         when (data.tempStatus) {
-                            0 -> "正常"
+                            0 -> context?.getString(R.string.normal)
                             3 -> "温度低异常"
                             4 -> "温度高异常"
                             else -> ""
@@ -2101,9 +2310,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 type = data.tempUnit
             }
         // ----------------------R20-------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20EchoData)
+        LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseEchoData)
             .observe(this) {
-                val data = it.data as R20BleResponse.BleResponse
+                val data = LepuBleResponse.BleResponse(it)
                 wirelessData.totalSize++
                 wirelessData.receiveBytes += data.bytes.size
                 wirelessData.oneDelay = System.currentTimeMillis() - recordTime
@@ -2129,6 +2338,228 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "总时延：${wirelessData.totalDelay.div(wirelessData.totalSize)} ms\n" +
                         "丢包率：${String.format("%.3f", wirelessData.missPercent)} %\n" +
                         "误码率：${String.format("%.3f", wirelessData.errorPercent)} %"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20RtState)
+            .observe(this) {
+                val data = it.data as R20BleResponse.RtState
+                binding.r20State.visibility = View.VISIBLE
+                if (data.isVentilated) {
+                    binding.r20VentilationSwitch.isChecked = true
+                    LpBleUtil.startRtTask(it.model, 1000)
+                } else {
+                    binding.r20VentilationSwitch.isChecked = false
+                    LpBleUtil.stopRtTask()
+                }
+                // BLE医生模式下
+                state = data.deviceMode == 2
+                binding.r20VentilationSwitch.isEnabled = state
+                binding.r20MaskTest.isEnabled = !data.isVentilated
+                binding.r20State.text = "设备实时状态：\n通气模式：${when (data.ventilationMode) {
+                    0 -> "CPAP"
+                    1 -> "APAP"
+                    2 -> "S"
+                    3 -> "S/T"
+                    4 -> "T"
+                    else -> "无"
+                }}\n通气状态：${
+                    if (data.isVentilated) context?.getString(R.string.yes) 
+                    else context?.getString(R.string.no)}\n" +
+                "${context?.getString(R.string.device_mode)}${when (data.deviceMode) {
+                        0 -> "患者模式"
+                        1 -> "设备端医生模式"
+                        2 -> "BLE端医生模式"
+                        3 -> "Socket端医生模式"
+                        else -> "无"
+                    }
+                }\n标准：${when (data.standard) {
+                        0 -> "CE"
+                        1 -> "FDA"
+                        else -> "无"
+                    }
+                }"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetSystemSetting)
+            .observe(this) {
+                val data = it.data as SystemSetting
+                type = data.unitSetting.pressureUnit
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20RtParam)
+            .observe(this) {
+                val data = it.data as R20BleResponse.RtParam
+                binding.deviceInfo.visibility = View.VISIBLE
+                binding.r20MaskTestText.visibility = View.GONE
+                binding.deviceInfo.text = "实时参数：\n实时压：${data.pressure} ${if (type == 0) "cmH2O" else "hPa"}\n" +
+                        "吸气压力：${data.ipap} ${if (type == 0) "cmH2O" else "hPa"}\n" +
+                        "呼气压力：${data.epap} ${if (type == 0) "cmH2O" else "hPa"}\n" +
+                        "潮气量：${if (data.vt < 0 || data.vt > 3000) "**" else data.vt}mL\n" +
+                        "分钟通气量：${if (data.mv < 0 || data.mv > 60) "**" else data.mv} L/min\n" +
+                        "漏气量：${if (data.leak < 0 || data.leak > 120) "**" else data.leak} L/min\n" +
+                        "呼吸率：${if (data.rr < 0 || data.rr > 60) "**" else data.rr} bpm\n" +
+                        "吸气时间：${if (data.ti < 0.1 || data.ti > 4) "--" else data.ti} s\n" +
+                        "吸呼比：${if (data.ie < 0.02 || data.ie > 3) "--" else {
+                            if (data.ie < 1) {
+                                "1:" + String.format("%.1f", 1f/data.ie)
+                            } else {
+                                String.format("%.1f", data.ie) + ":1"
+                            }
+                        }}\n" +
+                        "血氧：${if (data.spo2 < 70 || data.spo2 > 100) "**" else data.spo2} %\n" +
+                        "脉率：${if (data.pr < 30 || data.pr > 250) "**" else data.pr} bpm\n" +
+                        "心率：${if (data.hr < 30 || data.hr > 250) "**" else data.hr} bpm"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20MaskTest)
+            .observe(this) {
+                val data = it.data as R20BleResponse.MaskTestResult
+                binding.r20MaskTest.isChecked = data.status == 1
+                // BLE医生模式下
+                if (state) {
+                    binding.r20VentilationSwitch.isEnabled = data.status != 1
+                }
+                binding.r20MaskTestText.visibility = View.VISIBLE
+                binding.deviceInfo.visibility = View.GONE
+                binding.r20Event.visibility = View.GONE
+                binding.r20MaskTestText.text = "佩戴测试：\n设备状态：${when (data.status) {
+                    0 -> "未在测试状态"
+                    1 -> "测试中"
+                    2 -> "测试结束"
+                    else -> "无"
+                }}\n实时漏气量：${data.leak} L/min\n${context?.getString(R.string.measure_result)}：${when (data.result) {
+                    0 -> "测试未完成"
+                    1 -> "不合适"
+                    2 -> "合适"
+                    else -> "无"
+                }
+                }"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20Event)
+            .observe(this) {
+                val data = it.data as R20BleResponse.Event
+                binding.r20Event.visibility = View.VISIBLE
+                binding.r20Event.text = "事件上报：\n时间：${stringFromDate(Date(data.timestamp*1000), "yyyy-MM-dd HH:mm:ss")}\n" +
+                        "警告状态：${if (data.alarm) {"告警中"} else {"取消告警"}}\n" +
+                        "警告等级：${when (data.alarmLevel) {
+                            0 -> context?.getString(R.string.normal)
+                            1 -> "低"
+                            2 -> "中"
+                            3 -> "高"
+                            4 -> "最高"
+                            else -> "无"
+                        }}\n警告类型：${when (data.eventId) {
+                            1 -> "管路断开"
+                            2 -> "管路阻塞"
+                            3 -> "漏气量高"
+                            4 -> "呼吸频率高"
+                            5 -> "呼吸频率低"
+                            6 -> "潮气量低"
+                            7 -> "分钟通气量低"
+                            8 -> "血氧饱和度低"
+                            9 -> "心率/脉率高"
+                            10 -> "心率/脉率低"
+                            11 -> "窒息"
+                            12 -> "掉电"
+                            101 -> "涡轮HALL线没接"
+                            102 -> "涡轮温度超过90度"
+                            103 -> "涡轮堵转"
+                            104 -> "涡轮电源异常"
+                            201 -> "加热盘异常"
+                            202 -> "加热盘没接/温度传感器损坏"
+                            203 -> "加热盘温度超过75度"
+                            301 -> "流量传感器异常"
+                            302 -> "压力传感器异常"
+                            303 -> "流量传感器通信异常"
+                            304 -> "流量传感器测得的流速过大"
+                            305 -> "流量传感器测得的流速过小"
+                            306 -> "正常通气时，压力传感器数值过大"
+                            307 -> "正常通气时，压力传感器数值过小"
+                            308 -> "传感器压力偏低"
+                            309 -> "自检时，流量传感器流速过大"
+                            310 -> "自检时，流量传感器流速过小"
+                            311 -> "自检时，流量传感器通信异常"
+                            312 -> "自检时，压力传感器数值过大"
+                            313 -> "自检时，压力传感器数值过小"
+                            314 -> "温/湿度传感器异常"
+                            315 -> "大气压传感器异常"
+                            316 -> "预估压力与实际压力相差较远"
+                            401 -> "输入电压异常"
+                            402 -> "电源电压低"
+                            403 -> "电源电压高"
+                            501 -> "EEPROM 只读数据异常"
+                            502 -> "RTC时钟异常"
+                            503 -> "设备需要校准"
+                            504 -> "设备异常重启"
+                            601 -> "阻塞呼吸暂事件"
+                            602 -> "中枢型呼吸暂停事件"
+                            603 -> "无法分类的呼吸暂停事件"
+                            604 -> "低通气"
+                            605 -> "微觉醒"
+                            606 -> "打鼾事件"
+                            607 -> "周期性呼吸事件"
+                            608 -> "漏气量高事件"
+                            609 -> "面罩摘下"
+                            610 -> "自主呼吸占比"
+                            else -> "无"
+                        }
+                }"
+            }
+        LiveEventBus.get<ResponseError>(EventMsgConst.Cmd.EventCmdResponseError)
+            .observe(this) {
+                when (it.type) {
+                    LpBleCmd.TYPE_FILE_NOT_FOUND -> Toast.makeText(context, "找不到文件", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FILE_READ_FAILED -> Toast.makeText(context, "读文件失败", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FILE_WRITE_FAILED -> Toast.makeText(context, "写文件失败", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FIRMWARE_UPDATE_FAILED -> Toast.makeText(context, "固件升级失败", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_LANGUAGE_UPDATE_FAILED -> Toast.makeText(context, "语言包升级失败", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_PARAM_ILLEGAL -> Toast.makeText(context, "参数不合法", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_PERMISSION_DENIED -> Toast.makeText(context, "权限不足", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_DECRYPT_FAILED -> {
+                    Toast.makeText(context, "解密失败，断开连接", Toast.LENGTH_SHORT).show()
+                        LpBleUtil.disconnect(false)
+                    }
+                    LpBleCmd.TYPE_DEVICE_BUSY -> Toast.makeText(context, "设备资源被占用/设备忙", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_CMD_FORMAT_ERROR -> Toast.makeText(context, "指令格式错误", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_CMD_NOT_SUPPORTED -> Toast.makeText(context, "不支持指令", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_NORMAL_ERROR -> Toast.makeText(context, "通用错误", Toast.LENGTH_SHORT).show()
+                }
+            }
+        //--------------------ECN---------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStartRtData)
+            .observe(this) {
+                val data = it.data as Boolean
+                Toast.makeText(context, "开始上发实时数据$data", Toast.LENGTH_SHORT).show()
+                binding.ecnInfo.text = "开始上发实时数据$data"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStopRtData)
+            .observe(this) {
+                val data = it.data as Boolean
+                Toast.makeText(context, "停止上发实时数据$data", Toast.LENGTH_SHORT).show()
+                binding.ecnInfo.text = "停止上发实时数据$data"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStartCollect)
+            .observe(this) {
+                val data = it.data as Boolean
+                Toast.makeText(context, "开始采集实时数据$data", Toast.LENGTH_SHORT).show()
+                binding.ecnInfo.text = "开始采集实时数据$data"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStopCollect)
+            .observe(this) {
+                val data = it.data as Boolean
+                Toast.makeText(context, "停止采集实时数据$data", Toast.LENGTH_SHORT).show()
+                binding.ecnInfo.text = "停止采集实时数据$data"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnRtData)
+            .observe(this) {
+                val data = it.data as EcnBleResponse.RtData
+                binding.ecnInfo.text = "$data"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnGetRtState)
+            .observe(this) {
+                val data = it.data as EcnBleResponse.RtState
+                binding.ecnInfo.text = "$data"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnDiagnosisResult)
+            .observe(this) {
+                val data = it.data as EcnBleResponse.DiagnosisResult
+                binding.ecnInfo.text = "$data"
             }
     }
 

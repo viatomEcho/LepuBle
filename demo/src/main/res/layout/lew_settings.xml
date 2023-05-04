@@ -24,7 +24,7 @@
                 android:id="@+id/lew_get_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="获取设备信息"
+                android:text="@string/get_info"
                 android:layout_marginStart="20dp"/>
         </LinearLayout>
         <LinearLayout

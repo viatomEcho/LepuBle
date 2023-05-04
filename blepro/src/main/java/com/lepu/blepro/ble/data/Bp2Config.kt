@@ -18,6 +18,7 @@ class Bp2Config() {
     var beepSwitch: Boolean = false     // 心电音开关
     var avgMeasureMode: Int = 0         // 0：x3模式关闭 1：x3模式开启（时间间隔30s） 2：时间间隔60s 3：时间间隔90s 4：时间间隔120s
     var volume: Int = 0                 // 音量大小（0关，1，2，3）
+    var wifi4gSwitch: Boolean = false   // bp3 4G/WIFI开关 0：关；1：开
 
     constructor(bytes: ByteArray) : this() {
         this.bytes = bytes
@@ -41,20 +42,28 @@ class Bp2Config() {
         avgMeasureMode = byte2UInt(bytes[index])
         index++
         volume = byte2UInt(bytes[index])
+        index++
+        wifi4gSwitch = byte2UInt(bytes[index]) == 1
     }
 
     fun getDataBytes(): ByteArray {
-        val on = if (beepSwitch) {
+        val beepOn = if (beepSwitch) {
+            1
+        } else {
+            0
+        }
+        val wifi4gOn = if (wifi4gSwitch) {
             1
         } else {
             0
         }
         val data = ByteArray(22)
         return data.plus(int2ByteArray(bpTestTargetPressure))
-            .plus(on.toByte())
+            .plus(beepOn.toByte())
             .plus(avgMeasureMode.toByte())
             .plus(volume.toByte())
-            .plus(ByteArray(13))
+            .plus(wifi4gOn.toByte())
+            .plus(ByteArray(12))
     }
 
     override fun toString(): String {
@@ -72,6 +81,7 @@ class Bp2Config() {
             beepSwitch : $beepSwitch
             avgMeasureMode : $avgMeasureMode
             volume : $volume
+            wifi4gSwitch : $wifi4gSwitch
         """.trimIndent()
     }
 }

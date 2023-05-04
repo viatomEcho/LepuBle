@@ -4,11 +4,9 @@ import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Shader
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.blankj.utilcode.util.LogUtils
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
@@ -19,9 +17,14 @@ import com.github.mikephil.charting.formatter.YAxisValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.utils.ViewPortHandler
+import com.lepu.blepro.BleServiceHelper
+import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.DateUtil.stringFromDate
-import com.lepu.demo.cofig.Constant.BluetoothConfig.Companion.oxyData
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.oxyData
+import com.lepu.demo.util.DataConvert
+import com.lepu.demo.util.FileUtil
 import com.lepu.demo.views.*
+import java.io.File
 import java.util.*
 
 class OxyDataActivity : AppCompatActivity() {
@@ -29,6 +32,7 @@ class OxyDataActivity : AppCompatActivity() {
     private lateinit var mSpO2Chart: SpO2Chart
     private lateinit var mHrChart: HrChart
     private lateinit var mMovementChart: MovementChart
+    private lateinit var sleepText: TextView
     private var minHr = 35
     private var height = 0
     private var bound = 0f
@@ -42,9 +46,11 @@ class OxyDataActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_oxy_data)
         initView()
+        sleepAlg()
     }
 
     private fun initView() {
+        sleepText = findViewById(R.id.sleep_text)
         findViewById<TextView>(R.id.avg_spo2_val).text = "${oxyData.oxyBleFile.avgSpo2}"
         findViewById<TextView>(R.id.min_spo2_val).text = "${oxyData.oxyBleFile.minSpo2}"
         findViewById<TextView>(R.id.drops_3_val).text = "${oxyData.oxyBleFile.dropsTimes3Percent}"
@@ -178,7 +184,7 @@ class OxyDataActivity : AppCompatActivity() {
                 vibrate.add(Entry(70f, i, PhoneGlobal.MARK_VIBRATE))
             }
         }
-        val lineDataSet1 = LineDataSet(yVals, "氧含量（%）")
+        val lineDataSet1 = LineDataSet(yVals, getString(R.string.spo2))
         lineDataSet1.axisDependency = YAxis.AxisDependency.LEFT
         lineDataSet1.color = resources.getColor(R.color.color_ecg_bkg)
         lineDataSet1.setCircleColor(resources.getColor(R.color.color_ecg_bkg))
@@ -333,7 +339,7 @@ class OxyDataActivity : AppCompatActivity() {
             }
         }
 
-        val lineDataSet1 = LineDataSet(yVals1, "脉率")
+        val lineDataSet1 = LineDataSet(yVals1, getString(R.string.pr))
         lineDataSet1.axisDependency = YAxis.AxisDependency.RIGHT
         lineDataSet1.color = resources.getColor(R.color.teal_200)
         lineDataSet1.setCircleColor(resources.getColor(R.color.teal_200))
@@ -456,7 +462,7 @@ class OxyDataActivity : AppCompatActivity() {
         for (i in o2List.indices) {
             yVals.add(BarEntry((if (o2List[i] < 0) 0 else o2List[i]).toFloat(), i))
         }
-        val barDataSet = BarDataSet(yVals, "体动")
+        val barDataSet = BarDataSet(yVals, getString(R.string.motion))
         barDataSet.color = resources.getColor(R.color.colorOrange)
         barDataSet.barSpacePercent = 5f
         barDataSet.setDrawValues(false)
@@ -501,6 +507,48 @@ class OxyDataActivity : AppCompatActivity() {
             xVals.add(stringFromDate(Date(startTime), "HH:mm"))
             //血氧、心率时分秒
             timeList.add(stringFromDate(Date(startTime), "dd日 HH:mm:ss"))
+        }
+    }
+
+    // 睡眠算法
+    private fun sleepAlg() {
+        DataConvert.sleep_alg_init_0_25Hz()
+        val statuses = mutableListOf<Int>()
+        val filePath = "${BleServiceHelper.BleServiceHelper.rawFolder?.get(Bluetooth.MODEL_O2RING)}/sleep_result_${oxyData.fileName}.txt"
+        val isSave = File(filePath).exists()
+        for (data in oxyData.oxyBleFile.data) {
+            val status = DataConvert.sleep_alg_main_pro_0_25Hz(data.pr.toShort(), data.vector)
+            statuses.add(status)
+            if (!isSave) {
+                FileUtil.saveTextFile(
+                    filePath,
+                    "脉率: ${data.pr}，三轴值: ${data.vector}，睡眠状态: ${when (status) {
+                        0 -> "深睡眠"
+                        1 -> "浅睡眠"
+                        2 -> "快速眼动"
+                        3 -> "清醒"
+                        else -> "未得出结果"
+                    }}\n",
+                    true)
+            }
+        }
+        val result = DataConvert.sleep_alg_get_res_0_25Hz()
+        sleepText.text = "${getString(R.string.sleep_status_tips)}" +
+                "${statuses.toIntArray().joinToString(",")}\n" +
+                "${getString(R.string.sleep_time_total)}${DataConvert.getEcgTimeStr(result[0]*4)}\n" +
+                "${getString(R.string.deep_sleep_time)}${DataConvert.getEcgTimeStr(result[1]*4)}\n" +
+                "${getString(R.string.light_sleep_time)}${DataConvert.getEcgTimeStr(result[2]*4)}\n" +
+                "${getString(R.string.rapid_eye_time)}${DataConvert.getEcgTimeStr(result[3]*4)}\n" +
+                "${getString(R.string.awake_time)}${result[4]}"
+        if (!isSave) {
+            FileUtil.saveTextFile(
+                filePath,
+                "总睡眠时间: ${DataConvert.getEcgTimeStr(result[0]*4)}\n" +
+                        "深睡时间: ${DataConvert.getEcgTimeStr(result[1]*4)}\n" +
+                        "浅睡时间: ${DataConvert.getEcgTimeStr(result[2]*4)}\n" +
+                        "快速眼动时间: ${DataConvert.getEcgTimeStr(result[3]*4)}\n" +
+                        "清醒次数: ${result[4]}",
+                true)
         }
     }
 

@@ -78,13 +78,25 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             .enqueue()
     }
 
-    private fun sendOxyCmd(cmd: Int, bs: ByteArray){
+    private fun sendOxyCmd(cmd: Int){
         LepuBleLog.d(tag, "sendOxyCmd $cmd")
 
         if (curCmd != -1) {
             // busy
             LepuBleLog.d(tag, "busy: " + cmd.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
             return
+        }
+        val bs: ByteArray = when (cmd) {
+            OxyBleCmd.OXY_CMD_READ_CONTENT -> OxyBleCmd.readFileContent()
+            OxyBleCmd.OXY_CMD_READ_END -> OxyBleCmd.readFileEnd()
+            OxyBleCmd.OXY_CMD_RT_PARAM -> OxyBleCmd.getRtParam()
+            OxyBleCmd.OXY_CMD_RT_WAVE -> OxyBleCmd.getRtWave()
+            OxyBleCmd.OXY_CMD_PPG_RT_DATA -> OxyBleCmd.getPpgRt()
+            OxyBleCmd.OXY_CMD_BOX_INFO -> OxyBleCmd.getBoxInfo()
+            OxyBleCmd.OXY_CMD_PARA_SYNC -> OxyBleCmd.syncTime()
+            OxyBleCmd.OXY_CMD_INFO -> OxyBleCmd.getInfo()
+            OxyBleCmd.OXY_CMD_FACTORY_RESET -> OxyBleCmd.factoryReset()
+            else -> return
         }
         sendCmd(bs)
         curCmd = cmd
@@ -287,13 +299,13 @@ class OxyBleInterface(model: Int): BleInterface(model) {
 
                     LepuBleLog.d(tag, "model:$model, 文件大小：${fileSize}  文件名：$curFileName")
                     if (fileSize <= 0) {
-                        sendOxyCmd(OxyBleCmd.OXY_CMD_READ_END, OxyBleCmd.readFileEnd())
+                        sendOxyCmd(OxyBleCmd.OXY_CMD_READ_END)
                         return
                     }
                     curFileName?.let {
 
                         curFile = userId?.let { it1 -> OxyBleResponse.OxyFile(model, it, fileSize, it1) }
-                        sendOxyCmd(OxyBleCmd.OXY_CMD_READ_CONTENT, OxyBleCmd.readFileContent())
+                        sendOxyCmd(OxyBleCmd.OXY_CMD_READ_CONTENT)
                     }
 
                 } else {
@@ -324,9 +336,9 @@ class OxyBleInterface(model: Int): BleInterface(model) {
                         LepuBleLog.d(tag, "model:$model, 读文件中：${this.fileName}   => ${this.index} / ${this.fileSize}")
 
                         if (this.index < this.fileSize) {
-                            sendOxyCmd(OxyBleCmd.OXY_CMD_READ_CONTENT, OxyBleCmd.readFileContent())
+                            sendOxyCmd(OxyBleCmd.OXY_CMD_READ_CONTENT)
                         } else {
-                            sendOxyCmd(OxyBleCmd.OXY_CMD_READ_END, OxyBleCmd.readFileEnd())
+                            sendOxyCmd(OxyBleCmd.OXY_CMD_READ_END)
                         }
                     } ?: kotlin.run {
                         LepuBleLog.d(tag, "model:$model,  curFile error!!")
@@ -426,77 +438,101 @@ class OxyBleInterface(model: Int): BleInterface(model) {
             return
         }
         if (isPiRt){
-            sendOxyCmd(OxyBleCmd.OXY_CMD_RT_PARAM, OxyBleCmd.getRtParam())
+            sendOxyCmd(OxyBleCmd.OXY_CMD_RT_PARAM)
             return
         }
 
-        sendOxyCmd(OxyBleCmd.OXY_CMD_RT_WAVE, OxyBleCmd.getRtWave())// 无法支持1.4.1之前获取pi
+        sendOxyCmd(OxyBleCmd.OXY_CMD_RT_WAVE)// 无法支持1.4.1之前获取pi
     }
 
     fun getRtParam() {
-        sendOxyCmd(OxyBleCmd.OXY_CMD_RT_PARAM, OxyBleCmd.getRtParam())
+        sendOxyCmd(OxyBleCmd.OXY_CMD_RT_PARAM)
         LepuBleLog.e(tag, "getRtParam")
     }
 
     fun getRtWave() {
-        sendOxyCmd(OxyBleCmd.OXY_CMD_RT_WAVE, OxyBleCmd.getRtWave())
+        sendOxyCmd(OxyBleCmd.OXY_CMD_RT_WAVE)
         LepuBleLog.e(tag, "getRtWave")
     }
 
     fun getPpgRT(){
-        sendOxyCmd(OxyBleCmd.OXY_CMD_PPG_RT_DATA, OxyBleCmd.getPpgRt())
+        sendOxyCmd(OxyBleCmd.OXY_CMD_PPG_RT_DATA)
         LepuBleLog.e(tag, "getPpgRT")
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
+        if (curCmd != -1) {
+            // busy
+            LepuBleLog.d(tag, "busy: " + OxyBleCmd.OXY_CMD_READ_START.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
+            return
+        }
         this.curFileName = fileName
         this.userId = userId
 //        20201210095928
 //        AA03FC00000F003230323031323130303935393238004C
-        sendOxyCmd(OxyBleCmd.OXY_CMD_READ_START, OxyBleCmd.readFileStart(fileName))
+        sendCmd(OxyBleCmd.readFileStart(fileName))
+        curCmd = OxyBleCmd.OXY_CMD_READ_START
         LepuBleLog.d(tag, "userId:$userId 将要读取文件fileName: $curFileName")
     }
 
     fun getBoxInfo() {
-        sendOxyCmd(OxyBleCmd.OXY_CMD_BOX_INFO, OxyBleCmd.getBoxInfo())
+        sendOxyCmd(OxyBleCmd.OXY_CMD_BOX_INFO)
         LepuBleLog.e(tag, "getBoxInfo")
     }
 
     override fun syncTime() {
         settingType = arrayOf(OxyBleCmd.SYNC_TYPE_TIME)
-        sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.syncTime())
+        sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC)
         LepuBleLog.e(tag, "syncTime")
     }
 
     fun updateSetting(type: String, value: Any) {
+        if (curCmd != -1) {
+            // busy
+            LepuBleLog.d(tag, "busy: " + OxyBleCmd.OXY_CMD_READ_START.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
+            return
+        }
         settingType = arrayOf(type)
         val data = value as Int
         if (settingType[0] == OxyBleCmd.SYNC_TYPE_ALL_SW) {
             updateSetting(arrayOf(OxyBleCmd.SYNC_TYPE_OXI_SWITCH, OxyBleCmd.SYNC_TYPE_HR_SWITCH, OxyBleCmd.SYNC_TYPE_MT_SW, OxyBleCmd.SYNC_TYPE_IV_SW),
                 intArrayOf(data, data, data, data))
         } else {
-            sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.updateSetting(type, data))
+            sendCmd(OxyBleCmd.updateSetting(type, data))
+            curCmd = OxyBleCmd.OXY_CMD_PARA_SYNC
         }
-        LepuBleLog.e(tag, "updateSetting type:$type")
+        LepuBleLog.e(tag, "updateSetting type:$type, data:$data")
     }
     fun updateSetting(type: Array<String>, value: IntArray) {
+        if (curCmd != -1) {
+            // busy
+            LepuBleLog.d(tag, "busy: " + OxyBleCmd.OXY_CMD_READ_START.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
+            return
+        }
         settingType = type
-        sendOxyCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.updateSetting(type, value))
+        sendCmd(OxyBleCmd.updateSetting(type, value))
+        curCmd = OxyBleCmd.OXY_CMD_PARA_SYNC
         LepuBleLog.e(tag, "updateSetting type:${Arrays.toString(type)}, value:${Arrays.toString(value)}")
     }
 
     override fun getInfo() {
-        sendOxyCmd(OxyBleCmd.OXY_CMD_INFO, OxyBleCmd.getInfo())
+        sendOxyCmd(OxyBleCmd.OXY_CMD_INFO)
         LepuBleLog.e(tag, "getInfo")
     }
 
     override fun factoryReset() {
-        sendOxyCmd(OxyBleCmd.OXY_CMD_FACTORY_RESET, OxyBleCmd.factoryReset())
+        sendOxyCmd(OxyBleCmd.OXY_CMD_FACTORY_RESET)
         LepuBleLog.e(tag, "factoryReset")
     }
 
     fun burnFactoryInfo(config: FactoryConfig) {
-        sendOxyCmd(OxyBleCmd.OXY_CMD_BURN_FACTORY_INFO, OxyBleCmd.burnFactoryInfo(config.convert2DataO2()))
+        if (curCmd != -1) {
+            // busy
+            LepuBleLog.d(tag, "busy: " + OxyBleCmd.OXY_CMD_READ_START.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
+            return
+        }
+        sendCmd(OxyBleCmd.burnFactoryInfo(config.convert2DataO2()))
+        curCmd = OxyBleCmd.OXY_CMD_BURN_FACTORY_INFO
     }
 
     override fun factoryResetAll() {

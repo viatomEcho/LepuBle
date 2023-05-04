@@ -10,15 +10,15 @@ object BtpBleResponse {
     @ExperimentalUnsignedTypes
     class BleResponse (val bytes: ByteArray) {
         var cmd: Int
-        var pkgType: Byte
+        var pkgType: Int
         var pkgNo: Int
         var len: Int
         var content: ByteArray
 
         init {
-            cmd = (bytes[1].toUInt() and 0xFFu).toInt()
-            pkgType = bytes[3]
-            pkgNo = (bytes[4].toUInt() and 0xFFu).toInt()
+            cmd = byte2UInt(bytes[1])
+            pkgType = byte2UInt(bytes[3])
+            pkgNo = byte2UInt(bytes[4])
             len = toUInt(bytes.copyOfRange(5, 7))
             content = bytes.copyOfRange(7, 7+len)
         }
@@ -143,7 +143,7 @@ object BtpBleResponse {
         var fileType: Int     // 文件类型
         // reserved 8
         var magic: Int        // 幻数
-        var timestamp: Int    // 测量时间戳
+        var timestamp: Long   // 测量时间戳s
         var duration: Int     // 测量时长，单位：分钟
         // reserved 4
         var pointDatas = mutableListOf<PointData>()
@@ -156,7 +156,7 @@ object BtpBleResponse {
             index += 8
             magic = toUInt(bytes.copyOfRange(index, index+4))
             index += 4
-            timestamp = toUInt(bytes.copyOfRange(index, index+4)) - TimeZone.getDefault().getOffset(System.currentTimeMillis()).div(1000)
+            timestamp = toLong(bytes.copyOfRange(index, index+4)) - DateUtil.getTimeZoneOffset().div(1000)
             index += 4
             duration = toUInt(bytes.copyOfRange(index, index+4))
             index += 4
@@ -183,15 +183,15 @@ object BtpBleResponse {
 
     @ExperimentalUnsignedTypes
     class PointData(val bytes: ByteArray) {
-        var timestamp: Int  // 每一分钟的时间点（可获取指定时间段，预留）
-        var hrEvent: Int    // 心率事件
-        var hr: Int         // 心率
-        var tempEvent: Int  // 温度事件
-        var temp: Float     // 温度，单位：摄氏度
+        var timestamp: Long  // 每一分钟的时间点（可获取指定时间段，预留）s
+        var hrEvent: Int     // 心率事件
+        var hr: Int          // 心率
+        var tempEvent: Int   // 温度事件
+        var temp: Float      // 温度，单位：摄氏度
         // reserved 3
         init {
             var index = 0
-            timestamp = toUInt(bytes.copyOfRange(index, index+4)) - TimeZone.getDefault().getOffset(System.currentTimeMillis()).div(1000)
+            timestamp = toLong(bytes.copyOfRange(index, index+4)) - DateUtil.getTimeZoneOffset().div(1000)
             index += 4
             hrEvent = byte2UInt(bytes[index])
             index++

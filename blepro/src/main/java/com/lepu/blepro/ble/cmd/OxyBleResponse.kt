@@ -313,13 +313,13 @@ class OxyBleResponse{
         var rawDataBytes: ByteArray
 
         var rawDataArray = mutableListOf<PpgRawData>()
-        var irRedArray: IntArray
-        var irRedByteArray = ByteArray(0)
-        var irArray : IntArray
-        var irByteArray = ByteArray(0)
-        var redArray : IntArray
-        var redByteArray = ByteArray(0)
-        var motionArray : IntArray
+        var irRedArray: IntArray                // 红外+红光
+        var irRedByteArray = ByteArray(0)   // 红外+红光
+        var irArray : IntArray                  // 红外
+        var irByteArray = ByteArray(0)      // 红外
+        var redArray : IntArray                 // 红光
+        var redByteArray = ByteArray(0)     // 红光
+        var motionArray : IntArray              // 体动
 
         init {
             len = toUInt(bytes.copyOfRange(0, 2))
@@ -351,11 +351,11 @@ class OxyBleResponse{
     @ExperimentalUnsignedTypes
     @Parcelize
     class PpgRawData(var bytes: ByteArray): Parcelable {
-        var ir : Int
-        var irBytes: ByteArray
-        var red : Int
-        var redBytes : ByteArray
-        var motion : Int
+        var ir : Int              // 红外
+        var irBytes: ByteArray    // 红外
+        var red : Int             // 红光
+        var redBytes : ByteArray  // 红光
+        var motion : Int          // 体动
         init {
             ir = toUInt(bytes.copyOfRange(0, 4))
             irBytes = bytes.copyOfRange(0, 4)

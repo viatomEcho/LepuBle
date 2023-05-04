@@ -383,39 +383,4 @@ public class FileUtil {
             return 0;
         }
     }
-
-    // 生成bmp
-    public static void getBmp(Context context){
-        Bitmap inputBitmap = generateBitmap(context, "魑魅魍魉123");
-        //旋转图片 动作
-        Matrix matrix = new Matrix();
-        //旋转角度
-        matrix.postScale(1f, -1f); // 垂直镜像翻转
-//        matrix.setRotate(180,0, inputBitmap.getHeight() / 2);
-        int width = inputBitmap.getWidth();
-        // 创建新的图片
-        int height = inputBitmap.getHeight();
-        Bitmap resizedBitmap = Bitmap.createBitmap(inputBitmap, 0, 0, width, height, matrix, true);
-
-        System.out.println(resizedBitmap.getHeight() + " " +resizedBitmap.getWidth());
-        BitmapConvertor convertor = new BitmapConvertor(context);
-        convertor.convertBitmap(resizedBitmap, "my_name_image1");
-    }
-
-    public static Bitmap generateBitmap(Context context, String text){
-        Typeface typeface = Typeface.createFromAsset(context.getAssets(),"msyh.ttf");
-        TextPaint textPaint = new TextPaint();
-        textPaint.setTextSize(16);
-        textPaint.setTypeface(typeface);
-        textPaint.setColor(Color.WHITE);
-        int width = (int) Math.ceil(textPaint.measureText(text));
-        Paint.FontMetrics fontMetrics = textPaint.getFontMetrics();
-        int height = (int) Math.ceil(Math.abs(fontMetrics.bottom) + Math.abs(fontMetrics.top));
-
-        Bitmap bitmap = Bitmap.createBitmap(width,height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        canvas.drawText(text,0,Math.abs(fontMetrics.ascent),textPaint);
-        return bitmap;
-    }
-
 }

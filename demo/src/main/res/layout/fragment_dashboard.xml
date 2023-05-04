@@ -57,7 +57,7 @@
                                     android:id="@+id/ble_battery"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="电量：%"
+                                    android:text="@string/battery"
                                     android:textColor="@color/Black"
                                     android:layout_marginEnd="@dimen/dp_10"
                                     app:layout_constraintEnd_toEndOf="parent"
@@ -206,7 +206,7 @@
                                     android:id="@+id/bp_ble_battery"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="电量：%"
+                                    android:text="@string/battery"
                                     android:textColor="@color/Black"
                                     android:layout_marginEnd="@dimen/dp_10"
                                     app:layout_constraintEnd_toEndOf="parent"
@@ -417,7 +417,7 @@
                                         android:id="@+id/oxy_ble_battery"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="电量：%"
+                                        android:text="@string/battery"
                                         android:textColor="@color/Black"
                                         android:layout_marginEnd="@dimen/dp_10"
                                         app:layout_constraintEnd_toEndOf="parent"
@@ -649,6 +649,13 @@
                                 android:layout_height="wrap_content"
                                 android:textSize="16sp"
                                 android:text="红光"/>
+                            <TextView
+                                android:id="@+id/ppg_tips"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/dp_10"
+                                android:textColor="@color/colorRed"
+                                android:textSize="16sp"/>
                         </LinearLayout>
                         <CheckBox
                             android:visibility="gone"
@@ -659,6 +666,17 @@
                             app:layout_constraintStart_toStartOf="parent"
                             android:textSize="16sp"
                             android:text="开始采集"/>
+                        <Chronometer
+                            android:visibility="gone"
+                            android:id="@+id/collect_data_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/dp_10"
+                            android:layout_marginTop="13dp"
+                            android:format="00:00:00"
+                            app:layout_constraintTop_toBottomOf="@id/ppg_type_layout"
+                            app:layout_constraintStart_toEndOf="@id/collect_data"
+                            android:textSize="16sp"/>
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <!-- ER3产品实时布局 -->
@@ -718,7 +736,7 @@
                                     android:id="@+id/er3_ble_battery"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="电量：%"
+                                    android:text="@string/battery"
                                     android:textColor="@color/Black"
                                     android:layout_marginEnd="@dimen/dp_10"
                                     app:layout_constraintEnd_toEndOf="parent"
@@ -984,12 +1002,62 @@
                         </androidx.constraintlayout.widget.ConstraintLayout>
                     </androidx.cardview.widget.CardView>
 
+                    <!-- ECN心电图机 -->
+                    <LinearLayout
+                        android:visibility="gone"
+                        android:id="@+id/ecn_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/dp_10"
+                        android:orientation="vertical">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <Button
+                                android:id="@+id/ecn_rt_state"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="获取实时状态"/>
+                            <Button
+                                android:id="@+id/ecn_result"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/dp_10"
+                                android:text="获取诊断结论"/>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <CheckBox
+                                android:id="@+id/ecn_rt_data"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:textColor="@color/black"
+                                android:text="开始实时"/>
+                            <CheckBox
+                                android:id="@+id/ecn_collect"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/dp_10"
+                                android:textSize="16sp"
+                                android:textColor="@color/black"
+                                android:text="开始采集"/>
+                        </LinearLayout>
+                        <TextView
+                            android:id="@+id/ecn_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/dp_10"
+                            android:textSize="16sp"
+                            android:textColor="@color/black"/>
+                    </LinearLayout>
+
                     <!-- 无线共存测试 -->
                     <include
                         android:visibility="gone"
                         android:id="@+id/wireless_data_layout"
                         layout="@layout/wireless_data_dashboard"/>
-
                 </LinearLayout>
             </RelativeLayout>
             <CheckBox
@@ -1000,9 +1068,51 @@
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:text="开始录制"/>
-
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/r20_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <CheckBox
+                    android:id="@+id/r20_ventilation_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:text="通气"/>
+                <CheckBox
+                    android:id="@+id/r20_mask_test"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dp_10"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:text="面罩佩戴测试"/>
+            </LinearLayout>
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/r20_state"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
             <TextView
                 android:id="@+id/device_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+            <TextView
+                android:id="@+id/r20_event"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp_10"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+            <TextView
+                android:id="@+id/r20_mask_test_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp_10"
