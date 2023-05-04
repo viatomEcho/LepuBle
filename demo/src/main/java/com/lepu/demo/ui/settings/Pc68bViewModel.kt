@@ -43,7 +43,7 @@ class Pc68bViewModel : SettingViewModel() {
         }
     }
     fun initEvent(owner: LifecycleOwner) {
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bStatusInfo)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bStatusInfo)
             .observe(owner) {
                 val data = it.data as Pc68bBleResponse.StatusInfo
                 binding.content.text = "$data"
@@ -58,7 +58,7 @@ class Pc68bViewModel : SettingViewModel() {
                 val config = it.data as Pc68bConfig
                 this.config = config
                 binding.content.text = "$config"
-            }
+            }*/
     }
 
 }

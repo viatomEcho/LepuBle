@@ -9,7 +9,7 @@ import com.lepu.blepro.event.InterfaceEvent
 class LepodViewModel : InfoViewModel() {
 
     fun initEvent(owner: LifecycleOwner) {
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodFileList)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodFileList)
             .observe(owner) { event ->
                 (event.data as LepodBleResponse.FileList).let {
                     val names = arrayListOf<String>()
@@ -39,7 +39,7 @@ class LepodViewModel : InfoViewModel() {
                     }
                     _readNextFile.value = true
                 }
-            }
+            }*/
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodReset)
             .observe(owner) {
                 _reset.value = true

@@ -17,7 +17,7 @@ import com.github.mikephil.charting.formatter.YAxisValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.utils.ViewPortHandler
-import com.lepu.blepro.BleServiceHelper
+import com.lepu.blepro.ext.BleServiceHelper
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.demo.config.Constant.BluetoothConfig.Companion.oxyData

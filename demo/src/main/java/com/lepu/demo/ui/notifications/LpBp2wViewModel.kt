@@ -12,23 +12,23 @@ import com.lepu.demo.util.DataConvert
 class LpBp2wViewModel : InfoViewModel() {
 
     fun initEvent(owner: LifecycleOwner) {
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileError)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wReadFileError)
             .observe(owner) {
                 _readFileError.value = true
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReset)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wReset)
             .observe(owner) {
                 _reset.value = true
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFactoryReset)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wFactoryReset)
             .observe(owner) {
                 _factoryReset.value = true
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFactoryResetAll)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wFactoryResetAll)
             .observe(owner) {
                 _factoryResetAll.value = true
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFileList)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wFileList)
             .observe(owner) { event ->
                 (event.data as Bp2BleFile).let {
                     when (it.type) {
@@ -61,14 +61,14 @@ class LpBp2wViewModel : InfoViewModel() {
                         }
                     }
                 }
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadingFileProgress)
+            }*/
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wReadingFileProgress)
             .observe(owner) { event ->
                 (event.data as Bp2FilePart).let {
                     _process.value = (it.percent.times(100)).toInt()
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileComplete)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wReadFileComplete)
             .observe(owner) { event ->
                 (event.data as LeBp2wEcgFile).let {
                     val temp = getEcgData(it.timestamp, it.fileName, it.waveData, DataConvert.getBp2ShortArray(it.waveData), it.duration)
@@ -76,18 +76,18 @@ class LpBp2wViewModel : InfoViewModel() {
                     _readNextFile.value = true
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2WifiScanning)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2WifiScanning)
             .observe(owner) {
                 handler.postDelayed({
                     LpBleUtil.bp2GetWifiDevice(it.model)
                 }, 1000)
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2WifiDevice)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2WifiList)
             .observe(owner) {
                 val data = it.data as Bp2WifiDevice
                 _wifiDevice.value = data
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSetWifiConfig)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wSetWifiConfig)
             .observe(owner) {
                 val data = it.data as Boolean
                 if (data) {
@@ -96,7 +96,7 @@ class LpBp2wViewModel : InfoViewModel() {
                     }, 1000)
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetWifiConfig)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wGetWifiConfig)
             .observe(owner) {
                 val data = it.data as Bp2WifiConfig
                 _wifiConfig.value = data

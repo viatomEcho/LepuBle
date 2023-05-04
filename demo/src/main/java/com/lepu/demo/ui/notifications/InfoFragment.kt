@@ -13,7 +13,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hi.dhl.jdatabinding.binding
 import androidx.lifecycle.ViewModelProvider
-import com.lepu.blepro.BleServiceHelper
+import com.lepu.blepro.ext.BleServiceHelper
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.download.DownloadHelper
@@ -344,7 +344,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W) {
                                 server.addr = "34.209.148.123"
                                 server.port = 7100
-                            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W) {
+                            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP2W) {
                                 server.addr = "212.129.241.54"
                                 server.port = 7200
                             }
@@ -497,7 +497,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     // 源动健康测试服
                     server.addr = "34.209.148.123"
                     server.port = 7100
-                } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W) {
+                } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP2W) {
                     // 乐普健康测试服
                     server.addr = "212.129.241.54"
                     server.port = 7200
@@ -629,7 +629,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 binding.wifiConfig.visibility = View.VISIBLE
                 LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
             }
-            Bluetooth.MODEL_LE_BP2W -> {
+            Bluetooth.MODEL_LP_BP2W -> {
                 infoViewModel = ViewModelProvider(this).get(LpBp2wViewModel::class.java)
                 (infoViewModel as LpBp2wViewModel).initEvent(this)
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {

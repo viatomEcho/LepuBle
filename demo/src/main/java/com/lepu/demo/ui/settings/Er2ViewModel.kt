@@ -73,11 +73,11 @@ class Er2ViewModel : SettingViewModel() {
         }
     }
     fun initEvent(owner: LifecycleOwner) {
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2BurnFactoryInfo)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2BurnFactoryInfo)
             .observe(owner) {
                 _toast.value = context.getString(R.string.burn_info_success)
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetSwitcherState)
+            }*/
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SetConfig)
             .observe(owner) {
                 LpBleUtil.getEr2SwitcherState(it.model)
                 when (it.model) {
@@ -90,7 +90,7 @@ class Er2ViewModel : SettingViewModel() {
                     else -> _toast.value = "ER2 设置参数成功"
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2SwitcherState)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2GetConfig)
             .observe(owner) {
                 val data = it.data as ByteArray
                 val config = SwitcherConfig.parse(data)

@@ -1079,7 +1079,7 @@ class LpBleUtil {
             BleServiceHelper.r20GetBattery(model)
         }
         fun r20GetFileList(model: Int, fileType: Int, timestamp: Long) {
-            BleServiceHelper.getFileList(model, fileType, timestamp)
+//            BleServiceHelper.getFileList(model, fileType, timestamp)
         }
         fun r20Encrypt(model: Int, id: String) {
             BleServiceHelper.r20Encrypt(model, id)

@@ -9,7 +9,7 @@ import com.lepu.blepro.event.InterfaceEvent
 class Er3ViewModel : InfoViewModel() {
 
     fun initEvent(owner: LifecycleOwner) {
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FileList)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3FileList)
             .observe(owner) { event ->
                 (event.data as Er3BleResponse.FileList).let {
                     val names = arrayListOf<String>()
@@ -39,7 +39,7 @@ class Er3ViewModel : InfoViewModel() {
                     }
                     _readNextFile.value = true
                 }
-            }
+            }*/
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3Reset)
             .observe(owner) {
                 _reset.value = true

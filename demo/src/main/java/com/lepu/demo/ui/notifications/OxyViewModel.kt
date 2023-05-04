@@ -2,7 +2,7 @@ package com.lepu.demo.ui.notifications
 
 import androidx.lifecycle.LifecycleOwner
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.BleServiceHelper
+import com.lepu.blepro.ext.BleServiceHelper
 import com.lepu.blepro.ble.cmd.OxyBleResponse
 import com.lepu.blepro.ble.data.OxyBleFile
 import com.lepu.blepro.download.DownloadHelper

@@ -26,6 +26,7 @@ import com.lepu.blepro.ext.pc60fw.*
 import com.lepu.blepro.ext.pc80b.*
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.ByteUtils
+import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.getTimeString
 import com.lepu.demo.DemoWidgetProvider
@@ -40,8 +41,6 @@ import com.lepu.demo.data.WirelessData
 import com.lepu.demo.data.entity.DeviceEntity
 import com.lepu.demo.databinding.FragmentDashboardBinding
 import com.lepu.demo.util.DataConvert
-import com.lepu.demo.util.DateUtil
-import com.lepu.demo.util.DateUtil.stringFromDate
 import com.lepu.demo.util.FileUtil
 import com.lepu.demo.views.EcgBkg
 import com.lepu.demo.views.EcgView
@@ -1225,7 +1224,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     DataController.receive(data)
                     binding.dataStr.text = data.toString()
                     binding.deviceInfo.text = "${context?.getString(R.string.lead_state)}${
-                        if (rtData.isLeadOff == 1) context?.getString(R.string.lead_off) 
+                        if (rtData.isLeadOff) context?.getString(R.string.lead_off) 
                         else context?.getString(R.string.normal)}\n" +
                             "${context?.getString(R.string.measure_state)}${rtData.measureStage}：${
                                 when (rtData.measureStage) {
@@ -1668,7 +1667,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.spo2.value = rtData.spo2
                 viewModel.pi.value = rtData.pi
                 binding.dataStr.text = rtData.toString()
-                mainViewModel._battery.value = "${rtData.battery.times(25)} - ${(rtData.battery+1).times(25)} %"
                 binding.deviceInfo.text = "${context?.getString(R.string.no_probe_finger)}${rtData.isProbeOff}\n" +
                         "${context?.getString(R.string.pulse_search)}${rtData.isPulseSearching}"
             }

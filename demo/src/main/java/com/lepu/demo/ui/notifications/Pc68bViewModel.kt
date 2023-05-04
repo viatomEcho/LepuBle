@@ -8,7 +8,7 @@ import com.lepu.blepro.event.InterfaceEvent
 class Pc68bViewModel : InfoViewModel() {
 
     fun initEvent(owner: LifecycleOwner) {
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bFileList)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bFileList)
             .observe(owner) {
                 val data = it.data as MutableList<String>
                 val names = arrayListOf<String>()
@@ -23,7 +23,7 @@ class Pc68bViewModel : InfoViewModel() {
                 val data = it.data as Pc68bBleResponse.Record
                 _info.value = "$data"
                 _readNextFile.value = true
-            }
+            }*/
     }
 
 }

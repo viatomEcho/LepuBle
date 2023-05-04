@@ -196,10 +196,10 @@ class OxyViewModel : SettingViewModel() {
     }
 
     fun initEvent(owner: LifecycleOwner) {
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBurnFactoryInfo)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBurnFactoryInfo)
             .observe(owner) {
                 _toast.value = context.getString(R.string.burn_info_success)
-            }
+            }*/
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyInfo)
             .observe(owner) {
                 val data = it.data as OxyBleResponse.OxyInfo

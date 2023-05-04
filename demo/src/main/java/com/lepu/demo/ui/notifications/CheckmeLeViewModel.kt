@@ -9,7 +9,7 @@ import com.lepu.blepro.utils.DateUtil
 class CheckmeLeViewModel : InfoViewModel() {
 
     fun initEvent(owner: LifecycleOwner) {
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileList)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileList)
             .observe(owner) {
                 val data = it.data as CheckmeLeBleResponse.ListContent
                 when (data.type) {
@@ -40,7 +40,7 @@ class CheckmeLeViewModel : InfoViewModel() {
                         _info.value = "$list"
                     }
                 }
-            }
+            }*/
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.CheckmeLE.EventCheckmeLeGetFileListError)
             .observe(owner) {
                 _readFileError.value = true

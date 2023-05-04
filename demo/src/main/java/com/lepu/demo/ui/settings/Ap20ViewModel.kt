@@ -81,7 +81,7 @@ class Ap20ViewModel : SettingViewModel() {
     }
 
     fun initEvent(owner: LifecycleOwner) {
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20Battery)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20BatLevel)
             .observe(owner) {
                 val data = it.data as Int
                 binding.content.text = "电量${data}"
@@ -93,7 +93,7 @@ class Ap20ViewModel : SettingViewModel() {
                     else -> "0"
                 }}"
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20SetConfig)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20SetConfigResult)
             .observe(owner) {
                 val data = it.data as Ap20BleResponse.ConfigInfo
                 when (data.type) {
@@ -139,7 +139,7 @@ class Ap20ViewModel : SettingViewModel() {
                     }
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20GetConfig)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20GetConfigResult)
             .observe(owner) {
                 val data = it.data as Ap20BleResponse.ConfigInfo
                 when (data.type) {

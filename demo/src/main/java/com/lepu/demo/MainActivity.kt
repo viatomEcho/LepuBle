@@ -393,12 +393,12 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             (event.data as LepuDevice).let {
                 Toast.makeText(this, "BABYO2N ${getString(R.string.get_box_info)} $it", Toast.LENGTH_SHORT).show()
             }
-        }*/
+        }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyBurnFactoryInfo)
             .observe(this) {
                 Toast.makeText(this, "O2M ${getString(R.string.burn_info_success)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
-            }
+            }*/
         //-------------------------pc100---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC100.EventPc100DeviceInfo)
             .observe(this) { event ->

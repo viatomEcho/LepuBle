@@ -64,7 +64,7 @@ class Bp2wViewModel : InfoViewModel() {
                     _readNextFile.value = true
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiScanning)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2WifiScanning)
             .observe(owner) {
                 handler.postDelayed({
                     LpBleUtil.bp2GetWifiDevice(it.model)
@@ -88,7 +88,7 @@ class Bp2wViewModel : InfoViewModel() {
             .observe(owner) {
                 val data = it.data as Bp2WifiConfig
                 _wifiConfig.value = data
-            }
+            }*/
     }
 
 }

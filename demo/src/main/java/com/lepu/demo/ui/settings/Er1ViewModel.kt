@@ -94,11 +94,11 @@ class Er1ViewModel : SettingViewModel() {
         }
     }
     fun initEvent(owner: LifecycleOwner) {
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnFactoryInfo)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnFactoryInfo)
             .observe(owner) {
                 _toast.value = context.getString(R.string.burn_info_success)
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetSwitcherState)
+            }*/
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetConfig)
             .observe(owner) {
                 LpBleUtil.getEr1VibrateConfig(it.model)
                 when (it.model) {
@@ -123,7 +123,7 @@ class Er1ViewModel : SettingViewModel() {
                     else -> _toast.value = "ER1 设置参数成功"
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1VibrateConfig)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1GetConfig)
             .observe(owner) {
                 val data = it.data as ByteArray
                 if (it.model == Bluetooth.MODEL_DUOEK || it.model == Bluetooth.MODEL_HHM2 || it.model == Bluetooth.MODEL_HHM3) {
