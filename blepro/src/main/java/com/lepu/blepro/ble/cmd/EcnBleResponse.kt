@@ -3,6 +3,7 @@ package com.lepu.blepro.ble.cmd
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.bytesToHex
+import com.lepu.blepro.utils.toLong
 import com.lepu.blepro.utils.toUInt
 import org.json.JSONObject
 
@@ -52,12 +53,12 @@ object EcnBleResponse {
     }
 
     class BleFile(val bytes: ByteArray) {
-        var time: Int
+        var time: Long
         var fileNameSize: Int
         var fileName: String
         init {
             var index = 0
-            time = toUInt(bytes.copyOfRange(index, index+4))
+            time = toLong(bytes.copyOfRange(index, index+4))
             index += 4
             fileNameSize = byte2UInt(bytes[index])
             index++
@@ -96,18 +97,18 @@ object EcnBleResponse {
     }
 
     class RtData(val bytes: ByteArray) {
-        var status: RtState
+        var state: RtState
         var wave: ByteArray
         init {
             var index = 0
-            status = RtState(bytes.copyOfRange(index, index+10))
+            state = RtState(bytes.copyOfRange(index, index+10))
             index += 10
             wave = bytes.copyOfRange(index, bytes.size)
         }
         override fun toString(): String {
             return """
                 RtData : 
-                status : $status
+                state : $state
                 wave : ${bytesToHex(wave)}
             """.trimIndent()
         }

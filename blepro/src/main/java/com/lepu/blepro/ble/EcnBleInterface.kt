@@ -6,6 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.ecn.*
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
@@ -21,6 +22,12 @@ class EcnBleInterface(model: Int): BleInterface(model) {
     private var curSize = 0
     private var fileSize = 0
     private var fileContent = ByteArray(0)
+
+    private val fileList = FileList()
+    private val file = File()
+    private val rtState = RtState()
+    private val rtData = RtData()
+    private val diagnosisResult = arrayListOf<String>()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         if (isManagerInitialized()) {
@@ -59,7 +66,14 @@ class EcnBleInterface(model: Int): BleInterface(model) {
                 }
                 val data = EcnBleResponse.FileList(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_FILE_LIST => success data: $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnGetFileList).post(InterfaceEvent(model, data))
+                fileList.leftSize = data.leftSize
+                for (file in data.list) {
+                    val f = FileList().EachFile()
+                    f.startTime = file.time
+                    f.fileName = file.fileName
+                    fileList.list.add(f)
+                }
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnGetFileList).post(InterfaceEvent(model, fileList))
             }
             EcnBleCmd.READ_FILE_START -> {
                 //检查当前的下载状态
@@ -122,7 +136,9 @@ class EcnBleInterface(model: Int): BleInterface(model) {
                 if (curSize != fileSize) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadFileError).post(InterfaceEvent(model, true))
                 } else {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadFileComplete).post(InterfaceEvent(model, EcnBleResponse.File(fileContent, fileName)))
+                    file.content = fileContent
+                    file.fileName = fileName
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadFileComplete).post(InterfaceEvent(model, file))
                 }
             }
             EcnBleCmd.RT_STATUS -> {
@@ -132,7 +148,9 @@ class EcnBleInterface(model: Int): BleInterface(model) {
                 }
                 val data = EcnBleResponse.RtState(response.content)
                 LepuBleLog.d(tag, "model:$model,RT_STATUS => success data: $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnGetRtState).post(InterfaceEvent(model, data))
+                rtState.state = data.state
+                rtState.duration = data.duration
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnGetRtState).post(InterfaceEvent(model, rtState))
             }
             EcnBleCmd.RT_DATA -> {
                 if (response.len < 10) {
@@ -141,7 +159,12 @@ class EcnBleInterface(model: Int): BleInterface(model) {
                 }
                 val data = EcnBleResponse.RtData(response.content)
                 LepuBleLog.d(tag, "model:$model,RT_DATA => success data: $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnRtData).post(InterfaceEvent(model, data))
+                val rtState = RtState()
+                rtState.state = data.state.state
+                rtState.duration = data.state.duration
+                rtData.state = rtState
+                rtData.wave = data.wave
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnRtData).post(InterfaceEvent(model, rtData))
             }
             EcnBleCmd.START_RT_DATA -> {
                 if (response.pkgType != 0x01.toByte()) {
@@ -182,7 +205,11 @@ class EcnBleInterface(model: Int): BleInterface(model) {
             EcnBleCmd.DIAGNOSIS_RESULT -> {
                 val data = EcnBleResponse.DiagnosisResult(response.content)
                 LepuBleLog.d(tag, "model:$model,DIAGNOSIS_RESULT => success, data: $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnDiagnosisResult).post(InterfaceEvent(model, data))
+                diagnosisResult.clear()
+                for (result in data.result) {
+                    diagnosisResult.add(result)
+                }
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnDiagnosisResult).post(InterfaceEvent(model, diagnosisResult))
             }
         }
     }
@@ -270,6 +297,7 @@ class EcnBleInterface(model: Int): BleInterface(model) {
      * get file list
      */
     override fun getFileList() {
+        fileList.list.clear()
         sendCmd(EcnBleCmd.getFileList())
         LepuBleLog.d(tag, "getFileList...")
     }

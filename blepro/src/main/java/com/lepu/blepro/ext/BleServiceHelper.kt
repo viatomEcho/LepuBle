@@ -4046,6 +4046,24 @@ class BleServiceHelper private constructor() {
         }
     }
     // ECN
+    fun ecnGetFileList(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_ECN -> {
+                getInterface(model)?.getFileList()
+            }
+            else -> LepuBleLog.d(tag, "ecnGetFileList current model $model unsupported!!")
+        }
+    }
+    fun ecnReadFile(model: Int, fileName: String) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_ECN -> {
+                getInterface(model)?.readFile("", fileName)
+            }
+            else -> LepuBleLog.d(tag, "ecnReadFile current model $model unsupported!!")
+        }
+    }
     fun ecnStartCollect(model: Int) {
         if (!checkService()) return
         when (model) {
