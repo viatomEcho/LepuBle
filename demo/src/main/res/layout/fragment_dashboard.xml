@@ -1070,18 +1070,18 @@
                 android:text="开始录制"/>
             <LinearLayout
                 android:visibility="gone"
-                android:id="@+id/r20_switch"
+                android:id="@+id/ventilator_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
                 <CheckBox
-                    android:id="@+id/r20_ventilation_switch"
+                    android:id="@+id/ventilator_ventilation_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     android:text="通气"/>
                 <CheckBox
-                    android:id="@+id/r20_mask_test"
+                    android:id="@+id/ventilator_mask_test"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/dp_10"
@@ -1091,7 +1091,7 @@
             </LinearLayout>
             <TextView
                 android:visibility="gone"
-                android:id="@+id/r20_state"
+                android:id="@+id/ventilator_state"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp_10"
@@ -1105,14 +1105,14 @@
                 android:textColor="@color/black"
                 android:textSize="18sp"/>
             <TextView
-                android:id="@+id/r20_event"
+                android:id="@+id/ventilator_event"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp_10"
                 android:textColor="@color/black"
                 android:textSize="18sp"/>
             <TextView
-                android:id="@+id/r20_mask_test_text"
+                android:id="@+id/ventilator_mask_test_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp_10"

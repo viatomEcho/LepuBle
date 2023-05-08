@@ -5,7 +5,7 @@ import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.HexString.trimStr
 import java.util.*
 
-object R20BleResponse {
+object VentilatorBleResponse {
 
     @ExperimentalUnsignedTypes
     class BleResponse (val bytes: ByteArray) {
@@ -157,7 +157,7 @@ object R20BleResponse {
         var ventilationMode: Int   // 通气模式 0:CPAP  1:APAP  2:S   3:S/T   4:T
         var isVentilated: Boolean  // 是否通气 0:0ff;1:on
         var deviceMode: Int        // 0:患者模式；1：设备端医生模式；2：BLE端医生模式；3：Socket端医生模式
-        var standard: Int          // CE/FDA, 0:CE;1:FDA
+        var standard: Int          // CE/FDA, 1是 CFDA 2是CE，3是FDA
         // reserved 4
         init {
             var index = 0
@@ -243,8 +243,8 @@ object R20BleResponse {
     class Event(val bytes: ByteArray) {
         var timestamp: Long  // 测量时间时间戳 e.g.  0:  1970.01.01 00:00:0时间戳
         var alarm: Boolean   // 0-取消告警，1-告警
-        var alarmLevel: Int  // 告警等级 R20BleCmd.AlarmLevel
-        var eventId: Int     // 事件id R20BleCmd.EventId
+        var alarmLevel: Int  // 告警等级 VentilatorBleCmd.AlarmLevel
+        var eventId: Int     // 事件id VentilatorBleCmd.EventId
         // reserved 1
         init {
             var index = 0

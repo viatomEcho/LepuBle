@@ -94,7 +94,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.lepodLayout.root.visibility = View.GONE
         binding.vtm01Layout.root.visibility = View.GONE
         binding.btpLayout.root.visibility = View.GONE
-        binding.r20Layout.root.visibility = View.GONE
+        binding.ventilatorLayout.root.visibility = View.GONE
         binding.bp3Layout.root.visibility = View.GONE
         binding.sendCmd.visibility = View.GONE
         binding.content.visibility = View.GONE
@@ -280,15 +280,15 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
                 Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
                 Bluetooth.MODEL_LERES -> {
-                    setViewVisible(binding.r20Layout.root)
-                    settingViewModel = ViewModelProvider(this).get(R20ViewModel::class.java)
-                    (settingViewModel as R20ViewModel).initView(requireContext(), binding, it)
-                    (settingViewModel as R20ViewModel).initEvent(this)
-                    LpBleUtil.r20GetRtState(it)
-                    LpBleUtil.r20GetSystemSetting(it)
-                    LpBleUtil.r20GetVentilationSetting(it)
-                    LpBleUtil.r20GetMeasureSetting(it)
-                    LpBleUtil.r20GetWarningSetting(it)
+                    setViewVisible(binding.ventilatorLayout.root)
+                    settingViewModel = ViewModelProvider(this).get(VentilatorViewModel::class.java)
+                    (settingViewModel as VentilatorViewModel).initView(requireContext(), binding, it, mainViewModel)
+                    (settingViewModel as VentilatorViewModel).initEvent(this)
+                    LpBleUtil.ventilatorGetRtState(it)
+                    LpBleUtil.ventilatorGetSystemSetting(it)
+                    LpBleUtil.ventilatorGetVentilationSetting(it)
+                    LpBleUtil.ventilatorGetMeasureSetting(it)
+                    LpBleUtil.ventilatorGetWarningSetting(it)
                 }
                 Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
                     setViewVisible(binding.bp3Layout.root)
@@ -343,9 +343,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R10
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R11
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LERES) {
-                binding.r20Layout.version.setText("${it.hwV}")
-                binding.r20Layout.sn.setText("${it.sn}")
-                binding.r20Layout.code.setText("${it.branchCode}")
+                binding.ventilatorLayout.version.setText("${it.hwV}")
+                binding.ventilatorLayout.sn.setText("${it.sn}")
+                binding.ventilatorLayout.code.setText("${it.branchCode}")
             } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP3W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP3C) {
                 binding.bp3Layout.version.setText("${it.hwV}")

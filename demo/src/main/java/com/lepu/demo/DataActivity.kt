@@ -6,8 +6,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.github.barteksc.pdfviewer.PDFView
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.ble.data.r20.StatisticsFile
-import com.lepu.blepro.ble.data.r20.SystemSetting
+import com.lepu.blepro.ble.data.ventilator.StatisticsFile
+import com.lepu.blepro.ble.data.ventilator.SystemSetting
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.demo.ble.LpBleUtil
@@ -39,13 +39,13 @@ class DataActivity : AppCompatActivity() {
             Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
             Bluetooth.MODEL_LERES -> {
                 pdfView.visibility = View.GONE
-                LpBleUtil.r20GetSystemSetting(Constant.BluetoothConfig.currentModel[0])
+                LpBleUtil.ventilatorGetSystemSetting(Constant.BluetoothConfig.currentModel[0])
             }
         }
     }
 
     private fun initEvent() {
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetSystemSetting)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetSystemSetting)
             .observe(this) {
                 val data = it.data as SystemSetting
                 val unit = data.unitSetting.pressureUnit

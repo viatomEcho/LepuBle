@@ -35,8 +35,8 @@
                 android:id="@+id/btp_layout"
                 layout="@layout/btp_settings"/>
             <include
-                android:id="@+id/r20_layout"
-                layout="@layout/r20_settings"/>
+                android:id="@+id/ventilator_layout"
+                layout="@layout/ventilator_settings"/>
             <include
                 android:id="@+id/bp3_layout"
                 layout="@layout/bp3_settings"/>

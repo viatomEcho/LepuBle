@@ -425,8 +425,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 }
                 // 获取当天统计数据
                 val timestamp = com.lepu.demo.util.DateUtil.getDayTimestamp()
-//                LpBleUtil.r20GetFileList(Constant.BluetoothConfig.currentModel[0], 1, timestamp)
-                LpBleUtil.r20GetFileList(Constant.BluetoothConfig.currentModel[0], 1, 0)
+//                LpBleUtil.ventilatorGetFileList(Constant.BluetoothConfig.currentModel[0], 1, timestamp)
+                LpBleUtil.ventilatorGetFileList(Constant.BluetoothConfig.currentModel[0], 1, 0)
             } else {
                 LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0])
             }
@@ -834,8 +834,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
             Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
             Bluetooth.MODEL_LERES -> {
-                infoViewModel = ViewModelProvider(this).get(R20ViewModel::class.java)
-                (infoViewModel as R20ViewModel).initEvent(this)
+                infoViewModel = ViewModelProvider(this).get(VentilatorViewModel::class.java)
+                (infoViewModel as VentilatorViewModel).initEvent(this)
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
@@ -845,7 +845,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 binding.wifiConfig.visibility = View.VISIBLE
                 binding.setWifiConfig.visibility = View.GONE
                 binding.getWifiConfig.visibility = View.VISIBLE
-                LpBleUtil.r20GetVersionInfo(Constant.BluetoothConfig.currentModel[0])
+                LpBleUtil.ventilatorGetVersionInfo(Constant.BluetoothConfig.currentModel[0])
                 LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
             }
             Bluetooth.MODEL_LP_BP3W -> {

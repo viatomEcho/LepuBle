@@ -40,6 +40,7 @@ import com.lepu.demo.config.Constant
 import com.lepu.demo.config.Constant.BluetoothConfig.Companion.CHECK_BLE_REQUEST_CODE
 import com.lepu.demo.config.Constant.BluetoothConfig.Companion.SUPPORT_MODELS
 import com.lepu.demo.util.CollectUtil
+import com.lepu.demo.util.FileUtil
 import com.permissionx.guolindev.PermissionX
 
 class MainActivity : AppCompatActivity() , BleChangeObserver {
@@ -74,6 +75,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         checkServer()
         initLiveEvent()
 //        split()
+//        val data = FileUtil.readFileToByteArray(this, "2.dat")
+//        val file = PpgFile(data)
+//        FileUtil.saveFile(this, file.sampleIntsData, "2.txt")
+//        Log.d("111111111", "file.sampleIntsData.size : ${file.sampleIntsData.size}")
     }
 
     //创建菜单
@@ -111,6 +116,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
 //        viewModel._scanning.value = true
         LpBleUtil.startScan(SUPPORT_MODELS)
+//        多设备连接测试
+//        LpBleUtil.setInterface(Bluetooth.MODEL_DUOEK, false)
+//        LpBleUtil.setInterface(Bluetooth.MODEL_ER2, false)
+//        LpBleUtil.reconnect(intArrayOf(Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2), arrayOf("DuoEK 1636", "ER2 0008"))
     }
 
     private fun subscribeUi() {
@@ -251,7 +260,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     || it == Bluetooth.MODEL_R11
                     || it == Bluetooth.MODEL_R10
                     || it == Bluetooth.MODEL_LERES) {
-                    LpBleUtil.r20Encrypt(it, "0001")
+                    LpBleUtil.ventilatorEncrypt(it, "0001")
                 } else {
                     LpBleUtil.getInfo(it)
                 }
@@ -641,15 +650,15 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._battery.value = "${it.percent} %"
                 }
             }
-        //--------------------------R20--------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetUtcTime)
+        //--------------------------Ventilator--------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorSetUtcTime)
             .observe(this) {
-                Toast.makeText(this, "R20 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Ventilator ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetInfo)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetInfo)
             .observe(this) {
-                Toast.makeText(this, "R20 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Ventilator ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                 viewModel._er1Info.value = it.data as LepuDevice
             }
         //--------------------------Bp3--------------------------

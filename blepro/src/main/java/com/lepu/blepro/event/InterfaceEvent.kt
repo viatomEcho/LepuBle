@@ -748,44 +748,44 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     }
 
     /**
-     * R20BleInterface 发出的通知
+     * VentilatorBleInterface 发出的通知
      * 包含model: MODEL_R20, MODEL_R21,
      *           MODEL_R10, MODEL_R11,
      *           MODEL_LERES
      */
-    interface R20 {
+    interface Ventilator {
         companion object {
-            const val EventR20SetUtcTime = "com.lepu.ble.r20.set.utc.time"                        // 同步UTC时间 boolean
-            const val EventR20GetInfo = "com.lepu.ble.r20.get.info"                               // 获取设备信息 LepuDevice
-            const val EventR20Reset = "com.lepu.ble.r20.reset"                                    // 复位 boolean
-            const val EventR20FactoryReset = "com.lepu.ble.r20.factory.reset"                     // 恢复出厂设置 boolean
-            const val EventR20GetBattery = "com.lepu.ble.r20.get.battery"                         // 获取电量 KtBleBattery
-            const val EventR20BurnFactoryInfo = "com.lepu.ble.r20.burn.factory.info"              // 烧录出厂信息 boolean
-            const val EventR20DeviceBound = "com.lepu.ble.r20.device.bound"                       // 绑定设备 int (0成功, 1失败, 2超时)
-            const val EventR20DeviceUnBound = "com.lepu.ble.r20.device.un.bound"                  // 解绑设备 boolean
-            const val EventR20SetUserInfo = "com.lepu.ble.r20.set.user.info"                      // 设置账户信息 boolean
-            const val EventR20GetUserInfo = "com.lepu.ble.r20.get.user.info"                      // 获取账户信息 UserInfo
-            const val EventR20DoctorMode = "com.lepu.ble.r20.doctor.mode"                         // 进入医生模式 R20BleResponse.DoctorModeResult
-            const val EventR20GetWifiList = "com.lepu.ble.r20.get.wifi.list"                      // 获取WiFi列表 WifiList
-            const val EventR20SetWifiConfig = "com.lepu.ble.r20.set.wifi.config"                  // 配置WiFi信息 boolean
-            const val EventR20GetWifiConfig = "com.lepu.ble.r20.get.wifi.config"                  // 获取WiFi信息 WifiConfig
-            const val EventR20GetVersionInfo = "com.lepu.ble.r20.get.version.info"                // 获取详细版本信息 R20BleResponse.VersionInfo
-            const val EventR20GetSystemSetting = "com.lepu.ble.r20.get.system.setting"            // 获取系统设置 SystemSetting
-            const val EventR20SetSystemSetting = "com.lepu.ble.r20.set.system.setting"            // 配置系统设置 boolean
-            const val EventR20GetMeasureSetting = "com.lepu.ble.r20.get.measure.setting"          // 获取测量设置 MeasureSetting
-            const val EventR20SetMeasureSetting = "com.lepu.ble.r20.set.measure.setting"          // 配置测量设置 boolean
-            const val EventR20MaskTest = "com.lepu.ble.r20.mask.test"                             // 佩戴测试 R20BleResponse.MaskTestResult
-            const val EventR20GetVentilationSetting = "com.lepu.ble.r20.get.ventilation.setting"  // 获取通气控制参数 VentilationSetting
-            const val EventR20SetVentilationSetting = "com.lepu.ble.r20.set.ventilation.setting"  // 配置通气控制参数 boolean
-            const val EventR20GetWarningSetting = "com.lepu.ble.r20.get.warning.setting"          // 获取报警提示参数 WarningSetting
-            const val EventR20SetWarningSetting = "com.lepu.ble.r20.set.warning.setting"          // 配置报警提示参数 boolean
-            const val EventR20GetFileList = "com.lepu.ble.r20.get.file.list"                      // 获取记录列表 R20BleResponse.RecordList
-            const val EventR20ReadFileError = "com.lepu.ble.r20.read.file.error"                  // 传输文件出错 boolean
-            const val EventR20ReadingFileProgress = "com.lepu.ble.r20.reading.file.progress"      // 传输文件进度 int
-            const val EventR20ReadFileComplete = "com.lepu.ble.r20.read.file.complete"            // 传输文件完成 byte[]
-            const val EventR20RtState = "com.lepu.ble.r20.rt.state"                               // 实时状态 R20BleResponse.RtState
-            const val EventR20RtParam = "com.lepu.ble.r20.rt.param"                               // 实时参数 R20BleResponse.RtParam
-            const val EventR20Event = "com.lepu.ble.r20.event"                                    // 事件上报 R20BleResponse.Event
+            const val EventVentilatorSetUtcTime = "com.lepu.ble.ventilator.set.utc.time"                        // 同步UTC时间 boolean
+            const val EventVentilatorGetInfo = "com.lepu.ble.ventilator.get.info"                               // 获取设备信息 LepuDevice
+            const val EventVentilatorReset = "com.lepu.ble.ventilator.reset"                                    // 复位 boolean
+            const val EventVentilatorFactoryReset = "com.lepu.ble.ventilator.factory.reset"                     // 恢复出厂设置 boolean
+            const val EventVentilatorGetBattery = "com.lepu.ble.ventilator.get.battery"                         // 获取电量 KtBleBattery
+            const val EventVentilatorBurnFactoryInfo = "com.lepu.ble.ventilator.burn.factory.info"              // 烧录出厂信息 boolean
+            const val EventVentilatorDeviceBound = "com.lepu.ble.ventilator.device.bound"                       // 绑定设备 int (0成功, 1失败, 2超时)
+            const val EventVentilatorDeviceUnBound = "com.lepu.ble.ventilator.device.un.bound"                  // 解绑设备 boolean
+            const val EventVentilatorSetUserInfo = "com.lepu.ble.ventilator.set.user.info"                      // 设置账户信息 boolean
+            const val EventVentilatorGetUserInfo = "com.lepu.ble.ventilator.get.user.info"                      // 获取账户信息 UserInfo
+            const val EventVentilatorDoctorMode = "com.lepu.ble.ventilator.doctor.mode"                         // 进入医生模式 VentilatorBleResponse.DoctorModeResult
+            const val EventVentilatorGetWifiList = "com.lepu.ble.ventilator.get.wifi.list"                      // 获取WiFi列表 WifiList
+            const val EventVentilatorSetWifiConfig = "com.lepu.ble.ventilator.set.wifi.config"                  // 配置WiFi信息 boolean
+            const val EventVentilatorGetWifiConfig = "com.lepu.ble.ventilator.get.wifi.config"                  // 获取WiFi信息 WifiConfig
+            const val EventVentilatorGetVersionInfo = "com.lepu.ble.ventilator.get.version.info"                // 获取详细版本信息 VentilatorBleResponse.VersionInfo
+            const val EventVentilatorGetSystemSetting = "com.lepu.ble.ventilator.get.system.setting"            // 获取系统设置 SystemSetting
+            const val EventVentilatorSetSystemSetting = "com.lepu.ble.ventilator.set.system.setting"            // 配置系统设置 boolean
+            const val EventVentilatorGetMeasureSetting = "com.lepu.ble.ventilator.get.measure.setting"          // 获取测量设置 MeasureSetting
+            const val EventVentilatorSetMeasureSetting = "com.lepu.ble.ventilator.set.measure.setting"          // 配置测量设置 boolean
+            const val EventVentilatorMaskTest = "com.lepu.ble.ventilator.mask.test"                             // 佩戴测试 VentilatorBleResponse.MaskTestResult
+            const val EventVentilatorGetVentilationSetting = "com.lepu.ble.ventilator.get.ventilation.setting"  // 获取通气控制参数 VentilationSetting
+            const val EventVentilatorSetVentilationSetting = "com.lepu.ble.ventilator.set.ventilation.setting"  // 配置通气控制参数 boolean
+            const val EventVentilatorGetWarningSetting = "com.lepu.ble.ventilator.get.warning.setting"          // 获取报警提示参数 WarningSetting
+            const val EventVentilatorSetWarningSetting = "com.lepu.ble.ventilator.set.warning.setting"          // 配置报警提示参数 boolean
+            const val EventVentilatorGetFileList = "com.lepu.ble.ventilator.get.file.list"                      // 获取记录列表 VentilatorBleResponse.RecordList
+            const val EventVentilatorReadFileError = "com.lepu.ble.ventilator.read.file.error"                  // 传输文件出错 boolean
+            const val EventVentilatorReadingFileProgress = "com.lepu.ble.ventilator.reading.file.progress"      // 传输文件进度 int
+            const val EventVentilatorReadFileComplete = "com.lepu.ble.ventilator.read.file.complete"            // 传输文件完成 byte[]
+            const val EventVentilatorRtState = "com.lepu.ble.ventilator.rt.state"                               // 实时状态 VentilatorBleResponse.RtState
+            const val EventVentilatorRtParam = "com.lepu.ble.ventilator.rt.param"                               // 实时参数 VentilatorBleResponse.RtParam
+            const val EventVentilatorEvent = "com.lepu.ble.ventilator.event"                                    // 事件上报 VentilatorBleResponse.Event
         }
     }
 

@@ -9,14 +9,15 @@ import android.widget.SeekBar
 import androidx.lifecycle.LifecycleOwner
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.LpBleCmd
-import com.lepu.blepro.ble.cmd.R20BleCmd
-import com.lepu.blepro.ble.cmd.R20BleResponse
+import com.lepu.blepro.ble.cmd.VentilatorBleCmd
+import com.lepu.blepro.ble.cmd.VentilatorBleResponse
 import com.lepu.blepro.ble.cmd.ResponseError
 import com.lepu.blepro.ble.data.FactoryConfig
-import com.lepu.blepro.ble.data.r20.*
+import com.lepu.blepro.ble.data.ventilator.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.HexString.trimStr
+import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.data.DeviceFactoryData
@@ -25,7 +26,7 @@ import com.lepu.demo.util.StringUtil
 import kotlin.math.max
 import kotlin.math.min
 
-class R20ViewModel : SettingViewModel() {
+class VentilatorViewModel : SettingViewModel() {
 
     private lateinit var binding: FragmentSettingsBinding
     private lateinit var context: Context
@@ -33,111 +34,111 @@ class R20ViewModel : SettingViewModel() {
     private var measureSetting = MeasureSetting()
     private var ventilationSetting = VentilationSetting()
     private var warningSetting = WarningSetting()
-    private lateinit var rtState: R20BleResponse.RtState
+    private lateinit var rtState: VentilatorBleResponse.RtState
     private var spinnerSet = true
 
-    fun initView(context: Context, binding: FragmentSettingsBinding, model: Int) {
+    fun initView(context: Context, binding: FragmentSettingsBinding, model: Int, mainViewModel: MainViewModel) {
         this.context = context
         this.binding = binding
-        binding.r20Layout.factoryInfo.setOnClickListener {
-            binding.r20Layout.factoryInfo.background = context.getDrawable(R.drawable.string_selected)
-            binding.r20Layout.systemSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.measureSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.ventilationSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.warningSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.otherSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.factoryInfoLayout.visibility = View.VISIBLE
-            binding.r20Layout.systemSettingLayout.visibility = View.GONE
-            binding.r20Layout.measureSettingLayout.visibility = View.GONE
-            binding.r20Layout.ventilationSettingLayout.visibility = View.GONE
-            binding.r20Layout.warningSettingLayout.visibility = View.GONE
-            binding.r20Layout.otherLayout.visibility = View.GONE
+        binding.ventilatorLayout.factoryInfo.setOnClickListener {
+            binding.ventilatorLayout.factoryInfo.background = context.getDrawable(R.drawable.string_selected)
+            binding.ventilatorLayout.systemSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.measureSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.ventilationSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.warningSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.otherSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.factoryInfoLayout.visibility = View.VISIBLE
+            binding.ventilatorLayout.systemSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.measureSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.ventilationSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.warningSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.otherLayout.visibility = View.GONE
         }
-        binding.r20Layout.systemSetting.setOnClickListener {
-            binding.r20Layout.systemSetting.background = context.getDrawable(R.drawable.string_selected)
-            binding.r20Layout.factoryInfo.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.measureSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.ventilationSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.warningSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.otherSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.systemSettingLayout.visibility = View.VISIBLE
-            binding.r20Layout.factoryInfoLayout.visibility = View.GONE
-            binding.r20Layout.measureSettingLayout.visibility = View.GONE
-            binding.r20Layout.ventilationSettingLayout.visibility = View.GONE
-            binding.r20Layout.warningSettingLayout.visibility = View.GONE
-            binding.r20Layout.otherLayout.visibility = View.GONE
+        binding.ventilatorLayout.systemSetting.setOnClickListener {
+            binding.ventilatorLayout.systemSetting.background = context.getDrawable(R.drawable.string_selected)
+            binding.ventilatorLayout.factoryInfo.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.measureSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.ventilationSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.warningSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.otherSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.systemSettingLayout.visibility = View.VISIBLE
+            binding.ventilatorLayout.factoryInfoLayout.visibility = View.GONE
+            binding.ventilatorLayout.measureSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.ventilationSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.warningSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.otherLayout.visibility = View.GONE
             spinnerSet = false
-            LpBleUtil.r20GetSystemSetting(model)
+            LpBleUtil.ventilatorGetSystemSetting(model)
         }
-        binding.r20Layout.measureSetting.setOnClickListener {
-            binding.r20Layout.measureSetting.background = context.getDrawable(R.drawable.string_selected)
-            binding.r20Layout.factoryInfo.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.systemSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.ventilationSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.warningSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.otherSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.measureSettingLayout.visibility = View.VISIBLE
-            binding.r20Layout.factoryInfoLayout.visibility = View.GONE
-            binding.r20Layout.systemSettingLayout.visibility = View.GONE
-            binding.r20Layout.ventilationSettingLayout.visibility = View.GONE
-            binding.r20Layout.warningSettingLayout.visibility = View.GONE
-            binding.r20Layout.otherLayout.visibility = View.GONE
+        binding.ventilatorLayout.measureSetting.setOnClickListener {
+            binding.ventilatorLayout.measureSetting.background = context.getDrawable(R.drawable.string_selected)
+            binding.ventilatorLayout.factoryInfo.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.systemSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.ventilationSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.warningSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.otherSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.measureSettingLayout.visibility = View.VISIBLE
+            binding.ventilatorLayout.factoryInfoLayout.visibility = View.GONE
+            binding.ventilatorLayout.systemSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.ventilationSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.warningSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.otherLayout.visibility = View.GONE
             spinnerSet = false
-            LpBleUtil.r20GetVentilationSetting(model)
-            LpBleUtil.r20GetMeasureSetting(model)
+            LpBleUtil.ventilatorGetVentilationSetting(model)
+            LpBleUtil.ventilatorGetMeasureSetting(model)
         }
-        binding.r20Layout.ventilationSetting.setOnClickListener {
-            binding.r20Layout.ventilationSetting.background = context.getDrawable(R.drawable.string_selected)
-            binding.r20Layout.factoryInfo.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.systemSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.measureSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.warningSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.otherSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.ventilationSettingLayout.visibility = View.VISIBLE
-            binding.r20Layout.factoryInfoLayout.visibility = View.GONE
-            binding.r20Layout.systemSettingLayout.visibility = View.GONE
-            binding.r20Layout.measureSettingLayout.visibility = View.GONE
-            binding.r20Layout.warningSettingLayout.visibility = View.GONE
-            binding.r20Layout.otherLayout.visibility = View.GONE
-            LpBleUtil.r20GetRtState(model)
+        binding.ventilatorLayout.ventilationSetting.setOnClickListener {
+            binding.ventilatorLayout.ventilationSetting.background = context.getDrawable(R.drawable.string_selected)
+            binding.ventilatorLayout.factoryInfo.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.systemSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.measureSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.warningSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.otherSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.ventilationSettingLayout.visibility = View.VISIBLE
+            binding.ventilatorLayout.factoryInfoLayout.visibility = View.GONE
+            binding.ventilatorLayout.systemSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.measureSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.warningSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.otherLayout.visibility = View.GONE
+            LpBleUtil.ventilatorGetRtState(model)
             spinnerSet = false
-            LpBleUtil.r20GetVentilationSetting(model)
+            LpBleUtil.ventilatorGetVentilationSetting(model)
         }
-        binding.r20Layout.warningSetting.setOnClickListener {
-            binding.r20Layout.warningSetting.background = context.getDrawable(R.drawable.string_selected)
-            binding.r20Layout.factoryInfo.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.systemSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.measureSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.ventilationSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.otherSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.warningSettingLayout.visibility = View.VISIBLE
-            binding.r20Layout.factoryInfoLayout.visibility = View.GONE
-            binding.r20Layout.systemSettingLayout.visibility = View.GONE
-            binding.r20Layout.measureSettingLayout.visibility = View.GONE
-            binding.r20Layout.ventilationSettingLayout.visibility = View.GONE
-            binding.r20Layout.otherLayout.visibility = View.GONE
+        binding.ventilatorLayout.warningSetting.setOnClickListener {
+            binding.ventilatorLayout.warningSetting.background = context.getDrawable(R.drawable.string_selected)
+            binding.ventilatorLayout.factoryInfo.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.systemSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.measureSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.ventilationSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.otherSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.warningSettingLayout.visibility = View.VISIBLE
+            binding.ventilatorLayout.factoryInfoLayout.visibility = View.GONE
+            binding.ventilatorLayout.systemSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.measureSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.ventilationSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.otherLayout.visibility = View.GONE
             spinnerSet = false
-            LpBleUtil.r20GetWarningSetting(model)
+            LpBleUtil.ventilatorGetWarningSetting(model)
         }
-        binding.r20Layout.otherSetting.setOnClickListener {
-            binding.r20Layout.otherSetting.background = context.getDrawable(R.drawable.string_selected)
-            binding.r20Layout.factoryInfo.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.systemSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.measureSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.ventilationSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.warningSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
-            binding.r20Layout.otherLayout.visibility = View.VISIBLE
-            binding.r20Layout.factoryInfoLayout.visibility = View.GONE
-            binding.r20Layout.systemSettingLayout.visibility = View.GONE
-            binding.r20Layout.measureSettingLayout.visibility = View.GONE
-            binding.r20Layout.ventilationSettingLayout.visibility = View.GONE
-            binding.r20Layout.warningSettingLayout.visibility = View.GONE
-            LpBleUtil.r20GetRtState(model)
+        binding.ventilatorLayout.otherSetting.setOnClickListener {
+            binding.ventilatorLayout.otherSetting.background = context.getDrawable(R.drawable.string_selected)
+            binding.ventilatorLayout.factoryInfo.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.systemSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.measureSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.ventilationSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.warningSetting.background = context.getDrawable(R.drawable.dialog_hint_shape)
+            binding.ventilatorLayout.otherLayout.visibility = View.VISIBLE
+            binding.ventilatorLayout.factoryInfoLayout.visibility = View.GONE
+            binding.ventilatorLayout.systemSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.measureSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.ventilationSettingLayout.visibility = View.GONE
+            binding.ventilatorLayout.warningSettingLayout.visibility = View.GONE
+            LpBleUtil.ventilatorGetRtState(model)
         }
-        binding.r20Layout.factoryConfig.setOnClickListener {
+        binding.ventilatorLayout.factoryConfig.setOnClickListener {
             val config = FactoryConfig()
             var enableVersion = true
-            val tempVersion = binding.r20Layout.version.text
+            val tempVersion = binding.ventilatorLayout.version.text
             if (tempVersion.isNullOrEmpty()) {
                 enableVersion = false
             } else if (tempVersion.length == 1 && StringUtil.isBigLetter(tempVersion.toString())) {
@@ -157,7 +158,7 @@ class R20ViewModel : SettingViewModel() {
                 return@setOnClickListener
             }
             var enableCode = true
-            val tempCode = trimStr(binding.r20Layout.code.text.toString())
+            val tempCode = trimStr(binding.ventilatorLayout.code.text.toString())
             if (tempCode.isNullOrEmpty()) {
                 enableCode = false
             } else if (tempCode.length == 8) {
@@ -174,32 +175,32 @@ class R20ViewModel : SettingViewModel() {
             _deviceFactoryData.value = deviceFactoryData
         }
         // 绑定/解绑
-        binding.r20Layout.bound.setOnCheckedChangeListener { buttonView, isChecked ->
-            LpBleUtil.r20DeviceBound(model, isChecked)
+        binding.ventilatorLayout.bound.setOnCheckedChangeListener { buttonView, isChecked ->
+            LpBleUtil.ventilatorDeviceBound(model, isChecked)
         }
         // 进入医生模式
-        binding.r20Layout.doctorMode.setOnCheckedChangeListener { buttonView, isChecked ->
+        binding.ventilatorLayout.doctorMode.setOnCheckedChangeListener { buttonView, isChecked ->
             if (buttonView.isPressed) {
-                var pin = binding.r20Layout.pin.text.toString()
+                var pin = binding.ventilatorLayout.pin.text.toString()
                 pin = if (pin == "") {
                     "0319"
                 } else {
                     pin
                 }
-                LpBleUtil.r20DoctorMode(model, pin, System.currentTimeMillis().div(1000))
+                LpBleUtil.ventilatorDoctorMode(model, pin, System.currentTimeMillis().div(1000))
             }
         }
         // 系统设置
         // 单位设置
         ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("cmH2O", "hPa")).apply {
-            binding.r20Layout.unit.adapter = this
+            binding.ventilatorLayout.unit.adapter = this
         }
-        binding.r20Layout.unit.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.ventilatorLayout.unit.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (spinnerSet) {
-                    systemSetting.type = R20BleCmd.SystemSetting.UNIT
+                    systemSetting.type = VentilatorBleCmd.SystemSetting.UNIT
                     systemSetting.unitSetting.pressureUnit = position
-                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                    LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -207,30 +208,30 @@ class R20ViewModel : SettingViewModel() {
         }
         // 语言设置
         ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("英文", "中文")).apply {
-            binding.r20Layout.language.adapter = this
+            binding.ventilatorLayout.language.adapter = this
         }
-        binding.r20Layout.language.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.ventilatorLayout.language.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (spinnerSet) {
-                    systemSetting.type = R20BleCmd.SystemSetting.LANGUAGE
+                    systemSetting.type = VentilatorBleCmd.SystemSetting.LANGUAGE
                     systemSetting.languageSetting.language = position
-                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                    LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
         // 屏幕设置：屏幕亮度
-        binding.r20Layout.brightness.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.brightness.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    systemSetting.type = R20BleCmd.SystemSetting.SCREEN
+                    systemSetting.type = VentilatorBleCmd.SystemSetting.SCREEN
                     systemSetting.screenSetting.brightness = progress
-                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                    LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
                 }
-                binding.r20Layout.brightnessProcess.text = "$progress %"
+                binding.ventilatorLayout.brightnessProcess.text = "$progress %"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    binding.r20Layout.brightnessRange.text = "范围：${binding.r20Layout.brightness.min}% - ${binding.r20Layout.brightness.max}%"
+                    binding.ventilatorLayout.brightnessRange.text = "范围：${binding.ventilatorLayout.brightness.min}% - ${binding.ventilatorLayout.brightness.max}%"
                 }
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -238,162 +239,162 @@ class R20ViewModel : SettingViewModel() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.brightnessSub.setOnClickListener {
-            systemSetting.type = R20BleCmd.SystemSetting.SCREEN
-            systemSetting.screenSetting.brightness = --binding.r20Layout.brightness.progress
-            LpBleUtil.r20SetSystemSetting(model, systemSetting)
+        binding.ventilatorLayout.brightnessSub.setOnClickListener {
+            systemSetting.type = VentilatorBleCmd.SystemSetting.SCREEN
+            systemSetting.screenSetting.brightness = --binding.ventilatorLayout.brightness.progress
+            LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
         }
-        binding.r20Layout.brightnessAdd.setOnClickListener {
-            systemSetting.type = R20BleCmd.SystemSetting.SCREEN
-            systemSetting.screenSetting.brightness = ++binding.r20Layout.brightness.progress
-            LpBleUtil.r20SetSystemSetting(model, systemSetting)
+        binding.ventilatorLayout.brightnessAdd.setOnClickListener {
+            systemSetting.type = VentilatorBleCmd.SystemSetting.SCREEN
+            systemSetting.screenSetting.brightness = ++binding.ventilatorLayout.brightness.progress
+            LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
         }
         // 屏幕设置：自动熄屏
         ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("常亮", "30秒", "60秒", "90秒", "120秒")).apply {
-            binding.r20Layout.screenOff.adapter = this
+            binding.ventilatorLayout.screenOff.adapter = this
         }
-        binding.r20Layout.screenOff.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.ventilatorLayout.screenOff.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (spinnerSet) {
-                    systemSetting.type = R20BleCmd.SystemSetting.SCREEN
+                    systemSetting.type = VentilatorBleCmd.SystemSetting.SCREEN
                     systemSetting.screenSetting.autoOff = position.times(30)
-                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                    LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
         // 耗材设置：过滤棉
-        binding.r20Layout.filter.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.filter.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
+                    systemSetting.type = VentilatorBleCmd.SystemSetting.REPLACEMENT
                     systemSetting.replacements.filter = progress
-                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                    LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
                 }
-                binding.r20Layout.filterProcess.text = if (progress == 0) {
+                binding.ventilatorLayout.filterProcess.text = if (progress == 0) {
                     "关"
                 } else {
                     "$progress 个月"
                 }
-                binding.r20Layout.filterRange.text = "范围：关 - ${binding.r20Layout.filter.max}个月"
+                binding.ventilatorLayout.filterRange.text = "范围：关 - ${binding.ventilatorLayout.filter.max}个月"
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.filterSub.setOnClickListener {
-            systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
-            systemSetting.replacements.filter = --binding.r20Layout.filter.progress
-            LpBleUtil.r20SetSystemSetting(model, systemSetting)
+        binding.ventilatorLayout.filterSub.setOnClickListener {
+            systemSetting.type = VentilatorBleCmd.SystemSetting.REPLACEMENT
+            systemSetting.replacements.filter = --binding.ventilatorLayout.filter.progress
+            LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
         }
-        binding.r20Layout.filterAdd.setOnClickListener {
-            systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
-            systemSetting.replacements.filter = ++binding.r20Layout.filter.progress
-            LpBleUtil.r20SetSystemSetting(model, systemSetting)
+        binding.ventilatorLayout.filterAdd.setOnClickListener {
+            systemSetting.type = VentilatorBleCmd.SystemSetting.REPLACEMENT
+            systemSetting.replacements.filter = ++binding.ventilatorLayout.filter.progress
+            LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
         }
         // 耗材设置：面罩
-        binding.r20Layout.mask.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.mask.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
+                    systemSetting.type = VentilatorBleCmd.SystemSetting.REPLACEMENT
                     systemSetting.replacements.mask = progress
-                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                    LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
                 }
-                binding.r20Layout.maskProcess.text = if (progress == 0) {
+                binding.ventilatorLayout.maskProcess.text = if (progress == 0) {
                     "关"
                 } else {
                     "$progress 个月"
                 }
-                binding.r20Layout.maskRange.text = "范围：关 - ${binding.r20Layout.mask.max}个月"
+                binding.ventilatorLayout.maskRange.text = "范围：关 - ${binding.ventilatorLayout.mask.max}个月"
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.maskSub.setOnClickListener {
-            systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
-            systemSetting.replacements.mask = --binding.r20Layout.mask.progress
-            LpBleUtil.r20SetSystemSetting(model, systemSetting)
+        binding.ventilatorLayout.maskSub.setOnClickListener {
+            systemSetting.type = VentilatorBleCmd.SystemSetting.REPLACEMENT
+            systemSetting.replacements.mask = --binding.ventilatorLayout.mask.progress
+            LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
         }
-        binding.r20Layout.maskAdd.setOnClickListener {
-            systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
-            systemSetting.replacements.mask = ++binding.r20Layout.mask.progress
-            LpBleUtil.r20SetSystemSetting(model, systemSetting)
+        binding.ventilatorLayout.maskAdd.setOnClickListener {
+            systemSetting.type = VentilatorBleCmd.SystemSetting.REPLACEMENT
+            systemSetting.replacements.mask = ++binding.ventilatorLayout.mask.progress
+            LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
         }
         // 耗材设置：管道
-        binding.r20Layout.tube.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.tube.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
+                    systemSetting.type = VentilatorBleCmd.SystemSetting.REPLACEMENT
                     systemSetting.replacements.tube = progress
-                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                    LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
                 }
-                binding.r20Layout.tubeProcess.text = if (progress == 0) {
+                binding.ventilatorLayout.tubeProcess.text = if (progress == 0) {
                     "关"
                 } else {
                     "$progress 个月"
                 }
-                binding.r20Layout.tubeRange.text = "范围：关 - ${binding.r20Layout.tube.max}个月"
+                binding.ventilatorLayout.tubeRange.text = "范围：关 - ${binding.ventilatorLayout.tube.max}个月"
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.tubeSub.setOnClickListener {
-            systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
-            systemSetting.replacements.tube = --binding.r20Layout.tube.progress
-            LpBleUtil.r20SetSystemSetting(model, systemSetting)
+        binding.ventilatorLayout.tubeSub.setOnClickListener {
+            systemSetting.type = VentilatorBleCmd.SystemSetting.REPLACEMENT
+            systemSetting.replacements.tube = --binding.ventilatorLayout.tube.progress
+            LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
         }
-        binding.r20Layout.tubeAdd.setOnClickListener {
-            systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
-            systemSetting.replacements.tube = ++binding.r20Layout.tube.progress
-            LpBleUtil.r20SetSystemSetting(model, systemSetting)
+        binding.ventilatorLayout.tubeAdd.setOnClickListener {
+            systemSetting.type = VentilatorBleCmd.SystemSetting.REPLACEMENT
+            systemSetting.replacements.tube = ++binding.ventilatorLayout.tube.progress
+            LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
         }
         // 耗材设置：水箱
-        binding.r20Layout.tank.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.tank.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
+                    systemSetting.type = VentilatorBleCmd.SystemSetting.REPLACEMENT
                     systemSetting.replacements.tank = progress
-                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                    LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
                 }
-                binding.r20Layout.tankProcess.text = if (progress == 0) {
+                binding.ventilatorLayout.tankProcess.text = if (progress == 0) {
                     "关闭"
                 } else {
                     "$progress 个月"
                 }
-                binding.r20Layout.tankRange.text = "范围：关 - ${binding.r20Layout.tank.max}个月"
+                binding.ventilatorLayout.tankRange.text = "范围：关 - ${binding.ventilatorLayout.tank.max}个月"
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.tankSub.setOnClickListener {
-            systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
-            systemSetting.replacements.tank = --binding.r20Layout.tank.progress
-            LpBleUtil.r20SetSystemSetting(model, systemSetting)
+        binding.ventilatorLayout.tankSub.setOnClickListener {
+            systemSetting.type = VentilatorBleCmd.SystemSetting.REPLACEMENT
+            systemSetting.replacements.tank = --binding.ventilatorLayout.tank.progress
+            LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
         }
-        binding.r20Layout.tankAdd.setOnClickListener {
-            systemSetting.type = R20BleCmd.SystemSetting.REPLACEMENT
-            systemSetting.replacements.tank = ++binding.r20Layout.tank.progress
-            LpBleUtil.r20SetSystemSetting(model, systemSetting)
+        binding.ventilatorLayout.tankAdd.setOnClickListener {
+            systemSetting.type = VentilatorBleCmd.SystemSetting.REPLACEMENT
+            systemSetting.replacements.tank = ++binding.ventilatorLayout.tank.progress
+            LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
         }
         // 音量设置
-        binding.r20Layout.volume.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.volume.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    systemSetting.type = R20BleCmd.SystemSetting.VOLUME
+                    systemSetting.type = VentilatorBleCmd.SystemSetting.VOLUME
                     systemSetting.volumeSetting.volume = progress.times(5)
-                    LpBleUtil.r20SetSystemSetting(model, systemSetting)
+                    LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
                 }
-                binding.r20Layout.volumeProcess.text = "${progress.times(5)} %"
+                binding.ventilatorLayout.volumeProcess.text = "${progress.times(5)} %"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    binding.r20Layout.volumeRange.text = "范围：${binding.r20Layout.volume.min}% - ${binding.r20Layout.volume.max}%"
+                    binding.ventilatorLayout.volumeRange.text = "范围：${binding.ventilatorLayout.volume.min}% - ${binding.ventilatorLayout.volume.max}%"
                 }
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -401,33 +402,33 @@ class R20ViewModel : SettingViewModel() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.volumeSub.setOnClickListener {
-            systemSetting.type = R20BleCmd.SystemSetting.VOLUME
-            binding.r20Layout.volume.progress--
-            systemSetting.volumeSetting.volume = binding.r20Layout.volume.progress.times(5)
-            LpBleUtil.r20SetSystemSetting(model, systemSetting)
+        binding.ventilatorLayout.volumeSub.setOnClickListener {
+            systemSetting.type = VentilatorBleCmd.SystemSetting.VOLUME
+            binding.ventilatorLayout.volume.progress--
+            systemSetting.volumeSetting.volume = binding.ventilatorLayout.volume.progress.times(5)
+            LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
         }
-        binding.r20Layout.volumeAdd.setOnClickListener {
-            systemSetting.type = R20BleCmd.SystemSetting.VOLUME
-            binding.r20Layout.volume.progress++
-            systemSetting.volumeSetting.volume = binding.r20Layout.volume.progress.times(5)
-            LpBleUtil.r20SetSystemSetting(model, systemSetting)
+        binding.ventilatorLayout.volumeAdd.setOnClickListener {
+            systemSetting.type = VentilatorBleCmd.SystemSetting.VOLUME
+            binding.ventilatorLayout.volume.progress++
+            systemSetting.volumeSetting.volume = binding.ventilatorLayout.volume.progress.times(5)
+            LpBleUtil.ventilatorSetSystemSetting(model, systemSetting)
         }
         // 测量设置
         // 湿化等级
         ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("关闭", "1", "2", "3", "4", "5", "自动")).apply {
-            binding.r20Layout.humidification.adapter = this
+            binding.ventilatorLayout.humidification.adapter = this
         }
-        binding.r20Layout.humidification.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.ventilatorLayout.humidification.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (spinnerSet) {
-                    measureSetting.type = R20BleCmd.MeasureSetting.HUMIDIFICATION
+                    measureSetting.type = VentilatorBleCmd.MeasureSetting.HUMIDIFICATION
                     if (position == 6) {
                         measureSetting.humidification.humidification = 0xff
                     } else {
                         measureSetting.humidification.humidification = position
                     }
-                    LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                    LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -435,14 +436,14 @@ class R20ViewModel : SettingViewModel() {
         }
         // 呼吸压力释放：吸气压力释放
         ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("关闭", "1", "2", "3")).apply {
-            binding.r20Layout.ipr.adapter = this
+            binding.ventilatorLayout.ipr.adapter = this
         }
-        binding.r20Layout.ipr.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.ventilatorLayout.ipr.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (spinnerSet) {
-                    measureSetting.type = R20BleCmd.MeasureSetting.PRESSURE_REDUCE
+                    measureSetting.type = VentilatorBleCmd.MeasureSetting.PRESSURE_REDUCE
                     measureSetting.pressureReduce.ipr = position
-                    LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                    LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -450,66 +451,66 @@ class R20ViewModel : SettingViewModel() {
         }
         // 呼吸压力释放：呼气压力释放
         ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("关闭", "1", "2", "3")).apply {
-            binding.r20Layout.epr.adapter = this
+            binding.ventilatorLayout.epr.adapter = this
         }
-        binding.r20Layout.epr.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.ventilatorLayout.epr.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (spinnerSet) {
-                    measureSetting.type = R20BleCmd.MeasureSetting.PRESSURE_REDUCE
+                    measureSetting.type = VentilatorBleCmd.MeasureSetting.PRESSURE_REDUCE
                     measureSetting.pressureReduce.epr = position
-                    LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                    LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
         // 自动启停：自动启动
-        binding.r20Layout.autoStart.setOnCheckedChangeListener { buttonView, isChecked ->
+        binding.ventilatorLayout.autoStart.setOnCheckedChangeListener { buttonView, isChecked ->
             if (buttonView.isPressed) {
-                measureSetting.type = R20BleCmd.MeasureSetting.AUTO_SWITCH
+                measureSetting.type = VentilatorBleCmd.MeasureSetting.AUTO_SWITCH
                 measureSetting.autoSwitch.autoStart = isChecked
-                LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
             }
         }
         // 自动启停：自动停止
-        binding.r20Layout.autoEnd.setOnCheckedChangeListener { buttonView, isChecked ->
+        binding.ventilatorLayout.autoEnd.setOnCheckedChangeListener { buttonView, isChecked ->
             if (buttonView.isPressed) {
-                measureSetting.type = R20BleCmd.MeasureSetting.AUTO_SWITCH
+                measureSetting.type = VentilatorBleCmd.MeasureSetting.AUTO_SWITCH
                 measureSetting.autoSwitch.autoEnd = isChecked
-                LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
             }
         }
         // 自动启停：自动停止
-        binding.r20Layout.autoEnd.setOnCheckedChangeListener { buttonView, isChecked ->
+        binding.ventilatorLayout.autoEnd.setOnCheckedChangeListener { buttonView, isChecked ->
             if (buttonView.isPressed) {
-                measureSetting.type = R20BleCmd.MeasureSetting.AUTO_SWITCH
+                measureSetting.type = VentilatorBleCmd.MeasureSetting.AUTO_SWITCH
                 measureSetting.autoSwitch.autoEnd = isChecked
-                LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
             }
         }
         // 自动启停：自动停止
-        binding.r20Layout.preHeat.setOnCheckedChangeListener { buttonView, isChecked ->
+        binding.ventilatorLayout.preHeat.setOnCheckedChangeListener { buttonView, isChecked ->
             if (buttonView.isPressed) {
-                measureSetting.type = R20BleCmd.MeasureSetting.PRE_HEAT
+                measureSetting.type = VentilatorBleCmd.MeasureSetting.PRE_HEAT
                 measureSetting.preHeat.on = isChecked
-                LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
             }
         }
         // 缓冲压力
-        binding.r20Layout.rampPressure.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.rampPressure.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    measureSetting.type = R20BleCmd.MeasureSetting.RAMP
+                    measureSetting.type = VentilatorBleCmd.MeasureSetting.RAMP
                     measureSetting.ramp.pressure = progress.times(0.5f)
-                    LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                    LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
                 }
-                binding.r20Layout.rampPressureProcess.text = "${progress.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
+                binding.ventilatorLayout.rampPressureProcess.text = "${progress.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
                     "cmH2O"
                 } else {
                     "hPa"
                 }}"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    binding.r20Layout.rampPressureRange.text = "范围：${binding.r20Layout.rampPressure.min.times(0.5f)} - ${binding.r20Layout.rampPressure.max.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
+                    binding.ventilatorLayout.rampPressureRange.text = "范围：${binding.ventilatorLayout.rampPressure.min.times(0.5f)} - ${binding.ventilatorLayout.rampPressure.max.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
                         "cmH2O"
                     } else {
                         "hPa"
@@ -521,56 +522,56 @@ class R20ViewModel : SettingViewModel() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.rampPressureSub.setOnClickListener {
-            binding.r20Layout.rampPressure.progress--
-            measureSetting.type = R20BleCmd.MeasureSetting.RAMP
-            measureSetting.ramp.pressure = binding.r20Layout.rampPressure.progress.times(0.5f)
-            LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+        binding.ventilatorLayout.rampPressureSub.setOnClickListener {
+            binding.ventilatorLayout.rampPressure.progress--
+            measureSetting.type = VentilatorBleCmd.MeasureSetting.RAMP
+            measureSetting.ramp.pressure = binding.ventilatorLayout.rampPressure.progress.times(0.5f)
+            LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
         }
-        binding.r20Layout.rampPressureAdd.setOnClickListener {
-            binding.r20Layout.rampPressure.progress++
-            measureSetting.type = R20BleCmd.MeasureSetting.RAMP
-            measureSetting.ramp.pressure = binding.r20Layout.rampPressure.progress.times(0.5f)
-            LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+        binding.ventilatorLayout.rampPressureAdd.setOnClickListener {
+            binding.ventilatorLayout.rampPressure.progress++
+            measureSetting.type = VentilatorBleCmd.MeasureSetting.RAMP
+            measureSetting.ramp.pressure = binding.ventilatorLayout.rampPressure.progress.times(0.5f)
+            LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
         }
         // 缓冲时间
-        binding.r20Layout.rampTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.rampTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    measureSetting.type = R20BleCmd.MeasureSetting.RAMP
+                    measureSetting.type = VentilatorBleCmd.MeasureSetting.RAMP
                     measureSetting.ramp.time = progress.times(5)
-                    LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                    LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
                 }
-                binding.r20Layout.rampTimeProcess.text = "${progress.times(5)}min"
-                binding.r20Layout.rampTimeRange.text = "范围：关 - ${binding.r20Layout.rampTime.max.times(5)}min"
+                binding.ventilatorLayout.rampTimeProcess.text = "${progress.times(5)}min"
+                binding.ventilatorLayout.rampTimeRange.text = "范围：关 - ${binding.ventilatorLayout.rampTime.max.times(5)}min"
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.rampTimeSub.setOnClickListener {
-            binding.r20Layout.rampTime.progress--
-            measureSetting.type = R20BleCmd.MeasureSetting.RAMP
-            measureSetting.ramp.time = binding.r20Layout.rampTime.progress.times(5)
-            LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+        binding.ventilatorLayout.rampTimeSub.setOnClickListener {
+            binding.ventilatorLayout.rampTime.progress--
+            measureSetting.type = VentilatorBleCmd.MeasureSetting.RAMP
+            measureSetting.ramp.time = binding.ventilatorLayout.rampTime.progress.times(5)
+            LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
         }
-        binding.r20Layout.rampTimeAdd.setOnClickListener {
-            binding.r20Layout.rampTime.progress++
-            measureSetting.type = R20BleCmd.MeasureSetting.RAMP
-            measureSetting.ramp.time = binding.r20Layout.rampTime.progress.times(5)
-            LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+        binding.ventilatorLayout.rampTimeAdd.setOnClickListener {
+            binding.ventilatorLayout.rampTime.progress++
+            measureSetting.type = VentilatorBleCmd.MeasureSetting.RAMP
+            measureSetting.ramp.time = binding.ventilatorLayout.rampTime.progress.times(5)
+            LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
         }
         // 管道类型
         ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("15mm", "22mm")).apply {
-            binding.r20Layout.tubeType.adapter = this
+            binding.ventilatorLayout.tubeType.adapter = this
         }
-        binding.r20Layout.tubeType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.ventilatorLayout.tubeType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (spinnerSet) {
-                    measureSetting.type = R20BleCmd.MeasureSetting.TUBE_TYPE
+                    measureSetting.type = VentilatorBleCmd.MeasureSetting.TUBE_TYPE
                     measureSetting.tubeType.type = position
-                    LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                    LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -578,34 +579,34 @@ class R20ViewModel : SettingViewModel() {
         }
         // 面罩类型
         ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("口鼻罩", "鼻罩", "鼻枕")).apply {
-            binding.r20Layout.maskType.adapter = this
+            binding.ventilatorLayout.maskType.adapter = this
         }
-        binding.r20Layout.maskType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.ventilatorLayout.maskType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (spinnerSet) {
-                    measureSetting.type = R20BleCmd.MeasureSetting.MASK
+                    measureSetting.type = VentilatorBleCmd.MeasureSetting.MASK
                     measureSetting.mask.type = position
-                    LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                    LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
         // 面罩佩戴匹配测试压力
-        binding.r20Layout.maskPressure.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.maskPressure.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    measureSetting.type = R20BleCmd.MeasureSetting.MASK
+                    measureSetting.type = VentilatorBleCmd.MeasureSetting.MASK
                     measureSetting.mask.pressure = progress.toFloat()
-                    LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+                    LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
                 }
-                binding.r20Layout.maskPressureProcess.text = "${progress.toFloat()}${if (systemSetting.unitSetting.pressureUnit == 0) {
+                binding.ventilatorLayout.maskPressureProcess.text = "${progress.toFloat()}${if (systemSetting.unitSetting.pressureUnit == 0) {
                     "cmH2O"
                 } else {
                     "hPa"
                 }}"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    binding.r20Layout.maskPressureRange.text = "范围：${binding.r20Layout.maskPressure.min.times(1.0f)} - ${binding.r20Layout.maskPressure.max.times(1.0f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
+                    binding.ventilatorLayout.maskPressureRange.text = "范围：${binding.ventilatorLayout.maskPressure.min.times(1.0f)} - ${binding.ventilatorLayout.maskPressure.max.times(1.0f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
                         "cmH2O"
                     } else {
                         "hPa"
@@ -617,34 +618,69 @@ class R20ViewModel : SettingViewModel() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.maskPressureSub.setOnClickListener {
-            binding.r20Layout.maskPressure.progress--
-            measureSetting.type = R20BleCmd.MeasureSetting.MASK
-            measureSetting.mask.pressure = binding.r20Layout.maskPressure.progress.toFloat()
-            LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+        binding.ventilatorLayout.maskPressureSub.setOnClickListener {
+            binding.ventilatorLayout.maskPressure.progress--
+            measureSetting.type = VentilatorBleCmd.MeasureSetting.MASK
+            measureSetting.mask.pressure = binding.ventilatorLayout.maskPressure.progress.toFloat()
+            LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
         }
-        binding.r20Layout.maskPressureAdd.setOnClickListener {
-            binding.r20Layout.maskPressure.progress++
-            measureSetting.type = R20BleCmd.MeasureSetting.MASK
-            measureSetting.mask.pressure = binding.r20Layout.maskPressure.progress.toFloat()
-            LpBleUtil.r20SetMeasureSetting(model, measureSetting)
+        binding.ventilatorLayout.maskPressureAdd.setOnClickListener {
+            binding.ventilatorLayout.maskPressure.progress++
+            measureSetting.type = VentilatorBleCmd.MeasureSetting.MASK
+            measureSetting.mask.pressure = binding.ventilatorLayout.maskPressure.progress.toFloat()
+            LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
         }
         // 通气设置
+        // 通气模式
+        val ventilatorModel = VentilatorModel(mainViewModel._er1Info.value?.branchCode)
+        val modes = ArrayList<String>()
+        if (ventilatorModel.isSupportCpap) {
+            modes.add("CPAP")
+        }
+        if (ventilatorModel.isSupportApap) {
+            modes.add("APAP")
+        }
+        if (ventilatorModel.isSupportS) {
+            modes.add("S")
+        }
+        if (ventilatorModel.isSupportST) {
+            modes.add("S/T")
+        }
+        if (ventilatorModel.isSupportT) {
+            modes.add("T")
+        }
+        /*ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("CPAP", "APAP", "S", "S/T", "T")).apply {
+            binding.ventilatorLayout.ventilationMode.adapter = this
+        }*/
+        ArrayAdapter(context, android.R.layout.simple_list_item_1, modes).apply {
+            binding.ventilatorLayout.ventilationMode.adapter = this
+        }
+        binding.ventilatorLayout.ventilationMode.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (spinnerSet) {
+                    ventilationSetting.type = VentilatorBleCmd.VentilationSetting.VENTILATION_MODE
+                    ventilationSetting.ventilationMode.mode = position
+                    LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
         // CPAP模式压力
-        binding.r20Layout.cpapPressure.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.cpapPressure.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE
-                    ventilationSetting.pressure.pressure = progress.times(0.5f)
-                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                    ventilationSetting.type = VentilatorBleCmd.VentilationSetting.PRESSURE
+                    ventilationSetting.cpapPressure.pressure = progress.times(0.5f)
+                    LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
                 }
-                binding.r20Layout.cpapPressureProcess.text = "${progress.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
+                binding.ventilatorLayout.cpapPressureProcess.text = "${progress.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
                     "cmH2O"
                 } else {
                     "hPa"
                 }}"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    binding.r20Layout.cpapPressureRange.text = "范围：${binding.r20Layout.cpapPressure.min.times(0.5f)} - ${binding.r20Layout.cpapPressure.max.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
+                    binding.ventilatorLayout.cpapPressureRange.text = "范围：${binding.ventilatorLayout.cpapPressure.min.times(0.5f)} - ${binding.ventilatorLayout.cpapPressure.max.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
                         "cmH2O"
                     } else {
                         "hPa"
@@ -656,33 +692,33 @@ class R20ViewModel : SettingViewModel() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.cpapPressureSub.setOnClickListener {
-            binding.r20Layout.cpapPressure.progress--
-            ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE
-            ventilationSetting.pressure.pressure = binding.r20Layout.cpapPressure.progress.times(0.5f)
-            LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+        binding.ventilatorLayout.cpapPressureSub.setOnClickListener {
+            binding.ventilatorLayout.cpapPressure.progress--
+            ventilationSetting.type = VentilatorBleCmd.VentilationSetting.PRESSURE
+            ventilationSetting.cpapPressure.pressure = binding.ventilatorLayout.cpapPressure.progress.times(0.5f)
+            LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
         }
-        binding.r20Layout.cpapPressureAdd.setOnClickListener {
-            binding.r20Layout.cpapPressure.progress++
-            ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE
-            ventilationSetting.pressure.pressure = binding.r20Layout.cpapPressure.progress.times(0.5f)
-            LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+        binding.ventilatorLayout.cpapPressureAdd.setOnClickListener {
+            binding.ventilatorLayout.cpapPressure.progress++
+            ventilationSetting.type = VentilatorBleCmd.VentilationSetting.PRESSURE
+            ventilationSetting.cpapPressure.pressure = binding.ventilatorLayout.cpapPressure.progress.times(0.5f)
+            LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
         }
         // APAP模式压力最大值Pmax
-        binding.r20Layout.apapPressureMax.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.apapPressureMax.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_MAX
-                    ventilationSetting.pressureMax.max = progress.times(0.5f)
-                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                    ventilationSetting.type = VentilatorBleCmd.VentilationSetting.PRESSURE_MAX
+                    ventilationSetting.apapPressureMax.max = progress.times(0.5f)
+                    LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
                 }
-                binding.r20Layout.apapPressureMaxProcess.text = "${progress.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
+                binding.ventilatorLayout.apapPressureMaxProcess.text = "${progress.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
                     "cmH2O"
                 } else {
                     "hPa"
                 }}"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    binding.r20Layout.apapPressureMaxRange.text = "范围：${binding.r20Layout.apapPressureMax.min.times(0.5f)} - ${binding.r20Layout.apapPressureMax.max.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
+                    binding.ventilatorLayout.apapPressureMaxRange.text = "范围：${binding.ventilatorLayout.apapPressureMax.min.times(0.5f)} - ${binding.ventilatorLayout.apapPressureMax.max.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
                         "cmH2O"
                     } else {
                         "hPa"
@@ -694,33 +730,33 @@ class R20ViewModel : SettingViewModel() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.apapPressureMaxSub.setOnClickListener {
-            binding.r20Layout.apapPressureMax.progress--
-            ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_MAX
-            ventilationSetting.pressureMax.max = binding.r20Layout.apapPressureMax.progress.times(0.5f)
-            LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+        binding.ventilatorLayout.apapPressureMaxSub.setOnClickListener {
+            binding.ventilatorLayout.apapPressureMax.progress--
+            ventilationSetting.type = VentilatorBleCmd.VentilationSetting.PRESSURE_MAX
+            ventilationSetting.apapPressureMax.max = binding.ventilatorLayout.apapPressureMax.progress.times(0.5f)
+            LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
         }
-        binding.r20Layout.apapPressureMaxAdd.setOnClickListener {
-            binding.r20Layout.apapPressureMax.progress++
-            ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_MAX
-            ventilationSetting.pressureMax.max = binding.r20Layout.apapPressureMax.progress.times(0.5f)
-            LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+        binding.ventilatorLayout.apapPressureMaxAdd.setOnClickListener {
+            binding.ventilatorLayout.apapPressureMax.progress++
+            ventilationSetting.type = VentilatorBleCmd.VentilationSetting.PRESSURE_MAX
+            ventilationSetting.apapPressureMax.max = binding.ventilatorLayout.apapPressureMax.progress.times(0.5f)
+            LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
         }
         // APAP模式压力最小值Pmin
-        binding.r20Layout.apapPressureMin.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.apapPressureMin.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_MIN
-                    ventilationSetting.pressureMin.min = progress.times(0.5f)
-                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                    ventilationSetting.type = VentilatorBleCmd.VentilationSetting.PRESSURE_MIN
+                    ventilationSetting.apapPressureMin.min = progress.times(0.5f)
+                    LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
                 }
-                binding.r20Layout.apapPressureMinProcess.text = "${progress.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
+                binding.ventilatorLayout.apapPressureMinProcess.text = "${progress.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
                     "cmH2O"
                 } else {
                     "hPa"
                 }}"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    binding.r20Layout.apapPressureMinRange.text = "范围：${binding.r20Layout.apapPressureMin.min.times(0.5f)} - ${binding.r20Layout.apapPressureMin.max.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
+                    binding.ventilatorLayout.apapPressureMinRange.text = "范围：${binding.ventilatorLayout.apapPressureMin.min.times(0.5f)} - ${binding.ventilatorLayout.apapPressureMin.max.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
                         "cmH2O"
                     } else {
                         "hPa"
@@ -732,33 +768,33 @@ class R20ViewModel : SettingViewModel() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.apapPressureMinSub.setOnClickListener {
-            binding.r20Layout.apapPressureMin.progress--
-            ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_MIN
-            ventilationSetting.pressureMin.min = binding.r20Layout.apapPressureMin.progress.times(0.5f)
-            LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+        binding.ventilatorLayout.apapPressureMinSub.setOnClickListener {
+            binding.ventilatorLayout.apapPressureMin.progress--
+            ventilationSetting.type = VentilatorBleCmd.VentilationSetting.PRESSURE_MIN
+            ventilationSetting.apapPressureMin.min = binding.ventilatorLayout.apapPressureMin.progress.times(0.5f)
+            LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
         }
-        binding.r20Layout.apapPressureMinAdd.setOnClickListener {
-            binding.r20Layout.apapPressureMin.progress++
-            ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_MIN
-            ventilationSetting.pressureMin.min = binding.r20Layout.apapPressureMin.progress.times(0.5f)
-            LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+        binding.ventilatorLayout.apapPressureMinAdd.setOnClickListener {
+            binding.ventilatorLayout.apapPressureMin.progress++
+            ventilationSetting.type = VentilatorBleCmd.VentilationSetting.PRESSURE_MIN
+            ventilationSetting.apapPressureMin.min = binding.ventilatorLayout.apapPressureMin.progress.times(0.5f)
+            LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
         }
         // 吸气压力
-        binding.r20Layout.ipapPressure.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.ipapPressure.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_INHALE
+                    ventilationSetting.type = VentilatorBleCmd.VentilationSetting.PRESSURE_INHALE
                     ventilationSetting.pressureInhale.inhale = progress.times(0.5f)
-                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                    LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
                 }
-                binding.r20Layout.ipapPressureProcess.text = "${progress.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
+                binding.ventilatorLayout.ipapPressureProcess.text = "${progress.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
                     "cmH2O"
                 } else {
                     "hPa"
                 }}"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    binding.r20Layout.ipapPressureRange.text = "范围：${binding.r20Layout.ipapPressure.min.times(0.5f)} - ${binding.r20Layout.ipapPressure.max.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
+                    binding.ventilatorLayout.ipapPressureRange.text = "范围：${binding.ventilatorLayout.ipapPressure.min.times(0.5f)} - ${binding.ventilatorLayout.ipapPressure.max.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
                         "cmH2O"
                     } else {
                         "hPa"
@@ -770,33 +806,33 @@ class R20ViewModel : SettingViewModel() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.ipapPressureSub.setOnClickListener {
-            binding.r20Layout.ipapPressure.progress--
-            ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_INHALE
-            ventilationSetting.pressureInhale.inhale = binding.r20Layout.ipapPressure.progress.times(0.5f)
-            LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+        binding.ventilatorLayout.ipapPressureSub.setOnClickListener {
+            binding.ventilatorLayout.ipapPressure.progress--
+            ventilationSetting.type = VentilatorBleCmd.VentilationSetting.PRESSURE_INHALE
+            ventilationSetting.pressureInhale.inhale = binding.ventilatorLayout.ipapPressure.progress.times(0.5f)
+            LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
         }
-        binding.r20Layout.ipapPressureAdd.setOnClickListener {
-            binding.r20Layout.ipapPressure.progress++
-            ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_INHALE
-            ventilationSetting.pressureInhale.inhale = binding.r20Layout.ipapPressure.progress.times(0.5f)
-            LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+        binding.ventilatorLayout.ipapPressureAdd.setOnClickListener {
+            binding.ventilatorLayout.ipapPressure.progress++
+            ventilationSetting.type = VentilatorBleCmd.VentilationSetting.PRESSURE_INHALE
+            ventilationSetting.pressureInhale.inhale = binding.ventilatorLayout.ipapPressure.progress.times(0.5f)
+            LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
         }
         // 呼气压力
-        binding.r20Layout.epapPressure.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.epapPressure.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_EXHALE
+                    ventilationSetting.type = VentilatorBleCmd.VentilationSetting.PRESSURE_EXHALE
                     ventilationSetting.pressureExhale.exhale = progress.times(0.5f)
-                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                    LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
                 }
-                binding.r20Layout.epapPressureProcess.text = "${progress.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
+                binding.ventilatorLayout.epapPressureProcess.text = "${progress.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
                     "cmH2O"
                 } else {
                     "hPa"
                 }}"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    binding.r20Layout.epapPressureRange.text = "范围：${binding.r20Layout.epapPressure.min.times(0.5f)} - ${binding.r20Layout.epapPressure.max.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
+                    binding.ventilatorLayout.epapPressureRange.text = "范围：${binding.ventilatorLayout.epapPressure.min.times(0.5f)} - ${binding.ventilatorLayout.epapPressure.max.times(0.5f)}${if (systemSetting.unitSetting.pressureUnit == 0) {
                         "cmH2O"
                     } else {
                         "hPa"
@@ -808,29 +844,29 @@ class R20ViewModel : SettingViewModel() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.epapPressureSub.setOnClickListener {
-            binding.r20Layout.epapPressure.progress--
-            ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_EXHALE
-            ventilationSetting.pressureExhale.exhale = binding.r20Layout.epapPressure.progress.times(0.5f)
-            LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+        binding.ventilatorLayout.epapPressureSub.setOnClickListener {
+            binding.ventilatorLayout.epapPressure.progress--
+            ventilationSetting.type = VentilatorBleCmd.VentilationSetting.PRESSURE_EXHALE
+            ventilationSetting.pressureExhale.exhale = binding.ventilatorLayout.epapPressure.progress.times(0.5f)
+            LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
         }
-        binding.r20Layout.epapPressureAdd.setOnClickListener {
-            binding.r20Layout.epapPressure.progress++
-            ventilationSetting.type = R20BleCmd.VentilationSetting.PRESSURE_EXHALE
-            ventilationSetting.pressureExhale.exhale = binding.r20Layout.epapPressure.progress.times(0.5f)
-            LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+        binding.ventilatorLayout.epapPressureAdd.setOnClickListener {
+            binding.ventilatorLayout.epapPressure.progress++
+            ventilationSetting.type = VentilatorBleCmd.VentilationSetting.PRESSURE_EXHALE
+            ventilationSetting.pressureExhale.exhale = binding.ventilatorLayout.epapPressure.progress.times(0.5f)
+            LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
         }
         // 吸气时间
-        binding.r20Layout.inspiratoryTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.inspiratoryTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    ventilationSetting.type = R20BleCmd.VentilationSetting.INHALE_DURATION
+                    ventilationSetting.type = VentilatorBleCmd.VentilationSetting.INHALE_DURATION
                     ventilationSetting.inhaleDuration.duration = progress.div(10f)
-                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                    LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
                 }
-                binding.r20Layout.inspiratoryTimeProcess.text = "${progress.div(10f)}s"
+                binding.ventilatorLayout.inspiratoryTimeProcess.text = "${progress.div(10f)}s"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    binding.r20Layout.inspiratoryTimeRange.text = "范围：${String.format("%.1f", binding.r20Layout.inspiratoryTime.min.times(0.1f))} - ${String.format("%.1f", binding.r20Layout.inspiratoryTime.max.times(0.1f))}s"
+                    binding.ventilatorLayout.inspiratoryTimeRange.text = "范围：${String.format("%.1f", binding.ventilatorLayout.inspiratoryTime.min.times(0.1f))} - ${String.format("%.1f", binding.ventilatorLayout.inspiratoryTime.max.times(0.1f))}s"
                 }
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -838,29 +874,29 @@ class R20ViewModel : SettingViewModel() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.inspiratoryTimeSub.setOnClickListener {
-            binding.r20Layout.inspiratoryTime.progress--
-            ventilationSetting.type = R20BleCmd.VentilationSetting.INHALE_DURATION
-            ventilationSetting.inhaleDuration.duration = binding.r20Layout.inspiratoryTime.progress.div(10f)
-            LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+        binding.ventilatorLayout.inspiratoryTimeSub.setOnClickListener {
+            binding.ventilatorLayout.inspiratoryTime.progress--
+            ventilationSetting.type = VentilatorBleCmd.VentilationSetting.INHALE_DURATION
+            ventilationSetting.inhaleDuration.duration = binding.ventilatorLayout.inspiratoryTime.progress.div(10f)
+            LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
         }
-        binding.r20Layout.inspiratoryTimeAdd.setOnClickListener {
-            binding.r20Layout.inspiratoryTime.progress++
-            ventilationSetting.type = R20BleCmd.VentilationSetting.INHALE_DURATION
-            ventilationSetting.inhaleDuration.duration = binding.r20Layout.inspiratoryTime.progress.div(10f)
-            LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+        binding.ventilatorLayout.inspiratoryTimeAdd.setOnClickListener {
+            binding.ventilatorLayout.inspiratoryTime.progress++
+            ventilationSetting.type = VentilatorBleCmd.VentilationSetting.INHALE_DURATION
+            ventilationSetting.inhaleDuration.duration = binding.ventilatorLayout.inspiratoryTime.progress.div(10f)
+            LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
         }
         // 呼吸频率
-        binding.r20Layout.respiratoryFrequency.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.respiratoryFrequency.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    ventilationSetting.type = R20BleCmd.VentilationSetting.RESPIRATORY_RATE
+                    ventilationSetting.type = VentilatorBleCmd.VentilationSetting.RESPIRATORY_RATE
                     ventilationSetting.respiratoryRate.rate = progress
-                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                    LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
                 }
-                binding.r20Layout.respiratoryFrequencyProcess.text = "$progress bpm"
+                binding.ventilatorLayout.respiratoryFrequencyProcess.text = "$progress bpm"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    binding.r20Layout.respiratoryFrequencyRange.text = "范围：${binding.r20Layout.respiratoryFrequency.min} - ${binding.r20Layout.respiratoryFrequency.max}bpm"
+                    binding.ventilatorLayout.respiratoryFrequencyRange.text = "范围：${binding.ventilatorLayout.respiratoryFrequency.min} - ${binding.ventilatorLayout.respiratoryFrequency.max}bpm"
                 }
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -868,29 +904,29 @@ class R20ViewModel : SettingViewModel() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.respiratoryFrequencySub.setOnClickListener {
-            binding.r20Layout.respiratoryFrequency.progress--
-            ventilationSetting.type = R20BleCmd.VentilationSetting.RESPIRATORY_RATE
-            ventilationSetting.respiratoryRate.rate = binding.r20Layout.respiratoryFrequency.progress
-            LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+        binding.ventilatorLayout.respiratoryFrequencySub.setOnClickListener {
+            binding.ventilatorLayout.respiratoryFrequency.progress--
+            ventilationSetting.type = VentilatorBleCmd.VentilationSetting.RESPIRATORY_RATE
+            ventilationSetting.respiratoryRate.rate = binding.ventilatorLayout.respiratoryFrequency.progress
+            LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
         }
-        binding.r20Layout.respiratoryFrequencyAdd.setOnClickListener {
-            binding.r20Layout.respiratoryFrequency.progress++
-            ventilationSetting.type = R20BleCmd.VentilationSetting.RESPIRATORY_RATE
-            ventilationSetting.respiratoryRate.rate = binding.r20Layout.respiratoryFrequency.progress
-            LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+        binding.ventilatorLayout.respiratoryFrequencyAdd.setOnClickListener {
+            binding.ventilatorLayout.respiratoryFrequency.progress++
+            ventilationSetting.type = VentilatorBleCmd.VentilationSetting.RESPIRATORY_RATE
+            ventilationSetting.respiratoryRate.rate = binding.ventilatorLayout.respiratoryFrequency.progress
+            LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
         }
         // 压力上升时间
-        binding.r20Layout.raiseTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.raiseTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    ventilationSetting.type = R20BleCmd.VentilationSetting.RAISE_DURATION
+                    ventilationSetting.type = VentilatorBleCmd.VentilationSetting.RAISE_DURATION
                     ventilationSetting.pressureRaiseDuration.duration = progress.times(50)
-                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                    LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
                 }
-                binding.r20Layout.raiseTimeProcess.text = "${progress.times(50)}ms"
+                binding.ventilatorLayout.raiseTimeProcess.text = "${progress.times(50)}ms"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    binding.r20Layout.raiseTimeRange.text = "范围：${binding.r20Layout.raiseTime.min.times(50)} - ${binding.r20Layout.raiseTime.max.times(50)}ms"
+                    binding.ventilatorLayout.raiseTimeRange.text = "范围：${binding.ventilatorLayout.raiseTime.min.times(50)} - ${binding.ventilatorLayout.raiseTime.max.times(50)}ms"
                 }
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -898,28 +934,28 @@ class R20ViewModel : SettingViewModel() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.raiseTimeSub.setOnClickListener {
-            binding.r20Layout.raiseTime.progress--
-            ventilationSetting.type = R20BleCmd.VentilationSetting.RAISE_DURATION
-            ventilationSetting.pressureRaiseDuration.duration = binding.r20Layout.raiseTime.progress.times(50)
-            LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+        binding.ventilatorLayout.raiseTimeSub.setOnClickListener {
+            binding.ventilatorLayout.raiseTime.progress--
+            ventilationSetting.type = VentilatorBleCmd.VentilationSetting.RAISE_DURATION
+            ventilationSetting.pressureRaiseDuration.duration = binding.ventilatorLayout.raiseTime.progress.times(50)
+            LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
         }
-        binding.r20Layout.raiseTimeAdd.setOnClickListener {
-            binding.r20Layout.raiseTime.progress++
-            ventilationSetting.type = R20BleCmd.VentilationSetting.RAISE_DURATION
-            ventilationSetting.pressureRaiseDuration.duration = binding.r20Layout.raiseTime.progress.times(50)
-            LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+        binding.ventilatorLayout.raiseTimeAdd.setOnClickListener {
+            binding.ventilatorLayout.raiseTime.progress++
+            ventilationSetting.type = VentilatorBleCmd.VentilationSetting.RAISE_DURATION
+            ventilationSetting.pressureRaiseDuration.duration = binding.ventilatorLayout.raiseTime.progress.times(50)
+            LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
         }
         // 吸气触发灵敏度
         ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("自动挡", "1", "2", "3", "4", "5")).apply {
-            binding.r20Layout.iTrigger.adapter = this
+            binding.ventilatorLayout.iTrigger.adapter = this
         }
-        binding.r20Layout.iTrigger.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.ventilatorLayout.iTrigger.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (spinnerSet) {
-                    ventilationSetting.type = R20BleCmd.VentilationSetting.INHALE_SENSITIVE
+                    ventilationSetting.type = VentilatorBleCmd.VentilationSetting.INHALE_SENSITIVE
                     ventilationSetting.inhaleSensitive.sentive = position
-                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                    LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -927,14 +963,14 @@ class R20ViewModel : SettingViewModel() {
         }
         // 呼气触发灵敏度
         ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("自动挡", "1", "2", "3", "4", "5")).apply {
-            binding.r20Layout.eTrigger.adapter = this
+            binding.ventilatorLayout.eTrigger.adapter = this
         }
-        binding.r20Layout.eTrigger.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.ventilatorLayout.eTrigger.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (spinnerSet) {
-                    ventilationSetting.type = R20BleCmd.VentilationSetting.EXHALE_SENSITIVE
+                    ventilationSetting.type = VentilatorBleCmd.VentilationSetting.EXHALE_SENSITIVE
                     ventilationSetting.exhaleSensitive.sentive = position
-                    LpBleUtil.r20SetVentilationSetting(model, ventilationSetting)
+                    LpBleUtil.ventilatorSetVentilationSetting(model, ventilationSetting)
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -943,14 +979,14 @@ class R20ViewModel : SettingViewModel() {
         // 报警设置
         // 漏气量高
         ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("关闭", "15s", "30s", "45s", "60s")).apply {
-            binding.r20Layout.leakHigh.adapter = this
+            binding.ventilatorLayout.leakHigh.adapter = this
         }
-        binding.r20Layout.leakHigh.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.ventilatorLayout.leakHigh.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (spinnerSet) {
-                    warningSetting.type = R20BleCmd.WarningSetting.LEAK_HIGH
+                    warningSetting.type = VentilatorBleCmd.WarningSetting.LEAK_HIGH
                     warningSetting.warningLeak.high = position.times(15)
-                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                    LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -958,261 +994,261 @@ class R20ViewModel : SettingViewModel() {
         }
         // 呼吸暂停
         ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("关闭", "10s", "20s", "30s")).apply {
-            binding.r20Layout.apnea.adapter = this
+            binding.ventilatorLayout.apnea.adapter = this
         }
-        binding.r20Layout.apnea.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.ventilatorLayout.apnea.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (spinnerSet) {
-                    warningSetting.type = R20BleCmd.WarningSetting.APNEA
+                    warningSetting.type = VentilatorBleCmd.WarningSetting.APNEA
                     warningSetting.warningApnea.apnea = position.times(10)
-                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                    LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
         // 潮气量低
-        binding.r20Layout.vtLow.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.vtLow.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    warningSetting.type = R20BleCmd.WarningSetting.VT_LOW
+                    warningSetting.type = VentilatorBleCmd.WarningSetting.VT_LOW
                     warningSetting.warningVt.low = if (progress == 19) {
                         0
                     } else {
                         progress.times(10)
                     }
-                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                    LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
                 }
-                binding.r20Layout.vtLowProcess.text = if (progress == 19) {
+                binding.ventilatorLayout.vtLowProcess.text = if (progress == 19) {
                     "关"
                 } else {
                     "${progress.times(10)}ml"
                 }
-                binding.r20Layout.vtLowRange.text = "范围：关 - ${binding.r20Layout.vtLow.max.times(10)}ml"
+                binding.ventilatorLayout.vtLowRange.text = "范围：关 - ${binding.ventilatorLayout.vtLow.max.times(10)}ml"
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.vtLowSub.setOnClickListener {
-            binding.r20Layout.vtLow.progress--
-            warningSetting.type = R20BleCmd.WarningSetting.VT_LOW
-            warningSetting.warningVt.low = binding.r20Layout.vtLow.progress.times(10)
-            LpBleUtil.r20SetWarningSetting(model, warningSetting)
+        binding.ventilatorLayout.vtLowSub.setOnClickListener {
+            binding.ventilatorLayout.vtLow.progress--
+            warningSetting.type = VentilatorBleCmd.WarningSetting.VT_LOW
+            warningSetting.warningVt.low = binding.ventilatorLayout.vtLow.progress.times(10)
+            LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
-        binding.r20Layout.vtLowAdd.setOnClickListener {
-            binding.r20Layout.vtLow.progress++
-            warningSetting.type = R20BleCmd.WarningSetting.VT_LOW
-            warningSetting.warningVt.low = binding.r20Layout.vtLow.progress.times(10)
-            LpBleUtil.r20SetWarningSetting(model, warningSetting)
+        binding.ventilatorLayout.vtLowAdd.setOnClickListener {
+            binding.ventilatorLayout.vtLow.progress++
+            warningSetting.type = VentilatorBleCmd.WarningSetting.VT_LOW
+            warningSetting.warningVt.low = binding.ventilatorLayout.vtLow.progress.times(10)
+            LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
         // 分钟通气量低
-        binding.r20Layout.lowVentilation.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.lowVentilation.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    warningSetting.type = R20BleCmd.WarningSetting.LOW_VENTILATION
+                    warningSetting.type = VentilatorBleCmd.WarningSetting.LOW_VENTILATION
                     warningSetting.warningVentilation.low = progress
-                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                    LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
                 }
-                binding.r20Layout.lowVentilationProcess.text = if (progress == 0) {
+                binding.ventilatorLayout.lowVentilationProcess.text = if (progress == 0) {
                     "关"
                 } else {
                     "${progress}L/min"
                 }
-                binding.r20Layout.lowVentilationRange.text = "范围：关 - ${binding.r20Layout.lowVentilation.max}L/min"
+                binding.ventilatorLayout.lowVentilationRange.text = "范围：关 - ${binding.ventilatorLayout.lowVentilation.max}L/min"
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.lowVentilationSub.setOnClickListener {
-            binding.r20Layout.lowVentilation.progress--
-            warningSetting.type = R20BleCmd.WarningSetting.LOW_VENTILATION
-            warningSetting.warningVentilation.low = binding.r20Layout.lowVentilation.progress
-            LpBleUtil.r20SetWarningSetting(model, warningSetting)
+        binding.ventilatorLayout.lowVentilationSub.setOnClickListener {
+            binding.ventilatorLayout.lowVentilation.progress--
+            warningSetting.type = VentilatorBleCmd.WarningSetting.LOW_VENTILATION
+            warningSetting.warningVentilation.low = binding.ventilatorLayout.lowVentilation.progress
+            LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
-        binding.r20Layout.lowVentilationAdd.setOnClickListener {
-            binding.r20Layout.lowVentilation.progress++
-            warningSetting.type = R20BleCmd.WarningSetting.LOW_VENTILATION
-            warningSetting.warningVentilation.low = binding.r20Layout.lowVentilation.progress
-            LpBleUtil.r20SetWarningSetting(model, warningSetting)
+        binding.ventilatorLayout.lowVentilationAdd.setOnClickListener {
+            binding.ventilatorLayout.lowVentilation.progress++
+            warningSetting.type = VentilatorBleCmd.WarningSetting.LOW_VENTILATION
+            warningSetting.warningVentilation.low = binding.ventilatorLayout.lowVentilation.progress
+            LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
         // 呼吸频率高
-        binding.r20Layout.rrHigh.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.rrHigh.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    warningSetting.type = R20BleCmd.WarningSetting.RR_HIGH
+                    warningSetting.type = VentilatorBleCmd.WarningSetting.RR_HIGH
                     warningSetting.warningRrHigh.high = progress
-                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                    LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
                 }
-                binding.r20Layout.rrHighProcess.text = if (progress == 0) {
+                binding.ventilatorLayout.rrHighProcess.text = if (progress == 0) {
                     "关"
                 } else {
                     "${progress}bpm"
                 }
-                binding.r20Layout.rrHighRange.text = "范围：关 - ${binding.r20Layout.rrHigh.max}bpm"
+                binding.ventilatorLayout.rrHighRange.text = "范围：关 - ${binding.ventilatorLayout.rrHigh.max}bpm"
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.rrHighSub.setOnClickListener {
-            binding.r20Layout.rrHigh.progress--
-            warningSetting.type = R20BleCmd.WarningSetting.RR_HIGH
-            warningSetting.warningRrHigh.high = binding.r20Layout.rrHigh.progress
-            LpBleUtil.r20SetWarningSetting(model, warningSetting)
+        binding.ventilatorLayout.rrHighSub.setOnClickListener {
+            binding.ventilatorLayout.rrHigh.progress--
+            warningSetting.type = VentilatorBleCmd.WarningSetting.RR_HIGH
+            warningSetting.warningRrHigh.high = binding.ventilatorLayout.rrHigh.progress
+            LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
-        binding.r20Layout.rrHighAdd.setOnClickListener {
-            binding.r20Layout.rrHigh.progress++
-            warningSetting.type = R20BleCmd.WarningSetting.RR_HIGH
-            warningSetting.warningRrHigh.high = binding.r20Layout.rrHigh.progress
-            LpBleUtil.r20SetWarningSetting(model, warningSetting)
+        binding.ventilatorLayout.rrHighAdd.setOnClickListener {
+            binding.ventilatorLayout.rrHigh.progress++
+            warningSetting.type = VentilatorBleCmd.WarningSetting.RR_HIGH
+            warningSetting.warningRrHigh.high = binding.ventilatorLayout.rrHigh.progress
+            LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
         // 呼吸频率低
-        binding.r20Layout.rrLow.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.rrLow.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    warningSetting.type = R20BleCmd.WarningSetting.RR_LOW
+                    warningSetting.type = VentilatorBleCmd.WarningSetting.RR_LOW
                     warningSetting.warningRrLow.low = progress
-                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                    LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
                 }
-                binding.r20Layout.rrLowProcess.text = if (progress == 0) {
+                binding.ventilatorLayout.rrLowProcess.text = if (progress == 0) {
                     "关"
                 } else {
                     "${progress}bpm"
                 }
-                binding.r20Layout.rrLowRange.text = "范围：关 - ${binding.r20Layout.rrLow.max}bpm"
+                binding.ventilatorLayout.rrLowRange.text = "范围：关 - ${binding.ventilatorLayout.rrLow.max}bpm"
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.rrLowSub.setOnClickListener {
-            binding.r20Layout.rrLow.progress--
-            warningSetting.type = R20BleCmd.WarningSetting.RR_LOW
-            warningSetting.warningRrLow.low = binding.r20Layout.rrLow.progress
-            LpBleUtil.r20SetWarningSetting(model, warningSetting)
+        binding.ventilatorLayout.rrLowSub.setOnClickListener {
+            binding.ventilatorLayout.rrLow.progress--
+            warningSetting.type = VentilatorBleCmd.WarningSetting.RR_LOW
+            warningSetting.warningRrLow.low = binding.ventilatorLayout.rrLow.progress
+            LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
-        binding.r20Layout.rrLowAdd.setOnClickListener {
-            binding.r20Layout.rrLow.progress++
-            warningSetting.type = R20BleCmd.WarningSetting.RR_LOW
-            warningSetting.warningRrLow.low = binding.r20Layout.rrLow.progress
-            LpBleUtil.r20SetWarningSetting(model, warningSetting)
+        binding.ventilatorLayout.rrLowAdd.setOnClickListener {
+            binding.ventilatorLayout.rrLow.progress++
+            warningSetting.type = VentilatorBleCmd.WarningSetting.RR_LOW
+            warningSetting.warningRrLow.low = binding.ventilatorLayout.rrLow.progress
+            LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
         // 血氧饱和度低
-        binding.r20Layout.spo2Low.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.spo2Low.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    warningSetting.type = R20BleCmd.WarningSetting.SPO2_LOW
+                    warningSetting.type = VentilatorBleCmd.WarningSetting.SPO2_LOW
                     warningSetting.warningSpo2Low.low = if (progress == 79) {
                         0
                     } else {
                         progress
                     }
-                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                    LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
                 }
-                binding.r20Layout.spo2LowProcess.text = if (progress == 79) {
+                binding.ventilatorLayout.spo2LowProcess.text = if (progress == 79) {
                     "关"
                 } else {
                     "${progress}%"
                 }
-                binding.r20Layout.spo2LowRange.text = "范围：关 - ${binding.r20Layout.spo2Low.max}%"
+                binding.ventilatorLayout.spo2LowRange.text = "范围：关 - ${binding.ventilatorLayout.spo2Low.max}%"
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.spo2LowSub.setOnClickListener {
-            binding.r20Layout.spo2Low.progress--
-            warningSetting.type = R20BleCmd.WarningSetting.SPO2_LOW
-            warningSetting.warningSpo2Low.low = binding.r20Layout.spo2Low.progress
-            LpBleUtil.r20SetWarningSetting(model, warningSetting)
+        binding.ventilatorLayout.spo2LowSub.setOnClickListener {
+            binding.ventilatorLayout.spo2Low.progress--
+            warningSetting.type = VentilatorBleCmd.WarningSetting.SPO2_LOW
+            warningSetting.warningSpo2Low.low = binding.ventilatorLayout.spo2Low.progress
+            LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
-        binding.r20Layout.spo2LowAdd.setOnClickListener {
-            binding.r20Layout.spo2Low.progress++
-            warningSetting.type = R20BleCmd.WarningSetting.SPO2_LOW
-            warningSetting.warningSpo2Low.low = binding.r20Layout.spo2Low.progress
-            LpBleUtil.r20SetWarningSetting(model, warningSetting)
+        binding.ventilatorLayout.spo2LowAdd.setOnClickListener {
+            binding.ventilatorLayout.spo2Low.progress++
+            warningSetting.type = VentilatorBleCmd.WarningSetting.SPO2_LOW
+            warningSetting.warningSpo2Low.low = binding.ventilatorLayout.spo2Low.progress
+            LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
         // 脉率/心率高
-        binding.r20Layout.hrHigh.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.hrHigh.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    warningSetting.type = R20BleCmd.WarningSetting.HR_HIGH
+                    warningSetting.type = VentilatorBleCmd.WarningSetting.HR_HIGH
                     warningSetting.warningHrHigh.high = if (progress == 9) {
                         0
                     } else {
                         progress.times(10)
                     }
-                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                    LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
                 }
-                binding.r20Layout.hrHighProcess.text = if (progress == 9) {
+                binding.ventilatorLayout.hrHighProcess.text = if (progress == 9) {
                     "关"
                 } else {
                     "${progress.times(10)}bpm"
                 }
-                binding.r20Layout.hrHighRange.text = "范围：关 - ${binding.r20Layout.hrHigh.max.times(10)}bpm"
+                binding.ventilatorLayout.hrHighRange.text = "范围：关 - ${binding.ventilatorLayout.hrHigh.max.times(10)}bpm"
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.hrHighSub.setOnClickListener {
-            binding.r20Layout.hrHigh.progress--
-            warningSetting.type = R20BleCmd.WarningSetting.HR_HIGH
-            warningSetting.warningHrHigh.high = binding.r20Layout.hrHigh.progress.times(10)
-            LpBleUtil.r20SetWarningSetting(model, warningSetting)
+        binding.ventilatorLayout.hrHighSub.setOnClickListener {
+            binding.ventilatorLayout.hrHigh.progress--
+            warningSetting.type = VentilatorBleCmd.WarningSetting.HR_HIGH
+            warningSetting.warningHrHigh.high = binding.ventilatorLayout.hrHigh.progress.times(10)
+            LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
-        binding.r20Layout.hrHighAdd.setOnClickListener {
-            binding.r20Layout.hrHigh.progress++
-            warningSetting.type = R20BleCmd.WarningSetting.HR_HIGH
-            warningSetting.warningHrHigh.high = binding.r20Layout.hrHigh.progress.times(10)
-            LpBleUtil.r20SetWarningSetting(model, warningSetting)
+        binding.ventilatorLayout.hrHighAdd.setOnClickListener {
+            binding.ventilatorLayout.hrHigh.progress++
+            warningSetting.type = VentilatorBleCmd.WarningSetting.HR_HIGH
+            warningSetting.warningHrHigh.high = binding.ventilatorLayout.hrHigh.progress.times(10)
+            LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
         // 脉率/心率低
-        binding.r20Layout.hrLow.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.ventilatorLayout.hrLow.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    warningSetting.type = R20BleCmd.WarningSetting.HR_LOW
+                    warningSetting.type = VentilatorBleCmd.WarningSetting.HR_LOW
                     warningSetting.warningHrLow.low = if (progress == 5) {
                         0
                     } else {
                         progress.times(5)
                     }
-                    LpBleUtil.r20SetWarningSetting(model, warningSetting)
+                    LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
                 }
-                binding.r20Layout.hrLowProcess.text = if (progress == 5) {
+                binding.ventilatorLayout.hrLowProcess.text = if (progress == 5) {
                     "关"
                 } else {
                     "${progress.times(5)}bpm"
                 }
-                binding.r20Layout.hrLowRange.text = "范围：关 - ${binding.r20Layout.hrLow.max.times(5)}bpm"
+                binding.ventilatorLayout.hrLowRange.text = "范围：关 - ${binding.ventilatorLayout.hrLow.max.times(5)}bpm"
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
         })
-        binding.r20Layout.hrLowSub.setOnClickListener {
-            binding.r20Layout.hrLow.progress--
-            warningSetting.type = R20BleCmd.WarningSetting.HR_LOW
-            warningSetting.warningHrLow.low = binding.r20Layout.hrLow.progress.times(5)
-            LpBleUtil.r20SetWarningSetting(model, warningSetting)
+        binding.ventilatorLayout.hrLowSub.setOnClickListener {
+            binding.ventilatorLayout.hrLow.progress--
+            warningSetting.type = VentilatorBleCmd.WarningSetting.HR_LOW
+            warningSetting.warningHrLow.low = binding.ventilatorLayout.hrLow.progress.times(5)
+            LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
-        binding.r20Layout.hrLowAdd.setOnClickListener {
-            binding.r20Layout.hrLow.progress++
-            warningSetting.type = R20BleCmd.WarningSetting.HR_LOW
-            warningSetting.warningHrLow.low = binding.r20Layout.hrLow.progress.times(5)
-            LpBleUtil.r20SetWarningSetting(model, warningSetting)
+        binding.ventilatorLayout.hrLowAdd.setOnClickListener {
+            binding.ventilatorLayout.hrLow.progress++
+            warningSetting.type = VentilatorBleCmd.WarningSetting.HR_LOW
+            warningSetting.warningHrLow.low = binding.ventilatorLayout.hrLow.progress.times(5)
+            LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
         // 设置用户
-        binding.r20Layout.setUser.setOnClickListener {
+        binding.ventilatorLayout.setUser.setOnClickListener {
             val data = UserInfo()
             data.aid = 1133
             data.uid = 2233
@@ -1222,15 +1258,15 @@ class R20ViewModel : SettingViewModel() {
             data.height = 155
             data.weight = 40.5f
             data.gender = 1
-            LpBleUtil.r20SetUserInfo(model, data)
+            LpBleUtil.ventilatorSetUserInfo(model, data)
         }
-        binding.r20Layout.getUser.setOnClickListener {
-            LpBleUtil.r20GetUserInfo(model)
+        binding.ventilatorLayout.getUser.setOnClickListener {
+            LpBleUtil.ventilatorGetUserInfo(model)
         }
     }
 
     fun initEvent(owner: LifecycleOwner) {
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20DeviceBound)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorDeviceBound)
             .observe(owner) {
                 val data = it.data as Int
                 _toast.value = when (data) {
@@ -1240,13 +1276,13 @@ class R20ViewModel : SettingViewModel() {
                     else -> "绑定消息"
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20DeviceUnBound)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorDeviceUnBound)
             .observe(owner) {
                 _toast.value = "解绑成功"
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20DoctorMode)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorDoctorMode)
             .observe(owner) {
-                val data = it.data as R20BleResponse.DoctorModeResult
+                val data = it.data as VentilatorBleResponse.DoctorModeResult
                 _toast.value = if (data.success) {
                     "进入医生模式成功"
                 } else {
@@ -1258,14 +1294,14 @@ class R20ViewModel : SettingViewModel() {
                         else -> ""
                     }}"
                 }
-                LpBleUtil.r20GetRtState(it.model)
+                LpBleUtil.ventilatorGetRtState(it.model)
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20RtState)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorRtState)
             .observe(owner) {
-                val data = it.data as R20BleResponse.RtState
+                val data = it.data as VentilatorBleResponse.RtState
                 rtState = data
-                binding.r20Layout.doctorMode.isChecked = data.deviceMode != 0
-                binding.r20Layout.deviceMode.text = "${when (data.deviceMode) {
+                binding.ventilatorLayout.doctorMode.isChecked = data.deviceMode != 0
+                binding.ventilatorLayout.deviceMode.text = "${when (data.deviceMode) {
                     0 -> "(设备处于患者模式)"
                     1 -> "(设备端医生模式)"
                     2 -> "(BLE端医生模式)"
@@ -1273,185 +1309,138 @@ class R20ViewModel : SettingViewModel() {
                     else -> ""
                 }}"
                 layoutGone()
-                when (data.ventilationMode) {
-                    // CPAP
-                    0 -> {
-                        binding.r20Layout.eprLayout.visibility = View.VISIBLE
-                        binding.r20Layout.cpapPressureLayout.visibility = View.VISIBLE
-                    }
-                    // APAP
-                    1 -> {
-                        binding.r20Layout.eprLayout.visibility = View.VISIBLE
-                        binding.r20Layout.apapPressureMaxLayout.visibility = View.VISIBLE
-                        binding.r20Layout.apapPressureMinLayout.visibility = View.VISIBLE
-                    }
-                    // S
-                    2 -> {
-                        binding.r20Layout.ipapPressureLayout.visibility = View.VISIBLE
-                        binding.r20Layout.epapPressureLayout.visibility = View.VISIBLE
-                        binding.r20Layout.raiseTimeLayout.visibility = View.VISIBLE
-                        binding.r20Layout.iTriggerLayout.visibility = View.VISIBLE
-                        binding.r20Layout.eTriggerLayout.visibility = View.VISIBLE
-                        binding.r20Layout.lowVentilationLayout.visibility = View.VISIBLE
-                        binding.r20Layout.vtLowLayout.visibility = View.VISIBLE
-                        binding.r20Layout.rrHighLayout.visibility = View.VISIBLE
-                        binding.r20Layout.rrLowLayout.visibility = View.VISIBLE
-                    }
-                    // S/T
-                    3 -> {
-                        binding.r20Layout.ipapPressureLayout.visibility = View.VISIBLE
-                        binding.r20Layout.epapPressureLayout.visibility = View.VISIBLE
-                        binding.r20Layout.inspiratoryTimeLayout.visibility = View.VISIBLE
-                        binding.r20Layout.respiratoryFrequencyLayout.visibility = View.VISIBLE
-                        binding.r20Layout.raiseTimeLayout.visibility = View.VISIBLE
-                        binding.r20Layout.iTriggerLayout.visibility = View.VISIBLE
-                        binding.r20Layout.eTriggerLayout.visibility = View.VISIBLE
-                        binding.r20Layout.lowVentilationLayout.visibility = View.VISIBLE
-                        binding.r20Layout.vtLowLayout.visibility = View.VISIBLE
-                        binding.r20Layout.rrHighLayout.visibility = View.VISIBLE
-                        binding.r20Layout.rrLowLayout.visibility = View.VISIBLE
-                    }
-                    // T
-                    4 -> {
-                        binding.r20Layout.ipapPressureLayout.visibility = View.VISIBLE
-                        binding.r20Layout.epapPressureLayout.visibility = View.VISIBLE
-                        binding.r20Layout.inspiratoryTimeLayout.visibility = View.VISIBLE
-                        binding.r20Layout.respiratoryFrequencyLayout.visibility = View.VISIBLE
-                        binding.r20Layout.raiseTimeLayout.visibility = View.VISIBLE
-                        binding.r20Layout.lowVentilationLayout.visibility = View.VISIBLE
-                        binding.r20Layout.vtLowLayout.visibility = View.VISIBLE
-                        binding.r20Layout.rrHighLayout.visibility = View.VISIBLE
-                        binding.r20Layout.rrLowLayout.visibility = View.VISIBLE
-                    }
-                }
+                layoutVisible(data.ventilationMode)
                 when (data.standard) {
-                    // CE
-                    0 -> {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            binding.r20Layout.ipapPressure.min = 8
-                        }
-                        binding.r20Layout.epapPressure.max = 50
-                    }
                     // CFDA
                     1 -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            binding.r20Layout.ipapPressure.min = 12
+                            binding.ventilatorLayout.ipapPressure.min = 12
                         }
-                        binding.r20Layout.epapPressure.max = 46
+                        binding.ventilatorLayout.epapPressure.max = 46
+                    }
+                    // CE
+                    2 -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            binding.ventilatorLayout.ipapPressure.min = 8
+                        }
+                        binding.ventilatorLayout.epapPressure.max = 50
                     }
                 }
                 if (data.deviceMode == 2) {
-                    binding.r20Layout.ventilationSetting.visibility = View.VISIBLE
-                    binding.r20Layout.warningSetting.visibility = View.VISIBLE
+                    binding.ventilatorLayout.ventilationSetting.visibility = View.VISIBLE
+                    binding.ventilatorLayout.warningSetting.visibility = View.VISIBLE
                 } else {
-                    binding.r20Layout.ventilationSetting.visibility = View.GONE
-                    binding.r20Layout.ventilationSettingLayout.visibility = View.GONE
-                    binding.r20Layout.warningSetting.visibility = View.GONE
-                    binding.r20Layout.warningSettingLayout.visibility = View.GONE
+                    binding.ventilatorLayout.ventilationSetting.visibility = View.GONE
+                    binding.ventilatorLayout.ventilationSettingLayout.visibility = View.GONE
+                    binding.ventilatorLayout.warningSetting.visibility = View.GONE
+                    binding.ventilatorLayout.warningSettingLayout.visibility = View.GONE
                 }
                 if (data.isVentilated) {
-                    binding.r20Layout.systemSetting.visibility = View.GONE
-                    binding.r20Layout.systemSettingLayout.visibility = View.GONE
-                    binding.r20Layout.measureSetting.visibility = View.GONE
-                    binding.r20Layout.measureSettingLayout.visibility = View.GONE
+                    binding.ventilatorLayout.systemSetting.visibility = View.GONE
+                    binding.ventilatorLayout.systemSettingLayout.visibility = View.GONE
+                    binding.ventilatorLayout.measureSetting.visibility = View.GONE
+                    binding.ventilatorLayout.measureSettingLayout.visibility = View.GONE
                 } else {
-                    binding.r20Layout.systemSetting.visibility = View.VISIBLE
-                    binding.r20Layout.measureSetting.visibility = View.VISIBLE
+                    binding.ventilatorLayout.systemSetting.visibility = View.VISIBLE
+                    binding.ventilatorLayout.measureSetting.visibility = View.VISIBLE
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetSystemSetting)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetSystemSetting)
             .observe(owner) {
                 spinnerSet = false
                 systemSetting = it.data as SystemSetting
-                binding.r20Layout.unit.setSelection(systemSetting.unitSetting.pressureUnit)
-                binding.r20Layout.language.setSelection(systemSetting.languageSetting.language)
-                binding.r20Layout.brightness.progress = systemSetting.screenSetting.brightness
-                binding.r20Layout.screenOff.setSelection(systemSetting.screenSetting.autoOff.div(30))
-                binding.r20Layout.filter.progress = systemSetting.replacements.filter
-                binding.r20Layout.mask.progress = systemSetting.replacements.mask
-                binding.r20Layout.tube.progress = systemSetting.replacements.tube
-                binding.r20Layout.tank.progress = systemSetting.replacements.tank
-                binding.r20Layout.volume.progress = systemSetting.volumeSetting.volume.div(5)
+                binding.ventilatorLayout.unit.setSelection(systemSetting.unitSetting.pressureUnit)
+                binding.ventilatorLayout.language.setSelection(systemSetting.languageSetting.language)
+                binding.ventilatorLayout.brightness.progress = systemSetting.screenSetting.brightness
+                binding.ventilatorLayout.screenOff.setSelection(systemSetting.screenSetting.autoOff.div(30))
+                binding.ventilatorLayout.filter.progress = systemSetting.replacements.filter
+                binding.ventilatorLayout.mask.progress = systemSetting.replacements.mask
+                binding.ventilatorLayout.tube.progress = systemSetting.replacements.tube
+                binding.ventilatorLayout.tank.progress = systemSetting.replacements.tank
+                binding.ventilatorLayout.volume.progress = systemSetting.volumeSetting.volume.div(5)
                 spinnerSet = true
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetSystemSetting)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorSetSystemSetting)
             .observe(owner) {
                 _toast.value = "系统设置成功"
-//                LpBleUtil.r20GetSystemSetting(it.model)
+                LpBleUtil.ventilatorGetSystemSetting(it.model)
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetMeasureSetting)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetMeasureSetting)
             .observe(owner) {
                 spinnerSet = false
                 measureSetting = it.data as MeasureSetting
                 if (measureSetting.humidification.humidification == 0xff) {
-                    binding.r20Layout.humidification.setSelection(6)
+                    binding.ventilatorLayout.humidification.setSelection(6)
                 } else if (measureSetting.humidification.humidification > 6) {
-                    binding.r20Layout.humidification.setSelection(0)
+                    binding.ventilatorLayout.humidification.setSelection(0)
                 } else {
-                    binding.r20Layout.humidification.setSelection(measureSetting.humidification.humidification)
+                    binding.ventilatorLayout.humidification.setSelection(measureSetting.humidification.humidification)
                 }
                 if (measureSetting.pressureReduce.ipr > 4) {
-                    binding.r20Layout.ipr.setSelection(0)
+                    binding.ventilatorLayout.ipr.setSelection(0)
                 } else {
-                    binding.r20Layout.ipr.setSelection(measureSetting.pressureReduce.ipr)
+                    binding.ventilatorLayout.ipr.setSelection(measureSetting.pressureReduce.ipr)
                 }
                 if (measureSetting.pressureReduce.epr > 4) {
-                    binding.r20Layout.epr.setSelection(0)
+                    binding.ventilatorLayout.epr.setSelection(0)
                 } else {
-                    binding.r20Layout.epr.setSelection(measureSetting.pressureReduce.epr)
+                    binding.ventilatorLayout.epr.setSelection(measureSetting.pressureReduce.epr)
                 }
-                binding.r20Layout.autoStart.isChecked = measureSetting.autoSwitch.autoStart
-                binding.r20Layout.autoEnd.isChecked = measureSetting.autoSwitch.autoEnd
-                binding.r20Layout.preHeat.isChecked = measureSetting.preHeat.on
-                binding.r20Layout.rampPressure.progress = measureSetting.ramp.pressure.div(0.5).toInt()
+                binding.ventilatorLayout.autoStart.isChecked = measureSetting.autoSwitch.autoStart
+                binding.ventilatorLayout.autoEnd.isChecked = measureSetting.autoSwitch.autoEnd
+                binding.ventilatorLayout.preHeat.isChecked = measureSetting.preHeat.on
+                binding.ventilatorLayout.rampPressure.progress = measureSetting.ramp.pressure.div(0.5).toInt()
                 if (this::rtState.isInitialized) {
                     when (rtState.ventilationMode) {
                         // CPAP
-                        0 -> binding.r20Layout.rampPressure.max = binding.r20Layout.cpapPressure.progress
+                        0 -> binding.ventilatorLayout.rampPressure.max = binding.ventilatorLayout.cpapPressure.progress
                         // APAP
-                        1 -> binding.r20Layout.rampPressure.max = binding.r20Layout.apapPressureMin.progress
+                        1 -> binding.ventilatorLayout.rampPressure.max = binding.ventilatorLayout.apapPressureMin.progress
                         // S、S/T、T
-                        2, 3, 4 -> binding.r20Layout.rampPressure.max = binding.r20Layout.epapPressure.progress
+                        2, 3, 4 -> binding.ventilatorLayout.rampPressure.max = binding.ventilatorLayout.epapPressure.progress
                     }
                 }
-                binding.r20Layout.rampTime.progress = measureSetting.ramp.time.div(5)
-                binding.r20Layout.tubeType.setSelection(measureSetting.tubeType.type)
-                binding.r20Layout.maskType.setSelection(measureSetting.mask.type)
-                binding.r20Layout.maskPressure.progress = measureSetting.mask.pressure.toInt()
+                binding.ventilatorLayout.rampTime.progress = measureSetting.ramp.time.div(5)
+                binding.ventilatorLayout.tubeType.setSelection(measureSetting.tubeType.type)
+                binding.ventilatorLayout.maskType.setSelection(measureSetting.mask.type)
+                binding.ventilatorLayout.maskPressure.progress = measureSetting.mask.pressure.toInt()
                 spinnerSet = true
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetMeasureSetting)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorSetMeasureSetting)
             .observe(owner) {
                 _toast.value = "测量设置成功"
-//                LpBleUtil.r20GetMeasureSetting(it.model)
+                LpBleUtil.ventilatorGetMeasureSetting(it.model)
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetVentilationSetting)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetVentilationSetting)
             .observe(owner) {
                 spinnerSet = false
                 ventilationSetting = it.data as VentilationSetting
-                binding.r20Layout.cpapPressure.progress = ventilationSetting.pressure.pressure.div(0.5).toInt()
-                binding.r20Layout.apapPressureMax.progress = ventilationSetting.pressureMax.max.div(0.5).toInt()
-                binding.r20Layout.apapPressureMin.progress = ventilationSetting.pressureMin.min.div(0.5).toInt()
+                binding.ventilatorLayout.ventilationMode.setSelection(ventilationSetting.ventilationMode.mode)
+                layoutGone()
+                layoutVisible(ventilationSetting.ventilationMode.mode)
+                binding.ventilatorLayout.cpapPressure.progress = ventilationSetting.cpapPressure.pressure.div(0.5).toInt()
+                binding.ventilatorLayout.apapPressureMax.progress = ventilationSetting.apapPressureMax.max.div(0.5).toInt()
+                binding.ventilatorLayout.apapPressureMin.progress = ventilationSetting.apapPressureMin.min.div(0.5).toInt()
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    binding.r20Layout.apapPressureMax.min = binding.r20Layout.apapPressureMin.progress
+                    binding.ventilatorLayout.apapPressureMax.min = binding.ventilatorLayout.apapPressureMin.progress
                 }
-                binding.r20Layout.apapPressureMin.max = binding.r20Layout.apapPressureMax.progress
-                binding.r20Layout.ipapPressure.progress = ventilationSetting.pressureInhale.inhale.div(0.5).toInt()
-                binding.r20Layout.epapPressure.progress = ventilationSetting.pressureExhale.exhale.div(0.5).toInt()
+                binding.ventilatorLayout.apapPressureMin.max = binding.ventilatorLayout.apapPressureMax.progress
+                binding.ventilatorLayout.ipapPressure.progress = ventilationSetting.pressureInhale.inhale.div(0.5).toInt()
+                binding.ventilatorLayout.epapPressure.progress = ventilationSetting.pressureExhale.exhale.div(0.5).toInt()
                 if (this::rtState.isInitialized) {
-                    if (rtState.standard == 0) {
+                    if (rtState.standard == 2) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            binding.r20Layout.ipapPressure.min = binding.r20Layout.epapPressure.progress
+                            binding.ventilatorLayout.ipapPressure.min = binding.ventilatorLayout.epapPressure.progress
                         }
-                        binding.r20Layout.epapPressure.max = binding.r20Layout.ipapPressure.progress
-                    } else {
+                        binding.ventilatorLayout.epapPressure.max = binding.ventilatorLayout.ipapPressure.progress
+                    } else if (rtState.standard == 1) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            binding.r20Layout.ipapPressure.min = binding.r20Layout.epapPressure.progress + 4
+                            binding.ventilatorLayout.ipapPressure.min = binding.ventilatorLayout.epapPressure.progress + 4
                         }
-                        binding.r20Layout.epapPressure.max = binding.r20Layout.ipapPressure.progress-4
+                        binding.ventilatorLayout.epapPressure.max = binding.ventilatorLayout.ipapPressure.progress-4
                     }
                 }
-                binding.r20Layout.raiseTime.progress = ventilationSetting.pressureRaiseDuration.duration.div(50)
+                binding.ventilatorLayout.raiseTime.progress = ventilationSetting.pressureRaiseDuration.duration.div(50)
                 val limT = when (ventilationSetting.inhaleDuration.duration) {
                     0.3f -> 200
                     0.4f -> 250
@@ -1476,10 +1465,10 @@ class R20ViewModel : SettingViewModel() {
                     else -> 100
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    binding.r20Layout.raiseTime.min = max(100, minT).div(50)
+                    binding.ventilatorLayout.raiseTime.min = max(100, minT).div(50)
                 }
-                binding.r20Layout.raiseTime.max = min((limT), 900).div(50)
-                binding.r20Layout.inspiratoryTime.progress = ventilationSetting.inhaleDuration.duration.times(10).toInt()
+                binding.ventilatorLayout.raiseTime.max = min((limT), 900).div(50)
+                binding.ventilatorLayout.inspiratoryTime.progress = ventilationSetting.inhaleDuration.duration.times(10).toInt()
                 val temp = when (ventilationSetting.pressureRaiseDuration.duration) {
                     200 -> 0.3f
                     250 -> 0.4f
@@ -1495,64 +1484,64 @@ class R20ViewModel : SettingViewModel() {
                     else -> 0.3f
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    binding.r20Layout.inspiratoryTime.min = max(0.3f, temp).times(10).toInt()
+                    binding.ventilatorLayout.inspiratoryTime.min = max(0.3f, temp).times(10).toInt()
                 }
-                binding.r20Layout.inspiratoryTime.max = min((60f/ventilationSetting.respiratoryRate.rate)*2/3, 4.0f).times(10).toInt()
-                binding.r20Layout.respiratoryFrequency.progress = ventilationSetting.respiratoryRate.rate
-                binding.r20Layout.respiratoryFrequency.max = min((60/(ventilationSetting.inhaleDuration.duration/2*3).toInt()),30)
-                binding.r20Layout.iTrigger.setSelection(ventilationSetting.inhaleSensitive.sentive)
-                binding.r20Layout.eTrigger.setSelection(ventilationSetting.exhaleSensitive.sentive)
+                binding.ventilatorLayout.inspiratoryTime.max = min((60f/ventilationSetting.respiratoryRate.rate)*2/3, 4.0f).times(10).toInt()
+                binding.ventilatorLayout.respiratoryFrequency.progress = ventilationSetting.respiratoryRate.rate
+                binding.ventilatorLayout.respiratoryFrequency.max = min((60/(ventilationSetting.inhaleDuration.duration/2*3).toInt()),30)
+                binding.ventilatorLayout.iTrigger.setSelection(ventilationSetting.inhaleSensitive.sentive)
+                binding.ventilatorLayout.eTrigger.setSelection(ventilationSetting.exhaleSensitive.sentive)
                 spinnerSet = true
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetVentilationSetting)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorSetVentilationSetting)
             .observe(owner) {
                 _toast.value = "通气设置成功"
-//                LpBleUtil.r20GetVentilationSetting(it.model)
+                LpBleUtil.ventilatorGetVentilationSetting(it.model)
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetWarningSetting)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetWarningSetting)
             .observe(owner) {
                 spinnerSet = false
                 warningSetting = it.data as WarningSetting
-                binding.r20Layout.leakHigh.setSelection(warningSetting.warningLeak.high.div(15))
-                binding.r20Layout.lowVentilation.progress = warningSetting.warningVentilation.low
-                binding.r20Layout.vtLow.progress = if (warningSetting.warningVt.low == 0) {
+                binding.ventilatorLayout.leakHigh.setSelection(warningSetting.warningLeak.high.div(15))
+                binding.ventilatorLayout.lowVentilation.progress = warningSetting.warningVentilation.low
+                binding.ventilatorLayout.vtLow.progress = if (warningSetting.warningVt.low == 0) {
                     19
                 } else {
                     warningSetting.warningVt.low.div(10)
                 }
-                binding.r20Layout.rrHigh.progress = warningSetting.warningRrHigh.high
-                binding.r20Layout.rrLow.progress = warningSetting.warningRrLow.low
-                binding.r20Layout.spo2Low.progress = if (warningSetting.warningSpo2Low.low == 0) {
+                binding.ventilatorLayout.rrHigh.progress = warningSetting.warningRrHigh.high
+                binding.ventilatorLayout.rrLow.progress = warningSetting.warningRrLow.low
+                binding.ventilatorLayout.spo2Low.progress = if (warningSetting.warningSpo2Low.low == 0) {
                     79
                 } else {
                     warningSetting.warningSpo2Low.low
                 }
-                binding.r20Layout.hrHigh.progress = if (warningSetting.warningHrHigh.high == 0) {
+                binding.ventilatorLayout.hrHigh.progress = if (warningSetting.warningHrHigh.high == 0) {
                     9
                 } else {
                     warningSetting.warningHrHigh.high.div(10)
                 }
-                binding.r20Layout.hrLow.progress = if (warningSetting.warningHrLow.low == 0) {
+                binding.ventilatorLayout.hrLow.progress = if (warningSetting.warningHrLow.low == 0) {
                     5
                 } else {
                     warningSetting.warningHrLow.low.div(5)
                 }
-                binding.r20Layout.apnea.setSelection(warningSetting.warningApnea.apnea.div(10))
+                binding.ventilatorLayout.apnea.setSelection(warningSetting.warningApnea.apnea.div(10))
                 spinnerSet = true
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetWarningSetting)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorSetWarningSetting)
             .observe(owner) {
                 _toast.value = "警告设置成功"
-//                LpBleUtil.r20GetWarningSetting(it.model)
+                LpBleUtil.ventilatorGetWarningSetting(it.model)
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetUserInfo)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorSetUserInfo)
             .observe(owner) {
                 _toast.value = "用户设置成功"
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetUserInfo)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetUserInfo)
             .observe(owner) {
                 val data = it.data as UserInfo
-                binding.r20Layout.userInfo.text = "$data"
+                binding.ventilatorLayout.userInfo.text = "$data"
             }
         LiveEventBus.get<ResponseError>(EventMsgConst.Cmd.EventCmdResponseError)
             .observe(owner) {
@@ -1577,21 +1566,74 @@ class R20ViewModel : SettingViewModel() {
     }
 
     private fun layoutGone() {
-        binding.r20Layout.eprLayout.visibility = View.GONE
-        binding.r20Layout.cpapPressureLayout.visibility = View.GONE
-        binding.r20Layout.apapPressureMaxLayout.visibility = View.GONE
-        binding.r20Layout.apapPressureMinLayout.visibility = View.GONE
-        binding.r20Layout.ipapPressureLayout.visibility = View.GONE
-        binding.r20Layout.epapPressureLayout.visibility = View.GONE
-        binding.r20Layout.raiseTimeLayout.visibility = View.GONE
-        binding.r20Layout.iTriggerLayout.visibility = View.GONE
-        binding.r20Layout.eTriggerLayout.visibility = View.GONE
-        binding.r20Layout.inspiratoryTimeLayout.visibility = View.GONE
-        binding.r20Layout.respiratoryFrequencyLayout.visibility = View.GONE
-        binding.r20Layout.lowVentilationLayout.visibility = View.GONE
-        binding.r20Layout.vtLowLayout.visibility = View.GONE
-        binding.r20Layout.rrHighLayout.visibility = View.GONE
-        binding.r20Layout.rrLowLayout.visibility = View.GONE
+        binding.ventilatorLayout.eprLayout.visibility = View.GONE
+        binding.ventilatorLayout.cpapPressureLayout.visibility = View.GONE
+        binding.ventilatorLayout.apapPressureMaxLayout.visibility = View.GONE
+        binding.ventilatorLayout.apapPressureMinLayout.visibility = View.GONE
+        binding.ventilatorLayout.ipapPressureLayout.visibility = View.GONE
+        binding.ventilatorLayout.epapPressureLayout.visibility = View.GONE
+        binding.ventilatorLayout.raiseTimeLayout.visibility = View.GONE
+        binding.ventilatorLayout.iTriggerLayout.visibility = View.GONE
+        binding.ventilatorLayout.eTriggerLayout.visibility = View.GONE
+        binding.ventilatorLayout.inspiratoryTimeLayout.visibility = View.GONE
+        binding.ventilatorLayout.respiratoryFrequencyLayout.visibility = View.GONE
+        binding.ventilatorLayout.lowVentilationLayout.visibility = View.GONE
+        binding.ventilatorLayout.vtLowLayout.visibility = View.GONE
+        binding.ventilatorLayout.rrHighLayout.visibility = View.GONE
+        binding.ventilatorLayout.rrLowLayout.visibility = View.GONE
+    }
+    private fun layoutVisible(mode: Int) {
+        when (mode) {
+            // CPAP
+            0 -> {
+                binding.ventilatorLayout.eprLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.cpapPressureLayout.visibility = View.VISIBLE
+            }
+            // APAP
+            1 -> {
+                binding.ventilatorLayout.eprLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.apapPressureMaxLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.apapPressureMinLayout.visibility = View.VISIBLE
+            }
+            // S
+            2 -> {
+                binding.ventilatorLayout.ipapPressureLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.epapPressureLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.raiseTimeLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.iTriggerLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.eTriggerLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.lowVentilationLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.vtLowLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.rrHighLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.rrLowLayout.visibility = View.VISIBLE
+            }
+            // S/T
+            3 -> {
+                binding.ventilatorLayout.ipapPressureLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.epapPressureLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.inspiratoryTimeLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.respiratoryFrequencyLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.raiseTimeLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.iTriggerLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.eTriggerLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.lowVentilationLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.vtLowLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.rrHighLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.rrLowLayout.visibility = View.VISIBLE
+            }
+            // T
+            4 -> {
+                binding.ventilatorLayout.ipapPressureLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.epapPressureLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.inspiratoryTimeLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.respiratoryFrequencyLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.raiseTimeLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.lowVentilationLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.vtLowLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.rrHighLayout.visibility = View.VISIBLE
+                binding.ventilatorLayout.rrLowLayout.visibility = View.VISIBLE
+            }
+        }
     }
 
 }

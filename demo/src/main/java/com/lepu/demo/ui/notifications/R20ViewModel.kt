@@ -5,19 +5,19 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.Bp2WifiConfig
 import com.lepu.blepro.ble.data.Bp2WifiDevice
-import com.lepu.blepro.ble.data.r20.StatisticsFile
+import com.lepu.blepro.ble.data.ventilator.StatisticsFile
 import com.lepu.blepro.event.*
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.data.EcnData
 import com.lepu.demo.util.DateUtil
 import java.util.*
 
-class R20ViewModel : InfoViewModel() {
+class VentilatorViewModel : InfoViewModel() {
 
     fun initEvent(owner: LifecycleOwner) {
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetFileList)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetFileList)
             .observe(owner) {
-                val data = it.data as R20BleResponse.RecordList
+                val data = it.data as VentilatorBleResponse.RecordList
                 val names = arrayListOf<String>()
                 for (file in data.list) {
                     if (data.type == 1) {
@@ -29,15 +29,15 @@ class R20ViewModel : InfoViewModel() {
                 _fileNames.value = names
                 _info.value = names.toString()
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20ReadFileError)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorReadFileError)
             .observe(owner) {
                 _readFileError.value = true
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20ReadingFileProgress)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorReadingFileProgress)
             .observe(owner) {
                 _process.value = it.data as Int
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20ReadFileComplete)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorReadFileComplete)
             .observe(owner) {
                 val data = it.data as StatisticsFile
                 val temp = EcnData()
@@ -49,12 +49,12 @@ class R20ViewModel : InfoViewModel() {
         LiveEventBus.get<ResponseError>(EventMsgConst.Cmd.EventCmdResponseError)
             .observe(owner) {
                 when (it.cmd) {
-                    R20BleCmd.GET_WIFI_LIST -> {
+                    VentilatorBleCmd.GET_WIFI_LIST -> {
                         handler.postDelayed({
                             LpBleUtil.bp2GetWifiDevice(it.model)
                         }, 5000)
                     }
-                    R20BleCmd.GET_WIFI_CONFIG -> {
+                    VentilatorBleCmd.GET_WIFI_CONFIG -> {
                         noWifi.value = true
                     }
                 }
@@ -76,17 +76,17 @@ class R20ViewModel : InfoViewModel() {
                     LpBleCmd.TYPE_NORMAL_ERROR -> _toast.value = "通用错误"
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetWifiList)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetWifiList)
             .observe(owner) {
                 val data = it.data as Bp2WifiDevice
                 _wifiDevice.value = data
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetWifiConfig)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetWifiConfig)
             .observe(owner) {
                 val data = it.data as Bp2WifiConfig
                 _wifiConfig.value = data
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetWifiConfig)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorSetWifiConfig)
             .observe(owner) {
                 val data = it.data as Boolean
                 if (data) {
@@ -95,17 +95,17 @@ class R20ViewModel : InfoViewModel() {
                     }, 1000)
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20Reset)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorReset)
             .observe(owner) {
                 _reset.value = true
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20FactoryReset)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorFactoryReset)
             .observe(owner) {
                 _factoryReset.value = true
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetVersionInfo)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetVersionInfo)
             .observe(owner) {
-                val data = it.data as R20BleResponse.VersionInfo
+                val data = it.data as VentilatorBleResponse.VersionInfo
                 _info.value = _info.value + "\n引导版本：${data.blV}，算法版本：${data.algV}\n蓝牙驱动版本：${data.bleV}"
             }
     }

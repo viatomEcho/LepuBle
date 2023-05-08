@@ -16,7 +16,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.lew.RtData
-import com.lepu.blepro.ble.data.r20.SystemSetting
+import com.lepu.blepro.ble.data.ventilator.SystemSetting
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
@@ -36,7 +36,6 @@ import com.lepu.demo.data.WirelessData
 import com.lepu.demo.data.entity.DeviceEntity
 import com.lepu.demo.databinding.FragmentDashboardBinding
 import com.lepu.demo.util.DataConvert
-import com.lepu.demo.util.DateUtil
 import com.lepu.demo.util.DateUtil.stringFromDate
 import com.lepu.demo.util.FileUtil
 import com.lepu.demo.views.EcgBkg
@@ -459,10 +458,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_LERES -> {
                 binding.wirelessDataLayout.root.visibility = View.GONE
 //                binding.wirelessDataLayout.root.visibility = View.VISIBLE
-                binding.r20Switch.visibility = View.VISIBLE
-//                binding.r20Switch.visibility = View.GONE
-                LpBleUtil.r20GetRtState(it.modelNo)
-                LpBleUtil.r20GetSystemSetting(it.modelNo)
+                binding.ventilatorSwitch.visibility = View.VISIBLE
+//                binding.ventilatorSwitch.visibility = View.GONE
+                LpBleUtil.ventilatorGetRtState(it.modelNo)
+                LpBleUtil.ventilatorGetSystemSetting(it.modelNo)
             }
             Bluetooth.MODEL_ECN -> {
                 binding.ecnLayout.visibility = View.VISIBLE
@@ -872,16 +871,16 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 buttonView.text = context?.getString(R.string.start_record)
             }
         }
-        //--------------------r20--------------------------
-        binding.r20VentilationSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+        //--------------------ventilator--------------------------
+        binding.ventilatorVentilationSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             if (buttonView.isPressed) {
-                LpBleUtil.r20VentilationSwitch(Constant.BluetoothConfig.currentModel[0], isChecked)
+                LpBleUtil.ventilatorVentilationSwitch(Constant.BluetoothConfig.currentModel[0], isChecked)
             }
         }
-        binding.r20MaskTest.setOnCheckedChangeListener { buttonView, isChecked ->
+        binding.ventilatorMaskTest.setOnCheckedChangeListener { buttonView, isChecked ->
             LpBleUtil.stopRtTask(Constant.BluetoothConfig.currentModel[0])
             if (buttonView.isPressed) {
-                LpBleUtil.r20MaskTest(Constant.BluetoothConfig.currentModel[0], isChecked)
+                LpBleUtil.ventilatorMaskTest(Constant.BluetoothConfig.currentModel[0], isChecked)
             }
         }
         //--------------------ECN--------------------------
@@ -2314,7 +2313,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val data = it.data as BtpBleResponse.ConfigInfo
                 type = data.tempUnit
             }
-        // ----------------------R20-------------------
+        // ----------------------Ventilator-------------------
         LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseEchoData)
             .observe(this) {
                 val data = LepuBleResponse.BleResponse(it)
@@ -2344,22 +2343,22 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "丢包率：${String.format("%.3f", wirelessData.missPercent)} %\n" +
                         "误码率：${String.format("%.3f", wirelessData.errorPercent)} %"
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20RtState)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorRtState)
             .observe(this) {
-                val data = it.data as R20BleResponse.RtState
-                binding.r20State.visibility = View.VISIBLE
+                val data = it.data as VentilatorBleResponse.RtState
+                binding.ventilatorState.visibility = View.VISIBLE
                 if (data.isVentilated) {
-                    binding.r20VentilationSwitch.isChecked = true
+                    binding.ventilatorVentilationSwitch.isChecked = true
                     LpBleUtil.startRtTask(it.model, 1000)
                 } else {
-                    binding.r20VentilationSwitch.isChecked = false
+                    binding.ventilatorVentilationSwitch.isChecked = false
                     LpBleUtil.stopRtTask()
                 }
                 // BLE医生模式下
                 state = data.deviceMode == 2
-                binding.r20VentilationSwitch.isEnabled = state
-                binding.r20MaskTest.isEnabled = !data.isVentilated
-                binding.r20State.text = "设备实时状态：\n通气模式：${when (data.ventilationMode) {
+                binding.ventilatorVentilationSwitch.isEnabled = state
+                binding.ventilatorMaskTest.isEnabled = !data.isVentilated
+                binding.ventilatorState.text = "设备实时状态：\n通气模式：${when (data.ventilationMode) {
                     0 -> "CPAP"
                     1 -> "APAP"
                     2 -> "S"
@@ -2377,22 +2376,23 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         else -> "无"
                     }
                 }\n标准：${when (data.standard) {
-                        0 -> "CE"
-                        1 -> "FDA"
+                        1 -> "CFDA"
+                        2 -> "CE"
+                        3 -> "FDA"
                         else -> "无"
                     }
                 }"
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetSystemSetting)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetSystemSetting)
             .observe(this) {
                 val data = it.data as SystemSetting
                 type = data.unitSetting.pressureUnit
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20RtParam)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorRtParam)
             .observe(this) {
-                val data = it.data as R20BleResponse.RtParam
+                val data = it.data as VentilatorBleResponse.RtParam
                 binding.deviceInfo.visibility = View.VISIBLE
-                binding.r20MaskTestText.visibility = View.GONE
+                binding.ventilatorMaskTestText.visibility = View.GONE
                 binding.deviceInfo.text = "实时参数：\n实时压：${data.pressure} ${if (type == 0) "cmH2O" else "hPa"}\n" +
                         "吸气压力：${data.ipap} ${if (type == 0) "cmH2O" else "hPa"}\n" +
                         "呼气压力：${data.epap} ${if (type == 0) "cmH2O" else "hPa"}\n" +
@@ -2412,18 +2412,18 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "脉率：${if (data.pr < 30 || data.pr > 250) "**" else data.pr} bpm\n" +
                         "心率：${if (data.hr < 30 || data.hr > 250) "**" else data.hr} bpm"
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20MaskTest)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorMaskTest)
             .observe(this) {
-                val data = it.data as R20BleResponse.MaskTestResult
-                binding.r20MaskTest.isChecked = data.status == 1
+                val data = it.data as VentilatorBleResponse.MaskTestResult
+                binding.ventilatorMaskTest.isChecked = data.status == 1
                 // BLE医生模式下
                 if (state) {
-                    binding.r20VentilationSwitch.isEnabled = data.status != 1
+                    binding.ventilatorVentilationSwitch.isEnabled = data.status != 1
                 }
-                binding.r20MaskTestText.visibility = View.VISIBLE
+                binding.ventilatorMaskTestText.visibility = View.VISIBLE
                 binding.deviceInfo.visibility = View.GONE
-                binding.r20Event.visibility = View.GONE
-                binding.r20MaskTestText.text = "佩戴测试：\n设备状态：${when (data.status) {
+                binding.ventilatorEvent.visibility = View.GONE
+                binding.ventilatorMaskTestText.text = "佩戴测试：\n设备状态：${when (data.status) {
                     0 -> "未在测试状态"
                     1 -> "测试中"
                     2 -> "测试结束"
@@ -2436,11 +2436,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 }
                 }"
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20Event)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorEvent)
             .observe(this) {
-                val data = it.data as R20BleResponse.Event
-                binding.r20Event.visibility = View.VISIBLE
-                binding.r20Event.text = "事件上报：\n时间：${stringFromDate(Date(data.timestamp*1000), "yyyy-MM-dd HH:mm:ss")}\n" +
+                val data = it.data as VentilatorBleResponse.Event
+                binding.ventilatorEvent.visibility = View.VISIBLE
+                binding.ventilatorEvent.text = "事件上报：\n时间：${stringFromDate(Date(data.timestamp*1000), "yyyy-MM-dd HH:mm:ss")}\n" +
                         "警告状态：${if (data.alarm) {"告警中"} else {"取消告警"}}\n" +
                         "警告等级：${when (data.alarmLevel) {
                             0 -> context?.getString(R.string.normal)

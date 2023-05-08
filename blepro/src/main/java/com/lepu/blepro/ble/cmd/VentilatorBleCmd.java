@@ -7,7 +7,7 @@ import com.lepu.blepro.utils.EncryptUtil;
 /**
  * @author chenyongfeng
  */
-public class R20BleCmd {
+public class VentilatorBleCmd {
 
     private static final int TYPE_NORMAL_SEND = 0x00;
     private static final int HEAD = 0xA5;
@@ -287,16 +287,17 @@ public class R20BleCmd {
     }
     public static class VentilationSetting {
         public static final int ALL = 0;
-        public static final int PRESSURE = 1;           // CPAP模式压力
-        public static final int PRESSURE_MAX = 2;       // APAP模式压力最大值Pmax
-        public static final int PRESSURE_MIN = 3;       // APAP模式压力最小值Pmin
-        public static final int PRESSURE_INHALE = 4;    // 吸气压力
-        public static final int PRESSURE_EXHALE = 5;    // 呼气压力
-        public static final int INHALE_DURATION = 6;    // 吸气时间
-        public static final int RESPIRATORY_RATE = 7;   // 呼吸频率
-        public static final int RAISE_DURATION = 8;     // 压力上升时间
-        public static final int INHALE_SENSITIVE = 9;   // 吸气触发灵敏度
-        public static final int EXHALE_SENSITIVE = 10;  // 呼气触发灵敏度
+        public static final int VENTILATION_MODE = 1;   // 通气模式
+        public static final int PRESSURE = 2;           // CPAP模式压力
+        public static final int PRESSURE_MAX = 3;       // APAP模式压力最大值Pmax
+        public static final int PRESSURE_MIN = 4;       // APAP模式压力最小值Pmin
+        public static final int PRESSURE_INHALE = 5;    // 吸气压力
+        public static final int PRESSURE_EXHALE = 6;    // 呼气压力
+        public static final int INHALE_DURATION = 7;    // 吸气时间
+        public static final int RESPIRATORY_RATE = 8;   // 呼吸频率
+        public static final int RAISE_DURATION = 9;     // 压力上升时间
+        public static final int INHALE_SENSITIVE = 10;   // 吸气触发灵敏度
+        public static final int EXHALE_SENSITIVE = 11;  // 呼气触发灵敏度
     }
     public static class WarningSetting {
         public static final int ALL = 0;

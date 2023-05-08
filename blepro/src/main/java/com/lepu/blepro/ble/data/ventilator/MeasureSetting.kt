@@ -1,4 +1,4 @@
-package com.lepu.blepro.ble.data.r20
+package com.lepu.blepro.ble.data.ventilator
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 
