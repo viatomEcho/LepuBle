@@ -75,10 +75,11 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         checkServer()
         initLiveEvent()
 //        split()
-//        val data = FileUtil.readFileToByteArray(this, "2.dat")
+//        val data = FileUtil.readFileToByteArray(this, "VNVD6aXj---UxPSrOl3wfzkn.dat")
 //        val file = PpgFile(data)
-//        FileUtil.saveFile(this, file.sampleIntsData, "2.txt")
+//        FileUtil.saveFile(this, file.sampleIntsData, "VNVD6aXj---UxPSrOl3wfzkn.txt")
 //        Log.d("111111111", "file.sampleIntsData.size : ${file.sampleIntsData.size}")
+//        Log.d("111111111", "file : $file")
     }
 
     //创建菜单

@@ -965,6 +965,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
             infoViewModel.readFileError.observe(viewLifecycleOwner) {
                 if (it != null) {
+                    mAlertDialogCanCancel?.dismiss()
                     mAlertDialog?.dismiss()
                     Toast.makeText(context, context?.getString(R.string.read_error), Toast.LENGTH_SHORT).show()
                 }

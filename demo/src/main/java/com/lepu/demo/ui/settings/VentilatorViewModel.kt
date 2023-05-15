@@ -1,5 +1,6 @@
 package com.lepu.demo.ui.settings
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Build
 import android.view.View
@@ -480,15 +481,7 @@ class VentilatorViewModel : SettingViewModel() {
                 LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
             }
         }
-        // 自动启停：自动停止
-        binding.ventilatorLayout.autoEnd.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (buttonView.isPressed) {
-                measureSetting.type = VentilatorBleCmd.MeasureSetting.AUTO_SWITCH
-                measureSetting.autoSwitch.autoEnd = isChecked
-                LpBleUtil.ventilatorSetMeasureSetting(model, measureSetting)
-            }
-        }
-        // 自动启停：自动停止
+        // 预加热
         binding.ventilatorLayout.preHeat.setOnCheckedChangeListener { buttonView, isChecked ->
             if (buttonView.isPressed) {
                 measureSetting.type = VentilatorBleCmd.MeasureSetting.PRE_HEAT
@@ -649,9 +642,9 @@ class VentilatorViewModel : SettingViewModel() {
         if (ventilatorModel.isSupportT) {
             modes.add("T")
         }
-        /*ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("CPAP", "APAP", "S", "S/T", "T")).apply {
+        ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("CPAP", "APAP", "S", "S/T", "T")).apply {
             binding.ventilatorLayout.ventilationMode.adapter = this
-        }*/
+        }
         ArrayAdapter(context, android.R.layout.simple_list_item_1, modes).apply {
             binding.ventilatorLayout.ventilationMode.adapter = this
         }
@@ -983,10 +976,33 @@ class VentilatorViewModel : SettingViewModel() {
         }
         binding.ventilatorLayout.leakHigh.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (spinnerSet) {
-                    warningSetting.type = VentilatorBleCmd.WarningSetting.LEAK_HIGH
-                    warningSetting.warningLeak.high = position.times(15)
-                    LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
+                if (warningSetting.warningLeak.high == 0 && position != 0) {
+                    AlertDialog.Builder(context)
+                        .setTitle("提示")
+                        .setMessage("开此报警，会停用自动停止功能")
+                        .setPositiveButton(context.getString(R.string.confirm)) { _, _ ->
+                            if (spinnerSet) {
+                                warningSetting.type = VentilatorBleCmd.WarningSetting.LEAK_HIGH
+                                warningSetting.warningLeak.high = position.times(15)
+                                LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
+                            }
+                            binding.ventilatorLayout.autoEnd.isChecked = false
+                            binding.ventilatorLayout.autoEnd.isEnabled = false
+                        }
+                        .setNegativeButton(context.getString(R.string.cancel)) { _, _ ->
+                            binding.ventilatorLayout.leakHigh.setSelection(0)
+                        }
+                        .create()
+                        .show()
+                } else {
+                    if (spinnerSet) {
+                        warningSetting.type = VentilatorBleCmd.WarningSetting.LEAK_HIGH
+                        warningSetting.warningLeak.high = position.times(15)
+                        LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
+                    }
+                    if (position == 0) {
+                        binding.ventilatorLayout.autoEnd.isEnabled = true
+                    }
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -1034,7 +1050,11 @@ class VentilatorViewModel : SettingViewModel() {
         binding.ventilatorLayout.vtLowSub.setOnClickListener {
             binding.ventilatorLayout.vtLow.progress--
             warningSetting.type = VentilatorBleCmd.WarningSetting.VT_LOW
-            warningSetting.warningVt.low = binding.ventilatorLayout.vtLow.progress.times(10)
+            warningSetting.warningVt.low = if (binding.ventilatorLayout.vtLow.progress == 19) {
+                0
+            } else {
+                binding.ventilatorLayout.vtLow.progress.times(10)
+            }
             LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
         binding.ventilatorLayout.vtLowAdd.setOnClickListener {
@@ -1166,7 +1186,11 @@ class VentilatorViewModel : SettingViewModel() {
         binding.ventilatorLayout.spo2LowSub.setOnClickListener {
             binding.ventilatorLayout.spo2Low.progress--
             warningSetting.type = VentilatorBleCmd.WarningSetting.SPO2_LOW
-            warningSetting.warningSpo2Low.low = binding.ventilatorLayout.spo2Low.progress
+            warningSetting.warningSpo2Low.low = if (binding.ventilatorLayout.spo2Low.progress == 79) {
+                0
+            } else {
+                binding.ventilatorLayout.spo2Low.progress
+            }
             LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
         binding.ventilatorLayout.spo2LowAdd.setOnClickListener {
@@ -1202,7 +1226,11 @@ class VentilatorViewModel : SettingViewModel() {
         binding.ventilatorLayout.hrHighSub.setOnClickListener {
             binding.ventilatorLayout.hrHigh.progress--
             warningSetting.type = VentilatorBleCmd.WarningSetting.HR_HIGH
-            warningSetting.warningHrHigh.high = binding.ventilatorLayout.hrHigh.progress.times(10)
+            warningSetting.warningHrHigh.high = if (binding.ventilatorLayout.hrHigh.progress == 9) {
+                0
+            } else {
+                binding.ventilatorLayout.hrHigh.progress.times(10)
+            }
             LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
         binding.ventilatorLayout.hrHighAdd.setOnClickListener {
@@ -1238,7 +1266,11 @@ class VentilatorViewModel : SettingViewModel() {
         binding.ventilatorLayout.hrLowSub.setOnClickListener {
             binding.ventilatorLayout.hrLow.progress--
             warningSetting.type = VentilatorBleCmd.WarningSetting.HR_LOW
-            warningSetting.warningHrLow.low = binding.ventilatorLayout.hrLow.progress.times(5)
+            warningSetting.warningHrLow.low = if (binding.ventilatorLayout.hrLow.progress == 5) {
+                0
+            } else {
+                binding.ventilatorLayout.hrLow.progress.times(5)
+            }
             LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
         binding.ventilatorLayout.hrLowAdd.setOnClickListener {
@@ -1269,6 +1301,7 @@ class VentilatorViewModel : SettingViewModel() {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorDeviceBound)
             .observe(owner) {
                 val data = it.data as Int
+                binding.ventilatorLayout.bound.isChecked = data == 0
                 _toast.value = when (data) {
                     0 -> "绑定成功"
                     1 -> "绑定失败"
@@ -1437,7 +1470,7 @@ class VentilatorViewModel : SettingViewModel() {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             binding.ventilatorLayout.ipapPressure.min = binding.ventilatorLayout.epapPressure.progress + 4
                         }
-                        binding.ventilatorLayout.epapPressure.max = binding.ventilatorLayout.ipapPressure.progress-4
+                        binding.ventilatorLayout.epapPressure.max = binding.ventilatorLayout.ipapPressure.progress - 4
                     }
                 }
                 binding.ventilatorLayout.raiseTime.progress = ventilationSetting.pressureRaiseDuration.duration.div(50)
@@ -1511,6 +1544,17 @@ class VentilatorViewModel : SettingViewModel() {
                 }
                 binding.ventilatorLayout.rrHigh.progress = warningSetting.warningRrHigh.high
                 binding.ventilatorLayout.rrLow.progress = warningSetting.warningRrLow.low
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    if (warningSetting.warningRrLow.low != 0 && warningSetting.warningRrHigh.high != 0) {
+                        binding.ventilatorLayout.rrHigh.min = binding.ventilatorLayout.rrLow.progress + 2
+                        binding.ventilatorLayout.rrLow.max = binding.ventilatorLayout.rrHigh.progress - 2
+                    } else {
+                        binding.ventilatorLayout.rrLow.min = 0
+                        binding.ventilatorLayout.rrLow.max = 60
+                        binding.ventilatorLayout.rrHigh.min = 0
+                        binding.ventilatorLayout.rrHigh.max = 60
+                    }
+                }
                 binding.ventilatorLayout.spo2Low.progress = if (warningSetting.warningSpo2Low.low == 0) {
                     79
                 } else {

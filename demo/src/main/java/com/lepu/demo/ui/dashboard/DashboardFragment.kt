@@ -1122,11 +1122,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         }
         ppgFile.sn = mainViewModel.oxyInfo.value?.sn!!
         ppgFile.sampleIntsData = collectIntsData
-        val fileName = "PPG${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
-        FileUtil.saveFile(context, ppgFile.getDataBytes(), fileName)
+        val fileName = "PPG${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}"
+        FileUtil.saveFile(context, ppgFile.getDataBytes(), "$fileName.dat")
+        FileUtil.saveFile(context, collectIntsData, "$fileName.txt")
         Log.d(TAG, "collectIntsData: ${collectIntsData.joinToString(",")}")
         Log.d(TAG, "bytes: ${bytesToHex(ppgFile.getDataBytes())}")
-        val file = PpgFile(FileUtil.readFileToByteArray(context, fileName))
+        val file = PpgFile(FileUtil.readFileToByteArray(context, "$fileName.dat"))
         Log.d(TAG, "file: $file")
     }
 
@@ -1610,6 +1611,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 }
                 val ppgData = it.data as OxyBleResponse.PPGData
                 ppgData.let { data ->
+                    Log.d(TAG, "红外+红光：${data.irRedArray.joinToString(",")}")
+                    Log.d(TAG, "红外：${data.irArray.joinToString(",")}")
+                    Log.d(TAG, "红光：${data.redArray.joinToString(",")}")
                     if (binding.collectData.isChecked) {
                         if ((binding.ppgIr.isChecked) && (binding.ppgRed.isChecked)) {
                             collectIntsData = collectIntsData.plus(data.irRedArray)
@@ -2027,25 +2031,25 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                                     else -> ""
                                 }
                             }\n" +
-                            "心电导联状态：${data.param.leadOff}\n" +
-                            "体重稳定状态：${data.scaleData.stable}\n" +
-                            "体重单位${data.scaleData.unit}：${
+                            "${context?.getString(R.string.lead_state)}${data.param.leadOff}\n" +
+                            "${context?.getString(R.string.weight_state)}${data.scaleData.stable}\n" +
+                            "${context?.getString(R.string.weight_unit)}${data.scaleData.unit}：${
                                 when (data.scaleData.unit) {
                                     0 -> "kg"
                                     1 -> "LB"
                                     2 -> "ST"
                                     3 -> "LB-ST"
-                                    4 -> "斤"
+                                    4 -> "Jin"
                                     else -> ""
                                 }
                             }\n" +
-                            "体重值KG：${data.scaleData.weight}\n" +
-                            "阻抗值Ω：${data.scaleData.resistance}"
+                            "${context?.getString(R.string.weight_kg)}${data.scaleData.weight}\n" +
+                            "${context?.getString(R.string.imp_Ω)}${data.scaleData.resistance}"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1NoFile).observe(this) { event ->
             (event.data as Boolean).let {
-                binding.dataStr.text = "没有文件 $it"
+                binding.dataStr.text = "${context?.getString(R.string.no_file)} $it"
             }
         }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.FHR.EventFhrDeviceInfo)
@@ -2053,37 +2057,37 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val data = it.data as FhrBleResponse.DeviceInfo
                 binding.dataStr.text = "$data"
                 binding.deviceInfo.text = "${context?.getString(R.string.device_name)}${data.deviceName}\n" +
-                        "心率数据：${data.hr}\n" +
-                        "音量数据：${data.volume}\n" +
-                        "心音强度数据：${data.strength}\n" +
-                        "电量数据：${data.battery}"
+                        "${context?.getString(R.string.hr)}${data.hr}\n" +
+                        "${context?.getString(R.string.volume)}${data.volume}\n" +
+                        "${context?.getString(R.string.ecg_strength)}${data.strength}\n" +
+                        "${context?.getString(R.string.battery)}${data.battery}"
             }
         //------------------------------PoctorM3102--------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PoctorM3102.EventPoctorM3102Data)
             .observe(this) {
                 val data = it.data as PoctorM3102Data
                 binding.deviceInfo.text = when (data.type) {
-                    0 -> "血糖 : ${if (data.normal) {"${data.result} mmol/L\n时间 : ${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
-                    1 -> "尿酸 : ${if (data.normal) {"${data.result} umol/L\n时间 : ${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
-                    3 -> "血酮 : ${if (data.normal) {"${data.result} mmol/L\n时间 : ${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
-                    else -> "数据出错 : \n$data"
+                    0 -> "${context?.getString(R.string.glu_reault)}${if (data.normal) {"${data.result} mmol/L\n${context?.getString(R.string.start_time)}${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
+                    1 -> "${context?.getString(R.string.ua_reault)}${if (data.normal) {"${data.result} umol/L\n${context?.getString(R.string.start_time)}${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
+                    3 -> "${context?.getString(R.string.ketone_reault)}${if (data.normal) {"${data.result} mmol/L\n${context?.getString(R.string.start_time)}${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
+                    else -> "${context?.getString(R.string.error_result)}\n$data"
                 }
             }
         //------------------------------Bioland-BGM--------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmCountDown)
             .observe(this) {
                 val data = it.data as Int
-                binding.deviceInfo.text = "倒计时 : $data"
+                binding.deviceInfo.text = "${context?.getString(R.string.countdown)}$data"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmGluData)
             .observe(this) {
                 val data = it.data as BiolandBgmBleResponse.GluData
-                binding.deviceInfo.text = "血糖 : ${data.resultMg} mg/dL ${data.resultMmol} mmol/L\n时间 : ${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"
+                binding.deviceInfo.text = "${context?.getString(R.string.glu_reault)}${data.resultMg} mg/dL ${data.resultMmol} mmol/L\n${context?.getString(R.string.start_time)}${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmNoGluData)
             .observe(this) {
                 val data = it.data as Boolean
-                Toast.makeText(context, "没有文件", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "${context?.getString(R.string.no_file)}", Toast.LENGTH_SHORT).show()
             }
         //------------------------------ER3--------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3RtData)
@@ -2092,15 +2096,15 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Er3DataController.receive(data.wave.waveMvs)
                 Log.d("Er3Test", "data.wave.waveMvs.size ${data.wave.waveMvs.size}")
                 binding.er3TempInfo.text = "${context?.getString(R.string.software_version)}${mainViewModel._er1Info.value?.fwV}\n" +
-                        "温度：${data.param.temp} ℃"
+                        "${context?.getString(R.string.temp)}${data.param.temp} ℃"
                 mainViewModel._battery.value = "${data.param.battery} %"
-                binding.deviceInfo.text = "心率：${data.param.hr} bpm\n" +
-                        "体温：${data.param.temp} ℃\n" +
-                        "血氧：${data.param.spo2} %\n" +
-                        "pi：${data.param.pi} %\n" +
-                        "脉率：${data.param.pr}\n" +
-                        "呼吸率：${data.param.respRate}\n" +
-                        "电池状态${data.param.batteryStatus}：${
+                binding.deviceInfo.text = "${context?.getString(R.string.hr)}${data.param.hr} bpm\n" +
+                        "${context?.getString(R.string.temp)}${data.param.temp} ℃\n" +
+                        "${context?.getString(R.string.spo2)}：${data.param.spo2} %\n" +
+                        "${context?.getString(R.string.pi)}：${data.param.pi} %\n" +
+                        "${context?.getString(R.string.pr)}：${data.param.pr}\n" +
+                        "${context?.getString(R.string.rr)}${data.param.respRate}\n" +
+                        "${context?.getString(R.string.battery_state)}${data.param.batteryStatus}：${
                             when (data.param.batteryStatus) {
                                 0 -> context?.getString(R.string.no_charge)
                                 1 -> context?.getString(R.string.charging)
@@ -2109,58 +2113,58 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                                 else -> ""
                             }
                         }\n" +
-                        "心电导联线状态：${data.param.isInsertEcgLeadWire}\n" +
-                        "血氧状态${data.param.oxyStatus}：${
+                        "${context?.getString(R.string.lead_wire_state)}${data.param.isInsertEcgLeadWire}\n" +
+                        "${context?.getString(R.string.oxy_probe_state)}${data.param.oxyStatus}：${
                             when (data.param.oxyStatus) {
-                                0 -> "未接入血氧"
-                                1 -> "血氧状态正常"
-                                2 -> "血氧手指脱落"
-                                3 -> "探头故障"
+                                0 -> context?.getString(R.string.no_probe)
+                                1 -> context?.getString(R.string.insert_finger)
+                                2 -> context?.getString(R.string.no_finger)
+                                3 -> context?.getString(R.string.abnormal_use)
                                 else -> ""
                             }
                         }\n" +
-                        "体温状态：${data.param.isInsertTemp}\n" +
+                        "${context?.getString(R.string.temp_probe_state)}：${data.param.isInsertTemp}\n" +
                         "${context?.getString(R.string.measure_state)}${data.param.measureStatus}：${
                             when (data.param.measureStatus) {
-                                0 -> "空闲"
-                                1 -> "准备状态"
-                                2 -> "正式测量状态"
+                                0 -> context?.getString(R.string.idle_state)
+                                1 -> context?.getString(R.string.measure_prepare_state)
+                                2 -> context?.getString(R.string.measuring_state)
                                 else -> ""
                             }
                         }\n" +
-                        "测量中是否有配置设备：${data.param.isHasDevice}\n" +
-                        "测量中是否有配置体温设备：${data.param.isHasTemp}\n" +
-                        "测量中是否有配置血氧设备：${data.param.isHasOxy}\n" +
-                        "测量中是否有配置呼吸设备：${data.param.isHasRespRate}\n" +
+                        "${context?.getString(R.string.has_device)}${data.param.isHasDevice}\n" +
+                        "${context?.getString(R.string.has_temp_device)}${data.param.isHasTemp}\n" +
+                        "${context?.getString(R.string.has_oxy_device)}${data.param.isHasOxy}\n" +
+                        "${context?.getString(R.string.has_rr_device)}${data.param.isHasRespRate}\n" +
                         "${context?.getString(R.string.duration)}${data.param.recordTime}\n" +
                         "${context?.getString(R.string.start_time)}${data.param.year}-${data.param.month}-${data.param.day} ${data.param.hour}:${data.param.minute}:${data.param.second}\n" +
-                        "导联类型${data.param.leadType}：${
+                        "${context?.getString(R.string.lead_type)}${data.param.leadType}：${
                             when (data.param.leadType) {
-                                0 -> "LEAD_12，12导"
-                                1 -> "LEAD_6，6导"
-                                2 -> "LEAD_5，5导"
-                                3 -> "LEAD_3，3导"
-                                4 -> "LEAD_3_TEMP，3导带体温"
-                                5 -> "LEAD_3_LEG，3导胸贴"
-                                6 -> "LEAD_5_LEG，5导胸贴"
-                                7 -> "LEAD_6_LEG，6导胸贴"
-                                0xFF -> "LEAD_NONSUP，不支持的导联"
-                                else -> "UNKNOWN，未知导联"
+                                0 -> context?.getString(R.string.lead_type_12)
+                                1 -> context?.getString(R.string.lead_type_6)
+                                2 -> context?.getString(R.string.lead_type_5)
+                                3 -> context?.getString(R.string.lead_type_3)
+                                4 -> context?.getString(R.string.lead_type_3_temp)
+                                5 -> context?.getString(R.string.lead_type_3_leg)
+                                6 -> context?.getString(R.string.lead_type_5_leg)
+                                7 -> context?.getString(R.string.lead_type_6_leg)
+                                0xFF -> context?.getString(R.string.lead_type_non_sup)
+                                else -> context?.getString(R.string.lead_type_unknown)
                             }
                         }\n" +
-                        "一次性导联的sn：${data.param.leadSn}\n" +
-                        "I导联脱落：${data.param.isLeadOffI}\n" +
-                        "II导联脱落：${data.param.isLeadOffII}\n" +
-                        "III导联脱落：${data.param.isLeadOffIII}\n" +
-                        "aVR导联脱落：${data.param.isLeadOffaVR}\n" +
-                        "aVL导联脱落：${data.param.isLeadOffaVL}\n" +
-                        "aVF导联脱落：${data.param.isLeadOffaVF}\n" +
-                        "V1导联脱落：${data.param.isLeadOffV1}\n" +
-                        "V2导联脱落：${data.param.isLeadOffV2}\n" +
-                        "V3导联脱落：${data.param.isLeadOffV3}\n" +
-                        "V4导联脱落：${data.param.isLeadOffV4}\n" +
-                        "V5导联脱落：${data.param.isLeadOffV5}\n" +
-                        "V6导联脱落：${data.param.isLeadOffV6}\n" +
+                        "${context?.getString(R.string.lead_sn)}${context?.getString(R.string.lead_sn)}${data.param.leadSn}\n" +
+                        "${context?.getString(R.string.lead_I_lead_off)}${data.param.isLeadOffI}\n" +
+                        "${context?.getString(R.string.lead_II_lead_off)}${data.param.isLeadOffII}\n" +
+                        "${context?.getString(R.string.lead_III_lead_off)}${data.param.isLeadOffIII}\n" +
+                        "${context?.getString(R.string.lead_aVR_lead_off)}${data.param.isLeadOffaVR}\n" +
+                        "${context?.getString(R.string.lead_aVL_lead_off)}${data.param.isLeadOffaVL}\n" +
+                        "${context?.getString(R.string.lead_aVF_lead_off)}${data.param.isLeadOffaVF}\n" +
+                        "${context?.getString(R.string.lead_V1_lead_off)}${data.param.isLeadOffV1}\n" +
+                        "${context?.getString(R.string.lead_V2_lead_off)}${data.param.isLeadOffV2}\n" +
+                        "${context?.getString(R.string.lead_V3_lead_off)}${data.param.isLeadOffV3}\n" +
+                        "${context?.getString(R.string.lead_V4_lead_off)}${data.param.isLeadOffV4}\n" +
+                        "${context?.getString(R.string.lead_V5_lead_off)}${data.param.isLeadOffV5}\n" +
+                        "${context?.getString(R.string.lead_V6_lead_off)}${data.param.isLeadOffV6}\n" +
                         "${data.param}"
             }
         //------------------------------Lepod--------------------------------
@@ -2170,13 +2174,13 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 Er3DataController.receive(data.wave.waveMvs)
                 Log.d("LepodTest", "data.wave.waveMvs.size ${data.wave.waveMvs.size}")
                 mainViewModel._battery.value = "${data.param.battery} %"
-                binding.deviceInfo.text = "心率：${data.param.hr} bpm\n" +
-                        "体温：${data.param.temp} ℃\n" +
-                        "血氧：${data.param.spo2} %\n" +
-                        "pi：${data.param.pi} %\n" +
-                        "脉率：${data.param.pr}\n" +
-                        "呼吸率：${data.param.respRate}\n" +
-                        "电池状态${data.param.batteryStatus}：${
+                binding.deviceInfo.text = "${context?.getString(R.string.hr)}${data.param.hr} bpm\n" +
+                        "${context?.getString(R.string.temp)}${data.param.temp} ℃\n" +
+                        "${context?.getString(R.string.spo2)}：${data.param.spo2} %\n" +
+                        "${context?.getString(R.string.pi)}：${data.param.pi} %\n" +
+                        "${context?.getString(R.string.pr)}：${data.param.pr}\n" +
+                        "${context?.getString(R.string.rr)}${data.param.respRate}\n" +
+                        "${context?.getString(R.string.battery_state)}${data.param.batteryStatus}：${
                             when (data.param.batteryStatus) {
                                 0 -> context?.getString(R.string.no_charge)
                                 1 -> context?.getString(R.string.charging)
@@ -2185,60 +2189,60 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                                 else -> ""
                             }
                         }\n" +
-                        "心电导联线状态：${data.param.isInsertEcgLeadWire}\n" +
-                        "血氧状态${data.param.oxyStatus}：${
+                        "${context?.getString(R.string.lead_wire_state)}${data.param.isInsertEcgLeadWire}\n" +
+                        "${context?.getString(R.string.oxy_probe_state)}${data.param.oxyStatus}：${
                             when (data.param.oxyStatus) {
-                                0 -> "未接入血氧"
-                                1 -> "血氧状态正常"
-                                2 -> "血氧手指脱落"
-                                3 -> "探头故障"
+                                0 -> context?.getString(R.string.no_probe)
+                                1 -> context?.getString(R.string.insert_finger)
+                                2 -> context?.getString(R.string.no_finger)
+                                3 -> context?.getString(R.string.abnormal_use)
                                 else -> ""
                             }
                         }\n" +
-                        "体温状态：${data.param.isInsertTemp}\n" +
+                        "${context?.getString(R.string.temp_probe_state)}：${data.param.isInsertTemp}\n" +
                         "${context?.getString(R.string.measure_state)}${data.param.measureStatus}：${
                             when (data.param.measureStatus) {
-                                0 -> "空闲"
-                                1 -> "检测导联"
-                                2 -> "准备状态"
-                                3 -> "正式测量"
+                                0 -> context?.getString(R.string.idle_state)
+                                1 -> context?.getString(R.string.detect_lead_state)
+                                2 -> context?.getString(R.string.measure_prepare_state)
+                                3 -> context?.getString(R.string.measuring_state)
                                 else -> ""
                             }
                         }\n" +
                         "${context?.getString(R.string.duration)}${data.param.recordTime}\n" +
                         "${context?.getString(R.string.start_time)}${data.param.year}-${data.param.month}-${data.param.day} ${data.param.hour}:${data.param.minute}:${data.param.second}\n" +
-                        "导联类型${data.param.leadType}：${
+                        "${context?.getString(R.string.lead_type)}${data.param.leadType}：${
                             when (data.param.leadType) {
-                                0 -> "LEAD_12，12导"
-                                1 -> "LEAD_6，6导"
-                                2 -> "LEAD_5，5导"
-                                3 -> "LEAD_3，3导"
-                                4 -> "LEAD_3_TEMP，3导带体温"
-                                5 -> "LEAD_3_LEG，3导胸贴"
-                                6 -> "LEAD_5_LEG，5导胸贴"
-                                7 -> "LEAD_6_LEG，6导胸贴"
-                                0xFF -> "LEAD_NONSUP，不支持的导联"
-                                else -> "UNKNOWN，未知导联"
+                                0 -> context?.getString(R.string.lead_type_12)
+                                1 -> context?.getString(R.string.lead_type_6)
+                                2 -> context?.getString(R.string.lead_type_5)
+                                3 -> context?.getString(R.string.lead_type_3)
+                                4 -> context?.getString(R.string.lead_type_3_temp)
+                                5 -> context?.getString(R.string.lead_type_3_leg)
+                                6 -> context?.getString(R.string.lead_type_5_leg)
+                                7 -> context?.getString(R.string.lead_type_6_leg)
+                                0xFF -> context?.getString(R.string.lead_type_non_sup)
+                                else -> context?.getString(R.string.lead_type_unknown)
                             }
                         }\n" +
-                        "RA导联脱落：${data.param.isLeadOffRA}\n" +
-                        "RL导联脱落：${data.param.isLeadOffRL}\n" +
-                        "LA导联脱落：${data.param.isLeadOffLA}\n" +
-                        "LL导联脱落：${data.param.isLeadOffLL}\n" +
-                        "V1导联脱落：${data.param.isLeadOffV1}\n" +
-                        "V2导联脱落：${data.param.isLeadOffV2}\n" +
-                        "V3导联脱落：${data.param.isLeadOffV3}\n" +
-                        "V4导联脱落：${data.param.isLeadOffV4}\n" +
-                        "V5导联脱落：${data.param.isLeadOffV5}\n" +
-                        "V6导联脱落：${data.param.isLeadOffV6}"
+                        "${context?.getString(R.string.lead_RA_lead_off)}${data.param.isLeadOffRA}\n" +
+                        "${context?.getString(R.string.lead_RL_lead_off)}${data.param.isLeadOffRL}\n" +
+                        "${context?.getString(R.string.lead_LA_lead_off)}${data.param.isLeadOffLA}\n" +
+                        "${context?.getString(R.string.lead_LL_lead_off)}${data.param.isLeadOffLL}\n" +
+                        "${context?.getString(R.string.lead_V1_lead_off)}${data.param.isLeadOffV1}\n" +
+                        "${context?.getString(R.string.lead_V2_lead_off)}${data.param.isLeadOffV2}\n" +
+                        "${context?.getString(R.string.lead_V3_lead_off)}${data.param.isLeadOffV3}\n" +
+                        "${context?.getString(R.string.lead_V4_lead_off)}${data.param.isLeadOffV4}\n" +
+                        "${context?.getString(R.string.lead_V5_lead_off)}${data.param.isLeadOffV5}\n" +
+                        "${context?.getString(R.string.lead_V6_lead_off)}${data.param.isLeadOffV6}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodEcgStart)
             .observe(this) {
-                Toast.makeText(context, "开始测量", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context?.getString(R.string.start_measure), Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodEcgStop)
             .observe(this) {
-                Toast.makeText(context, "结束测量", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context?.getString(R.string.stop_measure), Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VCOMIN.EventVcominRtHr)
             .observe(this) {
@@ -2258,11 +2262,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.oxyPr.value = data.param.pr
                 viewModel.spo2.value = data.param.spo2
                 viewModel.pi.value = data.param.pi
-                binding.deviceInfo.text = "探头状态${data.param.probeState}：${
+                binding.deviceInfo.text = "${context?.getString(R.string.oxy_probe_state)}${data.param.probeState}：${
                     when (data.param.probeState) {
-                        0 -> "未检测到手指"
-                        1 -> "正常测量"
-                        2 -> "探头故障"
+                        0 -> context?.getString(R.string.no_finger)
+                        1 -> context?.getString(R.string.measuring_state)
+                        2 -> context?.getString(R.string.abnormal_use)
                         else -> ""
                     }
                 }"
@@ -2334,14 +2338,14 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 wirelessData.errorPercent = wirelessData.errorBytes.div(wirelessData.totalBytes*1.0).times(100)
                 wirelessData.missPercent = wirelessData.missSize.div(sendSeqNo*1.0).times(100)
                 tempSeqNo = data.pkgNo
-                binding.wirelessDataLayout.testData.text = "数据总量：${wirelessData.totalBytes.div(1024.0)} kb\n" +
-                        "总包数：${wirelessData.totalSize}\n" +
-                        "丢包数：${wirelessData.missSize}\n" +
-                        "错误字节：${wirelessData.errorBytes}\n" +
-                        "单次时延：${wirelessData.oneDelay} ms\n" +
-                        "总时延：${wirelessData.totalDelay.div(wirelessData.totalSize)} ms\n" +
-                        "丢包率：${String.format("%.3f", wirelessData.missPercent)} %\n" +
-                        "误码率：${String.format("%.3f", wirelessData.errorPercent)} %"
+                binding.wirelessDataLayout.testData.text = "${context?.getString(R.string.total_bytes)}${wirelessData.totalBytes.div(1024.0)} kb\n" +
+                        "${context?.getString(R.string.total_size)}${wirelessData.totalSize}\n" +
+                        "${context?.getString(R.string.miss_size)}${wirelessData.missSize}\n" +
+                        "${context?.getString(R.string.error_bytes)}${wirelessData.errorBytes}\n" +
+                        "${context?.getString(R.string.one_delay)}${wirelessData.oneDelay} ms\n" +
+                        "${context?.getString(R.string.total_delay)}${wirelessData.totalDelay.div(wirelessData.totalSize)} ms\n" +
+                        "${context?.getString(R.string.miss_percent)}${String.format("%.3f", wirelessData.missPercent)} %\n" +
+                        "${context?.getString(R.string.error_percent)}${String.format("%.3f", wirelessData.errorPercent)} %"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorRtState)
             .observe(this) {

@@ -284,6 +284,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     settingViewModel = ViewModelProvider(this).get(VentilatorViewModel::class.java)
                     (settingViewModel as VentilatorViewModel).initView(requireContext(), binding, it, mainViewModel)
                     (settingViewModel as VentilatorViewModel).initEvent(this)
+                    /*settingViewModel = ViewModelProvider(this).get(VentilatorInvalidViewModel::class.java)
+                    (settingViewModel as VentilatorInvalidViewModel).initView(requireContext(), binding, it, mainViewModel)
+                    (settingViewModel as VentilatorInvalidViewModel).initEvent(this)*/
                     LpBleUtil.ventilatorGetRtState(it)
                     LpBleUtil.ventilatorGetSystemSetting(it)
                     LpBleUtil.ventilatorGetVentilationSetting(it)
@@ -343,9 +346,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R10
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R11
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LERES) {
-                binding.ventilatorLayout.version.setText("${it.hwV}")
+                /*binding.ventilatorLayout.version.setText("${it.hwV}")
                 binding.ventilatorLayout.sn.setText("${it.sn}")
-                binding.ventilatorLayout.code.setText("${it.branchCode}")
+                binding.ventilatorLayout.code.setText("${it.branchCode}")*/
             } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP3W
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LP_BP3C) {
                 binding.bp3Layout.version.setText("${it.hwV}")

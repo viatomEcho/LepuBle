@@ -440,7 +440,7 @@
                 android:id="@+id/lew_get_hr_data"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="心率数据"
+                android:text="@string/hr"
                 android:layout_marginStart="20dp"/>
             <Button
                 android:id="@+id/lew_get_sleep_data"

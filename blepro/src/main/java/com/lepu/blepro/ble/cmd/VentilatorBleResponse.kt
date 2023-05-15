@@ -157,7 +157,7 @@ object VentilatorBleResponse {
         var ventilationMode: Int   // 通气模式 0:CPAP  1:APAP  2:S   3:S/T   4:T
         var isVentilated: Boolean  // 是否通气 0:0ff;1:on
         var deviceMode: Int        // 0:患者模式；1：设备端医生模式；2：BLE端医生模式；3：Socket端医生模式
-        var standard: Int          // CE/FDA, 1是 CFDA 2是CE，3是FDA
+        var standard: Int          // CE/FDA, 1是CFDA, 2是CE, 3是FDA
         // reserved 4
         init {
             var index = 0

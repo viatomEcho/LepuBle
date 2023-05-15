@@ -665,6 +665,12 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventEr3Reset = "com.lepu.ble.er3.reset"                                // 复位 boolean
             const val EventEr3FactoryReset = "com.lepu.ble.er3.factory.reset"                 // 恢复出厂设置 boolean
             const val EventEr3FactoryResetAll = "com.lepu.ble.er3.factory.reset.all"          // 恢复生产出厂状态 boolean
+            /**
+             * mode：心电测量模式
+             * 0：监护模式（带宽0.5HZ-40HZ）
+             * 1：手术模式（带宽1HZ-20HZ）
+             * 2：ST模式（带宽0.05HZ-40HZ）
+             */
             const val EventEr3GetConfig = "com.lepu.ble.er3.get.config"                       // 获取配置参数 int
             const val EventEr3GetConfigError = "com.lepu.ble.er3.get.config.error"            // 获取配置参数失败 boolean
             const val EventEr3SetConfig = "com.lepu.ble.er3.set.config"                       // 设置模式 boolean
