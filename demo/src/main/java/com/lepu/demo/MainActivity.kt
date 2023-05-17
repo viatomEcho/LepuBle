@@ -117,12 +117,12 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 //        lifecycle.addObserver(BIOL(this, SUPPORT_MODELS))
 
 //        viewModel._scanning.value = true
-//        LpBleUtil.startScan(SUPPORT_MODELS)
+        LpBleUtil.startScan(SUPPORT_MODELS)
 //        多设备连接测试
-        LpBleUtil.setInterface(Bluetooth.MODEL_PF_20AW, false)
-        LpBleUtil.setInterface(Bluetooth.MODEL_PC300, false)
+//        LpBleUtil.setInterface(Bluetooth.MODEL_PF_20AW, false)
+//        LpBleUtil.setInterface(Bluetooth.MODEL_PC300, false)
 //        LpBleUtil.reconnect(intArrayOf(Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PC300), arrayOf("PF-20AW_0008", "PC_300SNT"))
-        BleServiceHelper.BleServiceHelper.reconnectByAddress(intArrayOf(Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PC300), arrayOf("00:00:00:00:00:08", "00:00:00:00:00:09"))
+//        BleServiceHelper.BleServiceHelper.reconnectByAddress(intArrayOf(Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PC300), arrayOf("00:00:00:00:00:08", "00:00:00:00:00:09"))
     }
 
     private fun subscribeUi() {
@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
         // 开启/关闭扫描
         viewModel.scanning.observe(this) {
-//            LpBleUtil.startScan(SUPPORT_MODELS)
+            LpBleUtil.startScan(SUPPORT_MODELS)
         }
 
     }
