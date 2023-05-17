@@ -26,6 +26,7 @@ import com.afollestad.materialdialogs.DialogAction
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.lew.DeviceInfo
@@ -75,11 +76,11 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         checkServer()
         initLiveEvent()
 //        split()
-//        val data = FileUtil.readFileToByteArray(this, "VNVD6aXj---UxPSrOl3wfzkn.dat")
+//        val data = FileUtil.readFileToByteArray(this, "VNVVss35--2eG_h4qj47GloL.dat")
 //        val file = PpgFile(data)
-//        FileUtil.saveFile(this, file.sampleIntsData, "VNVD6aXj---UxPSrOl3wfzkn.txt")
-//        Log.d("111111111", "file.sampleIntsData.size : ${file.sampleIntsData.size}")
-//        Log.d("111111111", "file : $file")
+//        FileUtil.saveFile(this, file.sampleIntsData, "VNVVss35--2eG_h4qj47GloL.txt")
+//        Log.d("onCreate", "file.sampleIntsData.size : ${file.sampleIntsData.size}")
+//        Log.d("onCreate", "file : $file")
     }
 
     //创建菜单
@@ -116,11 +117,12 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 //        lifecycle.addObserver(BIOL(this, SUPPORT_MODELS))
 
 //        viewModel._scanning.value = true
-        LpBleUtil.startScan(SUPPORT_MODELS)
+//        LpBleUtil.startScan(SUPPORT_MODELS)
 //        多设备连接测试
-//        LpBleUtil.setInterface(Bluetooth.MODEL_DUOEK, false)
-//        LpBleUtil.setInterface(Bluetooth.MODEL_ER2, false)
-//        LpBleUtil.reconnect(intArrayOf(Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER2), arrayOf("DuoEK 1636", "ER2 0008"))
+        LpBleUtil.setInterface(Bluetooth.MODEL_PF_20AW, false)
+        LpBleUtil.setInterface(Bluetooth.MODEL_PC300, false)
+//        LpBleUtil.reconnect(intArrayOf(Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PC300), arrayOf("PF-20AW_0008", "PC_300SNT"))
+        BleServiceHelper.BleServiceHelper.reconnectByAddress(intArrayOf(Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PC300), arrayOf("00:00:00:00:00:08", "00:00:00:00:00:09"))
     }
 
     private fun subscribeUi() {
@@ -138,7 +140,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
         // 开启/关闭扫描
         viewModel.scanning.observe(this) {
-            LpBleUtil.startScan(SUPPORT_MODELS)
+//            LpBleUtil.startScan(SUPPORT_MODELS)
         }
 
     }

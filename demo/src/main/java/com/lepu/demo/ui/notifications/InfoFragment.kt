@@ -697,7 +697,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
             Bluetooth.MODEL_AOJ20A -> {
                 infoViewModel = ViewModelProvider(this).get(Aoj20aViewModel::class.java)
-                (infoViewModel as Aoj20aViewModel).initEvent(this)
+                (infoViewModel as Aoj20aViewModel).initEvent(this, requireContext())
                 mainViewModel.aoj20aInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "$it"
@@ -705,7 +705,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
             Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_CHECKME_POD_WPS -> {
                 infoViewModel = ViewModelProvider(this).get(CheckmePodViewModel::class.java)
-                (infoViewModel as CheckmePodViewModel).initEvent(this)
+                (infoViewModel as CheckmePodViewModel).initEvent(this, requireContext())
                 mainViewModel.checkmePodInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwVersion}\n" +
@@ -761,7 +761,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
             Bluetooth.MODEL_LES1 -> {
                 infoViewModel = ViewModelProvider(this).get(LeS1ViewModel::class.java)
-                (infoViewModel as LeS1ViewModel).initEvent(this)
+                (infoViewModel as LeS1ViewModel).initEvent(this, requireContext())
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
@@ -775,11 +775,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
             Bluetooth.MODEL_POCTOR_M3102 -> {
                 infoViewModel = ViewModelProvider(this).get(PoctorM3102ViewModel::class.java)
-                (infoViewModel as PoctorM3102ViewModel).initEvent(this)
+                (infoViewModel as PoctorM3102ViewModel).initEvent(this, requireContext())
             }
             Bluetooth.MODEL_BIOLAND_BGM -> {
                 infoViewModel = ViewModelProvider(this).get(BiolandBgmViewModel::class.java)
-                (infoViewModel as BiolandBgmViewModel).initEvent(this)
+                (infoViewModel as BiolandBgmViewModel).initEvent(this, requireContext())
                 mainViewModel.biolandInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "${context?.getString(R.string.software_version)}${it.version}\n" +
@@ -835,7 +835,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
             Bluetooth.MODEL_LERES -> {
                 infoViewModel = ViewModelProvider(this).get(VentilatorViewModel::class.java)
-                (infoViewModel as VentilatorViewModel).initEvent(this)
+                (infoViewModel as VentilatorViewModel).initEvent(this, requireContext())
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +

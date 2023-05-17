@@ -684,21 +684,21 @@ object LpWorkManager {
      *
      * @param scanModel IntArray 本次扫描过滤的model
      * @param needPair Boolean 本次扫描是否需要发送配对Event通知
-     * @param isReconnecting Boolean 本次扫描是否自来重连
+     * @param isReconnectScan Boolean 本次扫描是否自来重连
      */
-    fun startDiscover(scanModel: IntArray? = null, needPair: Boolean = false, isReconnecting :Boolean = false) {
-        LepuBleLog.d(tag, "start discover.....vailFace.size = ${vailFace.size()}, needPair = $needPair, isReconnecting = $isReconnecting")
+    fun startDiscover(scanModel: IntArray? = null, needPair: Boolean = false, isReconnectScan :Boolean = false) {
+        LepuBleLog.d(tag, "start discover.....vailFace.size = ${vailFace.size()}, needPair = $needPair, isReconnectScan = $isReconnectScan")
         stopDiscover()
 
-        if (vailFace.isEmpty() && isReconnecting) {
-            LepuBleLog.d(tag, "startDiscover vailFace.isEmpty(), isReconnecting:$isReconnecting")
+        if (vailFace.isEmpty() && isReconnectScan) {
+            LepuBleLog.d(tag, "startDiscover vailFace.isEmpty(), isReconnectScan:$isReconnectScan")
             return
         }
 
         BluetoothController.clear()
         this.needPair = needPair
         this.scanModel = scanModel
-        this.isReconnectScan = isReconnecting
+        this.isReconnectScan = isReconnectScan
 
         startScan?.cancel()
 
@@ -747,7 +747,7 @@ object LpWorkManager {
             this.toConnectUpdater = toConnectUpdater
             this.needPair = needPair
             setScanDefineDevice(false, false, "")
-            startDiscover(scanModel, needPair, isReconnecting = true)
+            startDiscover(scanModel, needPair, isReconnectScan = true)
         }
         LepuBleLog.d(tag, "reconnect: scanModel=> ${scanModel?.joinToString()} reconnectDeviceName=> ${reconnectDeviceName.joinToString()} ReScan: $reScan")
     }
@@ -759,7 +759,7 @@ object LpWorkManager {
      *
      * 蓝牙名一致的设备重连必须使用蓝牙地址重连方法
      */
-    fun reconnectByAddress(scanModel: IntArray? = null, reconnectDeviceAddress: Array<String>, needPair: Boolean,  toConnectUpdater: Boolean = false) {
+    fun reconnectByAddress(scanModel: IntArray? = null, reconnectDeviceAddress: Array<String>, needPair: Boolean = false,  toConnectUpdater: Boolean = false) {
 
         if (vailFace.isEmpty()) {
             LepuBleLog.d(tag, "reconnectByAddress vailFace.isEmpty()")
@@ -779,7 +779,7 @@ object LpWorkManager {
             this.needPair = needPair
             this.toConnectUpdater = toConnectUpdater
             setScanDefineDevice(false, false, "")
-            startDiscover(scanModel, isReconnecting = true)
+            startDiscover(scanModel, isReconnectScan = true)
         }
 
         LepuBleLog.d(tag, "reconnectByAddress: => ${reconnectDeviceAddress.joinToString()} => ReScan: $reScan")
@@ -945,7 +945,7 @@ object LpWorkManager {
                 }
 
             if (BluetoothController.addDevice(b)) {
-                LepuBleLog.d(tag, "model = ${b.model}, isReconnecting::$isReconnectScan, b= ${b.name}, recName = ${reconnectDeviceName.joinToString()}, " +
+                LepuBleLog.d(tag, "model = ${b.model}, isReconnectScan::$isReconnectScan, b= ${b.name}, recName = ${reconnectDeviceName.joinToString()}, " +
                         "toConnectUpdater = $toConnectUpdater,  isReconnectByAddress = $isReconnectByAddress ,  recAddress:${reconnectDeviceAddress.joinToString()}")
 
                 LiveEventBus.get<Bluetooth>(EventMsgConst.Discovery.EventDeviceFound).post(b)

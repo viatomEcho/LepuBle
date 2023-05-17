@@ -1984,25 +1984,25 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             .observe(this) {
                 val data = it.data as Pc300BleResponse.GluResult
                 binding.dataStr.text = "$data"
-                binding.deviceInfo.text = "${context?.getString(R.string.glu_reault_type)}${data.result}：${data.resultMess}\n" +
-                        "${context?.getString(R.string.glu_reault_unit)}${data.unit}：${
+                binding.deviceInfo.text = "${context?.getString(R.string.glu_result_type)}${data.result}：${data.resultMess}\n" +
+                        "${context?.getString(R.string.glu_result_unit)}${data.unit}：${
                             when (data.unit) {
                                 0 -> "mmol/L"
                                 1 -> "mg/dL"
                                 else -> ""
                             }
                         }\n" +
-                        "${context?.getString(R.string.glu_reault)}${data.data}"
+                        "${context?.getString(R.string.glu_result)}${data.data}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300UaResult)
             .observe(this) {
                 val data = it.data as Float
-                binding.deviceInfo.text = "${context?.getString(R.string.ua_reault)}$data mg/dL"
+                binding.deviceInfo.text = "${context?.getString(R.string.ua_result)}$data mg/dL"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300CholResult)
             .observe(this) {
                 val data = it.data as Int
-                binding.deviceInfo.text = "${context?.getString(R.string.chol_reault)}$data mg/dL"
+                binding.deviceInfo.text = "${context?.getString(R.string.chol_result)}$data mg/dL"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300EcgStart)
             .observe(this) {
@@ -2067,9 +2067,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             .observe(this) {
                 val data = it.data as PoctorM3102Data
                 binding.deviceInfo.text = when (data.type) {
-                    0 -> "${context?.getString(R.string.glu_reault)}${if (data.normal) {"${data.result} mmol/L\n${context?.getString(R.string.start_time)}${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
-                    1 -> "${context?.getString(R.string.ua_reault)}${if (data.normal) {"${data.result} umol/L\n${context?.getString(R.string.start_time)}${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
-                    3 -> "${context?.getString(R.string.ketone_reault)}${if (data.normal) {"${data.result} mmol/L\n${context?.getString(R.string.start_time)}${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
+                    0 -> "${context?.getString(R.string.glu_result)}${if (data.normal) {"${data.result} mmol/L\n${context?.getString(R.string.start_time)}${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
+                    1 -> "${context?.getString(R.string.ua_result)}${if (data.normal) {"${data.result} umol/L\n${context?.getString(R.string.start_time)}${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
+                    3 -> "${context?.getString(R.string.ketone_result)}${if (data.normal) {"${data.result} mmol/L\n${context?.getString(R.string.start_time)}${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
                     else -> "${context?.getString(R.string.error_result)}\n$data"
                 }
             }
@@ -2082,7 +2082,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmGluData)
             .observe(this) {
                 val data = it.data as BiolandBgmBleResponse.GluData
-                binding.deviceInfo.text = "${context?.getString(R.string.glu_reault)}${data.resultMg} mg/dL ${data.resultMmol} mmol/L\n${context?.getString(R.string.start_time)}${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"
+                binding.deviceInfo.text = "${context?.getString(R.string.glu_result)}${data.resultMg} mg/dL ${data.resultMmol} mmol/L\n${context?.getString(R.string.start_time)}${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmNoGluData)
             .observe(this) {
@@ -2278,32 +2278,32 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpRtData)
             .observe(this) {
                 val data = it.data as BtpBleResponse.RtData
-                binding.deviceInfo.text = "心率：${data.hr}\n"
+                binding.deviceInfo.text = "${context?.getString(R.string.hr)}${data.hr}\n"
                 if (type == 1) {
-                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "温度：${String.format("%.2f", (32+data.temp*1.8))} ℉\n"
+                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "${context?.getString(R.string.temp)}${String.format("%.2f", (32+data.temp*1.8))} ℉\n"
                 } else {
-                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "温度：${data.temp} ℃\n"
+                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "${context?.getString(R.string.temp)}${data.temp} ℃\n"
                 }
-                binding.deviceInfo.text = binding.deviceInfo.text.toString() + "测量中：${
+                binding.deviceInfo.text = binding.deviceInfo.text.toString() + "${context?.getString(R.string.measuring_state)}：${
                     if (data.isWearing) {
                         context?.getString(R.string.yes)
                     } else {
                         context?.getString(R.string.no)
                     }}\n" +
-                    "心率可信度：${data.level}\n" +
-                    "心率状态${data.hrStatus}：${
+                    "${context?.getString(R.string.hr_real_level)}${data.level}\n" +
+                    "${context?.getString(R.string.hr_status)}${data.hrStatus}：${
                         when (data.hrStatus) {
                             0 -> context?.getString(R.string.normal)
-                            1 -> "心率低异常"
-                            2 -> "心率高异常"
+                            1 -> context?.getString(R.string.low_hr_abnormal)
+                            2 -> context?.getString(R.string.high_hr_abnormal)
                             else -> ""
                         }
                     }\n" +
-                    "温度状态${data.tempStatus}：${
+                    "${data.tempStatus}：${
                         when (data.tempStatus) {
                             0 -> context?.getString(R.string.normal)
-                            3 -> "温度低异常"
-                            4 -> "温度高异常"
+                            3 -> context?.getString(R.string.low_temp_abnormal)
+                            4 -> context?.getString(R.string.high_temp_abnormal)
                             else -> ""
                         }
                     }"
@@ -2362,30 +2362,31 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 state = data.deviceMode == 2
                 binding.ventilatorVentilationSwitch.isEnabled = state
                 binding.ventilatorMaskTest.isEnabled = !data.isVentilated
-                binding.ventilatorState.text = "设备实时状态：\n通气模式：${when (data.ventilationMode) {
-                    0 -> "CPAP"
-                    1 -> "APAP"
-                    2 -> "S"
-                    3 -> "S/T"
-                    4 -> "T"
-                    else -> "无"
-                }}\n通气状态：${
-                    if (data.isVentilated) context?.getString(R.string.yes) 
-                    else context?.getString(R.string.no)}\n" +
-                "${context?.getString(R.string.device_mode)}${when (data.deviceMode) {
-                        0 -> "患者模式"
-                        1 -> "设备端医生模式"
-                        2 -> "BLE端医生模式"
-                        3 -> "Socket端医生模式"
-                        else -> "无"
-                    }
-                }\n标准：${when (data.standard) {
-                        1 -> "CFDA"
-                        2 -> "CE"
-                        3 -> "FDA"
-                        else -> "无"
-                    }
-                }"
+                binding.ventilatorState.text = "${context?.getString(R.string.run_state)}：\n" +
+                        "${context?.getString(R.string.ventilation_mode)}${when (data.ventilationMode) {
+                            0 -> "CPAP"
+                            1 -> "APAP"
+                            2 -> "S"
+                            3 -> "S/T"
+                            4 -> "T"
+                            else -> context?.getString(R.string.no)
+                        }}\n${context?.getString(R.string.ventilation_status)}${
+                            if (data.isVentilated) context?.getString(R.string.yes) 
+                            else context?.getString(R.string.no)}\n" +
+                        "${context?.getString(R.string.device_mode)}${when (data.deviceMode) {
+                                0 -> context?.getString(R.string.device_mode_normal)
+                                1 -> context?.getString(R.string.device_mode_doctor)
+                                2 -> context?.getString(R.string.device_mode_ble_doctor)
+                                3 -> context?.getString(R.string.device_mode_socket_doctor)
+                                else -> context?.getString(R.string.no)
+                            }
+                        }\n${context?.getString(R.string.standard)}${when (data.standard) {
+                                1 -> "CFDA"
+                                2 -> "CE"
+                                3 -> "FDA"
+                                else -> context?.getString(R.string.no)
+                            }
+                        }"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetSystemSetting)
             .observe(this) {
@@ -2397,24 +2398,25 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val data = it.data as VentilatorBleResponse.RtParam
                 binding.deviceInfo.visibility = View.VISIBLE
                 binding.ventilatorMaskTestText.visibility = View.GONE
-                binding.deviceInfo.text = "实时参数：\n实时压：${data.pressure} ${if (type == 0) "cmH2O" else "hPa"}\n" +
-                        "吸气压力：${data.ipap} ${if (type == 0) "cmH2O" else "hPa"}\n" +
-                        "呼气压力：${data.epap} ${if (type == 0) "cmH2O" else "hPa"}\n" +
-                        "潮气量：${if (data.vt < 0 || data.vt > 3000) "**" else data.vt}mL\n" +
-                        "分钟通气量：${if (data.mv < 0 || data.mv > 60) "**" else data.mv} L/min\n" +
-                        "漏气量：${if (data.leak < 0 || data.leak > 120) "**" else data.leak} L/min\n" +
-                        "呼吸率：${if (data.rr < 0 || data.rr > 60) "**" else data.rr} bpm\n" +
-                        "吸气时间：${if (data.ti < 0.1 || data.ti > 4) "--" else data.ti} s\n" +
-                        "吸呼比：${if (data.ie < 0.02 || data.ie > 3) "--" else {
+                binding.deviceInfo.text = "${context?.getString(R.string.rt_param)}\n" +
+                        "${context?.getString(R.string.rt_preasure)}${data.pressure} ${if (type == 0) "cmH2O" else "hPa"}\n" +
+                        "${context?.getString(R.string.ipap_preasure)}${data.ipap} ${if (type == 0) "cmH2O" else "hPa"}\n" +
+                        "${context?.getString(R.string.epap_preasure)}${data.epap} ${if (type == 0) "cmH2O" else "hPa"}\n" +
+                        "${context?.getString(R.string.vt)}${if (data.vt < 0 || data.vt > 3000) "**" else data.vt}mL\n" +
+                        "${context?.getString(R.string.mv)}${if (data.mv < 0 || data.mv > 60) "**" else data.mv} L/min\n" +
+                        "${context?.getString(R.string.leak)}${if (data.leak < 0 || data.leak > 120) "**" else data.leak} L/min\n" +
+                        "${context?.getString(R.string.rr)}${if (data.rr < 0 || data.rr > 60) "**" else data.rr} bpm\n" +
+                        "${context?.getString(R.string.ti)}${if (data.ti < 0.1 || data.ti > 4) "--" else data.ti} s\n" +
+                        "${context?.getString(R.string.ie)}\$${if (data.ie < 0.02 || data.ie > 3) "--" else {
                             if (data.ie < 1) {
                                 "1:" + String.format("%.1f", 1f/data.ie)
                             } else {
                                 String.format("%.1f", data.ie) + ":1"
                             }
                         }}\n" +
-                        "血氧：${if (data.spo2 < 70 || data.spo2 > 100) "**" else data.spo2} %\n" +
-                        "脉率：${if (data.pr < 30 || data.pr > 250) "**" else data.pr} bpm\n" +
-                        "心率：${if (data.hr < 30 || data.hr > 250) "**" else data.hr} bpm"
+                        "${context?.getString(R.string.spo2)}：${if (data.spo2 < 70 || data.spo2 > 100) "**" else data.spo2} %\n" +
+                        "${context?.getString(R.string.pr)}：${if (data.pr < 30 || data.pr > 250) "**" else data.pr} bpm\n" +
+                        "${context?.getString(R.string.hr)}${if (data.hr < 30 || data.hr > 250) "**" else data.hr} bpm"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorMaskTest)
             .observe(this) {
@@ -2427,133 +2429,135 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.ventilatorMaskTestText.visibility = View.VISIBLE
                 binding.deviceInfo.visibility = View.GONE
                 binding.ventilatorEvent.visibility = View.GONE
-                binding.ventilatorMaskTestText.text = "佩戴测试：\n设备状态：${when (data.status) {
-                    0 -> "未在测试状态"
-                    1 -> "测试中"
-                    2 -> "测试结束"
-                    else -> "无"
-                }}\n实时漏气量：${data.leak} L/min\n${context?.getString(R.string.measure_result)}：${when (data.result) {
-                    0 -> "测试未完成"
-                    1 -> "不合适"
-                    2 -> "合适"
-                    else -> "无"
-                }
-                }"
+                binding.ventilatorMaskTestText.text = "${context?.getString(R.string.mask_test)}\n" +
+                        "${context?.getString(R.string.run_state)}：${when (data.status) {
+                            0 -> context?.getString(R.string.test_idle)
+                            1 -> context?.getString(R.string.test_ing)
+                            2 -> context?.getString(R.string.test_end)
+                            else -> context?.getString(R.string.no)
+                        }}\n${context?.getString(R.string.leak)}${data.leak} L/min\n${context?.getString(R.string.measure_result)}：${when (data.result) {
+                            0 -> context?.getString(R.string.test_no_end)
+                            1 -> context?.getString(R.string.no_fit)
+                            2 -> context?.getString(R.string.fit)
+                            else -> context?.getString(R.string.no)
+                        }
+                        }"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorEvent)
             .observe(this) {
                 val data = it.data as VentilatorBleResponse.Event
                 binding.ventilatorEvent.visibility = View.VISIBLE
-                binding.ventilatorEvent.text = "事件上报：\n时间：${stringFromDate(Date(data.timestamp*1000), "yyyy-MM-dd HH:mm:ss")}\n" +
-                        "警告状态：${if (data.alarm) {"告警中"} else {"取消告警"}}\n" +
-                        "警告等级：${when (data.alarmLevel) {
+                binding.ventilatorEvent.text = "${context?.getString(R.string.event_report)}\n" +
+                        "${context?.getString(R.string.report_time)}${stringFromDate(Date(data.timestamp*1000), "yyyy-MM-dd HH:mm:ss")}\n" +
+                        "${context?.getString(R.string.warning_state)}${if (data.alarm) {"${context?.getString(R.string.warning)}"} else {"${context?.getString(R.string.cancel_warning)}"}}\n" +
+                        "${context?.getString(R.string.warning_level)}${when (data.alarmLevel) {
                             0 -> context?.getString(R.string.normal)
-                            1 -> "低"
-                            2 -> "中"
-                            3 -> "高"
-                            4 -> "最高"
-                            else -> "无"
-                        }}\n警告类型：${when (data.eventId) {
-                            1 -> "管路断开"
-                            2 -> "管路阻塞"
-                            3 -> "漏气量高"
-                            4 -> "呼吸频率高"
-                            5 -> "呼吸频率低"
-                            6 -> "潮气量低"
-                            7 -> "分钟通气量低"
-                            8 -> "血氧饱和度低"
-                            9 -> "心率/脉率高"
-                            10 -> "心率/脉率低"
-                            11 -> "窒息"
-                            12 -> "掉电"
-                            101 -> "涡轮HALL线没接"
-                            102 -> "涡轮温度超过90度"
-                            103 -> "涡轮堵转"
-                            104 -> "涡轮电源异常"
-                            201 -> "加热盘异常"
-                            202 -> "加热盘没接/温度传感器损坏"
-                            203 -> "加热盘温度超过75度"
-                            301 -> "流量传感器异常"
-                            302 -> "压力传感器异常"
-                            303 -> "流量传感器通信异常"
-                            304 -> "流量传感器测得的流速过大"
-                            305 -> "流量传感器测得的流速过小"
-                            306 -> "正常通气时，压力传感器数值过大"
-                            307 -> "正常通气时，压力传感器数值过小"
-                            308 -> "传感器压力偏低"
-                            309 -> "自检时，流量传感器流速过大"
-                            310 -> "自检时，流量传感器流速过小"
-                            311 -> "自检时，流量传感器通信异常"
-                            312 -> "自检时，压力传感器数值过大"
-                            313 -> "自检时，压力传感器数值过小"
-                            314 -> "温/湿度传感器异常"
-                            315 -> "大气压传感器异常"
-                            316 -> "预估压力与实际压力相差较远"
-                            401 -> "输入电压异常"
-                            402 -> "电源电压低"
-                            403 -> "电源电压高"
-                            501 -> "EEPROM 只读数据异常"
-                            502 -> "RTC时钟异常"
-                            503 -> "设备需要校准"
-                            504 -> "设备异常重启"
-                            601 -> "阻塞呼吸暂事件"
-                            602 -> "中枢型呼吸暂停事件"
-                            603 -> "无法分类的呼吸暂停事件"
-                            604 -> "低通气"
-                            605 -> "微觉醒"
-                            606 -> "打鼾事件"
-                            607 -> "周期性呼吸事件"
-                            608 -> "漏气量高事件"
-                            609 -> "面罩摘下"
-                            610 -> "自主呼吸占比"
-                            else -> "无"
+                            1 -> context?.getString(R.string.level_low)
+                            2 -> context?.getString(R.string.level_media)
+                            3 -> context?.getString(R.string.level_high)
+                            4 -> context?.getString(R.string.level_highest)
+                            else -> context?.getString(R.string.no)
+                        }}\n${context?.getString(R.string.warning_type)}${when (data.eventId) {
+                            1 -> context?.getString(R.string.warning_type_1)
+                            2 -> context?.getString(R.string.warning_type_2)
+                            3 -> context?.getString(R.string.warning_type_3)
+                            4 -> context?.getString(R.string.warning_type_4)
+                            5 -> context?.getString(R.string.warning_type_5)
+                            6 -> context?.getString(R.string.warning_type_6)
+                            7 -> context?.getString(R.string.warning_type_7)
+                            8 -> context?.getString(R.string.warning_type_8)
+                            9 -> context?.getString(R.string.warning_type_9)
+                            10 -> context?.getString(R.string.warning_type_10)
+                            11 -> context?.getString(R.string.warning_type_11)
+                            12 -> context?.getString(R.string.warning_type_12)
+                            101 -> context?.getString(R.string.warning_type_101)
+                            102 -> context?.getString(R.string.warning_type_102)
+                            103 -> context?.getString(R.string.warning_type_103)
+                            104 -> context?.getString(R.string.warning_type_104)
+                            201 -> context?.getString(R.string.warning_type_201)
+                            202 -> context?.getString(R.string.warning_type_202)
+                            203 -> context?.getString(R.string.warning_type_203)
+                            301 -> context?.getString(R.string.warning_type_301)
+                            302 -> context?.getString(R.string.warning_type_302)
+                            303 -> context?.getString(R.string.warning_type_303)
+                            304 -> context?.getString(R.string.warning_type_304)
+                            305 -> context?.getString(R.string.warning_type_305)
+                            306 -> context?.getString(R.string.warning_type_306)
+                            307 -> context?.getString(R.string.warning_type_307)
+                            308 -> context?.getString(R.string.warning_type_308)
+                            309 -> context?.getString(R.string.warning_type_309)
+                            310 -> context?.getString(R.string.warning_type_310)
+                            311 -> context?.getString(R.string.warning_type_311)
+                            312 -> context?.getString(R.string.warning_type_312)
+                            313 -> context?.getString(R.string.warning_type_313)
+                            314 -> context?.getString(R.string.warning_type_314)
+                            315 -> context?.getString(R.string.warning_type_315)
+                            316 -> context?.getString(R.string.warning_type_316)
+                            401 -> context?.getString(R.string.warning_type_401)
+                            402 -> context?.getString(R.string.warning_type_402)
+                            403 -> context?.getString(R.string.warning_type_403)
+                            501 -> context?.getString(R.string.warning_type_501)
+                            502 -> context?.getString(R.string.warning_type_502)
+                            503 -> context?.getString(R.string.warning_type_503)
+                            504 -> context?.getString(R.string.warning_type_504)
+                            601 -> context?.getString(R.string.warning_type_601)
+                            602 -> context?.getString(R.string.warning_type_602)
+                            603 -> context?.getString(R.string.warning_type_603)
+                            604 -> context?.getString(R.string.warning_type_604)
+                            605 -> context?.getString(R.string.warning_type_605)
+                            606 -> context?.getString(R.string.warning_type_606)
+                            607 -> context?.getString(R.string.warning_type_607)
+                            608 -> context?.getString(R.string.warning_type_608)
+                            609 -> context?.getString(R.string.warning_type_609)
+                            610 -> context?.getString(R.string.warning_type_610)
+                            else -> context?.getString(R.string.no)
                         }
                 }"
             }
         LiveEventBus.get<ResponseError>(EventMsgConst.Cmd.EventCmdResponseError)
             .observe(this) {
                 when (it.type) {
-                    LpBleCmd.TYPE_FILE_NOT_FOUND -> Toast.makeText(context, "找不到文件", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_FILE_READ_FAILED -> Toast.makeText(context, "读文件失败", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_FILE_WRITE_FAILED -> Toast.makeText(context, "写文件失败", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_FIRMWARE_UPDATE_FAILED -> Toast.makeText(context, "固件升级失败", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_LANGUAGE_UPDATE_FAILED -> Toast.makeText(context, "语言包升级失败", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_PARAM_ILLEGAL -> Toast.makeText(context, "参数不合法", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_PERMISSION_DENIED -> Toast.makeText(context, "权限不足", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FILE_NOT_FOUND -> Toast.makeText(context, context?.getString(R.string.file_not_found), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FILE_READ_FAILED -> Toast.makeText(context, context?.getString(R.string.read_error), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FILE_WRITE_FAILED -> Toast.makeText(context, context?.getString(R.string.write_file_error), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FIRMWARE_UPDATE_FAILED -> Toast.makeText(context, context?.getString(R.string.software_upgrade_error), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_LANGUAGE_UPDATE_FAILED -> Toast.makeText(context, context?.getString(R.string.language_upgrade_error), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_PARAM_ILLEGAL -> Toast.makeText(context, context?.getString(R.string.param_illegal), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_PERMISSION_DENIED -> Toast.makeText(context, context?.getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
                     LpBleCmd.TYPE_DECRYPT_FAILED -> {
-                    Toast.makeText(context, "解密失败，断开连接", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context?.getString(R.string.decrypt_failed), Toast.LENGTH_SHORT).show()
                         LpBleUtil.disconnect(false)
                     }
-                    LpBleCmd.TYPE_DEVICE_BUSY -> Toast.makeText(context, "设备资源被占用/设备忙", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_CMD_FORMAT_ERROR -> Toast.makeText(context, "指令格式错误", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_CMD_NOT_SUPPORTED -> Toast.makeText(context, "不支持指令", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_NORMAL_ERROR -> Toast.makeText(context, "通用错误", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_DEVICE_BUSY -> Toast.makeText(context, context?.getString(R.string.device_busy), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_CMD_FORMAT_ERROR -> Toast.makeText(context, context?.getString(R.string.cmd_format_error), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_CMD_NOT_SUPPORTED -> Toast.makeText(context, context?.getString(R.string.cmd_not_support), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_NORMAL_ERROR -> Toast.makeText(context, context?.getString(R.string.normal_error), Toast.LENGTH_SHORT).show()
                 }
             }
         //--------------------ECN---------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStartRtData)
             .observe(this) {
                 val data = it.data as Boolean
-                Toast.makeText(context, "开始上发实时数据$data", Toast.LENGTH_SHORT).show()
-                binding.ecnInfo.text = "开始上发实时数据$data"
+                Toast.makeText(context, "EventEcnStartRtData $data", Toast.LENGTH_SHORT).show()
+                binding.ecnInfo.text = "EventEcnStartRtData $data"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStopRtData)
             .observe(this) {
                 val data = it.data as Boolean
-                Toast.makeText(context, "停止上发实时数据$data", Toast.LENGTH_SHORT).show()
-                binding.ecnInfo.text = "停止上发实时数据$data"
+                Toast.makeText(context, "EventEcnStopRtData $data", Toast.LENGTH_SHORT).show()
+                binding.ecnInfo.text = "EventEcnStopRtData $data"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStartCollect)
             .observe(this) {
                 val data = it.data as Boolean
-                Toast.makeText(context, "开始采集实时数据$data", Toast.LENGTH_SHORT).show()
-                binding.ecnInfo.text = "开始采集实时数据$data"
+                Toast.makeText(context, "EventEcnStartCollect $data", Toast.LENGTH_SHORT).show()
+                binding.ecnInfo.text = "EventEcnStartCollect $data"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStopCollect)
             .observe(this) {
                 val data = it.data as Boolean
-                Toast.makeText(context, "停止采集实时数据$data", Toast.LENGTH_SHORT).show()
-                binding.ecnInfo.text = "停止采集实时数据$data"
+                Toast.makeText(context, "EventEcnStopCollect $data", Toast.LENGTH_SHORT).show()
+                binding.ecnInfo.text = "EventEcnStopCollect $data"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnRtData)
             .observe(this) {

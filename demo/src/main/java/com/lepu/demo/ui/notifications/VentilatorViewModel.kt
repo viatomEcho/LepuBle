@@ -1,5 +1,6 @@
 package com.lepu.demo.ui.notifications
 
+import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
@@ -7,6 +8,7 @@ import com.lepu.blepro.ble.data.Bp2WifiConfig
 import com.lepu.blepro.ble.data.Bp2WifiDevice
 import com.lepu.blepro.ble.data.ventilator.StatisticsFile
 import com.lepu.blepro.event.*
+import com.lepu.demo.R
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.data.EcnData
 import com.lepu.demo.util.DateUtil
@@ -14,7 +16,7 @@ import java.util.*
 
 class VentilatorViewModel : InfoViewModel() {
 
-    fun initEvent(owner: LifecycleOwner) {
+    fun initEvent(owner: LifecycleOwner, context: Context) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetFileList)
             .observe(owner) {
                 val data = it.data as VentilatorBleResponse.RecordList
@@ -59,21 +61,21 @@ class VentilatorViewModel : InfoViewModel() {
                     }
                 }
                 when (it.type) {
-                    LpBleCmd.TYPE_FILE_NOT_FOUND -> _toast.value = "找不到文件"
-                    LpBleCmd.TYPE_FILE_READ_FAILED -> _toast.value = "读文件失败"
-                    LpBleCmd.TYPE_FILE_WRITE_FAILED -> _toast.value = "写文件失败"
-                    LpBleCmd.TYPE_FIRMWARE_UPDATE_FAILED -> _toast.value = "固件升级失败"
-                    LpBleCmd.TYPE_LANGUAGE_UPDATE_FAILED -> _toast.value = "语言包升级失败"
-                    LpBleCmd.TYPE_PARAM_ILLEGAL -> _toast.value = "参数不合法"
-                    LpBleCmd.TYPE_PERMISSION_DENIED -> _toast.value = "权限不足"
+                    LpBleCmd.TYPE_FILE_NOT_FOUND -> _toast.value = context.getString(R.string.file_not_found)
+                    LpBleCmd.TYPE_FILE_READ_FAILED -> _toast.value = context.getString(R.string.read_error)
+                    LpBleCmd.TYPE_FILE_WRITE_FAILED -> _toast.value = context.getString(R.string.write_file_error)
+                    LpBleCmd.TYPE_FIRMWARE_UPDATE_FAILED -> _toast.value = context.getString(R.string.software_upgrade_error)
+                    LpBleCmd.TYPE_LANGUAGE_UPDATE_FAILED -> _toast.value = context.getString(R.string.language_upgrade_error)
+                    LpBleCmd.TYPE_PARAM_ILLEGAL -> _toast.value = context.getString(R.string.param_illegal)
+                    LpBleCmd.TYPE_PERMISSION_DENIED -> _toast.value = context.getString(R.string.permission_denied)
                     LpBleCmd.TYPE_DECRYPT_FAILED -> {
-                        _toast.value = "解密失败，断开连接"
+                        _toast.value = context.getString(R.string.decrypt_failed)
                         LpBleUtil.disconnect(false)
                     }
-                    LpBleCmd.TYPE_DEVICE_BUSY -> _toast.value = "设备资源被占用/设备忙"
-                    LpBleCmd.TYPE_CMD_FORMAT_ERROR -> _toast.value = "指令格式错误"
-                    LpBleCmd.TYPE_CMD_NOT_SUPPORTED -> _toast.value = "不支持指令"
-                    LpBleCmd.TYPE_NORMAL_ERROR -> _toast.value = "通用错误"
+                    LpBleCmd.TYPE_DEVICE_BUSY -> _toast.value = context.getString(R.string.device_busy)
+                    LpBleCmd.TYPE_CMD_FORMAT_ERROR -> _toast.value = context.getString(R.string.cmd_format_error)
+                    LpBleCmd.TYPE_CMD_NOT_SUPPORTED -> _toast.value = context.getString(R.string.cmd_not_support)
+                    LpBleCmd.TYPE_NORMAL_ERROR -> _toast.value = context.getString(R.string.normal_error)
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetWifiList)
