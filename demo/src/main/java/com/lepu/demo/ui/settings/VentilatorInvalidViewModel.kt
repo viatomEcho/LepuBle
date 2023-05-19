@@ -124,13 +124,17 @@ class VentilatorInvalidViewModel : SettingViewModel() {
         // 进入医生模式
         binding.ventilatorLayout.doctorMode.setOnCheckedChangeListener { buttonView, isChecked ->
             if (buttonView.isPressed) {
-                var pin = binding.ventilatorLayout.pin.text.toString()
-                pin = if (pin == "") {
-                    "0319"
+                if (isChecked) {
+                    var pin = binding.ventilatorLayout.pin.text.toString()
+                    pin = if (pin == "") {
+                        "0319"
+                    } else {
+                        pin
+                    }
+                    LpBleUtil.ventilatorDoctorModeIn(model, pin, System.currentTimeMillis().div(1000))
                 } else {
-                    pin
+                    LpBleUtil.ventilatorDoctorModeOut(model)
                 }
-                LpBleUtil.ventilatorDoctorMode(model, pin, System.currentTimeMillis().div(1000))
             }
         }
         // 系统设置
@@ -363,15 +367,29 @@ class VentilatorInvalidViewModel : SettingViewModel() {
             .observe(owner) {
                 val data = it.data as VentilatorBleResponse.DoctorModeResult
                 _toast.value = if (data.success) {
-                    "进入医生模式成功"
+                    if (data.isOut) {
+                        "退出医生模式成功"
+                    } else {
+                        "进入医生模式成功"
+                    }
                 } else {
-                    "进入医生模式失败, ${when (data.errCode) {
-                        1 -> "设备处于医生模式"
-                        2 -> "设备处于医生模式（BLE）"
-                        3 -> "设备处于医生模式（Socket）"
-                        4 -> context.getString(R.string.password_error)
-                        else -> ""
-                    }}"
+                    if (data.isOut) {
+                        "退出医生模式失败, ${when (data.errCode) {
+                            1 -> "设备处于医生模式"
+                            2 -> "设备处于医生模式（BLE）"
+                            3 -> "设备处于医生模式（Socket）"
+                            5 -> "设备处于患者模式"
+                            else -> ""
+                        }}"
+                    } else {
+                        "进入医生模式失败, ${when (data.errCode) {
+                            1 -> "设备处于医生模式"
+                            2 -> "设备处于医生模式（BLE）"
+                            3 -> "设备处于医生模式（Socket）"
+                            4 -> context.getString(R.string.password_error)
+                            else -> ""
+                        }}"
+                    }
                 }
                 LpBleUtil.ventilatorGetRtState(it.model)
             }

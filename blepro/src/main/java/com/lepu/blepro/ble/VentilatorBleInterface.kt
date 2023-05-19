@@ -248,15 +248,27 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model,GET_USER_INFO => success, data: $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetUserInfo).post(InterfaceEvent(model, data))
                 }
-                VentilatorBleCmd.DOCTOR_MODE -> {
+                VentilatorBleCmd.DOCTOR_MODE_IN -> {
                     if (isEncryptMode) {
                         val decrypt = EncryptUtil.AesDecrypt(response.content, aesEncryptKey)
                         if (decrypt.size < 2) {
-                            LepuBleLog.d(tag, "model:$model,DOCTOR_MODE => decrypt.size < 2, decrypt: ${bytesToHex(decrypt)}")
+                            LepuBleLog.d(tag, "model:$model,DOCTOR_MODE_IN => decrypt.size < 2, decrypt: ${bytesToHex(decrypt)}")
                             return
                         }
-                        LepuBleLog.d(tag, "model:$model,DOCTOR_MODE => success, decrypt: ${bytesToHex(decrypt)}")
-                        val data = VentilatorBleResponse.DoctorModeResult(decrypt)
+                        LepuBleLog.d(tag, "model:$model,DOCTOR_MODE_IN => success, decrypt: ${bytesToHex(decrypt)}")
+                        val data = VentilatorBleResponse.DoctorModeResult(false, decrypt)
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorDoctorMode).post(InterfaceEvent(model, data))
+                    }
+                }
+                VentilatorBleCmd.DOCTOR_MODE_OUT -> {
+                    if (isEncryptMode) {
+                        val decrypt = EncryptUtil.AesDecrypt(response.content, aesEncryptKey)
+                        if (decrypt.size < 2) {
+                            LepuBleLog.d(tag, "model:$model,DOCTOR_MODE_OUT => decrypt.size < 2, decrypt: ${bytesToHex(decrypt)}")
+                            return
+                        }
+                        LepuBleLog.d(tag, "model:$model,DOCTOR_MODE_OUT => success, decrypt: ${bytesToHex(decrypt)}")
+                        val data = VentilatorBleResponse.DoctorModeResult(true, decrypt)
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorDoctorMode).post(InterfaceEvent(model, data))
                     }
                 }
@@ -685,13 +697,19 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
         sendCmd(VentilatorBleCmd.getUserInfo(aesEncryptKey))
     }
     // 进入医生模式
-    fun doctorMode(pin: String, timestamp: Long) {
+    fun doctorModeIn(pin: String, timestamp: Long) {
         if (isEncryptMode) {
             if (pin.length > 6) {
-                sendCmd(VentilatorBleCmd.doctorMode(pin.toByteArray().copyOfRange(0, 6), timestamp, aesEncryptKey))
+                sendCmd(VentilatorBleCmd.doctorModeIn(pin.toByteArray().copyOfRange(0, 6), timestamp, aesEncryptKey))
             } else {
-                sendCmd(VentilatorBleCmd.doctorMode(pin.toByteArray(), timestamp, aesEncryptKey))
+                sendCmd(VentilatorBleCmd.doctorModeIn(pin.toByteArray(), timestamp, aesEncryptKey))
             }
+        }
+    }
+    // 退出医生模式
+    fun doctorModeOut() {
+        if (isEncryptMode) {
+            sendCmd(VentilatorBleCmd.doctorModeOut(aesEncryptKey))
         }
     }
     // 搜索WiFi列表

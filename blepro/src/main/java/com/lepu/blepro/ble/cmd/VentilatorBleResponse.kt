@@ -25,9 +25,10 @@ object VentilatorBleResponse {
     }
 
     @ExperimentalUnsignedTypes
-    class DoctorModeResult(val bytes: ByteArray) {
+    class DoctorModeResult(val isOut: Boolean, val bytes: ByteArray) {
+        // isOut：false进入医生模式，true退出医生模式
         var success: Boolean
-        var errCode: Int      // 1：设备处于医生模式；2：设备处于医生模式（BLE）；3：设备处于医生模式（Socket）; 4:密码错误
+        var errCode: Int      // 1：设备处于医生模式；2：设备处于医生模式（BLE）；3：设备处于医生模式（Socket）; 4:密码错误; 5:患者模式
         init {
             var index = 0
             success = byte2UInt(bytes[index]) == 1

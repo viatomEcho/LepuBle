@@ -16,7 +16,8 @@ public class VentilatorBleCmd {
     public static final int DEVICE_UNBOUND = 0x02;
     public static final int SET_USER_INFO = 0x03;
     public static final int GET_USER_INFO = 0x04;
-    public static final int DOCTOR_MODE = 0x05;
+    public static final int DOCTOR_MODE_IN = 0x05;
+    public static final int DOCTOR_MODE_OUT = 0x06;
     public static final int GET_WIFI_LIST = 0x11;
     public static final int SET_WIFI_CONFIG = 0x12;
     public static final int GET_WIFI_CONFIG = 0x13;
@@ -93,14 +94,17 @@ public class VentilatorBleCmd {
     public static byte[] getUserInfo(byte[] key) {
         return getReq(GET_USER_INFO, new byte[0], key);
     }
-    public static byte[] doctorMode(byte[] pin, long timestamp, byte[] key) {
+    public static byte[] doctorModeIn(byte[] pin, long timestamp, byte[] key) {
         byte[] data = new byte[10];
         System.arraycopy(pin, 0, data, 0, pin.length);
         data[6] = (byte) timestamp;
         data[7] = (byte) (timestamp >> 8);
         data[8] = (byte) (timestamp >> 16);
         data[9] = (byte) (timestamp >> 24);
-        return getReq(DOCTOR_MODE, data, key);
+        return getReq(DOCTOR_MODE_IN, data, key);
+    }
+    public static byte[] doctorModeOut(byte[] key) {
+        return getReq(DOCTOR_MODE_OUT, new byte[0], key);
     }
     public static byte[] getWifiList(int deviceNum, byte[] key) {
         if (deviceNum == 0) {

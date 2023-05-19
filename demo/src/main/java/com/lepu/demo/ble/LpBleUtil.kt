@@ -1116,8 +1116,11 @@ class LpBleUtil {
         fun ventilatorGetUserInfo(model: Int) {
             BleServiceHelper.ventilatorGetUserInfo(model)
         }
-        fun ventilatorDoctorMode(model: Int, pin: String, timestamp: Long) {
-            BleServiceHelper.ventilatorDoctorMode(model, pin, timestamp)
+        fun ventilatorDoctorModeIn(model: Int, pin: String, timestamp: Long) {
+            BleServiceHelper.ventilatorDoctorModeIn(model, pin, timestamp)
+        }
+        fun ventilatorDoctorModeOut(model: Int) {
+            BleServiceHelper.ventilatorDoctorModeOut(model)
         }
         fun ventilatorGetWifiList(model: Int) {
             BleServiceHelper.ventilatorGetWifiList(model)

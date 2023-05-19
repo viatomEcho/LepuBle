@@ -3788,7 +3788,7 @@ class BleServiceHelper private constructor() {
      * pin: 设备进入医生模式的密码
      * timestamp: 当前时间戳s
      */
-    fun ventilatorDoctorMode(model: Int, pin: String, timestamp: Long) {
+    fun ventilatorDoctorModeIn(model: Int, pin: String, timestamp: Long) {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
@@ -3796,12 +3796,31 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as VentilatorBleInterface).let {
-                        LepuBleLog.d(tag, "it as VentilatorBleInterface--ventilatorDoctorMode")
-                        it.doctorMode(pin, timestamp)
+                        LepuBleLog.d(tag, "it as VentilatorBleInterface--ventilatorDoctorModeIn")
+                        it.doctorModeIn(pin, timestamp)
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "ventilatorDoctorMode current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "ventilatorDoctorModeIn current model $model unsupported!!")
+        }
+    }
+    /**
+     * 退出医生模式
+     */
+    fun ventilatorDoctorModeOut(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as VentilatorBleInterface).let {
+                        LepuBleLog.d(tag, "it as VentilatorBleInterface--ventilatorDoctorModeOut")
+                        it.doctorModeOut()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "ventilatorDoctorModeOut current model $model unsupported!!")
         }
     }
     /**
