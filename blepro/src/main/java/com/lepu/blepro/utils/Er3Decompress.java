@@ -2,19 +2,19 @@ package com.lepu.blepro.utils;
 
 public class Er3Decompress {
 
-    public static int COM_RET_ORIGINAL  =   -128;  //需要保存原始值返回值
-    public static int COM_RET_POSITIVE  =   127;   //需要保存扩展数为正数返回值
-    public static int COM_RET_NEGATIVE  =   -127;  //需要保存扩展数为负数返回值
+    public int COM_RET_ORIGINAL  =   -128;  //需要保存原始值返回值
+    public int COM_RET_POSITIVE  =   127;   //需要保存扩展数为正数返回值
+    public int COM_RET_NEGATIVE  =   -127;  //需要保存扩展数为负数返回值
 
-    public static int COM_MAX_VAL   =   127;    //压缩最大值
-    public static int COM_MIN_VAL   =   -127;   //压缩最小值
-    public static int COM_EXTEND_MAX_VAL    =   382;    //压缩扩展最大值
-    public static int COM_EXTEND_MIN_VAL    =   -382;   //压缩扩展最小值
+    public int COM_MAX_VAL   =   127;    //压缩最大值
+    public int COM_MIN_VAL   =   -127;   //压缩最小值
+    public int COM_EXTEND_MAX_VAL    =   382;    //压缩扩展最大值
+    public int COM_EXTEND_MIN_VAL    =   -382;   //压缩扩展最小值
 
-    public static int ECG_CHANNEL_MAX_NUM   =   8;
+    public int ECG_CHANNEL_MAX_NUM   =   8;
 
-    static int mChannelNum;
-    static int mUncompressStep; //解压步骤	0x00:公用 0x01~0x0F:单通道  0x11~:多通道
+    int mChannelNum;
+    int mUncompressStep; //解压步骤	0x00:公用 0x01~0x0F:单通道  0x11~:多通道
 
     /**
      * //************************************************************************
@@ -62,7 +62,7 @@ public class Er3Decompress {
     /**
      * decompress output
      */
-    public static class Er3DecompressObj {
+    public class Er3DecompressObj {
         boolean valid;
         int[] output;
 
@@ -72,11 +72,11 @@ public class Er3Decompress {
         }
     }
 
-    static int[] lastData = null; //最后一次解压数据
-    static int[] uncompressData = null; //当前采样点解压缓存  多通道有效
-    static int uncompressLen; //当前采样点解压缓存已解压长度 多通道有效
+    int[] lastData = null; //最后一次解压数据
+    int[] uncompressData = null; //当前采样点解压缓存  多通道有效
+    int uncompressLen; //当前采样点解压缓存已解压长度 多通道有效
 
-    public static byte original_bitmask = 0x00; //原始数据位标记
+    public byte original_bitmask = 0x00; //原始数据位标记
 
     public int[] Decompress(byte compressData) {
         boolean compressRet = false;
