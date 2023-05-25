@@ -12,5 +12,10 @@ class EcgAdapter(layoutResId: Int, data: MutableList<EcgData>?) : BaseQuickAdapt
         holder.setText(R.id.name, "${context.getString(R.string.ecg_files)}\n" +
                 "${item.fileName}\n" +
                 "${context.getString(R.string.duration)}${DataConvert.getEcgTimeStr(item.duration)}")
+        if (item.isMotion) {
+            holder.setTextColor(R.id.name, context.resources.getColor(R.color.red_b))
+        } else {
+            holder.setTextColor(R.id.name, context.resources.getColor(R.color.colorBlack))
+        }
     }
 }

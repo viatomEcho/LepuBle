@@ -9,6 +9,7 @@ public class EcgData {
     private String fileName;
     private byte[] data;
     private short[] shortData;
+    private boolean motion;
 
     public long getRecordingTime() {
         return recordingTime;
@@ -50,6 +51,14 @@ public class EcgData {
         this.shortData = shortData;
     }
 
+    public boolean isMotion() {
+        return motion;
+    }
+
+    public void setMotion(boolean motion) {
+        this.motion = motion;
+    }
+
     @Override
     public String toString() {
         return "EcgData{" +
@@ -58,6 +67,7 @@ public class EcgData {
                 ", fileName='" + fileName + '\'' +
                 ", data=" + Arrays.toString(data) +
                 ", shortData=" + Arrays.toString(shortData) +
+                ", motion=" + motion +
                 '}';
     }
 }

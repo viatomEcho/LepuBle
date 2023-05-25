@@ -137,7 +137,7 @@
     <string name="dia">DIA：</string>
     <string name="mean">MEAN：</string>
     <string name="burning_time">Burning time</string>
-    <string name="ecg_files">Ecg file</string>
+    <string name="ecg_files">Ecg/HR file</string>
     <string name="total_bytes">Total bytes：</string>
     <string name="total_size">Total size：</string>
     <string name="miss_size">Miss size：</string>

@@ -175,7 +175,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_CMRING,
                 Bluetooth.MODEL_OXYU, Bluetooth.MODEL_AI_S100,
                 Bluetooth.MODEL_O2M_WPS, Bluetooth.MODEL_OXYFIT_WPS,
-                Bluetooth.MODEL_KIDSO2_WPS -> {
+                Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_SI_PO6 -> {
                     setViewVisible(binding.o2Layout.root)
                     settingViewModel = ViewModelProvider(this).get(OxyViewModel::class.java)
                     (settingViewModel as OxyViewModel).initView(requireContext(), binding, it)
@@ -903,7 +903,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             Bluetooth.MODEL_KIDSO2, Bluetooth.MODEL_KIDSO2_WPS,
             Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BBSM_S1,
             Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_BBSM_S2,
-            Bluetooth.MODEL_OXYLINK -> {
+            Bluetooth.MODEL_OXYLINK, Bluetooth.MODEL_SI_PO6 -> {
                 binding.o2Layout.o2MotorText.text = "声音强度："
                 binding.o2Layout.text0350.visibility = View.VISIBLE
                 binding.o2Layout.text03535.visibility = View.VISIBLE

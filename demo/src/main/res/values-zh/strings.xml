@@ -137,7 +137,7 @@
     <string name="dia">舒张压</string>
     <string name="mean">平均压</string>
     <string name="burning_time">烧录时间：</string>
-    <string name="ecg_files">心电文件</string>
+    <string name="ecg_files">心电/心率文件</string>
     <string name="total_bytes">数据总量：</string>
     <string name="total_size">总包数：</string>
     <string name="miss_size">丢包数：</string>

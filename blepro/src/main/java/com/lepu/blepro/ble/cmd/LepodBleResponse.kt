@@ -201,9 +201,12 @@ object LepodBleResponse {
         override fun toString(): String {
             return """
                 RtWave : 
+                samplingRate : $samplingRate
                 compressType : $compressType
                 firstIndex : $firstIndex
                 len : $len
+                wave.size : ${wave.size}
+                waveMvs.size : ${waveMvs.size}
             """.trimIndent()
         }
     }

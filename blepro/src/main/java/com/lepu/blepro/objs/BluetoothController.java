@@ -70,6 +70,7 @@ public class BluetoothController {
                 || model == Bluetooth.MODEL_KIDSO2_WPS
                 || model == Bluetooth.MODEL_OXYFIT
                 || model == Bluetooth.MODEL_OXYFIT_WPS
+                || model == Bluetooth.MODEL_SI_PO6
                 || model == Bluetooth.MODEL_OXYU) {
             isO2 = true;
         }

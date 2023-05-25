@@ -204,6 +204,8 @@ object Er3BleResponse {
                 RtWave : 
                 firstIndex : $firstIndex
                 len : $len
+                wave : ${wave.size}
+                waveMvs : ${waveMvs.size}
             """.trimIndent()
         }
     }

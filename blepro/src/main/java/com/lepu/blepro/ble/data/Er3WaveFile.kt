@@ -2,6 +2,7 @@ package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.Er3Decompress
+import com.lepu.blepro.utils.toLong
 import com.lepu.blepro.utils.toUInt
 
 /**
@@ -19,7 +20,7 @@ class Er3WaveFile {
     var recordingTime = 0   // 记录时长 e.g. 3600 :  3600s
     var dataCrc = 0         // 文件头部+原始波形和校验
     // reserved 10
-    var magic = 0           // 文件标志 固定值为0xA55A0438
+    var magic = 0L          // 文件标志 固定值为0xA55A0438 无符号数
 
     /**
      * 分块解压文件数据
@@ -157,7 +158,7 @@ class Er3WaveFile {
         dataCrc = toUInt(bytes.copyOfRange(index, index+2))
         index += 2
         index += 10
-        magic = toUInt(bytes.copyOfRange(index, index+4))
+        magic = toLong(bytes.copyOfRange(index, index+4))
     }
 
     override fun toString(): String {

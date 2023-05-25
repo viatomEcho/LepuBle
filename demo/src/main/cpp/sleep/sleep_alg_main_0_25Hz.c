@@ -57,6 +57,25 @@ void sleep_alg_init_0_25Hz() {
 	memset(&m_sleep_alg_pr_buff, 0, sizeof(m_sleep_alg_pr_buff));
 	m_sleep_alg_pr_buff_high_count = 0;
 	m_sleep_alg_pr_buff_count = 0;
+
+	//
+	m_sleep_alg_count = 0;
+	m_sleep_alg_pr = 0;
+	m_sleep_alg_pre_pr = 0;	
+	m_sleep_alg_acc = 0;	
+	m_sleep_alg_pre_acc = 0;	
+	m_sleep_alg_acc_high_sign = 0;	
+	m_sleep_alg_status_change_time = 0;		
+	m_sleep_alg_pr_base = 0;	
+	m_sleep_alg_pr_base_buff_count = 0;
+	m_sleep_alg_pr_buff_count = 0;	
+	m_sleep_alg_fall_sleep_time = 0;
+	m_sleep_alg_pr_base_std = 0;
+	m_sleep_alg_pr_std = 0;
+	m_sleep_alg_rem_flag = 0;
+	m_sleep_alg_awake_count = 0;	
+	m_sleep_alg_pr_buff_high_count = 0;	
+	memset(&m_sleep_alg_res, 0, sizeof(m_sleep_alg_res));
 }
 //算法主接口
 SLEEP_ALG_STATUS sleep_alg_main_pro_0_25Hz(sleep_alg_input_t  *input) {

@@ -105,7 +105,8 @@ public class Er3Decompress {
                     } else {
                         uncompressData[uncompressLen] = lastData[uncompressLen] + compressData;
                         lastData[uncompressLen] = uncompressData[uncompressLen];
-                        if (++uncompressLen >= mChannelNum) {
+                        uncompressLen++;
+                        if (uncompressLen >= mChannelNum) {
                             System.arraycopy(uncompressData, 0, output, 0, mChannelNum);
                             uncompressLen = 0;
                             compressRet = true;
@@ -149,7 +150,8 @@ public class Er3Decompress {
                 } else {
                     uncompressData[uncompressLen] = lastData[uncompressLen] + compressData;
                     lastData[uncompressLen] = uncompressData[uncompressLen];
-                    if (++uncompressLen >= mChannelNum) {
+                    uncompressLen++;
+                    if (uncompressLen >= mChannelNum) {
                         System.arraycopy(uncompressData, 0, output, 0, mChannelNum);
                         mUncompressStep = 0x00;
                         uncompressLen = 0;
@@ -161,7 +163,8 @@ public class Er3Decompress {
                 uncompressData[uncompressLen] = lastData[uncompressLen] | (compressData << 8);
                 lastData[uncompressLen] = uncompressData[uncompressLen];
                 mUncompressStep = 0x12;
-                if (++uncompressLen >= mChannelNum) {
+                uncompressLen++;
+                if (uncompressLen >= mChannelNum) {
                     System.arraycopy(uncompressData, 0, output, 0, mChannelNum);
                     mUncompressStep = 0x00;
                     uncompressLen = 0;

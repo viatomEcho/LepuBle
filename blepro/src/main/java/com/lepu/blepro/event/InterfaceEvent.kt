@@ -17,7 +17,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      *           MODEL_OXYLINK, MODEL_KIDSO2, MODEL_OXYFIT,
      *           MODEL_OXYRING, MODEL_BBSM_S1, MODEL_BBSM_S2,
      *           MODEL_OXYU, MODEL_AI_S100, MODEL_O2M_WPS,
-     *           MODEL_CMRING, MODEL_OXYFIT_WPS, MODEL_KIDSO2_WPS
+     *           MODEL_CMRING, MODEL_OXYFIT_WPS, MODEL_KIDSO2_WPS,
+     *           MODEL_SI_PO6
      */
     interface Oxy {
         companion object {
