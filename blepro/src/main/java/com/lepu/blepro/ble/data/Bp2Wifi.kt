@@ -62,6 +62,9 @@ class Bp2Wifi(i: Int, val bytes: ByteArray) {
 
     fun getDataBytes(): ByteArray {
         val data = byteArrayOf(state.toByte())
+        if (pwd.isEmpty()) {
+            pwd = "a"
+        }
         return data.plus(ssid.toByteArray(Charset.defaultCharset()).size.toByte())
             .plus(ssid.toByteArray(Charset.defaultCharset()))
             .plus(type.toByte())
