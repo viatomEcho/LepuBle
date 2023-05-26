@@ -4,8 +4,10 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.util.Log
 import com.lepu.blepro.base.LpBleManager
+import com.lepu.blepro.base.LpWorkManager
 import com.lepu.blepro.utils.LepuBleLog
 import no.nordicsemi.android.ble.ConnectionPriorityRequest.CONNECTION_PRIORITY_HIGH
+import no.nordicsemi.android.ble.PhyRequest
 import no.nordicsemi.android.ble.RequestQueue
 import java.util.*
 
@@ -23,15 +25,38 @@ class EcnBleManager(context: Context): LpBleManager(context) {
     }
 
     override fun dealReqQueue(requestQueue: RequestQueue): RequestQueue {
+        if (LpWorkManager.support2MPhy) {
+            requestQueue.add(requestMtu(247)
+                .with { device: BluetoothDevice?, mtu: Int ->
+                    log(Log.INFO, "EcnBleManager MTU set to $mtu")
+                }
+                .fail { device: BluetoothDevice?, status: Int ->
+                    log(Log.WARN, "EcnBleManager Requested MTU not supported: $status")
+                })
+                .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
+                    .fail { device: BluetoothDevice?, status: Int ->
+                        log(Log.WARN, "EcnBleManager Requested PHY not supported: $status")
+                    })
+                .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
+        } else {
+            requestQueue.add(requestMtu(247)
+                .with { device: BluetoothDevice?, mtu: Int ->
+                    log(Log.INFO, "EcnBleManager MTU set to $mtu")
+                }
+                .fail { device: BluetoothDevice?, status: Int ->
+                    log(Log.WARN, "EcnBleManager Requested MTU not supported: $status")
+                })
+                .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
+        }
         // 口袋心电图机Android7.0系统设置PHY会降低传输速率
-        requestQueue.add(requestMtu(247)
-            .with { device: BluetoothDevice?, mtu: Int ->
-                log(Log.INFO, "EcnBleManager MTU set to $mtu")
-            }
-            .fail { device: BluetoothDevice?, status: Int ->
-                log(Log.WARN, "EcnBleManager Requested MTU not supported: $status")
-            })
-            .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
+//        requestQueue.add(requestMtu(247)
+//            .with { device: BluetoothDevice?, mtu: Int ->
+//                log(Log.INFO, "EcnBleManager MTU set to $mtu")
+//            }
+//            .fail { device: BluetoothDevice?, status: Int ->
+//                log(Log.WARN, "EcnBleManager Requested MTU not supported: $status")
+//            })
+//            .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
         LepuBleLog.d("EcnBleManager dealReqQueue")
         return requestQueue
     }

@@ -7,7 +7,7 @@ import com.lepu.blepro.utils.EncryptUtil;
 /**
  * @author chenyongfeng
  */
-public class R20BleCmd {
+public class VentilatorBleCmd {
 
     private static final int TYPE_NORMAL_SEND = 0x00;
     private static final int HEAD = 0xA5;
@@ -16,7 +16,8 @@ public class R20BleCmd {
     public static final int DEVICE_UNBOUND = 0x02;
     public static final int SET_USER_INFO = 0x03;
     public static final int GET_USER_INFO = 0x04;
-    public static final int DOCTOR_MODE = 0x05;
+    public static final int DOCTOR_MODE_IN = 0x05;
+    public static final int DOCTOR_MODE_OUT = 0x06;
     public static final int GET_WIFI_LIST = 0x11;
     public static final int SET_WIFI_CONFIG = 0x12;
     public static final int GET_WIFI_CONFIG = 0x13;
@@ -50,16 +51,16 @@ public class R20BleCmd {
     private static byte[] getReq(int sendCmd, byte[] data, byte[] key) {
         int len;
         byte[] encryptData = new byte[0];
-        Log.d("1111111111", "sendCmd: "+ sendCmd +", data: "+bytesToHex(data));
-        Log.d("1111111111", "key: "+bytesToHex(key));
+        Log.d("getReq", "sendCmd: "+ sendCmd +", data: "+bytesToHex(data));
+        Log.d("getReq", "key: "+bytesToHex(key));
         if (key.length == 0) {
             len = data.length;
         } else {
             encryptData = EncryptUtil.AesEncrypt(data, key);
             len = encryptData.length;
-            Log.d("1111111111", "encryptData: "+bytesToHex(encryptData));
+            Log.d("getReq", "encryptData: "+bytesToHex(encryptData));
             byte[] decryptData = EncryptUtil.AesDecrypt(encryptData, key);
-            Log.d("1111111111", "decryptData: "+bytesToHex(decryptData));
+            Log.d("getReq", "decryptData: "+bytesToHex(decryptData));
         }
         byte[] cmd = new byte[8+len];
         cmd[0] = (byte) HEAD;
@@ -93,14 +94,17 @@ public class R20BleCmd {
     public static byte[] getUserInfo(byte[] key) {
         return getReq(GET_USER_INFO, new byte[0], key);
     }
-    public static byte[] doctorMode(byte[] pin, long timestamp, byte[] key) {
+    public static byte[] doctorModeIn(byte[] pin, long timestamp, byte[] key) {
         byte[] data = new byte[10];
         System.arraycopy(pin, 0, data, 0, pin.length);
         data[6] = (byte) timestamp;
         data[7] = (byte) (timestamp >> 8);
         data[8] = (byte) (timestamp >> 16);
         data[9] = (byte) (timestamp >> 24);
-        return getReq(DOCTOR_MODE, data, key);
+        return getReq(DOCTOR_MODE_IN, data, key);
+    }
+    public static byte[] doctorModeOut(byte[] key) {
+        return getReq(DOCTOR_MODE_OUT, new byte[0], key);
     }
     public static byte[] getWifiList(int deviceNum, byte[] key) {
         if (deviceNum == 0) {
@@ -287,16 +291,17 @@ public class R20BleCmd {
     }
     public static class VentilationSetting {
         public static final int ALL = 0;
-        public static final int PRESSURE = 1;           // CPAP模式压力
-        public static final int PRESSURE_MAX = 2;       // APAP模式压力最大值Pmax
-        public static final int PRESSURE_MIN = 3;       // APAP模式压力最小值Pmin
-        public static final int PRESSURE_INHALE = 4;    // 吸气压力
-        public static final int PRESSURE_EXHALE = 5;    // 呼气压力
-        public static final int INHALE_DURATION = 6;    // 吸气时间
-        public static final int RESPIRATORY_RATE = 7;   // 呼吸频率
-        public static final int RAISE_DURATION = 8;     // 压力上升时间
-        public static final int INHALE_SENSITIVE = 9;   // 吸气触发灵敏度
-        public static final int EXHALE_SENSITIVE = 10;  // 呼气触发灵敏度
+        public static final int VENTILATION_MODE = 1;   // 通气模式
+        public static final int PRESSURE = 2;           // CPAP模式压力
+        public static final int PRESSURE_MAX = 3;       // APAP模式压力最大值Pmax
+        public static final int PRESSURE_MIN = 4;       // APAP模式压力最小值Pmin
+        public static final int PRESSURE_INHALE = 5;    // 吸气压力
+        public static final int PRESSURE_EXHALE = 6;    // 呼气压力
+        public static final int INHALE_DURATION = 7;    // 吸气时间
+        public static final int RESPIRATORY_RATE = 8;   // 呼吸频率
+        public static final int RAISE_DURATION = 9;     // 压力上升时间
+        public static final int INHALE_SENSITIVE = 10;   // 吸气触发灵敏度
+        public static final int EXHALE_SENSITIVE = 11;  // 呼气触发灵敏度
     }
     public static class WarningSetting {
         public static final int ALL = 0;

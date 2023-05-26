@@ -62,8 +62,8 @@ object Er3BleResponse {
         var leadType: Int                 // 导联类型（0：LEAD_12，12导，1：LEAD_6，6导，2：LEAD_5，5导，3：LEAD_3，3导，4：LEAD_3_TEMP，3导带体温，
                                           // 5：LEAD_3_LEG，3导胸贴，6：LEAD_5_LEG，5导胸贴，7：LEAD_6_LEG，6导胸贴，0XFF：LEAD_NONSUP，不支持的导联）
         var leadSn: String                // 一次性导联的sn
-        var isLeadOffI: Boolean
-        var isLeadOffII: Boolean
+        var isLeadOffI: Boolean           // 对应LA电极
+        var isLeadOffII: Boolean          // 对应LL电极
         var isLeadOffIII: Boolean         // 暂无效
         var isLeadOffaVR: Boolean         // 暂无效
         var isLeadOffaVL: Boolean         // 暂无效
@@ -118,7 +118,7 @@ object Er3BleResponse {
             index++
             leadType = byte2UInt(bytes[index])
             index++
-            leadSn = String(bytes.copyOfRange(index, index+15))
+            leadSn = trimStr(String(bytes.copyOfRange(index, index+15)))
             index += 15
             isLeadOffI = (byte2UInt(bytes[index]) and 0x01) == 1
             isLeadOffII = ((byte2UInt(bytes[index]) and 0x02) shr 1) == 1
@@ -204,6 +204,8 @@ object Er3BleResponse {
                 RtWave : 
                 firstIndex : $firstIndex
                 len : $len
+                wave : ${wave.size}
+                waveMvs : ${waveMvs.size}
             """.trimIndent()
         }
     }

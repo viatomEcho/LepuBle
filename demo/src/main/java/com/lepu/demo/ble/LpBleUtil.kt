@@ -15,13 +15,12 @@ import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.Bp2Config
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
-import com.lepu.blepro.ble.data.r20.VentilationSetting
-import com.lepu.blepro.ble.data.r20.WarningSetting
+import com.lepu.blepro.ble.data.ventilator.VentilationSetting
+import com.lepu.blepro.ble.data.ventilator.WarningSetting
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.ext.er1.Er1Config
 import com.lepu.blepro.ext.er2.Er2Config
 import com.lepu.blepro.objs.Bluetooth
-import com.lepu.demo.BuildConfig
 import com.lepu.demo.config.Constant.BluetoothConfig
 
 class LpBleUtil {
@@ -1074,72 +1073,75 @@ class LpBleUtil {
         fun echo(model: Int, data: ByteArray) {
             BleServiceHelper.echo(model, data)
         }
-        // R20
-        fun r20GetBattery(model: Int) {
-            BleServiceHelper.r20GetBattery(model)
+        // Ventilator
+        fun ventilatorGetBattery(model: Int) {
+            BleServiceHelper.ventilatorGetBattery(model)
         }
-        fun r20GetFileList(model: Int, fileType: Int, timestamp: Long) {
+        fun ventilatorGetFileList(model: Int, fileType: Int, timestamp: Long) {
 //            BleServiceHelper.getFileList(model, fileType, timestamp)
         }
-        fun r20Encrypt(model: Int, id: String) {
-            BleServiceHelper.r20Encrypt(model, id)
+        fun ventilatorEncrypt(model: Int, id: String) {
+            BleServiceHelper.ventilatorEncrypt(model, id)
         }
-        fun r20DeviceBound(model: Int, bound: Boolean) {
-            BleServiceHelper.r20DeviceBound(model, bound)
+        fun ventilatorDeviceBound(model: Int, bound: Boolean) {
+            BleServiceHelper.ventilatorDeviceBound(model, bound)
         }
-        fun r20SetUserInfo(model: Int, userInfo: com.lepu.blepro.ble.data.r20.UserInfo) {
-            BleServiceHelper.r20SetUserInfo(model, userInfo)
+        fun ventilatorSetUserInfo(model: Int, userInfo: com.lepu.blepro.ble.data.ventilator.UserInfo) {
+            BleServiceHelper.ventilatorSetUserInfo(model, userInfo)
         }
-        fun r20GetUserInfo(model: Int) {
-            BleServiceHelper.r20GetUserInfo(model)
+        fun ventilatorGetUserInfo(model: Int) {
+            BleServiceHelper.ventilatorGetUserInfo(model)
         }
-        fun r20DoctorMode(model: Int, pin: String, timestamp: Long) {
-            BleServiceHelper.r20DoctorMode(model, pin, timestamp)
+        fun ventilatorDoctorModeIn(model: Int, pin: String, timestamp: Long) {
+            BleServiceHelper.ventilatorDoctorModeIn(model, pin, timestamp)
         }
-        fun r20GetWifiList(model: Int) {
-            BleServiceHelper.r20GetWifiList(model)
+        fun ventilatorDoctorModeOut(model: Int) {
+            BleServiceHelper.ventilatorDoctorModeOut(model)
         }
-        fun r20SetWifiConfig(model: Int, config: Bp2WifiConfig) {
-            BleServiceHelper.r20SetWifiConfig(model, config)
+        fun ventilatorGetWifiList(model: Int) {
+            BleServiceHelper.ventilatorGetWifiList(model)
         }
-        fun r20GetWifiConfig(model: Int) {
-            BleServiceHelper.r20GetWifiConfig(model)
+        fun ventilatorSetWifiConfig(model: Int, config: Bp2WifiConfig) {
+            BleServiceHelper.ventilatorSetWifiConfig(model, config)
         }
-        fun r20GetVersionInfo(model: Int) {
-            BleServiceHelper.r20GetVersionInfo(model)
+        fun ventilatorGetWifiConfig(model: Int) {
+            BleServiceHelper.ventilatorGetWifiConfig(model)
         }
-        fun r20GetSystemSetting(model: Int) {
-            BleServiceHelper.r20GetSystemSetting(model)
+        fun ventilatorGetVersionInfo(model: Int) {
+            BleServiceHelper.ventilatorGetVersionInfo(model)
         }
-        fun r20SetSystemSetting(model: Int, setting: com.lepu.blepro.ble.data.r20.SystemSetting) {
-            BleServiceHelper.r20SetSystemSetting(model, setting)
+        fun ventilatorGetSystemSetting(model: Int) {
+            BleServiceHelper.ventilatorGetSystemSetting(model)
         }
-        fun r20GetMeasureSetting(model: Int) {
-            BleServiceHelper.r20GetMeasureSetting(model)
+        fun ventilatorSetSystemSetting(model: Int, setting: com.lepu.blepro.ble.data.ventilator.SystemSetting) {
+            BleServiceHelper.ventilatorSetSystemSetting(model, setting)
         }
-        fun r20SetMeasureSetting(model: Int, setting: com.lepu.blepro.ble.data.r20.MeasureSetting) {
-            BleServiceHelper.r20SetMeasureSetting(model, setting)
+        fun ventilatorGetMeasureSetting(model: Int) {
+            BleServiceHelper.ventilatorGetMeasureSetting(model)
         }
-        fun r20MaskTest(model: Int, start: Boolean) {
-            BleServiceHelper.r20MaskTest(model, start)
+        fun ventilatorSetMeasureSetting(model: Int, setting: com.lepu.blepro.ble.data.ventilator.MeasureSetting) {
+            BleServiceHelper.ventilatorSetMeasureSetting(model, setting)
         }
-        fun r20GetVentilationSetting(model: Int) {
-            BleServiceHelper.r20GetVentilationSetting(model)
+        fun ventilatorMaskTest(model: Int, start: Boolean) {
+            BleServiceHelper.ventilatorMaskTest(model, start)
         }
-        fun r20SetVentilationSetting(model: Int, setting: VentilationSetting) {
-            BleServiceHelper.r20SetVentilationSetting(model, setting)
+        fun ventilatorGetVentilationSetting(model: Int) {
+            BleServiceHelper.ventilatorGetVentilationSetting(model)
         }
-        fun r20GetWarningSetting(model: Int) {
-            BleServiceHelper.r20GetWarningSetting(model)
+        fun ventilatorSetVentilationSetting(model: Int, setting: VentilationSetting) {
+            BleServiceHelper.ventilatorSetVentilationSetting(model, setting)
         }
-        fun r20SetWarningSetting(model: Int, setting: WarningSetting) {
-            BleServiceHelper.r20SetWarningSetting(model, setting)
+        fun ventilatorGetWarningSetting(model: Int) {
+            BleServiceHelper.ventilatorGetWarningSetting(model)
         }
-        fun r20VentilationSwitch(model: Int, start: Boolean) {
-            BleServiceHelper.r20VentilationSwitch(model, start)
+        fun ventilatorSetWarningSetting(model: Int, setting: WarningSetting) {
+            BleServiceHelper.ventilatorSetWarningSetting(model, setting)
         }
-        fun r20GetRtState(model: Int) {
-            BleServiceHelper.r20GetRtState(model)
+        fun ventilatorVentilationSwitch(model: Int, start: Boolean) {
+            BleServiceHelper.ventilatorVentilationSwitch(model, start)
+        }
+        fun ventilatorGetRtState(model: Int) {
+            BleServiceHelper.ventilatorGetRtState(model)
         }
         // BP3
         fun bp3GetBattery(model: Int) {

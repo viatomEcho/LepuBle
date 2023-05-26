@@ -7,6 +7,7 @@ import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.DateUtil
+import com.lepu.demo.data.AnalysisFile
 import com.lepu.demo.util.DataConvert
 
 class Er2ViewModel : InfoViewModel() {
@@ -54,6 +55,16 @@ class Er2ViewModel : InfoViewModel() {
                             Er2AnalysisFile(content)
                         }
 //                        _info.value = "$data"
+                        val analysisFile = AnalysisFile()
+                        analysisFile.fileName = it.fileName
+                        analysisFile.isMotion = false
+                        for (result in data.resultList) {
+                            if (result.diagnosis.isMoving) {
+                                analysisFile.isMotion = true
+                                break
+                            }
+                        }
+                        _analysisFile.value = analysisFile
                     }
                     _readNextFile.value = true
                 }

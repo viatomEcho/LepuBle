@@ -221,16 +221,16 @@ public class LpBleCmd {
     private static byte[] getReq(int sendCmd, byte[] data, byte[] key) {
         int len;
         byte[] encryptData = new byte[0];
-        Log.d("1111111111", "sendCmd: "+ sendCmd +", data: "+bytesToHex(data));
-        Log.d("1111111111", "key: "+bytesToHex(key));
+        Log.d("getReq", "sendCmd: "+ sendCmd +", data: "+bytesToHex(data));
+        Log.d("getReq", "key: "+bytesToHex(key));
         if (key.length == 0) {
             len = data.length;
         } else {
             encryptData = EncryptUtil.AesEncrypt(data, key);
             len = encryptData.length;
-            Log.d("1111111111", "encryptData: "+bytesToHex(encryptData));
+            Log.d("getReq", "encryptData: "+bytesToHex(encryptData));
             byte[] decryptData = EncryptUtil.AesDecrypt(encryptData, key);
-            Log.d("1111111111", "decryptData: "+bytesToHex(decryptData));
+            Log.d("getReq", "decryptData: "+bytesToHex(decryptData));
         }
         byte[] cmd = new byte[8+len];
 

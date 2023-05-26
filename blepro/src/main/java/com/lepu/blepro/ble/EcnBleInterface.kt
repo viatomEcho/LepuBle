@@ -84,7 +84,7 @@ class EcnBleInterface(model: Int): BleInterface(model) {
                 }
                 if (response.pkgType != 0x01.toByte()) {
                     LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, READ_FILE_START => error")
-                    sendCmd(EcnBleCmd.readFileEnd())
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadFileError).post(InterfaceEvent(model, true))
                     return
                 }
                 fileSize = toUInt(response.content)
@@ -105,7 +105,7 @@ class EcnBleInterface(model: Int): BleInterface(model) {
                 }
                 if (response.pkgType != 0x01.toByte()) {
                     LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, READ_FILE_DATA => error")
-                    sendCmd(EcnBleCmd.readFileEnd())
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnReadFileError).post(InterfaceEvent(model, true))
                     return
                 }
                 fileContent = fileContent.plus(response.content)

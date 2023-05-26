@@ -3,6 +3,7 @@ package com.lepu.demo.ui.notifications
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.os.FileUtils
 import android.os.Handler
 import android.util.Log
 import android.view.View
@@ -33,10 +34,7 @@ import com.lepu.demo.config.Constant
 import com.lepu.demo.config.Constant.BluetoothConfig.Companion.ecgData
 import com.lepu.demo.config.Constant.BluetoothConfig.Companion.ecnData
 import com.lepu.demo.config.Constant.BluetoothConfig.Companion.oxyData
-import com.lepu.demo.data.BpData
-import com.lepu.demo.data.EcgData
-import com.lepu.demo.data.EcnData
-import com.lepu.demo.data.OxyData
+import com.lepu.demo.data.*
 import com.lepu.demo.databinding.FragmentInfoBinding
 import com.lepu.demo.ui.adapter.*
 import com.lepu.demo.util.DataConvert
@@ -63,6 +61,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
     private lateinit var ecgAdapter: EcgAdapter
     var ecgList: ArrayList<EcgData> = arrayListOf()
+    var analysisFile: ArrayList<AnalysisFile> = arrayListOf()
     private lateinit var oxyAdapter: OxyAdapter
     var oxyList: ArrayList<OxyData> = arrayListOf()
     private lateinit var bpAdapter: BpAdapter
@@ -80,7 +79,36 @@ class InfoFragment : Fragment(R.layout.fragment_info){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
+//        val data = OxyData()
+//        data.fileName = "20230507231015"
+//        data.oxyBleFile = OxyBleFile(FileUtil.readFileToByteArray(context, "/o2/20230507231015.dat"))
+//        sleepAlg(data)
 //        testEr3()
+//        testEr3Decompress()
+    }
+
+    private fun testEr3Decompress() {
+        /*val fileName = "W20220921154419"
+        val data = org.apache.commons.io.FileUtils.readFileToByteArray(File("${context?.getExternalFilesDir(null)?.absolutePath}/$fileName"))
+        Er3BleResponse.getAllLeadShortsFromWaveBytes(data.copyOfRange(10, data.size-20), 0)
+        Log.d("11111111111111", "${data.size}")*/
+
+        val fileName = "20230523102452.txt"
+        val list = FileUtil.readFileToString(context, fileName).split(",")
+        val byteList = mutableListOf<Byte>()
+        list.map { it.toShort() }.forEach { short ->
+            shortToByteLittle(short).forEach {
+                byteList.add(it)
+            }
+        }
+        Er3BleResponse.getAllLeadShortsFromWaveBytes(byteList.toByteArray(), 2)
+        Log.d("11111111111111", "${byteList.size}")
+    }
+    fun shortToByteLittle(n: Short): ByteArray {
+        val b = ByteArray(2)
+        b[0] = (n.toInt() and 0xff).toByte()
+        b[1] = (n.toInt() shr 8 and 0xff).toByte()
+        return b
     }
 
     private fun testEr3() {
@@ -393,6 +421,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYLINK
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2_WPS
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SI_PO6
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYFIT
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYFIT_WPS
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYU
@@ -429,8 +458,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 }
                 // 获取当天统计数据
                 val timestamp = com.lepu.demo.util.DateUtil.getDayTimestamp()
-//                LpBleUtil.r20GetFileList(Constant.BluetoothConfig.currentModel[0], 1, timestamp)
-                LpBleUtil.r20GetFileList(Constant.BluetoothConfig.currentModel[0], 1, 0)
+//                LpBleUtil.ventilatorGetFileList(Constant.BluetoothConfig.currentModel[0], 1, timestamp)
+                LpBleUtil.ventilatorGetFileList(Constant.BluetoothConfig.currentModel[0], 1, 0)
             } else {
                 LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0])
             }
@@ -571,18 +600,31 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
         when (Constant.BluetoothConfig.currentModel[0]) {
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M, Bluetooth.MODEL_O2M_WPS,
-            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_CHECKO2,
+            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
             Bluetooth.MODEL_SLEEPO2, Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK, Bluetooth.MODEL_KIDSO2,
             Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_OXYU, Bluetooth.MODEL_CMRING,
-            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_OXYFIT_WPS, Bluetooth.MODEL_KIDSO2_WPS -> {
+            Bluetooth.MODEL_AI_S100, Bluetooth.MODEL_OXYFIT_WPS, Bluetooth.MODEL_KIDSO2_WPS,
+            Bluetooth.MODEL_SI_PO6 -> {
                 infoViewModel = ViewModelProvider(this).get(OxyViewModel::class.java)
                 (infoViewModel as OxyViewModel).initEvent(this)
                 mainViewModel.oxyInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwVersion}\n" +
                             "${context?.getString(R.string.software_version)}${it.swVersion}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}\nfileList：${it.fileList}"
+                }
+            }
+            Bluetooth.MODEL_CHECKO2 -> {
+                infoViewModel = ViewModelProvider(this).get(OxyViewModel::class.java)
+                (infoViewModel as OxyViewModel).initEvent(this)
+                mainViewModel.oxyInfo.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    var swVersion = it.swVersion.replace(".0", "")
+                    swVersion = "1.$swVersion"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwVersion}\n" +
+                            "${context?.getString(R.string.software_version)}$swVersion\n" +
                             "sn：${it.sn}\ncode：${it.branchCode}\nfileList：${it.fileList}"
                 }
             }
@@ -701,7 +743,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
             Bluetooth.MODEL_AOJ20A -> {
                 infoViewModel = ViewModelProvider(this).get(Aoj20aViewModel::class.java)
-                (infoViewModel as Aoj20aViewModel).initEvent(this)
+                (infoViewModel as Aoj20aViewModel).initEvent(this, requireContext())
                 mainViewModel.aoj20aInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "$it"
@@ -709,7 +751,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
             Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_CHECKME_POD_WPS -> {
                 infoViewModel = ViewModelProvider(this).get(CheckmePodViewModel::class.java)
-                (infoViewModel as CheckmePodViewModel).initEvent(this)
+                (infoViewModel as CheckmePodViewModel).initEvent(this, requireContext())
                 mainViewModel.checkmePodInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwVersion}\n" +
@@ -765,7 +807,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
             Bluetooth.MODEL_LES1 -> {
                 infoViewModel = ViewModelProvider(this).get(LeS1ViewModel::class.java)
-                (infoViewModel as LeS1ViewModel).initEvent(this)
+                (infoViewModel as LeS1ViewModel).initEvent(this, requireContext())
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
@@ -779,11 +821,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
             Bluetooth.MODEL_POCTOR_M3102 -> {
                 infoViewModel = ViewModelProvider(this).get(PoctorM3102ViewModel::class.java)
-                (infoViewModel as PoctorM3102ViewModel).initEvent(this)
+                (infoViewModel as PoctorM3102ViewModel).initEvent(this, requireContext())
             }
             Bluetooth.MODEL_BIOLAND_BGM -> {
                 infoViewModel = ViewModelProvider(this).get(BiolandBgmViewModel::class.java)
-                (infoViewModel as BiolandBgmViewModel).initEvent(this)
+                (infoViewModel as BiolandBgmViewModel).initEvent(this, requireContext())
                 mainViewModel.biolandInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "${context?.getString(R.string.software_version)}${it.version}\n" +
@@ -838,8 +880,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
             Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
             Bluetooth.MODEL_LERES -> {
-                infoViewModel = ViewModelProvider(this).get(R20ViewModel::class.java)
-                (infoViewModel as R20ViewModel).initEvent(this)
+                infoViewModel = ViewModelProvider(this).get(VentilatorViewModel::class.java)
+                (infoViewModel as VentilatorViewModel).initEvent(this, requireContext())
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
@@ -849,7 +891,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 binding.wifiConfig.visibility = View.VISIBLE
                 binding.setWifiConfig.visibility = View.GONE
                 binding.getWifiConfig.visibility = View.VISIBLE
-                LpBleUtil.r20GetVersionInfo(Constant.BluetoothConfig.currentModel[0])
+                LpBleUtil.ventilatorGetVersionInfo(Constant.BluetoothConfig.currentModel[0])
                 LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
             }
             Bluetooth.MODEL_LP_BP3W -> {
@@ -929,6 +971,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     ecgAdapter.notifyDataSetChanged()
                 }
             }
+            infoViewModel.analysisFile.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    analysisFile.add(it)
+                }
+            }
             infoViewModel.oxyData.observe(viewLifecycleOwner) {
                 if (it != null) {
                     oxyList.add(it)
@@ -969,6 +1016,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
             infoViewModel.readFileError.observe(viewLifecycleOwner) {
                 if (it != null) {
+                    mAlertDialogCanCancel?.dismiss()
                     mAlertDialog?.dismiss()
                     Toast.makeText(context, context?.getString(R.string.read_error), Toast.LENGTH_SHORT).show()
                 }
@@ -1094,6 +1142,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
         }
         val result = DataConvert.sleep_alg_get_res_0_25Hz()
+        Log.d("111111111111111", "DataConvert.sleep_alg_get_res_0_25Hz : $result")
         if (!isSave) {
             FileUtil.saveTextFile(
                 filePath,
@@ -1107,6 +1156,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
     }
 
     private fun refreshUI() {
+        analysisFile.clear()
         ecgList.clear()
         ecgAdapter.setNewInstance(ecgList)
         ecgAdapter.notifyDataSetChanged()
@@ -1138,6 +1188,17 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             trimStr(binding.fileName.text.toString())
         } else {
             if (fileNames.size == 0) {
+                for (ecg in ecgList) {
+                    for (analysis in analysisFile) {
+                        val itFileName = ecg.fileName.replace("R", "")
+                        val dataFileName = analysis.fileName.replace("a", "")
+                        if (itFileName == dataFileName) {
+                            ecg.isMotion = analysis.isMotion
+                            break
+                        }
+                    }
+                }
+                ecgAdapter.notifyDataSetChanged()
                 for (data in oxyList) {
                     sleepAlg(data)
                 }

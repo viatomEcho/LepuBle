@@ -26,6 +26,7 @@ import com.afollestad.materialdialogs.DialogAction
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.lew.DeviceInfo
@@ -40,6 +41,7 @@ import com.lepu.demo.config.Constant
 import com.lepu.demo.config.Constant.BluetoothConfig.Companion.CHECK_BLE_REQUEST_CODE
 import com.lepu.demo.config.Constant.BluetoothConfig.Companion.SUPPORT_MODELS
 import com.lepu.demo.util.CollectUtil
+import com.lepu.demo.util.FileUtil
 import com.permissionx.guolindev.PermissionX
 
 class MainActivity : AppCompatActivity() , BleChangeObserver {
@@ -74,6 +76,11 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         checkServer()
         initLiveEvent()
 //        split()
+//        val data = FileUtil.readFileToByteArray(this, "VNVVss35--2eG_h4qj47GloL.dat")
+//        val file = PpgFile(data)
+//        FileUtil.saveFile(this, file.sampleIntsData, "VNVVss35--2eG_h4qj47GloL.txt")
+//        Log.d("onCreate", "file.sampleIntsData.size : ${file.sampleIntsData.size}")
+//        Log.d("onCreate", "file : $file")
     }
 
     //创建菜单
@@ -111,6 +118,11 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
 
 //        viewModel._scanning.value = true
         LpBleUtil.startScan(SUPPORT_MODELS)
+//        多设备连接测试
+//        LpBleUtil.setInterface(Bluetooth.MODEL_PF_20AW, false)
+//        LpBleUtil.setInterface(Bluetooth.MODEL_PC300, false)
+//        LpBleUtil.reconnect(intArrayOf(Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PC300), arrayOf("PF-20AW_0008", "PC_300SNT"))
+//        BleServiceHelper.BleServiceHelper.reconnectByAddress(intArrayOf(Bluetooth.MODEL_PF_20AW, Bluetooth.MODEL_PC300), arrayOf("00:00:00:00:00:08", "00:00:00:00:00:09"))
     }
 
     private fun subscribeUi() {
@@ -246,7 +258,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     || it == Bluetooth.MODEL_R11
                     || it == Bluetooth.MODEL_R10
                     || it == Bluetooth.MODEL_LERES) {
-                    LpBleUtil.r20Encrypt(it, "0001")
+                    LpBleUtil.ventilatorEncrypt(it, "0001")
                 } else {
                     LpBleUtil.getInfo(it)
                 }
@@ -637,15 +649,15 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._battery.value = "${it.percent} %"
                 }
             }
-        //--------------------------R20--------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20SetUtcTime)
+        //--------------------------Ventilator--------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorSetUtcTime)
             .observe(this) {
-                Toast.makeText(this, "R20 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Ventilator ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetInfo)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetInfo)
             .observe(this) {
-                Toast.makeText(this, "R20 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Ventilator ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                 viewModel._er1Info.value = it.data as LepuDevice
             }
         //--------------------------Bp3--------------------------

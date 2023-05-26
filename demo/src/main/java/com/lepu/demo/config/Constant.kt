@@ -44,6 +44,7 @@ class Constant{
             const val KIDSO2_MODEL: Int = Bluetooth.MODEL_KIDSO2
             const val KIDSO2_WPS_MODEL: Int = Bluetooth.MODEL_KIDSO2_WPS
             const val OXYLINK_MODEL: Int = Bluetooth.MODEL_OXYLINK
+            const val SI_PO6_MODEL: Int = Bluetooth.MODEL_SI_PO6
             const val OXYFIT_MODEL: Int = Bluetooth.MODEL_OXYFIT
             const val OXYFIT_WPS_MODEL: Int = Bluetooth.MODEL_OXYFIT_WPS
             const val SLEEPU_MODEL: Int = Bluetooth.MODEL_SLEEPU
@@ -122,7 +123,7 @@ class Constant{
             const val PC200_BLE_MODEL: Int = Bluetooth.MODEL_PC200_BLE
             const val BTP_MODEL: Int = Bluetooth.MODEL_BTP
             const val S5_SCALE_MODEL: Int = Bluetooth.MODEL_S5_SCALE
-            const val R20_MODEL: Int = Bluetooth.MODEL_R20
+            const val ventilator_MODEL: Int = Bluetooth.MODEL_R20
             const val R21_MODEL: Int = Bluetooth.MODEL_R21
             const val R10_MODEL: Int = Bluetooth.MODEL_R10
             const val R11_MODEL: Int = Bluetooth.MODEL_R11
@@ -147,9 +148,9 @@ class Constant{
                 PF_10AW_MODEL, PF_10AW1_MODEL, PF_10BW_MODEL, PF_10BW1_MODEL, PF_20AW_MODEL, PF_20B_MODEL, CHECKME_MODEL,
                 PC80B_BLE_MODEL, SP20_BLE_MODEL, PC300_BLE_MODEL, ER3_MODEL, LEPOD_MODEL, PC60NW_BLE_MODEL,
                 SP20_WPS_MODEL, AP20_WPS_MODEL, PC60NW_WPS_MODEL, O2M_WPS_MODEL, PC80B_BLE2_MODEL, VTM01_MODEL,
-                PC200_BLE_MODEL, BTP_MODEL, S5_SCALE_MODEL, R20_MODEL, LERES_MODEL, PC60NW_NO_SN_MODEL, ECN_MODEL,
+                PC200_BLE_MODEL, BTP_MODEL, S5_SCALE_MODEL, ventilator_MODEL, LERES_MODEL, PC60NW_NO_SN_MODEL, ECN_MODEL,
                 GM_300SNT_MODEL, OXYFIT_WPS_MODEL, KIDSO2_WPS_MODEL, CHECKME_POD_WPS_MODEL, R21_MODEL, R10_MODEL, R11_MODEL,
-                LP_BP3W_MODEL, LP_BP3C_MODEL
+                LP_BP3W_MODEL, LP_BP3C_MODEL, SI_PO6_MODEL
             )
 
             val SUPPORT_FACES = SparseArray<Int>().apply {

@@ -1,18 +1,20 @@
 package com.lepu.demo.ui.notifications
 
+import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.LeS1BleResponse
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.DateUtil
+import com.lepu.demo.R
 
 class LeS1ViewModel : InfoViewModel() {
 
-    fun initEvent(owner: LifecycleOwner) {
+    fun initEvent(owner: LifecycleOwner, context: Context) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1NoFile)
             .observe(owner) { event ->
                 (event.data as Boolean).let {
-                    _info.value = "没有文件 $it"
+                    _info.value = "${context.getString(R.string.no_file)}$it"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1ReadingFileProgress)

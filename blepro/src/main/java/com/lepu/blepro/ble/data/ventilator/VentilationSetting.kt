@@ -1,4 +1,4 @@
-package com.lepu.blepro.ble.data.r20
+package com.lepu.blepro.ble.data.ventilator
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.int2ByteArray
@@ -8,9 +8,10 @@ class VentilationSetting() {
 
     var type = 0
     // reserved 3
-    var pressure = Pressure()
-    var pressureMax = PressureMax()
-    var pressureMin = PressureMin()
+    var ventilationMode = VentilationMode()
+    var cpapPressure = CpapPressure()
+    var apapPressureMax = ApapPressureMax()
+    var apapPressureMin = ApapPressureMin()
     var pressureExhale = PressureExhale()
     var pressureInhale = PressureInhale()
     var inhaleDuration = InhaleDuration()
@@ -21,11 +22,13 @@ class VentilationSetting() {
 
     constructor(bytes: ByteArray) : this() {
         var index = 0
-        pressure = Pressure(bytes.copyOfRange(index, index+1))
+        ventilationMode = VentilationMode(bytes.copyOfRange(index, index+1))
         index++
-        pressureMax = PressureMax(bytes.copyOfRange(index, index+1))
+        cpapPressure = CpapPressure(bytes.copyOfRange(index, index+1))
         index++
-        pressureMin = PressureMin(bytes.copyOfRange(index, index+1))
+        apapPressureMax = ApapPressureMax(bytes.copyOfRange(index, index+1))
+        index++
+        apapPressureMin = ApapPressureMin(bytes.copyOfRange(index, index+1))
         index++
         pressureInhale = PressureInhale(bytes.copyOfRange(index, index+1))
         index++
@@ -47,9 +50,10 @@ class VentilationSetting() {
             .plus(ByteArray(3))
         when (type) {
             0 -> {
-                data = data.plus(pressure.getDataBytes())
-                    .plus(pressureMax.getDataBytes())
-                    .plus(pressureMin.getDataBytes())
+                data = data.plus(ventilationMode.getDataBytes())
+                    .plus(cpapPressure.getDataBytes())
+                    .plus(apapPressureMax.getDataBytes())
+                    .plus(apapPressureMin.getDataBytes())
                     .plus(pressureInhale.getDataBytes())
                     .plus(pressureExhale.getDataBytes())
                     .plus(inhaleDuration.getDataBytes())
@@ -59,40 +63,54 @@ class VentilationSetting() {
                     .plus(exhaleSensitive.getDataBytes())
             }
             1 -> {
-                data = data.plus(pressure.getDataBytes())
+                data = data.plus(ventilationMode.getDataBytes())
             }
             2 -> {
-                data = data.plus(pressureMax.getDataBytes())
+                data = data.plus(cpapPressure.getDataBytes())
             }
             3 -> {
-                data = data.plus(pressureMin.getDataBytes())
+                data = data.plus(apapPressureMax.getDataBytes())
             }
             4 -> {
-                data = data.plus(pressureInhale.getDataBytes())
+                data = data.plus(apapPressureMin.getDataBytes())
             }
             5 -> {
-                data = data.plus(pressureExhale.getDataBytes())
+                data = data.plus(pressureInhale.getDataBytes())
             }
             6 -> {
-                data = data.plus(inhaleDuration.getDataBytes())
+                data = data.plus(pressureExhale.getDataBytes())
             }
             7 -> {
-                data = data.plus(respiratoryRate.getDataBytes())
+                data = data.plus(inhaleDuration.getDataBytes())
             }
             8 -> {
-                data = data.plus(pressureRaiseDuration.getDataBytes())
+                data = data.plus(respiratoryRate.getDataBytes())
             }
             9 -> {
-                data = data.plus(inhaleSensitive.getDataBytes())
+                data = data.plus(pressureRaiseDuration.getDataBytes())
             }
             10 -> {
+                data = data.plus(inhaleSensitive.getDataBytes())
+            }
+            11 -> {
                 data = data.plus(exhaleSensitive.getDataBytes())
             }
         }
         return data
     }
+    class VentilationMode() {
+        var mode = 0  // 0:CPAP  1:APAP  2:S   3:S/T   4:T
+        constructor(bytes: ByteArray) : this() {
+            var index = 0
+            mode = byte2UInt(bytes[index])
+        }
+        fun getDataBytes(): ByteArray {
+            return byteArrayOf(mode.toByte())
+                .plus(ByteArray(3))
+        }
+    }
     // 通气控制：压力
-    class Pressure() {
+    class CpapPressure() {
         var pressure = 6f  // CPAP模式压力   默认值:60  步长:5 范围:40-200  单位0.1cmH2O
         // reserved 3
         constructor(bytes: ByteArray) : this() {
@@ -105,7 +123,7 @@ class VentilationSetting() {
         }
     }
     // 通气控制：最大压力
-    class PressureMax() {
+    class ApapPressureMax() {
         var max = 12f  // APAP模式压力最大值Pmax 默认值:120 步长:5 范围:Pmin-200  单位0.1cmH2O
         // reserved 3
         constructor(bytes: ByteArray) : this() {
@@ -118,7 +136,7 @@ class VentilationSetting() {
         }
     }
     // 通气控制：最小压力
-    class PressureMin() {
+    class ApapPressureMin() {
         var min = 4f  // APAP模式压力最小值Pmin 默认值:40  步长:5 范围:40-Pmax   单位0.1cmH2O
         // reserved 3
         constructor(bytes: ByteArray) : this() {

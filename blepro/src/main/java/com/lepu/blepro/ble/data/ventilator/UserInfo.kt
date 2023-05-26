@@ -1,4 +1,4 @@
-package com.lepu.blepro.ble.data.r20
+package com.lepu.blepro.ble.data.ventilator
 
 import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
@@ -14,7 +14,7 @@ class UserInfo() {
     var height: Int = 0             // 身高 cm (init 170cm -> cmdSend 1700)
     var weight: Float = 0f          // 体重 kg (init 75.5kg -> cmdSend 755)
     var gender: Int = 0             // 性别 0：男 1：女
-    // reserved 16
+    // reserved 15
     var bytes = ByteArray(0)
 
     constructor(bytes: ByteArray) : this() {
@@ -66,7 +66,7 @@ class UserInfo() {
             .plus(int2ByteArray(height*10))
             .plus(int2ByteArray((weight*10).toInt()))
             .plus(gender.toByte())
-            .plus(ByteArray(16))
+            .plus(ByteArray(15))
     }
 
     override fun toString(): String {

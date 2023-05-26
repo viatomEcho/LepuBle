@@ -33,6 +33,10 @@ open class InfoViewModel : ViewModel() {
         value = null
     }
     var ecgData: LiveData<EcgData> = _ecgData
+    val _analysisFile = MutableLiveData<AnalysisFile>().apply {
+        value = null
+    }
+    var analysisFile: LiveData<AnalysisFile> = _analysisFile
     val _oxyData = MutableLiveData<OxyData>().apply {
         value = null
     }
@@ -74,13 +78,14 @@ open class InfoViewModel : ViewModel() {
     }
     var toast: LiveData<String> = _toast
 
-    fun getEcgData(recordingTime: Long, fileName: String, wave: ByteArray, shortData: ShortArray, duration: Int) : EcgData {
+    fun getEcgData(recordingTime: Long, fileName: String, wave: ByteArray, shortData: ShortArray, duration: Int, motion: Boolean = false) : EcgData {
         val data = EcgData()
         data.recordingTime = recordingTime
         data.fileName = fileName
         data.data = wave
         data.shortData = shortData
         data.duration = duration
+        data.isMotion = motion
         return data
     }
 }

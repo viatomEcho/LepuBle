@@ -127,6 +127,10 @@ abstract class LpBleManager(context: Context): BleManager(context) {
                 log(Log.INFO, "onMtuChanged mtu == $mtu")
             }
 
+            override fun onConnectionUpdated(gatt: BluetoothGatt, interval: Int, latency: Int, timeout: Int) {
+                super.onConnectionUpdated(gatt, interval, latency, timeout)
+                log(Log.INFO, "onConnectionUpdated interval == $interval, latency == $latency, timeout == $timeout")
+            }
 
             override fun onDeviceDisconnected() {
                 indicate_char = null

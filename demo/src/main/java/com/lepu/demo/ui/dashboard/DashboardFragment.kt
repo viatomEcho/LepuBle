@@ -16,7 +16,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.lew.RtData
-import com.lepu.blepro.ble.data.r20.SystemSetting
+import com.lepu.blepro.ble.data.ventilator.SystemSetting
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.pc102.BpResultError
@@ -41,6 +41,7 @@ import com.lepu.demo.data.WirelessData
 import com.lepu.demo.data.entity.DeviceEntity
 import com.lepu.demo.databinding.FragmentDashboardBinding
 import com.lepu.demo.util.DataConvert
+import com.lepu.demo.util.DateUtil.stringFromDate
 import com.lepu.demo.util.FileUtil
 import com.lepu.demo.views.EcgBkg
 import com.lepu.demo.views.EcgView
@@ -285,7 +286,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_PC60NW_BLE, Bluetooth.MODEL_PC60NW_WPS,
             Bluetooth.MODEL_O2M_WPS, Bluetooth.MODEL_VTM01,
             Bluetooth.MODEL_PC_60NW_NO_SN, Bluetooth.MODEL_OXYFIT_WPS,
-            Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_CHECKME_POD_WPS -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_CHECKME_POD_WPS,
+            Bluetooth.MODEL_SI_PO6 -> waveHandler.post(OxyWaveTask())
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_CHECK_ADV, Bluetooth.MODEL_PC300_BLE,
@@ -382,7 +384,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_CMRING, Bluetooth.MODEL_OXYU,
             Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_O2M_WPS,
             Bluetooth.MODEL_VTM01, Bluetooth.MODEL_OXYFIT_WPS,
-            Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_CHECKME_POD_WPS -> {
+            Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_CHECKME_POD_WPS,
+            Bluetooth.MODEL_SI_PO6 -> {
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.o2RtTypeLayout.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
@@ -462,10 +465,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_LERES -> {
                 binding.wirelessDataLayout.root.visibility = View.GONE
 //                binding.wirelessDataLayout.root.visibility = View.VISIBLE
-                binding.r20Switch.visibility = View.VISIBLE
-//                binding.r20Switch.visibility = View.GONE
-                LpBleUtil.r20GetRtState(it.modelNo)
-                LpBleUtil.r20GetSystemSetting(it.modelNo)
+                binding.ventilatorSwitch.visibility = View.VISIBLE
+//                binding.ventilatorSwitch.visibility = View.GONE
+                LpBleUtil.ventilatorGetRtState(it.modelNo)
+                LpBleUtil.ventilatorGetSystemSetting(it.modelNo)
             }
             Bluetooth.MODEL_ECN -> {
                 binding.ecnLayout.visibility = View.VISIBLE
@@ -707,6 +710,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPU
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SLEEPO2
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SNOREO2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_SI_PO6
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYFIT
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_OXYFIT_WPS
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_KIDSO2
@@ -875,16 +879,16 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 buttonView.text = context?.getString(R.string.start_record)
             }
         }
-        //--------------------r20--------------------------
-        binding.r20VentilationSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+        //--------------------ventilator--------------------------
+        binding.ventilatorVentilationSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             if (buttonView.isPressed) {
-                LpBleUtil.r20VentilationSwitch(Constant.BluetoothConfig.currentModel[0], isChecked)
+                LpBleUtil.ventilatorVentilationSwitch(Constant.BluetoothConfig.currentModel[0], isChecked)
             }
         }
-        binding.r20MaskTest.setOnCheckedChangeListener { buttonView, isChecked ->
+        binding.ventilatorMaskTest.setOnCheckedChangeListener { buttonView, isChecked ->
             LpBleUtil.stopRtTask(Constant.BluetoothConfig.currentModel[0])
             if (buttonView.isPressed) {
-                LpBleUtil.r20MaskTest(Constant.BluetoothConfig.currentModel[0], isChecked)
+                LpBleUtil.ventilatorMaskTest(Constant.BluetoothConfig.currentModel[0], isChecked)
             }
         }
         //--------------------ECN--------------------------
@@ -1126,11 +1130,12 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         }
         ppgFile.sn = mainViewModel.oxyInfo.value?.sn!!
         ppgFile.sampleIntsData = collectIntsData
-        val fileName = "PPG${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
-        FileUtil.saveFile(context, ppgFile.getDataBytes(), fileName)
+        val fileName = "PPG${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}"
+        FileUtil.saveFile(context, ppgFile.getDataBytes(), "$fileName.dat")
+        FileUtil.saveFile(context, collectIntsData, "$fileName.txt")
         Log.d(TAG, "collectIntsData: ${collectIntsData.joinToString(",")}")
         Log.d(TAG, "bytes: ${bytesToHex(ppgFile.getDataBytes())}")
-        val file = PpgFile(FileUtil.readFileToByteArray(context, fileName))
+        val file = PpgFile(FileUtil.readFileToByteArray(context, "$fileName.dat"))
         Log.d(TAG, "file: $file")
     }
 
@@ -1611,6 +1616,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 }
                 val ppgData = it.data as OxyBleResponse.PPGData
                 ppgData.let { data ->
+                    Log.d(TAG, "红外+红光：${data.irRedArray.joinToString(",")}")
+                    Log.d(TAG, "红外：${data.irArray.joinToString(",")}")
+                    Log.d(TAG, "红光：${data.redArray.joinToString(",")}")
                     if (binding.collectData.isChecked) {
                         if ((binding.ppgIr.isChecked) && (binding.ppgRed.isChecked)) {
                             collectIntsData = collectIntsData.plus(data.irRedArray)
@@ -1974,25 +1982,25 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             .observe(this) {
                 val data = it.data as Pc300BleResponse.GluResult
                 binding.dataStr.text = "$data"
-                binding.deviceInfo.text = "${context?.getString(R.string.glu_reault_type)}${data.result}：${data.resultMess}\n" +
-                        "${context?.getString(R.string.glu_reault_unit)}${data.unit}：${
+                binding.deviceInfo.text = "${context?.getString(R.string.glu_result_type)}${data.result}：${data.resultMess}\n" +
+                        "${context?.getString(R.string.glu_result_unit)}${data.unit}：${
                             when (data.unit) {
                                 0 -> "mmol/L"
                                 1 -> "mg/dL"
                                 else -> ""
                             }
                         }\n" +
-                        "${context?.getString(R.string.glu_reault)}${data.data}"
+                        "${context?.getString(R.string.glu_result)}${data.data}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300UaResult)
             .observe(this) {
                 val data = it.data as Float
-                binding.deviceInfo.text = "${context?.getString(R.string.ua_reault)}$data mg/dL"
+                binding.deviceInfo.text = "${context?.getString(R.string.ua_result)}$data mg/dL"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300CholResult)
             .observe(this) {
                 val data = it.data as Int
-                binding.deviceInfo.text = "${context?.getString(R.string.chol_reault)}$data mg/dL"
+                binding.deviceInfo.text = "${context?.getString(R.string.chol_result)}$data mg/dL"
             }
         /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300EcgStart)
             .observe(this) {
@@ -2021,25 +2029,25 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                                     else -> ""
                                 }
                             }\n" +
-                            "心电导联状态：${data.param.leadOff}\n" +
-                            "体重稳定状态：${data.scaleData.stable}\n" +
-                            "体重单位${data.scaleData.unit}：${
+                            "${context?.getString(R.string.lead_state)}${data.param.leadOff}\n" +
+                            "${context?.getString(R.string.weight_state)}${data.scaleData.stable}\n" +
+                            "${context?.getString(R.string.weight_unit)}${data.scaleData.unit}：${
                                 when (data.scaleData.unit) {
                                     0 -> "kg"
                                     1 -> "LB"
                                     2 -> "ST"
                                     3 -> "LB-ST"
-                                    4 -> "斤"
+                                    4 -> "Jin"
                                     else -> ""
                                 }
                             }\n" +
-                            "体重值KG：${data.scaleData.weight}\n" +
-                            "阻抗值Ω：${data.scaleData.resistance}"
+                            "${context?.getString(R.string.weight_kg)}${data.scaleData.weight}\n" +
+                            "${context?.getString(R.string.imp_Ω)}${data.scaleData.resistance}"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LES1.EventLeS1NoFile).observe(this) { event ->
             (event.data as Boolean).let {
-                binding.dataStr.text = "没有文件 $it"
+                binding.dataStr.text = "${context?.getString(R.string.no_file)} $it"
             }
         }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.FHR.EventFhrDeviceInfo)
@@ -2047,54 +2055,54 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val data = it.data as FhrBleResponse.DeviceInfo
                 binding.dataStr.text = "$data"
                 binding.deviceInfo.text = "${context?.getString(R.string.device_name)}${data.deviceName}\n" +
-                        "心率数据：${data.hr}\n" +
-                        "音量数据：${data.volume}\n" +
-                        "心音强度数据：${data.strength}\n" +
-                        "电量数据：${data.battery}"
+                        "${context?.getString(R.string.hr)}${data.hr}\n" +
+                        "${context?.getString(R.string.volume)}${data.volume}\n" +
+                        "${context?.getString(R.string.ecg_strength)}${data.strength}\n" +
+                        "${context?.getString(R.string.battery)}${data.battery}"
             }
         //------------------------------PoctorM3102--------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PoctorM3102.EventPoctorM3102Data)
             .observe(this) {
                 val data = it.data as PoctorM3102Data
                 binding.deviceInfo.text = when (data.type) {
-                    0 -> "血糖 : ${if (data.normal) {"${data.result} mmol/L\n时间 : ${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
-                    1 -> "尿酸 : ${if (data.normal) {"${data.result} umol/L\n时间 : ${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
-                    3 -> "血酮 : ${if (data.normal) {"${data.result} mmol/L\n时间 : ${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
-                    else -> "数据出错 : \n$data"
+                    0 -> "${context?.getString(R.string.glu_result)}${if (data.normal) {"${data.result} mmol/L\n${context?.getString(R.string.start_time)}${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
+                    1 -> "${context?.getString(R.string.ua_result)}${if (data.normal) {"${data.result} umol/L\n${context?.getString(R.string.start_time)}${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
+                    3 -> "${context?.getString(R.string.ketone_result)}${if (data.normal) {"${data.result} mmol/L\n${context?.getString(R.string.start_time)}${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"} else {if (data.result == 1) {"Hi"} else {"Lo"} }}"
+                    else -> "${context?.getString(R.string.error_result)}\n$data"
                 }
             }
         //------------------------------Bioland-BGM--------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmCountDown)
             .observe(this) {
                 val data = it.data as Int
-                binding.deviceInfo.text = "倒计时 : $data"
+                binding.deviceInfo.text = "${context?.getString(R.string.countdown)}$data"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmGluData)
             .observe(this) {
                 val data = it.data as BiolandBgmBleResponse.GluData
-                binding.deviceInfo.text = "血糖 : ${data.resultMg} mg/dL ${data.resultMmol} mmol/L\n时间 : ${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"
+                binding.deviceInfo.text = "${context?.getString(R.string.glu_result)}${data.resultMg} mg/dL ${data.resultMmol} mmol/L\n${context?.getString(R.string.start_time)}${getTimeString(data.year, data.month, data.day, data.hour, data.minute, 0)}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BiolandBgm.EventBiolandBgmNoGluData)
             .observe(this) {
                 val data = it.data as Boolean
-                Toast.makeText(context, "没有文件", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "${context?.getString(R.string.no_file)}", Toast.LENGTH_SHORT).show()
             }
         //------------------------------ER3--------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3RtData)
             .observe(this) {
                 val data = it.data as Er3BleResponse.RtData
                 Er3DataController.receive(data.wave.waveMvs)
-                Log.d("Er3Test", "data.wave.waveMvs.size ${data.wave.waveMvs.size}")
+                Log.d("Er3Test", "data.wave ${data.wave}")
                 binding.er3TempInfo.text = "${context?.getString(R.string.software_version)}${mainViewModel._er1Info.value?.fwV}\n" +
-                        "温度：${data.param.temp} ℃"
+                        "${context?.getString(R.string.temp)}${data.param.temp} ℃"
                 mainViewModel._battery.value = "${data.param.battery} %"
-                binding.deviceInfo.text = "心率：${data.param.hr} bpm\n" +
-                        "体温：${data.param.temp} ℃\n" +
-                        "血氧：${data.param.spo2} %\n" +
-                        "pi：${data.param.pi} %\n" +
-                        "脉率：${data.param.pr}\n" +
-                        "呼吸率：${data.param.respRate}\n" +
-                        "电池状态${data.param.batteryStatus}：${
+                binding.deviceInfo.text = "${context?.getString(R.string.hr)}${data.param.hr} bpm\n" +
+                        "${context?.getString(R.string.temp)}${data.param.temp} ℃\n" +
+                        "${context?.getString(R.string.spo2)}：${data.param.spo2} %\n" +
+                        "${context?.getString(R.string.pi)}：${data.param.pi} %\n" +
+                        "${context?.getString(R.string.pr)}：${data.param.pr}\n" +
+                        "${context?.getString(R.string.rr)}${data.param.respRate}\n" +
+                        "${context?.getString(R.string.battery_state)}${data.param.batteryStatus}：${
                             when (data.param.batteryStatus) {
                                 0 -> context?.getString(R.string.no_charge)
                                 1 -> context?.getString(R.string.charging)
@@ -2103,58 +2111,58 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                                 else -> ""
                             }
                         }\n" +
-                        "心电导联线状态：${data.param.isInsertEcgLeadWire}\n" +
-                        "血氧状态${data.param.oxyStatus}：${
+                        "${context?.getString(R.string.lead_wire_state)}${data.param.isInsertEcgLeadWire}\n" +
+                        "${context?.getString(R.string.oxy_probe_state)}${data.param.oxyStatus}：${
                             when (data.param.oxyStatus) {
-                                0 -> "未接入血氧"
-                                1 -> "血氧状态正常"
-                                2 -> "血氧手指脱落"
-                                3 -> "探头故障"
+                                0 -> context?.getString(R.string.no_probe)
+                                1 -> context?.getString(R.string.insert_finger)
+                                2 -> context?.getString(R.string.no_finger)
+                                3 -> context?.getString(R.string.abnormal_use)
                                 else -> ""
                             }
                         }\n" +
-                        "体温状态：${data.param.isInsertTemp}\n" +
+                        "${context?.getString(R.string.temp_probe_state)}：${data.param.isInsertTemp}\n" +
                         "${context?.getString(R.string.measure_state)}${data.param.measureStatus}：${
                             when (data.param.measureStatus) {
-                                0 -> "空闲"
-                                1 -> "准备状态"
-                                2 -> "正式测量状态"
+                                0 -> context?.getString(R.string.idle_state)
+                                1 -> context?.getString(R.string.measure_prepare_state)
+                                2 -> context?.getString(R.string.measuring_state)
                                 else -> ""
                             }
                         }\n" +
-                        "测量中是否有配置设备：${data.param.isHasDevice}\n" +
-                        "测量中是否有配置体温设备：${data.param.isHasTemp}\n" +
-                        "测量中是否有配置血氧设备：${data.param.isHasOxy}\n" +
-                        "测量中是否有配置呼吸设备：${data.param.isHasRespRate}\n" +
+                        "${context?.getString(R.string.has_device)}${data.param.isHasDevice}\n" +
+                        "${context?.getString(R.string.has_temp_device)}${data.param.isHasTemp}\n" +
+                        "${context?.getString(R.string.has_oxy_device)}${data.param.isHasOxy}\n" +
+                        "${context?.getString(R.string.has_rr_device)}${data.param.isHasRespRate}\n" +
                         "${context?.getString(R.string.duration)}${data.param.recordTime}\n" +
                         "${context?.getString(R.string.start_time)}${data.param.year}-${data.param.month}-${data.param.day} ${data.param.hour}:${data.param.minute}:${data.param.second}\n" +
-                        "导联类型${data.param.leadType}：${
+                        "${context?.getString(R.string.lead_type)}${data.param.leadType}：${
                             when (data.param.leadType) {
-                                0 -> "LEAD_12，12导"
-                                1 -> "LEAD_6，6导"
-                                2 -> "LEAD_5，5导"
-                                3 -> "LEAD_3，3导"
-                                4 -> "LEAD_3_TEMP，3导带体温"
-                                5 -> "LEAD_3_LEG，3导胸贴"
-                                6 -> "LEAD_5_LEG，5导胸贴"
-                                7 -> "LEAD_6_LEG，6导胸贴"
-                                0xFF -> "LEAD_NONSUP，不支持的导联"
-                                else -> "UNKNOWN，未知导联"
+                                0 -> context?.getString(R.string.lead_type_12)
+                                1 -> context?.getString(R.string.lead_type_6)
+                                2 -> context?.getString(R.string.lead_type_5)
+                                3 -> context?.getString(R.string.lead_type_3)
+                                4 -> context?.getString(R.string.lead_type_3_temp)
+                                5 -> context?.getString(R.string.lead_type_3_leg)
+                                6 -> context?.getString(R.string.lead_type_5_leg)
+                                7 -> context?.getString(R.string.lead_type_6_leg)
+                                0xFF -> context?.getString(R.string.lead_type_non_sup)
+                                else -> context?.getString(R.string.lead_type_unknown)
                             }
                         }\n" +
-                        "一次性导联的sn：${data.param.leadSn}\n" +
-                        "I导联脱落：${data.param.isLeadOffI}\n" +
-                        "II导联脱落：${data.param.isLeadOffII}\n" +
-                        "III导联脱落：${data.param.isLeadOffIII}\n" +
-                        "aVR导联脱落：${data.param.isLeadOffaVR}\n" +
-                        "aVL导联脱落：${data.param.isLeadOffaVL}\n" +
-                        "aVF导联脱落：${data.param.isLeadOffaVF}\n" +
-                        "V1导联脱落：${data.param.isLeadOffV1}\n" +
-                        "V2导联脱落：${data.param.isLeadOffV2}\n" +
-                        "V3导联脱落：${data.param.isLeadOffV3}\n" +
-                        "V4导联脱落：${data.param.isLeadOffV4}\n" +
-                        "V5导联脱落：${data.param.isLeadOffV5}\n" +
-                        "V6导联脱落：${data.param.isLeadOffV6}\n" +
+                        "${context?.getString(R.string.lead_sn)}${context?.getString(R.string.lead_sn)}${data.param.leadSn}\n" +
+                        "${context?.getString(R.string.lead_I_lead_off)}${data.param.isLeadOffI}\n" +
+                        "${context?.getString(R.string.lead_II_lead_off)}${data.param.isLeadOffII}\n" +
+                        "${context?.getString(R.string.lead_III_lead_off)}${data.param.isLeadOffIII}\n" +
+                        "${context?.getString(R.string.lead_aVR_lead_off)}${data.param.isLeadOffaVR}\n" +
+                        "${context?.getString(R.string.lead_aVL_lead_off)}${data.param.isLeadOffaVL}\n" +
+                        "${context?.getString(R.string.lead_aVF_lead_off)}${data.param.isLeadOffaVF}\n" +
+                        "${context?.getString(R.string.lead_V1_lead_off)}${data.param.isLeadOffV1}\n" +
+                        "${context?.getString(R.string.lead_V2_lead_off)}${data.param.isLeadOffV2}\n" +
+                        "${context?.getString(R.string.lead_V3_lead_off)}${data.param.isLeadOffV3}\n" +
+                        "${context?.getString(R.string.lead_V4_lead_off)}${data.param.isLeadOffV4}\n" +
+                        "${context?.getString(R.string.lead_V5_lead_off)}${data.param.isLeadOffV5}\n" +
+                        "${context?.getString(R.string.lead_V6_lead_off)}${data.param.isLeadOffV6}\n" +
                         "${data.param}"
             }
         //------------------------------Lepod--------------------------------
@@ -2162,15 +2170,15 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             .observe(this) {
                 val data = it.data as LepodBleResponse.RtData
                 Er3DataController.receive(data.wave.waveMvs)
-                Log.d("LepodTest", "data.wave.waveMvs.size ${data.wave.waveMvs.size}")
+                Log.d("LepodTest", "data.wave ${data.wave}")
                 mainViewModel._battery.value = "${data.param.battery} %"
-                binding.deviceInfo.text = "心率：${data.param.hr} bpm\n" +
-                        "体温：${data.param.temp} ℃\n" +
-                        "血氧：${data.param.spo2} %\n" +
-                        "pi：${data.param.pi} %\n" +
-                        "脉率：${data.param.pr}\n" +
-                        "呼吸率：${data.param.respRate}\n" +
-                        "电池状态${data.param.batteryStatus}：${
+                binding.deviceInfo.text = "${context?.getString(R.string.hr)}${data.param.hr} bpm\n" +
+                        "${context?.getString(R.string.temp)}${data.param.temp} ℃\n" +
+                        "${context?.getString(R.string.spo2)}：${data.param.spo2} %\n" +
+                        "${context?.getString(R.string.pi)}：${data.param.pi} %\n" +
+                        "${context?.getString(R.string.pr)}：${data.param.pr}\n" +
+                        "${context?.getString(R.string.rr)}${data.param.respRate}\n" +
+                        "${context?.getString(R.string.battery_state)}${data.param.batteryStatus}：${
                             when (data.param.batteryStatus) {
                                 0 -> context?.getString(R.string.no_charge)
                                 1 -> context?.getString(R.string.charging)
@@ -2179,60 +2187,60 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                                 else -> ""
                             }
                         }\n" +
-                        "心电导联线状态：${data.param.isInsertEcgLeadWire}\n" +
-                        "血氧状态${data.param.oxyStatus}：${
+                        "${context?.getString(R.string.lead_wire_state)}${data.param.isInsertEcgLeadWire}\n" +
+                        "${context?.getString(R.string.oxy_probe_state)}${data.param.oxyStatus}：${
                             when (data.param.oxyStatus) {
-                                0 -> "未接入血氧"
-                                1 -> "血氧状态正常"
-                                2 -> "血氧手指脱落"
-                                3 -> "探头故障"
+                                0 -> context?.getString(R.string.no_probe)
+                                1 -> context?.getString(R.string.insert_finger)
+                                2 -> context?.getString(R.string.no_finger)
+                                3 -> context?.getString(R.string.abnormal_use)
                                 else -> ""
                             }
                         }\n" +
-                        "体温状态：${data.param.isInsertTemp}\n" +
+                        "${context?.getString(R.string.temp_probe_state)}：${data.param.isInsertTemp}\n" +
                         "${context?.getString(R.string.measure_state)}${data.param.measureStatus}：${
                             when (data.param.measureStatus) {
-                                0 -> "空闲"
-                                1 -> "检测导联"
-                                2 -> "准备状态"
-                                3 -> "正式测量"
+                                0 -> context?.getString(R.string.idle_state)
+                                1 -> context?.getString(R.string.detect_lead_state)
+                                2 -> context?.getString(R.string.measure_prepare_state)
+                                3 -> context?.getString(R.string.measuring_state)
                                 else -> ""
                             }
                         }\n" +
                         "${context?.getString(R.string.duration)}${data.param.recordTime}\n" +
                         "${context?.getString(R.string.start_time)}${data.param.year}-${data.param.month}-${data.param.day} ${data.param.hour}:${data.param.minute}:${data.param.second}\n" +
-                        "导联类型${data.param.leadType}：${
+                        "${context?.getString(R.string.lead_type)}${data.param.leadType}：${
                             when (data.param.leadType) {
-                                0 -> "LEAD_12，12导"
-                                1 -> "LEAD_6，6导"
-                                2 -> "LEAD_5，5导"
-                                3 -> "LEAD_3，3导"
-                                4 -> "LEAD_3_TEMP，3导带体温"
-                                5 -> "LEAD_3_LEG，3导胸贴"
-                                6 -> "LEAD_5_LEG，5导胸贴"
-                                7 -> "LEAD_6_LEG，6导胸贴"
-                                0xFF -> "LEAD_NONSUP，不支持的导联"
-                                else -> "UNKNOWN，未知导联"
+                                0 -> context?.getString(R.string.lead_type_12)
+                                1 -> context?.getString(R.string.lead_type_6)
+                                2 -> context?.getString(R.string.lead_type_5)
+                                3 -> context?.getString(R.string.lead_type_3)
+                                4 -> context?.getString(R.string.lead_type_3_temp)
+                                5 -> context?.getString(R.string.lead_type_3_leg)
+                                6 -> context?.getString(R.string.lead_type_5_leg)
+                                7 -> context?.getString(R.string.lead_type_6_leg)
+                                0xFF -> context?.getString(R.string.lead_type_non_sup)
+                                else -> context?.getString(R.string.lead_type_unknown)
                             }
                         }\n" +
-                        "RA导联脱落：${data.param.isLeadOffRA}\n" +
-                        "RL导联脱落：${data.param.isLeadOffRL}\n" +
-                        "LA导联脱落：${data.param.isLeadOffLA}\n" +
-                        "LL导联脱落：${data.param.isLeadOffLL}\n" +
-                        "V1导联脱落：${data.param.isLeadOffV1}\n" +
-                        "V2导联脱落：${data.param.isLeadOffV2}\n" +
-                        "V3导联脱落：${data.param.isLeadOffV3}\n" +
-                        "V4导联脱落：${data.param.isLeadOffV4}\n" +
-                        "V5导联脱落：${data.param.isLeadOffV5}\n" +
-                        "V6导联脱落：${data.param.isLeadOffV6}"
+                        "${context?.getString(R.string.lead_RA_lead_off)}${data.param.isLeadOffRA}\n" +
+                        "${context?.getString(R.string.lead_RL_lead_off)}${data.param.isLeadOffRL}\n" +
+                        "${context?.getString(R.string.lead_LA_lead_off)}${data.param.isLeadOffLA}\n" +
+                        "${context?.getString(R.string.lead_LL_lead_off)}${data.param.isLeadOffLL}\n" +
+                        "${context?.getString(R.string.lead_V1_lead_off)}${data.param.isLeadOffV1}\n" +
+                        "${context?.getString(R.string.lead_V2_lead_off)}${data.param.isLeadOffV2}\n" +
+                        "${context?.getString(R.string.lead_V3_lead_off)}${data.param.isLeadOffV3}\n" +
+                        "${context?.getString(R.string.lead_V4_lead_off)}${data.param.isLeadOffV4}\n" +
+                        "${context?.getString(R.string.lead_V5_lead_off)}${data.param.isLeadOffV5}\n" +
+                        "${context?.getString(R.string.lead_V6_lead_off)}${data.param.isLeadOffV6}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodEcgStart)
             .observe(this) {
-                Toast.makeText(context, "开始测量", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context?.getString(R.string.start_measure), Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodEcgStop)
             .observe(this) {
-                Toast.makeText(context, "结束测量", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context?.getString(R.string.stop_measure), Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VCOMIN.EventVcominRtHr)
             .observe(this) {
@@ -2252,11 +2260,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.oxyPr.value = data.param.pr
                 viewModel.spo2.value = data.param.spo2
                 viewModel.pi.value = data.param.pi
-                binding.deviceInfo.text = "探头状态${data.param.probeState}：${
+                binding.deviceInfo.text = "${context?.getString(R.string.oxy_probe_state)}${data.param.probeState}：${
                     when (data.param.probeState) {
-                        0 -> "未检测到手指"
-                        1 -> "正常测量"
-                        2 -> "探头故障"
+                        0 -> context?.getString(R.string.no_finger)
+                        1 -> context?.getString(R.string.measuring_state)
+                        2 -> context?.getString(R.string.abnormal_use)
                         else -> ""
                     }
                 }"
@@ -2268,32 +2276,32 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpRtData)
             .observe(this) {
                 val data = it.data as BtpBleResponse.RtData
-                binding.deviceInfo.text = "心率：${data.hr}\n"
+                binding.deviceInfo.text = "${context?.getString(R.string.hr)}${data.hr}\n"
                 if (type == 1) {
-                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "温度：${String.format("%.2f", (32+data.temp*1.8))} ℉\n"
+                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "${context?.getString(R.string.temp)}${String.format("%.2f", (32+data.temp*1.8))} ℉\n"
                 } else {
-                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "温度：${data.temp} ℃\n"
+                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "${context?.getString(R.string.temp)}${data.temp} ℃\n"
                 }
-                binding.deviceInfo.text = binding.deviceInfo.text.toString() + "测量中：${
+                binding.deviceInfo.text = binding.deviceInfo.text.toString() + "${context?.getString(R.string.measuring_state)}：${
                     if (data.isWearing) {
                         context?.getString(R.string.yes)
                     } else {
                         context?.getString(R.string.no)
                     }}\n" +
-                    "心率可信度：${data.level}\n" +
-                    "心率状态${data.hrStatus}：${
+                    "${context?.getString(R.string.hr_real_level)}${data.level}\n" +
+                    "${context?.getString(R.string.hr_status)}${data.hrStatus}：${
                         when (data.hrStatus) {
                             0 -> context?.getString(R.string.normal)
-                            1 -> "心率低异常"
-                            2 -> "心率高异常"
+                            1 -> context?.getString(R.string.low_hr_abnormal)
+                            2 -> context?.getString(R.string.high_hr_abnormal)
                             else -> ""
                         }
                     }\n" +
-                    "温度状态${data.tempStatus}：${
+                    "${data.tempStatus}：${
                         when (data.tempStatus) {
                             0 -> context?.getString(R.string.normal)
-                            3 -> "温度低异常"
-                            4 -> "温度高异常"
+                            3 -> context?.getString(R.string.low_temp_abnormal)
+                            4 -> context?.getString(R.string.high_temp_abnormal)
                             else -> ""
                         }
                     }"
@@ -2307,7 +2315,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val data = it.data as BtpBleResponse.ConfigInfo
                 type = data.tempUnit
             }
-        // ----------------------R20-------------------
+        // ----------------------Ventilator-------------------
         LiveEventBus.get<ByteArray>(EventMsgConst.Cmd.EventCmdResponseEchoData)
             .observe(this) {
                 val data = LepuBleResponse.BleResponse(it)
@@ -2328,221 +2336,226 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 wirelessData.errorPercent = wirelessData.errorBytes.div(wirelessData.totalBytes*1.0).times(100)
                 wirelessData.missPercent = wirelessData.missSize.div(sendSeqNo*1.0).times(100)
                 tempSeqNo = data.pkgNo
-                binding.wirelessDataLayout.testData.text = "数据总量：${wirelessData.totalBytes.div(1024.0)} kb\n" +
-                        "总包数：${wirelessData.totalSize}\n" +
-                        "丢包数：${wirelessData.missSize}\n" +
-                        "错误字节：${wirelessData.errorBytes}\n" +
-                        "单次时延：${wirelessData.oneDelay} ms\n" +
-                        "总时延：${wirelessData.totalDelay.div(wirelessData.totalSize)} ms\n" +
-                        "丢包率：${String.format("%.3f", wirelessData.missPercent)} %\n" +
-                        "误码率：${String.format("%.3f", wirelessData.errorPercent)} %"
+                binding.wirelessDataLayout.testData.text = "${context?.getString(R.string.total_bytes)}${wirelessData.totalBytes.div(1024.0)} kb\n" +
+                        "${context?.getString(R.string.total_size)}${wirelessData.totalSize}\n" +
+                        "${context?.getString(R.string.miss_size)}${wirelessData.missSize}\n" +
+                        "${context?.getString(R.string.error_bytes)}${wirelessData.errorBytes}\n" +
+                        "${context?.getString(R.string.one_delay)}${wirelessData.oneDelay} ms\n" +
+                        "${context?.getString(R.string.total_delay)}${wirelessData.totalDelay.div(wirelessData.totalSize)} ms\n" +
+                        "${context?.getString(R.string.miss_percent)}${String.format("%.3f", wirelessData.missPercent)} %\n" +
+                        "${context?.getString(R.string.error_percent)}${String.format("%.3f", wirelessData.errorPercent)} %"
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20RtState)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorRtState)
             .observe(this) {
-                val data = it.data as R20BleResponse.RtState
-                binding.r20State.visibility = View.VISIBLE
+                val data = it.data as VentilatorBleResponse.RtState
+                binding.ventilatorState.visibility = View.VISIBLE
                 if (data.isVentilated) {
-                    binding.r20VentilationSwitch.isChecked = true
+                    binding.ventilatorVentilationSwitch.isChecked = true
                     LpBleUtil.startRtTask(it.model, 1000)
                 } else {
-                    binding.r20VentilationSwitch.isChecked = false
+                    binding.ventilatorVentilationSwitch.isChecked = false
                     LpBleUtil.stopRtTask()
                 }
                 // BLE医生模式下
                 state = data.deviceMode == 2
-                binding.r20VentilationSwitch.isEnabled = state
-                binding.r20MaskTest.isEnabled = !data.isVentilated
-                binding.r20State.text = "设备实时状态：\n通气模式：${when (data.ventilationMode) {
-                    0 -> "CPAP"
-                    1 -> "APAP"
-                    2 -> "S"
-                    3 -> "S/T"
-                    4 -> "T"
-                    else -> "无"
-                }}\n通气状态：${
-                    if (data.isVentilated) context?.getString(R.string.yes) 
-                    else context?.getString(R.string.no)}\n" +
-                "${context?.getString(R.string.device_mode)}${when (data.deviceMode) {
-                        0 -> "患者模式"
-                        1 -> "设备端医生模式"
-                        2 -> "BLE端医生模式"
-                        3 -> "Socket端医生模式"
-                        else -> "无"
-                    }
-                }\n标准：${when (data.standard) {
-                        0 -> "CE"
-                        1 -> "FDA"
-                        else -> "无"
-                    }
-                }"
+                binding.ventilatorVentilationSwitch.isEnabled = state
+                binding.ventilatorMaskTest.isEnabled = !data.isVentilated
+                binding.ventilatorState.text = "${context?.getString(R.string.run_state)}：\n" +
+                        "${context?.getString(R.string.ventilation_mode)}${when (data.ventilationMode) {
+                            0 -> "CPAP"
+                            1 -> "APAP"
+                            2 -> "S"
+                            3 -> "S/T"
+                            4 -> "T"
+                            else -> context?.getString(R.string.no)
+                        }}\n${context?.getString(R.string.ventilation_status)}${
+                            if (data.isVentilated) context?.getString(R.string.yes) 
+                            else context?.getString(R.string.no)}\n" +
+                        "${context?.getString(R.string.device_mode)}${when (data.deviceMode) {
+                                0 -> context?.getString(R.string.device_mode_normal)
+                                1 -> context?.getString(R.string.device_mode_doctor)
+                                2 -> context?.getString(R.string.device_mode_ble_doctor)
+                                3 -> context?.getString(R.string.device_mode_socket_doctor)
+                                else -> context?.getString(R.string.no)
+                            }
+                        }\n${context?.getString(R.string.standard)}${when (data.standard) {
+                                1 -> "CFDA"
+                                2 -> "CE"
+                                3 -> "FDA"
+                                else -> context?.getString(R.string.no)
+                            }
+                        }"
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20GetSystemSetting)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetSystemSetting)
             .observe(this) {
                 val data = it.data as SystemSetting
                 type = data.unitSetting.pressureUnit
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20RtParam)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorRtParam)
             .observe(this) {
-                val data = it.data as R20BleResponse.RtParam
+                val data = it.data as VentilatorBleResponse.RtParam
                 binding.deviceInfo.visibility = View.VISIBLE
-                binding.r20MaskTestText.visibility = View.GONE
-                binding.deviceInfo.text = "实时参数：\n实时压：${data.pressure} ${if (type == 0) "cmH2O" else "hPa"}\n" +
-                        "吸气压力：${data.ipap} ${if (type == 0) "cmH2O" else "hPa"}\n" +
-                        "呼气压力：${data.epap} ${if (type == 0) "cmH2O" else "hPa"}\n" +
-                        "潮气量：${if (data.vt < 0 || data.vt > 3000) "**" else data.vt}mL\n" +
-                        "分钟通气量：${if (data.mv < 0 || data.mv > 60) "**" else data.mv} L/min\n" +
-                        "漏气量：${if (data.leak < 0 || data.leak > 120) "**" else data.leak} L/min\n" +
-                        "呼吸率：${if (data.rr < 0 || data.rr > 60) "**" else data.rr} bpm\n" +
-                        "吸气时间：${if (data.ti < 0.1 || data.ti > 4) "--" else data.ti} s\n" +
-                        "吸呼比：${if (data.ie < 0.02 || data.ie > 3) "--" else {
+                binding.ventilatorMaskTestText.visibility = View.GONE
+                binding.deviceInfo.text = "${context?.getString(R.string.rt_param)}\n" +
+                        "${context?.getString(R.string.rt_preasure)}${data.pressure} ${if (type == 0) "cmH2O" else "hPa"}\n" +
+                        "${context?.getString(R.string.ipap_preasure)}${data.ipap} ${if (type == 0) "cmH2O" else "hPa"}\n" +
+                        "${context?.getString(R.string.epap_preasure)}${data.epap} ${if (type == 0) "cmH2O" else "hPa"}\n" +
+                        "${context?.getString(R.string.vt)}${if (data.vt < 0 || data.vt > 3000) "**" else data.vt}mL\n" +
+                        "${context?.getString(R.string.mv)}${if (data.mv < 0 || data.mv > 60) "**" else data.mv} L/min\n" +
+                        "${context?.getString(R.string.leak)}${if (data.leak < 0 || data.leak > 120) "**" else data.leak} L/min\n" +
+                        "${context?.getString(R.string.rr)}${if (data.rr < 0 || data.rr > 60) "**" else data.rr} bpm\n" +
+                        "${context?.getString(R.string.ti)}${if (data.ti < 0.1 || data.ti > 4) "--" else data.ti} s\n" +
+                        "${context?.getString(R.string.ie)}\$${if (data.ie < 0.02 || data.ie > 3) "--" else {
                             if (data.ie < 1) {
                                 "1:" + String.format("%.1f", 1f/data.ie)
                             } else {
                                 String.format("%.1f", data.ie) + ":1"
                             }
                         }}\n" +
-                        "血氧：${if (data.spo2 < 70 || data.spo2 > 100) "**" else data.spo2} %\n" +
-                        "脉率：${if (data.pr < 30 || data.pr > 250) "**" else data.pr} bpm\n" +
-                        "心率：${if (data.hr < 30 || data.hr > 250) "**" else data.hr} bpm"
+                        "${context?.getString(R.string.spo2)}：${if (data.spo2 < 70 || data.spo2 > 100) "**" else data.spo2} %\n" +
+                        "${context?.getString(R.string.pr)}：${if (data.pr < 30 || data.pr > 250) "**" else data.pr} bpm\n" +
+                        "${context?.getString(R.string.hr)}${if (data.hr < 30 || data.hr > 250) "**" else data.hr} bpm"
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20MaskTest)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorMaskTest)
             .observe(this) {
-                val data = it.data as R20BleResponse.MaskTestResult
-                binding.r20MaskTest.isChecked = data.status == 1
+                val data = it.data as VentilatorBleResponse.MaskTestResult
+                binding.ventilatorMaskTest.isChecked = data.status == 1
                 // BLE医生模式下
                 if (state) {
-                    binding.r20VentilationSwitch.isEnabled = data.status != 1
+                    binding.ventilatorVentilationSwitch.isEnabled = data.status != 1
                 }
-                binding.r20MaskTestText.visibility = View.VISIBLE
+                binding.ventilatorMaskTestText.visibility = View.VISIBLE
                 binding.deviceInfo.visibility = View.GONE
-                binding.r20Event.visibility = View.GONE
-                binding.r20MaskTestText.text = "佩戴测试：\n设备状态：${when (data.status) {
-                    0 -> "未在测试状态"
-                    1 -> "测试中"
-                    2 -> "测试结束"
-                    else -> "无"
-                }}\n实时漏气量：${data.leak} L/min\n${context?.getString(R.string.measure_result)}：${when (data.result) {
-                    0 -> "测试未完成"
-                    1 -> "不合适"
-                    2 -> "合适"
-                    else -> "无"
-                }
-                }"
+                binding.ventilatorEvent.visibility = View.GONE
+                binding.ventilatorMaskTestText.text = "${context?.getString(R.string.mask_test)}\n" +
+                        "${context?.getString(R.string.run_state)}：${when (data.status) {
+                            0 -> context?.getString(R.string.test_idle)
+                            1 -> context?.getString(R.string.test_ing)
+                            2 -> context?.getString(R.string.test_end)
+                            else -> context?.getString(R.string.no)
+                        }}\n${context?.getString(R.string.leak)}${data.leak} L/min\n${context?.getString(R.string.measure_result)}：${when (data.result) {
+                            0 -> context?.getString(R.string.test_no_end)
+                            1 -> context?.getString(R.string.no_fit)
+                            2 -> context?.getString(R.string.fit)
+                            else -> context?.getString(R.string.no)
+                        }
+                        }"
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.R20.EventR20Event)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorEvent)
             .observe(this) {
-                val data = it.data as R20BleResponse.Event
-                binding.r20Event.visibility = View.VISIBLE
-                binding.r20Event.text = "事件上报：\n时间：${stringFromDate(Date(data.timestamp*1000), "yyyy-MM-dd HH:mm:ss")}\n" +
-                        "警告状态：${if (data.alarm) {"告警中"} else {"取消告警"}}\n" +
-                        "警告等级：${when (data.alarmLevel) {
+                val data = it.data as VentilatorBleResponse.Event
+                binding.ventilatorEvent.visibility = View.VISIBLE
+                binding.ventilatorEvent.text = "${context?.getString(R.string.event_report)}\n" +
+                        "${context?.getString(R.string.report_time)}${stringFromDate(Date(data.timestamp*1000), "yyyy-MM-dd HH:mm:ss")}\n" +
+                        "${context?.getString(R.string.warning_state)}${if (data.alarm) {"${context?.getString(R.string.warning)}"} else {"${context?.getString(R.string.cancel_warning)}"}}\n" +
+                        "${context?.getString(R.string.warning_level)}${when (data.alarmLevel) {
                             0 -> context?.getString(R.string.normal)
-                            1 -> "低"
-                            2 -> "中"
-                            3 -> "高"
-                            4 -> "最高"
-                            else -> "无"
-                        }}\n警告类型：${when (data.eventId) {
-                            1 -> "管路断开"
-                            2 -> "管路阻塞"
-                            3 -> "漏气量高"
-                            4 -> "呼吸频率高"
-                            5 -> "呼吸频率低"
-                            6 -> "潮气量低"
-                            7 -> "分钟通气量低"
-                            8 -> "血氧饱和度低"
-                            9 -> "心率/脉率高"
-                            10 -> "心率/脉率低"
-                            11 -> "窒息"
-                            12 -> "掉电"
-                            101 -> "涡轮HALL线没接"
-                            102 -> "涡轮温度超过90度"
-                            103 -> "涡轮堵转"
-                            104 -> "涡轮电源异常"
-                            201 -> "加热盘异常"
-                            202 -> "加热盘没接/温度传感器损坏"
-                            203 -> "加热盘温度超过75度"
-                            301 -> "流量传感器异常"
-                            302 -> "压力传感器异常"
-                            303 -> "流量传感器通信异常"
-                            304 -> "流量传感器测得的流速过大"
-                            305 -> "流量传感器测得的流速过小"
-                            306 -> "正常通气时，压力传感器数值过大"
-                            307 -> "正常通气时，压力传感器数值过小"
-                            308 -> "传感器压力偏低"
-                            309 -> "自检时，流量传感器流速过大"
-                            310 -> "自检时，流量传感器流速过小"
-                            311 -> "自检时，流量传感器通信异常"
-                            312 -> "自检时，压力传感器数值过大"
-                            313 -> "自检时，压力传感器数值过小"
-                            314 -> "温/湿度传感器异常"
-                            315 -> "大气压传感器异常"
-                            316 -> "预估压力与实际压力相差较远"
-                            401 -> "输入电压异常"
-                            402 -> "电源电压低"
-                            403 -> "电源电压高"
-                            501 -> "EEPROM 只读数据异常"
-                            502 -> "RTC时钟异常"
-                            503 -> "设备需要校准"
-                            504 -> "设备异常重启"
-                            601 -> "阻塞呼吸暂事件"
-                            602 -> "中枢型呼吸暂停事件"
-                            603 -> "无法分类的呼吸暂停事件"
-                            604 -> "低通气"
-                            605 -> "微觉醒"
-                            606 -> "打鼾事件"
-                            607 -> "周期性呼吸事件"
-                            608 -> "漏气量高事件"
-                            609 -> "面罩摘下"
-                            610 -> "自主呼吸占比"
-                            else -> "无"
+                            1 -> context?.getString(R.string.level_low)
+                            2 -> context?.getString(R.string.level_media)
+                            3 -> context?.getString(R.string.level_high)
+                            4 -> context?.getString(R.string.level_highest)
+                            else -> context?.getString(R.string.no)
+                        }}\n${context?.getString(R.string.warning_type)}${when (data.eventId) {
+                            1 -> context?.getString(R.string.warning_type_1)
+                            2 -> context?.getString(R.string.warning_type_2)
+                            3 -> context?.getString(R.string.warning_type_3)
+                            4 -> context?.getString(R.string.warning_type_4)
+                            5 -> context?.getString(R.string.warning_type_5)
+                            6 -> context?.getString(R.string.warning_type_6)
+                            7 -> context?.getString(R.string.warning_type_7)
+                            8 -> context?.getString(R.string.warning_type_8)
+                            9 -> context?.getString(R.string.warning_type_9)
+                            10 -> context?.getString(R.string.warning_type_10)
+                            11 -> context?.getString(R.string.warning_type_11)
+                            12 -> context?.getString(R.string.warning_type_12)
+                            101 -> context?.getString(R.string.warning_type_101)
+                            102 -> context?.getString(R.string.warning_type_102)
+                            103 -> context?.getString(R.string.warning_type_103)
+                            104 -> context?.getString(R.string.warning_type_104)
+                            201 -> context?.getString(R.string.warning_type_201)
+                            202 -> context?.getString(R.string.warning_type_202)
+                            203 -> context?.getString(R.string.warning_type_203)
+                            301 -> context?.getString(R.string.warning_type_301)
+                            302 -> context?.getString(R.string.warning_type_302)
+                            303 -> context?.getString(R.string.warning_type_303)
+                            304 -> context?.getString(R.string.warning_type_304)
+                            305 -> context?.getString(R.string.warning_type_305)
+                            306 -> context?.getString(R.string.warning_type_306)
+                            307 -> context?.getString(R.string.warning_type_307)
+                            308 -> context?.getString(R.string.warning_type_308)
+                            309 -> context?.getString(R.string.warning_type_309)
+                            310 -> context?.getString(R.string.warning_type_310)
+                            311 -> context?.getString(R.string.warning_type_311)
+                            312 -> context?.getString(R.string.warning_type_312)
+                            313 -> context?.getString(R.string.warning_type_313)
+                            314 -> context?.getString(R.string.warning_type_314)
+                            315 -> context?.getString(R.string.warning_type_315)
+                            316 -> context?.getString(R.string.warning_type_316)
+                            401 -> context?.getString(R.string.warning_type_401)
+                            402 -> context?.getString(R.string.warning_type_402)
+                            403 -> context?.getString(R.string.warning_type_403)
+                            501 -> context?.getString(R.string.warning_type_501)
+                            502 -> context?.getString(R.string.warning_type_502)
+                            503 -> context?.getString(R.string.warning_type_503)
+                            504 -> context?.getString(R.string.warning_type_504)
+                            601 -> context?.getString(R.string.warning_type_601)
+                            602 -> context?.getString(R.string.warning_type_602)
+                            603 -> context?.getString(R.string.warning_type_603)
+                            604 -> context?.getString(R.string.warning_type_604)
+                            605 -> context?.getString(R.string.warning_type_605)
+                            606 -> context?.getString(R.string.warning_type_606)
+                            607 -> context?.getString(R.string.warning_type_607)
+                            608 -> context?.getString(R.string.warning_type_608)
+                            609 -> context?.getString(R.string.warning_type_609)
+                            610 -> context?.getString(R.string.warning_type_610)
+                            else -> context?.getString(R.string.no)
                         }
                 }"
             }
         LiveEventBus.get<ResponseError>(EventMsgConst.Cmd.EventCmdResponseError)
             .observe(this) {
                 when (it.type) {
-                    LpBleCmd.TYPE_FILE_NOT_FOUND -> Toast.makeText(context, "找不到文件", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_FILE_READ_FAILED -> Toast.makeText(context, "读文件失败", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_FILE_WRITE_FAILED -> Toast.makeText(context, "写文件失败", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_FIRMWARE_UPDATE_FAILED -> Toast.makeText(context, "固件升级失败", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_LANGUAGE_UPDATE_FAILED -> Toast.makeText(context, "语言包升级失败", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_PARAM_ILLEGAL -> Toast.makeText(context, "参数不合法", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_PERMISSION_DENIED -> Toast.makeText(context, "权限不足", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FILE_NOT_FOUND -> Toast.makeText(context, context?.getString(R.string.file_not_found), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FILE_READ_FAILED -> Toast.makeText(context, context?.getString(R.string.read_error), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FILE_WRITE_FAILED -> Toast.makeText(context, context?.getString(R.string.write_file_error), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_FIRMWARE_UPDATE_FAILED -> Toast.makeText(context, context?.getString(R.string.software_upgrade_error), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_LANGUAGE_UPDATE_FAILED -> Toast.makeText(context, context?.getString(R.string.language_upgrade_error), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_PARAM_ILLEGAL -> Toast.makeText(context, context?.getString(R.string.param_illegal), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_PERMISSION_DENIED -> Toast.makeText(context, context?.getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
                     LpBleCmd.TYPE_DECRYPT_FAILED -> {
-                    Toast.makeText(context, "解密失败，断开连接", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context?.getString(R.string.decrypt_failed), Toast.LENGTH_SHORT).show()
                         LpBleUtil.disconnect(false)
                     }
-                    LpBleCmd.TYPE_DEVICE_BUSY -> Toast.makeText(context, "设备资源被占用/设备忙", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_CMD_FORMAT_ERROR -> Toast.makeText(context, "指令格式错误", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_CMD_NOT_SUPPORTED -> Toast.makeText(context, "不支持指令", Toast.LENGTH_SHORT).show()
-                    LpBleCmd.TYPE_NORMAL_ERROR -> Toast.makeText(context, "通用错误", Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_DEVICE_BUSY -> Toast.makeText(context, context?.getString(R.string.device_busy), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_CMD_FORMAT_ERROR -> Toast.makeText(context, context?.getString(R.string.cmd_format_error), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_CMD_NOT_SUPPORTED -> Toast.makeText(context, context?.getString(R.string.cmd_not_support), Toast.LENGTH_SHORT).show()
+                    LpBleCmd.TYPE_NORMAL_ERROR -> Toast.makeText(context, context?.getString(R.string.normal_error), Toast.LENGTH_SHORT).show()
                 }
             }
         //--------------------ECN---------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStartRtData)
             .observe(this) {
                 val data = it.data as Boolean
-                Toast.makeText(context, "开始上发实时数据$data", Toast.LENGTH_SHORT).show()
-                binding.ecnInfo.text = "开始上发实时数据$data"
+                Toast.makeText(context, "EventEcnStartRtData $data", Toast.LENGTH_SHORT).show()
+                binding.ecnInfo.text = "EventEcnStartRtData $data"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStopRtData)
             .observe(this) {
                 val data = it.data as Boolean
-                Toast.makeText(context, "停止上发实时数据$data", Toast.LENGTH_SHORT).show()
-                binding.ecnInfo.text = "停止上发实时数据$data"
+                Toast.makeText(context, "EventEcnStopRtData $data", Toast.LENGTH_SHORT).show()
+                binding.ecnInfo.text = "EventEcnStopRtData $data"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStartCollect)
             .observe(this) {
                 val data = it.data as Boolean
-                Toast.makeText(context, "开始采集实时数据$data", Toast.LENGTH_SHORT).show()
-                binding.ecnInfo.text = "开始采集实时数据$data"
+                Toast.makeText(context, "EventEcnStartCollect $data", Toast.LENGTH_SHORT).show()
+                binding.ecnInfo.text = "EventEcnStartCollect $data"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnStopCollect)
             .observe(this) {
                 val data = it.data as Boolean
-                Toast.makeText(context, "停止采集实时数据$data", Toast.LENGTH_SHORT).show()
-                binding.ecnInfo.text = "停止采集实时数据$data"
+                Toast.makeText(context, "EventEcnStopCollect $data", Toast.LENGTH_SHORT).show()
+                binding.ecnInfo.text = "EventEcnStopCollect $data"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnRtData)
             .observe(this) {

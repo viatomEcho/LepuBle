@@ -96,20 +96,49 @@ object EcnBleResponse {
         }
     }
 
+    class RtWave(val bytes: ByteArray) {
+        var len1: Int
+        var len2: Int
+        var wave = mutableListOf<ByteArray>()
+        init {
+            var index = 0
+            len1 = byte2UInt(bytes[index])
+            index++
+            len2 = toUInt(bytes.copyOfRange(index, index+2))
+            index += 2
+            for (i in 0 until len1) {
+                wave.add(bytes.copyOfRange(index, index+len2))
+                index += len2
+            }
+        }
+        override fun toString(): String {
+            return """
+                RtWave : 
+                len1 : $len1
+                len2 : $len2
+                wave.size : ${wave.size}
+            """.trimIndent()
+        }
+    }
+
     class RtData(val bytes: ByteArray) {
         var state: RtState
         var wave: ByteArray
+        var status: RtState
+        var wave: RtWave
         init {
             var index = 0
             state = RtState(bytes.copyOfRange(index, index+10))
             index += 10
-            wave = bytes.copyOfRange(index, bytes.size)
+            wave = RtWave(bytes.copyOfRange(index, bytes.size))
         }
         override fun toString(): String {
             return """
                 RtData : 
                 state : $state
                 wave : ${bytesToHex(wave)}
+                status : $status
+                wave : $wave
             """.trimIndent()
         }
     }
