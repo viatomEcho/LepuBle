@@ -123,8 +123,6 @@ object EcnBleResponse {
 
     class RtData(val bytes: ByteArray) {
         var state: RtState
-        var wave: ByteArray
-        var status: RtState
         var wave: RtWave
         init {
             var index = 0
@@ -136,8 +134,6 @@ object EcnBleResponse {
             return """
                 RtData : 
                 state : $state
-                wave : ${bytesToHex(wave)}
-                status : $status
                 wave : $wave
             """.trimIndent()
         }

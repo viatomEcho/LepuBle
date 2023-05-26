@@ -13,8 +13,8 @@ import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.ble.data.Bp2Config
 import com.lepu.blepro.ble.data.lew.*
 import com.lepu.blepro.ble.data.lew.TimeData
-import com.lepu.blepro.ble.data.r20.VentilationSetting
-import com.lepu.blepro.ble.data.r20.WarningSetting
+import com.lepu.blepro.ble.data.ventilator.VentilationSetting
+import com.lepu.blepro.ble.data.ventilator.WarningSetting
 import com.lepu.blepro.constants.Ble
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.ext.bp2w.Bp2wConfig

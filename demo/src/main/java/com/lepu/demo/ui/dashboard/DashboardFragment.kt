@@ -41,7 +41,7 @@ import com.lepu.demo.data.WirelessData
 import com.lepu.demo.data.entity.DeviceEntity
 import com.lepu.demo.databinding.FragmentDashboardBinding
 import com.lepu.demo.util.DataConvert
-import com.lepu.demo.util.DateUtil.stringFromDate
+//import com.lepu.demo.util.DateUtil.stringFromDate
 import com.lepu.demo.util.FileUtil
 import com.lepu.demo.views.EcgBkg
 import com.lepu.demo.views.EcgView

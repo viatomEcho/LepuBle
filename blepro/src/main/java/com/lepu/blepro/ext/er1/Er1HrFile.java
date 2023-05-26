@@ -9,7 +9,7 @@ public class Er1HrFile {
     private int[] motionList;
     private boolean[] vibrationList;
     private int recordingTime;   // 记录时长 e.g. 3600 :  3600s
-    private int magic;           // 文件标志 固定值为0xA55A0438
+    private long magic;           // 文件标志 固定值为0xA55A0438
 
     public Er1HrFile(byte[] bytes) {
         VBeatHrFile data = new VBeatHrFile(bytes);
@@ -67,11 +67,11 @@ public class Er1HrFile {
         this.recordingTime = recordingTime;
     }
 
-    public int getMagic() {
+    public long getMagic() {
         return magic;
     }
 
-    public void setMagic(int magic) {
+    public void setMagic(long magic) {
         this.magic = magic;
     }
 }

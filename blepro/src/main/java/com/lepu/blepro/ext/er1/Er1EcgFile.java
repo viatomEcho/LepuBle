@@ -6,7 +6,7 @@ public class Er1EcgFile {
     private byte[] waveData;     // 125Hz原始波形压缩数据（差分压缩），0x7FFF(32767)为无效值
     private int recordingTime;   // 记录时长 e.g. 3600 :  3600s
     private int dataCrc;         // 文件头部+原始波形和校验
-    private int magic;           // 文件标志 固定值为0xA55A0438
+    private long magic;           // 文件标志 固定值为0xA55A0438
 
     public Er1EcgFile(byte[] bytes) {
         com.lepu.blepro.ble.data.Er1EcgFile data = new com.lepu.blepro.ble.data.Er1EcgFile(bytes);
@@ -49,11 +49,11 @@ public class Er1EcgFile {
         this.dataCrc = dataCrc;
     }
 
-    public int getMagic() {
+    public long getMagic() {
         return magic;
     }
 
-    public void setMagic(int magic) {
+    public void setMagic(long magic) {
         this.magic = magic;
     }
 }

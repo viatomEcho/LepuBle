@@ -163,7 +163,7 @@ class EcnBleInterface(model: Int): BleInterface(model) {
                 rtState.state = data.state.state
                 rtState.duration = data.state.duration
                 rtData.state = rtState
-                rtData.wave = data.wave
+                rtData.wave = data.wave.bytes
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ECN.EventEcnRtData).post(InterfaceEvent(model, rtData))
             }
             EcnBleCmd.START_RT_DATA -> {

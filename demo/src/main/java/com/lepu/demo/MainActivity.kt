@@ -26,7 +26,7 @@ import com.afollestad.materialdialogs.DialogAction
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.blepro.BleServiceHelper
+import com.lepu.blepro.ext.BleServiceHelper
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.ble.data.lew.DeviceInfo
