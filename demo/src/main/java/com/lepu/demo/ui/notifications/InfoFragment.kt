@@ -596,7 +596,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
         when (Constant.BluetoothConfig.currentModel[0]) {
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M, Bluetooth.MODEL_O2M_WPS,
-            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N, Bluetooth.MODEL_CHECKO2,
+            Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
             Bluetooth.MODEL_SLEEPO2, Bluetooth.MODEL_SNOREO2, Bluetooth.MODEL_WEARO2,
             Bluetooth.MODEL_SLEEPU, Bluetooth.MODEL_OXYLINK, Bluetooth.MODEL_KIDSO2,
             Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_OXYRING, Bluetooth.MODEL_BBSM_S1,
@@ -609,6 +609,18 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwVersion}\n" +
                             "${context?.getString(R.string.software_version)}${it.swVersion}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}\nfileList：${it.fileList}"
+                }
+            }
+            Bluetooth.MODEL_CHECKO2 -> {
+                infoViewModel = ViewModelProvider(this).get(OxyViewModel::class.java)
+                (infoViewModel as OxyViewModel).initEvent(this)
+                mainViewModel.oxyInfo.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    var swVersion = it.swVersion.replace(".0", "")
+                    swVersion = "1.$swVersion"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwVersion}\n" +
+                            "${context?.getString(R.string.software_version)}$swVersion\n" +
                             "sn：${it.sn}\ncode：${it.branchCode}\nfileList：${it.fileList}"
                 }
             }
