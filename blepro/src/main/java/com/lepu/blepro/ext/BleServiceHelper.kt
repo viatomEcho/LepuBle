@@ -22,6 +22,7 @@ import com.lepu.blepro.ext.er1.Er1Config
 import com.lepu.blepro.ext.er2.Er2Config
 import com.lepu.blepro.ext.lpbp2w.LpBp2WifiConfig
 import com.lepu.blepro.ext.lpbp2w.LpBp2wConfig
+import com.lepu.blepro.ext.ventilator.WifiConfig
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.observer.BleChangeObserver
 import com.lepu.blepro.utils.LepuBleLog
@@ -3455,7 +3456,7 @@ class BleServiceHelper private constructor() {
         }
     }
     // ventilator
-    fun ventilatorGetBattery(model: Int) {
+    fun ventilatorGetInfo(model: Int) {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
@@ -3463,12 +3464,61 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as VentilatorBleInterface).let {
-                        LepuBleLog.d(tag, "it as VentilatorBleInterface--ventilatorGetBattery")
-                        it.getBattery()
+                        LepuBleLog.d(tag, "it as VentilatorBleInterface--ventilatorGetInfo")
+                        it.getInfo()
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "ventilatorGetBattery current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "ventilatorGetInfo current model $model unsupported!!")
+        }
+    }
+    fun ventilatorFactoryReset(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as VentilatorBleInterface).let {
+                        LepuBleLog.d(tag, "it as VentilatorBleInterface--ventilatorGetInfoventilatorFactoryReset")
+                        it.factoryReset()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "ventilatorFactoryReset current model $model unsupported!!")
+        }
+    }
+    @JvmOverloads
+    fun ventilatorGetFileList(model: Int, recordType: Int = 1, startTime: Long = 0) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as VentilatorBleInterface).let {
+                        LepuBleLog.d(tag, "it as VentilatorBleInterface--ventilatorGetFileList")
+                        it.getFileList(recordType, startTime)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "ventilatorGetFileList current model $model unsupported!!")
+        }
+    }
+    fun ventilatorReadFile(model: Int, fileName: String) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as VentilatorBleInterface).let {
+                        LepuBleLog.d(tag, "it as VentilatorBleInterface--ventilatorReadFile")
+                        it.readFile("", fileName)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "ventilatorReadFile current model $model unsupported!!")
         }
     }
     /**
@@ -3507,38 +3557,6 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.d(tag, "ventilatorDeviceBound current model $model unsupported!!")
-        }
-    }
-    fun ventilatorSetUserInfo(model: Int, userInfo: com.lepu.blepro.ble.data.ventilator.UserInfo) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
-            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
-            Bluetooth.MODEL_LERES -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as VentilatorBleInterface).let {
-                        LepuBleLog.d(tag, "it as VentilatorBleInterface--ventilatorSetUserInfo")
-                        it.setUserInfo(userInfo)
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "ventilatorSetUserInfo current model $model unsupported!!")
-        }
-    }
-    fun ventilatorGetUserInfo(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
-            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
-            Bluetooth.MODEL_LERES -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as VentilatorBleInterface).let {
-                        LepuBleLog.d(tag, "it as VentilatorBleInterface--ventilatorGetUserInfo")
-                        it.getUserInfo()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "ventilatorGetUserInfo current model $model unsupported!!")
         }
     }
     /**
@@ -3601,7 +3619,7 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "ventilatorGetWifiList current model $model unsupported!!")
         }
     }
-    fun ventilatorSetWifiConfig(model: Int, config: Bp2WifiConfig) {
+    fun ventilatorSetWifiConfig(model: Int, config: WifiConfig) {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
@@ -3669,7 +3687,7 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "ventilatorGetSystemSetting current model $model unsupported!!")
         }
     }
-    fun ventilatorSetSystemSetting(model: Int, setting: com.lepu.blepro.ble.data.ventilator.SystemSetting) {
+    fun ventilatorSetSystemSetting(model: Int, setting: com.lepu.blepro.ext.ventilator.SystemSetting) {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
@@ -3701,7 +3719,7 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "ventilatorGetMeasureSetting current model $model unsupported!!")
         }
     }
-    fun ventilatorSetMeasureSetting(model: Int, setting: com.lepu.blepro.ble.data.ventilator.MeasureSetting) {
+    fun ventilatorSetMeasureSetting(model: Int, setting: com.lepu.blepro.ext.ventilator.MeasureSetting) {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
@@ -3749,7 +3767,7 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "ventilatorGetVentilationSetting current model $model unsupported!!")
         }
     }
-    fun ventilatorSetVentilationSetting(model: Int, setting: VentilationSetting) {
+    fun ventilatorSetVentilationSetting(model: Int, setting: com.lepu.blepro.ext.ventilator.VentilationSetting) {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
@@ -3781,7 +3799,7 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "ventilatorGetWarningSetting current model $model unsupported!!")
         }
     }
-    fun ventilatorSetWarningSetting(model: Int, setting: WarningSetting) {
+    fun ventilatorSetWarningSetting(model: Int, setting: com.lepu.blepro.ext.ventilator.WarningSetting) {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
@@ -3827,6 +3845,22 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.d(tag, "ventilatorGetRtState current model $model unsupported!!")
+        }
+    }
+    fun ventilatorGetRtParam(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as VentilatorBleInterface).let {
+                        LepuBleLog.d(tag, "it as VentilatorBleInterface--ventilatorGetRtParam")
+                        it.getRtParam()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "ventilatorGetRtParam current model $model unsupported!!")
         }
     }
     // BP3

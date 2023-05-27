@@ -56,13 +56,13 @@ object VentilatorBleResponse {
             var index = 0
             hwV = trimStr(String(bytes.copyOfRange(index, index+1)))
             index++
-            fwV = "${bytes[index+3]}.${bytes[index+2]}.${bytes[index+1]}.${bytes[index]}"
+            fwV = "${byte2UInt(bytes[index+3])}.${byte2UInt(bytes[index+2])}.${byte2UInt(bytes[index+1])}.${byte2UInt(bytes[index])}"
             index += 4
-            blV = "${bytes[index+3]}.${bytes[index+2]}.${bytes[index+1]}.${bytes[index]}"
+            blV = "${byte2UInt(bytes[index+3])}.${byte2UInt(bytes[index+2])}.${byte2UInt(bytes[index+1])}.${byte2UInt(bytes[index])}"
             index += 4
-            bleV = "${bytes[index+3]}.${bytes[index+2]}.${bytes[index+1]}.${bytes[index]}"
+            bleV = "${byte2UInt(bytes[index+3])}.${byte2UInt(bytes[index+2])}.${byte2UInt(bytes[index+1])}.${byte2UInt(bytes[index])}"
             index += 4
-            algV = "${bytes[index+3]}.${bytes[index+2]}.${bytes[index+1]}.${bytes[index]}"
+            algV = "${byte2UInt(bytes[index+3])}.${byte2UInt(bytes[index+2])}.${byte2UInt(bytes[index+1])}.${byte2UInt(bytes[index])}"
         }
         override fun toString(): String {
             return """

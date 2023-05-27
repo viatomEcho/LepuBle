@@ -97,10 +97,10 @@ class VentilatorViewModel : InfoViewModel() {
                     }, 1000)
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorReset)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorReset)
             .observe(owner) {
                 _reset.value = true
-            }
+            }*/
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorFactoryReset)
             .observe(owner) {
                 _factoryReset.value = true

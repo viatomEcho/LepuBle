@@ -1075,7 +1075,7 @@ class LpBleUtil {
         }
         // Ventilator
         fun ventilatorGetBattery(model: Int) {
-            BleServiceHelper.ventilatorGetBattery(model)
+//            BleServiceHelper.ventilatorGetBattery(model)
         }
         fun ventilatorGetFileList(model: Int, fileType: Int, timestamp: Long) {
 //            BleServiceHelper.getFileList(model, fileType, timestamp)
@@ -1087,10 +1087,10 @@ class LpBleUtil {
             BleServiceHelper.ventilatorDeviceBound(model, bound)
         }
         fun ventilatorSetUserInfo(model: Int, userInfo: com.lepu.blepro.ble.data.ventilator.UserInfo) {
-            BleServiceHelper.ventilatorSetUserInfo(model, userInfo)
+//            BleServiceHelper.ventilatorSetUserInfo(model, userInfo)
         }
         fun ventilatorGetUserInfo(model: Int) {
-            BleServiceHelper.ventilatorGetUserInfo(model)
+//            BleServiceHelper.ventilatorGetUserInfo(model)
         }
         fun ventilatorDoctorModeIn(model: Int, pin: String, timestamp: Long) {
             BleServiceHelper.ventilatorDoctorModeIn(model, pin, timestamp)
@@ -1102,7 +1102,7 @@ class LpBleUtil {
             BleServiceHelper.ventilatorGetWifiList(model)
         }
         fun ventilatorSetWifiConfig(model: Int, config: Bp2WifiConfig) {
-            BleServiceHelper.ventilatorSetWifiConfig(model, config)
+//            BleServiceHelper.ventilatorSetWifiConfig(model, config)
         }
         fun ventilatorGetWifiConfig(model: Int) {
             BleServiceHelper.ventilatorGetWifiConfig(model)
@@ -1114,13 +1114,13 @@ class LpBleUtil {
             BleServiceHelper.ventilatorGetSystemSetting(model)
         }
         fun ventilatorSetSystemSetting(model: Int, setting: com.lepu.blepro.ble.data.ventilator.SystemSetting) {
-            BleServiceHelper.ventilatorSetSystemSetting(model, setting)
+//            BleServiceHelper.ventilatorSetSystemSetting(model, setting)
         }
         fun ventilatorGetMeasureSetting(model: Int) {
             BleServiceHelper.ventilatorGetMeasureSetting(model)
         }
         fun ventilatorSetMeasureSetting(model: Int, setting: com.lepu.blepro.ble.data.ventilator.MeasureSetting) {
-            BleServiceHelper.ventilatorSetMeasureSetting(model, setting)
+//            BleServiceHelper.ventilatorSetMeasureSetting(model, setting)
         }
         fun ventilatorMaskTest(model: Int, start: Boolean) {
             BleServiceHelper.ventilatorMaskTest(model, start)
@@ -1129,13 +1129,13 @@ class LpBleUtil {
             BleServiceHelper.ventilatorGetVentilationSetting(model)
         }
         fun ventilatorSetVentilationSetting(model: Int, setting: VentilationSetting) {
-            BleServiceHelper.ventilatorSetVentilationSetting(model, setting)
+//            BleServiceHelper.ventilatorSetVentilationSetting(model, setting)
         }
         fun ventilatorGetWarningSetting(model: Int) {
             BleServiceHelper.ventilatorGetWarningSetting(model)
         }
         fun ventilatorSetWarningSetting(model: Int, setting: WarningSetting) {
-            BleServiceHelper.ventilatorSetWarningSetting(model, setting)
+//            BleServiceHelper.ventilatorSetWarningSetting(model, setting)
         }
         fun ventilatorVentilationSwitch(model: Int, start: Boolean) {
             BleServiceHelper.ventilatorVentilationSwitch(model, start)

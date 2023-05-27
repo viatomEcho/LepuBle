@@ -1596,7 +1596,7 @@ class VentilatorViewModel : SettingViewModel() {
                 _toast.value = "警告设置成功"
                 LpBleUtil.ventilatorGetWarningSetting(it.model)
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorSetUserInfo)
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorSetUserInfo)
             .observe(owner) {
                 _toast.value = "用户设置成功"
             }
@@ -1604,7 +1604,7 @@ class VentilatorViewModel : SettingViewModel() {
             .observe(owner) {
                 val data = it.data as UserInfo
                 binding.ventilatorLayout.userInfo.text = "$data"
-            }
+            }*/
         LiveEventBus.get<ResponseError>(EventMsgConst.Cmd.EventCmdResponseError)
             .observe(owner) {
                 when (it.type) {
