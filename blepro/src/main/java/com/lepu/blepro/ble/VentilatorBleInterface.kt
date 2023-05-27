@@ -1199,9 +1199,9 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
     }
     // 获取通气控制参数
     fun getVentilationSetting() {
-        if (isEncryptMode) {
+//        if (isEncryptMode) {
             sendCmd(VentilatorBleCmd.getVentilationSetting(aesEncryptKey))
-        }
+//        }
     }
     // 配置通气控制参数
     fun setVentilationSetting(data: com.lepu.blepro.ext.ventilator.VentilationSetting) {
@@ -1246,9 +1246,9 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
     }
     // 获取报警提示参数
     fun getWarningSetting() {
-        if (isEncryptMode) {
+//        if (isEncryptMode) {
             sendCmd(VentilatorBleCmd.getWarningSetting(aesEncryptKey))
-        }
+//        }
     }
     // 配置报警提示参数
     fun setWarningSetting(data: com.lepu.blepro.ext.ventilator.WarningSetting) {
