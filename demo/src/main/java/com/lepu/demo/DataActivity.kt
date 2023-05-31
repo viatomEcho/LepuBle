@@ -97,7 +97,7 @@ class DataActivity : AppCompatActivity() {
                         "漏气量：${if (file.leak[4] < 0 || file.leak[4] > 120) "**" else file.leak[4]}L/min\n" +
                         "分钟通气量：${if (file.mv[3] < 0 || file.mv[3] > 60) "**" else file.mv[3]}L/min\n" +
                         "呼吸频率：${if (file.rr[3] < 0 || file.rr[3] > 60) "**" else file.rr[3]}bpm\n" +
-                        "吸气时间：${if (file.ti[3] < 0 || file.ti[3] > 40) "--" else file.ti[3].div(10f)}s\n" +
+                        "吸气时间：${if (file.ti[3] < 0 || file.ti[3] > 4) "--" else file.ti[3]}s\n" +
                         "吸呼比：${if (file.ie[3] < 0.02 || file.ie[3] > 3) "--" else {
                             if (file.ie[3] < 1) {
                                 "1:" + String.format("%.1f", 1f/file.ie[3])
