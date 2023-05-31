@@ -751,6 +751,7 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
                         recordList.size = data.size
                         for (record in data.list) {
                             val r = RecordList().Record()
+                            r.recordName = record.recordName
                             r.measureTime = record.measureTime
                             r.updateTime = record.updateTime
                             recordList.list.add(r)

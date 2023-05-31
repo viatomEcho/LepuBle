@@ -5,9 +5,8 @@ import java.util.Arrays;
 public class StatisticsFile {
 
     private String fileName;
-    private int fileVersion;  //
+    private int fileVersion;
     private int fileType;
-    // reserved 8
     private int duration;  // 记录时长s
     private int usageDays;  // 使用设备的天数(0-365)
     private int moreThan4hDays;  // 每天使用时间大于4小时的天数(0-365)
@@ -23,21 +22,21 @@ public class StatisticsFile {
     private int sniCount;  // 鼾声次数
     private int pbCount;  // 周期性呼吸次数
     private int takeOffCount;  // 摘下次数
-    private int llTime;  // 大漏气量时间
+    private int llTime;  // 大漏气量时间s
     // reserved 4
     // 监测参数统计项
-    private int[] pressure;  // 实时压
-    private int[] ipap;      // 吸气压力
-    private int[] epap;      // 呼气压力
-    private int[] vt;        // 潮气量
-    private int[] mv;        // 分钟通气量
-    private int[] leak;      // 漏气量
-    private int[] rr;        // 呼吸率
-    private int[] ti;        // 吸气时间
-    private int[] ie;        // 呼吸比
-    private int[] spo2;      // 血氧
-    private int[] pr;        // 脉率
-    private int[] hr;        // 心率
+    private float[] pressure;  // 实时压(0~40cmH2O),单位0.1cmH20,e.g.10:1cmH2O[0,400]
+    private float[] ipap;      // 吸气压力(0~40cmH2O),单位0.1cmH20,e.g.10:1cmH2O[0,400]
+    private float[] epap;      // 呼气压力(0~40cmH2O),单位0.1cmH20,e.g.10:1cmH2O[0,400]
+    private int[] vt;        // 潮气量(0~3000mL),单位1mL,e.g.10:10mL[0,3000]
+    private float[] mv;        // 分钟通气量(0~60L/min),单位0.1L/min,e.g.10:1L/min[0,600]
+    private float[] leak;      // 漏气量(0~120L/min),单位0.1L/min,e.g.10:1L/min[0,1200]
+    private int[] rr;        // 呼吸率(0~60),单位1bpm,e.g.10:10bpm[0,60]
+    private float[] ti;        // 吸气时间(0.1-4s),单位0.1s,e.g.10:1s[1,40]
+    private float[] ie;        // 呼吸比(1:50.0-3.0:1),单位0.0001,[200,30000]
+    private int[] spo2;      // 血氧(70-100%),单位1%,e.g.10:10%[70,100]
+    private int[] pr;        // 脉率(30-250bpm),单位1bpm,e.g.10:10bpm[30,250]
+    private int[] hr;        // 心率(30-250bpm),单位1bpm,e.g.10:10bpm[30,250]
 
     public String getFileName() {
         return fileName;
@@ -183,27 +182,27 @@ public class StatisticsFile {
         this.llTime = llTime;
     }
 
-    public int[] getPressure() {
+    public float[] getPressure() {
         return pressure;
     }
 
-    public void setPressure(int[] pressure) {
+    public void setPressure(float[] pressure) {
         this.pressure = pressure;
     }
 
-    public int[] getIpap() {
+    public float[] getIpap() {
         return ipap;
     }
 
-    public void setIpap(int[] ipap) {
+    public void setIpap(float[] ipap) {
         this.ipap = ipap;
     }
 
-    public int[] getEpap() {
+    public float[] getEpap() {
         return epap;
     }
 
-    public void setEpap(int[] epap) {
+    public void setEpap(float[] epap) {
         this.epap = epap;
     }
 
@@ -215,19 +214,19 @@ public class StatisticsFile {
         this.vt = vt;
     }
 
-    public int[] getMv() {
+    public float[] getMv() {
         return mv;
     }
 
-    public void setMv(int[] mv) {
+    public void setMv(float[] mv) {
         this.mv = mv;
     }
 
-    public int[] getLeak() {
+    public float[] getLeak() {
         return leak;
     }
 
-    public void setLeak(int[] leak) {
+    public void setLeak(float[] leak) {
         this.leak = leak;
     }
 
@@ -239,19 +238,19 @@ public class StatisticsFile {
         this.rr = rr;
     }
 
-    public int[] getTi() {
+    public float[] getTi() {
         return ti;
     }
 
-    public void setTi(int[] ti) {
+    public void setTi(float[] ti) {
         this.ti = ti;
     }
 
-    public int[] getIe() {
+    public float[] getIe() {
         return ie;
     }
 
-    public void setIe(int[] ie) {
+    public void setIe(float[] ie) {
         this.ie = ie;
     }
 

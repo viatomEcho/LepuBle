@@ -51,8 +51,9 @@ public class RecordList {
     }
 
     public class Record {
-        private long measureTime;  // 记录时间，对应出文件名然后下载s
-        private long updateTime;   // 此记录更新时间s
+        private String recordName;  // 文件名
+        private long measureTime;   // 记录时间，对应出文件名然后下载s
+        private long updateTime;    // 此记录更新时间s
 
         public long getMeasureTime() {
             return measureTime;
@@ -70,10 +71,19 @@ public class RecordList {
             this.updateTime = updateTime;
         }
 
+        public String getRecordName() {
+            return recordName;
+        }
+
+        public void setRecordName(String recordName) {
+            this.recordName = recordName;
+        }
+
         @Override
         public String toString() {
             return "Record{" +
-                    "measureTime=" + measureTime +
+                    "recordName='" + recordName + '\'' +
+                    ", measureTime=" + measureTime +
                     ", updateTime=" + updateTime +
                     '}';
         }
