@@ -189,7 +189,7 @@ class VentilationSetting() {
     }
     // 通气控制：呼吸频率
     class RespiratoryRate() {
-        var rate = 5  // 呼吸频率。范围：5-30。 单位/min bpm
+        var rate = 5  // 呼吸频率。范围：5-30。 单位 bpm
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0
