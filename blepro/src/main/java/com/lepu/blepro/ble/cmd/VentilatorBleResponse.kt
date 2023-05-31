@@ -118,7 +118,7 @@ object VentilatorBleResponse {
             size = toUInt(bytes.copyOfRange(index, index+2))
             index += 2
             for (i in 0 until size) {
-                list.add(Record(bytes.copyOfRange(index, index+10)))
+                list.add(Record(bytes.copyOfRange(index, index+10), type))
                 index += 10
             }
         }
@@ -133,7 +133,8 @@ object VentilatorBleResponse {
         }
     }
     @ExperimentalUnsignedTypes
-    class Record(val bytes: ByteArray) {
+    class Record(val bytes: ByteArray, val type: Int) {
+        var recordName: String
         var measureTime: Long  // 记录时间，对应出文件名然后下载s
         var updateTime: Long   // 此记录更新时间s
         // reserved 2
@@ -141,12 +142,18 @@ object VentilatorBleResponse {
             var index = 0
             val rawOffset = DateUtil.getTimeZoneOffset().div(1000)
             measureTime = toLong(bytes.copyOfRange(index, index+4)) - rawOffset
+            recordName = when (type) {
+                1 -> "${DateUtil.stringFromDate(Date(measureTime*1000), "yyyyMMdd")}_day.stat"
+                2 -> "${DateUtil.stringFromDate(Date(measureTime*1000), "yyyyMMdd_HHmmss")}.stat"
+                else -> ""
+            }
             index += 4
             updateTime = toLong(bytes.copyOfRange(index, index+4)) - rawOffset
         }
         override fun toString(): String {
             return """
                 Record : 
+                recordName : $recordName
                 measureTime : ${DateUtil.stringFromDate(Date(measureTime.times(1000)), "yyyyMMdd:HHmmss")}
                 updateTime : ${DateUtil.stringFromDate(Date(updateTime.times(1000)), "yyyyMMdd:HHmmss")}
             """.trimIndent()

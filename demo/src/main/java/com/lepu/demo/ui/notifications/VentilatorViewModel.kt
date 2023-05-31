@@ -1,6 +1,7 @@
 package com.lepu.demo.ui.notifications
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
@@ -22,11 +23,7 @@ class VentilatorViewModel : InfoViewModel() {
                 val data = it.data as VentilatorBleResponse.RecordList
                 val names = arrayListOf<String>()
                 for (file in data.list) {
-                    if (data.type == 1) {
-                        names.add("${DateUtil.stringFromDate(Date(file.measureTime*1000), "yyyyMMdd")}_day.stat")
-                    } else if (data.type == 2) {
-                        names.add("${DateUtil.stringFromDate(Date(file.measureTime*1000), "yyyyMMdd_HHmmss")}.stat")
-                    }
+                    names.add(file.recordName)
                 }
                 _fileNames.value = names
                 _info.value = names.toString()
@@ -108,7 +105,7 @@ class VentilatorViewModel : InfoViewModel() {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetVersionInfo)
             .observe(owner) {
                 val data = it.data as VentilatorBleResponse.VersionInfo
-                _info.value = _info.value + "\n引导版本：${data.blV}，算法版本：${data.algV}\n蓝牙驱动版本：${data.bleV}"
+                Log.d("VentilatorViewModel", "VersionInfo : $data")
             }
     }
 

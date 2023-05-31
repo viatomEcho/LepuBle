@@ -2091,7 +2091,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER3.EventEr3RtData)
             .observe(this) {
                 val data = it.data as Er3BleResponse.RtData
-                Er3DataController.receive(data.wave.waveMvs)
+                Er3DataController.receive(data.wave.waveMvs, data.param.isLeadOffI, data.param.isLeadOffII)
                 Log.d("Er3Test", "data.wave ${data.wave}")
                 binding.er3TempInfo.text = "${context?.getString(R.string.software_version)}${mainViewModel._er1Info.value?.fwV}\n" +
                         "${context?.getString(R.string.temp)}${data.param.temp} ℃"
@@ -2150,7 +2150,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                                 else -> context?.getString(R.string.lead_type_unknown)
                             }
                         }\n" +
-                        "${context?.getString(R.string.lead_sn)}${context?.getString(R.string.lead_sn)}${data.param.leadSn}\n" +
+                        "${context?.getString(R.string.lead_sn)}${data.param.leadSn}\n" +
                         "${context?.getString(R.string.lead_I_lead_off)}${data.param.isLeadOffI}\n" +
                         "${context?.getString(R.string.lead_II_lead_off)}${data.param.isLeadOffII}\n" +
                         "${context?.getString(R.string.lead_III_lead_off)}${data.param.isLeadOffIII}\n" +
@@ -2169,7 +2169,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Lepod.EventLepodRtData)
             .observe(this) {
                 val data = it.data as LepodBleResponse.RtData
-                Er3DataController.receive(data.wave.waveMvs)
+                Er3DataController.receive(data.wave.waveMvs, data.param.isLeadOffLA, data.param.isLeadOffLL)
                 Log.d("LepodTest", "data.wave ${data.wave}")
                 mainViewModel._battery.value = "${data.param.battery} %"
                 binding.deviceInfo.text = "${context?.getString(R.string.hr)}${data.param.hr} bpm\n" +
@@ -2405,7 +2405,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "${context?.getString(R.string.leak)}${if (data.leak < 0 || data.leak > 120) "**" else data.leak} L/min\n" +
                         "${context?.getString(R.string.rr)}${if (data.rr < 0 || data.rr > 60) "**" else data.rr} bpm\n" +
                         "${context?.getString(R.string.ti)}${if (data.ti < 0.1 || data.ti > 4) "--" else data.ti} s\n" +
-                        "${context?.getString(R.string.ie)}\$${if (data.ie < 0.02 || data.ie > 3) "--" else {
+                        "${context?.getString(R.string.ie)}${if (data.ie < 0.02 || data.ie > 3) "--" else {
                             if (data.ie < 1) {
                                 "1:" + String.format("%.1f", 1f/data.ie)
                             } else {

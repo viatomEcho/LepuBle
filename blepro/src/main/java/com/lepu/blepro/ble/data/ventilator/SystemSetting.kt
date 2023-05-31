@@ -119,7 +119,7 @@ class SystemSetting() {
         }
     }
     class VolumeSetting() {
-        var volume = 30  // 音量, 0-100%，步进1%；默认30%
+        var volume = 30  // 音量, 0-100%，步进5%；默认30%
         // reserved 3
         constructor(bytes: ByteArray) : this() {
             var index = 0
