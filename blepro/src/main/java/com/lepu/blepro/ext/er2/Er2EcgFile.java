@@ -1,5 +1,7 @@
 package com.lepu.blepro.ext.er2;
 
+import com.lepu.blepro.ble.data.Er1EcgFile;
+
 public class Er2EcgFile {
 
     private int fileVersion;     // 文件版本 e.g.  0x01 :  V1
@@ -9,7 +11,7 @@ public class Er2EcgFile {
     private long magic;           // 文件标志 固定值为0xA55A0438
 
     public Er2EcgFile(byte[] bytes) {
-        com.lepu.blepro.ble.data.Er1EcgFile data = new com.lepu.blepro.ble.data.Er1EcgFile(bytes);
+        Er1EcgFile data = new Er1EcgFile(bytes);
         fileVersion = data.getFileVersion();
         waveData = data.getWaveData();
         recordingTime = data.getRecordingTime();

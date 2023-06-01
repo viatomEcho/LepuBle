@@ -1,6 +1,9 @@
 package com.lepu.blepro.ext.lpbp2w;
 
+import com.lepu.blepro.ble.data.LeBp2wEcgFile;
+
 public class EcgFile {
+    private byte[] bytes;
     private String fileName;
     private int fileVersion;
     private int fileType;
@@ -9,6 +12,29 @@ public class EcgFile {
     private short[] waveShortData;
     private float[] waveFloatData;
     private int duration;
+
+    public EcgFile() {
+
+    }
+    public EcgFile(byte[] bytes, String fileName) {
+        this.bytes = bytes;
+        this.fileName = fileName;
+        LeBp2wEcgFile data = new LeBp2wEcgFile(fileName, bytes, "");
+        fileVersion = data.getFileVersion();
+        fileType = data.getFileType();
+        startTime = data.getTimestamp();
+        waveData = data.getWaveData();
+        waveShortData = data.getWaveShortData();
+        waveFloatData = data.getWaveFloatData();
+        duration = data.getDuration();
+    }
+    public byte[] getBytes() {
+        return bytes;
+    }
+
+    public void setBytes(byte[] bytes) {
+        this.bytes = bytes;
+    }
 
     public String getFileName() {
         return fileName;

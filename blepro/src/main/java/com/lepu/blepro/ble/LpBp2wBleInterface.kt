@@ -315,6 +315,7 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                             } else {
                                 LeBp2wEcgFile(fileName, it, device.name)
                             }
+                            ecgFile.bytes = data.content
                             ecgFile.fileName = data.fileName
                             ecgFile.fileVersion = data.fileVersion
                             ecgFile.fileType = data.fileType

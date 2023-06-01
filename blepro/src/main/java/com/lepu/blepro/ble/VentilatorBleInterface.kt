@@ -845,6 +845,7 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorReadFileError).post(InterfaceEvent(model, 238))
                         } else {
                             val data = StatisticsFile(fileName, fileContent)
+                            statisticsFile.bytes = data.bytes
                             statisticsFile.fileName = data.fileName
                             statisticsFile.fileVersion = data.fileVersion
                             statisticsFile.fileType = data.fileType
@@ -1085,9 +1086,9 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
     }
     // 退出医生模式
     fun doctorModeOut() {
-        if (isEncryptMode) {
+//        if (isEncryptMode) {
             sendCmd(VentilatorBleCmd.doctorModeOut(aesEncryptKey))
-        }
+//        }
     }
     // 搜索WiFi列表
     fun getWifiList(deviceNum: Int) {

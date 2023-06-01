@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 public class StatisticsFile {
 
+    private byte[] bytes;
     private String fileName;
     private int fileVersion;
     private int fileType;
@@ -37,6 +38,52 @@ public class StatisticsFile {
     private int[] spo2;      // 血氧(70-100%),单位1%,e.g.10:10%[70,100]
     private int[] pr;        // 脉率(30-250bpm),单位1bpm,e.g.10:10bpm[30,250]
     private int[] hr;        // 心率(30-250bpm),单位1bpm,e.g.10:10bpm[30,250]
+
+    public StatisticsFile() {
+        
+    }
+    public StatisticsFile(byte[] bytes, String fileName) {
+        this.bytes = bytes;
+        this.fileName = fileName;
+        com.lepu.blepro.ble.data.ventilator.StatisticsFile data = new com.lepu.blepro.ble.data.ventilator.StatisticsFile(fileName, bytes);
+        fileVersion = data.getFileVersion();
+        fileType = data.getFileType();
+        duration = data.getDuration();
+        usageDays = data.getUsageDays();
+        moreThan4hDays = data.getMoreThan4hDays();
+        meanSecond = data.getMeanSecond();
+        spont = data.getSpont();
+        ahiCount = data.getAhiCount();
+        aiCount = data.getAiCount();
+        hiCount = data.getHiCount();
+        oaiCount = data.getOaiCount();
+        caiCount = data.getCaiCount();
+        rearCount = data.getRearCount();
+        sniCount = data.getSniCount();
+        pbCount = data.getPbCount();
+        takeOffCount = data.getTakeOffCount();
+        llTime = data.getLlTime();
+        pressure = data.getPressure();
+        ipap = data.getIpap();
+        epap = data.getEpap();
+        vt = data.getVt();
+        mv = data.getMv();
+        leak = data.getLeak();
+        rr = data.getRr();
+        ti = data.getTi();
+        ie = data.getIe();
+        spo2 = data.getSpo2();
+        pr = data.getPr();
+        hr = data.getHr();
+    }
+
+    public byte[] getBytes() {
+        return bytes;
+    }
+
+    public void setBytes(byte[] bytes) {
+        this.bytes = bytes;
+    }
 
     public String getFileName() {
         return fileName;
