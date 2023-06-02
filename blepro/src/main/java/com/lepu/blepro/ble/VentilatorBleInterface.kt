@@ -655,6 +655,49 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
                             exhaleSensitive.sentive = data.exhaleSensitive.sentive
                             ventilationSetting.exhaleSensitive = exhaleSensitive
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetVentilationSetting).post(InterfaceEvent(model, ventilationSetting))
+                        } else {
+                            if (response.content.size < 10) {
+                                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetVentilationSettingError).post(InterfaceEvent(model, 238))
+                                LepuBleLog.d(tag, "model:$model,GET_VENTILATION_SETTING => response.content.size < 10, response.content: ${bytesToHex(response.content)}")
+                                return
+                            }
+                            LepuBleLog.d(tag, "model:$model,GET_VENTILATION_SETTING => success, response.content: ${bytesToHex(response.content)}")
+                            val data = VentilationSetting(response.content)
+                            LepuBleLog.d(tag, "model:$model, => success, data: $data")
+                            val ventilationMode = com.lepu.blepro.ext.ventilator.VentilationSetting().VentilationMode()
+                            ventilationMode.mode = data.ventilationMode.mode
+                            ventilationSetting.ventilationMode = ventilationMode
+                            val cpapPressure = com.lepu.blepro.ext.ventilator.VentilationSetting().CpapPressure()
+                            cpapPressure.pressure = data.cpapPressure.pressure
+                            ventilationSetting.cpapPressure = cpapPressure
+                            val apapPressureMax = com.lepu.blepro.ext.ventilator.VentilationSetting().ApapPressureMax()
+                            apapPressureMax.max = data.apapPressureMax.max
+                            ventilationSetting.apapPressureMax = apapPressureMax
+                            val apapPressureMin = com.lepu.blepro.ext.ventilator.VentilationSetting().ApapPressureMin()
+                            apapPressureMin.min = data.apapPressureMin.min
+                            ventilationSetting.apapPressureMin = apapPressureMin
+                            val pressureInhale = com.lepu.blepro.ext.ventilator.VentilationSetting().PressureInhale()
+                            pressureInhale.inhale = data.pressureInhale.inhale
+                            ventilationSetting.pressureInhale = pressureInhale
+                            val pressureExhale = com.lepu.blepro.ext.ventilator.VentilationSetting().PressureExhale()
+                            pressureExhale.exhale = data.pressureExhale.exhale
+                            ventilationSetting.pressureExhale = pressureExhale
+                            val inhaleDuration = com.lepu.blepro.ext.ventilator.VentilationSetting().InhaleDuration()
+                            inhaleDuration.duration = data.inhaleDuration.duration
+                            ventilationSetting.inhaleDuration = inhaleDuration
+                            val respiratoryRate = com.lepu.blepro.ext.ventilator.VentilationSetting().RespiratoryRate()
+                            respiratoryRate.rate = data.respiratoryRate.rate
+                            ventilationSetting.respiratoryRate = respiratoryRate
+                            val pressureRaiseDuration = com.lepu.blepro.ext.ventilator.VentilationSetting().PressureRaiseDuration()
+                            pressureRaiseDuration.duration = data.pressureRaiseDuration.duration
+                            ventilationSetting.pressureRaiseDuration = pressureRaiseDuration
+                            val inhaleSensitive = com.lepu.blepro.ext.ventilator.VentilationSetting().InhaleSensitive()
+                            inhaleSensitive.sentive = data.inhaleSensitive.sentive
+                            ventilationSetting.inhaleSensitive = inhaleSensitive
+                            val exhaleSensitive = com.lepu.blepro.ext.ventilator.VentilationSetting().ExhaleSensitive()
+                            exhaleSensitive.sentive = data.exhaleSensitive.sentive
+                            ventilationSetting.exhaleSensitive = exhaleSensitive
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetVentilationSetting).post(InterfaceEvent(model, ventilationSetting))
                         }
                     }
                 }
@@ -679,6 +722,42 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
                             }
                             LepuBleLog.d(tag, "model:$model,GET_WARNING_SETTING => success, decrypt: ${bytesToHex(decrypt)}")
                             val data = WarningSetting(decrypt)
+                            val warningApnea = com.lepu.blepro.ext.ventilator.WarningSetting().WarningApnea()
+                            warningApnea.apnea = data.warningApnea.apnea
+                            warningSetting.warningApnea = warningApnea
+                            val warningLeak = com.lepu.blepro.ext.ventilator.WarningSetting().WarningLeak()
+                            warningLeak.high = data.warningLeak.high
+                            warningSetting.warningLeak = warningLeak
+                            val warningVt = com.lepu.blepro.ext.ventilator.WarningSetting().WarningVt()
+                            warningVt.low = data.warningVt.low
+                            warningSetting.warningVt = warningVt
+                            val warningVentilation = com.lepu.blepro.ext.ventilator.WarningSetting().WarningVentilation()
+                            warningVentilation.low = data.warningVentilation.low
+                            warningSetting.warningVentilation = warningVentilation
+                            val warningRrHigh = com.lepu.blepro.ext.ventilator.WarningSetting().WarningRrHigh()
+                            warningRrHigh.high = data.warningRrHigh.high
+                            warningSetting.warningRrHigh = warningRrHigh
+                            val warningRrLow = com.lepu.blepro.ext.ventilator.WarningSetting().WarningRrLow()
+                            warningRrLow.low = data.warningRrLow.low
+                            warningSetting.warningRrLow = warningRrLow
+                            val warningSpo2Low = com.lepu.blepro.ext.ventilator.WarningSetting().WarningSpo2Low()
+                            warningSpo2Low.low = data.warningSpo2Low.low
+                            warningSetting.warningSpo2Low = warningSpo2Low
+                            val warningHrHigh = com.lepu.blepro.ext.ventilator.WarningSetting().WarningHrHigh()
+                            warningHrHigh.high = data.warningHrHigh.high
+                            warningSetting.warningHrHigh = warningHrHigh
+                            val warningHrLow = com.lepu.blepro.ext.ventilator.WarningSetting().WarningHrLow()
+                            warningHrLow.low = data.warningHrLow.low
+                            warningSetting.warningHrLow = warningHrLow
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetWarningSetting).post(InterfaceEvent(model, warningSetting))
+                        } else {
+                            if (response.content.size < 10) {
+                                LepuBleLog.d(tag, "model:$model,GET_WARNING_SETTING => response.content.size < 10, response.content: ${bytesToHex(response.content)}")
+                                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetWarningSettingError).post(InterfaceEvent(model, 238))
+                                return
+                            }
+                            LepuBleLog.d(tag, "model:$model,GET_WARNING_SETTING => success, response.content: ${bytesToHex(response.content)}")
+                            val data = WarningSetting(response.content)
                             val warningApnea = com.lepu.blepro.ext.ventilator.WarningSetting().WarningApnea()
                             warningApnea.apnea = data.warningApnea.apnea
                             warningSetting.warningApnea = warningApnea
