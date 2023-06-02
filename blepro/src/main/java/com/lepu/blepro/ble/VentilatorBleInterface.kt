@@ -418,6 +418,15 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
                         val data = VentilationSetting(decrypt)
                         LepuBleLog.d(tag, "model:$model, => success, data: $data")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetVentilationSetting).post(InterfaceEvent(model, data))
+                    } else {
+                        if (response.content.size < 10) {
+                            LepuBleLog.d(tag, "model:$model,GET_VENTILATION_SETTING => response.content.size < 10, response.content: ${bytesToHex(response.content)}")
+                            return
+                        }
+                        LepuBleLog.d(tag, "model:$model,GET_VENTILATION_SETTING => success, response.content: ${bytesToHex(response.content)}")
+                        val data = VentilationSetting(response.content)
+                        LepuBleLog.d(tag, "model:$model, => success, data: $data")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetVentilationSetting).post(InterfaceEvent(model, data))
                     }
                 }
                 VentilatorBleCmd.SET_VENTILATION_SETTING -> {
@@ -436,6 +445,14 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
                         }
                         LepuBleLog.d(tag, "model:$model,GET_WARNING_SETTING => success, decrypt: ${bytesToHex(decrypt)}")
                         val data = WarningSetting(decrypt)
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetWarningSetting).post(InterfaceEvent(model, data))
+                    } else {
+                        if (response.content.size < 10) {
+                            LepuBleLog.d(tag, "model:$model,GET_WARNING_SETTING => response.content.size < 10, decrypt: ${bytesToHex(response.content)}")
+                            return
+                        }
+                        LepuBleLog.d(tag, "model:$model,GET_WARNING_SETTING => success, response.content: ${bytesToHex(response.content)}")
+                        val data = WarningSetting(response.content)
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetWarningSetting).post(InterfaceEvent(model, data))
                     }
                 }
@@ -708,9 +725,9 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
     }
     // 退出医生模式
     fun doctorModeOut() {
-        if (isEncryptMode) {
+//        if (isEncryptMode) {
             sendCmd(VentilatorBleCmd.doctorModeOut(aesEncryptKey))
-        }
+//        }
     }
     // 搜索WiFi列表
     fun getWifiList(deviceNum: Int) {
@@ -750,9 +767,9 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
     }
     // 获取通气控制参数
     fun getVentilationSetting() {
-        if (isEncryptMode) {
+//        if (isEncryptMode) {
             sendCmd(VentilatorBleCmd.getVentilationSetting(aesEncryptKey))
-        }
+//        }
     }
     // 配置通气控制参数
     fun setVentilationSetting(data: VentilationSetting) {
@@ -762,9 +779,9 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
     }
     // 获取报警提示参数
     fun getWarningSetting() {
-        if (isEncryptMode) {
+//        if (isEncryptMode) {
             sendCmd(VentilatorBleCmd.getWarningSetting(aesEncryptKey))
-        }
+//        }
     }
     // 配置报警提示参数
     fun setWarningSetting(data: WarningSetting) {
