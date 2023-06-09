@@ -76,8 +76,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         super.onViewCreated(view, savedInstanceState)
         init()
 //        val data = OxyData()
-//        data.fileName = "20230507231015"
-//        data.oxyBleFile = OxyBleFile(FileUtil.readFileToByteArray(context, "/o2/20230507231015.dat"))
+//        data.fileName = "uid-25468-date-20230608080558-source-O2Ring 3094"
+//        data.oxyBleFile = OxyBleFile(FileUtil.readFileToByteArray(context, "/o2/uid-25468-date-20230608080558-source-O2Ring 3094.dat"))
 //        sleepAlg(data)
 //        testEr3()
 //        testEr3Decompress()
@@ -332,7 +332,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         val pass = trimStr(password.text.toString())
                         val addr = trimStr(serverAddr.text.toString())
                         val port = trimStr(serverPort.text.toString())
-                        if (pass.isNullOrEmpty() || addr.isNullOrEmpty() || port.isNullOrEmpty()) {
+                        if (/*pass.isNullOrEmpty() || */addr.isNullOrEmpty() || port.isNullOrEmpty()) {
                             Toast.makeText(context, context?.getString(R.string.input_tips), Toast.LENGTH_SHORT).show()
                             return@setOnClickListener
                         } else {
@@ -357,10 +357,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     serverPort.visibility = View.GONE
                     sure.setOnClickListener { it1 ->
                         val pass = trimStr(password.text.toString())
-                        if (pass.isNullOrEmpty()) {
-                            Toast.makeText(context, context?.getString(R.string.input_tips), Toast.LENGTH_SHORT).show()
-                            return@setOnClickListener
-                        } else {
+//                        if (pass.isNullOrEmpty()) {
+//                            Toast.makeText(context, context?.getString(R.string.input_tips), Toast.LENGTH_SHORT).show()
+//                            return@setOnClickListener
+//                        } else {
                             wifiConfig.option = 3
                             it.pwd = pass
                             wifiConfig.wifi = it
@@ -379,7 +379,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             popupWindow?.dismiss()
                             mAlertDialogCanCancel?.setMessage(context?.getString(R.string.handling))
                             mAlertDialogCanCancel?.show()
-                        }
+//                        }
                     }
                 }
                 cancel.setOnClickListener {

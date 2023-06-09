@@ -108,6 +108,10 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                 LpBleUtil.reconnectByMac(currentModel[0], it1.deviceMacAddress)
             }
         }
+        binding.encrypt.isChecked = Constant.BluetoothConfig.isEncrypt
+        binding.encrypt.setOnCheckedChangeListener { buttonView, isChecked ->
+            Constant.BluetoothConfig.isEncrypt = isChecked
+        }
         binding.needPair.isChecked = Constant.BluetoothConfig.needPair
         binding.needPair.setOnCheckedChangeListener { buttonView, isChecked ->
             if (Constant.BluetoothConfig.splitType >= 10) {

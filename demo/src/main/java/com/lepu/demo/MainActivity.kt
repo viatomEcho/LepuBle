@@ -263,7 +263,11 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     || it == Bluetooth.MODEL_R11
                     || it == Bluetooth.MODEL_R10
                     || it == Bluetooth.MODEL_LERES) {
-                    LpBleUtil.ventilatorEncrypt(it, "0001")
+                    if (Constant.BluetoothConfig.isEncrypt) {
+                        LpBleUtil.ventilatorEncrypt(it, "0001")
+                    } else {
+                        LpBleUtil.setTime(it)
+                    }
                 } else {
                     LpBleUtil.getInfo(it)
                 }
