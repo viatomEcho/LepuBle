@@ -3,9 +3,12 @@ package com.lepu.demo
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.PendingIntent
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
+import android.hardware.usb.UsbDevice
+import android.hardware.usb.UsbManager
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
@@ -105,8 +108,24 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     Toast.makeText(this, getString(R.string.cannot_upgrade), Toast.LENGTH_SHORT).show()
                 }
             }
+            R.id.usb_file -> {
+                usbPermission()
+            }
         }
         return true
+    }
+
+    private val ACTION_USB_PERMISSION = "action.usb.permission"
+    private fun usbPermission() {
+        val usbManager = getSystemService(USB_SERVICE) as UsbManager
+        val usbDevice = intent.getParcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
+        val device = usbManager.deviceList.values.toList()[0]
+        if (usbDevice != null && usbManager.hasPermission(usbDevice)) {
+
+        } else {
+            val pendingIntent = PendingIntent.getBroadcast(this, 0, Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE)
+            usbManager.requestPermission(device, pendingIntent)
+        }
     }
 
     /**

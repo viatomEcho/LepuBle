@@ -81,6 +81,17 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 //        sleepAlg(data)
 //        testEr3()
 //        testEr3Decompress()
+
+        // 画心电图
+//        val data = FileUtil.readFileToString(context, "1.txt").split(",")
+//        val shortData = mutableListOf<Short>()
+//        for (d in data) {
+//            shortData.add(d.toShort())
+//        }
+//        val temp = getEcgData(0, "导联 aVF", byteArrayOf(0), shortData.toShortArray(), 0)
+//        ecgList.add(temp)
+//        ecgAdapter.setNewInstance(ecgList)
+//        ecgAdapter.notifyDataSetChanged()
     }
 
     private fun testEr3Decompress() {
@@ -1076,7 +1087,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             if (((w.state == 0) && (it.wifi.ssid.isNotEmpty())) || w.state == 1) {
                                 handler.postDelayed({
                                     LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
-                                }, 1000)
+                                }, 3000)
                             } else {
                                 mAlertDialogCanCancel?.dismiss()
                             }

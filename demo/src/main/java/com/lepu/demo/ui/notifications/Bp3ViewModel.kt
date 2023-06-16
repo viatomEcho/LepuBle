@@ -7,6 +7,7 @@ import com.lepu.blepro.ble.cmd.ResponseError
 import com.lepu.blepro.ble.data.Bp2Server
 import com.lepu.blepro.ble.data.Bp2WifiConfig
 import com.lepu.blepro.ble.data.Bp2WifiDevice
+import com.lepu.blepro.ble.data.KtBleFileList
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.demo.ble.LpBleUtil
@@ -37,7 +38,7 @@ class Bp3ViewModel : InfoViewModel() {
                     Bp3BleCmd.GET_WIFI_LIST -> {
                         handler.postDelayed({
                             LpBleUtil.bp2GetWifiDevice(it.model)
-                        }, 1000)
+                        }, 3000)
                     }
                     Bp3BleCmd.GET_WIFI_CONFIG -> {
                         noWifi.value = true
@@ -50,13 +51,23 @@ class Bp3ViewModel : InfoViewModel() {
                 if (data) {
                     handler.postDelayed({
                         LpBleUtil.bp2GetWifiConfig(it.model)
-                    }, 1000)
+                    }, 3000)
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3GetWifiConfig)
             .observe(owner) {
                 val data = it.data as Bp2WifiConfig
                 _wifiConfig.value = data
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3GetFileList)
+            .observe(owner) {
+                val data = it.data as KtBleFileList
+                val names = arrayListOf<String>()
+                for (fileName in data.fileNameList) {
+                    names.add(fileName)
+                }
+                _fileNames.value = names
+                _info.value = names.toString()
             }
     }
 

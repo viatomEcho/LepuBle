@@ -10,9 +10,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.Bp3BleCmd
 import com.lepu.blepro.ble.cmd.LpBleCmd
 import com.lepu.blepro.ble.cmd.ResponseError
-import com.lepu.blepro.ble.data.FactoryConfig
-import com.lepu.blepro.ble.data.Bp2Config
-import com.lepu.blepro.ble.data.LeBp2wUserList
+import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.HexString.trimStr
@@ -26,6 +24,7 @@ class Bp3ViewModel : SettingViewModel() {
 
     private lateinit var binding: FragmentSettingsBinding
     private lateinit var context: Context
+    private lateinit var bp2Config: Bp2Config
 
     fun initView(context: Context, binding: FragmentSettingsBinding, model: Int) {
         this.binding = binding
@@ -76,9 +75,36 @@ class Bp3ViewModel : SettingViewModel() {
                 LpBleUtil.bp3SwitchBpUnit(model, 1)
             }
         }
+        ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("关闭", "1", "2", "3")).apply {
+            binding.bp3Layout.volume.adapter = this
+        }
+        binding.bp3Layout.volume.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (this@Bp3ViewModel::bp2Config.isInitialized) {
+                    bp2Config.volume = position
+                    LpBleUtil.bp3SetConfig(model, bp2Config)
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+        ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("关闭", "30s", "60s", "90s", "120s")).apply {
+            binding.bp3Layout.x3Mode.adapter = this
+        }
+        binding.bp3Layout.x3Mode.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (this@Bp3ViewModel::bp2Config.isInitialized) {
+                    bp2Config.avgMeasureMode = position
+                    LpBleUtil.bp3SetConfig(model, bp2Config)
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
         ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("BP2 6621模拟器", "BP2 6621人体", "BP2 52832人体", "一体机")).apply {
             binding.bp3Layout.testMode.adapter = this
         }
+        binding.bp3Layout.testMode.setSelection(1)
         binding.bp3Layout.testMode.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 LpBleUtil.bp3SwitchTestMode(model, position)
@@ -86,11 +112,26 @@ class Bp3ViewModel : SettingViewModel() {
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
+        binding.bp3Layout.switchSound.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (this@Bp3ViewModel::bp2Config.isInitialized) {
+                if (buttonView.isPressed) {
+                    bp2Config.beepSwitch = isChecked
+                    LpBleUtil.bp3SetConfig(model, bp2Config)
+                }
+            }
+        }
         binding.bp3Layout.switchValve.setOnCheckedChangeListener { buttonView, isChecked ->
-            LpBleUtil.bp3SwitchValve(model, isChecked)
+            if (buttonView.isPressed) {
+                LpBleUtil.bp3SwitchValve(model, isChecked)
+            }
         }
         binding.bp3Layout.switchWifi4g.setOnCheckedChangeListener { buttonView, isChecked ->
-            LpBleUtil.bp3SwitchWifi4g(model, isChecked)
+            if (this@Bp3ViewModel::bp2Config.isInitialized) {
+                if (buttonView.isPressed) {
+                    bp2Config.wifi4gSwitch = isChecked
+                    LpBleUtil.bp3SwitchWifi4g(model, isChecked)
+                }
+            }
         }
         binding.bp3Layout.getRtPressure.setOnClickListener {
             LpBleUtil.bp3GetRtPressure(model, 1)
@@ -111,7 +152,7 @@ class Bp3ViewModel : SettingViewModel() {
             if (data.isNullOrEmpty()) {
                 Toast.makeText(context, "请输入目标压力值！", Toast.LENGTH_SHORT).show()
             } else {
-                LpBleUtil.bp3CalibrationSlope(model, data.toInt())
+                LpBleUtil.bp3PressureTest(model, data.toInt())
             }
         }
         binding.bp3Layout.readUser.setOnClickListener {
@@ -123,12 +164,19 @@ class Bp3ViewModel : SettingViewModel() {
             .observe(owner) {
                 _toast.value = context.getString(R.string.burn_info_success)
             }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3SetConfig)
+            .observe(owner) {
+                LpBleUtil.bp3GetConfig(it.model)
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3GetConfig)
             .observe(owner) {
-                val config = it.data as Bp2Config
-                binding.bp3Layout.calibrationSlopeText.setText("${config.slopePressure}")
-                binding.bp3Layout.pressureTestText.setText("${config.bpTestTargetPressure}")
-                binding.bp3Layout.switchWifi4g.isChecked = config.wifi4gSwitch
+                bp2Config = it.data as Bp2Config
+                binding.bp3Layout.calibrationSlopeText.setText("${bp2Config.slopePressure}")
+                binding.bp3Layout.pressureTestText.setText("${bp2Config.bpTestTargetPressure}")
+                binding.bp3Layout.switchWifi4g.isChecked = bp2Config.wifi4gSwitch
+                binding.bp3Layout.x3Mode.setSelection(bp2Config.avgMeasureMode)
+                binding.bp3Layout.switchSound.isChecked = bp2Config.beepSwitch
+                binding.bp3Layout.volume.setSelection(bp2Config.volume)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3SwitchValve)
             .observe(owner) {
@@ -179,10 +227,17 @@ class Bp3ViewModel : SettingViewModel() {
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3ReadFileComplete)
             .observe(owner) {
-                val data = it.data as LeBp2wUserList
-                for (user in data.userList) {
-                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "\n用户名: ${user.fName}${user.name}"
-                }
+//                val data = it.data as LeBp2wUserList
+//                for (user in data.userList) {
+//                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "\n用户名: ${user.fName}${user.name}"
+//                }
+                val data = it.data as Bp2BleFile
+//                if (data.type == 1) {
+//                    binding.deviceInfo.text = "${Bp2BpFile(data.content)}"
+//                } else if (data.type == 2) {
+//                    binding.deviceInfo.text = "${Bp2EcgFile(data.content)}"
+//                }
+                binding.deviceInfo.text = "${data.type}"
                 _toast.value = "读文件成功"
             }
         LiveEventBus.get<ResponseError>(EventMsgConst.Cmd.EventCmdResponseError)

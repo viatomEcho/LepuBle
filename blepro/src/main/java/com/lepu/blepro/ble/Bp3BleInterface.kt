@@ -369,7 +369,12 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
                     if (fileContent.size < fileSize) {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3ReadFileError).post(InterfaceEvent(model, true))
                     } else {
-                        val data = LeBp2wUserList(fileContent)
+                        val data = if (device.name == null) {
+                            Bp2BleFile(fileName, fileContent, "")
+                        } else {
+                            Bp2BleFile(fileName, fileContent, device.name)
+                        }
+//                        val data = LeBp2wUserList(fileContent)
                         LepuBleLog.d(tag, "model:$model,READ_FILE_END => data: $data")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3ReadFileComplete).post(InterfaceEvent(model, fileContent))
                     }

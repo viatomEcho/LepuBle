@@ -3,6 +3,7 @@ package com.lepu.blepro.ble.data
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.int2ByteArray
+import com.lepu.blepro.utils.int4ByteArray
 import com.lepu.blepro.utils.toUInt
 
 class Bp2Config() {
@@ -57,8 +58,13 @@ class Bp2Config() {
         } else {
             0
         }
-        val data = ByteArray(22)
-        return data.plus(int2ByteArray(bpTestTargetPressure))
+        return int4ByteArray(prevCalibZero)
+            .plus(int4ByteArray(lastCalibZero))
+            .plus(int4ByteArray(calibSlope))
+            .plus(int2ByteArray(slopePressure))
+            .plus(int4ByteArray(calibTicks))
+            .plus(int4ByteArray(sleepTicks))
+            .plus(int2ByteArray(bpTestTargetPressure))
             .plus(beepOn.toByte())
             .plus(avgMeasureMode.toByte())
             .plus(volume.toByte())

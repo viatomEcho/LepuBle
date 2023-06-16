@@ -385,6 +385,7 @@
     <string name="cmd_not_support">不支持指令</string>
     <string name="normal_error">通用错误</string>
     <string name="key_change_error">密钥校验失败，断开连接</string>
+    <string name="usb_file">USB File</string>
 
 
 </resources>

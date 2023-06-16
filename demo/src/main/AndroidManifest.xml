@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- 读取usb权限 -->
+    <uses-feature android:name="android.hardware.usb.host"/>
 
     <application
         android:allowBackup="true"
@@ -49,7 +51,7 @@
         </service>
         <receiver
             android:name=".DemoWidgetProvider"
-            android:exported="false"
+            android:exported="true"
             android:label="DemoWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
