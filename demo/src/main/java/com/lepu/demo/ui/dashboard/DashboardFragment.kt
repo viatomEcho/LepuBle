@@ -286,7 +286,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_CHECK_ADV, Bluetooth.MODEL_PC300_BLE,
-            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT,
+            Bluetooth.MODEL_CHECKME -> {
                 waveHandler.post(EcgWaveTask())
                 waveHandler.post(OxyWaveTask())
             }
@@ -428,7 +429,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 startWave(it.modelNo)
                 LpBleUtil.getInfo(it.modelNo)
             }
-            Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV -> {
+            Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV,
+            Bluetooth.MODEL_CHECKME -> {
                 binding.ecgLayout.visibility = View.VISIBLE
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.collectData.visibility = View.VISIBLE
@@ -1757,6 +1759,30 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtBreathParam)
             .observe(this) {
 //                val rtData = it.data as Ap20BleResponse.RtBreathParam
+            }
+        //------------------------------checkme------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Checkme.EventCheckmeRtData)
+            .observe(this) {
+                val rtData = it.data as CheckmeBleResponse.RtData
+                viewModel.oxyPr.value = rtData.pr
+                viewModel.spo2.value = rtData.spo2
+                viewModel.pi.value = rtData.pi
+                viewModel.ecgHr.value = rtData.hr
+
+                DataController.receive(rtData.ecgwFs)
+                OxyDataController.receive(rtData.spo2wIs)
+
+                mainViewModel._battery.value = "${rtData.battery} %"
+                binding.deviceInfo.text = "ECG -QRS：${rtData.qrs}\n" +
+                        "ECG -ST：${rtData.st}\n" +
+                        "ECG -PVCs：${rtData.pvcs}\n" +
+                        "ECG –R wave mark：${rtData.mark}\n" +
+                        "ECG -note：${rtData.ecgNote}\n" +
+                        "SpO2-pulse sound：${rtData.pulseSound}\n" +
+                        "SpO2-note：${rtData.spo2Note}"
+                if (binding.collectData.isChecked) {
+                    collectBytesData = collectBytesData.plus(rtData.spo2Wave)
+                }
             }
         //------------------------------vetcorder------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Vetcorder.EventVetcorderInfo)

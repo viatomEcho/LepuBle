@@ -1,28 +1,39 @@
 package com.lepu.blepro.ble.cmd;
 
+import static com.lepu.blepro.utils.StringUtilsKt.makeTimeStr;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.lepu.blepro.utils.StringUtilsKt.makeTimeStr;
 
 /**
  * @author wujuan
  */
-public class PulsebitBleCmd {
+public class CheckmeBleCmd {
 
     public static int OXY_CMD_READ_START = 0x03;
     public static int OXY_CMD_READ_CONTENT = 0x04;
     public static int OXY_CMD_READ_END = 0x05;
 
-    // 设备无响应
     public static int OXY_CMD_READ_LIST_START = 0x07;
     public static int OXY_CMD_READ_LIST_CONTENT = 0x08;
     public static int OXY_CMD_READ_LIST_END = 0x09;
-    // 设备无响应
 
     public static int OXY_CMD_INFO = 0x14;
     public static int OXY_CMD_PARA_SYNC = 0x16;
 
     public static final String SYNC_TYPE_TIME = "SetTIME";
+
+    public static class ListType {
+        public static final int DLC_TYPE = 0;
+        public static final int ECG_TYPE = 1;
+        public static final int OXY_TYPE = 2;
+        public static final int BP_TYPE = 3;
+        public static final int GLU_TYPE = 4;
+        public static final int TEMP_TYPE = 5;
+        public static final int SLM_TYPE = 6;
+        public static final int PED_TYPE = 7;
+        public static final int USER_TYPE = 8;
+        public static final int BPCAL_TYPE = 9;
+    }
 
     /**
      * O2 系列不使用SeqNo, 仅在下载数据时作为数据偏移

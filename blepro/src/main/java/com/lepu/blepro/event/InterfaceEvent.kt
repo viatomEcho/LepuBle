@@ -500,6 +500,23 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * CheckmeBleInterface 发出的通知
+     * 包含model: MODEL_CHECKME
+     */
+    interface Checkme {
+        companion object {
+            const val EventCheckmeSetTime = "com.lepu.ble.checkme.set.time"                            // 同步时间 boolean
+            const val EventCheckmeDeviceInfo = "com.lepu.ble.checkme.device.info"                      // 设备信息 CheckmeBleResponse.DeviceInfo
+            const val EventCheckmeRtData = "com.lepu.ble.checkme.rt.data"                              // 实时数据 CheckmeBleResponse.RtData
+            const val EventCheckmeGetFileListProgress = "com.lepu.ble.checkme.get.file.list.progress"  // 获取文件列表进度 int
+            const val EventCheckmeGetFileList = "com.lepu.ble.checkme.get.file.list"                   // 文件列表 CheckmeBleResponse.FileList
+            const val EventCheckmeGetFileListError = "com.lepu.ble.checkme.get.file.list.error"        // 获取文件列表出错 boolean
+            const val EventCheckmeReadingFileProgress = "com.lepu.ble.checkme.reading.file.progress"   // 获取文件进度 int
+            const val EventCheckmeReadFileComplete = "com.lepu.ble.checkme.read.file.complete"         // 获取文件完成 CheckmeBleResponse.EcgFile
+            const val EventCheckmeReadFileError = "com.lepu.ble.checkme.read.file.error"               // 获取文件出错 boolean
+        }
+    }
 
     /**
      * Pc68bBleInterface 发出的通知

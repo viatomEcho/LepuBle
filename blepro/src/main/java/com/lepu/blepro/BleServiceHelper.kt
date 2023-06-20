@@ -710,10 +710,12 @@ class BleServiceHelper private constructor() {
      * @param fileType CheckmeLe获取文件列表类型（CheckmeLeBleCmd.ListType.ECG_TYPE, OXY_TYPE, DLC_TYPE）
      * @param fileType 4G手表获取文件列表类型（LewBleCmd.ListType.SPORT, ECG, HR, OXY, SLEEP）
      * @param fileType 呼吸机获取文件列表类型（0：当天统计，1：单次统计）
+     * @param fileType Checkme获取文件列表类型（CheckmeBleCmd.ListType.ECG_TYPE, OXY_TYPE, DLC_TYPE,
+     *                 TEMP_TYPE, USER_TYPE, BPCAL_TYPE, SLM_TYPE, XPED_TYPE, NIBP_TYPE, GLU_TYPE）
      * @param startTime 起始时间戳 单位秒
      */
     @JvmOverloads
-    fun getFileList(model: Int, fileType: Int? = null, startTime: Long = 0){
+    fun getFileList(model: Int, fileType: Int? = null, startTime: Long = 0, id: Int = 1){
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_LE_BP2W -> {
@@ -736,6 +738,18 @@ class BleServiceHelper private constructor() {
                             it.getFileList()
                         } else {
                             it.getFileList(fileType)
+                        }
+                    }
+                }
+            }
+            Bluetooth.MODEL_CHECKME -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as CheckmeBleInterface).let {
+                        LepuBleLog.d(tag, "it as CheckmeBleInterface--getFileList")
+                        if (fileType == null) {
+                            it.getFileList()
+                        } else {
+                            it.getFileList(fileType, id)
                         }
                     }
                 }
@@ -4392,4 +4406,44 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "ecnGetDiagnosisResult current model $model unsupported!!")
         }
     }
+
+    fun checkmeStartRtData(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_CHECKME -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as CheckmeBleInterface).let {
+                        LepuBleLog.d(tag, "it as CheckmeBleInterface--checkmeStartRtData")
+                        it.startRtData()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "checkmeStartRtData current model $model unsupported!!")
+        }
+    }
+    /**
+     * 获取设备文件列表
+     * @param fileType Checkme获取文件列表类型（CheckmeBleCmd.ListType.ECG_TYPE, OXY_TYPE, DLC_TYPE,
+     *                 TEMP_TYPE, USER_TYPE, BPCAL_TYPE, SLM_TYPE, PED_TYPE, BP_TYPE, GLU_TYPE）
+     */
+    @JvmOverloads
+    fun checkmeGetFileList(model: Int, fileType: Int? = null, id: Int = 1) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_CHECKME -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as CheckmeBleInterface).let {
+                        LepuBleLog.d(tag, "it as CheckmeBleInterface--checkmeGetFileList")
+                        if (fileType == null) {
+                            it.getFileList()
+                        } else {
+                            it.getFileList(fileType, id)
+                        }
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "checkmeGetFileList current model $model unsupported!!")
+        }
+    }
+
 }

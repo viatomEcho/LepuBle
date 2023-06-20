@@ -119,6 +119,9 @@ class MainViewModel: ViewModel() {
     val _pulsebitInfo = MutableLiveData<PulsebitBleResponse.DeviceInfo>()
     val pulsebitInfo: LiveData<PulsebitBleResponse.DeviceInfo> = _pulsebitInfo
 
+    val _checkmeInfo = MutableLiveData<CheckmeBleResponse.DeviceInfo>()
+    val checkmeInfo: LiveData<CheckmeBleResponse.DeviceInfo> = _checkmeInfo
+
     val _checkmeLeInfo = MutableLiveData<CheckmeLeBleResponse.DeviceInfo>()
     val checkmeLeInfo: LiveData<CheckmeLeBleResponse.DeviceInfo> = _checkmeLeInfo
 

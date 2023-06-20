@@ -287,6 +287,9 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     } else {
                         LpBleUtil.setTime(it)
                     }
+                } else if (it == Bluetooth.MODEL_CHECKME) {
+                    LpBleUtil.setTime(it)
+                    LpBleUtil.checkmeStartRtData(it)
                 } else {
                     LpBleUtil.getInfo(it)
                 }
@@ -539,9 +542,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     Bluetooth.MODEL_HHM4 -> {
                         Toast.makeText(this, "HHM4 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
-                    Bluetooth.MODEL_CHECKME -> {
-                        Toast.makeText(this, "Checkme ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
-                    }
                     else -> {
                         Toast.makeText(this, "Pulsebit ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
@@ -558,14 +558,24 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                         Bluetooth.MODEL_HHM4 -> {
                             Toast.makeText(this, "HHM4 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
-                        Bluetooth.MODEL_CHECKME -> {
-                            Toast.makeText(this, "Checkme ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
-                        }
                         else -> {
                             Toast.makeText(this, "Pulsebit ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
                     }
                     viewModel._pulsebitInfo.value = it
+                }
+            }
+        //-------------------------checkme-------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Checkme.EventCheckmeSetTime)
+            .observe(this) {
+                Toast.makeText(this, "Checkme ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Checkme.EventCheckmeDeviceInfo)
+            .observe(this) { event ->
+                (event.data as CheckmeBleResponse.DeviceInfo).let {
+                    Toast.makeText(this, "Checkme ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
+                    viewModel._checkmeInfo.value = it
                 }
             }
         //-------------------------CheckmeLE-------------------------

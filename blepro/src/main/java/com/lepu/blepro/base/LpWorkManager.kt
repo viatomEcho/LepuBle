@@ -367,9 +367,16 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4,
-            Bluetooth.MODEL_CHECKME -> {
+            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4 -> {
                 PulsebitBleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
+            Bluetooth.MODEL_CHECKME -> {
+                CheckmeBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
                     vailFace.put(m, this)

@@ -454,6 +454,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     fileType = CheckmeLeBleCmd.ListType.ECG_TYPE
                 }
                 LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0], fileType)
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKME) {
+                fileType++
+                if (fileType > CheckmeBleCmd.ListType.BPCAL_TYPE) {
+                    fileType = CheckmeBleCmd.ListType.DLC_TYPE
+                }
+                LpBleUtil.checkmeGetFileList(Constant.BluetoothConfig.currentModel[0], fileType, 1)
             } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R20
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R21
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R10
@@ -766,7 +772,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             "sn：${it.sn}\ncode：${it.branchCode}"
                 }
             }
-            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4, Bluetooth.MODEL_CHECKME -> {
+            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4 -> {
                 infoViewModel = ViewModelProvider(this).get(PulsebitViewModel::class.java)
                 (infoViewModel as PulsebitViewModel).initEvent(this)
                 mainViewModel.pulsebitInfo.observe(viewLifecycleOwner) {
@@ -800,6 +806,16 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 infoViewModel = ViewModelProvider(this).get(CheckmeLeViewModel::class.java)
                 (infoViewModel as CheckmeLeViewModel).initEvent(this)
                 mainViewModel.checkmeLeInfo.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwVersion}\n" +
+                            "${context?.getString(R.string.software_version)}${it.swVersion}\n" +
+                            "sn：${it.sn}"
+                }
+            }
+            Bluetooth.MODEL_CHECKME -> {
+                infoViewModel = ViewModelProvider(this).get(CheckmeViewModel::class.java)
+                (infoViewModel as CheckmeViewModel).initEvent(this)
+                mainViewModel.checkmeInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwVersion}\n" +
                             "${context?.getString(R.string.software_version)}${it.swVersion}\n" +

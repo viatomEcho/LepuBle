@@ -840,8 +840,12 @@ class LpBleUtil {
         fun lewSetOxyThreshold(model: Int, threshold: OxyThreshold) {
             BleServiceHelper.lewSetOxyThreshold(model, threshold)
         }
-
-
+        fun checkmeGetFileList(model: Int, fileType: Int, id: Int) {
+            BleServiceHelper.checkmeGetFileList(model, fileType, id)
+        }
+        fun checkmeStartRtData(model: Int) {
+            BleServiceHelper.checkmeStartRtData(model)
+        }
 
         fun sp20GetBattery(model: Int) {
             Log.d(TAG, "sp20GetBattery")
