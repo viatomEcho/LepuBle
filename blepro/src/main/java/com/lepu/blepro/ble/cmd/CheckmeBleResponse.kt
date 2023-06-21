@@ -105,11 +105,11 @@ class CheckmeBleResponse{
     }
 
     @ExperimentalUnsignedTypes
-    class ListContent(val type: Int, val content: ByteArray) {
+    class ListContent(val userId: Int, val type: Int, val content: ByteArray) {
 
     }
     @ExperimentalUnsignedTypes
-    class FileContent(val fileName: String, val type: Int, val content: ByteArray) {
+    class FileContent(val fileName: String, val userId: Int, val type: Int, val content: ByteArray) {
 
     }
 

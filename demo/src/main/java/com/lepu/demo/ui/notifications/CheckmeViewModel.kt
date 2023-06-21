@@ -24,12 +24,10 @@ class CheckmeViewModel : InfoViewModel() {
                         }
                         _fileNames.value = names
                         _info.value = names.toString()
-                        Log.d("11111111111111111", "$list")
                     }
                     CheckmeBleCmd.ListType.TEMP_TYPE -> {
                         val list = CheckmeBleResponse.TempList(data.content)
                         _info.value = "$list"
-                        Log.d("11111111111111111", "$list")
                     }
                     CheckmeBleCmd.ListType.ECG_TYPE -> {
                         val list = CheckmeBleResponse.EcgList(data.content)
@@ -39,27 +37,22 @@ class CheckmeViewModel : InfoViewModel() {
                         }
                         _fileNames.value = names
                         _info.value = names.toString()
-                        Log.d("11111111111111111", "$list")
                     }
                     CheckmeBleCmd.ListType.OXY_TYPE -> {
                         val list = CheckmeBleResponse.OxyList(data.content)
                         _info.value = "$list"
-                        Log.d("11111111111111111", "$list")
                     }
                     CheckmeBleCmd.ListType.BPCAL_TYPE -> {
                         val list = CheckmeBleResponse.BpcalList(data.content)
                         _info.value = "$list"
-                        Log.d("11111111111111111", "$list")
                     }
                     CheckmeBleCmd.ListType.GLU_TYPE -> {
                         val list = CheckmeBleResponse.GluList(data.content)
                         _info.value = "$list"
-                        Log.d("11111111111111111", "$list")
                     }
                     CheckmeBleCmd.ListType.BP_TYPE -> {
                         val list = CheckmeBleResponse.BpList(data.content)
                         _info.value = "$list"
-                        Log.d("11111111111111111", "$list")
                     }
                     CheckmeBleCmd.ListType.SLM_TYPE -> {
                         val list = CheckmeBleResponse.SlmList(data.content)
@@ -69,17 +62,14 @@ class CheckmeViewModel : InfoViewModel() {
                         }
                         _fileNames.value = names
                         _info.value = names.toString()
-                        Log.d("11111111111111111", "$list")
                     }
                     CheckmeBleCmd.ListType.PED_TYPE -> {
                         val list = CheckmeBleResponse.PedList(data.content)
                         _info.value = "$list"
-                        Log.d("11111111111111111", "$list")
                     }
                     CheckmeBleCmd.ListType.USER_TYPE -> {
                         val list = CheckmeBleResponse.UserList(data.content)
                         _info.value = "$list"
-                        Log.d("11111111111111111", "$list")
                     }
                 }
             }

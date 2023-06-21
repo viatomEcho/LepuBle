@@ -2,6 +2,7 @@ package com.lepu.blepro.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.util.Log
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
@@ -36,6 +37,7 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
     private var fileName = ""
     private var fileSize = 0
     private var fileContent = ByteArray(0)
+    private var fwUpdate = FwUpdate()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         if (isManagerInitialized()) {
@@ -617,6 +619,48 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model,EVENT => success, data: $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorEvent).post(InterfaceEvent(model, data))
                 }
+                LpBleCmd.FW_UPDATE_START -> {
+                    LepuBleLog.d(tag, "model:$model,FW_UPDATE_START => success")
+                    offset = 0
+                    if (fwUpdate.data.size < 512) {
+                        sendCmd(LpBleCmd.fwUpdateData(offset, fwUpdate.data.copyOfRange(offset, fwUpdate.data.size), aesEncryptKey))
+                    } else {
+                        sendCmd(LpBleCmd.fwUpdateData(offset, fwUpdate.data.copyOfRange(offset, offset + 512), aesEncryptKey))
+                    }
+                }
+                LpBleCmd.FW_UPDATE_CONTENT -> {
+                    if (response.len > 0) {
+                        offset = toUInt(response.content)
+                        LepuBleLog.d(tag, "model:$model,FW_UPDATE_CONTENT => failed, $offset")
+                    } else {
+                        val temp = fwUpdate.data.size - offset
+                        offset += if (temp > 512) {
+                            512
+                        } else {
+                            temp
+                        }
+                        LepuBleLog.d(tag, "model:$model,FW_UPDATE_CONTENT => success, $offset")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorWritingFileProgress).post(InterfaceEvent(model, offset.times(100).div(fwUpdate.data.size)))
+                        if (offset >= fwUpdate.data.size) {
+                            sendCmd(LpBleCmd.fwUpdateEnd(aesEncryptKey))
+                        } else {
+                            if ((fwUpdate.data.size - offset) < 512) {
+                                sendCmd(LpBleCmd.fwUpdateData(offset, fwUpdate.data.copyOfRange(offset, fwUpdate.data.size), aesEncryptKey))
+                            } else {
+                                sendCmd(LpBleCmd.fwUpdateData(offset, fwUpdate.data.copyOfRange(offset, offset + 512), aesEncryptKey))
+                            }
+                        }
+                    }
+                }
+                LpBleCmd.FW_UPDATE_END -> {
+                    if (offset > fwUpdate.data.size) {
+                        LepuBleLog.d(tag, "model:$model,FW_UPDATE_END => failed")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorWriteFileEnd).post(InterfaceEvent(model, false))
+                    } else {
+                        LepuBleLog.d(tag, "model:$model,FW_UPDATE_END => success")
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorWriteFileEnd).post(InterfaceEvent(model, true))
+                    }
+                }
             }
         }
     }
@@ -798,5 +842,12 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
     // 实时状态获取
     fun getRtState() {
         sendCmd(VentilatorBleCmd.getRtState(aesEncryptKey))
+    }
+
+    // 升级固件
+    fun fwUpdate(fwUpdate: FwUpdate) {
+        this.fwUpdate = fwUpdate
+        sendCmd(LpBleCmd.fwUpdateStart(fwUpdate.convert2Data(), aesEncryptKey))
+        Log.d("11111111111", "$fwUpdate")
     }
 }

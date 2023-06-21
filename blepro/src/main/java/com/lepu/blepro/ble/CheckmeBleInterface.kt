@@ -2,9 +2,11 @@ package com.lepu.blepro.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.os.CountDownTimer
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
+import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.*
 import kotlin.experimental.inv
@@ -29,6 +31,16 @@ class CheckmeBleInterface(model: Int): BleInterface(model) {
     var fileContent : ByteArray? = null
     var userId = 1
     var fileType = -1
+    var cmdTimer = object : CountDownTimer(3000, 3000) {
+        override fun onTick(millisUntilFinished: Long) {
+            LepuBleLog.d(tag, "-------cmdTimer-onTick------")
+        }
+        override fun onFinish() {
+            LiveEventBus.get<Int>(EventMsgConst.Cmd.EventCmdResponseTimeOut).post(curCmd)
+            curCmd = -1
+            LepuBleLog.d(tag, "-------cmdTimer-onFinish------")
+        }
+    }
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         if (isManagerInitialized()) {
@@ -76,6 +88,7 @@ class CheckmeBleInterface(model: Int): BleInterface(model) {
         }
         sendCmd(bs)
         curCmd = cmd
+        cmdTimer.start()
     }
 
     override fun hasResponse(bytes: ByteArray?): ByteArray? {
@@ -233,11 +246,11 @@ class CheckmeBleInterface(model: Int): BleInterface(model) {
                                     fileType = CheckmeBleCmd.ListType.GLU_TYPE
                                 }
                             }
-                            val data = CheckmeBleResponse.ListContent(fileType, it)
+                            val data = CheckmeBleResponse.ListContent(userId, fileType, it)
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Checkme.EventCheckmeGetFileList).post(InterfaceEvent(model, data))
                             LepuBleLog.d(tag, "model:$model, ListContent : $data")
                         } else {
-                            val data = CheckmeBleResponse.FileContent(curFileName, fileType, it)
+                            val data = CheckmeBleResponse.FileContent(curFileName, userId, fileType, it)
                             LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Checkme.EventCheckmeReadFileComplete).post(InterfaceEvent(model, data))
                             LepuBleLog.d(tag, "model:$model, FileContent : $data")
                         }
@@ -264,6 +277,7 @@ class CheckmeBleInterface(model: Int): BleInterface(model) {
 
     private fun clearTimeout() {
         curCmd = -1
+        cmdTimer.cancel()
     }
 
     override fun dealReadFile(userId: String, fileName: String) {

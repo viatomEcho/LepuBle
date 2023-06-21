@@ -4086,6 +4086,22 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "ventilatorGetRtState current model $model unsupported!!")
         }
     }
+    fun ventilatorFwUpdate(model: Int, fwUpdate: FwUpdate) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as VentilatorBleInterface).let {
+                        LepuBleLog.d(tag, "it as VentilatorBleInterface--ventilatorFwUpdate")
+                        it.fwUpdate(fwUpdate)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "ventilatorFwUpdate current model $model unsupported!!")
+        }
+    }
     // BP3
     fun bp3GetBattery(model: Int) {
         if (!checkService()) return

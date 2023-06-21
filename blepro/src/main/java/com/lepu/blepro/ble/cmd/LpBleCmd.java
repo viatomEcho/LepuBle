@@ -210,6 +210,22 @@ public class LpBleCmd {
         return getReq(GET_USER_LIST, new byte[0], key);
     }
 
+    public static byte[] fwUpdateStart(byte[] data, byte[] key) {
+        return getReq(FW_UPDATE_START, data, key);
+    }
+    public static byte[] fwUpdateData(int offset, byte[] data, byte[] key) {
+        byte[] d = new byte[data.length+4];
+        d[0] = (byte) offset;
+        d[1] = (byte) (offset >> 8);
+        d[2] = (byte) (offset >> 16);
+        d[3] = (byte) (offset >> 24);
+        System.arraycopy(data, 0, d, 4, data.length);
+        return getReq(FW_UPDATE_CONTENT, d, key);
+    }
+    public static byte[] fwUpdateEnd(byte[] key) {
+        return getReq(FW_UPDATE_END, new byte[0], key);
+    }
+
     /**
      * 加密通讯
      * @return

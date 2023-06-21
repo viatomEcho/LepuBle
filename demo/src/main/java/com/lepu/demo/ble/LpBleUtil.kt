@@ -1171,6 +1171,9 @@ class LpBleUtil {
         fun ventilatorGetRtState(model: Int) {
             BleServiceHelper.ventilatorGetRtState(model)
         }
+        fun ventilatorFwUpdate(model: Int, fwUpdate: FwUpdate) {
+            BleServiceHelper.ventilatorFwUpdate(model, fwUpdate)
+        }
         // BP3
         fun bp3GetBattery(model: Int) {
             BleServiceHelper.bp3GetBattery(model)

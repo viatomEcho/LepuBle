@@ -14,6 +14,7 @@ import com.lepu.blepro.ble.cmd.VentilatorBleCmd
 import com.lepu.blepro.ble.cmd.VentilatorBleResponse
 import com.lepu.blepro.ble.cmd.ResponseError
 import com.lepu.blepro.ble.data.FactoryConfig
+import com.lepu.blepro.ble.data.FwUpdate
 import com.lepu.blepro.ble.data.ventilator.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
@@ -24,6 +25,7 @@ import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.data.DeviceFactoryData
 import com.lepu.demo.databinding.FragmentSettingsBinding
 import com.lepu.demo.util.StringUtil
+import org.apache.commons.io.IOUtils
 import kotlin.math.max
 import kotlin.math.min
 
@@ -176,6 +178,45 @@ class VentilatorViewModel : SettingViewModel() {
             deviceFactoryData.sn = tempSn
             deviceFactoryData.code = tempCode
             _deviceFactoryData.value = deviceFactoryData
+        }
+        // 升级
+        ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("选择", "bootloader", "app", "language")).apply {
+            binding.ventilatorLayout.fwUpdate.adapter = this
+        }
+        binding.ventilatorLayout.fwUpdate.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                when (position) {
+                    1 -> {
+                        val fwUpdate = FwUpdate()
+                        fwUpdate.deviceType = 0x3631
+                        fwUpdate.curMask = 1
+                        fwUpdate.setMask(true, false, false)
+                        fwUpdate.data = IOUtils.toByteArray(context.assets.open("update/update_XINANBAO_Bootloader.bin"))
+                        fwUpdate.size = fwUpdate.data.size
+                        LpBleUtil.ventilatorFwUpdate(model, fwUpdate)
+                    }
+                    2 -> {
+                        val fwUpdate = FwUpdate()
+                        fwUpdate.deviceType = 0x3631
+                        fwUpdate.curMask = 2
+                        fwUpdate.setMask(false, true, false)
+                        fwUpdate.data = IOUtils.toByteArray(context.assets.open("update/update_XINANBAO_APP.bin"))
+                        fwUpdate.size = fwUpdate.data.size
+                        LpBleUtil.ventilatorFwUpdate(model, fwUpdate)
+                    }
+                    3 -> {
+                        val fwUpdate = FwUpdate()
+                        fwUpdate.deviceType = 0x3631
+                        fwUpdate.curMask = 4
+                        fwUpdate.setMask(false, false, true)
+                        fwUpdate.data = IOUtils.toByteArray(context.assets.open("update/update_XINANBAO_Language.bin"))
+                        fwUpdate.size = fwUpdate.data.size
+                        LpBleUtil.ventilatorFwUpdate(model, fwUpdate)
+                    }
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
         }
         // 绑定/解绑
         binding.ventilatorLayout.bound.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -1634,6 +1675,16 @@ class VentilatorViewModel : SettingViewModel() {
                     LpBleCmd.TYPE_CMD_NOT_SUPPORTED -> _toast.value = "不支持指令"
                     LpBleCmd.TYPE_NORMAL_ERROR -> _toast.value = "通用错误"
                 }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorWritingFileProgress)
+            .observe(owner) {
+                val data = it.data as Int
+                binding.ventilatorLayout.updateInfo.text = "升级进度：$data %"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorWriteFileEnd)
+            .observe(owner) {
+                val data = it.data as Boolean
+                binding.ventilatorLayout.updateInfo.text = "升级完成：$data"
             }
     }
 

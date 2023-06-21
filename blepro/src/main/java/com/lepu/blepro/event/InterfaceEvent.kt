@@ -510,10 +510,10 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventCheckmeDeviceInfo = "com.lepu.ble.checkme.device.info"                      // 设备信息 CheckmeBleResponse.DeviceInfo
             const val EventCheckmeRtData = "com.lepu.ble.checkme.rt.data"                              // 实时数据 CheckmeBleResponse.RtData
             const val EventCheckmeGetFileListProgress = "com.lepu.ble.checkme.get.file.list.progress"  // 获取文件列表进度 int
-            const val EventCheckmeGetFileList = "com.lepu.ble.checkme.get.file.list"                   // 文件列表 CheckmeBleResponse.FileList
+            const val EventCheckmeGetFileList = "com.lepu.ble.checkme.get.file.list"                   // 文件列表 CheckmeBleResponse.ListContent
             const val EventCheckmeGetFileListError = "com.lepu.ble.checkme.get.file.list.error"        // 获取文件列表出错 boolean
             const val EventCheckmeReadingFileProgress = "com.lepu.ble.checkme.reading.file.progress"   // 获取文件进度 int
-            const val EventCheckmeReadFileComplete = "com.lepu.ble.checkme.read.file.complete"         // 获取文件完成 CheckmeBleResponse.EcgFile
+            const val EventCheckmeReadFileComplete = "com.lepu.ble.checkme.read.file.complete"         // 获取文件完成 CheckmeBleResponse.FileContent
             const val EventCheckmeReadFileError = "com.lepu.ble.checkme.read.file.error"               // 获取文件出错 boolean
         }
     }
@@ -810,6 +810,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventVentilatorRtState = "com.lepu.ble.ventilator.rt.state"                               // 实时状态 VentilatorBleResponse.RtState
             const val EventVentilatorRtParam = "com.lepu.ble.ventilator.rt.param"                               // 实时参数 VentilatorBleResponse.RtParam
             const val EventVentilatorEvent = "com.lepu.ble.ventilator.event"                                    // 事件上报 VentilatorBleResponse.Event
+            const val EventVentilatorWritingFileProgress = "com.lepu.ble.ventilator.writing.file.progress"      // 传输文件进度 int
+            const val EventVentilatorWriteFileEnd = "com.lepu.ble.ventilator.write.file.end"                    // 传输文件结束 boolean
         }
     }
 
