@@ -47,8 +47,8 @@ public class FileUtil {
 
 
     public static void saveFile(String filePath, byte[] data, boolean isAppend) {
+        createParentDirFile(filePath);
         File file = new File(filePath);
-
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -80,6 +80,7 @@ public class FileUtil {
     }
 
     public static void saveTextFile(String filePath, String data, boolean isAppend) {
+        createParentDirFile(filePath);
         File file = new File(filePath);
 
         if (!file.exists()) {

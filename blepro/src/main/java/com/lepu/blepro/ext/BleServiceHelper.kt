@@ -3863,6 +3863,22 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "ventilatorGetRtParam current model $model unsupported!!")
         }
     }
+    fun ventilatorFwUpdate(model: Int, fwUpdate: FwUpdate) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as VentilatorBleInterface).let {
+                        LepuBleLog.d(tag, "it as VentilatorBleInterface--ventilatorFwUpdate")
+                        it.fwUpdate(fwUpdate)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "ventilatorFwUpdate current model $model unsupported!!")
+        }
+    }
     // BP3
     fun bp3GetBattery(model: Int) {
         if (!checkService()) return
@@ -4201,4 +4217,44 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "ecnGetDiagnosisResult current model $model unsupported!!")
         }
     }
+
+    fun checkmeStartRtData(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_CHECKME -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as CheckmeBleInterface).let {
+                        LepuBleLog.d(tag, "it as CheckmeBleInterface--checkmeStartRtData")
+                        it.startRtData()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "checkmeStartRtData current model $model unsupported!!")
+        }
+    }
+    /**
+     * 获取设备文件列表
+     * @param fileType Checkme获取文件列表类型（CheckmeBleCmd.ListType.ECG_TYPE, OXY_TYPE, DLC_TYPE,
+     *                 TEMP_TYPE, USER_TYPE, BPCAL_TYPE, SLM_TYPE, PED_TYPE, BP_TYPE, GLU_TYPE）
+     */
+    @JvmOverloads
+    fun checkmeGetFileList(model: Int, fileType: Int? = null, id: Int = 1) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_CHECKME -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as CheckmeBleInterface).let {
+                        LepuBleLog.d(tag, "it as CheckmeBleInterface--checkmeGetFileList")
+                        if (fileType == null) {
+                            it.getFileList()
+                        } else {
+                            it.getFileList(fileType, id)
+                        }
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "checkmeGetFileList current model $model unsupported!!")
+        }
+    }
+
 }

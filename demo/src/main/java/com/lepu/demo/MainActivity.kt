@@ -3,9 +3,12 @@ package com.lepu.demo
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.PendingIntent
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
+import android.hardware.usb.UsbDevice
+import android.hardware.usb.UsbManager
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
@@ -105,8 +108,24 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     Toast.makeText(this, getString(R.string.cannot_upgrade), Toast.LENGTH_SHORT).show()
                 }
             }
+            R.id.usb_file -> {
+                usbPermission()
+            }
         }
         return true
+    }
+
+    private val ACTION_USB_PERMISSION = "action.usb.permission"
+    private fun usbPermission() {
+        val usbManager = getSystemService(USB_SERVICE) as UsbManager
+        val usbDevice = intent.getParcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
+        val device = usbManager.deviceList.values.toList()[0]
+        if (usbDevice != null && usbManager.hasPermission(usbDevice)) {
+
+        } else {
+            val pendingIntent = PendingIntent.getBroadcast(this, 0, Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE)
+            usbManager.requestPermission(device, pendingIntent)
+        }
     }
 
     /**
@@ -258,7 +277,14 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     || it == Bluetooth.MODEL_R11
                     || it == Bluetooth.MODEL_R10
                     || it == Bluetooth.MODEL_LERES) {
-                    LpBleUtil.ventilatorEncrypt(it, "0001")
+                    if (Constant.BluetoothConfig.isEncrypt) {
+                        LpBleUtil.ventilatorEncrypt(it, "0001")
+                    } else {
+                        LpBleUtil.setTime(it)
+                    }
+                } else if (it == Bluetooth.MODEL_CHECKME) {
+                    LpBleUtil.setTime(it)
+                    LpBleUtil.checkmeStartRtData(it)
                 } else {
                     LpBleUtil.getInfo(it)
                 }
@@ -512,9 +538,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     Bluetooth.MODEL_HHM4 -> {
                         Toast.makeText(this, "HHM4 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
-                    Bluetooth.MODEL_CHECKME -> {
-                        Toast.makeText(this, "Checkme ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
-                    }
                     else -> {
                         Toast.makeText(this, "Pulsebit ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
@@ -531,14 +554,24 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                         Bluetooth.MODEL_HHM4 -> {
                             Toast.makeText(this, "HHM4 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
-                        Bluetooth.MODEL_CHECKME -> {
-                            Toast.makeText(this, "Checkme ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
-                        }
                         else -> {
                             Toast.makeText(this, "Pulsebit ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
                     }
                     viewModel._pulsebitInfo.value = it
+                }
+            }
+        //-------------------------checkme-------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Checkme.EventCheckmeSetTime)
+            .observe(this) {
+                Toast.makeText(this, "Checkme ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Checkme.EventCheckmeDeviceInfo)
+            .observe(this) { event ->
+                (event.data as CheckmeBleResponse.DeviceInfo).let {
+                    Toast.makeText(this, "Checkme ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
+                    viewModel._checkmeInfo.value = it
                 }
             }
         //-------------------------CheckmeLE-------------------------

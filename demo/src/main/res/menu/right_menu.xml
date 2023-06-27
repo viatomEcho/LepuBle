@@ -2,4 +2,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/menu_factory_data" android:title="@string/burn_info"/>
     <item android:id="@+id/menu_upgrade" android:title="@string/upgrade_firmware"/>
+    <item android:id="@+id/usb_file" android:title="@string/usb_file" android:visible="false"/>
 </menu>

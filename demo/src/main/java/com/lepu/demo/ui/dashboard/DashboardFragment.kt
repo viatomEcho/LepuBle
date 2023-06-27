@@ -25,10 +25,9 @@ import com.lepu.blepro.ext.pc102.*
 import com.lepu.blepro.ext.pc60fw.*
 import com.lepu.blepro.ext.pc80b.*
 import com.lepu.blepro.objs.Bluetooth
-import com.lepu.blepro.utils.ByteUtils
+import com.lepu.blepro.utils.*
+import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.DateUtil.stringFromDate
-import com.lepu.blepro.utils.bytesToHex
-import com.lepu.blepro.utils.getTimeString
 import com.lepu.demo.DemoWidgetProvider
 import com.lepu.demo.MainViewModel
 import com.lepu.demo.R
@@ -64,10 +63,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     // 采集
     private var o2RtType = 0  // 0: rt param, 1: rt wave, 2: rt ppg
     private var startCollectTime = 0L
-    // ppg数据
+    // ppg数据（结束采集后保存数据）
     private var collectIntsData = IntArray(0)
-    // 脉搏波数据
-    private var collectBytesData = ByteArray(0)
+    // 脉搏波数据（边采集边保存）
 
     // 无线共存
     private var isStartWirelessTest = false
@@ -291,7 +289,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_CHECK_ADV, Bluetooth.MODEL_PC300_BLE,
-            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT,
+            Bluetooth.MODEL_CHECKME -> {
                 waveHandler.post(EcgWaveTask())
                 waveHandler.post(OxyWaveTask())
             }
@@ -393,8 +392,13 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 binding.bpLayout.visibility = View.GONE
                 binding.o2RtTypeLayout.check(R.id.o2_rt_param)
                 binding.ppgIr.isChecked = true
+                binding.collectData.isChecked = false
                 o2RtType = 0
-                LpBleUtil.startRtTask()
+                when (o2RtType) {
+                    0 -> LpBleUtil.oxyGetRtParam(Constant.BluetoothConfig.currentModel[0])
+                    1 -> LpBleUtil.oxyGetRtWave(Constant.BluetoothConfig.currentModel[0])
+                    2 -> LpBleUtil.oxyGetPpgRt(Constant.BluetoothConfig.currentModel[0])
+                }
                 startWave(it.modelNo)
             }
             Bluetooth.MODEL_PC60FW, Bluetooth.MODEL_PC_60B,
@@ -433,7 +437,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 startWave(it.modelNo)
                 LpBleUtil.getInfo(it.modelNo)
             }
-            Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV -> {
+            Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV,
+            Bluetooth.MODEL_CHECKME -> {
                 binding.ecgLayout.visibility = View.VISIBLE
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.collectData.visibility = View.VISIBLE
@@ -806,7 +811,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 }
                 R.id.o2_rt_ppg -> {
                     o2RtType = 2
-                    binding.ppgTypeLayout.visibility = View.VISIBLE
+                    binding.ppgTypeLayout.visibility = View.GONE
                     binding.collectData.visibility = View.VISIBLE
                     binding.collectDataTime.visibility = View.VISIBLE
                 }
@@ -1068,9 +1073,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     }
 
     private fun collectO2Data(isCollect: Boolean) {
+        Log.d(tag, "collectO2Data $isCollect")
         if (isCollect) {
             startCollectTime = System.currentTimeMillis()
-            collectBytesData = ByteArray(0)
             collectIntsData = IntArray(0)
             // 显示计时
             binding.collectDataTime.base = SystemClock.elapsedRealtime()
@@ -1080,30 +1085,15 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         } else {
             binding.collectDataTime.stop()
             when (o2RtType) {
-                1 -> {
-                    if (collectBytesData.isEmpty()) {
-                        Toast.makeText(context, context?.getString(R.string.collect_no_ppg_data), Toast.LENGTH_SHORT).show()
-                    } else {
-                        saveWaveData()
-                    }
-                }
-                2 -> {
+                /*2 -> {
                     if (collectIntsData.isEmpty()) {
                         Toast.makeText(context, context?.getString(R.string.collect_no_wave_data), Toast.LENGTH_SHORT).show()
                     } else {
                         savePpgData()
                     }
-                }
+                }*/
             }
         }
-    }
-
-    private fun saveWaveData() {
-        val fileName = "WAVE${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
-        FileUtil.saveFile(context, collectBytesData, fileName)
-        Log.d(TAG, "collectBytesData: ${bytesToHex(collectBytesData)}")
-        val bytes = FileUtil.readFileToByteArray(context, fileName)
-        Log.d(TAG, "file: ${bytesToHex(bytes)}")
     }
 
     private fun savePpgData() {
@@ -1561,9 +1551,21 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtData).observeForever { event ->
             (event.data as OxyBleResponse.RtWave).let { data ->
                 activity?.let {
+                    binding.o2DataTips.text = "(设备有上发脉搏波，采集文件保存在/sdcard/Documents/wave文件夹路径下)"
                     //接收数据 开始添加采集数据
                     if (binding.collectData.isChecked) {
-                        collectBytesData = collectBytesData.plus(data.waveByte)
+                        mainViewModel._oxyInfo.value?.sn?.let {
+                            if (it.length > 4) {
+                                val fileName = "${it.substring(it.length - 4)}W${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
+                                FileUtil.saveFile("/sdcard/Documents/wave/$fileName", data.waveByte, true)
+                            } else {
+                                val fileName = "${it}W${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
+                                FileUtil.saveFile("/sdcard/Documents/wave/$fileName", data.waveByte, true)
+                            }
+                        } ?: kotlin.run {
+                            val fileName = "W${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
+                            FileUtil.saveFile("/sdcard/Documents/wave/$fileName", data.waveByte, true)
+                        }
                     }
                     OxyDataController.receive(data.wFs)
                     when (o2RtType) {
@@ -1579,6 +1581,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamData)
             .observe(this) {
+                binding.o2DataTips.text = "(设备有上发实时参数)"
                 val data = it.data as OxyBleResponse.RtParam
                 viewModel.oxyPr.value = data.pr
                 viewModel.spo2.value = data.spo2
@@ -1608,7 +1611,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         // o2ring ppg
         /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyPpgData)
             .observe(this) {
-                binding.ppgTips.text = "(设备有上发PPG)"
+                binding.o2DataTips.text = "(设备有上发PPG，采集文件保存在/sdcard/Documents/ppg文件夹路径下)"
                 when (o2RtType) {
                     0 -> LpBleUtil.oxyGetRtParam(it.model)
                     1 -> LpBleUtil.oxyGetRtWave(it.model)
@@ -1620,12 +1623,30 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     Log.d(TAG, "红外：${data.irArray.joinToString(",")}")
                     Log.d(TAG, "红光：${data.redArray.joinToString(",")}")
                     if (binding.collectData.isChecked) {
-                        if ((binding.ppgIr.isChecked) && (binding.ppgRed.isChecked)) {
+                        /*if ((binding.ppgIr.isChecked) && (binding.ppgRed.isChecked)) {
                             collectIntsData = collectIntsData.plus(data.irRedArray)
                         } else if (binding.ppgIr.isChecked) {
                             collectIntsData = collectIntsData.plus(data.irArray)
                         } else if (binding.ppgRed.isChecked) {
                             collectIntsData = collectIntsData.plus(data.redArray)
+                        }*/
+                        mainViewModel._oxyInfo.value?.sn?.let { sn ->
+                            if (sn.length > 4) {
+                                val fileName = "${sn.substring(sn.length - 4)}P${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.txt"
+                                for (rawData in data.rawDataArray) {
+                                    FileUtil.saveTextFile("/sdcard/Documents/ppg/$fileName", "${rawData.ir} ${rawData.red} ${rawData.motion}\n", true)
+                                }
+                            } else {
+                                val fileName = "${sn}P${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.txt"
+                                for (rawData in data.rawDataArray) {
+                                    FileUtil.saveTextFile("/sdcard/Documents/ppg/$fileName", "${rawData.ir} ${rawData.red} ${rawData.motion}\n", true)
+                                }
+                            }
+                        } ?: kotlin.run {
+                            val fileName = "P${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.txt"
+                            for (rawData in data.rawDataArray) {
+                                FileUtil.saveTextFile("/sdcard/Documents/ppg/$fileName", "${rawData.ir} ${rawData.red} ${rawData.motion}\n", true)
+                            }
                         }
                     }
                 }
@@ -1638,7 +1659,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     1 -> LpBleUtil.oxyGetRtWave(it.model)
                     2 -> LpBleUtil.oxyGetPpgRt(it.model)
                 }
-                binding.ppgTips.text = "(设备没有上发PPG)"
+                binding.o2DataTips.text = "(设备没有上发PPG，请先进行测量)"
             }*/
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtWaveRes)
             .observe(this) {
@@ -1648,6 +1669,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     1 -> LpBleUtil.oxyGetRtWave(it.model)
                     2 -> LpBleUtil.oxyGetPpgRt(it.model)
                 }
+                binding.o2DataTips.text = "(设备没有上发脉搏波，请先进行测量)"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyRtParamRes)
             .observe(this) {
@@ -1657,6 +1679,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     1 -> LpBleUtil.oxyGetRtWave(it.model)
                     2 -> LpBleUtil.oxyGetPpgRt(it.model)
                 }
+                binding.o2DataTips.text = "(设备没有上发实时参数)"
             }
         //------------------------------pc60fw------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtWave)
@@ -1665,7 +1688,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 OxyDataController.receive(rtWave.waveIntData)
                 Log.d("test12345", "" + Arrays.toString(rtWave.waveIntData))
                 if (binding.collectData.isChecked) {
-                    collectBytesData = collectBytesData.plus(rtWave.waveData)
+                    val fileName = "W${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
+                    FileUtil.saveFile(context?.getExternalFilesDir(null)?.absolutePath+"/$fileName", rtWave.waveData, true)
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtParam)
@@ -1727,7 +1751,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val rtWave = it.data as com.lepu.blepro.ext.ap20.RtOxyWave
                 OxyDataController.receive(rtWave.waveIntData)
                 if (binding.collectData.isChecked) {
-                    collectBytesData = collectBytesData.plus(rtWave.waveData)
+                    val fileName = "W${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
+                    FileUtil.saveFile(context?.getExternalFilesDir(null)?.absolutePath+"/$fileName", rtWave.waveData, true)
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AP20.EventAp20RtOxyParam)
@@ -1753,6 +1778,31 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
 //                dataString += "\n rtData : $rtData"
 //                binding.dataStr.text = dataString
             }
+        //------------------------------checkme------------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Checkme.EventCheckmeRtData)
+            .observe(this) {
+                val rtData = it.data as CheckmeBleResponse.RtData
+                viewModel.oxyPr.value = rtData.pr
+                viewModel.spo2.value = rtData.spo2
+                viewModel.pi.value = rtData.pi
+                viewModel.ecgHr.value = rtData.hr
+
+                DataController.receive(rtData.ecgwFs)
+                OxyDataController.receive(rtData.spo2wIs)
+
+                mainViewModel._battery.value = "${rtData.battery} %"
+                binding.deviceInfo.text = "ECG -QRS：${rtData.qrs}\n" +
+                        "ECG -ST：${rtData.st}\n" +
+                        "ECG -PVCs：${rtData.pvcs}\n" +
+                        "ECG –R wave mark：${rtData.mark}\n" +
+                        "ECG -note：${rtData.ecgNote}\n" +
+                        "SpO2-pulse sound：${rtData.pulseSound}\n" +
+                        "SpO2-note：${rtData.spo2Note}"
+                if (binding.collectData.isChecked) {
+                    val fileName = "W${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
+                    FileUtil.saveFile(context?.getExternalFilesDir(null)?.absolutePath+"/$fileName", rtData.spo2Wave, true)
+                }
+            }
         //------------------------------vetcorder------------------------------
         /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Vetcorder.EventVetcorderInfo)
             .observe(this) {
@@ -1775,7 +1825,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "SpO2-pulse sound：${rtData.pulseSound}\n" +
                         "SpO2-note：${rtData.spo2Note}"
                 if (binding.collectData.isChecked) {
-                    collectBytesData = collectBytesData.plus(rtData.spo2Wave)
+                    val fileName = "W${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
+                    FileUtil.saveFile(context?.getExternalFilesDir(null)?.absolutePath+"/$fileName", rtData.spo2Wave, true)
                 }
             }*/
         //------------------------------sp20------------------------------
@@ -1784,7 +1835,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val rtWave = it.data as Sp20BleResponse.RtWave
                 OxyDataController.receive(rtWave.waveIntData)
                 if (binding.collectData.isChecked) {
-                    collectBytesData = collectBytesData.plus(rtWave.waveData)
+                    val fileName = "W${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
+                    FileUtil.saveFile(context?.getExternalFilesDir(null)?.absolutePath+"/$fileName", rtWave.waveData, true)
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.SP20.EventSp20RtParam)
@@ -1821,7 +1873,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val rtWave = it.data as Pc68bBleResponse.RtWave
                 OxyDataController.receive(rtWave.waveIntData)
                 if (binding.collectData.isChecked) {
-                    collectBytesData = collectBytesData.plus(rtWave.waveData)
+                    val fileName = "W${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
+                    FileUtil.saveFile(context?.getExternalFilesDir(null)?.absolutePath+"/$fileName", rtWave.waveData, true)
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC68B.EventPc68bRtParam)
@@ -1849,7 +1902,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         "${context?.getString(R.string.bar_chart)}${rtWave.barChart}\n" +
                         "${context?.getString(R.string.seq_no)}${rtWave.seqNo}"
                 if (binding.collectData.isChecked) {
-                    collectBytesData = collectBytesData.plus(rtWave.wave.toByte())
+                    val fileName = "W${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
+                    FileUtil.saveFile(context?.getExternalFilesDir(null)?.absolutePath+"/$fileName", byteArrayOf(rtWave.wave.toByte()), true)
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM20f.EventVTM20fRtParam)
@@ -1919,7 +1973,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                             }
                         }"
                 if (binding.collectData.isChecked) {
-                    collectBytesData = collectBytesData.plus(rtData.wave.waveByte)
+                    val fileName = "W${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
+                    FileUtil.saveFile(context?.getExternalFilesDir(null)?.absolutePath+"/$fileName", rtData.wave.waveByte, true)
                 }
             }
         //-------------------------pc300-------------------------
@@ -1928,7 +1983,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val data = it.data as Pc300BleResponse.RtOxyWave
                 OxyDataController.receive(data.waveIntData)
                 if (binding.collectData.isChecked) {
-                    collectBytesData = collectBytesData.plus(data.waveData)
+                    val fileName = "W${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
+                    FileUtil.saveFile(context?.getExternalFilesDir(null)?.absolutePath+"/$fileName", data.waveData, true)
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300RtOxyParam)
@@ -2269,7 +2325,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     }
                 }"
                 if (binding.collectData.isChecked) {
-                    collectBytesData = collectBytesData.plus(data.wave)
+                    val fileName = "W${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
+                    FileUtil.saveFile(context?.getExternalFilesDir(null)?.absolutePath+"/$fileName", data.wave, true)
                 }
             }
         //------------------------btp----------------------

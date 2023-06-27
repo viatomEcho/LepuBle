@@ -180,6 +180,7 @@ class Constant{
             var splitText = ""
             var splitType = 0
             var needPair = false
+            var isEncrypt = false
         }
     }
 

@@ -14,6 +14,7 @@ import com.lepu.blepro.ble.cmd.VentilatorBleCmd
 import com.lepu.blepro.ble.cmd.VentilatorBleResponse
 import com.lepu.blepro.ble.cmd.ResponseError
 import com.lepu.blepro.ble.data.FactoryConfig
+import com.lepu.blepro.ble.data.FwUpdate
 import com.lepu.blepro.ble.data.ventilator.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
@@ -24,6 +25,7 @@ import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.data.DeviceFactoryData
 import com.lepu.demo.databinding.FragmentSettingsBinding
 import com.lepu.demo.util.StringUtil
+import org.apache.commons.io.IOUtils
 import kotlin.math.max
 import kotlin.math.min
 
@@ -85,6 +87,8 @@ class VentilatorViewModel : SettingViewModel() {
             binding.ventilatorLayout.warningSettingLayout.visibility = View.GONE
             binding.ventilatorLayout.otherLayout.visibility = View.GONE
             spinnerSet = false
+            LpBleUtil.ventilatorGetWarningSetting(model)
+            LpBleUtil.ventilatorGetRtState(model)
             LpBleUtil.ventilatorGetVentilationSetting(model)
             LpBleUtil.ventilatorGetMeasureSetting(model)
         }
@@ -101,8 +105,8 @@ class VentilatorViewModel : SettingViewModel() {
             binding.ventilatorLayout.measureSettingLayout.visibility = View.GONE
             binding.ventilatorLayout.warningSettingLayout.visibility = View.GONE
             binding.ventilatorLayout.otherLayout.visibility = View.GONE
-            LpBleUtil.ventilatorGetRtState(model)
             spinnerSet = false
+            LpBleUtil.ventilatorGetRtState(model)
             LpBleUtil.ventilatorGetVentilationSetting(model)
         }
         binding.ventilatorLayout.warningSetting.setOnClickListener {
@@ -174,6 +178,45 @@ class VentilatorViewModel : SettingViewModel() {
             deviceFactoryData.sn = tempSn
             deviceFactoryData.code = tempCode
             _deviceFactoryData.value = deviceFactoryData
+        }
+        // 升级
+        ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("选择", "bootloader", "app", "language")).apply {
+            binding.ventilatorLayout.fwUpdate.adapter = this
+        }
+        binding.ventilatorLayout.fwUpdate.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                when (position) {
+                    1 -> {
+                        val fwUpdate = FwUpdate()
+                        fwUpdate.deviceType = 0x3631
+                        fwUpdate.curMask = 1
+                        fwUpdate.setMask(true, false, false)
+                        fwUpdate.data = IOUtils.toByteArray(context.assets.open("update/update_XINANBAO_Bootloader.bin"))
+                        fwUpdate.size = fwUpdate.data.size
+                        LpBleUtil.ventilatorFwUpdate(model, fwUpdate)
+                    }
+                    2 -> {
+                        val fwUpdate = FwUpdate()
+                        fwUpdate.deviceType = 0x3631
+                        fwUpdate.curMask = 2
+                        fwUpdate.setMask(false, true, false)
+                        fwUpdate.data = IOUtils.toByteArray(context.assets.open("update/update_XINANBAO_APP.bin"))
+                        fwUpdate.size = fwUpdate.data.size
+                        LpBleUtil.ventilatorFwUpdate(model, fwUpdate)
+                    }
+                    3 -> {
+                        val fwUpdate = FwUpdate()
+                        fwUpdate.deviceType = 0x3631
+                        fwUpdate.curMask = 4
+                        fwUpdate.setMask(false, false, true)
+                        fwUpdate.data = IOUtils.toByteArray(context.assets.open("update/update_XINANBAO_Language.bin"))
+                        fwUpdate.size = fwUpdate.data.size
+                        LpBleUtil.ventilatorFwUpdate(model, fwUpdate)
+                    }
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
         }
         // 绑定/解绑
         binding.ventilatorLayout.bound.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -1004,9 +1047,7 @@ class VentilatorViewModel : SettingViewModel() {
                         warningSetting.warningLeak.high = position.times(15)
                         LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
                     }
-                    if (position == 0) {
-                        binding.ventilatorLayout.autoEnd.isEnabled = true
-                    }
+                    binding.ventilatorLayout.autoEnd.isEnabled = position == 0
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -1104,7 +1145,11 @@ class VentilatorViewModel : SettingViewModel() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
                     warningSetting.type = VentilatorBleCmd.WarningSetting.RR_HIGH
-                    warningSetting.warningRrHigh.high = progress
+                    warningSetting.warningRrHigh.high = if (progress == binding.ventilatorLayout.rrHigh.min) {
+                        0
+                    } else {
+                        progress
+                    }
                     LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
                 }
                 binding.ventilatorLayout.rrHighProcess.text = if (progress == 0) {
@@ -1122,10 +1167,19 @@ class VentilatorViewModel : SettingViewModel() {
         binding.ventilatorLayout.rrHighSub.setOnClickListener {
             binding.ventilatorLayout.rrHigh.progress--
             warningSetting.type = VentilatorBleCmd.WarningSetting.RR_HIGH
-            warningSetting.warningRrHigh.high = binding.ventilatorLayout.rrHigh.progress
+            warningSetting.warningRrHigh.high = if (binding.ventilatorLayout.rrHigh.progress == binding.ventilatorLayout.rrHigh.min) {
+                0
+            } else {
+                binding.ventilatorLayout.rrHigh.progress
+            }
             LpBleUtil.ventilatorSetWarningSetting(model, warningSetting)
         }
         binding.ventilatorLayout.rrHighAdd.setOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (warningSetting.warningRrHigh.high == 0 && warningSetting.warningRrLow.low != 0) {
+                    binding.ventilatorLayout.rrHigh.min = warningSetting.warningRrLow.low + 1
+                }
+            }
             binding.ventilatorLayout.rrHigh.progress++
             warningSetting.type = VentilatorBleCmd.WarningSetting.RR_HIGH
             warningSetting.warningRrHigh.high = binding.ventilatorLayout.rrHigh.progress
@@ -1378,22 +1432,18 @@ class VentilatorViewModel : SettingViewModel() {
                     }
                 }
                 if (data.deviceMode == 2) {
-                    binding.ventilatorLayout.ventilationSetting.visibility = View.VISIBLE
-                    binding.ventilatorLayout.warningSetting.visibility = View.VISIBLE
+                    isEnableVentilationSetting(true)
+                    isEnableWarningSetting(true)
                 } else {
-                    binding.ventilatorLayout.ventilationSetting.visibility = View.GONE
-                    binding.ventilatorLayout.ventilationSettingLayout.visibility = View.GONE
-                    binding.ventilatorLayout.warningSetting.visibility = View.GONE
-                    binding.ventilatorLayout.warningSettingLayout.visibility = View.GONE
+                    isEnableVentilationSetting(false)
+                    isEnableWarningSetting(false)
                 }
                 if (data.isVentilated) {
-                    binding.ventilatorLayout.systemSetting.visibility = View.GONE
-                    binding.ventilatorLayout.systemSettingLayout.visibility = View.GONE
-                    binding.ventilatorLayout.measureSetting.visibility = View.GONE
-                    binding.ventilatorLayout.measureSettingLayout.visibility = View.GONE
+                    isEnableSystemSetting(false)
+                    isEnableMeasureSetting(false)
                 } else {
-                    binding.ventilatorLayout.systemSetting.visibility = View.VISIBLE
-                    binding.ventilatorLayout.measureSetting.visibility = View.VISIBLE
+                    isEnableSystemSetting(true)
+                    isEnableMeasureSetting(true)
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorGetSystemSetting)
@@ -1553,6 +1603,7 @@ class VentilatorViewModel : SettingViewModel() {
             .observe(owner) {
                 spinnerSet = false
                 warningSetting = it.data as WarningSetting
+                binding.ventilatorLayout.autoEnd.isEnabled = warningSetting.warningLeak.high == 0
                 binding.ventilatorLayout.leakHigh.setSelection(warningSetting.warningLeak.high.div(15))
                 binding.ventilatorLayout.lowVentilation.progress = warningSetting.warningVentilation.low
                 binding.ventilatorLayout.vtLow.progress = if (warningSetting.warningVt.low == 0) {
@@ -1560,12 +1611,10 @@ class VentilatorViewModel : SettingViewModel() {
                 } else {
                     warningSetting.warningVt.low.div(10)
                 }
-                binding.ventilatorLayout.rrHigh.progress = warningSetting.warningRrHigh.high
-                binding.ventilatorLayout.rrLow.progress = warningSetting.warningRrLow.low
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     if (warningSetting.warningRrLow.low != 0 && warningSetting.warningRrHigh.high != 0) {
-                        binding.ventilatorLayout.rrHigh.min = binding.ventilatorLayout.rrLow.progress + 2
-                        binding.ventilatorLayout.rrLow.max = binding.ventilatorLayout.rrHigh.progress - 2
+                        binding.ventilatorLayout.rrHigh.min = warningSetting.warningRrLow.low + 1
+                        binding.ventilatorLayout.rrLow.max = warningSetting.warningRrHigh.high - 2
                     } else {
                         binding.ventilatorLayout.rrLow.min = 0
                         binding.ventilatorLayout.rrLow.max = 60
@@ -1573,6 +1622,8 @@ class VentilatorViewModel : SettingViewModel() {
                         binding.ventilatorLayout.rrHigh.max = 60
                     }
                 }
+                binding.ventilatorLayout.rrHigh.progress = warningSetting.warningRrHigh.high
+                binding.ventilatorLayout.rrLow.progress = warningSetting.warningRrLow.low
                 binding.ventilatorLayout.spo2Low.progress = if (warningSetting.warningSpo2Low.low == 0) {
                     79
                 } else {
@@ -1624,6 +1675,16 @@ class VentilatorViewModel : SettingViewModel() {
                     LpBleCmd.TYPE_CMD_NOT_SUPPORTED -> _toast.value = "不支持指令"
                     LpBleCmd.TYPE_NORMAL_ERROR -> _toast.value = "通用错误"
                 }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorWritingFileProgress)
+            .observe(owner) {
+                val data = it.data as Int
+                binding.ventilatorLayout.updateInfo.text = "升级进度：$data %"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Ventilator.EventVentilatorWriteFileEnd)
+            .observe(owner) {
+                val data = it.data as Boolean
+                binding.ventilatorLayout.updateInfo.text = "升级完成：$data"
             }
     }
 
@@ -1696,6 +1757,84 @@ class VentilatorViewModel : SettingViewModel() {
                 binding.ventilatorLayout.rrLowLayout.visibility = View.VISIBLE
             }
         }
+    }
+
+    private fun isEnableSystemSetting(enable: Boolean) {
+        binding.ventilatorLayout.unit.isEnabled = enable
+        binding.ventilatorLayout.language.isEnabled = enable
+        binding.ventilatorLayout.screenOff.isEnabled = enable
+        binding.ventilatorLayout.brightness.isEnabled = enable
+        binding.ventilatorLayout.filter.isEnabled = enable
+        binding.ventilatorLayout.mask.isEnabled = enable
+        binding.ventilatorLayout.tube.isEnabled = enable
+        binding.ventilatorLayout.tank.isEnabled = enable
+        binding.ventilatorLayout.volume.isEnabled = enable
+    }
+    private fun isEnableMeasureSetting(enable: Boolean) {
+        binding.ventilatorLayout.humidification.isEnabled = enable
+        binding.ventilatorLayout.epr.isEnabled = enable
+        binding.ventilatorLayout.tubeType.isEnabled = enable
+        binding.ventilatorLayout.maskType.isEnabled = enable
+        binding.ventilatorLayout.maskPressure.isEnabled = enable
+        binding.ventilatorLayout.rampPressure.isEnabled = enable
+        binding.ventilatorLayout.rampTime.isEnabled = enable
+        binding.ventilatorLayout.autoStart.isEnabled = enable
+        binding.ventilatorLayout.autoEnd.isEnabled = enable
+        binding.ventilatorLayout.preHeat.isEnabled = enable
+    }
+    private fun isEnableVentilationSetting(enable: Boolean) {
+        binding.ventilatorLayout.ventilationMode.isEnabled = enable
+        binding.ventilatorLayout.iTrigger.isEnabled = enable
+        binding.ventilatorLayout.eTrigger.isEnabled = enable
+        binding.ventilatorLayout.cpapPressureSub.isEnabled = enable
+        binding.ventilatorLayout.cpapPressure.isEnabled = enable
+        binding.ventilatorLayout.cpapPressureAdd.isEnabled = enable
+        binding.ventilatorLayout.apapPressureMaxSub.isEnabled = enable
+        binding.ventilatorLayout.apapPressureMax.isEnabled = enable
+        binding.ventilatorLayout.apapPressureMaxAdd.isEnabled = enable
+        binding.ventilatorLayout.apapPressureMinSub.isEnabled = enable
+        binding.ventilatorLayout.apapPressureMin.isEnabled = enable
+        binding.ventilatorLayout.apapPressureMinAdd.isEnabled = enable
+        binding.ventilatorLayout.ipapPressureSub.isEnabled = enable
+        binding.ventilatorLayout.ipapPressure.isEnabled = enable
+        binding.ventilatorLayout.ipapPressureAdd.isEnabled = enable
+        binding.ventilatorLayout.epapPressureSub.isEnabled = enable
+        binding.ventilatorLayout.epapPressure.isEnabled = enable
+        binding.ventilatorLayout.epapPressureAdd.isEnabled = enable
+        binding.ventilatorLayout.inspiratoryTimeSub.isEnabled = enable
+        binding.ventilatorLayout.inspiratoryTime.isEnabled = enable
+        binding.ventilatorLayout.inspiratoryTimeAdd.isEnabled = enable
+        binding.ventilatorLayout.respiratoryFrequencySub.isEnabled = enable
+        binding.ventilatorLayout.respiratoryFrequency.isEnabled = enable
+        binding.ventilatorLayout.respiratoryFrequencyAdd.isEnabled = enable
+        binding.ventilatorLayout.raiseTimeSub.isEnabled = enable
+        binding.ventilatorLayout.raiseTime.isEnabled = enable
+        binding.ventilatorLayout.raiseTimeAdd.isEnabled = enable
+    }
+    private fun isEnableWarningSetting(enable: Boolean) {
+        binding.ventilatorLayout.leakHigh.isEnabled = enable
+        binding.ventilatorLayout.apnea.isEnabled = enable
+        binding.ventilatorLayout.lowVentilationSub.isEnabled = enable
+        binding.ventilatorLayout.lowVentilation.isEnabled = enable
+        binding.ventilatorLayout.lowVentilationAdd.isEnabled = enable
+        binding.ventilatorLayout.vtLowSub.isEnabled = enable
+        binding.ventilatorLayout.vtLow.isEnabled = enable
+        binding.ventilatorLayout.vtLowAdd.isEnabled = enable
+        binding.ventilatorLayout.rrHighSub.isEnabled = enable
+        binding.ventilatorLayout.rrHigh.isEnabled = enable
+        binding.ventilatorLayout.rrHighAdd.isEnabled = enable
+        binding.ventilatorLayout.rrLowSub.isEnabled = enable
+        binding.ventilatorLayout.rrLow.isEnabled = enable
+        binding.ventilatorLayout.rrLowAdd.isEnabled = enable
+        binding.ventilatorLayout.spo2LowSub.isEnabled = enable
+        binding.ventilatorLayout.spo2Low.isEnabled = enable
+        binding.ventilatorLayout.spo2LowAdd.isEnabled = enable
+        binding.ventilatorLayout.hrHighSub.isEnabled = enable
+        binding.ventilatorLayout.hrHigh.isEnabled = enable
+        binding.ventilatorLayout.hrHighAdd.isEnabled = enable
+        binding.ventilatorLayout.hrLowSub.isEnabled = enable
+        binding.ventilatorLayout.hrLow.isEnabled = enable
+        binding.ventilatorLayout.hrLowAdd.isEnabled = enable
     }
 
 }

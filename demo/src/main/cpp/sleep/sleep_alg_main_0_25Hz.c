@@ -182,7 +182,7 @@ SLEEP_ALG_STATUS sleep_alg_main_pro_0_25Hz(sleep_alg_input_t  *input) {
 			//入睡判断
 			if (pr_down_count >= 4					//连续4个值下降 
 				&& m_sleep_alg_awake_count > SLEEP_ALG_SAMPLE_0_25_HZ * 60 * 10		//佩戴超过10分钟（人的正常入睡时间为10-30分钟）
-				&& avge < 75
+				//&& avge < 75
 				&& m_sleep_alg_fall_sleep_flag == 0
 				&& (!m_sleep_alg_acc_high_sign)) {
 				m_sleep_alg_fall_sleep_flag = 1;

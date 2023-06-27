@@ -80,11 +80,22 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         super.onViewCreated(view, savedInstanceState)
         init()
 //        val data = OxyData()
-//        data.fileName = "20230507231015"
-//        data.oxyBleFile = OxyBleFile(FileUtil.readFileToByteArray(context, "/o2/20230507231015.dat"))
+//        data.fileName = "uid-25468-date-20230608080558-source-O2Ring 3094"
+//        data.oxyBleFile = OxyBleFile(FileUtil.readFileToByteArray(context, "/o2/uid-25468-date-20230608080558-source-O2Ring 3094.dat"))
 //        sleepAlg(data)
 //        testEr3()
 //        testEr3Decompress()
+
+        // 画心电图
+//        val data = FileUtil.readFileToString(context, "1.txt").split(",")
+//        val shortData = mutableListOf<Short>()
+//        for (d in data) {
+//            shortData.add(d.toShort())
+//        }
+//        val temp = getEcgData(0, "导联 aVF", byteArrayOf(0), shortData.toShortArray(), 0)
+//        ecgList.add(temp)
+//        ecgAdapter.setNewInstance(ecgList)
+//        ecgAdapter.notifyDataSetChanged()
     }
 
     private fun testEr3Decompress() {
@@ -336,7 +347,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         val pass = trimStr(password.text.toString())
                         val addr = trimStr(serverAddr.text.toString())
                         val port = trimStr(serverPort.text.toString())
-                        if (pass.isNullOrEmpty() || addr.isNullOrEmpty() || port.isNullOrEmpty()) {
+                        if (/*pass.isNullOrEmpty() || */addr.isNullOrEmpty() || port.isNullOrEmpty()) {
                             Toast.makeText(context, context?.getString(R.string.input_tips), Toast.LENGTH_SHORT).show()
                             return@setOnClickListener
                         } else {
@@ -361,10 +372,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     serverPort.visibility = View.GONE
                     sure.setOnClickListener { it1 ->
                         val pass = trimStr(password.text.toString())
-                        if (pass.isNullOrEmpty()) {
-                            Toast.makeText(context, context?.getString(R.string.input_tips), Toast.LENGTH_SHORT).show()
-                            return@setOnClickListener
-                        } else {
+//                        if (pass.isNullOrEmpty()) {
+//                            Toast.makeText(context, context?.getString(R.string.input_tips), Toast.LENGTH_SHORT).show()
+//                            return@setOnClickListener
+//                        } else {
                             wifiConfig.option = 3
                             it.pwd = pass
                             wifiConfig.wifi = it
@@ -383,7 +394,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             popupWindow?.dismiss()
                             mAlertDialogCanCancel?.setMessage(context?.getString(R.string.handling))
                             mAlertDialogCanCancel?.show()
-                        }
+//                        }
                     }
                 }
                 cancel.setOnClickListener {
@@ -447,6 +458,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     fileType = CheckmeLeBleCmd.ListType.ECG_TYPE
                 }
                 LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0], fileType)
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CHECKME) {
+                fileType++
+                if (fileType > CheckmeBleCmd.ListType.BPCAL_TYPE) {
+                    fileType = CheckmeBleCmd.ListType.DLC_TYPE
+                }
+                LpBleUtil.checkmeGetFileList(Constant.BluetoothConfig.currentModel[0], fileType, 1)
             } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R20
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R21
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_R10
@@ -759,7 +776,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             "sn：${it.sn}\ncode：${it.branchCode}"
                 }
             }
-            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4, Bluetooth.MODEL_CHECKME -> {
+            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4 -> {
                 infoViewModel = ViewModelProvider(this).get(PulsebitViewModel::class.java)
                 (infoViewModel as PulsebitViewModel).initEvent(this)
                 mainViewModel.pulsebitInfo.observe(viewLifecycleOwner) {
@@ -793,6 +810,16 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 infoViewModel = ViewModelProvider(this).get(CheckmeLeViewModel::class.java)
                 (infoViewModel as CheckmeLeViewModel).initEvent(this)
                 mainViewModel.checkmeLeInfo.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwVersion}\n" +
+                            "${context?.getString(R.string.software_version)}${it.swVersion}\n" +
+                            "sn：${it.sn}"
+                }
+            }
+            Bluetooth.MODEL_CHECKME -> {
+                infoViewModel = ViewModelProvider(this).get(CheckmeViewModel::class.java)
+                (infoViewModel as CheckmeViewModel).initEvent(this)
+                mainViewModel.checkmeInfo.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwVersion}\n" +
                             "${context?.getString(R.string.software_version)}${it.swVersion}\n" +
@@ -1080,7 +1107,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             if (((w.state == 0) && (it.wifi.ssid.isNotEmpty())) || w.state == 1) {
                                 handler.postDelayed({
                                     LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
-                                }, 1000)
+                                }, 3000)
                             } else {
                                 mAlertDialogCanCancel?.dismiss()
                             }

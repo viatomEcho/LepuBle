@@ -190,6 +190,9 @@ public class EcgBkg extends View {
         }
 
         // 1mm x
+        // 总共是屏幕mm：mWidth/(1/ DataController.mm2px)
+        // 第i个点是第imm
+        // path绘图使用像素单位
         for (int i = 0; i < mWidth/(1/ DataController.mm2px) + 1; i++) {
             Path p = new Path();
             p.moveTo(i/ DataController.mm2px, 0);
