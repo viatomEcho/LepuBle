@@ -1557,7 +1557,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
             Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
-            Bluetooth.MODEL_PC60NW_WPS -> {
+            Bluetooth.MODEL_PC60NW_WPS, Bluetooth.MODEL_PC_60NW_NO_SN -> {
                 getInterface(model)?.getInfo()
             }
         }
@@ -1581,7 +1581,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_S5W, Bluetooth.MODEL_S6W,
             Bluetooth.MODEL_S7W, Bluetooth.MODEL_S7BW,
             Bluetooth.MODEL_S6W1, Bluetooth.MODEL_PC60NW_BLE,
-            Bluetooth.MODEL_PC60NW_WPS -> {
+            Bluetooth.MODEL_PC60NW_WPS, Bluetooth.MODEL_PC_60NW_NO_SN -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc60FwBleInterface).let {
                         LepuBleLog.d(tag, "it as Pc60FwBleInterface--pc60fwEnableRtData")
