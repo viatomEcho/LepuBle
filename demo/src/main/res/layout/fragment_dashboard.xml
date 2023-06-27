@@ -630,12 +630,21 @@
                                 android:textSize="16sp"
                                 android:text="PPG数据"/>
                         </RadioGroup>
+                        <TextView
+                            android:id="@+id/o2_data_tips"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/dp_10"
+                            android:textColor="@color/colorRed"
+                            android:textSize="16sp"
+                            app:layout_constraintTop_toBottomOf="@id/o2_rt_type_layout"
+                            app:layout_constraintStart_toStartOf="parent"/>
                         <LinearLayout
                             android:visibility="gone"
                             android:id="@+id/ppg_type_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:layout_constraintTop_toBottomOf="@id/o2_rt_type_layout"
+                            app:layout_constraintTop_toBottomOf="@id/o2_data_tips"
                             app:layout_constraintStart_toStartOf="parent">
                             <CheckBox
                                 android:id="@+id/ppg_ir"
@@ -649,13 +658,6 @@
                                 android:layout_height="wrap_content"
                                 android:textSize="16sp"
                                 android:text="红光"/>
-                            <TextView
-                                android:id="@+id/ppg_tips"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/dp_10"
-                                android:textColor="@color/colorRed"
-                                android:textSize="16sp"/>
                         </LinearLayout>
                         <CheckBox
                             android:visibility="gone"
