@@ -15,7 +15,7 @@ import com.lepu.blepro.utils.toUInt
  * receive:
  * 1.实时心电、血氧
  * 血氧心电采样率：实时25HZ
- * 心电增益：n * 4033 / (32767 * 12 * 1.05) = n * 0.0097683451362458-----102.3714852467146倍
+ * 心电增益：n * (4033 / (32767 * 12)) * 1.05 = n * 0.010769600512711-----92.85395487230314倍
  */
 class VetcorderBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "VetcorderBleInterface"
