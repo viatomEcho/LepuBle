@@ -341,7 +341,13 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                     GLU_RESULT -> {
                         LepuBleLog.d(tag, "model:$model,GLU_RESULT 血糖 => success $data")
                         val data = Pc300BleResponse.GluResult(response.content)
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300GluResult).post(InterfaceEvent(model, data))
+
+                        gluResult.unit = data.unit
+                        gluResult.data = data.data
+                        gluResult.result = data.result
+                        gluResult.resultMess = data.resultMess
+
+                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300GluResult).post(InterfaceEvent(model, gluResult))
                     }
                     UA_RESULT -> {
                         LepuBleLog.d(tag, "model:$model,UA_RESULT 尿酸 => success $data")

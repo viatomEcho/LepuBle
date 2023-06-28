@@ -103,7 +103,7 @@ public class Pc300BleCmd {
         return getReq(TOKEN_0XFF, DEVICE_INFO_4, new byte[0]);
     }
     public static byte[] getDeviceInfo51() {
-        return getReq(TOKEN_0X51, 0x01, new byte[0]);
+        return getReq(TOKEN_0X51, DEVICE_INFO, new byte[0]);
     }
     public static byte[] getDeviceId() {
         return getReq(TOKEN_0XFF, GET_DEVICE_ID, new byte[0]);
