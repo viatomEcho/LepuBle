@@ -77,13 +77,14 @@ class CheckmeBleInterface(model: Int): BleInterface(model) {
             return
         }
         val bs: ByteArray = when (cmd) {
-            PulsebitBleCmd.OXY_CMD_READ_LIST_START -> PulsebitBleCmd.readListStart()
-            PulsebitBleCmd.OXY_CMD_READ_LIST_CONTENT -> PulsebitBleCmd.readListContent()
-            PulsebitBleCmd.OXY_CMD_READ_LIST_END -> PulsebitBleCmd.readListEnd()
-            PulsebitBleCmd.OXY_CMD_READ_END -> PulsebitBleCmd.readFileEnd()
-            PulsebitBleCmd.OXY_CMD_READ_CONTENT -> PulsebitBleCmd.readFileContent()
-            PulsebitBleCmd.OXY_CMD_PARA_SYNC -> PulsebitBleCmd.syncTime()
-            PulsebitBleCmd.OXY_CMD_INFO -> PulsebitBleCmd.getInfo()
+            CheckmeBleCmd.OXY_CMD_READ_LIST_START -> CheckmeBleCmd.readListStart()
+            CheckmeBleCmd.OXY_CMD_READ_LIST_CONTENT -> CheckmeBleCmd.readListContent()
+            CheckmeBleCmd.OXY_CMD_READ_LIST_END -> CheckmeBleCmd.readListEnd()
+            CheckmeBleCmd.OXY_CMD_READ_END -> CheckmeBleCmd.readFileEnd()
+            CheckmeBleCmd.OXY_CMD_READ_CONTENT -> CheckmeBleCmd.readFileContent()
+            CheckmeBleCmd.OXY_CMD_PARA_SYNC -> CheckmeBleCmd.syncTime()
+            CheckmeBleCmd.OXY_CMD_INFO -> CheckmeBleCmd.getInfo()
+            CheckmeBleCmd.OXY_CMD_PING -> CheckmeBleCmd.ping()
             else -> return
         }
         sendCmd(bs)
@@ -154,12 +155,17 @@ class CheckmeBleInterface(model: Int): BleInterface(model) {
             }
 
             when (curCmd) {
-                PulsebitBleCmd.OXY_CMD_PARA_SYNC -> {
+                CheckmeBleCmd.OXY_CMD_PING -> {
+                    clearTimeout()
+                    LepuBleLog.d(tag, "model:$model, OXY_CMD_PING => success")
+                    syncTime()
+                }
+                CheckmeBleCmd.OXY_CMD_PARA_SYNC -> {
                     clearTimeout()
                     LepuBleLog.d(tag, "model:$model, OXY_CMD_PARA_SYNC => success")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Checkme.EventCheckmeSetTime).post(InterfaceEvent(model, true))
                 }
-                PulsebitBleCmd.OXY_CMD_INFO -> {
+                CheckmeBleCmd.OXY_CMD_INFO -> {
 
                     clearTimeout()
                     val info = CheckmeBleResponse.DeviceInfo(response.content)
@@ -168,7 +174,7 @@ class CheckmeBleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Checkme.EventCheckmeDeviceInfo).post(InterfaceEvent(model, info))
                 }
 
-                PulsebitBleCmd.OXY_CMD_READ_START -> {
+                CheckmeBleCmd.OXY_CMD_READ_START -> {
                     clearTimeout()
 
                     if (response.state) {
@@ -177,9 +183,9 @@ class CheckmeBleInterface(model: Int): BleInterface(model) {
                         fileContent = null
                         LepuBleLog.d(tag, "model:$model, 文件大小：${fileSize}  文件名：$curFileName")
                         if (fileSize <= 0) {
-                            sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_END)
+                            sendOxyCmd(CheckmeBleCmd.OXY_CMD_READ_END)
                         } else {
-                            sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_CONTENT)
+                            sendOxyCmd(CheckmeBleCmd.OXY_CMD_READ_CONTENT)
                         }
                     } else {
                         if (curFileName.contains(".dat")) {
@@ -191,7 +197,7 @@ class CheckmeBleInterface(model: Int): BleInterface(model) {
                     }
                 }
 
-                PulsebitBleCmd.OXY_CMD_READ_CONTENT -> {
+                CheckmeBleCmd.OXY_CMD_READ_CONTENT -> {
                     clearTimeout()
                     fileContent = add(fileContent, response.content)
                     curSize += response.len
@@ -203,12 +209,12 @@ class CheckmeBleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "model:$model, 读文件中：$curFileName   => $curSize / $fileSize ${curSize*100/fileSize}")
 
                     if (curSize < fileSize) {
-                        sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_CONTENT)
+                        sendOxyCmd(CheckmeBleCmd.OXY_CMD_READ_CONTENT)
                     } else {
-                        sendOxyCmd(PulsebitBleCmd.OXY_CMD_READ_END)
+                        sendOxyCmd(CheckmeBleCmd.OXY_CMD_READ_END)
                     }
                 }
-                PulsebitBleCmd.OXY_CMD_READ_END -> {
+                CheckmeBleCmd.OXY_CMD_READ_END -> {
                     clearTimeout()
                     LepuBleLog.d(tag, "model:$model, 读文件完成: $curFileName ==> $fileSize")
 
@@ -283,7 +289,7 @@ class CheckmeBleInterface(model: Int): BleInterface(model) {
     override fun dealReadFile(userId: String, fileName: String) {
         if (curCmd != -1) {
             // busy
-            LepuBleLog.d(tag, "busy: " + PulsebitBleCmd.OXY_CMD_READ_START.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
+            LepuBleLog.d(tag, "busy: " + CheckmeBleCmd.OXY_CMD_READ_START.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
             return
         }
         if (fileType == -1) {
@@ -292,33 +298,33 @@ class CheckmeBleInterface(model: Int): BleInterface(model) {
         }
         this.curFileName = fileName
         LepuBleLog.d(tag, "$userId 将要读取文件 $curFileName")
-        sendCmd(PulsebitBleCmd.readFileStart(fileName))
-        curCmd = PulsebitBleCmd.OXY_CMD_READ_START
+        sendCmd(CheckmeBleCmd.readFileStart(fileName))
+        curCmd = CheckmeBleCmd.OXY_CMD_READ_START
         LepuBleLog.e(tag, "dealReadFile")
     }
 
     override fun syncTime() {
-        sendOxyCmd(PulsebitBleCmd.OXY_CMD_PARA_SYNC)
+        sendOxyCmd(CheckmeBleCmd.OXY_CMD_PARA_SYNC)
         LepuBleLog.e(tag, "syncTime")
     }
 
     override fun getFileList() {
         if (curCmd != -1) {
             // busy
-            LepuBleLog.d(tag, "busy: " + PulsebitBleCmd.OXY_CMD_READ_START.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
+            LepuBleLog.d(tag, "busy: " + CheckmeBleCmd.OXY_CMD_READ_START.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
             return
         }
         this.curFileName = "1dlc.dat"
         LepuBleLog.d(tag, "将要读取文件 $curFileName")
-        sendCmd(PulsebitBleCmd.readFileStart(curFileName))
-        curCmd = PulsebitBleCmd.OXY_CMD_READ_START
+        sendCmd(CheckmeBleCmd.readFileStart(curFileName))
+        curCmd = CheckmeBleCmd.OXY_CMD_READ_START
         LepuBleLog.e(tag, "getFileList")
     }
 
     fun getFileList(type: Int, id: Int) {
         if (curCmd != -1) {
             // busy
-            LepuBleLog.d(tag, "busy: " + PulsebitBleCmd.OXY_CMD_READ_START.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
+            LepuBleLog.d(tag, "busy: " + CheckmeBleCmd.OXY_CMD_READ_START.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
             return
         }
         userId = id
@@ -335,13 +341,13 @@ class CheckmeBleInterface(model: Int): BleInterface(model) {
             CheckmeBleCmd.ListType.DLC_TYPE -> curFileName = "${id}dlc.dat"    // xdlc.dat
             CheckmeBleCmd.ListType.GLU_TYPE -> curFileName = "${id}glu.dat"    // xglu.dat
         }
-        sendCmd(PulsebitBleCmd.readFileStart(curFileName))
-        curCmd = PulsebitBleCmd.OXY_CMD_READ_START
+        sendCmd(CheckmeBleCmd.readFileStart(curFileName))
+        curCmd = CheckmeBleCmd.OXY_CMD_READ_START
         LepuBleLog.e(tag, "getFileList type:$type, curFileName:$curFileName")
     }
 
     override fun getInfo() {
-        sendOxyCmd(PulsebitBleCmd.OXY_CMD_INFO)
+        sendOxyCmd(CheckmeBleCmd.OXY_CMD_INFO)
         LepuBleLog.e(tag, "getInfo")
     }
 
@@ -363,10 +369,6 @@ class CheckmeBleInterface(model: Int): BleInterface(model) {
 
     override fun dealContinueRF(userId: String, fileName: String) {
         LepuBleLog.e(tag, "dealContinueRF Not yet implemented")
-    }
-
-    fun startRtData() {
-        sendCmd(byteArrayOf(0x01))
     }
 
 }
