@@ -12,7 +12,7 @@ class Ad5Data(val bytes: ByteArray) {
 
     init {
         cmd = byte2UInt(bytes[2])
-        sn = trimStr(String(bytes.copyOfRange(3, 10)))
+        sn = trimStr(String(bytes.copyOfRange(3, 11)))
         hr1 = byte2UInt(bytes[11])
         hr2 = byte2UInt(bytes[12])
     }

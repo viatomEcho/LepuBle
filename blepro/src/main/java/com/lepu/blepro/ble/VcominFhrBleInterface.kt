@@ -51,7 +51,7 @@ class VcominFhrBleInterface(model: Int): BleInterface(model) {
         }
         val data = VcominData(response)
         LepuBleLog.d(tag, "received data : $data")
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VCOMIN.EventVcominRtHr).post(InterfaceEvent(model, data))
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VCOMIN.EventVcominRtHr).post(InterfaceEvent(model, data.hr2))
     }
 
     @OptIn(ExperimentalUnsignedTypes::class)

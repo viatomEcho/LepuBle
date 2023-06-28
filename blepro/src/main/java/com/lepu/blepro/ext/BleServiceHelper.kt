@@ -558,17 +558,17 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_AOJ20A -> {
                 return inter is Aoj20aBleInterface
             }
-            Bluetooth.MODEL_CHECK_POD -> {
+            Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_CHECKME_POD_WPS -> {
                 return inter is CheckmePodBleInterface
             }
             Bluetooth.MODEL_PC_68B -> {
                 return inter is Pc68bBleInterface
             }
-            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
                 return inter is Pc300BleInterface
             }
-            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4,
-            Bluetooth.MODEL_CHECKME -> {
+            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4 -> {
                 return inter is PulsebitBleInterface
             }
             Bluetooth.MODEL_CHECKME_LE -> {
@@ -644,7 +644,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_CMRING,
             Bluetooth.MODEL_OXYU, Bluetooth.MODEL_AI_S100,
             Bluetooth.MODEL_O2M_WPS, Bluetooth.MODEL_OXYFIT_WPS,
-            Bluetooth.MODEL_KIDSO2_WPS -> {
+            Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_SI_PO6 -> {
                 getInterface(model)?.getInfo()
             }
         }
@@ -663,7 +663,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_CMRING,
             Bluetooth.MODEL_OXYU, Bluetooth.MODEL_AI_S100,
             Bluetooth.MODEL_O2M_WPS, Bluetooth.MODEL_OXYFIT_WPS,
-            Bluetooth.MODEL_KIDSO2_WPS -> {
+            Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_SI_PO6 -> {
                 getInterface(model)?.let {
                     LepuBleLog.d(tag, "--oxyReadFile--")
                     it.readFile(userId, fileName)
@@ -684,7 +684,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_CMRING,
             Bluetooth.MODEL_OXYU, Bluetooth.MODEL_AI_S100,
             Bluetooth.MODEL_O2M_WPS, Bluetooth.MODEL_OXYFIT_WPS,
-            Bluetooth.MODEL_KIDSO2_WPS -> {
+            Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_SI_PO6 -> {
                 getInterface(model)?.let {
                     LepuBleLog.d(tag, "--oxyFactoryReset--")
                     it.factoryReset()
@@ -705,7 +705,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_CMRING,
             Bluetooth.MODEL_OXYU, Bluetooth.MODEL_AI_S100,
             Bluetooth.MODEL_O2M_WPS, Bluetooth.MODEL_OXYFIT_WPS,
-            Bluetooth.MODEL_KIDSO2_WPS -> {
+            Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_SI_PO6 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetRtWave")
@@ -729,7 +729,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_CMRING,
             Bluetooth.MODEL_OXYU, Bluetooth.MODEL_AI_S100,
             Bluetooth.MODEL_O2M_WPS, Bluetooth.MODEL_OXYFIT_WPS,
-            Bluetooth.MODEL_KIDSO2_WPS -> {
+            Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_SI_PO6 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--oxyGetRtParam")
@@ -753,7 +753,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_CMRING,
             Bluetooth.MODEL_OXYU, Bluetooth.MODEL_AI_S100,
             Bluetooth.MODEL_O2M_WPS, Bluetooth.MODEL_OXYFIT_WPS,
-            Bluetooth.MODEL_KIDSO2_WPS -> {
+            Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_SI_PO6 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--oxyUpdateSetting")
@@ -789,7 +789,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_BBSM_S2, Bluetooth.MODEL_CMRING,
             Bluetooth.MODEL_OXYU, Bluetooth.MODEL_AI_S100,
             Bluetooth.MODEL_O2M_WPS, Bluetooth.MODEL_OXYFIT_WPS,
-            Bluetooth.MODEL_KIDSO2_WPS -> {
+            Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_SI_PO6 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as OxyBleInterface).let{
                         LepuBleLog.d(tag, "it as OxyBleInterface--oxyUpdateSetting")
@@ -1857,7 +1857,7 @@ class BleServiceHelper private constructor() {
     fun checkmePodGetInfo(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_CHECK_POD -> {
+            Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_CHECKME_POD_WPS -> {
                 getInterface(model)?.getInfo()
             }
         }
@@ -1865,7 +1865,7 @@ class BleServiceHelper private constructor() {
     fun checkmePodGetFileList(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_CHECK_POD -> {
+            Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_CHECKME_POD_WPS -> {
                 getInterface(model)?.getFileList()
             }
         }
@@ -1874,7 +1874,7 @@ class BleServiceHelper private constructor() {
     fun pulsebitExGetInfo(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4, Bluetooth.MODEL_CHECKME -> {
+            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4 -> {
                 getInterface(model)?.getInfo()
             }
         }
@@ -1882,7 +1882,7 @@ class BleServiceHelper private constructor() {
     fun pulsebitExGetFileList(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4, Bluetooth.MODEL_CHECKME -> {
+            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4 -> {
                 getInterface(model)?.getFileList()
             }
         }
@@ -1890,7 +1890,7 @@ class BleServiceHelper private constructor() {
     fun pulsebitExReadFile(model: Int, fileName: String) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4, Bluetooth.MODEL_CHECKME -> {
+            Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4 -> {
                 getInterface(model)?.readFile("", fileName)
             }
         }
@@ -1927,7 +1927,8 @@ class BleServiceHelper private constructor() {
     fun pc300GetInfo(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE -> {
+            Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
                 getInterface(model)?.getInfo()
             }
         }
@@ -4218,6 +4219,15 @@ class BleServiceHelper private constructor() {
         }
     }
 
+    fun checkmeGetInfo(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_CHECKME -> {
+                getInterface(model)?.getInfo()
+            }
+            else -> LepuBleLog.d(tag, "checkmeGetInfo current model $model unsupported!!")
+        }
+    }
     /**
      * 获取设备文件列表
      * @param fileType Checkme获取文件列表类型（CheckmeBleCmd.ListType.ECG_TYPE, OXY_TYPE, DLC_TYPE,
@@ -4242,5 +4252,14 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "checkmeGetFileList current model $model unsupported!!")
         }
     }
+    fun checkmeReadFile(model: Int, fileName: String) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_CHECKME -> {
+                getInterface(model)?.readFile("", fileName)
+            }
+        }
+    }
+
 
 }

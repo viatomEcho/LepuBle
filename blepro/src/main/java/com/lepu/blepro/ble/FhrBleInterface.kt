@@ -6,6 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.ext.FhrInfo
 import com.lepu.blepro.utils.*
 
 /**
@@ -16,6 +17,7 @@ import com.lepu.blepro.utils.*
  */
 class FhrBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "FhrBleInterface"
+    private var fhrInfo = FhrInfo()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         if (isManagerInitialized()) {
@@ -60,7 +62,12 @@ class FhrBleInterface(model: Int): BleInterface(model) {
                     return
                 }
                 val info = FhrBleResponse.DeviceInfo(response.bytes)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.FHR.EventFhrDeviceInfo).post(InterfaceEvent(model, info))
+                fhrInfo.deviceName = info.deviceName
+                fhrInfo.hr = info.hr
+                fhrInfo.volume = info.volume
+                fhrInfo.strength = info.strength
+                fhrInfo.battery = info.battery
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.FHR.EventFhrDeviceInfo).post(InterfaceEvent(model, fhrInfo))
             }
             0x0a -> {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.FHR.EventFhrAudioData).post(InterfaceEvent(model, response.content))

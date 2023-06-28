@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
  */
 class Ad5FhrBleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Ad5FhrBleInterface"
+    private var ad5Data = com.lepu.blepro.ext.Ad5Data()
 
     override fun initManager(context: Context, device: BluetoothDevice, isUpdater: Boolean) {
         if (isManagerInitialized()) {
@@ -66,7 +67,10 @@ class Ad5FhrBleInterface(model: Int): BleInterface(model) {
         }
         val data = Ad5Data(response)
         LepuBleLog.d(tag, "received data : $data")
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AD5.EventAd5RtHr).post(InterfaceEvent(model, data))
+        ad5Data.sn = data.sn
+        ad5Data.hr1 = data.hr1
+        ad5Data.hr2 = data.hr2
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.AD5.EventAd5RtHr).post(InterfaceEvent(model, ad5Data))
     }
 
     @OptIn(ExperimentalUnsignedTypes::class)
