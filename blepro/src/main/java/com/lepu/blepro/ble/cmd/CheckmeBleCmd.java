@@ -18,6 +18,7 @@ public class CheckmeBleCmd {
     public static int OXY_CMD_READ_LIST_END = 0x09;
 
     public static int OXY_CMD_INFO = 0x14;
+    public static int OXY_CMD_PING = 0x15;
     public static int OXY_CMD_PARA_SYNC = 0x16;
 
     public static final String SYNC_TYPE_TIME = "SetTIME";
@@ -65,6 +66,14 @@ public class CheckmeBleCmd {
         return buf;
     }
 
+    public static byte[] ping() {
+        byte[] buf = new byte[8];
+        buf[0] = (byte) 0xAA;
+        buf[1] = (byte) OXY_CMD_PING;
+        buf[2] = (byte) ~OXY_CMD_PING;
+        buf[7] = BleCRC.calCRC8(buf);
+        return buf;
+    }
     public static byte[] getInfo() {
         byte[] buf = new byte[8];
         buf[0] = (byte) 0xAA;

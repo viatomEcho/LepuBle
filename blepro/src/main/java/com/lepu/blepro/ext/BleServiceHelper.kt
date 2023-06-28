@@ -4218,20 +4218,6 @@ class BleServiceHelper private constructor() {
         }
     }
 
-    fun checkmeStartRtData(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_CHECKME -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as CheckmeBleInterface).let {
-                        LepuBleLog.d(tag, "it as CheckmeBleInterface--checkmeStartRtData")
-                        it.startRtData()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "checkmeStartRtData current model $model unsupported!!")
-        }
-    }
     /**
      * 获取设备文件列表
      * @param fileType Checkme获取文件列表类型（CheckmeBleCmd.ListType.ECG_TYPE, OXY_TYPE, DLC_TYPE,

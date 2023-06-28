@@ -284,7 +284,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     }
                 } else if (it == Bluetooth.MODEL_CHECKME) {
                     LpBleUtil.setTime(it)
-                    LpBleUtil.checkmeStartRtData(it)
                 } else {
                     LpBleUtil.getInfo(it)
                 }
