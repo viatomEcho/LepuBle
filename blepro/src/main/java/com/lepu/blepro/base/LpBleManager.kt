@@ -141,6 +141,7 @@ abstract class LpBleManager(context: Context): BleManager(context) {
         }
     }
     fun setNotify() {
+        LepuBleLog.d(MANAGER_TAG, "setNotify...")
         setNotificationCallback(notify_char)
             .with { device: BluetoothDevice, data: Data ->
 

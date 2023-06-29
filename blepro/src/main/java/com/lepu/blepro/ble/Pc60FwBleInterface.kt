@@ -54,6 +54,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                     Bluetooth.MODEL_PF_20AW,
                     Bluetooth.MODEL_PF_20B,
                     Bluetooth.MODEL_OXYSMART -> Pc60FwBleManager(context)
+                    Bluetooth.MODEL_PC_60NW_NO_SN -> Pc6nwBleManager(context)
                     else -> Pc6nBleManager(context)
                 }
                 LepuBleLog.d(tag, "isManagerInitialized, manager.bluetoothDevice == null")
@@ -82,6 +83,7 @@ class Pc60FwBleInterface(model: Int): BleInterface(model) {
                 Bluetooth.MODEL_PF_20AW,
                 Bluetooth.MODEL_PF_20B,
                 Bluetooth.MODEL_OXYSMART -> Pc60FwBleManager(context)
+                Bluetooth.MODEL_PC_60NW_NO_SN -> Pc6nwBleManager(context)
                 else -> Pc6nBleManager(context)
             }
             LepuBleLog.d(tag, "!isManagerInitialized, manager.create done")
