@@ -837,6 +837,11 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         }
     }
 
+    override fun onDestroy() {
+        LpBleUtil.disconnect(false)
+        super.onDestroy()
+    }
+
 }
 
 fun Activity.checkBluetooth(requestCode: Int, finishOnCancel: Boolean = false): Boolean =
