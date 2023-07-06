@@ -168,6 +168,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventLeBp2wSetWifiConfig = "com.lepu.ble.le.bp2w.set.wifi.config"              // 设置WiFi boolean
             const val EventLeBp2wGetFileListCrc = "com.lepu.ble.le.bp2w.get.fileList.crc"            // 获取列表校验值 FileListCrc
             const val EventLeBp2wDeleteFile = "com.lepu.ble.le.bp2w.delete.file"                     // 删除文件 boolean
+            const val EventLeBp2wGetWifiVersion = "com.lepu.ble.le.bp2w.get.wifi.version"            // 获取WiFi固件版本 String
         }
     }
 
@@ -841,6 +842,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface BP3 {
         companion object {
+            const val EventBp3Echo = "com.lepu.ble.bp3.echo"                                  // 回显 byte[]
             const val EventBp3GetInfo = "com.lepu.ble.bp3.get.info"                           // 设备信息 LepuDevice
             const val EventBp3GetBattery = "com.lepu.ble.bp3.get.battery"                     // 电池信息 KtBleBattery
             const val EventBp3RtData = "com.lepu.ble.bp3.rt.data"                             // 实时数据 Bp2BleRtData
@@ -869,7 +871,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBp3GetFileList = "com.lepu.ble.bp3.get.file.list"                  // 获取文件列表 KtBleFileList
             const val EventBp3ReadFileError = "com.lepu.ble.bp3.read.file.error"              // 读文件错误 boolean
             const val EventBp3ReadingFileProgress = "com.lepu.ble.bp3.reading.file.process"   // 读文件进度 int
-            const val EventBp3ReadFileComplete = "com.lepu.ble.bp3.read.file.complete"        // 读文件完成 LeBp2wUserList
+            const val EventBp3ReadFileComplete = "com.lepu.ble.bp3.read.file.complete"        // 读文件完成 byte[]
         }
     }
 

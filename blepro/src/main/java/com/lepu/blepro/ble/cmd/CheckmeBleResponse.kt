@@ -963,7 +963,7 @@ class CheckmeBleResponse{
         var hour: Int
         var minute: Int
         var second: Int
-        var glu: Float          // 血糖值
+        var glu: Int            // 血糖值, 单位mg/dL
         init {
             var index = 0
             year = toUInt(bytes.copyOfRange(index, index+2))
@@ -978,7 +978,7 @@ class CheckmeBleResponse{
             index++
             second = byte2UInt(bytes[index])
             index++
-            glu = toUInt(bytes.copyOfRange(index, index+2)).div(10f)
+            glu = toUInt(bytes.copyOfRange(index, index+2))
             recordName = getTimeString(year, month, day, hour, minute, second)
             timestamp = DateUtil.getSecondTimestamp(recordName)
         }

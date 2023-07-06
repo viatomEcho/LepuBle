@@ -75,17 +75,15 @@ class Bp3ViewModel : SettingViewModel() {
                 LpBleUtil.bp3SwitchBpUnit(model, 1)
             }
         }
-        ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("关闭", "1", "2", "3")).apply {
-            binding.bp3Layout.volume.adapter = this
-        }
-        binding.bp3Layout.volume.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        binding.bp3Layout.volume.setOnClickListener {
+            val data = trimStr(binding.bp3Layout.volumeText.text.toString())
+            if (data.isNullOrEmpty()) {
+                Toast.makeText(context, "请输入校准压力值！", Toast.LENGTH_SHORT).show()
+            } else {
                 if (this@Bp3ViewModel::bp2Config.isInitialized) {
-                    bp2Config.volume = position
+                    bp2Config.volume = data.toInt()
                     LpBleUtil.bp3SetConfig(model, bp2Config)
                 }
-            }
-            override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
         ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("关闭", "30s", "60s", "90s", "120s")).apply {
@@ -176,7 +174,7 @@ class Bp3ViewModel : SettingViewModel() {
                 binding.bp3Layout.switchWifi4g.isChecked = bp2Config.wifi4gSwitch
                 binding.bp3Layout.x3Mode.setSelection(bp2Config.avgMeasureMode)
                 binding.bp3Layout.switchSound.isChecked = bp2Config.beepSwitch
-                binding.bp3Layout.volume.setSelection(bp2Config.volume)
+                binding.bp3Layout.volumeText.setText("${bp2Config.volume}")
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3SwitchValve)
             .observe(owner) {
@@ -231,13 +229,6 @@ class Bp3ViewModel : SettingViewModel() {
 //                for (user in data.userList) {
 //                    binding.deviceInfo.text = binding.deviceInfo.text.toString() + "\n用户名: ${user.fName}${user.name}"
 //                }
-                val data = it.data as Bp2BleFile
-//                if (data.type == 1) {
-//                    binding.deviceInfo.text = "${Bp2BpFile(data.content)}"
-//                } else if (data.type == 2) {
-//                    binding.deviceInfo.text = "${Bp2EcgFile(data.content)}"
-//                }
-                binding.deviceInfo.text = "${data.type}"
                 _toast.value = "读文件成功"
             }
         LiveEventBus.get<ResponseError>(EventMsgConst.Cmd.EventCmdResponseError)

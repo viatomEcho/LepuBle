@@ -4447,5 +4447,24 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "checkmeGetFileList current model $model unsupported!!")
         }
     }
+    @JvmOverloads
+    fun checkmeReadFile(model: Int, userId: String, fileName: String, fileType: Int? = null) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_CHECKME -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as CheckmeBleInterface).let {
+                        LepuBleLog.d(tag, "it as CheckmeBleInterface--checkmeReadFile")
+                        if (fileType == null) {
+                            it.readFile(userId, fileName, 0)
+                        } else {
+                            it.readFileWithType(userId, fileName, fileType)
+                        }
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "checkmeReadFile current model $model unsupported!!")
+        }
+    }
 
 }

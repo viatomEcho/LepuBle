@@ -79,6 +79,7 @@ class MainViewModel: ViewModel() {
     }
     var downloadTip: LiveData<String> = _downloadTip
 
+    var wifiVersion = ""
     /**
      * 设备信息
      */

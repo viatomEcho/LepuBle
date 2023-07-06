@@ -9,6 +9,7 @@ import com.lepu.blepro.ble.cmd.LeBp2wBleCmd.*
 import com.lepu.blepro.ble.cmd.LepuBleResponse
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.CrcUtil.calCRC8
 import com.lepu.blepro.utils.LepuBleLog
 import com.lepu.blepro.utils.add
@@ -315,10 +316,10 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.d(tag, "RT_DATA bleResponse.len <= 0")
                     return
                 }
-                LepuBleLog.d(tag, "model:$model,RT_DATA => success")
 
                 val rtData = Bp2BleRtData(bleResponse.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wRtData).post(InterfaceEvent(model, rtData))
+                LepuBleLog.d(tag, "model:$model,RT_DATA => success, rtData.rtWave : ${rtData.rtWave}, rtData.rtState : ${rtData.rtState}")
             }
 
             SET_CONFIG -> {
@@ -464,12 +465,21 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wDeleteFile).post(InterfaceEvent(model, true))
                 LepuBleLog.d(tag, "model:$model,DELETE_FILE => success")
             }
-
+            GET_WIFI_VERSION -> {
+                if (bleResponse.len <= 3) {
+                    LepuBleLog.d(tag, "GET_WIFI_VERSION bleResponse.len <= 3")
+                    return
+                }
+                val data = "${byte2UInt(bleResponse.content[3])}.${byte2UInt(bleResponse.content[2])}.${byte2UInt(bleResponse.content[1])}.${byte2UInt(bleResponse.content[0])}"
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetWifiVersion).post(InterfaceEvent(model, data))
+                LepuBleLog.d(tag, "model:$model,GET_WIFI_VERSION => success")
+            }
         }
     }
 
     override fun getInfo() {
         sendCmd(LeBp2wBleCmd.getInfo())
+        sendCmd(LeBp2wBleCmd.getWifiVersion())
         LepuBleLog.d(tag, "getInfo...")
     }
 

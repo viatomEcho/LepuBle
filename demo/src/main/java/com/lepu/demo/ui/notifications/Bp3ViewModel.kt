@@ -4,13 +4,12 @@ import androidx.lifecycle.LifecycleOwner
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.Bp3BleCmd
 import com.lepu.blepro.ble.cmd.ResponseError
-import com.lepu.blepro.ble.data.Bp2Server
-import com.lepu.blepro.ble.data.Bp2WifiConfig
-import com.lepu.blepro.ble.data.Bp2WifiDevice
-import com.lepu.blepro.ble.data.KtBleFileList
+import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.demo.ble.LpBleUtil
+import com.lepu.demo.data.BpData
+import com.lepu.demo.util.DataConvert
 
 class Bp3ViewModel : InfoViewModel() {
 
@@ -68,6 +67,35 @@ class Bp3ViewModel : InfoViewModel() {
                 }
                 _fileNames.value = names
                 _info.value = names.toString()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3ReadFileError)
+            .observe(owner) {
+                _toast.value = "读文件错误"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3ReadingFileProgress)
+            .observe(owner) {
+                val data = it.data as Int
+                _info.value = "读文件进度：$data %"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3ReadFileComplete)
+            .observe(owner) { event ->
+                (event.data as Bp2BleFile).let {
+                    if (it.type == 2) {
+                        val data = Bp2EcgFile(it.content)
+                        val temp = getEcgData(data.measureTime.toLong(), it.name, data.waveData, DataConvert.getBp2ShortArray(data.waveData), data.recordingTime)
+                        _ecgData.value = temp
+                    } else if (it.type == 1) {
+                        val data = Bp2BpFile(it.content)
+                        val temp = BpData()
+                        temp.fileName = it.name
+                        temp.sys = data.sys
+                        temp.dia = data.dia
+                        temp.pr = data.pr
+                        temp.mean = data.mean
+                        _bpData.value = temp
+                    }
+                    _readNextFile.value = true
+                }
             }
     }
 

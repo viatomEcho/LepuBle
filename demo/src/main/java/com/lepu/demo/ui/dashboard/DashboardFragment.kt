@@ -376,9 +376,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_OXYFIT, Bluetooth.MODEL_OXYRING,
             Bluetooth.MODEL_CMRING, Bluetooth.MODEL_OXYU,
             Bluetooth.MODEL_CHECK_POD, Bluetooth.MODEL_O2M_WPS,
-            Bluetooth.MODEL_VTM01, Bluetooth.MODEL_OXYFIT_WPS,
-            Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_CHECKME_POD_WPS,
-            Bluetooth.MODEL_SI_PO6 -> {
+            Bluetooth.MODEL_OXYFIT_WPS, Bluetooth.MODEL_KIDSO2_WPS,
+            Bluetooth.MODEL_CHECKME_POD_WPS, Bluetooth.MODEL_SI_PO6 -> {
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.o2RtTypeLayout.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
@@ -392,6 +391,22 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     0 -> LpBleUtil.oxyGetRtParam(Constant.BluetoothConfig.currentModel[0])
                     1 -> LpBleUtil.oxyGetRtWave(Constant.BluetoothConfig.currentModel[0])
                     2 -> LpBleUtil.oxyGetPpgRt(Constant.BluetoothConfig.currentModel[0])
+                }
+                startWave(it.modelNo)
+            }
+            Bluetooth.MODEL_VTM01 -> {
+                binding.oxyLayout.visibility = View.VISIBLE
+                binding.o2RtTypeLayout.visibility = View.VISIBLE
+                binding.er3Layout.visibility = View.GONE
+                binding.ecgLayout.visibility = View.GONE
+                binding.bpLayout.visibility = View.GONE
+                binding.o2RtTypeLayout.check(R.id.o2_rt_param)
+                binding.ppgIr.isChecked = true
+                binding.collectData.isChecked = false
+                o2RtType = 0
+                when (o2RtType) {
+                    0, 1 -> LpBleUtil.startRtTask()
+                    2 -> LpBleUtil.vtm01GetOriginalData(Constant.BluetoothConfig.currentModel[0])
                 }
                 startWave(it.modelNo)
             }
@@ -2332,6 +2347,36 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 if (binding.collectData.isChecked) {
                     val fileName = "W${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
                     FileUtil.saveFile(context?.getExternalFilesDir(null)?.absolutePath+"/$fileName", data.wave, true)
+                }
+                when (o2RtType) {
+                    0, 1 -> {
+                        if (LpBleUtil.isRtStop(Constant.BluetoothConfig.currentModel[0])) {
+                            LpBleUtil.startRtTask()
+                        }
+                    }
+                    2 -> {
+                        LpBleUtil.stopRtTask()
+                        LpBleUtil.vtm01GetOriginalData(Constant.BluetoothConfig.currentModel[0])
+                    }
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.VTM01.EventVtm01OriginalData)
+            .observe(this) {
+                val data = it.data as Vtm01BleResponse.OriginalData
+                Log.d("1111111111111", "data.len : ${data.len}")
+                Log.d("1111111111111", "data.irRedBytes : ${bytesToHex(data.irRedBytes)}")
+                Log.d("1111111111111", "data.irIntArray : ${data.irIntArray.joinToString(",")}")
+                Log.d("1111111111111", "data.redIntArray : ${data.redIntArray.joinToString(",")}")
+                when (o2RtType) {
+                    0, 1 -> {
+                        if (LpBleUtil.isRtStop(Constant.BluetoothConfig.currentModel[0])) {
+                            LpBleUtil.startRtTask()
+                        }
+                    }
+                    2 -> {
+                        LpBleUtil.stopRtTask()
+                        LpBleUtil.vtm01GetOriginalData(Constant.BluetoothConfig.currentModel[0])
+                    }
                 }
             }
         //------------------------btp----------------------

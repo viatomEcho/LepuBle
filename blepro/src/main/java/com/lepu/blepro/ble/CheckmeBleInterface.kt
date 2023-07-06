@@ -292,15 +292,20 @@ class CheckmeBleInterface(model: Int): BleInterface(model) {
             LepuBleLog.d(tag, "busy: " + CheckmeBleCmd.OXY_CMD_READ_START.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
             return
         }
-        if (fileType == -1) {
-            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Checkme.EventCheckmeReadFileError).post(InterfaceEvent(model, true))
-            return
-        }
         this.curFileName = fileName
         LepuBleLog.d(tag, "$userId 将要读取文件 $curFileName")
         sendCmd(CheckmeBleCmd.readFileStart(fileName))
         curCmd = CheckmeBleCmd.OXY_CMD_READ_START
         LepuBleLog.e(tag, "dealReadFile")
+    }
+    fun readFileWithType(userId: String, fileName: String, fileType: Int) {
+        if (curCmd != -1) {
+            // busy
+            LepuBleLog.d(tag, "busy: " + CheckmeBleCmd.OXY_CMD_READ_START.toString() + "\$curCmd =>" + java.lang.String.valueOf(curCmd))
+            return
+        }
+        this.fileType = fileType
+        dealReadFile(userId, fileName)
     }
 
     override fun syncTime() {

@@ -691,6 +691,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
                             "${context?.getString(R.string.software_version)}${it.fwV}\n" +
+                            "WiFi固件版本：${mainViewModel.wifiVersion}\n" +
                             "sn：${it.sn}\ncode：${it.branchCode}\n" +
                             "${context?.getString(R.string.battery)}${mainViewModel._battery.value}"
                 }
