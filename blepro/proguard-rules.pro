@@ -22,6 +22,10 @@
 #-keep class com.lepu.blepro.**{*;}
 #-keep interface com.lepu.blepro.**{*;}
 
+-classobfuscationdictionary class_ditionary.txt
+-obfuscationdictionary class_ditionary.txt
+-packageobfuscationdictionary class_ditionary.txt
+
 -keep class com.lepu.blepro.ext**{*;}
 -keep class com.lepu.blepro.constants**{*;}
 -keep class com.lepu.blepro.event**{*;}
