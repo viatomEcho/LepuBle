@@ -368,6 +368,10 @@ class Er1BleInterface(model: Int): BleInterface(model) {
         sendCmd(Er1BleCmd.setVibrate(switcher, threshold1, threshold2))
         LepuBleLog.d(tag, "setVibrateConfig...switcher:$switcher, threshold1:$threshold1, threshold2:$threshold2")
     }
+    fun setVibrateConfig(config: Er1Config) {
+        sendCmd(Er1BleCmd.setVibrate(config.getDataBytes()))
+        LepuBleLog.d(tag, "setVibrateConfig...config:$config")
+    }
 
     fun setVibrateConfig(switcher: Boolean, vector: Int, motionCount: Int, motionWindows: Int){
         sendCmd(Er1BleCmd.setSwitcher(switcher, vector,motionCount, motionWindows))

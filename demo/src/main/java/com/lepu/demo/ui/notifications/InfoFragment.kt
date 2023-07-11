@@ -76,8 +76,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         super.onViewCreated(view, savedInstanceState)
         init()
 //        val data = OxyData()
-//        data.fileName = "uid-25468-date-20230608080558-source-O2Ring 3094"
-//        data.oxyBleFile = OxyBleFile(FileUtil.readFileToByteArray(context, "/o2/uid-25468-date-20230608080558-source-O2Ring 3094.dat"))
+//        data.fileName = "uid-192637-data-20230623220915-source-O2Ring 2839"
+//        data.oxyBleFile = OxyBleFile(FileUtil.readFileToByteArray(context, "/o2/uid-192637-data-20230623220915-source-O2Ring 2839.dat"))
 //        sleepAlg(data)
 //        testEr3()
 //        testEr3Decompress()

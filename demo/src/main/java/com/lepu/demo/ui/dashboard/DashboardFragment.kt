@@ -1703,7 +1703,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC60Fw.EventPC60FwRtDataWave)
             .observe(this) {
                 val rtWave = it.data as PC60FwBleResponse.RtDataWave
-                OxyDataController.receive(rtWave.waveIntData)
+                OxyDataController.receive(rtWave.waveIntReData)
                 Log.d("test12345", "" + Arrays.toString(rtWave.waveIntData))
                 if (binding.collectData.isChecked) {
                     val fileName = "W${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"

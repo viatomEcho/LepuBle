@@ -431,29 +431,45 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
         }
         binding.er1Layout.er1SetSound.setOnCheckedChangeListener { buttonView, isChecked ->
-            val temp1 = trimStr(binding.er1Layout.er1Hr1.text.toString())
-            val temp2 = trimStr(binding.er1Layout.er1Hr2.text.toString())
-            if (temp1.isNullOrEmpty() || temp2.isNullOrEmpty()) {
-                Toast.makeText(context, "阈值输入不能为空", Toast.LENGTH_SHORT).show()
+            if (!this::config.isInitialized) {
                 return@setOnCheckedChangeListener
-            } else {
-                if (isNumber(temp1) && isNumber(temp2)) {
-                    LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], isChecked, temp1.toInt(), temp2.toInt())
-                    cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-                    binding.sendCmd.text = cmdStr
-                } else {
-                    Toast.makeText(context, "阈值请输入数字", Toast.LENGTH_SHORT).show()
-                }
             }
+            (config as Er1Config).hrSwitch = isChecked
+            LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], (config as Er1Config))
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.er1Layout.er1SetBattery.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (!this::config.isInitialized) {
+                return@setOnCheckedChangeListener
+            }
+            (config as Er1Config).batSwitch = isChecked
+            LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], (config as Er1Config))
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
+        }
+        binding.er1Layout.er1SetWave.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (!this::config.isInitialized) {
+                return@setOnCheckedChangeListener
+            }
+            (config as Er1Config).waveSwitch = isChecked
+            LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], (config as Er1Config))
+            cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+            binding.sendCmd.text = cmdStr
         }
         binding.er1Layout.er1SetHr.setOnClickListener {
+            if (!this::config.isInitialized) {
+                return@setOnClickListener
+            }
             val temp1 = trimStr(binding.er1Layout.er1Hr1.text.toString())
             val temp2 = trimStr(binding.er1Layout.er1Hr2.text.toString())
             if (temp1.isNullOrEmpty() || temp2.isNullOrEmpty()) {
                 Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
             } else {
                 if (isNumber(temp1) && isNumber(temp2)) {
-                    LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], switchState, temp1.toInt(), temp2.toInt())
+                    (config as Er1Config).hr1 = temp1.toInt()
+                    (config as Er1Config).hr2 = temp2.toInt()
+                    LpBleUtil.setEr1Vibrate(Constant.BluetoothConfig.currentModel[0], (config as Er1Config))
                     cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
                     binding.sendCmd.text = cmdStr
                 } else {
@@ -1079,12 +1095,18 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                         else -> Toast.makeText(context, "DuoEK 获取参数成功", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    val config = VbVibrationSwitcherConfig.parse(data)
+//                    val config = VbVibrationSwitcherConfig.parse(data)
+                    val config = Er1Config(data)
                     this.config = config
-                    binding.er1Layout.er1SetSound.isChecked = config.switcher
+                    binding.er1Layout.er1SetSound.isChecked = config.hrSwitch
+                    binding.er1Layout.er1SetBattery.isChecked = config.batSwitch
+                    binding.er1Layout.er1SetWave.isChecked = config.waveSwitch
                     binding.er1Layout.er1Hr1.setText("${config.hr1}")
                     binding.er1Layout.er1Hr2.setText("${config.hr2}")
-                    binding.content.text = "switcher : " + config.switcher + " hr1 : " + config.hr1 + " hr2 : " + config.hr2
+                    binding.content.text = "hrSwitch : " + config.hrSwitch +
+                            " batSwitch : " + config.batSwitch +
+                            " waveSwitch : " + config.waveSwitch +
+                            " hr1 : " + config.hr1 + " hr2 : " + config.hr2
                     when (it.model) {
                         Bluetooth.MODEL_ER1 -> {
                             Toast.makeText(context, "ER1 获取参数成功", Toast.LENGTH_SHORT).show()

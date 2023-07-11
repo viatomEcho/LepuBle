@@ -1217,6 +1217,21 @@ class BleServiceHelper private constructor() {
         }
 
     }
+    fun setEr1Vibrate(model: Int, config: Er1Config) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Er1BleInterface).let {
+                        LepuBleLog.d(tag, "it as Er1BleInterface--setEr1Vibrate")
+                        it.setVibrateConfig(config)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "setEr1Vibrate current model $model unsupported!!")
+
+        }
+    }
 
     /**
      * duoek设置参数

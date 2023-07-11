@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.*
+import com.lepu.blepro.ble.data.Er1Config
 import com.lepu.blepro.ble.data.FactoryConfig
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
@@ -62,29 +63,27 @@ class Er1ViewModel : SettingViewModel() {
             _deviceFactoryData.value = deviceFactoryData
         }
         binding.er1Layout.er1SetSound.setOnCheckedChangeListener { buttonView, isChecked ->
-            val temp1 = HexString.trimStr(binding.er1Layout.er1Hr1.text.toString())
-            val temp2 = HexString.trimStr(binding.er1Layout.er1Hr2.text.toString())
-            if (temp1.isNullOrEmpty() || temp2.isNullOrEmpty()) {
-                _toast.value = "阈值输入不能为空"
+            if (config == null) {
                 return@setOnCheckedChangeListener
-            } else {
-                if (StringUtil.isNumber(temp1) && StringUtil.isNumber(temp2)) {
-                    LpBleUtil.setEr1Vibrate(model, isChecked, temp1.toInt(), temp2.toInt())
-                    cmdStr = "send : " + LpBleUtil.getSendCmd(model)
-                    binding.sendCmd.text = cmdStr
-                } else {
-                    _toast.value = "阈值请输入数字"
-                }
             }
+            (config as Er1Config).hrSwitch = isChecked
+            LpBleUtil.setEr1Vibrate(model, (config as Er1Config))
+            cmdStr = "send : " + LpBleUtil.getSendCmd(model)
+            binding.sendCmd.text = cmdStr
         }
         binding.er1Layout.er1SetHr.setOnClickListener {
+            if (config == null) {
+                return@setOnClickListener
+            }
             val temp1 = HexString.trimStr(binding.er1Layout.er1Hr1.text.toString())
             val temp2 = HexString.trimStr(binding.er1Layout.er1Hr2.text.toString())
             if (temp1.isNullOrEmpty() || temp2.isNullOrEmpty()) {
                 _toast.value = "输入不能为空"
             } else {
                 if (StringUtil.isNumber(temp1) && StringUtil.isNumber(temp2)) {
-                    LpBleUtil.setEr1Vibrate(model, switchState, temp1.toInt(), temp2.toInt())
+                    (config as Er1Config).hr1 = temp1.toInt()
+                    (config as Er1Config).hr2 = temp2.toInt()
+                    LpBleUtil.setEr1Vibrate(model, (config as Er1Config))
                     cmdStr = "send : " + LpBleUtil.getSendCmd(model)
                     binding.sendCmd.text = cmdStr
                 } else {
@@ -144,12 +143,13 @@ class Er1ViewModel : SettingViewModel() {
                         else -> _toast.value = "DuoEK 获取参数成功"
                     }
                 } else {
-                    val config = VbVibrationSwitcherConfig.parse(data)
+//                    val config = VbVibrationSwitcherConfig.parse(data)
+                    val config = Er1Config(data)
                     this.config = config
-                    binding.er1Layout.er1SetSound.isChecked = config.switcher
+                    binding.er1Layout.er1SetSound.isChecked = config.hrSwitch
                     binding.er1Layout.er1Hr1.setText("${config.hr1}")
                     binding.er1Layout.er1Hr2.setText("${config.hr2}")
-                    binding.content.text = "switcher : " + config.switcher + " hr1 : " + config.hr1 + " hr2 : " + config.hr2
+                    binding.content.text = "switcher : " + config.hrSwitch + " hr1 : " + config.hr1 + " hr2 : " + config.hr2
                     when (it.model) {
                         Bluetooth.MODEL_ER1 -> {
                             _toast.value = "ER1 获取参数成功"
