@@ -194,7 +194,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
                 Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_MY_SCALE,
                 Bluetooth.MODEL_F5_SCALE, Bluetooth.MODEL_F8_SCALE,
-                Bluetooth.MODEL_S5_SCALE -> {
+                Bluetooth.MODEL_S5_SCALE, Bluetooth.MODEL_LESCALE_P3 -> {
                     setViewVisible(binding.scaleLayout)
                 }
                 Bluetooth.MODEL_PC100 -> {

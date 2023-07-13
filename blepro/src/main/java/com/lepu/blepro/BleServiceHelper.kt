@@ -346,7 +346,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_POCTOR_M3102, Bluetooth.MODEL_BIOLAND_BGM,
             Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_BPM,
             Bluetooth.MODEL_PC80B_BLE2, Bluetooth.MODEL_PC200_BLE,
-            Bluetooth.MODEL_S5_SCALE -> false
+            Bluetooth.MODEL_S5_SCALE, Bluetooth.MODEL_LESCALE_P3 -> false
             else -> true
         }
     }
@@ -676,7 +676,7 @@ class BleServiceHelper private constructor() {
                 return inter is Bpw1BleInterface
             }
             Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE,
-            Bluetooth.MODEL_S5_SCALE -> {
+            Bluetooth.MODEL_S5_SCALE, Bluetooth.MODEL_LESCALE_P3 -> {
                 return inter is F4ScaleBleInterface
             }
             Bluetooth.MODEL_MY_SCALE, Bluetooth.MODEL_F5_SCALE -> {
@@ -1912,7 +1912,7 @@ class BleServiceHelper private constructor() {
 
         when(model){
             Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE,
-            Bluetooth.MODEL_S5_SCALE -> {
+            Bluetooth.MODEL_S5_SCALE, Bluetooth.MODEL_LESCALE_P3 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as F4ScaleBleInterface).let {
                         LepuBleLog.d(tag, "it as F4ScaleBleInterface--setUserInfo")
@@ -1936,7 +1936,7 @@ class BleServiceHelper private constructor() {
 
         when(model){
             Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE,
-            Bluetooth.MODEL_S5_SCALE -> {
+            Bluetooth.MODEL_S5_SCALE, Bluetooth.MODEL_LESCALE_P3 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as F4ScaleBleInterface).let {
                         LepuBleLog.d(tag, "it as F4ScaleBleInterface--setUserList")

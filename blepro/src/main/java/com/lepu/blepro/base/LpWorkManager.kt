@@ -270,7 +270,7 @@ object LpWorkManager {
                 }
             }
             Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE,
-            Bluetooth.MODEL_S5_SCALE -> {
+            Bluetooth.MODEL_S5_SCALE, Bluetooth.MODEL_LESCALE_P3 -> {
                 F4ScaleBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -579,7 +579,7 @@ object LpWorkManager {
                 }
             }
             Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE,
-            Bluetooth.MODEL_S5_SCALE -> {
+            Bluetooth.MODEL_S5_SCALE, Bluetooth.MODEL_LESCALE_P3 -> {
                 F4ScaleBleManager(context).apply {
                     vailManager.put(m, this)
                     return this
