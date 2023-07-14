@@ -382,6 +382,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._er1Info.value = it
                 }
             }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetWifiVersion)
+            .observe(this) {
+                viewModel.wifiVersion = it.data as String
+            }
         /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wRtState)
             .observe(this) { event ->
                 (event.data as Bp2BleRtState).let {
@@ -709,6 +713,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 (event.data as KtBleBattery).let {
                     viewModel._battery.value = "${it.percent} %"
                 }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3Echo)
+            .observe(this) {
+                Toast.makeText(this, "回显成功", Toast.LENGTH_SHORT).show()
             }
     }
     private fun needPermission(){

@@ -268,7 +268,7 @@ object LpWorkManager {
                 }
             }
             Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE,
-            Bluetooth.MODEL_S5_SCALE -> {
+            Bluetooth.MODEL_S5_SCALE, Bluetooth.MODEL_LESCALE_P3 -> {
                 F4ScaleBleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -357,7 +357,8 @@ object LpWorkManager {
                 }
             }
             Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
-            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT,
+            Bluetooth.MODEL_CMI_PC303 -> {
                 Pc300BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -576,7 +577,7 @@ object LpWorkManager {
                 }
             }
             Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE,
-            Bluetooth.MODEL_S5_SCALE -> {
+            Bluetooth.MODEL_S5_SCALE, Bluetooth.MODEL_LESCALE_P3 -> {
                 F4ScaleBleManager(context).apply {
                     vailManager.put(m, this)
                     return this
@@ -590,7 +591,7 @@ object LpWorkManager {
             }
             Bluetooth.MODEL_PC100, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_PC300_BLE, Bluetooth.MODEL_PC200_BLE,
-            Bluetooth.MODEL_GM_300SNT -> {
+            Bluetooth.MODEL_GM_300SNT, Bluetooth.MODEL_CMI_PC303 -> {
                 Pc100BleManager(context).apply {
                     vailManager.put(m, this)
                     return this

@@ -269,7 +269,7 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_POCTOR_M3102, Bluetooth.MODEL_BIOLAND_BGM,
             Bluetooth.MODEL_PC_68B, Bluetooth.MODEL_BPM,
             Bluetooth.MODEL_PC80B_BLE2, Bluetooth.MODEL_PC200_BLE,
-            Bluetooth.MODEL_S5_SCALE -> false
+            Bluetooth.MODEL_S5_SCALE, Bluetooth.MODEL_LESCALE_P3 -> false
             else -> true
         }
     }
@@ -565,7 +565,8 @@ class BleServiceHelper private constructor() {
                 return inter is Pc68bBleInterface
             }
             Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
-            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT,
+            Bluetooth.MODEL_CMI_PC303 -> {
                 return inter is Pc300BleInterface
             }
             Bluetooth.MODEL_PULSEBITEX, Bluetooth.MODEL_HHM4 -> {
@@ -1928,7 +1929,8 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
-            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT,
+            Bluetooth.MODEL_CMI_PC303 -> {
                 getInterface(model)?.getInfo()
             }
         }
@@ -1937,7 +1939,8 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
-            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT,
+            Bluetooth.MODEL_CMI_PC303 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc300BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetGlucometerType")
@@ -1952,7 +1955,8 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
-            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT,
+            Bluetooth.MODEL_CMI_PC303 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc300BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc300BleInterface--pc300GetGlucometerType")
@@ -2360,7 +2364,7 @@ class BleServiceHelper private constructor() {
 
         when(model){
             Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE,
-            Bluetooth.MODEL_S5_SCALE -> {
+            Bluetooth.MODEL_S5_SCALE, Bluetooth.MODEL_LESCALE_P3 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as F4ScaleBleInterface).let {
                         LepuBleLog.d(tag, "it as F4ScaleBleInterface--setUserInfo")
@@ -2384,7 +2388,7 @@ class BleServiceHelper private constructor() {
 
         when(model){
             Bluetooth.MODEL_F4_SCALE, Bluetooth.MODEL_F8_SCALE,
-            Bluetooth.MODEL_S5_SCALE -> {
+            Bluetooth.MODEL_S5_SCALE, Bluetooth.MODEL_LESCALE_P3 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as F4ScaleBleInterface).let {
                         LepuBleLog.d(tag, "it as F4ScaleBleInterface--setUserList")
@@ -4252,14 +4256,24 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "checkmeGetFileList current model $model unsupported!!")
         }
     }
-    fun checkmeReadFile(model: Int, fileName: String) {
+    @JvmOverloads
+    fun checkmeReadFile(model: Int, userId: String, fileName: String, fileType: Int? = null) {
         if (!checkService()) return
-        when(model) {
+        when (model) {
             Bluetooth.MODEL_CHECKME -> {
-                getInterface(model)?.readFile("", fileName)
+                getInterface(model)?.let { it1 ->
+                    (it1 as CheckmeBleInterface).let {
+                        LepuBleLog.d(tag, "it as CheckmeBleInterface--checkmeReadFile")
+                        if (fileType == null) {
+                            it.readFile(userId, fileName, 0)
+                        } else {
+                            it.readFileWithType(userId, fileName, fileType)
+                        }
+                    }
+                }
             }
+            else -> LepuBleLog.d(tag, "checkmeReadFile current model $model unsupported!!")
         }
     }
-
 
 }

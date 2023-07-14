@@ -122,6 +122,26 @@ public class Er1BleCmd {
         LepuBleLog.d(ByteArrayKt.bytesToHex(cmd));
         return cmd;
     }
+    public static byte[] setVibrate(byte[] data) {
+        int len = 3;
+
+        byte[] cmd = new byte[8+len];
+        cmd[0] = (byte) 0xA5;
+        cmd[1] = (byte) SET_VIBRATE_STATE;
+        cmd[2] = (byte) ~SET_VIBRATE_STATE;
+        cmd[3] = (byte) 0x00;
+        cmd[4] = (byte) seqNo;
+        cmd[5] = (byte) 0x03;
+        cmd[6] = (byte) 0x00;
+        cmd[7] = data[0];
+        cmd[8] = data[1];
+        cmd[9] = data[2];
+        cmd[10] = BleCRC.calCRC8(cmd);
+        addNo();
+
+        LepuBleLog.d(ByteArrayKt.bytesToHex(cmd));
+        return cmd;
+    }
 
     public static byte[] setSwitcher(boolean on1,int vector, int motionCount,int motionWindows) {
         int len = 5;

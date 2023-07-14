@@ -202,6 +202,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventLpBp2wSetWifiConfig = "com.lepu.ble.lp.bp2w.set.wifi.config"              // 设置WiFi boolean
             const val EventLpBp2wGetFileListCrc = "com.lepu.ble.lp.bp2w.get.file.list.crc"           // 获取文件列表CRC com.lepu.blepro.ext.lpbp2w.FileListCrc
             const val EventLpBp2wDeleteFile = "com.lepu.ble.lp.bp2w.delete.file"                     // 删除文件 boolean
+            const val EventLeBp2wGetWifiVersion = "com.lepu.ble.le.bp2w.get.wifi.version"            // 获取WiFi固件版本 String
         }
     }
 
@@ -489,7 +490,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
     /**
      * PC300BleInterface 发出的通知
      * 包含model: MODEL_PC300(PC_300SNT), MODEL_PC300_BLE(PC_300SNT-BLE)
-     *           MODEL_PC200_BLE(PC-200-BLE)
+     *           MODEL_PC200_BLE(PC-200-BLE), MODEL_GM_300SNT(GM_300SNT, GM_300SNT-BLE),
+     *           MODEL_CMI_PC303(CMI_PC303, CMI_PC303-BLE)
      * 功能：
      * 1.获取设备信息：BleServiceHelper.pc300GetInfo()
      * 2.实时心电/血压/血氧/血糖/体温数据：设备测量时自动上发
@@ -935,6 +937,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface BP3 {
         companion object {
+            const val EventBp3Echo = "com.lepu.ble.bp3.echo"                                  // 回显 byte[]
             const val EventBp3GetInfo = "com.lepu.ble.bp3.get.info"                           // 设备信息 LepuDevice
             const val EventBp3GetBattery = "com.lepu.ble.bp3.get.battery"                     // 电池信息 KtBleBattery
             const val EventBp3RtData = "com.lepu.ble.bp3.rt.data"                             // 实时数据 Bp2BleRtData
@@ -963,7 +966,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBp3GetFileList = "com.lepu.ble.bp3.get.file.list"                  // 获取文件列表 KtBleFileList
             const val EventBp3ReadFileError = "com.lepu.ble.bp3.read.file.error"              // 读文件错误 boolean
             const val EventBp3ReadingFileProgress = "com.lepu.ble.bp3.reading.file.process"   // 读文件进度 int
-            const val EventBp3ReadFileComplete = "com.lepu.ble.bp3.read.file.complete"        // 读文件完成 LeBp2wUserList
+            const val EventBp3ReadFileComplete = "com.lepu.ble.bp3.read.file.complete"        // 读文件完成 byte[]
         }
     }
 

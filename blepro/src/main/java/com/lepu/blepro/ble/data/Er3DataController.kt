@@ -109,20 +109,29 @@ object Er3DataController {
         }
 
         for (i in fs.indices step 8) {
-            src1[index] = fs[i]
-            src2[index] = fs[i+1]
-            src3[index] = fs[i+2]
-            src4[index] = fs[i+3]
-            src5[index] = fs[i+4]
-            src6[index] = fs[i+5]
-            src7[index] = fs[i+6]
-            src8[index] = fs[i+7]
+            // 与设备显示UI对齐
             if (isLAOff || isLLOff) {
+                src1[index] = 0f
+                src2[index] = fs[i+1]
+                src3[index] = fs[i+2]
+                src4[index] = 0f
+                src5[index] = 0f
+                src6[index] = 0f
+                src7[index] = 0f
+                src8[index] = 0f
                 src9[index] = 0f
                 src10[index] = 0f
                 src11[index] = 0f
                 src12[index] = 0f
             } else {
+                src1[index] = fs[i]
+                src2[index] = fs[i+1]
+                src3[index] = fs[i+2]
+                src4[index] = fs[i+3]
+                src5[index] = fs[i+4]
+                src6[index] = fs[i+5]
+                src7[index] = fs[i+6]
+                src8[index] = fs[i+7]
                 src9[index] = fs[i+2] - fs[i+1]  // III = II-I
                 src10[index] = -(fs[i+2] + fs[i+1])/2  // aVR = - (I+II)/2
                 src11[index] = fs[i+1] - fs[i+2]/2  // aVL = I - II/2

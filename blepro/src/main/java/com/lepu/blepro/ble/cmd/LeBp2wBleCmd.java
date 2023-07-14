@@ -30,6 +30,7 @@ public class LeBp2wBleCmd {
 
     public static final int GET_CONFIG = 0x00;
     public static final int SET_CONFIG = 0x0B;
+    public static final int GET_WIFI_VERSION = 0x33;
     public static final int SET_TIME = 0xEC;
     public static final int SET_UTC_TIME = 0xC0;
     public static final int GET_INFO = 0xE1;
@@ -188,6 +189,9 @@ public class LeBp2wBleCmd {
         }
     }
 
+    public static byte[] getWifiVersion() {
+        return getReq(GET_WIFI_VERSION, new byte[0]);
+    }
     public static byte[] getRtState() {
         return getReq(RT_STATE, new byte[0]);
     }

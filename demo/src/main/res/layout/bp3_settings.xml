@@ -98,7 +98,7 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp">
@@ -107,11 +107,23 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
                 android:textSize="16sp"
-                android:text="播报音量:"/>
-            <Spinner
-                android:id="@+id/volume"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:text="播报音量："/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/volume_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:hint="0关闭,1-15" />
+                <Button
+                    android:id="@+id/volume"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="设置" />
+            </RelativeLayout>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"

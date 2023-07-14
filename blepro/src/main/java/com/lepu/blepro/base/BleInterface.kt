@@ -440,6 +440,7 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
             || model == Bluetooth.MODEL_PC300
             || model == Bluetooth.MODEL_PC300_BLE
             || model == Bluetooth.MODEL_GM_300SNT
+            || model == Bluetooth.MODEL_CMI_PC303
             || model == Bluetooth.MODEL_PC200_BLE
             || model == Bluetooth.MODEL_R20
             || model == Bluetooth.MODEL_R21

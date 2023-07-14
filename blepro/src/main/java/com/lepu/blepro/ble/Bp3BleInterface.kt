@@ -116,6 +116,11 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
             LepuBleLog.d(tag, "model:$model,ResponseError => $data")
         } else {
             when (response.cmd) {
+                LpBleCmd.ECHO -> {
+//                    sendCmd(LpBleCmd.echo(ByteArray(239), aesEncryptKey))
+                    LepuBleLog.d(tag, "model:$model,ECHO => success data: ${bytesToHex(response.content)}")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3Echo).post(InterfaceEvent(model, response.content))
+                }
                 LpBleCmd.GET_INFO -> {
                     if (response.len < 38) {
                         LepuBleLog.d(tag, "GET_INFO response.len < 38")
@@ -202,11 +207,12 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
                 }
                 Bp3BleCmd.RT_DATA -> {
                     if (response.len < 32) {
-                        LepuBleLog.d(tag, "model:$model,RT_DATA => response.len < 32")
+                        LepuBleLog.d(tag, "model:$model,RT_DATA => response.len < 32, ${bytesToHex(response.content)}")
                         return
                     }
                     val data = Bp2BleRtData(response.content)
-                    LepuBleLog.d(tag, "model:$model,RT_DATA => success, data: $data")
+                    LepuBleLog.d(tag, "model:$model,RT_DATA => success, data.rtState: ${data.rtState}")
+                    LepuBleLog.d(tag, "model:$model,RT_DATA => success, data.rtWave: ${data.rtWave}")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3RtData).post(InterfaceEvent(model, data))
                 }
                 Bp3BleCmd.PRESSURE_TEST -> {
@@ -369,14 +375,17 @@ class Bp3BleInterface(model: Int): BleInterface(model) {
                     if (fileContent.size < fileSize) {
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3ReadFileError).post(InterfaceEvent(model, true))
                     } else {
-                        val data = if (device.name == null) {
-                            Bp2BleFile(fileName, fileContent, "")
+                        if (fileName.contains(".list")) {
+
                         } else {
-                            Bp2BleFile(fileName, fileContent, device.name)
+                            val data = if (device.name == null) {
+                                Bp2BleFile(fileName, fileContent, "")
+                            } else {
+                                Bp2BleFile(fileName, fileContent, device.name)
+                            }
+                            LepuBleLog.d(tag, "model:$model,READ_FILE_END => data: $data")
+                            LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3ReadFileComplete).post(InterfaceEvent(model, data))
                         }
-//                        val data = LeBp2wUserList(fileContent)
-                        LepuBleLog.d(tag, "model:$model,READ_FILE_END => data: $data")
-                        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3ReadFileComplete).post(InterfaceEvent(model, fileContent))
                     }
                 }
             }

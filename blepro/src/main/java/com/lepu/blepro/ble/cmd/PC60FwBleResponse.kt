@@ -105,12 +105,12 @@ class PC60FwBleResponse{
     class RtDataWave(var byteArray: ByteArray) : Parcelable {
         val waveData: ByteArray
         val waveIntData: IntArray
+        val waveIntReData: IntArray  // 倒置数据
         init {
             waveData = byteArray.copyOfRange(0, 5).toList().asSequence().map { (it.toInt() and 0x7f).toByte() }.toList().toByteArray()
-            waveIntData =  byteArray.copyOfRange(0, 5).toList().asSequence().map { (it.toInt() and 0x7f)}.toList().toIntArray()
+            waveIntData = byteArray.copyOfRange(0, 5).toList().asSequence().map { (it.toInt() and 0x7f)}.toList().toIntArray()
+            waveIntReData = byteArray.copyOfRange(0, 5).toList().asSequence().map { (127-(it.toInt() and 0x7f))}.toList().toIntArray()
         }
-
-
     }
 
     @ExperimentalUnsignedTypes
