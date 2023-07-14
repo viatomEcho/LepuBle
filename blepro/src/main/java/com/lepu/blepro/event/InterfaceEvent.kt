@@ -202,7 +202,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventLpBp2wSetWifiConfig = "com.lepu.ble.lp.bp2w.set.wifi.config"              // 设置WiFi boolean
             const val EventLpBp2wGetFileListCrc = "com.lepu.ble.lp.bp2w.get.file.list.crc"           // 获取文件列表CRC com.lepu.blepro.ext.lpbp2w.FileListCrc
             const val EventLpBp2wDeleteFile = "com.lepu.ble.lp.bp2w.delete.file"                     // 删除文件 boolean
-            const val EventLeBp2wGetWifiVersion = "com.lepu.ble.le.bp2w.get.wifi.version"            // 获取WiFi固件版本 String
+            const val EventLpBp2wGetWifiVersion = "com.lepu.ble.lp.bp2w.get.wifi.version"            // 获取WiFi固件版本 String
         }
     }
 

@@ -455,8 +455,8 @@ class LpBleUtil {
             data.threshold2 = threshold2
             BleServiceHelper.er1SetConfig(model, data)
         }
-        fun setEr1Vibrate(model: Int, config: Er1Config) {
-            BleServiceHelper.setEr1Vibrate(model, config)
+        fun setEr1Vibrate(model: Int, config: com.lepu.blepro.ble.data.Er1Config) {
+//            BleServiceHelper.setEr1Vibrate(model, config)
         }
         fun setDuoekVibrate(model: Int,switcher: Boolean, vector: Int, motionCount: Int,motionWindows: Int ){
 //            BleServiceHelper.setEr1Vibrate(model, switcher, vector, motionCount, motionWindows)

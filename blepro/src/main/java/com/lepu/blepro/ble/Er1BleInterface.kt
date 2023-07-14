@@ -6,6 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
+import com.lepu.blepro.ble.data.Er1Config
 import com.lepu.blepro.event.EventMsgConst
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.ext.er1.*
@@ -31,7 +32,7 @@ import kotlin.experimental.inv
 class Er1BleInterface(model: Int): BleInterface(model) {
     private val tag: String = "Er1BleInterface"
 
-    private var config = Er1Config()
+    private var config = com.lepu.blepro.ext.er1.Er1Config()
     private var deviceInfo = DeviceInfo()
     private var deviceRtData = RtData()
     private var deviceRtParam = RtParam()

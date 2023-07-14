@@ -693,7 +693,7 @@ class LpBp2wBleInterface(model: Int): BleInterface(model) {
                     return
                 }
                 val data = "${byte2UInt(bleResponse.content[3])}.${byte2UInt(bleResponse.content[2])}.${byte2UInt(bleResponse.content[1])}.${byte2UInt(bleResponse.content[0])}"
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetWifiVersion).post(InterfaceEvent(model, data))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wGetWifiVersion).post(InterfaceEvent(model, data))
                 LepuBleLog.d(tag, "model:$model,GET_WIFI_VERSION => success")
             }
         }

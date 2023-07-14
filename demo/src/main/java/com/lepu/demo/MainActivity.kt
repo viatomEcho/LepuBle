@@ -382,7 +382,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._er1Info.value = it
                 }
             }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetWifiVersion)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LpBp2w.EventLpBp2wGetWifiVersion)
             .observe(this) {
                 viewModel.wifiVersion = it.data as String
             }
