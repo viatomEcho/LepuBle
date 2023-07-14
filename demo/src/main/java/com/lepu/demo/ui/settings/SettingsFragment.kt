@@ -244,7 +244,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     setViewVisible(binding.ad5Layout)
                 }
                 Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
-                Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
+                Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT,
+                Bluetooth.MODEL_CMI_PC303 -> {
                     setViewVisible(binding.pc300Layout.root)
                     settingViewModel = ViewModelProvider(this).get(Pc300ViewModel::class.java)
                     (settingViewModel as Pc300ViewModel).initView(requireContext(), binding, it)

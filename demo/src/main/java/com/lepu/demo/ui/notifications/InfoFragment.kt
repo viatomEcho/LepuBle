@@ -795,7 +795,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 }
             }
             Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE, Bluetooth.MODEL_GM_300SNT,
-            Bluetooth.MODEL_PC200_BLE -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_CMI_PC303 -> {
                 mainViewModel.pc300Info.observe(viewLifecycleOwner) {
                     binding.info.text = "$it"
                     binding.deviceInfo.text = "${context?.getString(R.string.device_name)}${it.deviceName}\n" +

@@ -58,6 +58,7 @@ object Vtm20fBleResponse {
     @ExperimentalUnsignedTypes
     class RtWave (val bytes: ByteArray) {
         var wave: Int             // 脉搏波
+        var waveRe: Int           // 倒置数据
         var pulseSound: Boolean   // 脉搏波音标记（true：表征有脉搏音 false：表征无脉搏音）
         var isSensorOff: Boolean  // 导连脱落标志（true：表征导连脱落 false：表征导连链接正常）
         var isDisturb: Boolean    // 状态标记（true：表示运动干扰 false：表示状态正常）
@@ -68,6 +69,7 @@ object Vtm20fBleResponse {
         init {
             var index = 0
             wave = byte2UInt(bytes[index])
+            waveRe = 100 - wave
             index++
             pulseSound = (byte2UInt(bytes[index]) and 0x01) == 1
             isSensorOff = ((byte2UInt(bytes[index]) and 0x02) shr 1) == 1

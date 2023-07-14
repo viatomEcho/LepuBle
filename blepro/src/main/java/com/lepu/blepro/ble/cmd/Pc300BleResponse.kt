@@ -173,9 +173,11 @@ object Pc300BleResponse {
     class RtOxyWave(val bytes: ByteArray) {
         val waveData: ByteArray
         val waveIntData: IntArray
+        val waveIntReData: IntArray
         init {
             waveData = bytes.copyOfRange(0, bytes.size).toList().asSequence().map { (it.toInt() and 0x7f).toByte() }.toList().toByteArray()
             waveIntData =  bytes.copyOfRange(0, bytes.size).toList().asSequence().map { (it.toInt() and 0x7f)}.toList().toIntArray()
+            waveIntReData =  bytes.copyOfRange(0, bytes.size).toList().asSequence().map { 127-(it.toInt() and 0x7f)}.toList().toIntArray()
         }
     }
 

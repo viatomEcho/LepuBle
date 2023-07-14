@@ -3217,7 +3217,8 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
-            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT,
+            Bluetooth.MODEL_CMI_PC303 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc300BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc300BleInterface--startEcg")
@@ -3240,7 +3241,8 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
-            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT,
+            Bluetooth.MODEL_CMI_PC303 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc300BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc300BleInterface--stopEcg")
@@ -3271,7 +3273,8 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
-            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT,
+            Bluetooth.MODEL_CMI_PC303 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc300BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetEcgDataDigit")
@@ -3313,7 +3316,8 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
-            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT,
+            Bluetooth.MODEL_CMI_PC303 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc300BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc300BleInterface--pc300SetGlucometerType")
@@ -3328,7 +3332,8 @@ class BleServiceHelper private constructor() {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_PC300, Bluetooth.MODEL_PC300_BLE,
-            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT -> {
+            Bluetooth.MODEL_PC200_BLE, Bluetooth.MODEL_GM_300SNT,
+            Bluetooth.MODEL_CMI_PC303 -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pc300BleInterface).let {
                         LepuBleLog.d(tag, "it as Pc300BleInterface--pc300GetGlucometerType")

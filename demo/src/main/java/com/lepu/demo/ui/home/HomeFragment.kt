@@ -195,6 +195,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     }
                     ToastUtil.showToast(activity, context?.getString(R.string.connecting))
                     LpBleUtil.stopScan()
+                    BluetoothController.clear()
                     binding.rcv.visibility = View.GONE
 
                     mainViewModel._curBluetooth.value = DeviceEntity(it.name, it.macAddr, it.model)
@@ -360,6 +361,7 @@ class HomeFragment : Fragment(R.layout.fragment_home){
                     }
                     ToastUtil.showToast(activity, context?.getString(R.string.connecting))
                     LpBleUtil.stopScan()
+                    BluetoothController.clear()
                     binding.rcv.visibility = View.GONE
 
                     mainViewModel._curBluetooth.value = DeviceEntity(b.name, b.macAddr, b.model)
