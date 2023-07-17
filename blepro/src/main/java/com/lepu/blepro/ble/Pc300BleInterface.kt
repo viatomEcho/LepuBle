@@ -97,6 +97,7 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                         device.name?.let {
                             pc300Device.deviceName = it
                         }
+                        deviceInfo.deviceName = pc300Device.deviceName
                         LepuBleLog.d(tag, "model:$model,GET_DEVICE_NAME 查询产品名称 => success $data")
                     }
                     DEVICE_INFO_2 -> {
@@ -109,9 +110,11 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                         pc300Device.hardwareV = data.hardwareV
                         pc300Device.batLevel = data.batLevel
                         pc300Device.batStatus = data.batStatus
+
                         deviceInfo.softwareV = pc300Device.softwareV
                         deviceInfo.hardwareV = pc300Device.hardwareV
                         deviceInfo.batLevel = pc300Device.batLevel
+                        deviceInfo.batStatus = pc300Device.batStatus
 
                         LepuBleLog.d(tag, "model:$model,DEVICE_INFO_2 查询版本及电量等级 => success $data")
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300DeviceInfo).post(InterfaceEvent(model, deviceInfo))
@@ -126,12 +129,13 @@ class Pc300BleInterface(model: Int): BleInterface(model) {
                         pc300Device.hardwareV = data.hardwareV
                         pc300Device.batLevel = data.batLevel
                         pc300Device.batStatus = data.batStatus
+
                         deviceInfo.softwareV = pc300Device.softwareV
                         deviceInfo.hardwareV = pc300Device.hardwareV
                         deviceInfo.batLevel = pc300Device.batLevel
+                        deviceInfo.batStatus = pc300Device.batStatus
 
                         LepuBleLog.d(tag, "model:$model,DEVICE_INFO_4 查询版本及电量等级 => success $data")
-                        if (deviceInfo.deviceName == null) return
                         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.PC300.EventPc300DeviceInfo).post(InterfaceEvent(model, deviceInfo))
                     }
                     SET_TIME -> {

@@ -5,7 +5,8 @@ public class DeviceInfo {
     private String deviceName;
     private String softwareV;
     private String hardwareV;
-    private int batLevel;     // 电量等级
+    private int batLevel;     // 电量等级 0-3
+    private int batStatus;    // 电池状态 0：正常，1：充电中，2：已充满
 
     public int getDeviceId() {
         return deviceId;
@@ -47,6 +48,14 @@ public class DeviceInfo {
         this.batLevel = batLevel;
     }
 
+    public int getBatStatus() {
+        return batStatus;
+    }
+
+    public void setBatStatus(int batStatus) {
+        this.batStatus = batStatus;
+    }
+
     @Override
     public String toString() {
         return "DeviceInfo{" +
@@ -55,6 +64,7 @@ public class DeviceInfo {
                 ", softwareV='" + softwareV + '\'' +
                 ", hardwareV='" + hardwareV + '\'' +
                 ", batLevel=" + batLevel +
+                ", batStatus=" + batStatus +
                 '}';
     }
 }
