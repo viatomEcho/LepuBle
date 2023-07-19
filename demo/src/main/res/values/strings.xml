@@ -39,7 +39,7 @@
     <string name="low">≥</string>
 
     <!-- 兼容英文版本 -->
-    <string name="app_version">App version：LepuDevice V0.0.3</string>
+    <string name="app_version">App version：LepuDevice V0.0.4</string>
     <string name="device_type">Device type：</string>
     <string name="pair_connect">Pair connect</string>
     <string name="bluetooth_device">Device</string>
