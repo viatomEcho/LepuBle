@@ -126,7 +126,7 @@
     <string name="pi">pi</string>
     <string name="pr">脉率</string>
     <string name="motion">体动</string>
-    <string name="sleep_status_tips">睡眠状态(0深睡眠,1浅睡眠,2快速眼动,3清醒,4无结果)：</string>
+    <string name="sleep_status_tips">睡眠状态(0深睡眠,1浅睡眠,2快速眼动,3清醒,4准备睡眠阶段,5无结果)：</string>
     <string name="sleep_time_total">总睡眠时间：</string>
     <string name="deep_sleep_time">深睡时间：</string>
     <string name="light_sleep_time">浅睡时间：</string>

@@ -722,6 +722,24 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             .observe(this) {
                 Toast.makeText(this, "回显成功", Toast.LENGTH_SHORT).show()
             }
+        //--------------------------pf10aw-1--------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1SetTime)
+            .observe(this) {
+                val data = it.data as Boolean
+                Toast.makeText(this, "同步时间 $data", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1GetInfo)
+            .observe(this) {
+                Toast.makeText(this, "${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
+                viewModel._er1Info.value = it.data as LepuDevice
+                LpBleUtil.pf10Aw1GetBattery(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1GetBattery)
+            .observe(this) {
+                val data = it.data as KtBleBattery
+                viewModel._battery.value = "${data.percent} %"
+            }
     }
     private fun needPermission(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

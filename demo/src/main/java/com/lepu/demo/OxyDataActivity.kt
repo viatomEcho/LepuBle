@@ -512,7 +512,7 @@ class OxyDataActivity : AppCompatActivity() {
 
     // 睡眠算法
     private fun sleepAlg() {
-        DataConvert.sleep_alg_init_0_25Hz()
+        DataConvert.sleep_alg_init_0_25Hz(oxyData.oxyBleFile.startTime)
         val statuses = mutableListOf<Int>()
         val filePath = "${BleServiceHelper.BleServiceHelper.rawFolder?.get(Bluetooth.MODEL_O2RING)}/sleep_result_${oxyData.fileName}.txt"
         val isSave = File(filePath).exists()
@@ -527,27 +527,55 @@ class OxyDataActivity : AppCompatActivity() {
                         1 -> "浅睡眠"
                         2 -> "快速眼动"
                         3 -> "清醒"
+                        4 -> "准备睡眠阶段"
                         else -> "未得出结果"
                     }}\n",
                     true)
             }
         }
         val result = DataConvert.sleep_alg_get_res_0_25Hz()
+        val len = result[7]
         sleepText.text = "${getString(R.string.sleep_status_tips)}" +
                 "${statuses.toIntArray().joinToString(",")}\n" +
                 "${getString(R.string.sleep_time_total)}${DataConvert.getEcgTimeStr(result[0]*4)}\n" +
                 "${getString(R.string.deep_sleep_time)}${DataConvert.getEcgTimeStr(result[1]*4)}\n" +
                 "${getString(R.string.light_sleep_time)}${DataConvert.getEcgTimeStr(result[2]*4)}\n" +
                 "${getString(R.string.rapid_eye_time)}${DataConvert.getEcgTimeStr(result[3]*4)}\n" +
-                "${getString(R.string.awake_time)}${result[4]}"
+                "${getString(R.string.awake_time)}${result[4]}\n" +
+                "准备睡眠时间: ${DataConvert.getEcgTimeStr(result[5]*4)}\n" +
+                "入睡时间点: ${result[6]}\n" +
+                "睡眠分期结果数组长度: ${result[7]}\n" +
+                "出睡时间点: ${result[8+len]} %\n" +
+                "深睡比例: ${result[9+len]} %\n" +
+                "浅睡比例: ${result[10+len]} %\n" +
+                "快速眼动比例: ${result[11+len]} %"
         if (!isSave) {
+            var temp = ""
+            for (i in 0 until len) {
+                temp += "${when (result[8+i]) {
+                    0 -> "深睡眠"
+                    1 -> "浅睡眠"
+                    2 -> "快速眼动"
+                    3 -> "清醒"
+                    4 -> "准备睡眠阶段"
+                    else -> "未得出结果"
+                }}, "
+            }
             FileUtil.saveTextFile(
                 filePath,
                 "总睡眠时间: ${DataConvert.getEcgTimeStr(result[0]*4)}\n" +
                         "深睡时间: ${DataConvert.getEcgTimeStr(result[1]*4)}\n" +
                         "浅睡时间: ${DataConvert.getEcgTimeStr(result[2]*4)}\n" +
                         "快速眼动时间: ${DataConvert.getEcgTimeStr(result[3]*4)}\n" +
-                        "清醒次数: ${result[4]}",
+                        "清醒次数: ${result[4]}\n" +
+                        "准备睡眠时间: ${DataConvert.getEcgTimeStr(result[5]*4)}\n" +
+                        "入睡时间点: ${result[6]}\n" +
+                        "睡眠分期结果数组长度: ${result[7]}\n" +
+                        "睡眠分期结果: $temp\n" +
+                        "出睡时间点: ${result[8+len]} %\n" +
+                        "深睡比例: ${result[9+len]} %\n" +
+                        "浅睡比例: ${result[10+len]} %\n" +
+                        "快速眼动比例: ${result[11+len]} %",
                 true)
         }
     }

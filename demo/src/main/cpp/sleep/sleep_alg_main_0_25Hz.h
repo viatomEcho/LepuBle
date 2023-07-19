@@ -33,6 +33,8 @@
 
 #define			SLEEP_ALG_REM_COUNTINUE_COUNT			(int)(SLEEP_ALG_SAMPLE_0_25_HZ * 60 * 4)
 
+#define         SLEEP_STATE_BUFF_LEN                    (int)(SLEEP_ALG_SAMPLE_0_25_HZ * 60 * 60 * 10)          // 保存睡眠状态数组最大长度
+
 /*
 typedef enum
 {
@@ -50,6 +52,7 @@ typedef enum
 	SLEEP_ALG_STATUS_LIGHT,				//浅睡眠
 	SLEEP_ALG_STATUS_REM,				//快速眼动
 	SLEEP_ALG_STATUS_AWAKE,				//清醒
+	SLEEP_ALG_STATUS_PREPARATION,       //准备睡眠阶段（可算在卧床时间里）（没使用）
 	SLEEP_ALG_STATUS_NONE,			    //未得出结果
 }SLEEP_ALG_STATUS;
 
@@ -58,17 +61,26 @@ typedef enum
 //主输入结构体
 typedef struct
 {
-	short             pr;				//脉率（单位0.1bpm）
+	short             pr;				//脉率（单位1bpm）
 	int				  acc;				//三轴值
 }sleep_alg_input_t;
 
 typedef struct
 {
-	unsigned int	sleep_time;		//总睡眠时间（单位：采样点数）
-	unsigned int	deep_time;		//深睡时间（单位：采样点数）
-	unsigned int	light_time;		//浅睡时间（单位：采样点数）
-	unsigned int	rem_time;		//快速眼动时间（单位：采样点数）
-	unsigned int	awake_time;		//清醒次数
+	unsigned int	sleep_time;		//总睡眠时间（单位：s）
+	unsigned int	deep_time;		//深睡时间（单位：s）
+	unsigned int	light_time;		//浅睡时间（单位：s）
+	unsigned int	rem_time;		//快速眼动时间（单位：s）
+	unsigned int	awake_cnt;		//清醒次数
+	unsigned int    preparation_time; //准备睡眠时间（单位：s）(暂时没使用)
+	unsigned int    falling_asleep;   //入睡时间点 (时间戳)
+	SLEEP_ALG_STATUS   sleep_state_buff[SLEEP_STATE_BUFF_LEN];  // 保存睡眠分期结果
+	unsigned int    sleep_state_buff_len;       // 保存睡眠分期结果数组长度
+	unsigned int    awake_time;       // 出睡时间点 （时间戳）
+
+	unsigned int    deep_time_percent;  // 深睡比例（单位：%）
+	unsigned int    light_time_percent; // 浅睡比例（单位：%）
+	unsigned int    rem_time_percent;   // 快速眼动比例（单位：%）
 }sleep_alg_result;
 
 typedef struct
@@ -78,7 +90,7 @@ typedef struct
 }sleep_alg_rem_pr;
 
 
-void sleep_alg_init_0_25Hz();
+void sleep_alg_init_0_25Hz(unsigned int input_start_timestamp);
 SLEEP_ALG_STATUS sleep_alg_main_pro_0_25Hz(sleep_alg_input_t  *input);
 sleep_alg_result* sleep_alg_get_res_0_25Hz();
 

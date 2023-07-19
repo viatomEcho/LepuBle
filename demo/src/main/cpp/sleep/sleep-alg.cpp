@@ -10,8 +10,8 @@
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_lepu_demo_util_DataConvert_sleep_1alg_1init_10_125Hz(JNIEnv *env, jclass clazz) {
-    sleep_alg_init_0_25Hz();
+Java_com_lepu_demo_util_DataConvert_sleep_1alg_1init_10_125Hz(JNIEnv *env, jclass clazz, jint timestamp) {
+    sleep_alg_init_0_25Hz(timestamp);
 }
 
 extern "C"
@@ -28,17 +28,28 @@ Java_com_lepu_demo_util_DataConvert_sleep_1alg_1main_1pro_10_125Hz(JNIEnv *env, 
 extern "C"
 JNIEXPORT jintArray JNICALL
 Java_com_lepu_demo_util_DataConvert_sleep_1alg_1get_1res_10_125Hz(JNIEnv *env, jclass clazz) {
-    int *arrays = 0;
-    arrays = (int *)malloc(sizeof(int)*5);
-    memset(arrays,'\0',sizeof(arrays));
     sleep_alg_result *result = sleep_alg_get_res_0_25Hz();
+    int len = result->sleep_state_buff_len;
+    int *arrays = 0;
+    arrays = (int *)malloc(sizeof(int)*(12+len));
+    memset(arrays,'\0',sizeof(arrays));
     arrays[0] = result->sleep_time;
     arrays[1] = result->deep_time;
     arrays[2] = result->light_time;
     arrays[3] = result->rem_time;
-    arrays[4] = result->awake_time;
-    jintArray data = (*env).NewIntArray(5);
-    (*env).SetIntArrayRegion(data, 0, 5, arrays);
+    arrays[4] = result->awake_cnt;
+    arrays[5] = result->preparation_time;
+    arrays[6] = result->falling_asleep;
+    arrays[7] = result->sleep_state_buff_len;
+    for (int i = 0; i < len; i++) {
+        arrays[8+i] = result->sleep_state_buff[i];
+    }
+    arrays[8+len] = result->awake_time;
+    arrays[9+len] = result->deep_time_percent;
+    arrays[10+len] = result->light_time_percent;
+    arrays[11+len] = result->rem_time_percent;
+    jintArray data = (*env).NewIntArray(12+len);
+    (*env).SetIntArrayRegion(data, 0, (12+len), arrays);
     free(arrays);
     return data;
 }

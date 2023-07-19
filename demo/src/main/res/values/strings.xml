@@ -126,7 +126,7 @@
     <string name="pi">pi</string>
     <string name="pr">PR</string>
     <string name="motion">Motion</string>
-    <string name="sleep_status_tips">Sleep status(0:Deep sleep,1:Light sleep,2:Rapid eye,3:Awaken,4:No result)：</string>
+    <string name="sleep_status_tips">Sleep status(0:Deep sleep,1:Light sleep,2:Rapid eye,3:Awaken,4:Ready sleep,5:No result)：</string>
     <string name="sleep_time_total">Total sleep time：</string>
     <string name="deep_sleep_time">Deep sleep time：</string>
     <string name="light_sleep_time">Light sleep time：</string>

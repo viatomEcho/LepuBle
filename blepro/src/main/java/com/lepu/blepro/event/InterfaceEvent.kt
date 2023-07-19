@@ -876,4 +876,28 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
         }
     }
 
+    /**
+     * Pf10Aw1BleInterface 发出的通知
+     * 包含model: MODEL_PF_10AW_1
+     */
+    interface Pf10Aw1 {
+        companion object {
+            const val EventPf10Aw1SetTime = "com.lepu.ble.pf10aw1.set.time"                          // 同步时间 boolean
+            const val EventPf10Aw1GetBattery = "com.lepu.ble.pf10aw1.get.battery"                    // 电池信息 KtBleBattery
+            const val EventPf10Aw1GetInfo = "com.lepu.ble.pf10aw1.get.info"                          // 设备信息 LepuDevice
+            const val EventPf10Aw1GetFileList = "com.lepu.ble.pf10aw1.get.file.list"                 // 文件列表 Pf10Aw1BleResponse.FileList
+            const val EventPf10Aw1ReadFileError = "com.lepu.ble.pf10aw1.read.file.error"             // 读文件失败 boolean
+            const val EventPf10Aw1ReadingFileProgress = "com.lepu.ble.pf10aw1.reading.file.process"  // 读文件进度 int
+            const val EventPf10Aw1ReadFileComplete = "com.lepu.ble.pf10aw1.read.file.complete"       // 读文件完成 Pf10Aw1BleResponse.BleFile
+            const val EventPf10Aw1GetConfig = "com.lepu.ble.pf10aw1.get.config"                      // 获取设备配置 Pf10Aw1Config
+            const val EventPf10Aw1SetConfig = "com.lepu.ble.pf10aw1.set.config"                      // 设置设备信息 boolean
+            const val EventPf10Aw1RtParam = "com.lepu.ble.pf10aw1.rt.param"                          // 血氧参数 Pf10Aw1BleResponse.RtParam
+            const val EventPf10Aw1RtWave = "com.lepu.ble.pf10aw1.rt.wave"                            // 血氧波形 Pf10Aw1BleResponse.RtWave
+            const val EventPf10Aw1WorkingStatus = "com.lepu.ble.pf10aw1.working.status"              // 工作状态数据 Pf10Aw1BleResponse.WorkingStatus
+            const val EventPf10Aw1Reset = "com.lepu.ble.pf10aw1.reset"                               // 复位 boolean
+            const val EventPf10Aw1FactoryReset = "com.lepu.ble.pf10aw1.factory.reset"                // 恢复出厂设置 boolean
+            const val EventPf10Aw1FactoryResetAll = "com.lepu.ble.pf10aw1.factory.reset.all"         // 恢复生产出厂状态 boolean
+            const val EventPf10Aw1BurnFactoryInfo = "com.lepu.ble.pf10aw1.burn.factory.info"         // 烧录信息 boolean
+        }
+    }
 }

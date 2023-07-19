@@ -243,6 +243,14 @@ object LpWorkManager {
                     return this
                 }
             }
+            Bluetooth.MODEL_PF_10AW_1 -> {
+                Pf10Aw1BleInterface(m).apply {
+                    this.runRtImmediately = runRtImmediately
+
+                    vailFace.put(m, this)
+                    return this
+                }
+            }
 
             Bluetooth.MODEL_PC80B, Bluetooth.MODEL_PC80B_BLE,
             Bluetooth.MODEL_PC80B_BLE2 -> {

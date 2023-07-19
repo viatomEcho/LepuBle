@@ -59,6 +59,7 @@ class Constant{
             const val PF_10_MODEL: Int = Bluetooth.MODEL_PF_10
             const val PF_10AW_MODEL: Int = Bluetooth.MODEL_PF_10AW
             const val PF_10AW1_MODEL: Int = Bluetooth.MODEL_PF_10AW1
+            const val PF_10AW_1_MODEL: Int = Bluetooth.MODEL_PF_10AW_1
             const val PF_10BW_MODEL: Int = Bluetooth.MODEL_PF_10BW
             const val PF_10BW1_MODEL: Int = Bluetooth.MODEL_PF_10BW1
             const val PF_20_MODEL: Int = Bluetooth.MODEL_PF_20
@@ -152,7 +153,7 @@ class Constant{
                 SP20_WPS_MODEL, AP20_WPS_MODEL, PC60NW_WPS_MODEL, O2M_WPS_MODEL, PC80B_BLE2_MODEL, VTM01_MODEL,
                 PC200_BLE_MODEL, BTP_MODEL, S5_SCALE_MODEL, ventilator_MODEL, LERES_MODEL, PC60NW_NO_SN_MODEL, ECN_MODEL,
                 GM_300SNT_MODEL, OXYFIT_WPS_MODEL, KIDSO2_WPS_MODEL, CHECKME_POD_WPS_MODEL, R21_MODEL, R10_MODEL, R11_MODEL,
-                LP_BP3W_MODEL, LP_BP3C_MODEL, SI_PO6_MODEL, LESCALE_P3_MODEL, CMI_PC303_MODEL
+                LP_BP3W_MODEL, LP_BP3C_MODEL, SI_PO6_MODEL, LESCALE_P3_MODEL, CMI_PC303_MODEL, PF_10AW_1_MODEL
             )
 
             val SUPPORT_FACES = SparseArray<Int>().apply {

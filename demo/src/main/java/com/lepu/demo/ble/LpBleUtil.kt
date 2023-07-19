@@ -1245,6 +1245,18 @@ class LpBleUtil {
         fun ecnGetDiagnosisResult(model: Int) {
             BleServiceHelper.ecnGetDiagnosisResult(model)
         }
+        fun pf10Aw1SetConfig(model: Int, config: Pf10Aw1Config) {
+            BleServiceHelper.pf10Aw1SetConfig(model, config)
+        }
+        fun pf10Aw1GetConfig(model: Int) {
+            BleServiceHelper.pf10Aw1GetConfig(model)
+        }
+        fun pf10Aw1EnableRtData(model: Int, type: Int, enable: Boolean) {
+            BleServiceHelper.pf10Aw1EnableRtData(model, type, enable)
+        }
+        fun pf10Aw1GetBattery(model: Int) {
+            BleServiceHelper.pf10Aw1GetBattery(model)
+        }
     }
 
 

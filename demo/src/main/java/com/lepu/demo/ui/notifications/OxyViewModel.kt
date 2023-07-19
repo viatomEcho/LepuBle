@@ -36,7 +36,12 @@ class OxyViewModel : InfoViewModel() {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Oxy.EventOxyReadFileComplete)
             .observe(owner) { event ->
                 (event.data as OxyBleResponse.OxyFile).let {
-                    val data = OxyBleFile(it.fileContent)
+                    val content = DownloadHelper.readFile(it.model, "", it.fileName)
+                    val data = if (content.isEmpty()) {
+                        OxyBleFile(it.fileContent)
+                    } else {
+                        OxyBleFile(content)
+                    }
                     val fileName = getTimeString(data.year, data.month, data.day, data.hour, data.minute, data.second)
                     val filePath = "${BleServiceHelper.BleServiceHelper.rawFolder?.get(Bluetooth.MODEL_O2RING)}/$fileName.dat"
                     val isSave = File(filePath).exists()

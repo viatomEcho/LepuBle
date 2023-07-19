@@ -280,6 +280,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_PC_60NW_NO_SN, Bluetooth.MODEL_OXYFIT_WPS,
             Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_CHECKME_POD_WPS,
             Bluetooth.MODEL_SI_PO6 -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_PF_10AW_1 -> {
+                LpBleUtil.pf10Aw1EnableRtData(Constant.BluetoothConfig.currentModel[0], Pf10Aw1BleCmd.EnableType.OXY_PARAM, true)
+                LpBleUtil.pf10Aw1EnableRtData(Constant.BluetoothConfig.currentModel[0], Pf10Aw1BleCmd.EnableType.OXY_WAVE, true)
+                waveHandler.post(OxyWaveTask())
+            }
 
             Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_PC300,
             Bluetooth.MODEL_CHECK_ADV, Bluetooth.MODEL_PC300_BLE,
@@ -425,7 +430,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_S6W, Bluetooth.MODEL_S6W1,
             Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S7W,
             Bluetooth.MODEL_PC60NW_BLE, Bluetooth.MODEL_PC60NW_WPS,
-            Bluetooth.MODEL_PC_60NW_NO_SN -> {
+            Bluetooth.MODEL_PC_60NW_NO_SN, Bluetooth.MODEL_PF_10AW_1 -> {
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.collectData.visibility = View.VISIBLE
                 binding.collectDataTime.visibility = View.VISIBLE
@@ -781,7 +786,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S6W1,
                     Bluetooth.MODEL_SP20_WPS, Bluetooth.MODEL_PC60NW_WPS,
                     Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_PC60NW_BLE,
-                    Bluetooth.MODEL_PC_60NW_NO_SN -> {
+                    Bluetooth.MODEL_PC_60NW_NO_SN, Bluetooth.MODEL_PF_10AW_1 -> {
                         LpBleUtil.enableRtData(it, type, state)
                         type++
                         if (type > Sp20BleCmd.EnableType.OXY_WAVE) {
@@ -2691,6 +2696,31 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val data = it.data as EcnBleResponse.DiagnosisResult
                 binding.ecnInfo.text = "$data"
             }
+        //--------------------pf10fw-1---------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1RtWave)
+            .observe(this) {
+                val rtWave = it.data as Pf10Aw1BleResponse.RtWave
+                OxyDataController.receive(rtWave.waveIntReData)
+                if (binding.collectData.isChecked) {
+                    val fileName = "W${stringFromDate(Date(startCollectTime), "yyyyMMddHHmmss")}.dat"
+                    FileUtil.saveFile(context?.getExternalFilesDir(null)?.absolutePath+"/$fileName", rtWave.waveData, true)
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1RtParam)
+            .observe(this) {
+                val rtData = it.data as Pf10Aw1BleResponse.RtParam
+                viewModel.oxyPr.value = rtData.pr
+                viewModel.spo2.value = rtData.spo2
+                viewModel.pi.value = rtData.pi
+                binding.dataStr.text = rtData.toString()
+                binding.oxyBleBattery.text = "${context?.getString(R.string.battery)}${rtData.batLevel.times(25)} - ${(rtData.batLevel+1).times(25)} %"
+                binding.deviceInfo.text = "${context?.getString(R.string.no_probe_finger)}${rtData.probeOff}"
+            }
+        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1WorkingStatus)
+            .observe(this) {
+                val data = it.data as Pf10Aw1BleResponse.WorkingStatus
+                binding.deviceInfo.text = binding.deviceInfo.text.toString() + "$data"
+            }*/
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -2717,6 +2747,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
     }
 
     override fun onDestroy() {
+        LpBleUtil.pf10Aw1EnableRtData(Constant.BluetoothConfig.currentModel[0], Pf10Aw1BleCmd.EnableType.OXY_PARAM, false)
+        LpBleUtil.pf10Aw1EnableRtData(Constant.BluetoothConfig.currentModel[0], Pf10Aw1BleCmd.EnableType.OXY_WAVE, false)
         LpBleUtil.stopRtTask()
         stopWave()
         isStartWirelessTest = false

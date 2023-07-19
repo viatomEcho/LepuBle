@@ -946,6 +946,17 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 binding.serverConfig.visibility = View.VISIBLE
                 LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
             }
+            Bluetooth.MODEL_PF_10AW_1 -> {
+                infoViewModel = ViewModelProvider(this).get(Pf10Aw1ViewModel::class.java)
+                (infoViewModel as Pf10Aw1ViewModel).initEvent(this)
+                mainViewModel.er1Info.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.fwV}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}\n" +
+                    "${context?.getString(R.string.battery)}${mainViewModel._battery.value}"
+                }
+            }
         }
 
         //----------------------------------------------------------------------------
@@ -1147,9 +1158,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
     // 睡眠算法
     private fun sleepAlg(oxyData: OxyData) {
-        DataConvert.sleep_alg_init_0_25Hz()
+        DataConvert.sleep_alg_init_0_25Hz(oxyData.oxyBleFile.startTime)
         val filePath = "${BleServiceHelper.BleServiceHelper.rawFolder?.get(Bluetooth.MODEL_O2RING)}/sleep_result_${oxyData.fileName}.txt"
         val isSave = File(filePath).exists()
+        Log.d("111111111", "oxyData.oxyBleFile : ${oxyData.oxyBleFile}")
         for (data in oxyData.oxyBleFile.data) {
             val status = DataConvert.sleep_alg_main_pro_0_25Hz(data.pr.toShort(), data.vector)
             if (!isSave) {
@@ -1160,6 +1172,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                         1 -> "浅睡眠"
                         2 -> "快速眼动"
                         3 -> "清醒"
+                        4 -> "准备睡眠阶段"
                         else -> "未得出结果"
                     }}\n",
                     true)
@@ -1168,13 +1181,33 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         val result = DataConvert.sleep_alg_get_res_0_25Hz()
         Log.d("111111111111111", "DataConvert.sleep_alg_get_res_0_25Hz : $result")
         if (!isSave) {
+            val len = result[7]
+            var temp = ""
+            for (i in 0 until len) {
+                temp += "${when (result[8+i]) {
+                        0 -> "深睡眠"
+                        1 -> "浅睡眠"
+                        2 -> "快速眼动"
+                        3 -> "清醒"
+                        4 -> "准备睡眠阶段"
+                        else -> "未得出结果"
+                        }}, "
+            }
             FileUtil.saveTextFile(
                 filePath,
-                "总睡眠时间: ${DataConvert.getEcgTimeStr(result[0]*4)}\n" +
-                        "深睡时间: ${DataConvert.getEcgTimeStr(result[1]*4)}\n" +
-                        "浅睡时间: ${DataConvert.getEcgTimeStr(result[2]*4)}\n" +
-                        "快速眼动时间: ${DataConvert.getEcgTimeStr(result[3]*4)}\n" +
-                        "清醒次数: ${result[4]}",
+                "总睡眠时间: ${DataConvert.getEcgTimeStr(result[0])}\n" +
+                        "深睡时间: ${DataConvert.getEcgTimeStr(result[1])}\n" +
+                        "浅睡时间: ${DataConvert.getEcgTimeStr(result[2])}\n" +
+                        "快速眼动时间: ${DataConvert.getEcgTimeStr(result[3])}\n" +
+                        "清醒次数: ${result[4]}\n" +
+                        "准备睡眠时间: ${DataConvert.getEcgTimeStr(result[5])}\n" +
+                        "入睡时间点: ${result[6]}\n" +
+                        "睡眠分期结果数组长度: ${result[7]}\n" +
+                        "出睡时间点: ${result[8+len]}\n" +
+                        "深睡比例: ${result[9+len]} %\n" +
+                        "浅睡比例: ${result[10+len]} %\n" +
+                        "快速眼动比例: ${result[11+len]} %\n" +
+                        "睡眠分期结果: $temp",
                 true)
         }
     }

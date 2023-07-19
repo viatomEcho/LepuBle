@@ -40,6 +40,9 @@
             <include
                 android:id="@+id/bp3_layout"
                 layout="@layout/bp3_settings"/>
+            <include
+                android:id="@+id/pf10aw1_layout"
+                layout="@layout/pf10aw1_settings"/>
             <LinearLayout
                 android:id="@+id/le_bp2w_layout"
                 android:layout_width="match_parent"

@@ -46,8 +46,11 @@ static unsigned int		m_sleep_alg_rem_count = 0;								//进入快速眼动计数
 static unsigned int		m_sleep_alg_awake_count = 0;							//清醒持续阶段计数
 static int					m_sleep_alg_pr_buff_high_count = 0;				
 static sleep_alg_result	m_sleep_alg_res = { 0 };
+static int save_sleep_state_flag = 0;   // 开始保存睡眠分析状态标志位 
+static unsigned int start_timestamp;    // 保存开始跑数据的第一个点时间戳
+
 //算法初始化
-void sleep_alg_init_0_25Hz() {
+void sleep_alg_init_0_25Hz(unsigned int input_start_timestamp) {
 	sleep_alg_filter_init();
 	m_sleep_alg_status = SLEEP_ALG_STATUS_AWAKE;
 	m_sleep_alg_pre_status = SLEEP_ALG_STATUS_AWAKE;
@@ -76,6 +79,9 @@ void sleep_alg_init_0_25Hz() {
 	m_sleep_alg_awake_count = 0;	
 	m_sleep_alg_pr_buff_high_count = 0;	
 	memset(&m_sleep_alg_res, 0, sizeof(m_sleep_alg_res));
+    save_sleep_state_flag = 0;
+
+	start_timestamp = input_start_timestamp;
 }
 //算法主接口
 SLEEP_ALG_STATUS sleep_alg_main_pro_0_25Hz(sleep_alg_input_t  *input) {
@@ -187,6 +193,11 @@ SLEEP_ALG_STATUS sleep_alg_main_pro_0_25Hz(sleep_alg_input_t  *input) {
 				&& (!m_sleep_alg_acc_high_sign)) {
 				m_sleep_alg_fall_sleep_flag = 1;
 				m_sleep_alg_fall_sleep_time = m_sleep_alg_count;
+
+				if(save_sleep_state_flag == 0){
+					m_sleep_alg_res.falling_asleep = m_sleep_alg_count + 1;  // 保存第一次入睡时间点（距离开始第一个点的距离）				
+				}				
+				save_sleep_state_flag = 1;  // 开始保存睡眠分期数据标志
 			}
 
 			if (pr_down_count >= 3) {
@@ -289,23 +300,38 @@ SLEEP_ALG_STATUS sleep_alg_main_pro_0_25Hz(sleep_alg_input_t  *input) {
 	switch (m_sleep_alg_status)
 	{
 	case SLEEP_ALG_STATUS_REM:
-		m_sleep_alg_res.rem_time++;
+		//m_sleep_alg_res.rem_time++;  // 数据点数（4s一个点）
+		m_sleep_alg_res.rem_time += 4;    // 数据时间（单位：s）
 		break;
 	case SLEEP_ALG_STATUS_DEEP:
-		m_sleep_alg_res.deep_time++;
+		//m_sleep_alg_res.deep_time++;
+		m_sleep_alg_res.deep_time += 4;   // 数据时间（单位：s）
 		break;
 	case SLEEP_ALG_STATUS_LIGHT:
-		m_sleep_alg_res.light_time++;
+		//m_sleep_alg_res.light_time++;
+		m_sleep_alg_res.light_time += 4;  // 数据时间（单位：s）
 		break;
 	case SLEEP_ALG_STATUS_AWAKE:
-		if (m_sleep_alg_pre_status != SLEEP_ALG_STATUS_AWAKE) {
-			m_sleep_alg_res.awake_time++;
+		if (m_sleep_alg_pre_status != SLEEP_ALG_STATUS_AWAKE  && m_sleep_alg_pre_status != SLEEP_ALG_STATUS_PREPARATION ) {
+			m_sleep_alg_res.awake_cnt++;
 		}
+		break;
+	case SLEEP_ALG_STATUS_PREPARATION:
+		//m_sleep_alg_res.preparation_time++;
+		m_sleep_alg_res.preparation_time += 4;  // 数据时间（单位：s）
 		break;
 	default:
 		break;
 	}
 	m_sleep_alg_res.sleep_time = m_sleep_alg_res.rem_time + m_sleep_alg_res.deep_time + m_sleep_alg_res.light_time;
+
+	// 保存分期结果
+	if(save_sleep_state_flag == 1)
+	{
+		m_sleep_alg_res.sleep_state_buff[m_sleep_alg_res.sleep_state_buff_len] = m_sleep_alg_status;
+
+		if(++m_sleep_alg_res.sleep_state_buff_len == SLEEP_STATE_BUFF_LEN)  m_sleep_alg_res.sleep_state_buff_len = 0;
+	}
 
 	m_sleep_alg_pre_status = m_sleep_alg_status;
 	m_sleep_alg_pre_pr = input->pr;
@@ -316,6 +342,38 @@ SLEEP_ALG_STATUS sleep_alg_main_pro_0_25Hz(sleep_alg_input_t  *input) {
 
 
 sleep_alg_result* sleep_alg_get_res_0_25Hz() {
+	// 如果最后时间是清醒应在睡眠分期中剔除掉，不应画在睡眠分期中，并把清醒次数减一
+	int i;
+	int delete_flag = 0;
+
+	for(i = m_sleep_alg_res.sleep_state_buff_len - 1; i >= 0; i--)
+	{
+		if(m_sleep_alg_res.sleep_state_buff[i] == SLEEP_ALG_STATUS_AWAKE)
+		{
+			m_sleep_alg_res.sleep_state_buff_len--;
+			delete_flag = 1;
+		}
+		else
+		{
+			if(delete_flag == 1) m_sleep_alg_res.awake_cnt--;
+			break;  // 跳出for循环
+		}
+	}
+
+	// 计算深睡、浅睡、快速眼动的比例
+	if(m_sleep_alg_res.sleep_time)
+	{
+		m_sleep_alg_res.deep_time_percent  = (m_sleep_alg_res.deep_time * 100 + m_sleep_alg_res.sleep_time / 2) / m_sleep_alg_res.sleep_time; 
+		m_sleep_alg_res.light_time_percent = (m_sleep_alg_res.light_time * 100 + m_sleep_alg_res.sleep_time / 2) / m_sleep_alg_res.sleep_time;
+		m_sleep_alg_res.rem_time_percent   = (m_sleep_alg_res.rem_time * 100 + m_sleep_alg_res.sleep_time / 2) / m_sleep_alg_res.sleep_time; 
+	}
+	
+	//计算入睡时间点（转成时间戳）
+	m_sleep_alg_res.falling_asleep = start_timestamp + m_sleep_alg_res.falling_asleep * 4;
+
+	// 计算出睡时间点（转成时间戳）
+	m_sleep_alg_res.awake_time = m_sleep_alg_res.falling_asleep + m_sleep_alg_res.sleep_state_buff_len * 4;
+
 	return (&m_sleep_alg_res);
 }
 

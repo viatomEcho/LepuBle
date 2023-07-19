@@ -1073,6 +1073,14 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
+            Bluetooth.MODEL_PF_10AW_1 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Pf10Aw1BleInterface).let {
+                        LepuBleLog.d(tag, "it as Pf10Aw1BleInterface--burnFactoryInfo")
+                        it.burnFactoryInfo(config)
+                    }
+                }
+            }
             else -> LepuBleLog.d(tag, "burnFactoryInfo current model $model unsupported!!")
         }
     }
@@ -4484,6 +4492,64 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.d(tag, "checkmeReadFile current model $model unsupported!!")
+        }
+    }
+
+    // pf10aw-1
+    fun pf10Aw1GetConfig(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_PF_10AW_1 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Pf10Aw1BleInterface).let {
+                        LepuBleLog.d(tag, "it as Pf10Aw1BleInterface--pf10Aw1GetConfig")
+                        it.getConfig()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "pf10Aw1GetConfig current model $model unsupported!!")
+        }
+    }
+    fun pf10Aw1SetConfig(model: Int, config: Pf10Aw1Config) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_PF_10AW_1 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Pf10Aw1BleInterface).let {
+                        LepuBleLog.d(tag, "it as Pf10Aw1BleInterface--pf10Aw1SetConfig")
+                        it.setConfig(config)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "pf10Aw1SetConfig current model $model unsupported!!")
+        }
+    }
+    fun pf10Aw1EnableRtData(model: Int, type: Int, enable: Boolean) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_PF_10AW_1 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Pf10Aw1BleInterface).let {
+                        LepuBleLog.d(tag, "it as Pf10Aw1BleInterface--pf10Aw1EnableRtData")
+                        it.enableRtData(type, enable)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "pf10Aw1EnableRtData current model $model unsupported!!")
+        }
+    }
+    fun pf10Aw1GetBattery(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_PF_10AW_1 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Pf10Aw1BleInterface).let {
+                        LepuBleLog.d(tag, "it as Pf10Aw1BleInterface--pf10Aw1GetBattery")
+                        it.getBattery()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "pf10Aw1GetBattery current model $model unsupported!!")
         }
     }
 

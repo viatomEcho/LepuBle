@@ -96,6 +96,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.btpLayout.root.visibility = View.GONE
         binding.ventilatorLayout.root.visibility = View.GONE
         binding.bp3Layout.root.visibility = View.GONE
+        binding.pf10aw1Layout.root.visibility = View.GONE
         binding.sendCmd.visibility = View.GONE
         binding.content.visibility = View.GONE
         if (v == null) return
@@ -301,6 +302,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     (settingViewModel as Bp3ViewModel).initEvent(this)
                     LpBleUtil.bp3GetConfig(it)
                 }
+                Bluetooth.MODEL_PF_10AW_1 -> {
+                    setViewVisible(binding.pf10aw1Layout.root)
+                    settingViewModel = ViewModelProvider(this).get(Pf10Aw1ViewModel::class.java)
+                    (settingViewModel as Pf10Aw1ViewModel).initView(requireContext(), binding, it)
+                    (settingViewModel as Pf10Aw1ViewModel).initEvent(this)
+                    LpBleUtil.pf10Aw1GetConfig(it)
+                }
                 else -> {
                     setViewVisible(null)
                 }
@@ -355,6 +363,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.bp3Layout.version.setText("${it.hwV}")
                 binding.bp3Layout.sn.setText("${it.sn}")
                 binding.bp3Layout.code.setText("${it.branchCode}")
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10AW_1) {
+                binding.pf10aw1Layout.version.setText("${it.hwV}")
+                binding.pf10aw1Layout.sn.setText("${it.sn}")
+                binding.pf10aw1Layout.code.setText("${it.branchCode}")
             }
         }
         mainViewModel.er2Info.observe(viewLifecycleOwner) {

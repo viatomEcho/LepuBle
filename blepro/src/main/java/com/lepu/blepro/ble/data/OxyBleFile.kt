@@ -87,6 +87,12 @@ class OxyBleFile(val bytes: ByteArray) {
             OxyBleFile : 
             version : $version
             operationMode : $operationMode
+            year : $year
+            month : $month
+            day : $day
+            hour : $hour
+            minute : $minute
+            second : $second
             startTime : $startTime
             startTime : ${getTimeString(year, month, day, hour, minute, second)}
             size : $size
