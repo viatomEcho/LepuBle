@@ -128,7 +128,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
                 Bluetooth.MODEL_BP2 -> {
                     setViewVisible(binding.bp2Layout.root)
-                    binding.bp2Layout.bp2VolumeLayout.visibility = View.GONE
                     binding.bp2Layout.bp2ModeLayout.visibility = View.GONE
                     binding.bp2Layout.bp2PhyLayout.visibility = View.GONE
                     binding.bp2Layout.bp2DeleteFile.visibility = View.GONE
@@ -138,7 +137,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_BP2A -> {
                     setViewVisible(binding.bp2Layout.root)
                     binding.bp2Layout.bp2SetSwitch.visibility = View.GONE
-                    binding.bp2Layout.bp2VolumeLayout.visibility = View.GONE
                     binding.bp2Layout.bp2ModeLayout.visibility = View.GONE
                     binding.bp2Layout.bp2PhyLayout.visibility = View.GONE
                     binding.bp2Layout.bp2DeleteFile.visibility = View.GONE
@@ -148,7 +146,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 Bluetooth.MODEL_BP2T -> {
                     setViewVisible(binding.bp2Layout.root)
                     binding.bp2Layout.bp2SetSwitch.visibility = View.GONE
-                    binding.bp2Layout.bp2VolumeLayout.visibility = View.GONE
                     binding.bp2Layout.bp2ModeLayout.visibility = View.GONE
                     binding.bp2Layout.bp2DeleteFile.visibility = View.GONE
                     binding.bp2Layout.bp2WriteUser.visibility = View.GONE
@@ -374,6 +371,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.er2Layout.er2Sn.setText("${it.serialNum}")
             binding.er2Layout.er2Code.setText("${it.branchCode}")
         }
+        mainViewModel.bp2Info.observe(viewLifecycleOwner) {
+            binding.bp2Layout.version.setText("${it.hwV}")
+            binding.bp2Layout.sn.setText("${it.sn}")
+            binding.bp2Layout.code.setText("${it.branchCode}")
+        }
         mainViewModel.boInfo.observe(viewLifecycleOwner) {
             binding.pc60fwCode.setText("${it.branchCode}")
         }
@@ -541,6 +543,45 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         //-------------------------bp2/bp2a/bp2t/bp2w/lp bp2w--------------------
+        binding.bp2Layout.factoryConfig.setOnClickListener {
+            val config = FactoryConfig()
+            var enableVersion = true
+            val tempVersion = binding.bp2Layout.version.text
+            if (tempVersion.isNullOrEmpty()) {
+                enableVersion = false
+            } else if (tempVersion.length == 1 && isBigLetter(tempVersion.toString())) {
+                config.setHwVersion(tempVersion.first())
+            } else {
+                Toast.makeText(context, "硬件版本请输入A-Z字母", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            var enableSn = true
+            val tempSn = trimStr(binding.bp2Layout.sn.text.toString())
+            if (tempSn.isNullOrEmpty()) {
+                enableSn = false
+            } else if (tempSn.length == 10) {
+                config.setSnCode(tempSn)
+            } else {
+                Toast.makeText(context, "sn请输入10位", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            var enableCode = true
+            val tempCode = trimStr(binding.bp2Layout.code.text.toString())
+            if (tempCode.isNullOrEmpty()) {
+                enableCode = false
+            } else if (tempCode.length == 8) {
+                config.setBranchCode(tempCode)
+            } else {
+                Toast.makeText(context, "code请输入8位", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            config.setBurnFlag(enableSn, enableVersion, enableCode)
+            LpBleUtil.burnFactoryInfo(Constant.BluetoothConfig.currentModel[0], config)
+            deviceFactoryData.sn = tempSn
+            deviceFactoryData.code = tempCode
+            deviceFactoryData.time = DateUtil.stringFromDate(Date(System.currentTimeMillis()), DateUtil.DATE_ALL_ALL)
+            FileUtil.saveTextFile("${context?.getExternalFilesDir(null)?.absolutePath}/device_factory_data.txt", deviceFactoryData.toString(), true)
+        }
         binding.bp2Layout.bp2SetSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             (config as Bp2Config).beepSwitch = isChecked
             LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
@@ -1171,11 +1212,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
             }
         //----------------------------bp2/bp2a/bp2t-----------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2BurnFactoryInfo)
+            .observe(this) {
+                Toast.makeText(context, context?.getString(R.string.burn_info_success), Toast.LENGTH_SHORT).show()
+                LpBleUtil.reset(it.model)
+            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2GetConfigResult)
             .observe(this) {
                 val config = it.data as Bp2Config
                 this.config = config
                 binding.content.text = "$config"
+                binding.bp2Layout.volumeSpinner.setSelection(config.volume)
                 binding.bp2Layout.bp2SetSwitch.isChecked = config.beepSwitch
                 Toast.makeText(context, "获取参数成功", Toast.LENGTH_SHORT).show()
             }

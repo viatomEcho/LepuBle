@@ -1013,6 +1013,14 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T ->{
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2BleInterface--burnFactoryInfo")
+                        it.burnFactoryInfo(config)
+                    }
+                }
+            }
             Bluetooth.MODEL_O2RING, Bluetooth.MODEL_O2M,
             Bluetooth.MODEL_BABYO2, Bluetooth.MODEL_BABYO2N,
             Bluetooth.MODEL_CHECKO2, Bluetooth.MODEL_SLEEPO2,

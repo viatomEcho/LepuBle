@@ -8,6 +8,7 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.Bp2BleCmd
 import com.lepu.blepro.ble.cmd.Bp2BleCmd.*
 import com.lepu.blepro.ble.cmd.Bp2BleResponse
+import com.lepu.blepro.ble.cmd.LpBleCmd
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.utils.CrcUtil.calCRC8
@@ -335,6 +336,15 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                 val data = Bp2BlePhyState(bleResponse.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SetPhyState).post(InterfaceEvent(model, data))
             }
+            LpBleCmd.BURN_FACTORY_INFO -> {
+                if (bleResponse.type != 0x01.toByte()) {
+                    LepuBleLog.d(tag, "model:$model,BURN_FACTORY_INFO => failed")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2BurnFactoryInfo).post(InterfaceEvent(model, false))
+                } else {
+                    LepuBleLog.d(tag, "model:$model,BURN_FACTORY_INFO => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2BurnFactoryInfo).post(InterfaceEvent(model, true))
+                }
+            }
 
 
         }
@@ -426,6 +436,11 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
 
     override fun dealContinueRF(userId: String, fileName: String) {
         LepuBleLog.e(tag, "dealContinueRF not yet implemented")
+    }
+
+    fun burnFactoryInfo(config: FactoryConfig) {
+        sendCmd(LpBleCmd.burnFactoryInfo(config.convert2Data(), aesEncryptKey))
+        LepuBleLog.d(tag, "burnFactoryInfo...")
     }
 
 }

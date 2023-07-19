@@ -106,6 +106,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBp2SetPhyState = "com.lepu.ble.bp2.set.phy.state"                  // 设置理疗状态 Bp2BlePhyState
             const val EventBp2GetPhyState = "com.lepu.ble.bp2.get.phy.state"                  // 获取理疗状态 Bp2BlePhyState
             const val EventBp2GetPhyStateError = "com.lepu.ble.bp2.get.phy.state.error"       // 获取理疗状态出错 boolean
+            const val EventBp2BurnFactoryInfo = "com.lepu.ble.bp2.burn.factory.info"          // 烧录出厂信息 boolean
         }
     }
 
