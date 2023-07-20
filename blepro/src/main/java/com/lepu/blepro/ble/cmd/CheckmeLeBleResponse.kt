@@ -210,7 +210,7 @@ object CheckmeLeBleResponse{
             index++
             second = byte2UInt(bytes[index])
             index++
-            temp = bytesToFloat(bytes.copyOfRange(index, index+4))
+            temp = intToFloat(toUInt(bytes.copyOfRange(index, index+4)))
             recordName = getTimeString(year, month, day, hour, minute, second)
             timestamp = getSecondTimestamp(recordName)
         }

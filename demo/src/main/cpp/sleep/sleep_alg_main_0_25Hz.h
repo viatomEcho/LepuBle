@@ -94,6 +94,8 @@ void sleep_alg_init_0_25Hz(unsigned int input_start_timestamp);
 SLEEP_ALG_STATUS sleep_alg_main_pro_0_25Hz(sleep_alg_input_t  *input);
 sleep_alg_result* sleep_alg_get_res_0_25Hz();
 
+void sleep_alg_main(int* PR_buff, int* ACC_buff, int buff_len); // 新增加算法调用接口，数据以数组传入 
+
 int sleep_alg_get_pr_base();
 
 int sleep_alg_get_pr();

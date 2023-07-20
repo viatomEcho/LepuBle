@@ -83,6 +83,24 @@ void sleep_alg_init_0_25Hz(unsigned int input_start_timestamp) {
 
 	start_timestamp = input_start_timestamp;
 }
+
+// 新增加算法调用接口（以数组形式传入数据）
+void sleep_alg_main(int* PR_buff, int* ACC_buff, int buff_len)
+{
+	sleep_alg_input_t input_data_temp;
+	int i;
+
+	for(i = 0; i < buff_len; i++)
+	{
+		input_data_temp.pr  = PR_buff[i];
+		input_data_temp.acc = ACC_buff[i]; 
+
+		sleep_alg_main_pro_0_25Hz(&input_data_temp);
+	}
+
+	return;
+}
+
 //算法主接口
 SLEEP_ALG_STATUS sleep_alg_main_pro_0_25Hz(sleep_alg_input_t  *input) {
 
@@ -195,7 +213,7 @@ SLEEP_ALG_STATUS sleep_alg_main_pro_0_25Hz(sleep_alg_input_t  *input) {
 				m_sleep_alg_fall_sleep_time = m_sleep_alg_count;
 
 				if(save_sleep_state_flag == 0){
-					m_sleep_alg_res.falling_asleep = m_sleep_alg_count + 1;  // 保存第一次入睡时间点（距离开始第一个点的距离）				
+					m_sleep_alg_res.falling_asleep = m_sleep_alg_count;  // 保存第一次入睡时间点				
 				}				
 				save_sleep_state_flag = 1;  // 开始保存睡眠分期数据标志
 			}

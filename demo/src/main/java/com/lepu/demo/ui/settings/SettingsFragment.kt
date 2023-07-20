@@ -643,21 +643,20 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
-        ArrayAdapter(requireContext(),
-            android.R.layout.simple_list_item_1,
-            arrayListOf("关", "1", "2", "3")
-        ).apply {
-            binding.bp2Layout.volumeSpinner.adapter = this
-        }
-        binding.bp2Layout.volumeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (!this@SettingsFragment::config.isInitialized) return
-                (config as Bp2Config).volume = position
-                LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
-                cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
-                binding.sendCmd.text = cmdStr
-            }
-            override fun onNothingSelected(parent: AdapterView<*>?) {
+        binding.bp2Layout.setVolume.setOnClickListener {
+            if (!this@SettingsFragment::config.isInitialized) return@setOnClickListener
+            val v = trimStr(binding.bp2Layout.volumeText.text.toString())
+            if (v.isNullOrEmpty()) {
+                Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show()
+            } else {
+                if (isNumber(v)) {
+                    (config as Bp2Config).volume = v.toInt()
+                    LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
+                    cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
+                    binding.sendCmd.text = cmdStr
+                } else {
+                    Toast.makeText(context, "请输入数字", Toast.LENGTH_SHORT).show()
+                }
             }
         }
         ArrayAdapter(requireContext(),
@@ -1222,7 +1221,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 val config = it.data as Bp2Config
                 this.config = config
                 binding.content.text = "$config"
-                binding.bp2Layout.volumeSpinner.setSelection(config.volume)
+                binding.bp2Layout.volumeText.setText("${config.volume}")
                 binding.bp2Layout.bp2SetSwitch.isChecked = config.beepSwitch
                 Toast.makeText(context, "获取参数成功", Toast.LENGTH_SHORT).show()
             }
@@ -1368,7 +1367,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 setReceiveCmd(config.bytes)
                 binding.content.text = "$config"
                 binding.bp2Layout.bp2SetSwitch.isChecked = config.beepSwitch
-                binding.bp2Layout.volumeSpinner.setSelection(config.volume)
+                binding.bp2Layout.volumeText.setText("${config.volume}")
                 binding.bp2Layout.modeSpinner.setSelection(config.avgMeasureMode)
                 Toast.makeText(context, "获取参数成功", Toast.LENGTH_SHORT).show()
             }

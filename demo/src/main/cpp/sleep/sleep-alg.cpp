@@ -26,6 +26,15 @@ Java_com_lepu_demo_util_DataConvert_sleep_1alg_1main_1pro_10_125Hz(JNIEnv *env, 
 }
 
 extern "C"
+JNIEXPORT void JNICALL
+Java_com_lepu_demo_util_DataConvert_sleep_1alg_1main(JNIEnv *env, jclass clazz, jintArray pr, jintArray acc) {
+    int len = (*env).GetArrayLength(pr);
+    int *p = (*env).GetIntArrayElements(pr, NULL);
+    int *a = (*env).GetIntArrayElements(acc, NULL);
+    sleep_alg_main(p, a, len);
+}
+
+extern "C"
 JNIEXPORT jintArray JNICALL
 Java_com_lepu_demo_util_DataConvert_sleep_1alg_1get_1res_10_125Hz(JNIEnv *env, jclass clazz) {
     sleep_alg_result *result = sleep_alg_get_res_0_25Hz();

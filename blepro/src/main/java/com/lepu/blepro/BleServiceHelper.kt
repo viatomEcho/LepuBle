@@ -1215,7 +1215,7 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * er1设置参数
+     * er1设置参数（无屏版）
      */
     fun setEr1Vibrate(model: Int, switcher: Boolean, threshold1: Int, threshold2: Int){
         if (!checkService()) return
@@ -1233,6 +1233,10 @@ class BleServiceHelper private constructor() {
         }
 
     }
+
+    /**
+     * er1设置参数（有屏版）
+     */
     fun setEr1Vibrate(model: Int, config: Er1Config) {
         if (!checkService()) return
         when(model) {

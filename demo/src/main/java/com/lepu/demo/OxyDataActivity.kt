@@ -516,7 +516,11 @@ class OxyDataActivity : AppCompatActivity() {
         val statuses = mutableListOf<Int>()
         val filePath = "${BleServiceHelper.BleServiceHelper.rawFolder?.get(Bluetooth.MODEL_O2RING)}/sleep_result_${oxyData.fileName}.txt"
         val isSave = File(filePath).exists()
+        val prList = mutableListOf<Int>()
+        val vectorList = mutableListOf<Int>()
         for (data in oxyData.oxyBleFile.data) {
+            prList.add(data.pr)
+            vectorList.add(data.vector)
             val status = DataConvert.sleep_alg_main_pro_0_25Hz(data.pr.toShort(), data.vector)
             statuses.add(status)
             if (!isSave) {
@@ -533,6 +537,7 @@ class OxyDataActivity : AppCompatActivity() {
                     true)
             }
         }
+//        DataConvert.sleep_alg_main(prList.toIntArray(), vectorList.toIntArray())
         val result = DataConvert.sleep_alg_get_res_0_25Hz()
         val len = result[7]
         sleepText.text = "${getString(R.string.sleep_status_tips)}" +

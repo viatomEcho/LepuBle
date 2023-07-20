@@ -76,8 +76,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         super.onViewCreated(view, savedInstanceState)
         init()
 //        val data = OxyData()
-//        data.fileName = "uid-192637-data-20230623220915-source-O2Ring 2839"
-//        data.oxyBleFile = OxyBleFile(FileUtil.readFileToByteArray(context, "/o2/uid-192637-data-20230623220915-source-O2Ring 2839.dat"))
+//        data.fileName = "20230530010104"
+//        data.oxyBleFile = OxyBleFile(FileUtil.readFileToByteArray(context, "/o2/20230530010104.dat"))
 //        sleepAlg(data)
 //        testEr3()
 //        testEr3Decompress()
@@ -1162,7 +1162,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         val filePath = "${BleServiceHelper.BleServiceHelper.rawFolder?.get(Bluetooth.MODEL_O2RING)}/sleep_result_${oxyData.fileName}.txt"
         val isSave = File(filePath).exists()
         Log.d("111111111", "oxyData.oxyBleFile : ${oxyData.oxyBleFile}")
+        val prList = mutableListOf<Int>()
+        val vectorList = mutableListOf<Int>()
         for (data in oxyData.oxyBleFile.data) {
+            prList.add(data.pr)
+            vectorList.add(data.vector)
             val status = DataConvert.sleep_alg_main_pro_0_25Hz(data.pr.toShort(), data.vector)
             if (!isSave) {
                 FileUtil.saveTextFile(
@@ -1178,8 +1182,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     true)
             }
         }
+//        DataConvert.sleep_alg_main(prList.toIntArray(), vectorList.toIntArray())
         val result = DataConvert.sleep_alg_get_res_0_25Hz()
-        Log.d("111111111111111", "DataConvert.sleep_alg_get_res_0_25Hz : $result")
         if (!isSave) {
             val len = result[7]
             var temp = ""

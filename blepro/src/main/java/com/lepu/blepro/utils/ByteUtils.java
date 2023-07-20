@@ -23,13 +23,9 @@ public class ByteUtils {
         return b;
     }
 
-    public static float bytesToFloat(byte[] b) {
-        int accum = 0;
-        accum = accum|(b[0] & 0xff) << 0;
-        accum = accum|(b[1] & 0xff) << 8;
-        accum = accum|(b[2] & 0xff) << 16;
-        accum = accum|(b[3] & 0xff) << 24;
-        return Float.intBitsToFloat(accum);
+
+    public static float intToFloat(int b) {
+        return Float.intBitsToFloat(b);
     }
 
     /**

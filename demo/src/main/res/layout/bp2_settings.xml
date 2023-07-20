@@ -89,17 +89,28 @@
             android:id="@+id/bp2_volume_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp">
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
                 android:textSize="16sp"
-                android:text="播报音量:"/>
-            <Spinner
-                android:id="@+id/volume_spinner"
+                android:text="播报音量："/>
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/volume_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+                <Button
+                    android:id="@+id/set_volume"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="设置" />
+            </RelativeLayout>
         </LinearLayout>
         <LinearLayout
             android:id="@+id/bp2_mode_layout"
