@@ -1,9 +1,11 @@
 package com.lepu.blepro.ble.cmd
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.utils.toLong
 import com.lepu.blepro.utils.toUInt
+import java.util.*
 
 object Pf10Aw1BleResponse {
 
@@ -62,7 +64,9 @@ object Pf10Aw1BleResponse {
             index += 4
             magic = toLong(bytes.copyOfRange(index, index+4))
             index += 4
-            startTime = toLong(bytes.copyOfRange(index, index+4))
+            val rawOffset = DateUtil.getTimeZoneOffset().div(1000)
+            val defaultTime = toLong(bytes.copyOfRange(index, index+4))
+            startTime = defaultTime - rawOffset
             index += 4
             size = toUInt(bytes.copyOfRange(index, index+4))
             index += 4
@@ -81,6 +85,7 @@ object Pf10Aw1BleResponse {
                 checkSum : $checkSum
                 magic : $magic
                 startTime : $startTime
+                startTime : ${DateUtil.stringFromDate(Date(startTime.times(1000)), "yyyy-MM-dd HH:mm:ss")}
                 size : $size
                 interval : $interval
                 channelType : $channelType

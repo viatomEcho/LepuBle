@@ -31,6 +31,7 @@ class Pf10Aw1ViewModel : InfoViewModel() {
             .observe(owner) { event ->
                 (event.data as Pf10Aw1BleResponse.BleFile).let {
                     _readNextFile.value = true
+                    _info.value = _info.value + "\n$it"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1Reset)
