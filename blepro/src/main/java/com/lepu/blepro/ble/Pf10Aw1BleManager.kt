@@ -11,9 +11,9 @@ import java.util.*
  */
 class Pf10Aw1BleManager(context: Context): LpBleManager(context) {
     override fun initUUID() {
-        service_uuid = UUID.fromString("E8FBA14B-0001-98F9-831B-4E2941D01248")
-        write_uuid = UUID.fromString("E8FBA14B-0002-98F9-831B-4E2941D01248")
-        notify_uuid = UUID.fromString("E8FBA14B-0003-98F9-831B-4E2941D01248")
+        service_uuid = UUID.fromString("E8FB0001-A14B-98F9-831B-4E2941D01248")
+        write_uuid = UUID.fromString("E8FB0002-A14B-98F9-831B-4E2941D01248")
+        notify_uuid = UUID.fromString("E8FB0003-A14B-98F9-831B-4E2941D01248")
         LepuBleLog.d("Pf10Aw1BleManager initUUID")
     }
 

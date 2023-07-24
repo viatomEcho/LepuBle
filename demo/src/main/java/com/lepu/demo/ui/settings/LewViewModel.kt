@@ -71,7 +71,7 @@ class LewViewModel : SettingViewModel() {
         }
         // 获取电量
         binding.lewLayout.lewGetBattery.setOnClickListener {
-            LpBleUtil.lewGetBattery(model)
+            LpBleUtil.getBattery(model)
             binding.responseCmd.text = ""
             binding.content.text = ""
             binding.sendCmd.text = ""

@@ -1089,6 +1089,14 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
+            Bluetooth.MODEL_O2RING_S -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as OxyIIBleInterface).let {
+                        LepuBleLog.d(tag, "it as OxyIIBleInterface--burnFactoryInfo")
+                        it.burnFactoryInfo(config)
+                    }
+                }
+            }
             else -> LepuBleLog.d(tag, "burnFactoryInfo current model $model unsupported!!")
         }
     }
@@ -2041,20 +2049,86 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * 获取电量（ap20）
+     * 获取电量
      */
-    fun ap20GetBattery(model: Int) {
+    fun getBattery(model: Int) {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_AP20, Bluetooth.MODEL_AP20_WPS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Ap20BleInterface).let {
-                        LepuBleLog.d(tag, "it as Ap20BleInterface--ap20GetBattery")
+                        LepuBleLog.d(tag, "it as Ap20BleInterface--getBattery")
                         it.getBattery()
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "ap20GetBattery current model $model unsupported!!")
+            Bluetooth.MODEL_PF_10AW_1 -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Pf10Aw1BleInterface).let {
+                        LepuBleLog.d(tag, "it as Pf10Aw1BleInterface--getBattery")
+                        it.getBattery()
+                    }
+                }
+            }
+            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp3BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp3BleInterface--getBattery")
+                        it.getBattery()
+                    }
+                }
+            }
+            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
+            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
+            Bluetooth.MODEL_LERES -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as VentilatorBleInterface).let {
+                        LepuBleLog.d(tag, "it as VentilatorBleInterface--getBattery")
+                        it.getBattery()
+                    }
+                }
+            }
+            Bluetooth.MODEL_BTP -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as BtpBleInterface).let {
+                        LepuBleLog.d(tag, "it as BtpBleInterface--getBattery")
+                        it.getBattery()
+                    }
+                }
+            }
+            Bluetooth.MODEL_LEM -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LemBleInterface).let {
+                        LepuBleLog.d(tag, "it as LemBleInterface--getBattery")
+                        it.getBattery()
+                    }
+                }
+            }
+            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Sp20BleInterface).let {
+                        LepuBleLog.d(tag, "it as Sp20BleInterface--sp20GetBattery")
+                        it.getBattery()
+                    }
+                }
+            }
+            Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LewBleInterface).let {
+                        LepuBleLog.d(tag, "it as LewBleInterface--getBattery")
+                        it.getBattery()
+                    }
+                }
+            }
+            Bluetooth.MODEL_O2RING_S -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as OxyIIBleInterface).let {
+                        LepuBleLog.d(tag, "it as OxyIIBleInterface--getBattery")
+                        it.getBattery()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "getBattery current model $model unsupported!!")
         }
     }
 
@@ -2106,23 +2180,6 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.d(tag, "lewBoundDevice current model $model unsupported!!")
-        }
-    }
-    /**
-     * 获取电量（lew）
-     */
-    fun lewGetBattery(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LewBleInterface).let {
-                        LepuBleLog.d(tag, "it as LewBleInterface--lewGetBattery")
-                        it.getBattery()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "lewGetBattery current model $model unsupported!!")
         }
     }
     /**
@@ -2973,24 +3030,6 @@ class BleServiceHelper private constructor() {
     }
 
     /**
-     * 获取电量（ap20）
-     */
-    fun sp20GetBattery(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_SP20, Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_SP20_WPS -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Sp20BleInterface).let {
-                        LepuBleLog.d(tag, "it as Sp20BleInterface--sp20GetBattery")
-                        it.getBattery()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "sp20GetBattery current model $model unsupported!!")
-        }
-    }
-
-    /**
      * 删除历史数据（aoj20a）
      */
     fun aoj20aDeleteData(model: Int) {
@@ -3415,20 +3454,6 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "lemDeviceSwitch current model $model unsupported!!")
         }
     }
-    fun lemGetBattery(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LEM -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as LemBleInterface).let {
-                        LepuBleLog.d(tag, "it as LemBleInterface--lemGetBattery")
-                        it.getBattery()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "lemGetBattery current model $model unsupported!!")
-        }
-    }
     fun lemHeatMode(model: Int, on: Boolean) {
         if (!checkService()) return
         when (model) {
@@ -3614,20 +3639,6 @@ class BleServiceHelper private constructor() {
     }
 
     // BTP
-    fun btpGetBattery(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_BTP -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as BtpBleInterface).let {
-                        LepuBleLog.d(tag, "it as BtpBleInterface--btpGetBattery")
-                        it.getBattery()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "btpGetBattery current model $model unsupported!!")
-        }
-    }
     fun btpGetConfig(model: Int) {
         if (!checkService()) return
         when (model) {
@@ -3752,22 +3763,6 @@ class BleServiceHelper private constructor() {
         }
     }
     // ventilator
-    fun ventilatorGetBattery(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
-            Bluetooth.MODEL_R10, Bluetooth.MODEL_R11,
-            Bluetooth.MODEL_LERES -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as VentilatorBleInterface).let {
-                        LepuBleLog.d(tag, "it as VentilatorBleInterface--ventilatorGetBattery")
-                        it.getBattery()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "ventilatorGetBattery current model $model unsupported!!")
-        }
-    }
     /**
      * 加密通讯
      */
@@ -4143,20 +4138,6 @@ class BleServiceHelper private constructor() {
         }
     }
     // BP3
-    fun bp3GetBattery(model: Int) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_LP_BP3W, Bluetooth.MODEL_LP_BP3C -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bp3BleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp3BleInterface--bp3GetBattery")
-                        it.getBattery()
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "bp3GetBattery current model $model unsupported!!")
-        }
-    }
     fun bp3GetConfig(model: Int) {
         if (!checkService()) return
         when (model) {
@@ -4550,18 +4531,33 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "pf10Aw1EnableRtData current model $model unsupported!!")
         }
     }
-    fun pf10Aw1GetBattery(model: Int) {
+    // o2ring s
+    fun oxyIIGetConfig(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PF_10AW_1 -> {
+            Bluetooth.MODEL_O2RING_S -> {
                 getInterface(model)?.let { it1 ->
-                    (it1 as Pf10Aw1BleInterface).let {
-                        LepuBleLog.d(tag, "it as Pf10Aw1BleInterface--pf10Aw1GetBattery")
-                        it.getBattery()
+                    (it1 as OxyIIBleInterface).let {
+                        LepuBleLog.d(tag, "it as OxyIIBleInterface--oxyIIGetConfig")
+                        it.getConfig()
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "pf10Aw1GetBattery current model $model unsupported!!")
+            else -> LepuBleLog.d(tag, "oxyIIGetConfig current model $model unsupported!!")
+        }
+    }
+    fun oxyIISetConfig(model: Int, config: OxyIIConfig) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_O2RING_S -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as OxyIIBleInterface).let {
+                        LepuBleLog.d(tag, "it as OxyIIBleInterface--oxyIISetConfig")
+                        it.setConfig(config)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "oxyIISetConfig current model $model unsupported!!")
         }
     }
 

@@ -681,7 +681,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             .observe(this) {
                 Toast.makeText(this, "BTP ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                 viewModel._er1Info.value = it.data as LepuDevice
-                LpBleUtil.btpGetBattery(it.model)
+                LpBleUtil.getBattery(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BTP.EventBtpGetBattery)
             .observe(this) { event ->
@@ -710,7 +710,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             .observe(this) {
                 Toast.makeText(this, "BP3 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                 viewModel._er1Info.value = it.data as LepuDevice
-                LpBleUtil.bp3GetBattery(it.model)
+                LpBleUtil.getBattery(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3GetBattery)
             .observe(this) { event ->
@@ -733,9 +733,27 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             .observe(this) {
                 Toast.makeText(this, "${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                 viewModel._er1Info.value = it.data as LepuDevice
-                LpBleUtil.pf10Aw1GetBattery(it.model)
+                LpBleUtil.getBattery(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1GetBattery)
+            .observe(this) {
+                val data = it.data as KtBleBattery
+                viewModel._battery.value = "${data.percent} %"
+            }
+        //--------------------------o2ring s--------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIISetTime)
+            .observe(this) {
+                val data = it.data as Boolean
+                Toast.makeText(this, "同步时间 $data", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIGetInfo)
+            .observe(this) {
+                Toast.makeText(this, "${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
+                viewModel._er1Info.value = it.data as LepuDevice
+                LpBleUtil.getBattery(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIGetBattery)
             .observe(this) {
                 val data = it.data as KtBleBattery
                 viewModel._battery.value = "${data.percent} %"

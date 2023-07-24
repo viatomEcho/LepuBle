@@ -15,18 +15,11 @@ import com.lepu.blepro.utils.toUInt
 import kotlin.experimental.inv
 
 /**
- * 指甲血氧设备：
- * send:
- * 1.获取设备信息
- * 2.实时血氧使能开关
- * receive:
- * 1.实时血氧
- * 2.实时工作状态
- * 血氧采样率：参数1HZ，波形50HZ
+ * O2Ring S血氧设备：
  */
-class Pf10Aw1BleInterface(model: Int): BleInterface(model) {
+class OxyIIBleInterface(model: Int): BleInterface(model) {
     
-    private val tag: String = "Pf10Aw1BleInterface"
+    private val tag: String = "OxyIIBleInterface"
     var fileSize: Int = 0
     var fileName: String = ""
     var curSize: Int = 0
@@ -101,12 +94,12 @@ class Pf10Aw1BleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "onResponseReceived bytes: ${bytesToHex(response.bytes)}")
         when (response.cmd) {
             LpBleCmd.SET_TIME -> {
-                if (response.pkgType == Pf10Aw1BleCmd.TYPE_NORMAL_RECEIVE) {
+                if (response.pkgType == OxyIIBleCmd.TYPE_NORMAL_RECEIVE) {
                     LepuBleLog.d(tag, "model:$model, SET_TIME => success")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1SetTime).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIISetTime).post(InterfaceEvent(model, true))
                 } else {
                     LepuBleLog.d(tag, "model:$model, SET_TIME => failed")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1SetTime).post(InterfaceEvent(model, false))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIISetTime).post(InterfaceEvent(model, false))
                 }
             }
             LpBleCmd.GET_BATTERY -> {
@@ -116,7 +109,7 @@ class Pf10Aw1BleInterface(model: Int): BleInterface(model) {
                 }
                 val data = KtBleBattery(response.content)
                 LepuBleLog.d(tag, "model:$model,GET_BATTERY => success, data: $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1GetBattery).post(InterfaceEvent(model, data))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIGetBattery).post(InterfaceEvent(model, data))
             }
             LpBleCmd.GET_INFO -> {
                 if (response.content.size < 38) {
@@ -125,42 +118,42 @@ class Pf10Aw1BleInterface(model: Int): BleInterface(model) {
                 }
                 val data = LepuDevice(response.content)
                 LepuBleLog.d(tag, "model:$model, GET_INFO => success, data: $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1GetInfo).post(InterfaceEvent(model, data))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIGetInfo).post(InterfaceEvent(model, data))
             }
             LpBleCmd.RESET -> {
-                if (response.pkgType == Pf10Aw1BleCmd.TYPE_NORMAL_RECEIVE) {
+                if (response.pkgType == OxyIIBleCmd.TYPE_NORMAL_RECEIVE) {
                     LepuBleLog.d(tag, "model:$model, RESET => success")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1Reset).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIReset).post(InterfaceEvent(model, true))
                 } else {
                     LepuBleLog.d(tag, "model:$model, RESET => failed")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1Reset).post(InterfaceEvent(model, false))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIReset).post(InterfaceEvent(model, false))
                 }
             }
             LpBleCmd.FACTORY_RESET -> {
-                if (response.pkgType == Pf10Aw1BleCmd.TYPE_NORMAL_RECEIVE) {
+                if (response.pkgType == OxyIIBleCmd.TYPE_NORMAL_RECEIVE) {
                     LepuBleLog.d(tag, "model:$model, FACTORY_RESET => success")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1FactoryReset).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIFactoryReset).post(InterfaceEvent(model, true))
                 } else {
                     LepuBleLog.d(tag, "model:$model, FACTORY_RESET => failed")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1FactoryReset).post(InterfaceEvent(model, false))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIFactoryReset).post(InterfaceEvent(model, false))
                 }
             }
             LpBleCmd.FACTORY_RESET_ALL -> {
-                if (response.pkgType == Pf10Aw1BleCmd.TYPE_NORMAL_RECEIVE) {
+                if (response.pkgType == OxyIIBleCmd.TYPE_NORMAL_RECEIVE) {
                     LepuBleLog.d(tag, "model:$model, FACTORY_RESET_ALL => success")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1FactoryResetAll).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIFactoryResetAll).post(InterfaceEvent(model, true))
                 } else {
                     LepuBleLog.d(tag, "model:$model, FACTORY_RESET_ALL => failed")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1FactoryResetAll).post(InterfaceEvent(model, false))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIFactoryResetAll).post(InterfaceEvent(model, false))
                 }
             }
             LpBleCmd.BURN_FACTORY_INFO -> {
-                if (response.pkgType == Pf10Aw1BleCmd.TYPE_NORMAL_RECEIVE) {
+                if (response.pkgType == OxyIIBleCmd.TYPE_NORMAL_RECEIVE) {
                     LepuBleLog.d(tag, "model:$model, BURN_FACTORY_INFO => success")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1BurnFactoryInfo).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIBurnFactoryInfo).post(InterfaceEvent(model, true))
                 } else {
                     LepuBleLog.d(tag, "model:$model, BURN_FACTORY_INFO => failed")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1BurnFactoryInfo).post(InterfaceEvent(model, false))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIBurnFactoryInfo).post(InterfaceEvent(model, false))
                 }
             }
             LpBleCmd.GET_FILE_LIST -> {
@@ -168,9 +161,9 @@ class Pf10Aw1BleInterface(model: Int): BleInterface(model) {
                     LepuBleLog.e(tag, "GET_FILE_LIST response.size:${response.content.size} error")
                     return
                 }
-                val data = Pf10Aw1BleResponse.FileList(response.content)
+                val data = OxyIIBleResponse.FileList(response.content)
                 LepuBleLog.d(tag, "model:$model, GET_FILE_LIST => success, data : $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1GetFileList).post(
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIGetFileList).post(
                     InterfaceEvent(model, data)
                 )
             }
@@ -211,7 +204,7 @@ class Pf10Aw1BleInterface(model: Int): BleInterface(model) {
                 fileContent = add(fileContent, response.content)
                 val percent = offset*100/fileSize
                 LepuBleLog.d(tag, "model:$model,READ_FILE_DATA => offset: $offset, fileSize: $fileSize")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1ReadingFileProgress).post(InterfaceEvent(model, percent))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIReadingFileProgress).post(InterfaceEvent(model, percent))
                 if (offset < fileSize) {
                     sendCmd(LpBleCmd.readFileData(offset, aesEncryptKey))
                 } else {
@@ -224,73 +217,63 @@ class Pf10Aw1BleInterface(model: Int): BleInterface(model) {
                     return
                 }
                 if (fileContent.size < fileSize) {
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1ReadFileError).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIReadFileError).post(InterfaceEvent(model, true))
                 } else {
-                    val data = Pf10Aw1BleResponse.BleFile(fileContent)
+                    val data = OxyIIBleResponse.BleFile(fileContent)
                     LepuBleLog.d(tag, "model:$model,READ_FILE_END => data: $data")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1ReadFileComplete).post(InterfaceEvent(model, data))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIReadFileComplete).post(InterfaceEvent(model, data))
                 }
             }
-            Pf10Aw1BleCmd.ENABLE_PARAM -> {
-                LepuBleLog.d(tag, "model:$model, ENABLE_PARAM => success")
-            }
-            Pf10Aw1BleCmd.ENABLE_WAVE -> {
-                LepuBleLog.d(tag, "model:$model, ENABLE_WAVE => success")
-            }
-            Pf10Aw1BleCmd.RT_PARAM -> {
-                if (response.content.size < 5) {
+            OxyIIBleCmd.RT_PARAM -> {
+                if (response.content.size < 14) {
                     LepuBleLog.e(tag, "RT_PARAM response.size:${response.content.size} error")
                 }
-                val data = Pf10Aw1BleResponse.RtParam(response.content)
+                val data = OxyIIBleResponse.RtParam(response.content)
                 LepuBleLog.d(tag, "model:$model, RT_PARAM => success, data : $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1RtParam).post(InterfaceEvent(model, data))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIRtParam).post(InterfaceEvent(model, data))
             }
-            Pf10Aw1BleCmd.RT_WAVE -> {
-                if (response.content.size < 5) {
+            OxyIIBleCmd.RT_WAVE -> {
+                if (response.content.size < 6) {
                     LepuBleLog.e(tag, "RT_WAVE response.size:${response.content.size} error")
                 }
-                val data = Pf10Aw1BleResponse.RtWave(response.content)
+                val data = OxyIIBleResponse.RtWave(response.content)
                 LepuBleLog.d(tag, "model:$model, RT_WAVE => success, data : $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1RtWave).post(InterfaceEvent(model, data))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIRtWave).post(InterfaceEvent(model, data))
             }
-            Pf10Aw1BleCmd.GET_CONFIG -> {
+            OxyIIBleCmd.RT_DATA -> {
+                if (response.content.size < 26) {
+                    LepuBleLog.e(tag, "RT_DATA response.size:${response.content.size} error")
+                }
+                val data = OxyIIBleResponse.RtData(response.content)
+                LepuBleLog.d(tag, "model:$model, RT_DATA => success, data : $data")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIRtData).post(InterfaceEvent(model, data))
+            }
+            OxyIIBleCmd.GET_CONFIG -> {
                 if (response.content.size < 9) {
                     LepuBleLog.e(tag, "GET_CONFIG response.size:${response.content.size} error")
                 }
-                val data = Pf10Aw1Config(response.content)
+                val data = OxyIIConfig(response.content)
                 LepuBleLog.d(tag, "model:$model, GET_CONFIG => success, data : $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1GetConfig).post(InterfaceEvent(model, data))
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIGetConfig).post(InterfaceEvent(model, data))
             }
-            Pf10Aw1BleCmd.SET_CONFIG -> {
-                if (response.pkgType == Pf10Aw1BleCmd.TYPE_NORMAL_RECEIVE) {
+            OxyIIBleCmd.SET_CONFIG -> {
+                if (response.pkgType == OxyIIBleCmd.TYPE_NORMAL_RECEIVE) {
                     LepuBleLog.d(tag, "model:$model, SET_CONFIG => success")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1SetConfig).post(InterfaceEvent(model, true))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIISetConfig).post(InterfaceEvent(model, true))
                 } else {
                     LepuBleLog.d(tag, "model:$model, SET_CONFIG => failed")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1SetConfig).post(InterfaceEvent(model, false))
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIISetConfig).post(InterfaceEvent(model, false))
                 }
-            }
-            Pf10Aw1BleCmd.WORK_STATUS_DATA -> {
-                if (response.content.size < 4) {
-                    LepuBleLog.e(tag, "WORK_STATUS_DATA response.size:${response.content.size} error")
-                }
-                val data = Pf10Aw1BleResponse.WorkingStatus(response.content)
-                LepuBleLog.d(tag, "model:$model, WORK_STATUS_DATA => success, data : $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1WorkingStatus).post(InterfaceEvent(model, data))
             }
         }
     }
 
-    fun enableRtData(type: Int, enable: Boolean) {
-        sendCmd(Pf10Aw1BleCmd.enableSwitch(type, enable))
-        LepuBleLog.d(tag, "enableRtData type:$type, enable:$enable")
-    }
     fun getConfig() {
-        sendCmd(Pf10Aw1BleCmd.getConfig())
+        sendCmd(OxyIIBleCmd.getConfig())
         LepuBleLog.d(tag, "getConfig")
     }
-    fun setConfig(config: Pf10Aw1Config) {
-        sendCmd(Pf10Aw1BleCmd.setConfig(config.getDataBytes()))
+    fun setConfig(config: OxyIIConfig) {
+        sendCmd(OxyIIBleCmd.setConfig(config.getDataBytes()))
         LepuBleLog.d(tag, "setConfig : $config")
     }
     fun burnFactoryInfo(config: FactoryConfig) {
@@ -313,7 +296,9 @@ class Pf10Aw1BleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getRtData() {
-        LepuBleLog.e(tag, "getRtData not yet implemented")
+        sendCmd(OxyIIBleCmd.getRtData())
+//        sendCmd(OxyIIBleCmd.getRtWave())
+        LepuBleLog.e(tag, "getRtData")
     }
 
     override fun getFileList() {

@@ -97,6 +97,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.ventilatorLayout.root.visibility = View.GONE
         binding.bp3Layout.root.visibility = View.GONE
         binding.pf10aw1Layout.root.visibility = View.GONE
+        binding.oxy2Layout.root.visibility = View.GONE
         binding.sendCmd.visibility = View.GONE
         binding.content.visibility = View.GONE
         if (v == null) return
@@ -203,7 +204,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     settingViewModel = ViewModelProvider(this).get(Ap20ViewModel::class.java)
                     (settingViewModel as Ap20ViewModel).initView(requireContext(), binding, it)
                     (settingViewModel as Ap20ViewModel).initEvent(this)
-                    LpBleUtil.ap20GetBattery(Constant.BluetoothConfig.currentModel[0])
+                    LpBleUtil.getBattery(Constant.BluetoothConfig.currentModel[0])
                     LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], 0)
                     LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], 1)
                     LpBleUtil.ap20GetConfig(Constant.BluetoothConfig.currentModel[0], 2)
@@ -223,7 +224,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     settingViewModel = ViewModelProvider(this).get(Sp20ViewModel::class.java)
                     (settingViewModel as Sp20ViewModel).initView(binding, it)
                     (settingViewModel as Sp20ViewModel).initEvent(this)
-                    LpBleUtil.sp20GetBattery(Constant.BluetoothConfig.currentModel[0])
+                    LpBleUtil.getBattery(Constant.BluetoothConfig.currentModel[0])
                     LpBleUtil.sp20GetConfig(Constant.BluetoothConfig.currentModel[0], 2)
                     LpBleUtil.sp20GetConfig(Constant.BluetoothConfig.currentModel[0], 3)
                     LpBleUtil.sp20GetConfig(Constant.BluetoothConfig.currentModel[0], 4)
@@ -306,6 +307,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     (settingViewModel as Pf10Aw1ViewModel).initEvent(this)
                     LpBleUtil.pf10Aw1GetConfig(it)
                 }
+                Bluetooth.MODEL_O2RING_S -> {
+                    setViewVisible(binding.oxy2Layout.root)
+                    settingViewModel = ViewModelProvider(this).get(OxyIIViewModel::class.java)
+                    (settingViewModel as OxyIIViewModel).initView(requireContext(), binding, it)
+                    (settingViewModel as OxyIIViewModel).initEvent(this)
+                    LpBleUtil.oxyIIGetConfig(it)
+                }
                 else -> {
                     setViewVisible(null)
                 }
@@ -364,6 +372,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.pf10aw1Layout.version.setText("${it.hwV}")
                 binding.pf10aw1Layout.sn.setText("${it.sn}")
                 binding.pf10aw1Layout.code.setText("${it.branchCode}")
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING_S) {
+                binding.oxy2Layout.version.setText("${it.hwV}")
+                binding.oxy2Layout.sn.setText("${it.sn}")
+                binding.oxy2Layout.code.setText("${it.branchCode}")
             }
         }
         mainViewModel.er2Info.observe(viewLifecycleOwner) {
@@ -759,7 +771,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.sendCmd.text = cmdStr
         }
         binding.lemLayout.lemGetBattery.setOnClickListener {
-            LpBleUtil.lemGetBattery(Constant.BluetoothConfig.currentModel[0])
+            LpBleUtil.getBattery(Constant.BluetoothConfig.currentModel[0])
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
         }

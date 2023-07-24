@@ -191,7 +191,9 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
         if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1
             || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1_N
-            || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM1) {
+            || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM1
+            || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10AW_1
+            || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING_S) {
             mAlertDialog = AlertDialog.Builder(requireContext())
                 .setCancelable(false)
                 .setMessage(context?.getString(R.string.handling))
@@ -955,6 +957,17 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             "${context?.getString(R.string.software_version)}${it.fwV}\n" +
                             "sn：${it.sn}\ncode：${it.branchCode}\n" +
                     "${context?.getString(R.string.battery)}${mainViewModel._battery.value}"
+                }
+            }
+            Bluetooth.MODEL_O2RING_S -> {
+                infoViewModel = ViewModelProvider(this).get(OxyIIViewModel::class.java)
+                (infoViewModel as OxyIIViewModel).initEvent(this)
+                mainViewModel.er1Info.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "${context?.getString(R.string.hardware_version)}${it.hwV}\n" +
+                            "${context?.getString(R.string.software_version)}${it.fwV}\n" +
+                            "sn：${it.sn}\ncode：${it.branchCode}\n" +
+                            "${context?.getString(R.string.battery)}${mainViewModel._battery.value}"
                 }
             }
         }

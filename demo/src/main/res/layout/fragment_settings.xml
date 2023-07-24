@@ -43,6 +43,9 @@
             <include
                 android:id="@+id/pf10aw1_layout"
                 layout="@layout/pf10aw1_settings"/>
+            <include
+                android:id="@+id/oxy2_layout"
+                layout="@layout/oxy2_settings"/>
             <LinearLayout
                 android:id="@+id/le_bp2w_layout"
                 android:layout_width="match_parent"

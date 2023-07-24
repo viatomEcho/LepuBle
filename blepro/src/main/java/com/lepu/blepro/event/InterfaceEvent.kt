@@ -901,4 +901,29 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventPf10Aw1BurnFactoryInfo = "com.lepu.ble.pf10aw1.burn.factory.info"         // 烧录信息 boolean
         }
     }
+
+    /**
+     * OxyIIBleInterface 发出的通知
+     * 包含model: MODEL_O2RING_S
+     */
+    interface OxyII {
+        companion object {
+            const val EventOxyIISetTime = "com.lepu.ble.oxy2.set.time"                          // 同步时间 boolean
+            const val EventOxyIIGetBattery = "com.lepu.ble.oxy2.get.battery"                    // 电池信息 KtBleBattery
+            const val EventOxyIIGetInfo = "com.lepu.ble.oxy2.get.info"                          // 设备信息 LepuDevice
+            const val EventOxyIIGetFileList = "com.lepu.ble.oxy2.get.file.list"                 // 文件列表 OxyIIBleResponse.FileList
+            const val EventOxyIIReadFileError = "com.lepu.ble.oxy2.read.file.error"             // 读文件失败 boolean
+            const val EventOxyIIReadingFileProgress = "com.lepu.ble.oxy2.reading.file.process"  // 读文件进度 int
+            const val EventOxyIIReadFileComplete = "com.lepu.ble.oxy2.read.file.complete"       // 读文件完成 OxyIIBleResponse.BleFile
+            const val EventOxyIIGetConfig = "com.lepu.ble.oxy2.get.config"                      // 获取设备配置 OxyIIConfig
+            const val EventOxyIISetConfig = "com.lepu.ble.oxy2.set.config"                      // 设置设备信息 boolean
+            const val EventOxyIIRtParam = "com.lepu.ble.oxy2.rt.param"                          // 血氧参数 OxyIIBleResponse.RtParam
+            const val EventOxyIIRtWave = "com.lepu.ble.oxy2.rt.wave"                            // 血氧波形 OxyIIBleResponse.RtWave
+            const val EventOxyIIRtData = "com.lepu.ble.oxy2.rt.data"                            // 血氧波形 OxyIIBleResponse.RtData
+            const val EventOxyIIReset = "com.lepu.ble.oxy2.reset"                               // 复位 boolean
+            const val EventOxyIIFactoryReset = "com.lepu.ble.oxy2.factory.reset"                // 恢复出厂设置 boolean
+            const val EventOxyIIFactoryResetAll = "com.lepu.ble.oxy2.factory.reset.all"         // 恢复生产出厂状态 boolean
+            const val EventOxyIIBurnFactoryInfo = "com.lepu.ble.oxy2.burn.factory.info"         // 烧录信息 boolean
+        }
+    }
 }

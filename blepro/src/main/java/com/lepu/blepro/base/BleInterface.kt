@@ -524,8 +524,8 @@ abstract class BleInterface(val model: Int): ConnectionObserver, NotifyListener{
 
     fun stopRtTask(sendCmd:() -> Unit = {}){
         LepuBleLog.d(tag, "stopRtTask start...")
-        isRtStop = true
         rtHandler.removeCallbacks(rTask)
+        isRtStop = true
         GlobalScope.launch {
             delay(500)
             sendCmd.invoke()

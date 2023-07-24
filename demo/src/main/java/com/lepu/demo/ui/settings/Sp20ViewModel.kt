@@ -16,7 +16,7 @@ class Sp20ViewModel : SettingViewModel() {
     fun initView(binding: FragmentSettingsBinding, model: Int) {
         this.binding = binding
         binding.sp20Layout.getBattery.setOnClickListener {
-            LpBleUtil.sp20GetBattery(model)
+            LpBleUtil.getBattery(model)
             cmdStr = "send : " + LpBleUtil.getSendCmd(model)
             binding.sendCmd.text = cmdStr
         }

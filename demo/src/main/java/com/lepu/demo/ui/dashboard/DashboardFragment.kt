@@ -279,7 +279,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_O2M_WPS, Bluetooth.MODEL_VTM01,
             Bluetooth.MODEL_PC_60NW_NO_SN, Bluetooth.MODEL_OXYFIT_WPS,
             Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_CHECKME_POD_WPS,
-            Bluetooth.MODEL_SI_PO6 -> waveHandler.post(OxyWaveTask())
+            Bluetooth.MODEL_SI_PO6, Bluetooth.MODEL_O2RING_S -> waveHandler.post(OxyWaveTask())
             Bluetooth.MODEL_PF_10AW_1 -> {
                 LpBleUtil.pf10Aw1EnableRtData(Constant.BluetoothConfig.currentModel[0], Pf10Aw1BleCmd.EnableType.OXY_PARAM, true)
                 LpBleUtil.pf10Aw1EnableRtData(Constant.BluetoothConfig.currentModel[0], Pf10Aw1BleCmd.EnableType.OXY_WAVE, true)
@@ -493,6 +493,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_ECN -> {
                 binding.ecnLayout.visibility = View.VISIBLE
                 LpBleUtil.ecnGetRtState(it.modelNo)
+            }
+            Bluetooth.MODEL_O2RING_S -> {
+                binding.oxyLayout.visibility = View.VISIBLE
+                LpBleUtil.startRtTask(1000L)
+                startWave(it.modelNo)
             }
         }
     }
@@ -2721,6 +2726,22 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 val data = it.data as Pf10Aw1BleResponse.WorkingStatus
                 binding.deviceInfo.text = binding.deviceInfo.text.toString() + "$data"
             }*/
+        //--------------------o2ring s---------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIRtData)
+            .observe(this) {
+                val rtData = it.data as OxyIIBleResponse.RtData
+                OxyDataController.receive(rtData.wave.waveInt)
+                viewModel.oxyPr.value = rtData.param.pr
+                viewModel.spo2.value = rtData.param.spo2
+                viewModel.pi.value = rtData.param.pi
+                binding.dataStr.text = rtData.toString()
+                binding.oxyBleBattery.text = "${context?.getString(R.string.battery)}${rtData.param.batteryPercent} %"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIRtWave)
+            .observe(this) {
+                val data = it.data as OxyIIBleResponse.RtWave
+                OxyDataController.receive(data.waveInt)
+            }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

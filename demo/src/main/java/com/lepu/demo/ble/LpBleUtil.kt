@@ -113,6 +113,8 @@ class LpBleUtil {
 //            RAW_FOLDERS.put(Bluetooth.MODEL_R10, PathUtils.getExternalAppFilesPath() + "/r10/")
 //            RAW_FOLDERS.put(Bluetooth.MODEL_R11, PathUtils.getExternalAppFilesPath() + "/r11/")
 //            RAW_FOLDERS.put(Bluetooth.MODEL_LERES, PathUtils.getExternalAppFilesPath() + "/leres/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_PF_10AW_1, PathUtils.getExternalAppFilesPath() + "/pf10aw1/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_O2RING_S, PathUtils.getExternalAppFilesPath() + "/o2rings/")
             RAW_FOLDERS.put(Bluetooth.MODEL_O2RING, PathUtils.getExternalAppFilesPath() + "/o2/")
 
             getServiceHelper()
@@ -647,14 +649,14 @@ class LpBleUtil {
                 BleServiceHelper.ap20GetConfig(model, type)
             }
         }
-        fun ap20GetBattery(model: Int) {
-            Log.d(TAG, "ap20GetBattery")
+        fun getBattery(model: Int) {
+            Log.d(TAG, "getBattery")
             BleServiceHelper.getInterface(model)?.let {
                 if(getBleState(model) != State.CONNECTED){
                     Log.d(TAG, "设备未连接")
                     return
                 }
-                BleServiceHelper.ap20GetBattery(model)
+                BleServiceHelper.getBattery(model)
             }
         }
 
@@ -666,16 +668,6 @@ class LpBleUtil {
                     return
                 }
                 BleServiceHelper.lewBoundDevice(model, bound)
-            }
-        }
-        fun lewGetBattery(model: Int){
-            Log.d(TAG, "lewGetBattery")
-            BleServiceHelper.getInterface(model)?.let {
-                if(getBleState(model) != State.CONNECTED){
-                    Log.d(TAG, "设备未连接")
-                    return
-                }
-                BleServiceHelper.lewGetBattery(model)
             }
         }
         fun lewSetTime(model: Int, data: TimeData) {
@@ -847,16 +839,6 @@ class LpBleUtil {
             BleServiceHelper.checkmeGetFileList(model, fileType, id)
         }
 
-        fun sp20GetBattery(model: Int) {
-            Log.d(TAG, "sp20GetBattery")
-            BleServiceHelper.getInterface(model)?.let {
-                if(getBleState(model) != State.CONNECTED){
-                    Log.d(TAG, "设备未连接")
-                    return
-                }
-                BleServiceHelper.sp20GetBattery(model)
-            }
-        }
         fun sp20GetConfig(model: Int, type: Int) {
             Log.d(TAG, "sp20GetConfig")
             BleServiceHelper.getInterface(model)?.let {
@@ -1030,9 +1012,6 @@ class LpBleUtil {
         fun lemHeatMode(model: Int, on: Boolean) {
             BleServiceHelper.lemHeatMode(model, on)
         }
-        fun lemGetBattery(model: Int) {
-            BleServiceHelper.lemGetBattery(model)
-        }
         fun lemMassMode(model: Int, mode: Int) {
             BleServiceHelper.lemMassageMode(model, mode)
         }
@@ -1074,9 +1053,6 @@ class LpBleUtil {
             BleServiceHelper.vtm01SleepMode(model, on)
         }
         // BTP
-        fun btpGetBattery(model: Int) {
-            BleServiceHelper.btpGetBattery(model)
-        }
         fun btpGetConfig(model: Int) {
             BleServiceHelper.btpGetConfig(model)
         }
@@ -1102,9 +1078,6 @@ class LpBleUtil {
             BleServiceHelper.echo(model, data)
         }
         // Ventilator
-        fun ventilatorGetBattery(model: Int) {
-            BleServiceHelper.ventilatorGetBattery(model)
-        }
         fun ventilatorGetFileList(model: Int, fileType: Int, timestamp: Long) {
             BleServiceHelper.getFileList(model, fileType, timestamp)
         }
@@ -1175,9 +1148,6 @@ class LpBleUtil {
             BleServiceHelper.ventilatorFwUpdate(model, fwUpdate)
         }
         // BP3
-        fun bp3GetBattery(model: Int) {
-            BleServiceHelper.bp3GetBattery(model)
-        }
         fun bp3GetConfig(model: Int) {
             BleServiceHelper.bp3GetConfig(model)
         }
@@ -1254,8 +1224,11 @@ class LpBleUtil {
         fun pf10Aw1EnableRtData(model: Int, type: Int, enable: Boolean) {
             BleServiceHelper.pf10Aw1EnableRtData(model, type, enable)
         }
-        fun pf10Aw1GetBattery(model: Int) {
-            BleServiceHelper.pf10Aw1GetBattery(model)
+        fun oxyIISetConfig(model: Int, config: OxyIIConfig) {
+            BleServiceHelper.oxyIISetConfig(model, config)
+        }
+        fun oxyIIGetConfig(model: Int) {
+            BleServiceHelper.oxyIIGetConfig(model)
         }
     }
 

@@ -6,6 +6,7 @@ package com.lepu.blepro.ble.cmd;
 public class Pf10Aw1BleCmd {
 
     private static final int TYPE_NORMAL_SEND = 0x00;
+    public static final int TYPE_NORMAL_RECEIVE = 0x01;
     private static final int HEAD = 0xA5;
     public static final int GET_CONFIG = 0x00;
     public static final int SET_CONFIG = 0x01;
