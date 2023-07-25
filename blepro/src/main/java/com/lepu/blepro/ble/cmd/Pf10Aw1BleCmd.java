@@ -32,7 +32,7 @@ public class Pf10Aw1BleCmd {
         public static final int SPO2_LOW = 1;      // 血氧阈值提醒
         public static final int PR_HIGH = 2;       // 脉率高阈值
         public static final int PR_LOW = 3;        // 脉率低阈值
-        public static final int ALARM_SWITCH = 4;  // 闹钟开关
+        public static final int ALARM_SWITCH = 4;  // 阈值提醒开关
         public static final int MEASURE_MODE = 5;  // 测量模式
         public static final int BEEP_SWITCH = 6;   // 蜂鸣器开关
         public static final int LANGUAGE = 7;      // 语言包

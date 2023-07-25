@@ -90,7 +90,7 @@ class OxyIIViewModel : SettingViewModel() {
             (config as OxyIIConfig).hrSwitch.buzzerOn = isChecked
             LpBleUtil.oxyIISetConfig(model, (config as OxyIIConfig))
         }
-        ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("熄屏", "低", "中", "高")).apply {
+        ArrayAdapter(context, android.R.layout.simple_list_item_1, arrayListOf("低", "中", "高")).apply {
             binding.oxy2Layout.brightnessMode.adapter = this
         }
         binding.oxy2Layout.brightnessMode.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {

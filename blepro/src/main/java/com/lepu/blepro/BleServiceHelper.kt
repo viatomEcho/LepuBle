@@ -712,10 +712,11 @@ class BleServiceHelper private constructor() {
      * @param fileType 呼吸机获取文件列表类型（0：当天统计，1：单次统计）
      * @param fileType Checkme获取文件列表类型（CheckmeBleCmd.ListType.ECG_TYPE, OXY_TYPE, DLC_TYPE,
      *                 TEMP_TYPE, USER_TYPE, BPCAL_TYPE, SLM_TYPE, XPED_TYPE, NIBP_TYPE, GLU_TYPE）
+     * @param fileType O2Ring S获取文件列表类型 （OxyIIBleCmd.FileType.OXY, PPG）
      * @param startTime 起始时间戳 单位秒
      */
     @JvmOverloads
-    fun getFileList(model: Int, fileType: Int? = null, startTime: Long = 0, id: Int = 1){
+    fun getFileList(model: Int, fileType: Int? = null, startTime: Long = 0){
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_LE_BP2W -> {
@@ -742,18 +743,6 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
-            Bluetooth.MODEL_CHECKME -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as CheckmeBleInterface).let {
-                        LepuBleLog.d(tag, "it as CheckmeBleInterface--getFileList")
-                        if (fileType == null) {
-                            it.getFileList()
-                        } else {
-                            it.getFileList(fileType, id)
-                        }
-                    }
-                }
-            }
             Bluetooth.MODEL_LEW, Bluetooth.MODEL_W12C -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as LewBleInterface).let {
@@ -776,6 +765,18 @@ class BleServiceHelper private constructor() {
                             it.getFileList()
                         } else {
                             it.getFileList(fileType, startTime)
+                        }
+                    }
+                }
+            }
+            Bluetooth.MODEL_O2RING_S -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as OxyIIBleInterface).let {
+                        LepuBleLog.d(tag, "it as OxyIIBleInterface--getFileList")
+                        if (fileType == null) {
+                            it.getFileList()
+                        } else {
+                            it.getFileList(fileType)
                         }
                     }
                 }
@@ -1277,6 +1278,34 @@ class BleServiceHelper private constructor() {
             }
             else -> LepuBleLog.d(tag, "setEr1Vibrate current model $model unsupported!!")
 
+        }
+    }
+
+    // 定制BP2A_Sibel
+    fun bp2aCmd0x40(model: Int, key: Boolean, measure: Boolean) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_BP2A -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2Cmd0x40")
+                        it.cmd0x40(key, measure)
+                    }
+                }
+            }
+        }
+    }
+    fun bp2aCmd0x41(model: Int, on: Boolean) {
+        if (!checkService()) return
+        when(model) {
+            Bluetooth.MODEL_BP2A -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2Cmd0x41")
+                        it.cmd0x41(on)
+                    }
+                }
+            }
         }
     }
 

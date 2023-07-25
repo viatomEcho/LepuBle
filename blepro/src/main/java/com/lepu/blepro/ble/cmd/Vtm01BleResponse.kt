@@ -68,7 +68,7 @@ object Vtm01BleResponse {
             waveInt = IntArray(len)
             for (i in wave.indices) {
                 var temp = byte2UInt(wave[i])
-                // 处理毛刺
+                // 脉搏音标记
                 if (temp == 255) {
                     if (i==0) {
                         if ((i+1) < len)

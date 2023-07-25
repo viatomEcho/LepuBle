@@ -1,8 +1,12 @@
 package com.lepu.demo.ui.notifications
 
+import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.ble.cmd.OxyIIBleCmd
 import com.lepu.blepro.ble.cmd.OxyIIBleResponse
+import com.lepu.blepro.ble.data.OxyIIBleFile
+import com.lepu.blepro.ble.data.PpgFile
 import com.lepu.blepro.event.InterfaceEvent
 
 class OxyIIViewModel : InfoViewModel() {
@@ -31,7 +35,13 @@ class OxyIIViewModel : InfoViewModel() {
             .observe(owner) { event ->
                 (event.data as OxyIIBleResponse.BleFile).let {
                     _readNextFile.value = true
-                    _info.value = _info.value + "\n$it"
+                    val data = if (it.fileType == OxyIIBleCmd.FileType.OXY) {
+                        OxyIIBleFile(it.content)
+                    } else {
+                        PpgFile(it.content)
+                    }
+                    _info.value = _info.value + "\n$data"
+                    Log.d("111111111111", "_info.value : ${_info.value}")
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIReset)

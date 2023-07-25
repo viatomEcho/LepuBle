@@ -14,6 +14,10 @@ public class OxyIIBleCmd {
     public static int RT_WAVE = 0x03;
     public static int RT_DATA = 0x04;
     public static int RT_PPG = 0x05;
+    public static int GET_FILE_LIST = 0x06;
+    public static int READ_FILE_START = 0x07;
+    public static int READ_FILE_DATA = 0x08;
+    public static int READ_FILE_END = 0x09;
 
     public static int seqNo = 0;
     private static void addNo() {
@@ -21,6 +25,11 @@ public class OxyIIBleCmd {
         if (seqNo >= 255) {
             seqNo = 0;
         }
+    }
+
+    public static class FileType {
+        public static final int OXY = 0;
+        public static final int PPG = 1;
     }
 
     /**
@@ -59,6 +68,36 @@ public class OxyIIBleCmd {
 
     public static byte[] getRtPpg() {
         return getReq(RT_PPG, new byte[]{0x07, 0x00});
+    }
+
+    public static byte[] getFileList() {
+        return getReq(GET_FILE_LIST, new byte[0]);
+    }
+    public static byte[] readFileStart(byte[] fileName, byte offset) {
+        // filename = 16, offset = 4
+        int len = 20;
+
+        byte[] data = new byte[len];
+        int l = Math.min(fileName.length, 16);
+        System.arraycopy(fileName, 0, data, 0, l);
+
+        data[len-4] = offset;
+        data[len-3] = (byte) (offset >> 8);
+        data[len-2] = (byte) (offset >> 16);
+        data[len-1] = (byte) (offset >> 24);
+        return getReq(READ_FILE_START, data);
+    }
+    public static byte[] readFileData(int addrOffset) {
+        int len = 4;
+        byte[] data = new byte[len];
+        data[0] = (byte) addrOffset;
+        data[1] = (byte) (addrOffset >> 8);
+        data[2] = (byte) (addrOffset >> 16);
+        data[3] = (byte) (addrOffset >> 24);
+        return getReq(READ_FILE_DATA, data);
+    }
+    public static byte[] readFileEnd() {
+        return getReq(READ_FILE_END, new byte[0]);
     }
 
     private static byte[] getReq(int sendCmd, byte[] data) {

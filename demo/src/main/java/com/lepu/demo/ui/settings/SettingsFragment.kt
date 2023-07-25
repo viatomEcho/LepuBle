@@ -376,6 +376,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.oxy2Layout.version.setText("${it.hwV}")
                 binding.oxy2Layout.sn.setText("${it.sn}")
                 binding.oxy2Layout.code.setText("${it.branchCode}")
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_BP2W
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_LE_BP2W) {
+                binding.bp2Layout.version.setText("${it.hwV}")
+                binding.bp2Layout.sn.setText("${it.sn}")
+                binding.bp2Layout.code.setText("${it.branchCode}")
             }
         }
         mainViewModel.er2Info.observe(viewLifecycleOwner) {
@@ -387,6 +392,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             binding.bp2Layout.version.setText("${it.hwV}")
             binding.bp2Layout.sn.setText("${it.sn}")
             binding.bp2Layout.code.setText("${it.branchCode}")
+            if (trimStr(it.branchCode) == "32050007") {
+                binding.bp2Layout.bp2aSibel.visibility = View.VISIBLE
+            }
         }
         mainViewModel.boInfo.observe(viewLifecycleOwner) {
             binding.pc60fwCode.setText("${it.branchCode}")
@@ -553,6 +561,19 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
             cmdStr = "send : " + LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
             binding.sendCmd.text = cmdStr
+        }
+        //-------------------------bp2a sibel------------------------------------
+        binding.bp2Layout.key.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (!buttonView.isPressed) return@setOnCheckedChangeListener
+            LpBleUtil.bp2aCmd0x40(Constant.BluetoothConfig.currentModel[0], isChecked, binding.bp2Layout.measure.isChecked)
+        }
+        binding.bp2Layout.measure.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (!buttonView.isPressed) return@setOnCheckedChangeListener
+            LpBleUtil.bp2aCmd0x40(Constant.BluetoothConfig.currentModel[0], binding.bp2Layout.key.isChecked, isChecked)
+        }
+        binding.bp2Layout.screen.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (!buttonView.isPressed) return@setOnCheckedChangeListener
+            LpBleUtil.bp2aCmd0x41(Constant.BluetoothConfig.currentModel[0], isChecked)
         }
         //-------------------------bp2/bp2a/bp2t/bp2w/lp bp2w--------------------
         binding.bp2Layout.factoryConfig.setOnClickListener {
@@ -1221,6 +1242,15 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     }
                     else -> Toast.makeText(context, "ER2 获取参数成功", Toast.LENGTH_SHORT).show()
                 }
+            }
+        //----------------------------bp2a sibel-----------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SetCmd0x40)
+            .observe(this) {
+                Toast.makeText(context, "设置成功", Toast.LENGTH_SHORT).show()
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SetCmd0x41)
+            .observe(this) {
+                Toast.makeText(context, "设置成功", Toast.LENGTH_SHORT).show()
             }
         //----------------------------bp2/bp2a/bp2t-----------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2BurnFactoryInfo)

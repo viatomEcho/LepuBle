@@ -496,7 +496,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             }
             Bluetooth.MODEL_O2RING_S -> {
                 binding.oxyLayout.visibility = View.VISIBLE
-                LpBleUtil.startRtTask(1000L)
+                LpBleUtil.startRtTask()
                 startWave(it.modelNo)
             }
         }
@@ -2736,11 +2736,27 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.pi.value = rtData.param.pi
                 binding.dataStr.text = rtData.toString()
                 binding.oxyBleBattery.text = "${context?.getString(R.string.battery)}${rtData.param.batteryPercent} %"
+                binding.deviceInfo.text = "${rtData.param}"
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIRtWave)
             .observe(this) {
                 val data = it.data as OxyIIBleResponse.RtWave
                 OxyDataController.receive(data.waveInt)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIRtParam)
+            .observe(this) {
+                val rtData = it.data as OxyIIBleResponse.RtParam
+                viewModel.oxyPr.value = rtData.pr
+                viewModel.spo2.value = rtData.spo2
+                viewModel.pi.value = rtData.pi
+                binding.dataStr.text = rtData.toString()
+                binding.oxyBleBattery.text = "${context?.getString(R.string.battery)}${rtData.batteryPercent} %"
+                binding.deviceInfo.text = "$rtData"
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIRtPpg)
+            .observe(this) {
+                val data = it.data as OxyIIBleResponse.RtPpg
+                binding.deviceInfo.text = "$data"
             }
     }
 

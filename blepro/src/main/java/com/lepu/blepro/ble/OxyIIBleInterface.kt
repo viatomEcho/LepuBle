@@ -156,16 +156,18 @@ class OxyIIBleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIBurnFactoryInfo).post(InterfaceEvent(model, false))
                 }
             }
-            LpBleCmd.GET_FILE_LIST -> {
+            LpBleCmd.GET_FILE_LIST, OxyIIBleCmd.GET_FILE_LIST -> {
                 if (response.content.isEmpty()) {
                     LepuBleLog.e(tag, "GET_FILE_LIST response.size:${response.content.size} error")
                     return
                 }
-                val data = OxyIIBleResponse.FileList(response.content)
+                val data = if (response.cmd == LpBleCmd.GET_FILE_LIST) {
+                    OxyIIBleResponse.FileList(OxyIIBleCmd.FileType.OXY, response.content)
+                } else {
+                    OxyIIBleResponse.FileList(OxyIIBleCmd.FileType.PPG, response.content)
+                }
                 LepuBleLog.d(tag, "model:$model, GET_FILE_LIST => success, data : $data")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIGetFileList).post(
-                    InterfaceEvent(model, data)
-                )
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIGetFileList).post(InterfaceEvent(model, data))
             }
             LpBleCmd.READ_FILE_START -> {
                 //检查当前的下载状态
@@ -219,7 +221,7 @@ class OxyIIBleInterface(model: Int): BleInterface(model) {
                 if (fileContent.size < fileSize) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIReadFileError).post(InterfaceEvent(model, true))
                 } else {
-                    val data = OxyIIBleResponse.BleFile(fileContent)
+                    val data = OxyIIBleResponse.BleFile(OxyIIBleCmd.FileType.OXY, fileContent)
                     LepuBleLog.d(tag, "model:$model,READ_FILE_END => data: $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIReadFileComplete).post(InterfaceEvent(model, data))
                 }
@@ -248,6 +250,14 @@ class OxyIIBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model, RT_DATA => success, data : $data")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIRtData).post(InterfaceEvent(model, data))
             }
+            OxyIIBleCmd.RT_PPG -> {
+                if (response.content.size < 2) {
+                    LepuBleLog.e(tag, "RT_PPG response.size:${response.content.size} error")
+                }
+                val data = OxyIIBleResponse.RtPpg(response.content)
+                LepuBleLog.d(tag, "model:$model, RT_PPG => success, data : $data")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIRtPpg).post(InterfaceEvent(model, data))
+            }
             OxyIIBleCmd.GET_CONFIG -> {
                 if (response.content.size < 9) {
                     LepuBleLog.e(tag, "GET_CONFIG response.size:${response.content.size} error")
@@ -263,6 +273,63 @@ class OxyIIBleInterface(model: Int): BleInterface(model) {
                 } else {
                     LepuBleLog.d(tag, "model:$model, SET_CONFIG => failed")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIISetConfig).post(InterfaceEvent(model, false))
+                }
+            }
+            OxyIIBleCmd.READ_FILE_START -> {
+                //检查当前的下载状态
+                if (isCancelRF || isPausedRF) {
+                    sendCmd(OxyIIBleCmd.readFileEnd())
+                    LepuBleLog.d(tag, "READ_FILE_START isCancelRF: $isCancelRF, isPausedRF: $isPausedRF")
+                    return
+                }
+                if (response.len < 4) {
+                    LepuBleLog.d(tag, "model:$model,READ_FILE_START => response.len < 4")
+                    return
+                }
+                fileContent = if (offset == 0) {
+                    ByteArray(0)
+                } else {
+                    DownloadHelper.readFile(model, "", fileName)
+                }
+                offset = fileContent.size
+                fileSize = toUInt(response.content)
+                if (fileSize <= 0) {
+                    sendCmd(OxyIIBleCmd.readFileEnd())
+                } else {
+                    sendCmd(OxyIIBleCmd.readFileData(offset))
+                }
+                LepuBleLog.d(tag, "model:$model,READ_FILE_START => fileName: $fileName, offset: $offset, fileSize: $fileSize")
+            }
+            OxyIIBleCmd.READ_FILE_DATA -> {
+                //检查当前的下载状态
+                if (isCancelRF || isPausedRF) {
+                    sendCmd(OxyIIBleCmd.readFileEnd())
+                    LepuBleLog.d(tag, "READ_FILE_DATA isCancelRF: $isCancelRF, isPausedRF: $isPausedRF")
+                    return
+                }
+                offset += response.len
+                DownloadHelper.writeFile(model, "", fileName, "dat", response.content)
+                fileContent = add(fileContent, response.content)
+                val percent = offset*100/fileSize
+                LepuBleLog.d(tag, "model:$model,READ_FILE_DATA => offset: $offset, fileSize: $fileSize")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIReadingFileProgress).post(InterfaceEvent(model, percent))
+                if (offset < fileSize) {
+                    sendCmd(OxyIIBleCmd.readFileData(offset))
+                } else {
+                    sendCmd(OxyIIBleCmd.readFileEnd())
+                }
+            }
+            OxyIIBleCmd.READ_FILE_END -> {
+                if (isCancelRF || isPausedRF) {
+                    LepuBleLog.d(tag, "READ_FILE_END isCancelRF: $isCancelRF, isPausedRF: $isPausedRF, offset: $offset, fileSize: $fileSize")
+                    return
+                }
+                if (fileContent.size < fileSize) {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIReadFileError).post(InterfaceEvent(model, true))
+                } else {
+                    val data = OxyIIBleResponse.BleFile(OxyIIBleCmd.FileType.PPG, fileContent)
+                    LepuBleLog.d(tag, "model:$model,READ_FILE_END => data: $data")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIReadFileComplete).post(InterfaceEvent(model, data))
                 }
             }
         }
@@ -296,14 +363,22 @@ class OxyIIBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getRtData() {
-        sendCmd(OxyIIBleCmd.getRtData())
-//        sendCmd(OxyIIBleCmd.getRtWave())
+//        sendCmd(OxyIIBleCmd.getRtData())
+        sendCmd(OxyIIBleCmd.getRtWave())
         LepuBleLog.e(tag, "getRtData")
     }
 
     override fun getFileList() {
         sendCmd(LpBleCmd.getFileList(aesEncryptKey))
         LepuBleLog.e(tag, "getFileList")
+    }
+    fun getFileList(type: Int) {
+        if (type == OxyIIBleCmd.FileType.OXY) {
+            sendCmd(LpBleCmd.getFileList(aesEncryptKey))
+        } else if (type == OxyIIBleCmd.FileType.PPG) {
+            sendCmd(OxyIIBleCmd.getFileList())
+        }
+        LepuBleLog.e(tag, "getFileList, type : $type")
     }
 
     override fun dealReadFile(userId: String, fileName: String) {

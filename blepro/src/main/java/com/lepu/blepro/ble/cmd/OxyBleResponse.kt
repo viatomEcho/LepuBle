@@ -251,7 +251,7 @@ class OxyBleResponse{
             wByte = ByteArray(len)
             for (i in 0 until len) {
                 var temp = byte2UInt(waveByte[i])
-                // 处理毛刺
+                // 脉搏音标记-100，oxyfit是-10
                 if (temp == 156 || temp == 246) {
                     if (i==0) {
                         if ((i+1) < len)

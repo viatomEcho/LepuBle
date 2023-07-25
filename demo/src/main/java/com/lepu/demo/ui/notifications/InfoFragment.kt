@@ -475,6 +475,12 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 val timestamp = com.lepu.demo.util.DateUtil.getDayTimestamp()
 //                LpBleUtil.ventilatorGetFileList(Constant.BluetoothConfig.currentModel[0], 1, timestamp)
                 LpBleUtil.ventilatorGetFileList(Constant.BluetoothConfig.currentModel[0], 1, 0)
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING_S) {
+                fileType++
+                if (fileType > OxyIIBleCmd.FileType.PPG) {
+                    fileType = OxyIIBleCmd.FileType.OXY
+                }
+                LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0], fileType)
             } else {
                 LpBleUtil.getFileList(Constant.BluetoothConfig.currentModel[0])
             }

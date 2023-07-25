@@ -71,6 +71,29 @@
             android:layout_height="wrap_content"
             android:text="心跳音"/>
         <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/bp2a_sibel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <CheckBox
+                android:id="@+id/key"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="按键"/>
+            <CheckBox
+                android:id="@+id/measure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_10"
+                android:text="血压测量"/>
+            <CheckBox
+                android:id="@+id/screen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_10"
+                android:text="熄屏"/>
+        </LinearLayout>
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp">

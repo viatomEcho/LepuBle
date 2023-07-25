@@ -28,7 +28,7 @@ class PpgFile() {
     var leadSize = 1                        // 通道数量。1个字节。（正式上线应该会只选择一个通道的数据，考虑到扩展以及研发阶段，协议支持多通道数据。协议定义最多支持4个通道）
     var leadConfig = arrayOf(0, 0, 0, 0)    // 采样通道列表，依次为采样点通道，0：未定义，1：红外，2：红光。4个字节
     var waveConfig = arrayOf(0, 0, 0, 0)    // 采样光谱波长，4个通道。8个字节。
-    var accuracy = 0xffff                   // 采样精度。≥2字节缩放为为2字节（0xffff），1字节保持不变（0x00ff）。两个字节
+    var accuracy = 0xffff                   // 采样精度。≥2字节缩放为2字节（0xffff），1字节保持不变（0x00ff）。两个字节
     var maxValue = 0xffff                   // 最大值。（ppg采样值为无符号位数据）。两个字节
     var baseline = 0                        // 基线 0x00。两个字节
     var deviceType = 0                      // 设备类型，只做存储维护，0：未定义，1：o2ring，2：pc60fw。1个字节

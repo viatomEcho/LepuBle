@@ -107,6 +107,8 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBp2GetPhyState = "com.lepu.ble.bp2.get.phy.state"                  // 获取理疗状态 Bp2BlePhyState
             const val EventBp2GetPhyStateError = "com.lepu.ble.bp2.get.phy.state.error"       // 获取理疗状态出错 boolean
             const val EventBp2BurnFactoryInfo = "com.lepu.ble.bp2.burn.factory.info"          // 烧录出厂信息 boolean
+            const val EventBp2SetCmd0x40 = "com.lepu.ble.bp2.set.cmd.0x40"                    // boolean
+            const val EventBp2SetCmd0x41 = "com.lepu.ble.bp2.set.cmd.0x41"                    // boolean
         }
     }
 
@@ -920,6 +922,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventOxyIIRtParam = "com.lepu.ble.oxy2.rt.param"                          // 血氧参数 OxyIIBleResponse.RtParam
             const val EventOxyIIRtWave = "com.lepu.ble.oxy2.rt.wave"                            // 血氧波形 OxyIIBleResponse.RtWave
             const val EventOxyIIRtData = "com.lepu.ble.oxy2.rt.data"                            // 血氧波形 OxyIIBleResponse.RtData
+            const val EventOxyIIRtPpg = "com.lepu.ble.oxy2.rt.ppg"                              // 原始数据 OxyIIBleResponse.RtPpg
             const val EventOxyIIReset = "com.lepu.ble.oxy2.reset"                               // 复位 boolean
             const val EventOxyIIFactoryReset = "com.lepu.ble.oxy2.factory.reset"                // 恢复出厂设置 boolean
             const val EventOxyIIFactoryResetAll = "com.lepu.ble.oxy2.factory.reset.all"         // 恢复生产出厂状态 boolean

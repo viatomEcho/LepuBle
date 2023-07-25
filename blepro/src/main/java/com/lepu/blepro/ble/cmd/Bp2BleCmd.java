@@ -31,6 +31,10 @@ public class Bp2BleCmd {
     public static final int FILE_READ_PKG = 0xF3;
     public static final int FILE_READ_END = 0xF4;
 
+    // 定制BP2A_Sibel
+    public static final int CMD_0X40 = 0x40;
+    public static final int CMD_0X41 = 0x41;
+
     private static void addNo() {
         seqNo++;
         if (seqNo >= 255) {
@@ -161,5 +165,24 @@ public class Bp2BleCmd {
     }
     public static byte[] getRtData() {
         return getReq(RT_DATA, new byte[0]);
+    }
+
+    // BP2A_Sibel定制
+    public static byte[] cmd0x40(boolean key, boolean measure) {
+        byte[] data = new byte[2];
+        if (key) {
+            data[0] = 1;
+        }
+        if (measure) {
+            data[1] = 1;
+        }
+        return getReq(CMD_0X40, data);
+    }
+    public static byte[] cmd0x41(boolean on) {
+        if (on) {
+            return getReq(CMD_0X41, new byte[]{1});
+        } else {
+            return getReq(CMD_0X41, new byte[]{0});
+        }
     }
 }

@@ -499,6 +499,14 @@ class LpBleUtil {
             BleServiceHelper.getEr2SwitcherState(model)
         }
 
+        // 定制BP2A_Sibel
+        fun bp2aCmd0x40(model: Int, key: Boolean, measure: Boolean) {
+            BleServiceHelper.bp2aCmd0x40(model, key, measure)
+        }
+        fun bp2aCmd0x41(model: Int, on: Boolean) {
+            BleServiceHelper.bp2aCmd0x41(model, on)
+        }
+
         @JvmOverloads
         fun bp2SetConfig(model: Int, switchState: Boolean, volume: Int = 2){
             BleServiceHelper.bp2SetConfig(model, switchState, volume)
