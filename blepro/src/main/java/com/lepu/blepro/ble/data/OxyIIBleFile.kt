@@ -96,7 +96,7 @@ class OxyIIBleFile(val bytes: ByteArray) {
     }
     override fun toString(): String {
         return """
-        BleFile : 
+        OxyIIBleFile : 
         fileVersion : $fileVersion
         fileType : $fileType
         deviceModel : $deviceModel

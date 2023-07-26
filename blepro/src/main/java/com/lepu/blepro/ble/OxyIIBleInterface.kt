@@ -363,9 +363,21 @@ class OxyIIBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun getRtData() {
-//        sendCmd(OxyIIBleCmd.getRtData())
-        sendCmd(OxyIIBleCmd.getRtWave())
+        sendCmd(OxyIIBleCmd.getRtData())
         LepuBleLog.e(tag, "getRtData")
+    }
+
+    fun getRtParam() {
+        sendCmd(OxyIIBleCmd.getRtParam())
+        LepuBleLog.e(tag, "getRtParam")
+    }
+    fun getRtWave() {
+        sendCmd(OxyIIBleCmd.getRtWave())
+        LepuBleLog.e(tag, "getRtWave")
+    }
+    fun getRtPpg() {
+        sendCmd(OxyIIBleCmd.getRtPpg())
+        LepuBleLog.e(tag, "getRtPpg")
     }
 
     override fun getFileList() {
@@ -387,6 +399,16 @@ class OxyIIBleInterface(model: Int): BleInterface(model) {
         LepuBleLog.e(tag, "dealReadFile")
     }
 
+    fun readFileWithType(userId: String, fileName: String, fileType: Int) {
+        LepuBleLog.e(tag, "readFileWithType, fileType : $fileType")
+        if (fileType == OxyIIBleCmd.FileType.OXY) {
+            dealReadFile(userId, fileName)
+        } else {
+            this.fileName = fileName
+            sendCmd(OxyIIBleCmd.readFileStart(fileName.toByteArray(), 0))
+        }
+    }
+
     override fun reset() {
         sendCmd(LpBleCmd.reset(aesEncryptKey))
         LepuBleLog.e(tag, "reset")
@@ -405,6 +427,5 @@ class OxyIIBleInterface(model: Int): BleInterface(model) {
     override fun dealContinueRF(userId: String, fileName: String) {
         LepuBleLog.e(tag, "dealContinueRF not yet implemented")
     }
-
 
 }

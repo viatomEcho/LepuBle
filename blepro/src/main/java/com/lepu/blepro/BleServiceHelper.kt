@@ -793,12 +793,48 @@ class BleServiceHelper private constructor() {
      * @param fileName String
      * @param model Int
      * @param offset Int 开始读文件的偏移量
+     * @param fileType Checkme读文件类型（CheckmeBleCmd.ListType.ECG_TYPE, DLC_TYPE, SLM_TYPE）
+     * @param fileType O2Ring S读文件类型 （OxyIIBleCmd.FileType.OXY, PPG）
      */
     @JvmOverloads
-    fun readFile(userId: String, fileName: String, model: Int, offset: Int = 0) {
+    fun readFile(userId: String, fileName: String, model: Int, offset: Int = 0, fileType: Int? = null) {
         if (!checkService()) return
-        getInterface(model)?.let {
-            it.readFile(userId, fileName, offset)
+        when (model) {
+            Bluetooth.MODEL_CHECKME -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as CheckmeBleInterface).let {
+                        LepuBleLog.d(tag, "it as CheckmeBleInterface--readFile")
+                        if (fileType == null) {
+                            it.readFile(userId, fileName, offset)
+                        } else {
+                            it.offset = offset //初始赋值 本地文件长度
+                            it.isCancelRF = false
+                            it.isPausedRF = false
+                            it.readFileWithType(userId, fileName, fileType)
+                        }
+                    }
+                }
+            }
+            Bluetooth.MODEL_O2RING_S -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as OxyIIBleInterface).let {
+                        LepuBleLog.d(tag, "it as OxyIIBleInterface--readFile")
+                        if (fileType == null) {
+                            it.readFile(userId, fileName, offset)
+                        } else {
+                            it.offset = offset //初始赋值 本地文件长度
+                            it.isCancelRF = false
+                            it.isPausedRF = false
+                            it.readFileWithType(userId, fileName, fileType)
+                        }
+                    }
+                }
+            }
+            else -> {
+                getInterface(model)?.let {
+                    it.readFile(userId, fileName, offset)
+                }
+            }
         }
 
     }
@@ -831,13 +867,36 @@ class BleServiceHelper private constructor() {
     /**
      * 继续读取文件,并发送通知
      * @param model Int
+     * @param fileType Checkme读文件类型（CheckmeBleCmd.ListType.ECG_TYPE, DLC_TYPE, SLM_TYPE）
+     * @param fileType O2Ring S读文件类型 （OxyIIBleCmd.FileType.OXY, PPG）
      */
-    fun continueReadFile(model: Int,userId: String, fileName: String, offset: Int){
+    @JvmOverloads
+    fun continueReadFile(model: Int,userId: String, fileName: String, offset: Int, fileType: Int? = null) {
         if (!checkService()) return
-        getInterface(model)?.let {
-            it.isPausedRF = false
-            it.continueRf(userId, fileName, offset)
-            LiveEventBus.get<Int>(EventMsgConst.Download.EventIsContinue).post(model)
+        when (model) {
+            Bluetooth.MODEL_O2RING_S -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as OxyIIBleInterface).let {
+                        LepuBleLog.d(tag, "it as OxyIIBleInterface--continueReadFile")
+                        it.isPausedRF = false
+                        if (fileType == null) {
+                            it.continueRf(userId, fileName, offset)
+                            LiveEventBus.get<Int>(EventMsgConst.Download.EventIsContinue).post(model)
+                        } else {
+                            it.offset = offset //初始赋值 本地文件长度
+                            it.readFileWithType(userId, fileName, fileType)
+                            LiveEventBus.get<Int>(EventMsgConst.Download.EventIsContinue).post(model)
+                        }
+                    }
+                }
+            }
+            else -> {
+                getInterface(model)?.let {
+                    it.isPausedRF = false
+                    it.continueRf(userId, fileName, offset)
+                    LiveEventBus.get<Int>(EventMsgConst.Download.EventIsContinue).post(model)
+                }
+            }
         }
     }
 
@@ -4497,25 +4556,6 @@ class BleServiceHelper private constructor() {
             else -> LepuBleLog.d(tag, "checkmeGetFileList current model $model unsupported!!")
         }
     }
-    @JvmOverloads
-    fun checkmeReadFile(model: Int, userId: String, fileName: String, fileType: Int? = null) {
-        if (!checkService()) return
-        when (model) {
-            Bluetooth.MODEL_CHECKME -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as CheckmeBleInterface).let {
-                        LepuBleLog.d(tag, "it as CheckmeBleInterface--checkmeReadFile")
-                        if (fileType == null) {
-                            it.readFile(userId, fileName, 0)
-                        } else {
-                            it.readFileWithType(userId, fileName, fileType)
-                        }
-                    }
-                }
-            }
-            else -> LepuBleLog.d(tag, "checkmeReadFile current model $model unsupported!!")
-        }
-    }
 
     // pf10aw-1
     fun pf10Aw1GetConfig(model: Int) {
@@ -4587,6 +4627,48 @@ class BleServiceHelper private constructor() {
                 }
             }
             else -> LepuBleLog.d(tag, "oxyIISetConfig current model $model unsupported!!")
+        }
+    }
+    fun oxyIIGetRtParam(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_O2RING_S -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as OxyIIBleInterface).let {
+                        LepuBleLog.d(tag, "it as OxyIIBleInterface--oxyIIGetRtParam")
+                        it.getRtParam()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "oxyIIGetRtParam current model $model unsupported!!")
+        }
+    }
+    fun oxyIIGetRtWave(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_O2RING_S -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as OxyIIBleInterface).let {
+                        LepuBleLog.d(tag, "it as OxyIIBleInterface--oxyIIGetRtWave")
+                        it.getRtWave()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "oxyIIGetRtWave current model $model unsupported!!")
+        }
+    }
+    fun oxyIIGetRtPpg(model: Int) {
+        if (!checkService()) return
+        when (model) {
+            Bluetooth.MODEL_O2RING_S -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as OxyIIBleInterface).let {
+                        LepuBleLog.d(tag, "it as OxyIIBleInterface--oxyIIGetRtPpg")
+                        it.getRtPpg()
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "oxyIIGetRtPpg current model $model unsupported!!")
         }
     }
 

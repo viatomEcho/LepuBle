@@ -181,7 +181,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .setMessage(context?.getString(R.string.whether_continue_read))
             .setPositiveButton(context?.getString(R.string.confirm)) { _, _ ->
                 val offset = DownloadHelper.readFile(Constant.BluetoothConfig.currentModel[0], "", curFileName)
-                LpBleUtil.continueReadFile(Constant.BluetoothConfig.currentModel[0], "", curFileName, offset.size)
+                if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING_S) {
+                    LpBleUtil.continueReadFile(Constant.BluetoothConfig.currentModel[0], "", curFileName, offset.size, fileType)
+                } else {
+                    LpBleUtil.continueReadFile(Constant.BluetoothConfig.currentModel[0], "", curFileName, offset.size)
+                }
                 mAlertDialog?.show()
             }
             .setNegativeButton(context?.getString(R.string.cancel)) { _, _ ->
@@ -1294,7 +1298,11 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             fileNames[0]
         }
         val offset = DownloadHelper.readFile(Constant.BluetoothConfig.currentModel[0], "", curFileName)
-        LpBleUtil.readFile("", curFileName, Constant.BluetoothConfig.currentModel[0], offset.size)
+        if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING_S) {
+            LpBleUtil.readFile( "", curFileName, Constant.BluetoothConfig.currentModel[0], offset.size, fileType)
+        } else {
+            LpBleUtil.readFile("", curFileName, Constant.BluetoothConfig.currentModel[0], offset.size)
+        }
         binding.sendCmd.text = LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
     }
 

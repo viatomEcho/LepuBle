@@ -378,8 +378,8 @@ class LpBleUtil {
          * @param offset Int
          */
         @JvmOverloads
-        fun readFile(userId: String, fileName: String, model: Int, offset: Int = 0) {
-            BleServiceHelper.readFile(userId, fileName, model, offset)
+        fun readFile(userId: String, fileName: String, model: Int, offset: Int = 0, fileType: Int? = null) {
+            BleServiceHelper.readFile(userId, fileName, model, offset, fileType)
         }
         fun cancelReadFile(model: Int){
             BleServiceHelper.cancelReadFile(model)
@@ -387,8 +387,9 @@ class LpBleUtil {
         fun pauseReadFile(model: Int){
             BleServiceHelper.pauseReadFile(model)
         }
-        fun continueReadFile(model: Int, userId: String, fileName: String, offset: Int){
-            BleServiceHelper.continueReadFile(model, userId, fileName, offset)
+        @JvmOverloads
+        fun continueReadFile(model: Int, userId: String, fileName: String, offset: Int, fileType: Int? = null){
+            BleServiceHelper.continueReadFile(model, userId, fileName, offset, fileType)
         }
         fun getRawFolder(model: Int): String? {
             return BleServiceHelper.rawFolder?.get(model)
@@ -1237,6 +1238,15 @@ class LpBleUtil {
         }
         fun oxyIIGetConfig(model: Int) {
             BleServiceHelper.oxyIIGetConfig(model)
+        }
+        fun oxyIIGetRtParam(model: Int) {
+            BleServiceHelper.oxyIIGetRtParam(model)
+        }
+        fun oxyIIGetRtWave(model: Int) {
+            BleServiceHelper.oxyIIGetRtWave(model)
+        }
+        fun oxyIIGetRtPpg(model: Int) {
+            BleServiceHelper.oxyIIGetRtPpg(model)
         }
     }
 
