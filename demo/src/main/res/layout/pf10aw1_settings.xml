@@ -69,6 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <CheckBox
+                android:visibility="gone"
                 android:id="@+id/set_alarm_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -83,6 +84,7 @@
                 android:textSize="16sp"
                 android:text="蜂鸣器"/>
             <CheckBox
+                android:visibility="gone"
                 android:id="@+id/set_ble_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -91,6 +93,7 @@
                 android:text="蓝牙"/>
         </LinearLayout>
         <RadioGroup
+            android:visibility="gone"
             android:id="@+id/set_language"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

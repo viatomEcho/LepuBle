@@ -108,7 +108,6 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventBp2GetPhyStateError = "com.lepu.ble.bp2.get.phy.state.error"       // 获取理疗状态出错 boolean
             const val EventBp2BurnFactoryInfo = "com.lepu.ble.bp2.burn.factory.info"          // 烧录出厂信息 boolean
             const val EventBp2SetCmd0x40 = "com.lepu.ble.bp2.set.cmd.0x40"                    // boolean
-            const val EventBp2SetCmd0x41 = "com.lepu.ble.bp2.set.cmd.0x41"                    // boolean
         }
     }
 
@@ -162,7 +161,6 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventLeBp2wFactoryResetAll = "com.lepu.ble.le.bp2w.factory.reset.all"          // 恢复生产出厂状态 boolean
             const val EventLeBp2wSetConfig = "com.lepu.ble.le.bp2w.set.config"                       // 设置心跳音开关 boolean
             const val EventLeBp2wGetConfig = "com.lepu.ble.le.bp2w.get.config"                       // 获取参数 Bp2Config
-            const val EventLeBp2wSyncTime = "com.lepu.ble.le.bp2w.sync.time"                         // 同步时间 boolean
             const val EventLeBp2wSyncUtcTime = "com.lepu.ble.le.bp2w.sync.utc.time"                  // 同步UTC时间 boolean
             const val EventLeBp2wSwitchState = "com.lepu.ble.le.bp2w.switch.state"                   // 切换设备状态 boolean
             const val EventLeBp2WifiDevice = "com.lepu.ble.le.bp2w.wifi.device"                      // 获取路由 Bp2WifiDevice
@@ -885,7 +883,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface Pf10Aw1 {
         companion object {
-            const val EventPf10Aw1SetTime = "com.lepu.ble.pf10aw1.set.time"                          // 同步时间 boolean
+            const val EventPf10Aw1SetUtcTime = "com.lepu.ble.pf10aw1.set.utc.time"                   // 同步UTC时间 boolean
             const val EventPf10Aw1GetBattery = "com.lepu.ble.pf10aw1.get.battery"                    // 电池信息 KtBleBattery
             const val EventPf10Aw1GetInfo = "com.lepu.ble.pf10aw1.get.info"                          // 设备信息 LepuDevice
             const val EventPf10Aw1GetFileList = "com.lepu.ble.pf10aw1.get.file.list"                 // 文件列表 Pf10Aw1BleResponse.FileList
@@ -910,7 +908,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface OxyII {
         companion object {
-            const val EventOxyIISetTime = "com.lepu.ble.oxy2.set.time"                          // 同步时间 boolean
+            const val EventOxyIISetUtcTime = "com.lepu.ble.oxy2.set.utc.time"                   // 同步UTC时间 boolean
             const val EventOxyIIGetBattery = "com.lepu.ble.oxy2.get.battery"                    // 电池信息 KtBleBattery
             const val EventOxyIIGetInfo = "com.lepu.ble.oxy2.get.info"                          // 设备信息 LepuDevice
             const val EventOxyIIGetFileList = "com.lepu.ble.oxy2.get.file.list"                 // 文件列表 OxyIIBleResponse.FileList

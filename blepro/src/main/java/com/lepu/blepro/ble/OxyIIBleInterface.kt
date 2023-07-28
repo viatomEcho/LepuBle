@@ -93,13 +93,13 @@ class OxyIIBleInterface(model: Int): BleInterface(model) {
     private fun onResponseReceived(response: LepuBleResponse.BleResponse) {
         LepuBleLog.d(tag, "onResponseReceived bytes: ${bytesToHex(response.bytes)}")
         when (response.cmd) {
-            LpBleCmd.SET_TIME -> {
+            LpBleCmd.SET_UTC_TIME -> {
                 if (response.pkgType == OxyIIBleCmd.TYPE_NORMAL_RECEIVE) {
-                    LepuBleLog.d(tag, "model:$model, SET_TIME => success")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIISetTime).post(InterfaceEvent(model, true))
+                    LepuBleLog.d(tag, "model:$model, SET_UTC_TIME => success")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIISetUtcTime).post(InterfaceEvent(model, true))
                 } else {
-                    LepuBleLog.d(tag, "model:$model, SET_TIME => failed")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIISetTime).post(InterfaceEvent(model, false))
+                    LepuBleLog.d(tag, "model:$model, SET_UTC_TIME => failed")
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIISetUtcTime).post(InterfaceEvent(model, false))
                 }
             }
             LpBleCmd.GET_BATTERY -> {
@@ -358,7 +358,7 @@ class OxyIIBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun syncTime() {
-        sendCmd(LpBleCmd.setTime(aesEncryptKey))
+        sendCmd(LpBleCmd.setUtcTime(aesEncryptKey))
         LepuBleLog.e(tag, "syncTime")
     }
 

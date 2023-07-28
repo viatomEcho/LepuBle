@@ -33,7 +33,6 @@ public class Bp2BleCmd {
 
     // 定制BP2A_Sibel
     public static final int CMD_0X40 = 0x40;
-    public static final int CMD_0X41 = 0x41;
 
     private static void addNo() {
         seqNo++;
@@ -177,12 +176,5 @@ public class Bp2BleCmd {
             data[1] = 1;
         }
         return getReq(CMD_0X40, data);
-    }
-    public static byte[] cmd0x41(boolean on) {
-        if (on) {
-            return getReq(CMD_0X41, new byte[]{1});
-        } else {
-            return getReq(CMD_0X41, new byte[]{0});
-        }
     }
 }

@@ -10,11 +10,11 @@ class Pf10Aw1Config() {
     var spo2Low = Spo2Low()          // 血氧阈值 85%-99% 步进：1%
     var prHi = PrHigh()              // 脉搏高阈值 100bpm-240bpm；步进：5bpm
     var prLow = PrLow()              // 脉搏低阈值  30bpm-60bpm；步进：5bpm
-    var alarmSwitch = AlarmSwitch()  // 阈值提醒开关 0:关 1：开
+    var alarmSwitch = AlarmSwitch()  // 阈值提醒开关 0:关 1：开 预留
     var measureMode = MeasureMode()  // 测量模式 1：点测 2：连续
     var beepSwitch = BeepSwitch()    // 蜂鸣器开关  0:关 1：开
-    var language = Language()        // 语言包 0:英文 1：中文
-    var bleSwitch = BleSwitch()      // 蓝牙开关 0:关 1：开
+    var language = Language()        // 语言包 0:英文 1：中文 预留
+    var bleSwitch = BleSwitch()      // 蓝牙开关 0:关 1：开 预留
     var esMode = EsMode()            // 测量过程，定时息屏，0：常亮，1：1分钟熄屏，2：3分钟熄屏，3：5分钟熄屏
     // reserved 8
 

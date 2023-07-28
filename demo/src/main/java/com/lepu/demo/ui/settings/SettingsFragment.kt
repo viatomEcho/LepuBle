@@ -142,6 +142,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     binding.bp2Layout.bp2PhyLayout.visibility = View.GONE
                     binding.bp2Layout.bp2DeleteFile.visibility = View.GONE
                     binding.bp2Layout.bp2WriteUser.visibility = View.GONE
+                    LpBleUtil.bp2GetRtState(it)
                     LpBleUtil.bp2GetConfig(it)
                 }
                 Bluetooth.MODEL_BP2T -> {
@@ -573,7 +574,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
         binding.bp2Layout.screen.setOnCheckedChangeListener { buttonView, isChecked ->
             if (!buttonView.isPressed) return@setOnCheckedChangeListener
-            LpBleUtil.bp2aCmd0x41(Constant.BluetoothConfig.currentModel[0], isChecked)
+            (config as Bp2Config).screenSwitch = isChecked
+            LpBleUtil.bp2SetConfig(Constant.BluetoothConfig.currentModel[0], (config as Bp2Config))
         }
         //-------------------------bp2/bp2a/bp2t/bp2w/lp bp2w--------------------
         binding.bp2Layout.factoryConfig.setOnClickListener {
@@ -1247,10 +1249,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SetCmd0x40)
             .observe(this) {
                 Toast.makeText(context, "设置成功", Toast.LENGTH_SHORT).show()
-            }
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SetCmd0x41)
-            .observe(this) {
-                Toast.makeText(context, "设置成功", Toast.LENGTH_SHORT).show()
+                LpBleUtil.bp2GetRtState(it.model)
             }
         //----------------------------bp2/bp2a/bp2t-----------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2BurnFactoryInfo)
@@ -1265,6 +1264,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.content.text = "$config"
                 binding.bp2Layout.volumeText.setText("${config.volume}")
                 binding.bp2Layout.bp2SetSwitch.isChecked = config.beepSwitch
+                if (it.model == Bluetooth.MODEL_BP2A) {
+                    binding.bp2Layout.screen.isChecked = config.screenSwitch
+                }
                 Toast.makeText(context, "获取参数成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SetConfigResult)
@@ -1278,6 +1280,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 setReceiveCmd(data.bytes)
                 binding.content.text = "$data"
                 state = data.status
+                if (it.model == Bluetooth.MODEL_BP2A) {
+                    binding.bp2Layout.key.isChecked = data.key
+                }
 //                Toast.makeText(context, "获取设备状态成功", Toast.LENGTH_SHORT).show()
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SwitchState)

@@ -504,9 +504,6 @@ class LpBleUtil {
         fun bp2aCmd0x40(model: Int, key: Boolean, measure: Boolean) {
             BleServiceHelper.bp2aCmd0x40(model, key, measure)
         }
-        fun bp2aCmd0x41(model: Int, on: Boolean) {
-            BleServiceHelper.bp2aCmd0x41(model, on)
-        }
 
         @JvmOverloads
         fun bp2SetConfig(model: Int, switchState: Boolean, volume: Int = 2){

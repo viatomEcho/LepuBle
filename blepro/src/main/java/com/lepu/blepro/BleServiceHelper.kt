@@ -1354,19 +1354,6 @@ class BleServiceHelper private constructor() {
             }
         }
     }
-    fun bp2aCmd0x41(model: Int, on: Boolean) {
-        if (!checkService()) return
-        when(model) {
-            Bluetooth.MODEL_BP2A -> {
-                getInterface(model)?.let { it1 ->
-                    (it1 as Bp2BleInterface).let {
-                        LepuBleLog.d(tag, "it as Bp2BleInterface--bp2Cmd0x41")
-                        it.cmd0x41(on)
-                    }
-                }
-            }
-        }
-    }
 
     /**
      * 获取配置信息（bp2，bp2a，bp2t，bp2w，le bp2w）

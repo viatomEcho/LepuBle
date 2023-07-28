@@ -355,16 +355,6 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SetCmd0x40).post(InterfaceEvent(model, true))
                 }
             }
-            CMD_0X41 -> {
-                LepuBleLog.d(tag, "model:$model,CMD_0X41 => success")
-                if (bleResponse.type != 0x01.toByte()) {
-                    LepuBleLog.d(tag, "model:$model,CMD_0X41 => failed")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SetCmd0x41).post(InterfaceEvent(model, false))
-                } else {
-                    LepuBleLog.d(tag, "model:$model,CMD_0X41 => success")
-                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2SetCmd0x41).post(InterfaceEvent(model, true))
-                }
-            }
         }
 
     }
@@ -464,9 +454,6 @@ class Bp2BleInterface(model: Int): BleInterface(model) {
     // 定制BP2A_Sibel
     fun cmd0x40(key: Boolean, measure: Boolean) {
         sendCmd(Bp2BleCmd.cmd0x40(key, measure))
-    }
-    fun cmd0x41(on: Boolean) {
-        sendCmd(Bp2BleCmd.cmd0x41(on))
     }
 
 }

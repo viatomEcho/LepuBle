@@ -366,13 +366,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 }
             }
         //-------------------------LeBp2w---------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSyncTime)
-            .observe(this) {
-                Toast.makeText(this, "LP-BP2W ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
-                LpBleUtil.getInfo(it.model)
-                LpBleUtil.bp2GetRtState(it.model)
-                LpBleUtil.bp2GetWifiConfig(it.model)
-            }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSyncUtcTime)
             .observe(this) {
                 Toast.makeText(this, "LP-BP2W ${getString(R.string.sync_utc_time)}", Toast.LENGTH_SHORT).show()
@@ -723,10 +716,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 Toast.makeText(this, "回显成功", Toast.LENGTH_SHORT).show()
             }
         //--------------------------pf10aw-1--------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1SetTime)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1SetUtcTime)
             .observe(this) {
                 val data = it.data as Boolean
-                Toast.makeText(this, "同步时间 $data", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "同步UTC时间 $data", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1GetInfo)
@@ -741,10 +734,10 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 viewModel._battery.value = "${data.percent} %"
             }
         //--------------------------o2ring s--------------------------
-        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIISetTime)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIISetUtcTime)
             .observe(this) {
                 val data = it.data as Boolean
-                Toast.makeText(this, "同步时间 $data", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "同步UTC时间 $data", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIGetInfo)

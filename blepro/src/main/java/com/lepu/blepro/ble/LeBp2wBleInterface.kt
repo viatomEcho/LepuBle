@@ -122,11 +122,6 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wInfo).post(InterfaceEvent(model, info))
             }
 
-            SET_TIME -> {
-                //同步时间
-                LepuBleLog.d(tag, "model:$model,SET_TIME => success")
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSyncTime).post(InterfaceEvent(model, true))
-            }
             SET_UTC_TIME -> {
                 //同步时间
                 LepuBleLog.d(tag, "model:$model,SET_UTC_TIME => success")
@@ -484,7 +479,6 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
     }
 
     override fun syncTime() {
-//        sendCmd(setTime())
         sendCmd(setUtcTime())
         LepuBleLog.d(tag, "syncTime...")
     }

@@ -22,7 +22,9 @@ class Bp2BleRtState(val bytes: ByteArray) {
     var battery : KtBleBattery
     var avgCnt: Int              // x3当前测量下标 0,1,2
     var avgWaitTick: Int         // x3等待计时
-    // reserve 2
+    // bp2a sibel
+    var key: Boolean             // 按键开关
+    // reserved 1
 
     init {
         status = bytes[0].toInt()
@@ -30,6 +32,7 @@ class Bp2BleRtState(val bytes: ByteArray) {
         battery = KtBleBattery(bytes.copyOfRange(1, 5))
         avgCnt = byte2UInt(bytes[5])
         avgWaitTick = byte2UInt(bytes[6])
+        key = byte2UInt(bytes[7]) == 1
     }
 
     private fun getStatusMsg(status: Int): String {
@@ -57,6 +60,7 @@ class Bp2BleRtState(val bytes: ByteArray) {
             battery : $battery
             avgCnt : $avgCnt
             avgWaitTick : $avgWaitTick
+            key : $key
         """.trimIndent()
     }
 }

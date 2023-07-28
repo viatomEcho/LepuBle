@@ -1,12 +1,10 @@
 package com.lepu.blepro.ble.data
 
+import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.ByteUtils.int4Bytes
 import com.lepu.blepro.utils.HexString.trimStr
-import com.lepu.blepro.utils.int2ByteArray
-import com.lepu.blepro.utils.int4ByteArray
-import com.lepu.blepro.utils.toLong
-import com.lepu.blepro.utils.toUInt
+import java.util.*
 
 class PpgFile() {
 
@@ -140,6 +138,7 @@ class PpgFile() {
             fileType : $fileType
             configSize : $configSize
             sampleTime : $sampleTime
+            sampleTime : ${DateUtil.stringFromDate(Date(sampleTime.times(1000)), "yyyy-MM-dd HH:mm:ss")}
             sampleRate : $sampleRate
             sampleSize : $sampleSize
             leadSize : $leadSize

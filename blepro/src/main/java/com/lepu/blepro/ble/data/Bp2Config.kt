@@ -20,6 +20,9 @@ class Bp2Config() {
     var avgMeasureMode: Int = 0         // 0：x3模式关闭 1：x3模式开启（时间间隔30s） 2：时间间隔60s 3：时间间隔90s 4：时间间隔120s
     var volume: Int = 0                 // 音量大小（0关，1，2，3）
     var wifi4gSwitch: Boolean = false   // bp3 4G/WIFI开关 0：关；1：开
+    // reserved 4
+    var screenSwitch = false            // 熄屏开关 0：关；1：开
+    // reserved 7
 
     constructor(bytes: ByteArray) : this() {
         this.bytes = bytes
@@ -45,6 +48,9 @@ class Bp2Config() {
         volume = byte2UInt(bytes[index])
         index++
         wifi4gSwitch = byte2UInt(bytes[index]) == 1
+        index++
+        index += 4
+        screenSwitch = byte2UInt(bytes[index]) == 1
     }
 
     fun getDataBytes(): ByteArray {
@@ -54,6 +60,11 @@ class Bp2Config() {
             0
         }
         val wifi4gOn = if (wifi4gSwitch) {
+            1
+        } else {
+            0
+        }
+        val screenOn = if (screenSwitch) {
             1
         } else {
             0
@@ -69,7 +80,9 @@ class Bp2Config() {
             .plus(avgMeasureMode.toByte())
             .plus(volume.toByte())
             .plus(wifi4gOn.toByte())
-            .plus(ByteArray(12))
+            .plus(ByteArray(4))
+            .plus(screenOn.toByte())
+            .plus(ByteArray(7))
     }
 
     override fun toString(): String {
@@ -88,6 +101,7 @@ class Bp2Config() {
             avgMeasureMode : $avgMeasureMode
             volume : $volume
             wifi4gSwitch : $wifi4gSwitch
+            screenSwitch : $screenSwitch
         """.trimIndent()
     }
 }
