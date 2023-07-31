@@ -19,6 +19,7 @@ import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.objs.Bluetooth
+import com.lepu.blepro.utils.AlgorithmUtil
 import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.vals.server
@@ -1181,7 +1182,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
     // 睡眠算法
     private fun sleepAlg(oxyData: OxyData) {
-        DataConvert.sleep_alg_init_0_25Hz(oxyData.oxyBleFile.startTime)
+        AlgorithmUtil.sleep_alg_init_0_25Hz(oxyData.oxyBleFile.startTime)
         val filePath = "${BleServiceHelper.BleServiceHelper.rawFolder?.get(Bluetooth.MODEL_O2RING)}/sleep_result_${oxyData.fileName}.txt"
         val isSave = File(filePath).exists()
         Log.d("111111111", "oxyData.oxyBleFile : ${oxyData.oxyBleFile}")
@@ -1190,7 +1191,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         for (data in oxyData.oxyBleFile.data) {
             prList.add(data.pr)
             vectorList.add(data.vector)
-            val status = DataConvert.sleep_alg_main_pro_0_25Hz(data.pr.toShort(), data.vector)
+            val status = AlgorithmUtil.sleep_alg_main_pro_0_25Hz(data.pr.toShort(), data.vector)
             if (!isSave) {
                 FileUtil.saveTextFile(
                     filePath,
@@ -1205,8 +1206,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     true)
             }
         }
-//        DataConvert.sleep_alg_main(prList.toIntArray(), vectorList.toIntArray())
-        val result = DataConvert.sleep_alg_get_res_0_25Hz()
+//        AlgorithmUtil.sleep_alg_main(prList.toIntArray(), vectorList.toIntArray())
+        val result = AlgorithmUtil.sleep_alg_get_res_0_25Hz()
         if (!isSave) {
             val len = result[7]
             var temp = ""

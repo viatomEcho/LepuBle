@@ -1161,7 +1161,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     val len = data.wave.wFs.size
                     Log.d("er1 data ", "len = $len")
                     for (i in 0 until len) {
-                        val temp = DataConvert.filter(data.wave.wFs[i].toDouble(), false)
+                        val temp = AlgorithmUtil.filter(data.wave.wFs[i].toDouble(), false)
                         if (temp.isNotEmpty()) {
                             val d = FloatArray(temp.size)
                             for (j in d.indices) {
@@ -1199,7 +1199,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     Log.d("er2 data ", "len = ${data.waveData.size}")
                     val len = data.waveData.datas.size
                     for (i in 0 until len) {
-                        val temp = DataConvert.filter(data.waveData.datas[i].toDouble(), false)
+                        val temp = AlgorithmUtil.filter(data.waveData.datas[i].toDouble(), false)
                         if (temp.isNotEmpty()) {
                             val d = FloatArray(temp.size)
                             for (j in d.indices) {
@@ -1329,7 +1329,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                         val mvs = ByteUtils.bytes2mvs(bp2Rt.rtWave.waveform)
                         val len = mvs.size
                         for (i in 0 until len) {
-                            val temp = DataConvert.filter(mvs[i].toDouble(), false)
+                            val temp = AlgorithmUtil.filter(mvs[i].toDouble(), false)
                             if (temp.isNotEmpty()) {
                                 val d = FloatArray(temp.size)
                                 for (j in d.indices) {
@@ -2719,13 +2719,13 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 viewModel.pi.value = rtData.pi
                 binding.dataStr.text = rtData.toString()
                 binding.oxyBleBattery.text = "${context?.getString(R.string.battery)}${rtData.batLevel.times(25)} - ${(rtData.batLevel+1).times(25)} %"
-                binding.deviceInfo.text = "${context?.getString(R.string.no_probe_finger)}${rtData.probeOff}"
+//                binding.deviceInfo.text = "${context?.getString(R.string.no_probe_finger)}${rtData.probeOff}\n"
             }
-        /*LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1WorkingStatus)
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1WorkingStatus)
             .observe(this) {
                 val data = it.data as Pf10Aw1BleResponse.WorkingStatus
-                binding.deviceInfo.text = binding.deviceInfo.text.toString() + "$data"
-            }*/
+                binding.deviceInfo.text = "$data"
+            }
         //--------------------o2ring s---------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIRtData)
             .observe(this) {

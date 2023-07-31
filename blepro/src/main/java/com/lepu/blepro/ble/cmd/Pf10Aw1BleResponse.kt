@@ -136,13 +136,21 @@ object Pf10Aw1BleResponse {
             waveIntData = bytes.copyOfRange(0, 5).toList().asSequence().map { (it.toInt() and 0x7f)}.toList().toIntArray()
             waveIntReData = bytes.copyOfRange(0, 5).toList().asSequence().map { (127-(it.toInt() and 0x7f))}.toList().toIntArray()
         }
+        override fun toString(): String {
+            return """
+                RtWave : 
+                waveIntData : ${waveIntData.joinToString(",")}
+            """.trimIndent()
+        }
     }
 
     class WorkingStatus(val bytes: ByteArray) {
         var mode: Int   // 模式（1：点测 2：连续 3：菜单）
-        var step: Int   // 状态（0：idle 1：准备阶段 2：正在测量 3：播报血氧结果 4：脉率分析 5：点测完成）
-        var para1: Int
-        var para2: Int
+        var step: Int   // 状态：点测模式（0：idle 1：准备阶段 2：正在测量 3：播报血氧结果 4：脉率分析 5：点测完成）
+                        //      连续模式（0：准备阶段，1：正在测量，2：测量结束）
+        var para1: Int  // 点测模式（状态2：剩余时间秒，状态3：血氧值，状态4：脉率分析结果）
+                        // 连续模式（记录时长）
+        var para2: Int  // 点测模式（状态3：脉率值）
         init {
             var index = 0
             mode = byte2UInt(bytes[index])
@@ -152,6 +160,9 @@ object Pf10Aw1BleResponse {
             para1 = byte2UInt(bytes[index])
             index++
             para2 = byte2UInt(bytes[index])
+            if (mode == 2) {
+                para1 += (para2 shl 8)
+            }
         }
         override fun toString(): String {
             return """

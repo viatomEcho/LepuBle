@@ -17,7 +17,7 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        src/main/cpp/online/native-lib.cpp
+        ../blepro/src/main/cpp/online/native-lib.cpp
 
         )
 add_library( # Sets the name of the library.
@@ -27,7 +27,7 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        src/main/cpp/online/bp-lib.cpp
+        ../blepro/src/main/cpp/online/bp-lib.cpp
 
         )
 
@@ -36,20 +36,20 @@ add_library(
         offline-lib
 
         SHARED
-        src/main/cpp/offline/native-lib.cpp
+        ../blepro/src/main/cpp/offline/native-lib.cpp
 
 )
 add_library(
         bp-offline
 
         SHARED
-        src/main/cpp/offline/bp-lib.cpp
+        ../blepro/src/main/cpp/offline/bp-lib.cpp
 
 )
 add_library(
         sleep-alg
         SHARED
-        src/main/cpp/sleep/sleep-alg.cpp
+        ../blepro/src/main/cpp/sleep/sleep-alg.cpp
 )
 #add_library(
 #        sleep_alg_main_0_25Hz
