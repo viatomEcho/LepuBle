@@ -1,6 +1,7 @@
 package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.toUInt
 
 class Pf10Aw1Config() {
 
@@ -16,6 +17,8 @@ class Pf10Aw1Config() {
     var language = Language()        // 语言包 0:英文 1：中文 预留
     var bleSwitch = BleSwitch()      // 蓝牙开关 0:关 1：开 预留
     var esMode = EsMode()            // 测量过程，定时息屏，0：常亮，1：1分钟熄屏，2：3分钟熄屏，3：5分钟熄屏
+    // reserved 8
+    var utc = 80                     // 时区，默认80
     // reserved 8
 
     constructor(bytes: ByteArray) : this() {
@@ -38,6 +41,9 @@ class Pf10Aw1Config() {
         bleSwitch = BleSwitch(bytes.copyOfRange(index, index+1))
         index++
         esMode = EsMode(bytes.copyOfRange(index, index+1))
+        index++
+        index += 8
+        utc = bytes[index].toInt()  // 有符号数
     }
 
     fun getDataBytes() : ByteArray {
@@ -231,6 +237,7 @@ class Pf10Aw1Config() {
             language : ${language.language}
             bleSwitch : ${bleSwitch.on}
             esMode : ${esMode.mode}
+            utc : $utc
         """.trimIndent()
     }
 }
