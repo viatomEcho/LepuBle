@@ -41,6 +41,7 @@ object Pf10Aw1BleResponse {
         var magic: Long                      // 文件标志 固定值为0xDA5A1248
         var startTime: Long                  // 开始测量时间
         var size: Int                        // 记录点数
+        var endTime: Long                    // 结束测量时间
         var interval: Int                    // 存储间隔
         var channelType: Int                 // 通道类型，0：CHANNAL_SPO2_PR，1：CHANNEL_SPO2_PR_MOTION
         var channelBytes: Int                // 单个通道字节数
@@ -72,6 +73,7 @@ object Pf10Aw1BleResponse {
             size = toUInt(bytes.copyOfRange(index, index+4))
             index += 4
             interval = byte2UInt(bytes[index])
+            endTime = startTime + size*interval
             index++
             channelType = byte2UInt(bytes[index])
             index++
@@ -87,12 +89,11 @@ object Pf10Aw1BleResponse {
                 magic : $magic
                 startTime : $startTime
                 startTime : ${DateUtil.stringFromDate(Date(startTime.times(1000)), "yyyy-MM-dd HH:mm:ss")}
+                endTime : ${DateUtil.stringFromDate(Date(endTime.times(1000)), "yyyy-MM-dd HH:mm:ss")}
                 size : $size
                 interval : $interval
                 channelType : $channelType
                 channelBytes : $channelBytes
-                spo2List : ${spo2List.joinToString(",")}
-                prList : ${prList.joinToString(",")}
             """.trimIndent()
         }
     }

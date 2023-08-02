@@ -50,7 +50,35 @@ class OxyViewModel : InfoViewModel() {
                     }
                     val temp = OxyData()
                     temp.fileName = fileName
-                    temp.oxyBleFile = data
+                    temp.recordingTime = data.recordingTime
+                    temp.avgSpo2 = data.avgSpo2
+                    temp.minSpo2 = data.minSpo2
+                    temp.dropsTimes3Percent = data.dropsTimes3Percent
+                    temp.dropsTimes4Percent = data.dropsTimes4Percent
+                    temp.asleepTimePercent = data.asleepTimePercent
+                    temp.durationTime90Percent = data.durationTime90Percent
+                    temp.dropsTimes90Percent = data.dropsTimes90Percent
+                    temp.asleepTime = data.asleepTime
+                    temp.o2Score = data.o2Score
+                    temp.startTime = data.startTime
+                    val len = data.data.size
+                    val spo2s = IntArray(len)
+                    val hrs = IntArray(len)
+                    val motions = IntArray(len)
+                    val warningSpo2s = BooleanArray(len)
+                    val warningHrs = BooleanArray(len)
+                    for (i in 0 until len) {
+                        spo2s[i] = data.data[i].spo2
+                        hrs[i] = data.data[i].pr
+                        motions[i] = data.data[i].vector
+                        warningSpo2s[i] = data.data[i].warningSignSpo2
+                        warningHrs[i] = data.data[i].warningSignPr
+                    }
+                    temp.spo2s = spo2s
+                    temp.hrs = hrs
+                    temp.motions = motions
+                    temp.warningSpo2s = warningSpo2s
+                    temp.warningHrs = warningHrs
                     _oxyData.value = temp
                     _readNextFile.value = true
                 }

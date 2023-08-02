@@ -255,7 +255,21 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 (adapter.getItem(position) as OxyData).let {
                     val intent = Intent(context, OxyDataActivity::class.java)
                     oxyData.fileName = it.fileName
-                    oxyData.oxyBleFile = it.oxyBleFile
+                    oxyData.recordingTime = it.recordingTime
+                    oxyData.avgSpo2 = it.avgSpo2
+                    oxyData.minSpo2 = it.minSpo2
+                    oxyData.dropsTimes3Percent = it.dropsTimes3Percent
+                    oxyData.dropsTimes4Percent = it.dropsTimes4Percent
+                    oxyData.asleepTimePercent = it.asleepTimePercent
+                    oxyData.durationTime90Percent = it.durationTime90Percent
+                    oxyData.asleepTime = it.asleepTime
+                    oxyData.o2Score = it.o2Score
+                    oxyData.startTime = it.startTime
+                    oxyData.spo2s = it.spo2s
+                    oxyData.hrs = it.hrs
+                    oxyData.motions = it.motions
+                    oxyData.warningSpo2s = it.warningSpo2s
+                    oxyData.warningHrs = it.warningHrs
                     startActivity(intent)
                 }
             }
@@ -1182,20 +1196,20 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
     // 睡眠算法
     private fun sleepAlg(oxyData: OxyData) {
-        AlgorithmUtil.sleep_alg_init_0_25Hz(oxyData.oxyBleFile.startTime)
+        AlgorithmUtil.sleep_alg_init_0_25Hz(oxyData.startTime.toInt())
         val filePath = "${BleServiceHelper.BleServiceHelper.rawFolder?.get(Bluetooth.MODEL_O2RING)}/sleep_result_${oxyData.fileName}.txt"
         val isSave = File(filePath).exists()
-        Log.d("111111111", "oxyData.oxyBleFile : ${oxyData.oxyBleFile}")
+        Log.d("111111111", "oxyData : $oxyData")
         val prList = mutableListOf<Int>()
         val vectorList = mutableListOf<Int>()
-        for (data in oxyData.oxyBleFile.data) {
-            prList.add(data.pr)
-            vectorList.add(data.vector)
-            val status = AlgorithmUtil.sleep_alg_main_pro_0_25Hz(data.pr.toShort(), data.vector)
+        for (i in 0 until oxyData.spo2s.size) {
+            prList.add(oxyData.hrs[i])
+            vectorList.add(oxyData.motions[i])
+            val status = AlgorithmUtil.sleep_alg_main_pro_0_25Hz(oxyData.hrs[i].toShort(), oxyData.motions[i])
             if (!isSave) {
                 FileUtil.saveTextFile(
                     filePath,
-                    "脉率: ${data.pr}，三轴值: ${data.vector}，睡眠状态: ${when (status) {
+                    "脉率: ${oxyData.hrs[i]}，三轴值: ${oxyData.motions[i]}，睡眠状态: ${when (status) {
                         0 -> "深睡眠"
                         1 -> "浅睡眠"
                         2 -> "快速眼动"

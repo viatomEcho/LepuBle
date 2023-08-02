@@ -11,6 +11,6 @@ class OxyAdapter(layoutResId: Int, data: MutableList<OxyData>?) : BaseQuickAdapt
     override fun convert(holder: BaseViewHolder, item: OxyData) {
         holder.setText(R.id.name, "${context.getString(R.string.oxy_files)}\n" +
                 "${item.fileName}\n" +
-                "${context.getString(R.string.duration)}${DataConvert.getEcgTimeStr(item.oxyBleFile.recordingTime)}")
+                "${context.getString(R.string.duration)}${DataConvert.getEcgTimeStr(item.recordingTime)}")
     }
 }

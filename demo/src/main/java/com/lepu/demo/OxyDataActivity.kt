@@ -52,16 +52,16 @@ class OxyDataActivity : AppCompatActivity() {
 
     private fun initView() {
         sleepText = findViewById(R.id.sleep_text)
-        findViewById<TextView>(R.id.avg_spo2_val).text = "${oxyData.oxyBleFile.avgSpo2}"
-        findViewById<TextView>(R.id.min_spo2_val).text = "${oxyData.oxyBleFile.minSpo2}"
-        findViewById<TextView>(R.id.drops_3_val).text = "${oxyData.oxyBleFile.dropsTimes3Percent}"
-        findViewById<TextView>(R.id.drops_4_val).text = "${oxyData.oxyBleFile.dropsTimes4Percent}"
-        findViewById<TextView>(R.id.below_90_duration_val).text = "${oxyData.oxyBleFile.durationTime90Percent}"
-        findViewById<TextView>(R.id.below_90_time_val).text = "${oxyData.oxyBleFile.dropsTimes90Percent}"
-        findViewById<TextView>(R.id.asleep_percent_val).text = "${oxyData.oxyBleFile.asleepTimePercent}"
-        findViewById<TextView>(R.id.asleep_time_val).text = "${oxyData.oxyBleFile.asleepTime}"
-        findViewById<TextView>(R.id.o2_score_val).text = "${oxyData.oxyBleFile.o2Score.div(10f)}"
-        findViewById<TextView>(R.id.recording_time_val).text = "${oxyData.oxyBleFile.recordingTime}"
+        findViewById<TextView>(R.id.avg_spo2_val).text = "${oxyData.avgSpo2}"
+        findViewById<TextView>(R.id.min_spo2_val).text = "${oxyData.minSpo2}"
+        findViewById<TextView>(R.id.drops_3_val).text = "${oxyData.dropsTimes3Percent}"
+        findViewById<TextView>(R.id.drops_4_val).text = "${oxyData.dropsTimes4Percent}"
+        findViewById<TextView>(R.id.below_90_duration_val).text = "${oxyData.durationTime90Percent}"
+        findViewById<TextView>(R.id.below_90_time_val).text = "${oxyData.dropsTimes90Percent}"
+        findViewById<TextView>(R.id.asleep_percent_val).text = "${oxyData.asleepTimePercent}"
+        findViewById<TextView>(R.id.asleep_time_val).text = "${oxyData.asleepTime}"
+        findViewById<TextView>(R.id.o2_score_val).text = "${oxyData.o2Score.div(10f)}"
+        findViewById<TextView>(R.id.recording_time_val).text = "${oxyData.recordingTime}"
         mSpO2Chart = findViewById(R.id.chart_spo2)
         mHrChart = findViewById(R.id.chart_hr)
         mMovementChart = findViewById(R.id.chart_movement)
@@ -476,34 +476,33 @@ class OxyDataActivity : AppCompatActivity() {
 
     private fun getAllDataList(isType: Int): ArrayList<Int> {
         val integers = arrayListOf<Int>()
-        for (i in oxyData.oxyBleFile.data.indices) {
+        for (i in 0 until oxyData.spo2s.size) {
             var integer = 0
             when (isType) {
-                0 -> integer = oxyData.oxyBleFile.data[i].spo2
-                1 -> integer = oxyData.oxyBleFile.data[i].pr
-                2 -> integer = oxyData.oxyBleFile.data[i].vector
+                0 -> integer = oxyData.spo2s[i]
+                1 -> integer = oxyData.hrs[i]
+                2 -> integer = oxyData.motions[i]
             }
             integers.add(integer)
         }
         return integers
     }
     private fun getAllSign(isType: Int): ArrayList<Boolean> {
-        if (oxyData.oxyBleFile.data.size <= 0) {
+        if (oxyData.warningSpo2s.isEmpty()) {
             return arrayListOf()
         }
         val integers = arrayListOf<Boolean>()
-        for (i in oxyData.oxyBleFile.data.indices) {
+        for (i in 0 until oxyData.warningSpo2s.size) {
             when (isType) {
-                0 -> integers.add(oxyData.oxyBleFile.data[i].warningSignSpo2)
-                1 -> integers.add(oxyData.oxyBleFile.data[i].warningSignPr)
-                2 -> integers.add(oxyData.oxyBleFile.data[i].warningSignVector)
+                0 -> integers.add(oxyData.warningSpo2s[i])
+                1 -> integers.add(oxyData.warningHrs[i])
             }
         }
         return integers
     }
     private fun setTimeData(o2List: ArrayList<Int>) {
         for (i in o2List.indices) {
-            val startTime: Long = oxyData.oxyBleFile.startTime*1000L + i * 2000
+            val startTime: Long = oxyData.startTime*1000L + i * 2000
             //体动时分
             xVals.add(stringFromDate(Date(startTime), "HH:mm"))
             //血氧、心率时分秒
@@ -513,21 +512,21 @@ class OxyDataActivity : AppCompatActivity() {
 
     // 睡眠算法
     private fun sleepAlg() {
-        AlgorithmUtil.sleep_alg_init_0_25Hz(oxyData.oxyBleFile.startTime)
+        AlgorithmUtil.sleep_alg_init_0_25Hz(oxyData.startTime.toInt())
         val statuses = mutableListOf<Int>()
         val filePath = "${BleServiceHelper.BleServiceHelper.rawFolder?.get(Bluetooth.MODEL_O2RING)}/sleep_result_${oxyData.fileName}.txt"
         val isSave = File(filePath).exists()
         val prList = mutableListOf<Int>()
         val vectorList = mutableListOf<Int>()
-        for (data in oxyData.oxyBleFile.data) {
-            prList.add(data.pr)
-            vectorList.add(data.vector)
-            val status = AlgorithmUtil.sleep_alg_main_pro_0_25Hz(data.pr.toShort(), data.vector)
+        for (i in 0 until oxyData.spo2s.size) {
+            prList.add(oxyData.hrs[i])
+            vectorList.add(oxyData.motions[i])
+            val status = AlgorithmUtil.sleep_alg_main_pro_0_25Hz(oxyData.hrs[i].toShort(), oxyData.motions[i])
             statuses.add(status)
             if (!isSave) {
                 FileUtil.saveTextFile(
                     filePath,
-                    "脉率: ${data.pr}，三轴值: ${data.vector}，睡眠状态: ${when (status) {
+                    "脉率: ${oxyData.hrs[i]}，三轴值: ${oxyData.motions[i]}，睡眠状态: ${when (status) {
                         0 -> "深睡眠"
                         1 -> "浅睡眠"
                         2 -> "快速眼动"

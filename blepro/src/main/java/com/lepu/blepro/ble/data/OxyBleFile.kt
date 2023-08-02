@@ -16,7 +16,7 @@ class OxyBleFile(val bytes: ByteArray) {
     var hour: Int
     var minute: Int
     var second: Int
-    var startTime: Int              // timestamp s
+    var startTime: Long             // timestamp s
     var size: Int                   // Total bytes of this data file package
     var recordingTime: Int          // Total recording time
     var asleepTime: Int             // Reserved for total asleep time future
@@ -49,7 +49,7 @@ class OxyBleFile(val bytes: ByteArray) {
         minute = byte2UInt(bytes[index])
         index++
         second = byte2UInt(bytes[index])
-        startTime = getSecondTimestamp(getTimeString(year, month, day, hour, minute, second)).toInt()
+        startTime = getSecondTimestamp(getTimeString(year, month, day, hour, minute, second))
         index++
         size = toUInt(bytes.copyOfRange(index, index+4))
         index += 4

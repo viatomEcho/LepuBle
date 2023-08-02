@@ -3,11 +3,18 @@ package com.lepu.demo.ui.notifications
 import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.ble.cmd.OxyIIBleCmd
 import com.lepu.blepro.ble.cmd.OxyIIBleResponse
 import com.lepu.blepro.ble.data.OxyIIBleFile
 import com.lepu.blepro.ble.data.PpgFile
+import com.lepu.blepro.download.DownloadHelper
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.objs.Bluetooth
+import com.lepu.blepro.utils.DateUtil
+import com.lepu.demo.data.OxyData
+import java.io.File
+import java.util.*
 
 class OxyIIViewModel : InfoViewModel() {
 
@@ -35,12 +42,51 @@ class OxyIIViewModel : InfoViewModel() {
             .observe(owner) { event ->
                 (event.data as OxyIIBleResponse.BleFile).let {
                     _readNextFile.value = true
-                    val data = if (it.fileType == OxyIIBleCmd.FileType.OXY) {
-                        OxyIIBleFile(it.content)
+                    if (it.fileType == OxyIIBleCmd.FileType.OXY) {
+                        val data = OxyIIBleFile(it.content)
+                        val fileName = DateUtil.stringFromDate(Date(data.startTime*1000), "yyyyMMddhhmmss")
+                        val filePath = "${BleServiceHelper.BleServiceHelper.rawFolder?.get(Bluetooth.MODEL_O2RING)}/$fileName.dat"
+                        val isSave = File(filePath).exists()
+                        if (!isSave) {
+                            DownloadHelper.writeFile(Bluetooth.MODEL_O2RING, "", fileName, "dat", data.bytes)
+                        }
+                        val temp = OxyData()
+                        temp.fileName = fileName
+                        temp.recordingTime = data.interval*data.size
+                        temp.avgSpo2 = data.avgSpo2
+                        temp.minSpo2 = data.minSpo2
+                        temp.dropsTimes3Percent = data.dropsTimes3Percent
+                        temp.dropsTimes4Percent = data.dropsTimes4Percent
+                        temp.asleepTimePercent = data.percentLessThan90
+                        temp.durationTime90Percent = data.durationTime90Percent
+                        temp.dropsTimes90Percent = data.dropsTimes90Percent
+                        temp.asleepTime = data.asleepTime
+                        temp.o2Score = data.o2Score
+                        temp.startTime = data.startTime
+                        val len = data.spo2List.size
+                        val spo2s = IntArray(len)
+                        val hrs = IntArray(len)
+                        val motions = IntArray(len)
+                        val warningSpo2s = BooleanArray(len)
+                        val warningHrs = BooleanArray(len)
+                        for (i in 0 until len) {
+                            spo2s[i] = data.spo2List[i]
+                            hrs[i] = data.prList[i]
+                            motions[i] = data.motionList[i]
+                            warningSpo2s[i] = data.remindsSpo2[i]
+                            warningHrs[i] = data.remindHrs[i]
+                        }
+                        temp.spo2s = spo2s
+                        temp.hrs = hrs
+                        temp.motions = motions
+                        temp.warningSpo2s = warningSpo2s
+                        temp.warningHrs = warningHrs
+                        _oxyData.value = temp
+                        _readNextFile.value = true
                     } else {
-                        PpgFile(it.content)
+                        val data = PpgFile(it.content)
+                        _info.value = _info.value + "\n$data"
                     }
-                    _info.value = _info.value + "\n$data"
                     Log.d("111111111111", "_info.value : ${_info.value}")
                 }
             }
