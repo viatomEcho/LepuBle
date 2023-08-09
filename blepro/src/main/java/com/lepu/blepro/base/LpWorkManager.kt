@@ -243,7 +243,7 @@ object LpWorkManager {
                     return this
                 }
             }
-            Bluetooth.MODEL_PF_10AW_1 -> {
+            Bluetooth.MODEL_PF_10AW_1, Bluetooth.MODEL_PF_10BWS -> {
                 Pf10Aw1BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 

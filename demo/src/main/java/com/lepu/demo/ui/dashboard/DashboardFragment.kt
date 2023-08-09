@@ -280,7 +280,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_PC_60NW_NO_SN, Bluetooth.MODEL_OXYFIT_WPS,
             Bluetooth.MODEL_KIDSO2_WPS, Bluetooth.MODEL_CHECKME_POD_WPS,
             Bluetooth.MODEL_SI_PO6, Bluetooth.MODEL_O2RING_S -> waveHandler.post(OxyWaveTask())
-            Bluetooth.MODEL_PF_10AW_1 -> {
+            Bluetooth.MODEL_PF_10AW_1, Bluetooth.MODEL_PF_10BWS -> {
                 LpBleUtil.pf10Aw1EnableRtData(Constant.BluetoothConfig.currentModel[0], Pf10Aw1BleCmd.EnableType.OXY_PARAM, true)
                 LpBleUtil.pf10Aw1EnableRtData(Constant.BluetoothConfig.currentModel[0], Pf10Aw1BleCmd.EnableType.OXY_WAVE, true)
                 waveHandler.post(OxyWaveTask())
@@ -430,7 +430,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_S6W, Bluetooth.MODEL_S6W1,
             Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S7W,
             Bluetooth.MODEL_PC60NW_BLE, Bluetooth.MODEL_PC60NW_WPS,
-            Bluetooth.MODEL_PC_60NW_NO_SN, Bluetooth.MODEL_PF_10AW_1 -> {
+            Bluetooth.MODEL_PC_60NW_NO_SN, Bluetooth.MODEL_PF_10AW_1,
+            Bluetooth.MODEL_PF_10BWS -> {
                 binding.oxyLayout.visibility = View.VISIBLE
                 binding.collectData.visibility = View.VISIBLE
                 binding.collectDataTime.visibility = View.VISIBLE
@@ -797,7 +798,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     Bluetooth.MODEL_S7BW, Bluetooth.MODEL_S6W1,
                     Bluetooth.MODEL_SP20_WPS, Bluetooth.MODEL_PC60NW_WPS,
                     Bluetooth.MODEL_SP20_BLE, Bluetooth.MODEL_PC60NW_BLE,
-                    Bluetooth.MODEL_PC_60NW_NO_SN, Bluetooth.MODEL_PF_10AW_1 -> {
+                    Bluetooth.MODEL_PC_60NW_NO_SN, Bluetooth.MODEL_PF_10AW_1,
+                    Bluetooth.MODEL_PF_10BWS -> {
                         LpBleUtil.enableRtData(it, type, state)
                         type++
                         if (type > Sp20BleCmd.EnableType.OXY_WAVE) {

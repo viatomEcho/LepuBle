@@ -1141,7 +1141,7 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
-            Bluetooth.MODEL_PF_10AW_1 -> {
+            Bluetooth.MODEL_PF_10AW_1, Bluetooth.MODEL_PF_10BWS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pf10Aw1BleInterface).let {
                         LepuBleLog.d(tag, "it as Pf10Aw1BleInterface--burnFactoryInfo")
@@ -2137,7 +2137,7 @@ class BleServiceHelper private constructor() {
                     }
                 }
             }
-            Bluetooth.MODEL_PF_10AW_1 -> {
+            Bluetooth.MODEL_PF_10AW_1, Bluetooth.MODEL_PF_10BWS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pf10Aw1BleInterface).let {
                         LepuBleLog.d(tag, "it as Pf10Aw1BleInterface--getBattery")
@@ -4557,7 +4557,7 @@ class BleServiceHelper private constructor() {
     fun pf10Aw1GetConfig(model: Int) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PF_10AW_1 -> {
+            Bluetooth.MODEL_PF_10AW_1, Bluetooth.MODEL_PF_10BWS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pf10Aw1BleInterface).let {
                         LepuBleLog.d(tag, "it as Pf10Aw1BleInterface--pf10Aw1GetConfig")
@@ -4571,7 +4571,7 @@ class BleServiceHelper private constructor() {
     fun pf10Aw1SetConfig(model: Int, config: Pf10Aw1Config) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PF_10AW_1 -> {
+            Bluetooth.MODEL_PF_10AW_1, Bluetooth.MODEL_PF_10BWS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pf10Aw1BleInterface).let {
                         LepuBleLog.d(tag, "it as Pf10Aw1BleInterface--pf10Aw1SetConfig")
@@ -4585,7 +4585,7 @@ class BleServiceHelper private constructor() {
     fun pf10Aw1EnableRtData(model: Int, type: Int, enable: Boolean) {
         if (!checkService()) return
         when (model) {
-            Bluetooth.MODEL_PF_10AW_1 -> {
+            Bluetooth.MODEL_PF_10AW_1, Bluetooth.MODEL_PF_10BWS -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as Pf10Aw1BleInterface).let {
                         LepuBleLog.d(tag, "it as Pf10Aw1BleInterface--pf10Aw1EnableRtData")

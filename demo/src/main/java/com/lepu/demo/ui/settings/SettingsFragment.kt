@@ -301,7 +301,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     (settingViewModel as Bp3ViewModel).initEvent(this)
                     LpBleUtil.bp3GetConfig(it)
                 }
-                Bluetooth.MODEL_PF_10AW_1 -> {
+                Bluetooth.MODEL_PF_10AW_1, Bluetooth.MODEL_PF_10BWS -> {
                     setViewVisible(binding.pf10aw1Layout.root)
                     settingViewModel = ViewModelProvider(this).get(Pf10Aw1ViewModel::class.java)
                     (settingViewModel as Pf10Aw1ViewModel).initView(requireContext(), binding, it)
@@ -369,7 +369,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.bp3Layout.version.setText("${it.hwV}")
                 binding.bp3Layout.sn.setText("${it.sn}")
                 binding.bp3Layout.code.setText("${it.branchCode}")
-            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10AW_1) {
+            } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10AW_1
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10BWS) {
                 binding.pf10aw1Layout.version.setText("${it.hwV}")
                 binding.pf10aw1Layout.sn.setText("${it.sn}")
                 binding.pf10aw1Layout.code.setText("${it.branchCode}")

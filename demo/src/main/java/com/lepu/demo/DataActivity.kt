@@ -57,7 +57,7 @@ class DataActivity : AppCompatActivity() {
                 pdfView.visibility = View.GONE
                 LpBleUtil.ventilatorGetSystemSetting(Constant.BluetoothConfig.currentModel[0])
             }
-            Bluetooth.MODEL_PF_10AW_1 -> {
+            Bluetooth.MODEL_PF_10AW_1, Bluetooth.MODEL_PF_10BWS -> {
                 pdfView.visibility = View.GONE
                 handler.post {
                     textView.text = "文件名：${oxyData.fileName}\n" +

@@ -880,7 +880,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
 
     /**
      * Pf10Aw1BleInterface 发出的通知
-     * 包含model: MODEL_PF_10AW_1
+     * 包含model: MODEL_PF_10AW_1, MODEL_PF_10BWS
      */
     interface Pf10Aw1 {
         companion object {

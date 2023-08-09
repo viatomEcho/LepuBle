@@ -199,6 +199,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1_N
             || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM1
             || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10AW_1
+            || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10BWS
             || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING_S) {
             mAlertDialog = AlertDialog.Builder(requireContext())
                 .setCancelable(false)
@@ -271,7 +272,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     oxyData.motions = it.motions
                     oxyData.warningSpo2s = it.warningSpo2s
                     oxyData.warningHrs = it.warningHrs
-                    if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10AW_1) {
+                    if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10AW_1
+                        || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10BWS) {
                         val intent = Intent(context, DataActivity::class.java)
                         startActivity(intent)
                     } else {
@@ -980,7 +982,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 binding.serverConfig.visibility = View.VISIBLE
                 LpBleUtil.bp2GetWifiConfig(Constant.BluetoothConfig.currentModel[0])
             }
-            Bluetooth.MODEL_PF_10AW_1 -> {
+            Bluetooth.MODEL_PF_10AW_1, Bluetooth.MODEL_PF_10BWS -> {
                 infoViewModel = ViewModelProvider(this).get(Pf10Aw1ViewModel::class.java)
                 (infoViewModel as Pf10Aw1ViewModel).initEvent(this)
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {
