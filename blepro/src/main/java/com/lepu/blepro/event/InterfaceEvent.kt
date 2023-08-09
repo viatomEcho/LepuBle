@@ -62,6 +62,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventEr1SetTime = "com.lepu.ble.er1.set.time"                           // 同步时间 boolean
             const val EventEr1BurnFactoryInfo = "com.lepu.ble.er1.burn.factory.info"          // 烧录出厂信息 boolean
             const val EventEr1BurnLockFlash = "com.lepu.ble.er1.burn.lock.flash"              // 加密Flash boolean
+            const val EventEr1StopEcg = "com.lepu.ble.er1.stop.ecg"                           // 结束测量 boolean
         }
     }
 
@@ -925,6 +926,19 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
             const val EventOxyIIFactoryReset = "com.lepu.ble.oxy2.factory.reset"                // 恢复出厂设置 boolean
             const val EventOxyIIFactoryResetAll = "com.lepu.ble.oxy2.factory.reset.all"         // 恢复生产出厂状态 boolean
             const val EventOxyIIBurnFactoryInfo = "com.lepu.ble.oxy2.burn.factory.info"         // 烧录信息 boolean
+        }
+    }
+
+    /**
+     * TmbBleInterface 发出的通知
+     * 包含model: MODEL_TMB_2088
+     */
+    interface TMB {
+        companion object {
+            const val EventTmbLogin = "com.lepu.ble.tmb.login"
+            const val EventTmbSetTime = "com.lepu.ble.tmb.set.time"
+            const val EventTmbGetInfo = "com.lepu.ble.tmb.get.info"
+            const val EventTmbRecordData = "com.lepu.ble.tmb.record.data"
         }
     }
 }

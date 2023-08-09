@@ -38,6 +38,7 @@ import com.lepu.demo.util.DataConvert
 import com.lepu.demo.util.FileUtil
 import com.lepu.demo.util.LogcatHelper
 import java.io.*
+import kotlin.collections.ArrayList
 
 class InfoFragment : Fragment(R.layout.fragment_info){
 
@@ -253,10 +254,10 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         oxyAdapter.setOnItemClickListener { adapter, view, position ->
             if (adapter.data.size > 0) {
                 (adapter.getItem(position) as OxyData).let {
-                    val intent = Intent(context, OxyDataActivity::class.java)
                     oxyData.fileName = it.fileName
                     oxyData.recordingTime = it.recordingTime
                     oxyData.avgSpo2 = it.avgSpo2
+                    oxyData.avgHr = it.avgHr
                     oxyData.minSpo2 = it.minSpo2
                     oxyData.dropsTimes3Percent = it.dropsTimes3Percent
                     oxyData.dropsTimes4Percent = it.dropsTimes4Percent
@@ -270,7 +271,13 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     oxyData.motions = it.motions
                     oxyData.warningSpo2s = it.warningSpo2s
                     oxyData.warningHrs = it.warningHrs
-                    startActivity(intent)
+                    if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10AW_1) {
+                        val intent = Intent(context, DataActivity::class.java)
+                        startActivity(intent)
+                    } else {
+                        val intent = Intent(context, OxyDataActivity::class.java)
+                        startActivity(intent)
+                    }
                 }
             }
         }
@@ -493,7 +500,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 // 获取当天统计数据
                 val timestamp = com.lepu.demo.util.DateUtil.getDayTimestamp()
 //                LpBleUtil.ventilatorGetFileList(Constant.BluetoothConfig.currentModel[0], 1, timestamp)
-                LpBleUtil.ventilatorGetFileList(Constant.BluetoothConfig.currentModel[0], 1, 0)
+                LpBleUtil.ventilatorGetFileList(Constant.BluetoothConfig.currentModel[0], 1, 1686672000)
             } else if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING_S) {
                 fileType++
                 if (fileType > OxyIIBleCmd.FileType.PPG) {

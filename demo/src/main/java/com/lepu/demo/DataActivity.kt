@@ -1,6 +1,8 @@
 package com.lepu.demo
 
+import android.app.AlertDialog
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -10,21 +12,35 @@ import com.lepu.blepro.ble.data.ventilator.StatisticsFile
 import com.lepu.blepro.ble.data.ventilator.SystemSetting
 import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
+import com.lepu.blepro.utils.DateUtil
 import com.lepu.demo.ble.LpBleUtil
 import com.lepu.demo.config.Constant
 import com.lepu.demo.config.Constant.BluetoothConfig.Companion.ecnData
+import com.lepu.demo.config.Constant.BluetoothConfig.Companion.oxyData
 import com.lepu.demo.util.DataConvert
+import java.util.*
 
 class DataActivity : AppCompatActivity() {
 
     private lateinit var pdfView: PDFView
     private lateinit var textView: TextView
 
+    val handler = Handler()
+    var mAlertDialog: AlertDialog? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_data)
+        mAlertDialog = AlertDialog.Builder(this)
+            .setCancelable(false)
+            .setMessage(getString(R.string.handling))
+            .create()
+        mAlertDialog?.show()
         initView()
         initEvent()
+        handler.postDelayed({
+            mAlertDialog?.dismiss()
+        }, 1000)
     }
 
     private fun initView() {
@@ -40,6 +56,17 @@ class DataActivity : AppCompatActivity() {
             Bluetooth.MODEL_LERES -> {
                 pdfView.visibility = View.GONE
                 LpBleUtil.ventilatorGetSystemSetting(Constant.BluetoothConfig.currentModel[0])
+            }
+            Bluetooth.MODEL_PF_10AW_1 -> {
+                pdfView.visibility = View.GONE
+                handler.post {
+                    textView.text = "文件名：${oxyData.fileName}\n" +
+                            "开始测量：${DateUtil.stringFromDate(Date(oxyData.startTime.times(1000)), "yyyy-MM-dd HH:mm:ss")}\n" +
+                            "结束测量：${DateUtil.stringFromDate(Date((oxyData.startTime+oxyData.recordingTime).times(1000)), "yyyy-MM-dd HH:mm:ss")}\n" +
+                            "记录时长：${DataConvert.getEcgTimeStr(oxyData.recordingTime)}\n" +
+                            "血氧：${oxyData.spo2s.joinToString(",")}\n" +
+                            "脉率：${oxyData.hrs.joinToString(",")}"
+                }
             }
         }
     }

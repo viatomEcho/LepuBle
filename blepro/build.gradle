@@ -122,7 +122,7 @@ group='com.github.viatomEcho'*/
 
 
 // maven
-def BUILD_VERSION = '0.0.1'
+def BUILD_VERSION = '2.0.3.15'
 
 // 源代码一起打包
 task androidSourcesJar(type: Jar) {
@@ -150,7 +150,7 @@ afterEvaluate {
                 name "LepuBle"
                 credentials(HttpHeaderCredentials) {
                     name = "Deploy-Token"
-                    value = "mf_rss1z6yQ2DeZ-urbW"
+                    value = "jMCHXv-upTT47AXegB1E"
                 }
                 authentication {
                     header(HttpHeaderAuthentication)

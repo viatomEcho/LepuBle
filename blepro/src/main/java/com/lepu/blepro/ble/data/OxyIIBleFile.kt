@@ -1,9 +1,6 @@
 package com.lepu.blepro.ble.data
 
-import com.lepu.blepro.utils.ByteUtils
-import com.lepu.blepro.utils.DateUtil
-import com.lepu.blepro.utils.toLong
-import com.lepu.blepro.utils.toUInt
+import com.lepu.blepro.utils.*
 import java.util.*
 
 class OxyIIBleFile(val bytes: ByteArray) {
@@ -59,10 +56,9 @@ class OxyIIBleFile(val bytes: ByteArray) {
         index += 4
         magic = toLong(bytes.copyOfRange(index, index+4))
         index += 4
-//        val rawOffset = DateUtil.getTimeZoneOffset().div(1000)
-//        val defaultTime = toLong(bytes.copyOfRange(index, index+4))
-//        startTime = defaultTime - rawOffset
-        startTime = toLong(bytes.copyOfRange(index, index+4))
+        val rawOffset = DateUtil.getTimeZoneOffset().div(1000)
+        val defaultTime = toLong(bytes.copyOfRange(index, index+4))
+        startTime = defaultTime - rawOffset
         index += 4
         size = toUInt(bytes.copyOfRange(index, index+4))
         index += 4
@@ -98,6 +94,7 @@ class OxyIIBleFile(val bytes: ByteArray) {
     override fun toString(): String {
         return """
         OxyIIBleFile : 
+        bytes : ${bytesToHex(bytes)}
         fileVersion : $fileVersion
         fileType : $fileType
         deviceModel : $deviceModel

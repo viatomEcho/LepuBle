@@ -3,8 +3,7 @@ package com.lepu.blepro.ble.data.lew
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.blepro.utils.HexString.trimStr
-import com.lepu.blepro.utils.bytesToHex
-import com.lepu.blepro.utils.toUInt
+import com.lepu.blepro.utils.*
 import java.nio.charset.StandardCharsets
 import java.util.*
 
@@ -31,12 +30,12 @@ class EcgList(val listSize: Int, val bytes: ByteArray) {
     }
 
     class Item(val bytes: ByteArray) {
-        var recordingTime: Int
+        var recordingTime: Long
         var nameLen: Int
         var name: String
         init {
             var index = 0
-            recordingTime = toUInt(bytes.copyOfRange(index, index + 4))
+            recordingTime = toLong(bytes.copyOfRange(index, index + 4))
             index += 4
             nameLen = byte2UInt(bytes[index])
             index++
@@ -48,7 +47,7 @@ class EcgList(val listSize: Int, val bytes: ByteArray) {
             Item : 
             bytes : ${bytesToHex(bytes)}
             recordingTime : $recordingTime
-            recordingTimeStr : ${stringFromDate(Date(recordingTime * 1000L), "yyyy-MM-dd HH:mm:ss")}
+            recordingTimeStr : ${stringFromDate(Date(recordingTime * 1000), "yyyy-MM-dd HH:mm:ss")}
             nameLen : $nameLen
             name : $name
         """.trimIndent()

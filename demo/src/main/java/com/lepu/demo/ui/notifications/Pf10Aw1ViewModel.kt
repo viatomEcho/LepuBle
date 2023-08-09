@@ -34,7 +34,7 @@ class Pf10Aw1ViewModel : InfoViewModel() {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1ReadFileComplete)
             .observe(owner) { event ->
                 (event.data as Pf10Aw1BleResponse.BleFile).let {
-                    val fileName = DateUtil.stringFromDate(Date(it.startTime*1000), "yyyyMMddhhmmss")
+                    val fileName = DateUtil.stringFromDate(Date(it.startTime*1000), "yyyyMMddHHmmss")
                     val temp = OxyData()
                     temp.fileName = fileName
                     temp.recordingTime = it.interval*it.size
@@ -59,7 +59,6 @@ class Pf10Aw1ViewModel : InfoViewModel() {
                     temp.warningHrs = warningHrs
                     _oxyData.value = temp
                     _readNextFile.value = true
-                    _info.value = _info.value + "\n$it"
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.Pf10Aw1.EventPf10Aw1Reset)

@@ -565,10 +565,16 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC300_BLE
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_GM_300SNT
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CMI_PC303
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_DUOEK
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1_N
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM1
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM2
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM3
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PC200_BLE) {
                 LpBleUtil.stopEcg(Constant.BluetoothConfig.currentModel[0])
             }
-            LpBleUtil.stopRtTask()
+//            LpBleUtil.stopRtTask()
         }
         viewModel.dataEcgSrc.observe(viewLifecycleOwner) {
             if (this::ecgView.isInitialized) {
@@ -1190,6 +1196,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                                 } 
                             }"
                 }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1StopEcg)
+            .observe(this) {
+                val data = it.data as Boolean
+                Toast.makeText(context, "停止测量${if (data) "成功" else "失败"}", Toast.LENGTH_SHORT).show()
             }
         //------------------------------er2------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER2.EventEr2RtData)

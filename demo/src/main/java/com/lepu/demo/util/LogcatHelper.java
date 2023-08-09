@@ -29,7 +29,8 @@ public class LogcatHelper {
      *
      * */
     public void init(Context context) {
-        PATH_LOGCAT = context.getExternalFilesDir(null).getAbsolutePath() + File.separator + "log";
+//        PATH_LOGCAT = context.getExternalFilesDir(null).getAbsolutePath() + File.separator + "log";
+        PATH_LOGCAT = "/sdcard/Documents/log";
         File file = new File(PATH_LOGCAT);
         if (!file.exists()) {
             file.mkdirs();
@@ -76,7 +77,7 @@ public class LogcatHelper {
             mPID = pid;
             try {
                 out = new FileOutputStream(new File(dir, "BLE-"
-                        + DateUtil.getFileName() + ".log"));
+                        + DateUtil.getFileName() + ".txt"));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }

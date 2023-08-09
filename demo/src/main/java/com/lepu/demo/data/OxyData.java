@@ -5,6 +5,7 @@ public class OxyData {
     private String fileName;
     private int recordingTime;
     private int avgSpo2;
+    private int avgHr;
     private int minSpo2;
     private int dropsTimes3Percent;
     private int dropsTimes4Percent;
@@ -42,6 +43,14 @@ public class OxyData {
 
     public void setAvgSpo2(int avgSpo2) {
         this.avgSpo2 = avgSpo2;
+    }
+
+    public int getAvgHr() {
+        return avgHr;
+    }
+
+    public void setAvgHr(int avgHr) {
+        this.avgHr = avgHr;
     }
 
     public int getMinSpo2() {

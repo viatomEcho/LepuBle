@@ -1,9 +1,11 @@
 package com.lepu.demo
 
+import android.app.AlertDialog
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Shader
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -38,6 +40,9 @@ class OxyDataActivity : AppCompatActivity() {
     private var height = 0
     private var bound = 0f
 
+    val handler = Handler()
+    var mAlertDialog: AlertDialog? = null
+
     //时分
     private val xVals = ArrayList<String>()
     //时分秒
@@ -46,13 +51,24 @@ class OxyDataActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_oxy_data)
-        initView()
-        sleepAlg()
+        mAlertDialog = AlertDialog.Builder(this)
+            .setCancelable(false)
+            .setMessage(getString(R.string.handling))
+            .create()
+        mAlertDialog?.show()
+        handler.post {
+            initView()
+            sleepAlg()
+        }
+        handler.postDelayed({
+            mAlertDialog?.dismiss()
+        }, 1000)
     }
 
     private fun initView() {
         sleepText = findViewById(R.id.sleep_text)
         findViewById<TextView>(R.id.avg_spo2_val).text = "${oxyData.avgSpo2}"
+        findViewById<TextView>(R.id.avg_hr_val).text = "${oxyData.avgHr}"
         findViewById<TextView>(R.id.min_spo2_val).text = "${oxyData.minSpo2}"
         findViewById<TextView>(R.id.drops_3_val).text = "${oxyData.dropsTimes3Percent}"
         findViewById<TextView>(R.id.drops_4_val).text = "${oxyData.dropsTimes4Percent}"
@@ -60,8 +76,14 @@ class OxyDataActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.below_90_time_val).text = "${oxyData.dropsTimes90Percent}"
         findViewById<TextView>(R.id.asleep_percent_val).text = "${oxyData.asleepTimePercent}"
         findViewById<TextView>(R.id.asleep_time_val).text = "${oxyData.asleepTime}"
+        findViewById<TextView>(R.id.o2_size_val).text = "${oxyData.spo2s.size}"
+        findViewById<TextView>(R.id.interval_val).text = if (oxyData.spo2s.isNotEmpty()) {
+            "${oxyData.recordingTime.div(oxyData.spo2s.size)}"
+        } else {
+            "0"
+        }
         findViewById<TextView>(R.id.o2_score_val).text = "${oxyData.o2Score.div(10f)}"
-        findViewById<TextView>(R.id.recording_time_val).text = "${oxyData.recordingTime}"
+        findViewById<TextView>(R.id.recording_time_val).text = "${DataConvert.getEcgTimeStr(oxyData.recordingTime)}"
         mSpO2Chart = findViewById(R.id.chart_spo2)
         mHrChart = findViewById(R.id.chart_hr)
         mMovementChart = findViewById(R.id.chart_movement)

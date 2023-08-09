@@ -22,7 +22,17 @@ public class ByteUtils {
         b[3] = (byte) ((i >> 24) & 0xFF);
         return b;
     }
-
+    /**
+     * 转四个字节byte数组（大端模式）
+     */
+    public static byte[] int4BytesBig(long i) {
+        byte[] b = new byte[4];
+        b[0] = (byte) ((i >> 24) & 0xFF);
+        b[1] = (byte) ((i >> 16) & 0xFF);
+        b[2] = (byte) ((i >> 8) & 0xFF);
+        b[3] = (byte) (i & 0xFF);
+        return b;
+    }
 
     public static float intToFloat(int b) {
         return Float.intBitsToFloat(b);

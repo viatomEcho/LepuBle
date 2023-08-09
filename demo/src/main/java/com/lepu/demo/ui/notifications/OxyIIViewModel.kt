@@ -41,19 +41,14 @@ class OxyIIViewModel : InfoViewModel() {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.OxyII.EventOxyIIReadFileComplete)
             .observe(owner) { event ->
                 (event.data as OxyIIBleResponse.BleFile).let {
-                    _readNextFile.value = true
                     if (it.fileType == OxyIIBleCmd.FileType.OXY) {
                         val data = OxyIIBleFile(it.content)
-                        val fileName = DateUtil.stringFromDate(Date(data.startTime*1000), "yyyyMMddhhmmss")
-                        val filePath = "${BleServiceHelper.BleServiceHelper.rawFolder?.get(Bluetooth.MODEL_O2RING)}/$fileName.dat"
-                        val isSave = File(filePath).exists()
-                        if (!isSave) {
-                            DownloadHelper.writeFile(Bluetooth.MODEL_O2RING, "", fileName, "dat", data.bytes)
-                        }
+                        val fileName = DateUtil.stringFromDate(Date(data.startTime*1000), "yyyyMMddHHmmss")
                         val temp = OxyData()
                         temp.fileName = fileName
                         temp.recordingTime = data.interval*data.size
                         temp.avgSpo2 = data.avgSpo2
+                        temp.avgHr = data.avgHr
                         temp.minSpo2 = data.minSpo2
                         temp.dropsTimes3Percent = data.dropsTimes3Percent
                         temp.dropsTimes4Percent = data.dropsTimes4Percent
@@ -82,11 +77,11 @@ class OxyIIViewModel : InfoViewModel() {
                         temp.warningSpo2s = warningSpo2s
                         temp.warningHrs = warningHrs
                         _oxyData.value = temp
-                        _readNextFile.value = true
                     } else {
                         val data = PpgFile(it.content)
                         _info.value = _info.value + "\n$data"
                     }
+                    _readNextFile.value = true
                     Log.d("111111111111", "_info.value : ${_info.value}")
                 }
             }

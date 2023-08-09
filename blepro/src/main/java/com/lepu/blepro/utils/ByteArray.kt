@@ -54,6 +54,7 @@ fun add(ori: ByteArray?, add: ByteArray): ByteArray {
 }
 /**
  * byte数组转无符号整数（小端模式）
+ * 四字节有符号数，小于四字节是无符号数
  */
 @ExperimentalUnsignedTypes fun toUInt(bytes: ByteArray): Int {
     var result : UInt = 0u
@@ -70,12 +71,24 @@ fun add(ori: ByteArray?, add: ByteArray): ByteArray {
 fun toInt(bytes: ByteArray): Int {
     var result : Int = 0
     for (i in bytes.indices) {
+        // .toInt = 有符号数，and 0xFF = 无符号数，计算结果同上一个方法，待修改
         result = result or ((bytes[i].toInt() and 0xFF) shl 8*i)
     }
 
     return result
 }
 
+/**
+ * byte数组转有符号long（大端模式）
+ * 八字节有符号数，小于八字节是无符号数
+ */
+@ExperimentalUnsignedTypes fun toLongBig(bytes: ByteArray): Long {
+    var result : Long = 0
+    for (i in bytes.indices) {
+        result = result or ((bytes[i].toLong() and 0xFF) shl 8*(bytes.size-1-i))
+    }
+    return result
+}
 /**
  * byte数组转无符号整数（大端模式）
  */

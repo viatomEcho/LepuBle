@@ -109,7 +109,7 @@
     <string name="connect_error">Connection error</string>
     <string name="no_server">Server not configured</string>
     <string name="get_file_list1">1.Get file list</string>
-    <string name="get_file_list1_read_file2">1.Get file list 2.Read file (App log file in sdcard/Android/data/com.lepu.blepro.demo/files)</string>
+    <string name="get_file_list1_read_file2">1.Get file list 2.Read file (App log file in /Storage/Documents/log/)</string>
     <string name="file_name_tips">(If the file name is empty, read all files in the list)</string>
     <string name="read_file2">2.Read file</string>
     <string name="file_name">File name</string>

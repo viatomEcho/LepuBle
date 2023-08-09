@@ -65,10 +65,9 @@ object Pf10Aw1BleResponse {
             index += 4
             magic = toLong(bytes.copyOfRange(index, index+4))
             index += 4
-//            val rawOffset = DateUtil.getTimeZoneOffset().div(1000)
-//            val defaultTime = toLong(bytes.copyOfRange(index, index+4))
-//            startTime = defaultTime - rawOffset
-            startTime = toLong(bytes.copyOfRange(index, index+4))
+            val rawOffset = DateUtil.getTimeZoneOffset().div(1000)
+            val defaultTime = toLong(bytes.copyOfRange(index, index+4))
+            startTime = defaultTime - rawOffset
             index += 4
             size = toUInt(bytes.copyOfRange(index, index+4))
             index += 4

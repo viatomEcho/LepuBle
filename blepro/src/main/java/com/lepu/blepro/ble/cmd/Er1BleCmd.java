@@ -25,7 +25,7 @@ public class Er1BleCmd {
     public static final int READ_FILE_END = 0xF4;
     public static final int SET_VIBRATE_STATE = 0x04;
     public static final int SET_TIME = 0xEC;
-
+    public static final int STOP_ECG = 0x05;
 
     private static int seqNo = 0;
     private static void addNo() {
@@ -86,6 +86,24 @@ public class Er1BleCmd {
         cmd[0] = (byte) 0xA5;
         cmd[1] = (byte) GET_INFO;
         cmd[2] = (byte) ~GET_INFO;
+        cmd[3] = (byte) 0x00;
+        cmd[4] = (byte) seqNo;
+        cmd[5] = (byte) 0;
+        cmd[6] = (byte) 0;
+        cmd[7] = BleCRC.calCRC8(cmd);
+
+        addNo();
+
+        return cmd;
+    }
+
+    public static byte[] stopEcg() {
+        int len = 0;
+
+        byte[] cmd = new byte[8+len];
+        cmd[0] = (byte) 0xA5;
+        cmd[1] = (byte) STOP_ECG;
+        cmd[2] = (byte) ~STOP_ECG;
         cmd[3] = (byte) 0x00;
         cmd[4] = (byte) seqNo;
         cmd[5] = (byte) 0;

@@ -116,6 +116,46 @@
                 android:layout_marginTop="5dp"
                 android:textColor="@color/black"
                 android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/o2_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/o2_score"
+                android:layout_marginTop="5dp"
+                android:text="Point Size："
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/o2_size_val"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@id/o2_score_val"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/black"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/recording_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/o2_size"
+                android:layout_marginTop="5dp"
+                android:text="Recording Time："
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/recording_time_val"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@id/o2_size_val"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/black"
+                android:textSize="14sp"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -204,17 +244,17 @@
                 android:textSize="14sp"/>
 
             <TextView
-                android:id="@+id/recording_time"
+                android:id="@+id/avg_hr"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/asleep_time"
                 android:layout_marginTop="5dp"
-                android:text="Recording Time："
+                android:text="Average Hr："
                 android:textColor="@color/black"
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/recording_time_val"
+                android:id="@+id/avg_hr_val"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -222,9 +262,31 @@
                 android:layout_marginTop="5dp"
                 android:textColor="@color/black"
                 android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/interval"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/avg_hr"
+                android:layout_marginTop="5dp"
+                android:text="Interval："
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/interval_val"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@id/avg_hr_val"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/black"
+                android:textSize="14sp"/>
+
         </RelativeLayout>
     </LinearLayout>
     <TextView
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_10"
@@ -233,6 +295,7 @@
         android:textColor="@color/colorRed"
         android:text="@string/sleep_result_path"/>
     <androidx.core.widget.NestedScrollView
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_margin="@dimen/dp_10"

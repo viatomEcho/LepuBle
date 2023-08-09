@@ -259,6 +259,14 @@ class Er1BleInterface(model: Int): BleInterface(model) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1BurnLockFlash).post(InterfaceEvent(model, false))
                 }
             }
+            Er1BleCmd.STOP_ECG -> {
+                LepuBleLog.d(tag, "model:$model,STOP_ECG => success")
+                if (response.pkgType == 0x01.toByte()) {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1StopEcg).post(InterfaceEvent(model, true))
+                } else {
+                    LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1StopEcg).post(InterfaceEvent(model, false))
+                }
+            }
         }
     }
 
@@ -385,6 +393,10 @@ class Er1BleInterface(model: Int): BleInterface(model) {
     fun burnLockFlash() {
         sendCmd(Er1BleCmd.burnLockFlash())
         LepuBleLog.d(tag, "burnLockFlash...")
+    }
+    fun stopEcg() {
+        sendCmd(Er1BleCmd.stopEcg())
+        LepuBleLog.d(tag, "stopEcg...")
     }
 
 }
