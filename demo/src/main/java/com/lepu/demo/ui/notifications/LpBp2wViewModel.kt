@@ -1,5 +1,6 @@
 package com.lepu.demo.ui.notifications
 
+import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.ble.cmd.LeBp2wBleCmd
@@ -72,6 +73,7 @@ class LpBp2wViewModel : InfoViewModel() {
             .observe(owner) { event ->
                 (event.data as LeBp2wEcgFile).let {
                     val temp = getEcgData(it.timestamp, it.fileName, it.waveData, DataConvert.getBp2ShortArray(it.waveData), it.duration)
+                    Log.d("111111111111", "$it")
                     _ecgData.value = temp
                     _readNextFile.value = true
                 }

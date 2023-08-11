@@ -5,6 +5,7 @@ import com.lepu.blepro.utils.ByteUtils.toSignedShort
 import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.blepro.utils.bytesToHex
+import com.lepu.blepro.utils.toLong
 import com.lepu.blepro.utils.toUInt
 import java.util.*
 
@@ -12,7 +13,7 @@ class Bp2EcgFile(val bytes: ByteArray) {
 
     var fileVersion: Int            // 文件版本 e.g.  0x01 :  V1
     var fileType: Int               // 文件类型 1：血压；2：心电
-    var measureTime: Int            // 测量时间时间戳 s
+    var measureTime: Long           // 测量时间时间戳 s
     // reserved 3
     var uploadTag: Boolean          // 上传标识
     var recordingTime: Int          // 记录时长 s
@@ -35,7 +36,7 @@ class Bp2EcgFile(val bytes: ByteArray) {
         fileType = byte2UInt(bytes[index])
         index++
         val rawOffset = DateUtil.getTimeZoneOffset().div(1000)
-        val defaultTime = toUInt(bytes.copyOfRange(index, index+4))
+        val defaultTime = toLong(bytes.copyOfRange(index, index+4))
         measureTime = defaultTime - rawOffset
         index += 4
         index += 3

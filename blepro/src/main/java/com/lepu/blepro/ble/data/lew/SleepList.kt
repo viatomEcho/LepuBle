@@ -1,9 +1,11 @@
 package com.lepu.blepro.ble.data.lew
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
+import com.lepu.blepro.utils.toLong
 import java.util.*
 
 class SleepList(val listSize: Int, val bytes: ByteArray) {
@@ -29,16 +31,16 @@ class SleepList(val listSize: Int, val bytes: ByteArray) {
     }
 
     class Item(val bytes: ByteArray) {
-        var startTime: Int
-        var stopTime: Int
+        var startTime: Long
+        var stopTime: Long
         // reserved 2
         var len: Int
         var datas = mutableListOf<Sleep>()
         init {
             var index = 0
-            startTime = toUInt(bytes.copyOfRange(index, index + 4))
+            startTime = toLong(bytes.copyOfRange(index, index + 4)) - DateUtil.getTimeZoneOffset().div(1000)
             index += 4
-            stopTime = toUInt(bytes.copyOfRange(index, index + 4))
+            stopTime = toLong(bytes.copyOfRange(index, index + 4)) - DateUtil.getTimeZoneOffset().div(1000)
             index += 4
             index += 2
             len = byte2UInt(bytes[index])

@@ -751,6 +751,18 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                 val data = it.data as KtBleBattery
                 viewModel._battery.value = "${data.percent} %"
             }
+        //--------------------------tmb--------------------------
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.TMB.EventTmbSetTime)
+            .observe(this) {
+                val data = it.data as Boolean
+                Toast.makeText(this, "${getString(R.string.sync_time)} $data", Toast.LENGTH_SHORT).show()
+                LpBleUtil.getInfo(it.model)
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.TMB.EventTmbGetInfo)
+            .observe(this) {
+                viewModel._tmbInfo.value = it.data as TmbInfo
+                Toast.makeText(this, "${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
+            }
     }
     private fun needPermission(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

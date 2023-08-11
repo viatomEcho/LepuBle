@@ -17,7 +17,7 @@ import java.util.*
 
 class TmbBleManager(context: Context): LpBleManager(context) {
 
-    var tmbInfo = TmbInfo()
+    val tmbInfo = TmbInfo()
 
     lateinit var service_info_uuid: UUID
     lateinit var manufacturer_uuid: UUID
@@ -249,7 +249,7 @@ class TmbBleManager(context: Context): LpBleManager(context) {
         }.enqueue()
         readCharacteristic(model_char).with { device, data ->
             data.value?.let {
-                tmbInfo.model = trimStr(String(it))
+                tmbInfo.name = trimStr(String(it))
             }
         }.enqueue()
         readCharacteristic(serial_char).with { device, data ->
@@ -270,12 +270,6 @@ class TmbBleManager(context: Context): LpBleManager(context) {
         readCharacteristic(sv_char).with { device, data ->
             data.value?.let {
                 tmbInfo.sv = trimStr(String(it))
-            }
-        }.enqueue()
-        readCharacteristic(id_char).with { device, data ->
-            data.value?.let {
-                tmbInfo.id = trimStr(String(it))
-                LepuBleLog.e("tmbInfo:$tmbInfo")
             }
         }.enqueue()
     }

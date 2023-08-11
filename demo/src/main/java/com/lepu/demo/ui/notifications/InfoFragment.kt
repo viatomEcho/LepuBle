@@ -14,10 +14,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hi.dhl.jdatabinding.binding
 import androidx.lifecycle.ViewModelProvider
+import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.download.DownloadHelper
+import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
 import com.lepu.blepro.utils.AlgorithmUtil
 import com.lepu.blepro.utils.DateUtil
@@ -1002,6 +1004,20 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                             "${context?.getString(R.string.software_version)}${it.fwV}\n" +
                             "sn：${it.sn}\ncode：${it.branchCode}\n" +
                             "${context?.getString(R.string.battery)}${mainViewModel._battery.value}"
+                }
+            }
+            Bluetooth.MODEL_TMB_2088 -> {
+                infoViewModel = ViewModelProvider(this).get(TmbViewModel::class.java)
+                (infoViewModel as TmbViewModel).initEvent(this)
+                mainViewModel.tmbInfo.observe(viewLifecycleOwner) {
+                    binding.info.text = "$it"
+                    binding.deviceInfo.text = "${context?.getString(R.string.device_name)}${it.name}\n" +
+                            "制造商：${it.manufacturer}\n" +
+                            "${context?.getString(R.string.hardware_version)}${it.hv}\n" +
+                            "${context?.getString(R.string.software_version)}${it.fv}\n" +
+                            "软件版本：${it.sv}\nsn：${it.serial}\n" +
+                            "Device ID：${it.deviceId}\nUser ID：${it.userId}\n" +
+                            "${context?.getString(R.string.battery)}${it.battery} %"
                 }
             }
         }

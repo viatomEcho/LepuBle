@@ -2,6 +2,7 @@ package com.lepu.blepro.ble.data
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.ByteUtils.toSignedShort
+import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.toLong
 
 class LeBp2wEcgFile {
@@ -23,7 +24,7 @@ class LeBp2wEcgFile {
         index++
         fileType = byte2UInt(content[index])
         index++
-        timestamp = toLong(content.copyOfRange(index, index+4))
+        timestamp = toLong(content.copyOfRange(index, index+4)) - DateUtil.getTimeZoneOffset().div(1000)
         index += 4
         // reserved 4
         index += 4

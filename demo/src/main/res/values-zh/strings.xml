@@ -133,9 +133,9 @@
     <string name="rapid_eye_time">快速眼动时间：</string>
     <string name="awake_time">清醒次数：</string>
     <string name="bp_files">血压文件</string>
-    <string name="sys">收缩压</string>
-    <string name="dia">舒张压</string>
-    <string name="mean">平均压</string>
+    <string name="sys">收缩压：</string>
+    <string name="dia">舒张压：</string>
+    <string name="mean">平均压：</string>
     <string name="burning_time">烧录时间：</string>
     <string name="ecg_files">心电/心率文件</string>
     <string name="total_bytes">数据总量：</string>

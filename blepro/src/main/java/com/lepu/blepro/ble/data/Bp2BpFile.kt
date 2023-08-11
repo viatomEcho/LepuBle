@@ -4,6 +4,7 @@ import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.blepro.utils.bytesToHex
+import com.lepu.blepro.utils.toLong
 import com.lepu.blepro.utils.toUInt
 import java.util.*
 
@@ -11,7 +12,7 @@ class Bp2BpFile(val bytes: ByteArray) {
 
     var fileVersion: Int       // 文件版本 e.g.  0x01 :  V1
     var fileType: Int          // 文件类型 1：血压；2：心电
-    var measureTime: Int       // 测量时间时间戳s
+    var measureTime: Long      // 测量时间时间戳s
     var measureMode: Int       // 测量模式 0:单次模式 1:X3模式 2:间隔模式
     var measureInterval: Int   // 测量间隔单位s 仅非单次模式有效
     var uploadTag: Boolean     // 上传标识
@@ -31,7 +32,7 @@ class Bp2BpFile(val bytes: ByteArray) {
         fileType = byte2UInt(bytes[index])
         index++
         val rawOffset = DateUtil.getTimeZoneOffset().div(1000)
-        val defaultTime = toUInt(bytes.copyOfRange(index, index+4))
+        val defaultTime = toLong(bytes.copyOfRange(index, index+4))
         measureTime = defaultTime - rawOffset
         index += 4
         measureMode = byte2UInt(bytes[index])

@@ -137,6 +137,8 @@ class MainViewModel: ViewModel() {
     val _biolandInfo = MutableLiveData<BiolandBgmBleResponse.DeviceInfo>()
     val biolandInfo: LiveData<BiolandBgmBleResponse.DeviceInfo> = _biolandInfo
 
+    val _tmbInfo = MutableLiveData<TmbInfo>()
+    val tmbInfo: LiveData<TmbInfo> = _tmbInfo
     /**
      * 当前蓝牙
      */

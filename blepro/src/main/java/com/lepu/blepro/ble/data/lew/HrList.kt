@@ -29,7 +29,7 @@ class HrList(val listSize: Int, val bytes: ByteArray) {
         var hr: Int
         init {
             var index = 0
-            recordingTime = toLong(bytes.copyOfRange(index, index + 4))
+            recordingTime = toLong(bytes.copyOfRange(index, index + 4)) - DateUtil.getTimeZoneOffset().div(1000)
             index += 4
             hr = toUInt(bytes.copyOfRange(index, index + 2))
         }

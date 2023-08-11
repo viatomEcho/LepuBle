@@ -2,12 +2,14 @@ package com.lepu.blepro.ble.data;
 
 public class TmbInfo {
     private String manufacturer;
-    private String model;
+    private String name;
     private String serial;
     private String hv;
     private String fv;
     private String sv;
-    private String id;
+    private int userId;
+    private String deviceId;
+    private int battery;
 
     public String getManufacturer() {
         return manufacturer;
@@ -17,12 +19,12 @@ public class TmbInfo {
         this.manufacturer = manufacturer;
     }
 
-    public String getModel() {
-        return model;
+    public String getName() {
+        return name;
     }
 
-    public void setModel(String model) {
-        this.model = model;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getSerial() {
@@ -57,24 +59,42 @@ public class TmbInfo {
         this.sv = sv;
     }
 
-    public String getId() {
-        return id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public int getBattery() {
+        return battery;
+    }
+
+    public void setBattery(int battery) {
+        this.battery = battery;
     }
 
     @Override
     public String toString() {
         return "TmbInfo{" +
                 "manufacturer='" + manufacturer + '\'' +
-                ", model='" + model + '\'' +
+                ", name='" + name + '\'' +
                 ", serial='" + serial + '\'' +
                 ", hv='" + hv + '\'' +
                 ", fv='" + fv + '\'' +
                 ", sv='" + sv + '\'' +
-                ", id='" + id + '\'' +
+                ", userId=" + userId +
+                ", deviceId='" + deviceId + '\'' +
+                ", battery=" + battery +
                 '}';
     }
 }

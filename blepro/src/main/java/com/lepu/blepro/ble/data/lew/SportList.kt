@@ -1,8 +1,10 @@
 package com.lepu.blepro.ble.data.lew
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.blepro.utils.bytesToHex
+import com.lepu.blepro.utils.toLong
 import com.lepu.blepro.utils.toUInt
 import java.util.*
 
@@ -28,8 +30,8 @@ class SportList(val listSize: Int, val bytes: ByteArray) {
 
     class Item(val bytes: ByteArray) {
         var type: Int       // LewBleCmd.SportType
-        var startTime: Int
-        var stopTime: Int
+        var startTime: Long
+        var stopTime: Long
         var distance: Int
         var averHr: Int
         var maxHr: Int
@@ -41,9 +43,9 @@ class SportList(val listSize: Int, val bytes: ByteArray) {
             var index = 0
             type = byte2UInt(bytes[index])
             index++
-            startTime = toUInt(bytes.copyOfRange(index, index + 4))
+            startTime = toLong(bytes.copyOfRange(index, index + 4)) - DateUtil.getTimeZoneOffset().div(1000)
             index += 4
-            stopTime = toUInt(bytes.copyOfRange(index, index + 4))
+            stopTime = toLong(bytes.copyOfRange(index, index + 4)) - DateUtil.getTimeZoneOffset().div(1000)
             index += 4
             distance = toUInt(bytes.copyOfRange(index, index + 4))
             index += 4

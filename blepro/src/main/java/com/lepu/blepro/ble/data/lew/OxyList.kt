@@ -1,9 +1,11 @@
 package com.lepu.blepro.ble.data.lew
 
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
+import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.blepro.utils.bytesToHex
 import com.lepu.blepro.utils.toUInt
+import com.lepu.blepro.utils.toLong
 import java.util.*
 
 class OxyList(val listSize: Int, val bytes: ByteArray) {
@@ -27,13 +29,13 @@ class OxyList(val listSize: Int, val bytes: ByteArray) {
     }
 
     class Item(val bytes: ByteArray) {
-        var recordingTime: Int
+        var recordingTime: Long
         var pr: Int
         var spo2: Int
         // reserved 1
         init {
             var index = 0
-            recordingTime = toUInt(bytes.copyOfRange(index, index + 4))
+            recordingTime = toLong(bytes.copyOfRange(index, index + 4)) - DateUtil.getTimeZoneOffset().div(1000)
             index += 4
             pr = toUInt(bytes.copyOfRange(index, index + 2))
             index += 2

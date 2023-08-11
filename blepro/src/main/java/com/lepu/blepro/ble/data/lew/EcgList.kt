@@ -35,7 +35,7 @@ class EcgList(val listSize: Int, val bytes: ByteArray) {
         var name: String
         init {
             var index = 0
-            recordingTime = toLong(bytes.copyOfRange(index, index + 4))
+            recordingTime = toLong(bytes.copyOfRange(index, index + 4)) - DateUtil.getTimeZoneOffset().div(1000)
             index += 4
             nameLen = byte2UInt(bytes[index])
             index++
