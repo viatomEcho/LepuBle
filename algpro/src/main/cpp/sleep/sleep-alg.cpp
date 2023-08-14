@@ -10,13 +10,13 @@
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_lepu_blepro_utils_AlgorithmUtil_sleep_1alg_1init_10_125Hz(JNIEnv *env, jclass clazz, jint timestamp) {
+Java_com_lepu_algpro_AlgorithmUtil_sleepAlgInit(JNIEnv *env, jclass clazz, jint timestamp) {
     sleep_alg_init_0_25Hz(timestamp);
 }
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_lepu_blepro_utils_AlgorithmUtil_sleep_1alg_1main_1pro_10_125Hz(JNIEnv *env, jclass clazz, jshort pr, jint acc) {
+Java_com_lepu_algpro_AlgorithmUtil_sleepAlgMainPro(JNIEnv *env, jclass clazz, jshort pr, jint acc) {
     sleep_alg_input_t i;
     i.pr = pr;
     i.acc = acc;
@@ -27,7 +27,7 @@ Java_com_lepu_blepro_utils_AlgorithmUtil_sleep_1alg_1main_1pro_10_125Hz(JNIEnv *
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_lepu_blepro_utils_AlgorithmUtil_sleep_1alg_1main(JNIEnv *env, jclass clazz, jintArray pr, jintArray acc) {
+Java_com_lepu_algpro_AlgorithmUtil_sleepAlgMain(JNIEnv *env, jclass clazz, jintArray pr, jintArray acc) {
     int len = (*env).GetArrayLength(pr);
     int *p = (*env).GetIntArrayElements(pr, NULL);
     int *a = (*env).GetIntArrayElements(acc, NULL);
@@ -36,7 +36,7 @@ Java_com_lepu_blepro_utils_AlgorithmUtil_sleep_1alg_1main(JNIEnv *env, jclass cl
 
 extern "C"
 JNIEXPORT jintArray JNICALL
-Java_com_lepu_blepro_utils_AlgorithmUtil_sleep_1alg_1get_1res_10_125Hz(JNIEnv *env, jclass clazz) {
+Java_com_lepu_algpro_AlgorithmUtil_sleepAlgGetResult(JNIEnv *env, jclass clazz) {
     sleep_alg_result *result = sleep_alg_get_res_0_25Hz();
     int len = result->sleep_state_buff_len;
     int *arrays = 0;

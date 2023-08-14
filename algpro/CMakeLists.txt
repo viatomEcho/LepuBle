@@ -11,13 +11,13 @@ cmake_minimum_required(VERSION 3.4.1)
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-        native-lib
+        online-lib
 
         # Sets the library as a shared library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        ../blepro/src/main/cpp/online/native-lib.cpp
+        ../algpro/src/main/cpp/online/native-lib.cpp
 
         )
 add_library( # Sets the name of the library.
@@ -27,7 +27,7 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        ../blepro/src/main/cpp/online/bp-lib.cpp
+        ../algpro/src/main/cpp/online/bp-lib.cpp
 
         )
 
@@ -36,20 +36,20 @@ add_library(
         offline-lib
 
         SHARED
-        ../blepro/src/main/cpp/offline/native-lib.cpp
+        ../algpro/src/main/cpp/offline/native-lib.cpp
 
 )
 add_library(
         bp-offline
 
         SHARED
-        ../blepro/src/main/cpp/offline/bp-lib.cpp
+        ../algpro/src/main/cpp/offline/bp-lib.cpp
 
 )
 add_library(
         sleep-alg
         SHARED
-        ../blepro/src/main/cpp/sleep/sleep-alg.cpp
+        ../algpro/src/main/cpp/sleep/sleep-alg.cpp
 )
 #add_library(
 #        sleep_alg_main_0_25Hz
@@ -87,7 +87,7 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-        native-lib
+        online-lib
 
         #        filter
 

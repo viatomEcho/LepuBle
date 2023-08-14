@@ -28,7 +28,7 @@ static StreamSwtQua streamSwtQua;
 extern "C"
 
 JNIEXPORT jdoubleArray JNICALL
-Java_com_lepu_blepro_utils_AlgorithmUtil_filter(JNIEnv *env,jobject thiz, jdouble f, jboolean reset) {
+Java_com_lepu_algpro_AlgorithmUtil_filter(JNIEnv *env,jclass thiz, jdouble f, jboolean reset) {
 
     if (reset) {
         streamSwtQua.ResetMe();

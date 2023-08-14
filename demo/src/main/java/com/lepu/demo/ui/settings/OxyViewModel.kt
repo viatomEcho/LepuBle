@@ -95,19 +95,14 @@ class OxyViewModel : SettingViewModel() {
                 _toast.value = "输入不正确，请重新输入"
             }
         }
-        ArrayAdapter(context,
-            android.R.layout.simple_list_item_1,
-            arrayListOf("Standard模式", "Always Off模式", "Always On模式")
-        ).apply {
-            binding.o2Layout.lightModeSpinner.adapter = this
-        }
-        binding.o2Layout.lightModeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                LpBleUtil.updateSetting(model, OxyBleCmd.SYNC_TYPE_LIGHTING_MODE, position)
+        binding.o2Layout.setLightMode.setOnClickListener {
+            val temp = HexString.trimStr(binding.o2Layout.lightMode.text.toString())
+            if (StringUtil.isNumber(temp)) {
+                LpBleUtil.updateSetting(model, OxyBleCmd.SYNC_TYPE_LIGHTING_MODE, temp.toInt())
                 cmdStr = "send : " + LpBleUtil.getSendCmd(model)
                 binding.sendCmd.text = cmdStr
-            }
-            override fun onNothingSelected(parent: AdapterView<*>?) {
+            } else {
+                _toast.value = "输入不正确，请重新输入"
             }
         }
         binding.o2Layout.o2HrSwitch.setOnClickListener {
@@ -140,19 +135,14 @@ class OxyViewModel : SettingViewModel() {
                 _toast.value = "输入不正确，请重新输入"
             }
         }
-        ArrayAdapter(context,
-            android.R.layout.simple_list_item_1,
-            arrayListOf("低", "中", "高")
-        ).apply {
-            binding.o2Layout.lightLevelSpinner.adapter = this
-        }
-        binding.o2Layout.lightLevelSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                LpBleUtil.updateSetting(model, OxyBleCmd.SYNC_TYPE_LIGHT_STR, position)
+        binding.o2Layout.setLightLevel.setOnClickListener {
+            val temp = HexString.trimStr(binding.o2Layout.lightLevel.text.toString())
+            if (StringUtil.isNumber(temp)) {
+                LpBleUtil.updateSetting(model, OxyBleCmd.SYNC_TYPE_LIGHT_STR, temp.toInt())
                 cmdStr = "send : " + LpBleUtil.getSendCmd(model)
                 binding.sendCmd.text = cmdStr
-            }
-            override fun onNothingSelected(parent: AdapterView<*>?) {
+            } else {
+                _toast.value = "输入不正确，请重新输入"
             }
         }
         binding.o2Layout.o2SetMtThr.setOnClickListener {
@@ -210,8 +200,8 @@ class OxyViewModel : SettingViewModel() {
                 binding.o2Layout.o2Hr.setText("${data.hrSwitch}")
                 binding.o2Layout.o2Motor.setText("${data.motor}")
                 binding.o2Layout.o2Buzzer.setText("${data.buzzer}")
-                binding.o2Layout.lightModeSpinner.setSelection(data.lightingMode)
-                binding.o2Layout.lightLevelSpinner.setSelection(data.lightStr)
+                binding.o2Layout.lightMode.setText("${data.lightingMode}")
+                binding.o2Layout.lightLevel.setText("${data.lightStr}")
                 binding.o2Layout.o2MtThr.setText("${data.mtThr}")
                 binding.o2Layout.o2MtSwitch.isChecked = data.mtSwitch == 1
                 binding.o2Layout.o2IvThr.setText("${data.ivThr}")

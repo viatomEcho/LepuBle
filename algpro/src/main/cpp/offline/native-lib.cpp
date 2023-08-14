@@ -31,7 +31,7 @@
 extern "C"
 
 JNIEXPORT jshortArray JNICALL
-Java_com_lepu_blepro_utils_AlgorithmUtil_shortfilter(JNIEnv *env, jobject thiz, jshortArray inShorts) {
+Java_com_lepu_algpro_AlgorithmUtil_shortFilter(JNIEnv *env, jclass thiz, jshortArray inShorts) {
 
     short *shortArray;
     jsize arraySize;

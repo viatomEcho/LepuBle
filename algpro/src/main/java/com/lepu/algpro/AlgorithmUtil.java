@@ -1,4 +1,4 @@
-package com.lepu.blepro.utils;
+package com.lepu.algpro;
 
 /**
  * @author chenyongfeng
@@ -7,7 +7,7 @@ public class AlgorithmUtil {
 
     // 滤波
     static {
-        System.loadLibrary("native-lib");
+        System.loadLibrary("online-lib");
         System.loadLibrary("offline-lib");
         // 睡眠算法
         System.loadLibrary("sleep-alg");
@@ -15,7 +15,7 @@ public class AlgorithmUtil {
 
     public static native double[] filter(double f, boolean reset);
 
-    public static native short[] shortfilter(short[] shorts);
+    public static native short[] shortFilter(short[] shorts);
 
     // reset filter
     public static void resetFilter() {
@@ -23,10 +23,10 @@ public class AlgorithmUtil {
     }
 
     // sleep alg
-    public static native void sleep_alg_init_0_25Hz(int timestamp);
+    public static native void sleepAlgInit(int timestamp);
     // 脉率，三轴值
-    public static native int sleep_alg_main_pro_0_25Hz(short pr, int acc);
-    public static native void sleep_alg_main(int[] pr, int[] acc);
-    public static native int[] sleep_alg_get_res_0_25Hz();
+    public static native int sleepAlgMainPro(short pr, int acc);
+    public static native void sleepAlgMain(int[] pr, int[] acc);
+    public static native int[] sleepAlgGetResult();
 
 }

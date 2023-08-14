@@ -3,7 +3,7 @@ package com.lepu.demo.util;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.TypedValue;
-import com.lepu.blepro.utils.AlgorithmUtil;
+import com.lepu.algpro.AlgorithmUtil;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -121,7 +121,7 @@ public class DataConvert {
         }
         short[] shortData = new short[len-invalid];
         System.arraycopy(tempData, 0, shortData, 0, shortData.length);
-        return AlgorithmUtil.shortfilter(shortData);
+        return AlgorithmUtil.shortFilter(shortData);
     }
 
     /**
@@ -135,7 +135,7 @@ public class DataConvert {
         for (int i = 0; i < count; i++) {
             dest[i] = (short) (data[i * 2 + 1] << 8 | data[2 * i] & 0xff);
         }
-        return AlgorithmUtil.shortfilter(dest);
+        return AlgorithmUtil.shortFilter(dest);
     }
 
     public static short[] getEr3ShortArray(int[] data) {

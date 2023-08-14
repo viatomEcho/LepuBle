@@ -3,7 +3,6 @@ package com.lepu.demo.ui.notifications
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.os.FileUtils
 import android.os.Handler
 import android.util.Log
 import android.view.View
@@ -14,14 +13,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hi.dhl.jdatabinding.binding
 import androidx.lifecycle.ViewModelProvider
-import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.ble.cmd.*
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.download.DownloadHelper
-import com.lepu.blepro.event.InterfaceEvent
 import com.lepu.blepro.objs.Bluetooth
-import com.lepu.blepro.utils.AlgorithmUtil
+import com.lepu.algpro.AlgorithmUtil
 import com.lepu.blepro.utils.DateUtil
 import com.lepu.blepro.utils.HexString.trimStr
 import com.lepu.blepro.vals.server
@@ -1221,7 +1218,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
 
     // 睡眠算法
     private fun sleepAlg(oxyData: OxyData) {
-        AlgorithmUtil.sleep_alg_init_0_25Hz(oxyData.startTime.toInt())
+        AlgorithmUtil.sleepAlgInit(oxyData.startTime.toInt())
         val filePath = "${BleServiceHelper.BleServiceHelper.rawFolder?.get(Bluetooth.MODEL_O2RING)}/sleep_result_${oxyData.fileName}.txt"
         val isSave = File(filePath).exists()
         Log.d("111111111", "oxyData : $oxyData")
@@ -1230,7 +1227,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
         for (i in 0 until oxyData.spo2s.size) {
             prList.add(oxyData.hrs[i])
             vectorList.add(oxyData.motions[i])
-            val status = AlgorithmUtil.sleep_alg_main_pro_0_25Hz(oxyData.hrs[i].toShort(), oxyData.motions[i])
+            val status = AlgorithmUtil.sleepAlgMainPro(oxyData.hrs[i].toShort(), oxyData.motions[i])
             if (!isSave) {
                 FileUtil.saveTextFile(
                     filePath,
@@ -1245,8 +1242,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                     true)
             }
         }
-//        AlgorithmUtil.sleep_alg_main(prList.toIntArray(), vectorList.toIntArray())
-        val result = AlgorithmUtil.sleep_alg_get_res_0_25Hz()
+//        AlgorithmUtil.sleepAlgMain(prList.toIntArray(), vectorList.toIntArray())
+        val result = AlgorithmUtil.sleepAlgGetResult()
         if (!isSave) {
             val len = result[7]
             var temp = ""

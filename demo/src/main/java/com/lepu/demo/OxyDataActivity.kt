@@ -21,7 +21,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.utils.ViewPortHandler
 import com.lepu.blepro.BleServiceHelper
 import com.lepu.blepro.objs.Bluetooth
-import com.lepu.blepro.utils.AlgorithmUtil
+import com.lepu.algpro.AlgorithmUtil
 import com.lepu.blepro.utils.DateUtil.stringFromDate
 import com.lepu.demo.config.Constant.BluetoothConfig.Companion.oxyData
 import com.lepu.demo.util.DataConvert
@@ -534,7 +534,7 @@ class OxyDataActivity : AppCompatActivity() {
 
     // 睡眠算法
     private fun sleepAlg() {
-        AlgorithmUtil.sleep_alg_init_0_25Hz(oxyData.startTime.toInt())
+        AlgorithmUtil.sleepAlgInit(oxyData.startTime.toInt())
         val statuses = mutableListOf<Int>()
         val filePath = "${BleServiceHelper.BleServiceHelper.rawFolder?.get(Bluetooth.MODEL_O2RING)}/sleep_result_${oxyData.fileName}.txt"
         val isSave = File(filePath).exists()
@@ -543,7 +543,7 @@ class OxyDataActivity : AppCompatActivity() {
         for (i in 0 until oxyData.spo2s.size) {
             prList.add(oxyData.hrs[i])
             vectorList.add(oxyData.motions[i])
-            val status = AlgorithmUtil.sleep_alg_main_pro_0_25Hz(oxyData.hrs[i].toShort(), oxyData.motions[i])
+            val status = AlgorithmUtil.sleepAlgMainPro(oxyData.hrs[i].toShort(), oxyData.motions[i])
             statuses.add(status)
             if (!isSave) {
                 FileUtil.saveTextFile(
@@ -559,8 +559,8 @@ class OxyDataActivity : AppCompatActivity() {
                     true)
             }
         }
-//        AlgorithmUtil.sleep_alg_main(prList.toIntArray(), vectorList.toIntArray())
-        val result = AlgorithmUtil.sleep_alg_get_res_0_25Hz()
+//        AlgorithmUtil.sleepAlgMain(prList.toIntArray(), vectorList.toIntArray())
+        val result = AlgorithmUtil.sleepAlgGetResult()
         val len = result[7]
         sleepText.text = "${getString(R.string.sleep_status_tips)}" +
                 "${statuses.toIntArray().joinToString(",")}\n" +
