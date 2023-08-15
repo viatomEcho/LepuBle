@@ -227,7 +227,7 @@
             android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ble_state"
-            android:text="加密模式(连接呼吸机前设置)"/>
+            android:text="加密模式(连接前设置生效)"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

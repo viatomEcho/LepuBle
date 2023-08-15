@@ -195,7 +195,7 @@ class VentilatorBleInterface(model: Int): BleInterface(model) {
                         return
                     }
                     LepuBleLog.d(tag, "model:$model,ENCRYPT => success, decrypt: ${bytesToHex(decrypt)}")
-                    val data = VentilatorBleResponse.EncryptInfo(decrypt)
+                    val data = LepuBleResponse.EncryptInfo(decrypt)
                     aesEncryptKey = data.key
                     isEncryptMode = true
                     LepuBleLog.d(tag, "model:$model,ENCRYPT => success, data: $data")

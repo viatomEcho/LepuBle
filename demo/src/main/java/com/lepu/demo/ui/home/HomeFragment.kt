@@ -221,8 +221,10 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         mainViewModel.bleState.observe(viewLifecycleOwner) {
             if (it) {
                 binding.bleState.text = context?.getString(R.string.state_connect)
+                binding.encrypt.isEnabled = false
             } else {
                 binding.bleState.text = context?.getString(R.string.state_disconnect)
+                binding.encrypt.isEnabled = true
             }
             if (it) {
                 mAlertDialog?.dismiss()

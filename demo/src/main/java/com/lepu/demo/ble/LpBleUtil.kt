@@ -1087,8 +1087,8 @@ class LpBleUtil {
         fun ventilatorGetFileList(model: Int, fileType: Int, timestamp: Long) {
             BleServiceHelper.getFileList(model, fileType, timestamp)
         }
-        fun ventilatorEncrypt(model: Int, id: String) {
-            BleServiceHelper.ventilatorEncrypt(model, id)
+        fun encrypt(model: Int, id: String) {
+            BleServiceHelper.encrypt(model, id)
         }
         fun ventilatorDeviceBound(model: Int, bound: Boolean) {
             BleServiceHelper.ventilatorDeviceBound(model, bound)

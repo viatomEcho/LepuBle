@@ -45,13 +45,11 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-// versionName : 2.0.x.x------vihealth使用 2.0.x.0为发布版
-// versionName : 2.x.0.x------乐普健康使用 2.x.0.0为发布版
 ext {
     minSdkVersion = 21
     targetSdkVersion = 31
     compileSdkVersion = 31
     buildToolsVersion = "31.0.0"
-    versionCode = 4
-    versionName = "lepu-0.0.4"
+    versionCode = 5
+    versionName = "lepu-0.0.5"
 }

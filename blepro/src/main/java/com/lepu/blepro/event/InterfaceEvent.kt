@@ -89,6 +89,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface BP2 {
         companion object {
+            const val EventBp2Encrypt = "com.lepu.ble.bp2.encrypt"                            // 交换密钥 LepuBleResponse.EncryptInfo
             const val EventBp2Info = "com.lepu.ble.bp2.info"                                  // 设备信息 Bp2DeviceInfo
             const val EventBp2RtData = "com.lepu.ble.bp2.rtData"                              // 实时数据 Bp2BleRtData
             const val EventBp2State = "com.lepu.ble.bp2.state"                                // 实时状态 Bp2BleRtState
@@ -118,6 +119,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface BP2W {
         companion object {
+            const val EventBp2wEncrypt = "com.lepu.ble.bp2w.encrypt"                            // 交换密钥 LepuBleResponse.EncryptInfo
             const val EventBp2wInfo = "com.lepu.ble.bp2w.info"                                  // 设备信息 LepuDevice
             const val EventBp2wRtState = "com.lepu.ble.bp2w.rtState"                            // 主机状态 Bp2BleRtState
             const val EventBp2wRtData = "com.lepu.ble.bp2w.rtData"                              // 实时数据 Bp2BleRtData
@@ -146,6 +148,7 @@ class InterfaceEvent(val model: Int, val data: Any): LiveEvent {
      */
     interface LeBP2W {
         companion object {
+            const val EventLeBp2wEncrypt = "com.lepu.ble.le.bp2w.encrypt"                            // 交换密钥 LepuBleResponse.EncryptInfo
             const val EventLeBp2wInfo = "com.lepu.ble.le.bp2w.info"                                  // 设备信息 LepuDevice
             const val EventLeBp2wRtState = "com.lepu.ble.le.bp2w.rtState"                            // 主机状态 Bp2BleRtState
             const val EventLeBp2wRtData = "com.lepu.ble.le.bp2w.rtData"                              // 实时数据 Bp2BleRtData

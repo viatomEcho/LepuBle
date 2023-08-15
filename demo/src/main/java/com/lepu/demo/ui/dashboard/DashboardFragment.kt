@@ -1415,6 +1415,18 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                             "${context?.getString(R.string.poor_signal)}${
                                 if (data1.isPoolSignal) context?.getString(R.string.yes) 
                                 else context?.getString(R.string.no)}"
+                        val mvs = ByteUtils.bytes2mvs(bp2Rt.rtWave.waveform)
+                        val len = mvs.size
+                        for (i in 0 until len) {
+                            val temp = AlgorithmUtil.filter(mvs[i].toDouble(), false)
+                            if (temp.isNotEmpty()) {
+                                val d = FloatArray(temp.size)
+                                for (j in d.indices) {
+                                    d[j] = temp[j].toFloat()
+                                }
+                                DataController.receive(d)
+                            }
+                        }
                     }
                     3 -> {
                         data1 = Bp2DataEcgResult(bp2Rt.rtWave.waveData)
@@ -1426,8 +1438,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     }
                     else -> data1 = ""
                 }
-                val mvs = ByteUtils.bytes2mvs(bp2Rt.rtWave.waveform)
-                DataController.receive(mvs)
                 mainViewModel._battery.value = "${bp2Rt.rtState.battery.percent} %"
                 binding.dataStr.text = "dataType: " + bp2Rt.rtWave.waveDataType + " " + data1.toString() + "----rtState--" + bp2Rt.rtState.toString()
             }
@@ -1484,7 +1494,17 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                                 if (data2.isPoolSignal) context?.getString(R.string.yes) 
                                 else context?.getString(R.string.no)}"
                         val mvs = ByteUtils.bytes2mvs(bp2Rt.rtWave.waveform)
-                        DataController.receive(mvs)
+                        val len = mvs.size
+                        for (i in 0 until len) {
+                            val temp = AlgorithmUtil.filter(mvs[i].toDouble(), false)
+                            if (temp.isNotEmpty()) {
+                                val d = FloatArray(temp.size)
+                                for (j in d.indices) {
+                                    d[j] = temp[j].toFloat()
+                                }
+                                DataController.receive(d)
+                            }
+                        }
                         Log.d("11111111111111", "mvs.size : ${mvs.size}, mvs : ${mvs.joinToString(",")}")
                     }
                     3 -> {
@@ -1500,7 +1520,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 mainViewModel._battery.value = "${bp2Rt.rtState.battery.percent} %"
                 binding.dataStr.text = "dataType: " + bp2Rt.rtWave.waveDataType + " " + data2.toString() + "----rtState--" + bp2Rt.rtState.toString()
             }
-        //------------------------------le bp2w------------------------------
+        //------------------------------bp3w------------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP3.EventBp3RtData)
             .observe(this) {
                 val bp2Rt = it.data as Bp2BleRtData
@@ -1548,6 +1568,18 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                             "${context?.getString(R.string.poor_signal)}${
                                 if (data2.isPoolSignal) context?.getString(R.string.yes) 
                                 else context?.getString(R.string.no)}"
+                        val mvs = ByteUtils.bytes2mvs(bp2Rt.rtWave.waveform)
+                        val len = mvs.size
+                        for (i in 0 until len) {
+                            val temp = AlgorithmUtil.filter(mvs[i].toDouble(), false)
+                            if (temp.isNotEmpty()) {
+                                val d = FloatArray(temp.size)
+                                for (j in d.indices) {
+                                    d[j] = temp[j].toFloat()
+                                }
+                                DataController.receive(d)
+                            }
+                        }
                     }
                     3 -> {
                         data2 = Bp2DataEcgResult(bp2Rt.rtWave.waveData)
@@ -1559,8 +1591,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                     }
                     else -> data2 = ""
                 }
-                val mvs = ByteUtils.bytes2mvs(bp2Rt.rtWave.waveform)
-                DataController.receive(mvs)
                 mainViewModel._battery.value = "${bp2Rt.rtState.battery.percent} %"
                 binding.dataStr.text = "dataType: " + bp2Rt.rtWave.waveDataType + " " + data2.toString() + "----rtState--" + bp2Rt.rtState.toString()
             }

@@ -275,29 +275,4 @@ object VentilatorBleResponse {
             """.trimIndent()
         }
     }
-
-    @ExperimentalUnsignedTypes
-    class EncryptInfo(val bytes: ByteArray) {
-        var type: Int       // 0：未加密，1：AES加密，2：MD5 加密
-        var len: Int        // 加密密钥长度
-        // reserved 2
-        var key: ByteArray  // 加密通讯密钥AES key
-        init {
-            var index = 0
-            type = byte2UInt(bytes[index])
-            index++
-            len = byte2UInt(bytes[index])
-            index++
-            index += 2
-            key = bytes.copyOfRange(index, index+len)
-        }
-        override fun toString(): String {
-            return """
-                EncryptInfo : 
-                type : $type
-                len : $len
-                key : ${bytesToHex(key)}
-            """.trimIndent()
-        }
-    }
 }

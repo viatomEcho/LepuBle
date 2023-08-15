@@ -7,14 +7,12 @@ import com.lepu.blepro.base.BleInterface
 import com.lepu.blepro.ble.cmd.LeBp2wBleCmd
 import com.lepu.blepro.ble.cmd.LeBp2wBleCmd.*
 import com.lepu.blepro.ble.cmd.LepuBleResponse
+import com.lepu.blepro.ble.cmd.LpBleCmd
 import com.lepu.blepro.ble.data.*
 import com.lepu.blepro.event.InterfaceEvent
+import com.lepu.blepro.utils.*
 import com.lepu.blepro.utils.ByteUtils.byte2UInt
 import com.lepu.blepro.utils.CrcUtil.calCRC8
-import com.lepu.blepro.utils.LepuBleLog
-import com.lepu.blepro.utils.add
-import com.lepu.blepro.utils.bytesToHex
-import com.lepu.blepro.utils.toUInt
 import kotlin.experimental.inv
 
 /**
@@ -112,40 +110,76 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
         LepuBleLog.d(tag, "onResponseReceived cmd: ${bleResponse.cmd}, bytes: ${bytesToHex(bleResponse.bytes)}")
 
         when (bleResponse.cmd) {
-            GET_INFO -> {
-                if (bleResponse.len <= 0 || bleResponse.content.size < 38) {
-                    LepuBleLog.d(tag, "GET_INFO bleResponse.len <= 0")
+            LpBleCmd.ENCRYPT -> {
+                val decrypt = EncryptUtil.LepuDecrypt(bleResponse.content, lepuEncryptKey)
+                if (decrypt.size < 4) {
+                    LepuBleLog.d(tag, "model:$model,ENCRYPT => decrypt.size < 4, decrypt: ${bytesToHex(decrypt)}")
                     return
                 }
-                LepuBleLog.d(tag, "model:$model,GET_INFO => success")
-                val info = LepuDevice(bleResponse.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wInfo).post(InterfaceEvent(model, info))
+                LepuBleLog.d(tag, "model:$model,ENCRYPT => success, decrypt: ${bytesToHex(decrypt)}")
+                val data = LepuBleResponse.EncryptInfo(decrypt)
+                aesEncryptKey = data.key
+                isEncryptMode = true
+                LepuBleLog.d(tag, "model:$model,ENCRYPT => success, data: $data")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wEncrypt).post(InterfaceEvent(model, data))
+            }
+            LpBleCmd.GET_INFO -> {
+                val data = if (isEncryptMode) {
+                    val decrypt = EncryptUtil.AesDecrypt(bleResponse.content, aesEncryptKey)
+                    if (decrypt.size < 38) {
+                        LepuBleLog.d(tag, "model:$model,GET_INFO => decrypt.size < 38, decrypt: ${bytesToHex(decrypt)}")
+                        return
+                    }
+                    LepuBleLog.d(tag, "model:$model,GET_INFO => success, decrypt: ${bytesToHex(decrypt)}")
+                    LepuDevice(decrypt)
+                } else {
+                    if (bleResponse.len < 38) {
+                        LepuBleLog.d(tag, "model:$model,GET_INFO => response.len < 38")
+                        return
+                    }
+                    LepuDevice(bleResponse.content)
+                }
+                LepuBleLog.d(tag, "model:$model,GET_INFO => success, data: $data")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wInfo).post(InterfaceEvent(model, data))
             }
 
-            SET_UTC_TIME -> {
+            LpBleCmd.SET_UTC_TIME -> {
+                if (isEncryptMode) {
+                    LepuBleLog.d(tag, "model:$model,SET_UTC_TIME => success, data : ${bytesToHex(EncryptUtil.AesDecrypt(bleResponse.content, aesEncryptKey))}")
+                }
                 //同步时间
                 LepuBleLog.d(tag, "model:$model,SET_UTC_TIME => success")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wSyncUtcTime).post(InterfaceEvent(model, true))
             }
 
             RT_STATE -> {
-                if (bleResponse.len <= 0 || bleResponse.content.size < 7) {
-                    LepuBleLog.d(tag, "RT_STATE bleResponse.len <= 0")
-                    return
+                val data = if (isEncryptMode) {
+                    val decrypt = EncryptUtil.AesDecrypt(bleResponse.content, aesEncryptKey)
+                    if (decrypt.size < 7) {
+                        LepuBleLog.d(tag, "model:$model,RT_STATE => decrypt.size < 7, decrypt: ${bytesToHex(decrypt)}")
+                        return
+                    }
+                    LepuBleLog.d(tag, "model:$model,RT_STATE => success, decrypt: ${bytesToHex(decrypt)}")
+                    Bp2BleRtState(decrypt)
+                } else {
+                    if (bleResponse.content.size < 7) {
+                        LepuBleLog.d(tag, "model:$model,RT_STATE => response.content.size < 7")
+                        return
+                    }
+                    Bp2BleRtState(bleResponse.content)
                 }
                 // 主机状态
-                LepuBleLog.d(tag, "model:$model,RT_STATE => success")
-                val data = Bp2BleRtState(bleResponse.content)
+                LepuBleLog.d(tag, "model:$model,RT_STATE => success, data : $data")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wRtState).post(InterfaceEvent(model, data))
             }
 
             //----------------------------读文件--------------------------
-            READ_FILE_START -> {
+            LpBleCmd.READ_FILE_START -> {
                 LepuBleLog.d(tag, "model:$model,READ_FILE_START => success")
 
                 //检查当前的下载状态
                 if (isCancelRF || isPausedRF) {
-                    sendCmd(readFileEnd())
+                    sendCmd(LpBleCmd.readFileEnd(aesEncryptKey))
                     LepuBleLog.d(tag, "READ_FILE_START isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
                     return
                 }
@@ -159,44 +193,56 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
 
                 curSize = 0
                 fileContent = null
-                fileSize = toUInt(bleResponse.content.copyOfRange(0, 4))
-                LepuBleLog.d(tag, "download file $fileName CMD_FILE_READ_START fileSize == $fileSize")
-                if (fileSize <= 0) {
-                    sendCmd(readFileEnd())
+                fileSize = if (isEncryptMode) {
+                    val decrypt = EncryptUtil.AesDecrypt(bleResponse.content, aesEncryptKey)
+                    toUInt(decrypt)
                 } else {
-                    sendCmd(readFileData(0))
+                    toUInt(bleResponse.content)
+                }
+                LepuBleLog.d(tag, "download file $fileName READ_FILE_START fileSize == $fileSize")
+                if (fileSize <= 0) {
+                    sendCmd(LpBleCmd.readFileEnd(aesEncryptKey))
+                } else {
+                    sendCmd(LpBleCmd.readFileData(0, aesEncryptKey))
                 }
             }
-            READ_FILE_DATA -> {
-                LepuBleLog.d(tag, "model:$model,READ_FILE_CONTENT => success")
+            LpBleCmd.READ_FILE_DATA -> {
+                LepuBleLog.d(tag, "model:$model,READ_FILE_DATA => success")
 
                 //检查当前的下载状态
                 if (isCancelRF || isPausedRF) {
-                    sendCmd(readFileEnd())
+                    sendCmd(LpBleCmd.readFileEnd(aesEncryptKey))
                     LepuBleLog.d(tag, "READ_FILE_DATA isCancelRF:$isCancelRF, isPausedRF:$isPausedRF")
                     return
                 }
 
                 //检查返回是否异常
                 if (bleResponse.pkgType != 0x01) {
-                    LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, READ_FILE_CONTENT => error")
+                    LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, READ_FILE_DATA => error")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadFileError).post(InterfaceEvent(model, fileName))
                     return
                 }
+                val part = if (isEncryptMode) {
+                    val decrypt = EncryptUtil.AesDecrypt(bleResponse.content, aesEncryptKey)
+                    curSize += decrypt.size
+                    fileContent = add(fileContent, decrypt)
+                    Bp2FilePart(fileName, fileSize, curSize)
+                } else {
+                    curSize += bleResponse.len
+                    fileContent = add(fileContent, bleResponse.content)
+                    Bp2FilePart(fileName, fileSize, curSize)
+                }
 
-                curSize += bleResponse.len
-                val part = Bp2FilePart(fileName, fileSize, curSize)
-                fileContent = add(fileContent, bleResponse.content)
-                LepuBleLog.d(tag, "download file $fileName READ_FILE_CONTENT curSize == $curSize | fileSize == $fileSize")
+                LepuBleLog.d(tag, "download file $fileName READ_FILE_DATA curSize == $curSize | fileSize == $fileSize")
 
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReadingFileProgress).post(InterfaceEvent(model, part))
                 if (curSize < fileSize) {
-                    sendCmd(readFileData(curSize))
+                    sendCmd(LpBleCmd.readFileData(curSize, aesEncryptKey))
                 } else {
-                    sendCmd(readFileEnd())
+                    sendCmd(LpBleCmd.readFileEnd(aesEncryptKey))
                 }
             }
-            READ_FILE_END -> {
+            LpBleCmd.READ_FILE_END -> {
                 if (isCancelRF || isPausedRF){
                     LepuBleLog.d(tag, "已经取消/暂停下载 isCancelRF = $isCancelRF, isPausedRF = $isPausedRF" )
                     return
@@ -244,7 +290,7 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             //--------------------------写文件--------------------------
-            WRITE_FILE_START -> {
+            LpBleCmd.WRITE_FILE_START -> {
                 //检查返回是否异常
                 if (bleResponse.pkgType != 0x01) {
                     LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, WRITE_FILE_START => error")
@@ -253,18 +299,18 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                 }
                 LepuBleLog.d(tag, "model:$model,WRITE_FILE_START => success")
                 if (fileSize <= 0) {
-                    sendCmd(writeFileEnd())
+                    sendCmd(LpBleCmd.writeFileEnd(aesEncryptKey))
                 } else {
                     curSize = if (fileSize < chunkSize) {
-                        sendCmd(writeFileData(userList?.getDataBytes()?.copyOfRange(0, fileSize)))
+                        sendCmd(LpBleCmd.writeFileData(userList?.getDataBytes()?.copyOfRange(0, fileSize), aesEncryptKey))
                         fileSize
                     } else {
-                        sendCmd(writeFileData(userList?.getDataBytes()?.copyOfRange(0, chunkSize)))
+                        sendCmd(LpBleCmd.writeFileData(userList?.getDataBytes()?.copyOfRange(0, chunkSize), aesEncryptKey))
                         chunkSize
                     }
                 }
             }
-            WRITE_FILE_DATA -> {
+            LpBleCmd.WRITE_FILE_DATA -> {
                 //检查返回是否异常
                 if (bleResponse.pkgType != 0x01) {
                     LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, WRITE_FILE_DATA => error")
@@ -275,15 +321,15 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                 if (curSize < fileSize) {
 
                     if (fileSize - curSize < chunkSize) {
-                        sendCmd(writeFileData(userList?.getDataBytes()?.copyOfRange(curSize, fileSize)))
+                        sendCmd(LpBleCmd.writeFileData(userList?.getDataBytes()?.copyOfRange(curSize, fileSize), aesEncryptKey))
                         curSize = fileSize
                     } else {
-                        sendCmd(writeFileData(userList?.getDataBytes()?.copyOfRange(curSize, curSize + chunkSize)))
+                        sendCmd(LpBleCmd.writeFileData(userList?.getDataBytes()?.copyOfRange(curSize, curSize + chunkSize), aesEncryptKey))
                         curSize += chunkSize
                     }
 
                 } else {
-                    sendCmd(writeFileEnd())
+                    sendCmd(LpBleCmd.writeFileEnd(aesEncryptKey))
                 }
 
                 val part = Bp2FilePart(fileName, fileSize, curSize)
@@ -292,7 +338,7 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2WritingFileProgress).post(InterfaceEvent(model, part))
 
             }
-            WRITE_FILE_END -> {
+            LpBleCmd.WRITE_FILE_END -> {
                 //检查返回是否异常
                 if (bleResponse.pkgType != 0x01) {
                     LepuBleLog.d(tag, "model:$model, fileName = ${fileName}, WRITE_FILE_END => error")
@@ -300,21 +346,35 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                     return
                 }
                 LepuBleLog.d(tag, "model:$model,WRITE_FILE_END => success")
-                val crc = FileListCrc(FileType.USER_TYPE, bleResponse.content)
+                val crc = if (isEncryptMode) {
+                    val decrypt = EncryptUtil.AesDecrypt(bleResponse.content, aesEncryptKey)
+                    FileListCrc(FileType.USER_TYPE, decrypt)
+                } else {
+                    FileListCrc(FileType.USER_TYPE, bleResponse.content)
+                }
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2WriteFileComplete).post(InterfaceEvent(model, crc))
                 curSize = 0
             }
 
             //实时波形
             RT_DATA -> {
-                if (bleResponse.len <= 0 || bleResponse.content.size < 32) {
-                    LepuBleLog.d(tag, "RT_DATA bleResponse.len <= 0")
-                    return
+                val data = if (isEncryptMode) {
+                    val decrypt = EncryptUtil.AesDecrypt(bleResponse.content, aesEncryptKey)
+                    if (decrypt.size < 32) {
+                        LepuBleLog.d(tag, "model:$model,RT_DATA => decrypt.size < 32, decrypt: ${bytesToHex(decrypt)}")
+                        return
+                    }
+                    LepuBleLog.d(tag, "model:$model,RT_DATA => success, decrypt: ${bytesToHex(decrypt)}")
+                    Bp2BleRtData(decrypt)
+                } else {
+                    if (bleResponse.content.size < 32) {
+                        LepuBleLog.d(tag, "model:$model,RT_DATA => response.content.size < 32")
+                        return
+                    }
+                    Bp2BleRtData(bleResponse.content)
                 }
-
-                val rtData = Bp2BleRtData(bleResponse.content)
-                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wRtData).post(InterfaceEvent(model, rtData))
-                LepuBleLog.d(tag, "model:$model,RT_DATA => success, rtData.rtWave : ${rtData.rtWave}, rtData.rtState : ${rtData.rtState}")
+                LepuBleLog.d(tag, "model:$model,RT_DATA => success, data.rtWave : ${data.rtWave}, data.rtState : ${data.rtState}")
+                LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wRtData).post(InterfaceEvent(model, data))
             }
 
             SET_CONFIG -> {
@@ -330,16 +390,26 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             GET_CONFIG -> {
-                if (bleResponse.len <= 0 || bleResponse.content.size < 27) {
-                    LepuBleLog.d(tag, "GET_CONFIG bleResponse.len <= 0")
-                    return
+                val data = if (isEncryptMode) {
+                    val decrypt = EncryptUtil.AesDecrypt(bleResponse.content, aesEncryptKey)
+                    if (decrypt.size < 27) {
+                        LepuBleLog.d(tag, "model:$model,GET_CONFIG => decrypt.size < 27, decrypt: ${bytesToHex(decrypt)}")
+                        return
+                    }
+                    LepuBleLog.d(tag, "model:$model,GET_CONFIG => success, decrypt: ${bytesToHex(decrypt)}")
+                    Bp2Config(decrypt)
+                } else {
+                    if (bleResponse.content.size < 27) {
+                        LepuBleLog.d(tag, "model:$model,GET_CONFIG => response.len < 27")
+                        return
+                    }
+                    Bp2Config(bleResponse.content)
                 }
-                LepuBleLog.d(tag, "model:$model,GET_CONFIG => success")
-                val data = Bp2Config(bleResponse.content)
+                LepuBleLog.d(tag, "model:$model,GET_CONFIG => success, data : $data")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetConfig).post(InterfaceEvent(model, data))
             }
 
-            RESET -> {
+            LpBleCmd.RESET -> {
                 if (bleResponse.pkgType != 0x01) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReset).post(InterfaceEvent(model, false))
                     LepuBleLog.d(tag, "model:$model,RESET => error")
@@ -350,7 +420,7 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wReset).post(InterfaceEvent(model, true))
             }
 
-            FACTORY_RESET -> {
+            LpBleCmd.FACTORY_RESET -> {
                 if (bleResponse.pkgType != 0x01) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFactoryReset).post(InterfaceEvent(model, false))
                     LepuBleLog.d(tag, "model:$model,FACTORY_RESET => error")
@@ -361,7 +431,7 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFactoryReset).post(InterfaceEvent(model, true))
             }
 
-            FACTORY_RESET_ALL -> {
+            LpBleCmd.FACTORY_RESET_ALL -> {
                 if (bleResponse.pkgType != 0x01) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wFactoryResetAll).post(InterfaceEvent(model, false))
                     LepuBleLog.d(tag, "model:$model,FACTORY_RESET_ALL => error")
@@ -390,27 +460,50 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                 if (bleResponse.pkgType == 0xFF) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2WifiScanning).post(InterfaceEvent(model, true))
                 } else {
-                    val data = Bp2WifiDevice(bleResponse.content)
-                    LepuBleLog.d(tag, "model:$model, data.toString == $data")
+                    val data = if (isEncryptMode) {
+                        val decrypt = EncryptUtil.AesDecrypt(bleResponse.content, aesEncryptKey)
+                        if (decrypt.isEmpty()) {
+                            LepuBleLog.d(tag, "model:$model,GET_WIFI_ROUTE => decrypt.isEmpty(), decrypt: ${bytesToHex(decrypt)}")
+                            return
+                        }
+                        LepuBleLog.d(tag, "model:$model,GET_WIFI_ROUTE => success, decrypt: ${bytesToHex(decrypt)}")
+                        Bp2WifiDevice(decrypt)
+                    } else {
+                        if (bleResponse.content.isEmpty()) {
+                            LepuBleLog.d(tag, "model:$model,GET_WIFI_ROUTE => response.content.isEmpty()")
+                            return
+                        }
+                        Bp2WifiDevice(bleResponse.content)
+                    }
+                    LepuBleLog.d(tag, "model:$model, GET_WIFI_ROUTE => success, data :  $data")
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2WifiDevice).post(InterfaceEvent(model, data))
                 }
             }
-
-            GET_FILE_LIST -> {
+            // 国内bp2WiFi不适用
+            LpBleCmd.GET_FILE_LIST -> {
                 val data = LeBp2wBleList(bleResponse.content)
-                LepuBleLog.d(tag, "model:$model, GET_FILE_LIST $data")
+                LepuBleLog.d(tag, "model:$model, GET_FILE_LIST => success, data : $data")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wList).post(InterfaceEvent(model, data))
             }
 
             GET_WIFI_CONFIG -> {
-                if (bleResponse.len <= 0) {
-                    LepuBleLog.d(tag, "GET_WIFI_CONFIG bleResponse.len <= 0")
-                    return
+                val data = if (isEncryptMode) {
+                    val decrypt = EncryptUtil.AesDecrypt(bleResponse.content, aesEncryptKey)
+                    if (decrypt.isEmpty()) {
+                        LepuBleLog.d(tag, "model:$model,GET_WIFI_CONFIG => decrypt.isEmpty(), decrypt: ${bytesToHex(decrypt)}")
+                        return
+                    }
+                    LepuBleLog.d(tag, "model:$model,GET_WIFI_CONFIG => success, decrypt: ${bytesToHex(decrypt)}")
+                    Bp2WifiConfig(decrypt)
+                } else {
+                    if (bleResponse.content.isEmpty()) {
+                        LepuBleLog.d(tag, "model:$model,GET_WIFI_CONFIG => response.content.isEmpty()")
+                        return
+                    }
+                    Bp2WifiConfig(bleResponse.content)
                 }
-                LepuBleLog.d(tag, "model:$model,GET_WIFI_CONFIG => success")
+                LepuBleLog.d(tag, "model:$model,GET_WIFI_CONFIG => success, data : $data")
                 LepuBleLog.d(tag, "model:$model,bytesToHex == " + bytesToHex(bleResponse.content))
-                var data = Bp2WifiConfig(bleResponse.content)
-                LepuBleLog.d(tag, "model:$model, data.toString == $data")
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetWifiConfig).post(InterfaceEvent(model, data))
             }
 
@@ -425,33 +518,60 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
             }
 
             GET_ECG_LIST_CRC -> {
-                if (bleResponse.len <= 0) {
-                    LepuBleLog.d(tag, "GET_ECG_LIST_CRC bleResponse.len <= 0")
-                    return
+                val crc = if (isEncryptMode) {
+                    val decrypt = EncryptUtil.AesDecrypt(bleResponse.content, aesEncryptKey)
+                    if (decrypt.isEmpty()) {
+                        LepuBleLog.d(tag, "GET_ECG_LIST_CRC decrypt.isEmpty()")
+                        return
+                    }
+                    FileListCrc(FileType.ECG_TYPE, decrypt)
+                } else {
+                    if (bleResponse.content.isEmpty()) {
+                        LepuBleLog.d(tag, "GET_ECG_LIST_CRC bleResponse.content.isEmpty()")
+                        return
+                    }
+                    FileListCrc(FileType.ECG_TYPE, bleResponse.content)
                 }
-                val crc = FileListCrc(FileType.ECG_TYPE, bleResponse.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetFileListCrc).post(InterfaceEvent(model, crc))
                 LepuBleLog.d(tag, "model:$model,GET_ECG_LIST_CRC => success")
             }
             GET_BP_LIST_CRC -> {
-                if (bleResponse.len <= 0) {
-                    LepuBleLog.d(tag, "GET_BP_LIST_CRC bleResponse.len <= 0")
-                    return
+                val crc = if (isEncryptMode) {
+                    val decrypt = EncryptUtil.AesDecrypt(bleResponse.content, aesEncryptKey)
+                    if (decrypt.isEmpty()) {
+                        LepuBleLog.d(tag, "GET_BP_LIST_CRC decrypt.isEmpty()")
+                        return
+                    }
+                    FileListCrc(FileType.BP_TYPE, decrypt)
+                } else {
+                    if (bleResponse.content.isEmpty()) {
+                        LepuBleLog.d(tag, "GET_BP_LIST_CRC bleResponse.content.isEmpty()")
+                        return
+                    }
+                    FileListCrc(FileType.BP_TYPE, bleResponse.content)
                 }
-                val crc = FileListCrc(FileType.BP_TYPE, bleResponse.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetFileListCrc).post(InterfaceEvent(model, crc))
                 LepuBleLog.d(tag, "model:$model,GET_BP_LIST_CRC => success")
             }
             GET_USER_LIST_CRC -> {
-                if (bleResponse.len <= 0) {
-                    LepuBleLog.d(tag, "GET_USER_LIST_CRC bleResponse.len <= 0")
-                    return
+                val crc = if (isEncryptMode) {
+                    val decrypt = EncryptUtil.AesDecrypt(bleResponse.content, aesEncryptKey)
+                    if (decrypt.isEmpty()) {
+                        LepuBleLog.d(tag, "GET_USER_LIST_CRC decrypt.isEmpty()")
+                        return
+                    }
+                    FileListCrc(FileType.USER_TYPE, decrypt)
+                } else {
+                    if (bleResponse.content.isEmpty()) {
+                        LepuBleLog.d(tag, "GET_USER_LIST_CRC bleResponse.content.isEmpty()")
+                        return
+                    }
+                    FileListCrc(FileType.USER_TYPE, bleResponse.content)
                 }
-                val crc = FileListCrc(FileType.USER_TYPE, bleResponse.content)
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetFileListCrc).post(InterfaceEvent(model, crc))
                 LepuBleLog.d(tag, "model:$model,GET_USER_LIST_CRC => success")
             }
-            DELETE_FILE -> {
+            LpBleCmd.DELETE_FILE -> {
                 if (bleResponse.pkgType != 0x01) {
                     LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wDeleteFile).post(InterfaceEvent(model, false))
                     LepuBleLog.d(tag, "model:$model,DELETE_FILE => error")
@@ -461,60 +581,78 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                 LepuBleLog.d(tag, "model:$model,DELETE_FILE => success")
             }
             GET_WIFI_VERSION -> {
-                if (bleResponse.len <= 3) {
-                    LepuBleLog.d(tag, "GET_WIFI_VERSION bleResponse.len <= 3")
-                    return
+                val data = if (isEncryptMode) {
+                    val decrypt = EncryptUtil.AesDecrypt(bleResponse.content, aesEncryptKey)
+                    if (decrypt.size < 3) {
+                        LepuBleLog.d(tag, "model:$model,GET_WIFI_VERSION => decrypt.size < 3, decrypt: ${bytesToHex(decrypt)}")
+                        return
+                    }
+                    LepuBleLog.d(tag, "model:$model,GET_WIFI_VERSION => success, decrypt: ${bytesToHex(decrypt)}")
+                    "${byte2UInt(decrypt[3])}.${byte2UInt(decrypt[2])}.${byte2UInt(decrypt[1])}.${byte2UInt(decrypt[0])}"
+                } else {
+                    if (bleResponse.content.size < 3) {
+                        LepuBleLog.d(tag, "model:$model,GET_WIFI_VERSION => response.len < 3")
+                        return
+                    }
+                    "${byte2UInt(bleResponse.content[3])}.${byte2UInt(bleResponse.content[2])}.${byte2UInt(bleResponse.content[1])}.${byte2UInt(bleResponse.content[0])}"
                 }
-                val data = "${byte2UInt(bleResponse.content[3])}.${byte2UInt(bleResponse.content[2])}.${byte2UInt(bleResponse.content[1])}.${byte2UInt(bleResponse.content[0])}"
                 LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetWifiVersion).post(InterfaceEvent(model, data))
-                LepuBleLog.d(tag, "model:$model,GET_WIFI_VERSION => success")
+                LepuBleLog.d(tag, "model:$model,GET_WIFI_VERSION => success, data : $data")
             }
         }
     }
-
+    // 密钥交换
+    fun encrypt(id: String) {
+        val encrypt = EncryptUtil.LepuEncrypt(EncryptUtil.getAccessToken(id), lepuEncryptKey)
+        sendCmd(LpBleCmd.encrypt(encrypt, ByteArray(0)))
+        LepuBleLog.d(tag, "encrypt...lepuEncryptKey: ${bytesToHex(lepuEncryptKey)}")
+        LepuBleLog.d(tag, "encrypt...encrypt: ${bytesToHex(encrypt)}")
+        val decrypt = EncryptUtil.LepuDecrypt(encrypt, lepuEncryptKey)
+        LepuBleLog.d(tag, "encrypt...decrypt: ${bytesToHex(decrypt)}")
+    }
     override fun getInfo() {
-        sendCmd(LeBp2wBleCmd.getInfo())
-        sendCmd(LeBp2wBleCmd.getWifiVersion())
+        sendCmd(LpBleCmd.getInfo(aesEncryptKey))
+        sendCmd(getWifiVersion(aesEncryptKey))
         LepuBleLog.d(tag, "getInfo...")
     }
 
     override fun syncTime() {
-        sendCmd(setUtcTime())
+        sendCmd(LpBleCmd.setUtcTime(aesEncryptKey))
         LepuBleLog.d(tag, "syncTime...")
     }
 
     fun syncUtcTime() {
-        sendCmd(setUtcTime())
-        LepuBleLog.d(tag, "syncUtcTime..." + bytesToHex(setUtcTime()))
+        sendCmd(LpBleCmd.setUtcTime(aesEncryptKey))
+        LepuBleLog.d(tag, "syncUtcTime..." + bytesToHex(LpBleCmd.setUtcTime(aesEncryptKey)))
     }
 
     fun deleteFile() {
-        sendCmd(LeBp2wBleCmd.deleteFile())
+        sendCmd(LpBleCmd.deleteFile(aesEncryptKey))
         LepuBleLog.d(tag, "deleteFile...")
     }
 
     //实时波形命令
     override fun getRtData() {
-        sendCmd(LeBp2wBleCmd.getRtData())
+        sendCmd(LeBp2wBleCmd.getRtData(aesEncryptKey))
         LepuBleLog.d(tag, "getRtData...")
     }
 
     fun setConfig(config: Bp2Config){
-        sendCmd(setConfig(config.getDataBytes()))
+        sendCmd(setConfig(config.getDataBytes(), aesEncryptKey))
         LepuBleLog.d(tag, "setConfig...config:$config")
     }
      fun getConfig(){
-         sendCmd(LeBp2wBleCmd.getConfig())
+         sendCmd(LeBp2wBleCmd.getConfig(aesEncryptKey))
          LepuBleLog.d(tag, "getConfig...")
     }
 
     override fun getFileList() {
-        sendCmd(LeBp2wBleCmd.getFileList())
+        sendCmd(LpBleCmd.getFileList(aesEncryptKey))
         LepuBleLog.d(tag, "getFileList...")
     }
 
     fun getFileListCrc(fileType: Int) {
-        sendCmd(LeBp2wBleCmd.getFileListCrc(fileType))
+        sendCmd(LeBp2wBleCmd.getFileListCrc(fileType, aesEncryptKey))
         LepuBleLog.d(tag, "getFileListCrc...fileType:$fileType")
     }
 
@@ -531,13 +669,13 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
                 fileName = "user.list"
             }
         }
-        sendCmd(readFileStart(fileName.toByteArray(), 0))
+        sendCmd(LpBleCmd.readFileStart(fileName.toByteArray(), 0, aesEncryptKey))
         LepuBleLog.d(tag, "getFileList... fileName == $fileName, fileType:$fileType")
     }
 
     override fun dealReadFile(userId: String, fileName: String) {
         this.fileName = fileName
-        sendCmd(readFileStart(fileName.toByteArray(), 0))
+        sendCmd(LpBleCmd.readFileStart(fileName.toByteArray(), 0, aesEncryptKey))
         LepuBleLog.d(tag, "dealReadFile... fileName == $fileName, userId:$userId")
     }
 
@@ -545,20 +683,20 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
         this.userList = userList
         fileSize = userList.getDataBytes().size
         fileName = "user.list"
-        sendCmd(writeFileStart(fileName.toByteArray(), 0, fileSize))
+        sendCmd(LpBleCmd.writeFileStart(fileName.toByteArray(), 0, fileSize, aesEncryptKey))
         LepuBleLog.d(tag, "writeUserList... fileName == $fileName, fileSize == $fileSize")
     }
 
     override fun reset() {
-        sendCmd(LeBp2wBleCmd.reset())
+        sendCmd(LpBleCmd.reset(aesEncryptKey))
         LepuBleLog.d(tag, "reset...")
     }
     override fun factoryReset() {
-        sendCmd(LeBp2wBleCmd.factoryReset())
+        sendCmd(LpBleCmd.factoryReset(aesEncryptKey))
         LepuBleLog.d(tag, "factoryReset...")
     }
     override fun factoryResetAll() {
-        sendCmd(LeBp2wBleCmd.factoryResetAll())
+        sendCmd(LpBleCmd.factoryResetAll(aesEncryptKey))
         LepuBleLog.d(tag, "factoryResetAll...")
     }
 
@@ -571,7 +709,7 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
      * 5：进入理疗模式
      */
     fun switchState(state: Int){
-        sendCmd(LeBp2wBleCmd.switchState(state))
+        sendCmd(LeBp2wBleCmd.switchState(state, aesEncryptKey))
         LepuBleLog.e("enter  switchState： SWITCH_STATE===$state")
     }
 
@@ -579,7 +717,7 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
      * 获取wifi路由
      */
     fun getWifiDevice() {
-        sendCmd(getWifiRoute(0))
+        sendCmd(getWifiRoute(0, aesEncryptKey))
         LepuBleLog.d(tag, "getWifiDevice...")
     }
 
@@ -587,7 +725,7 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
      * 配置要连接的wifi
      */
     fun setWifiConfig(config: Bp2WifiConfig) {
-        sendCmd(setWifiConfig(config.getDataBytes()))
+        sendCmd(setWifiConfig(config.getDataBytes(), aesEncryptKey))
         LepuBleLog.d(tag, "setWifiConfig...config:$config")
     }
 
@@ -595,12 +733,12 @@ class LeBp2wBleInterface(model: Int): BleInterface(model) {
      * 获取当前配置的wifi
      */
     fun getWifiConfig() {
-        sendCmd(LeBp2wBleCmd.getWifiConfig())
+        sendCmd(LeBp2wBleCmd.getWifiConfig(aesEncryptKey))
         LepuBleLog.d(tag, "getWifiConfig...")
     }
 
     fun getRtState() {
-        sendCmd(LeBp2wBleCmd.getRtState())
+        sendCmd(LeBp2wBleCmd.getRtState(aesEncryptKey))
         LepuBleLog.d(tag, "getRtState...")
     }
 

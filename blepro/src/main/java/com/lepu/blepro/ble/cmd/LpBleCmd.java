@@ -234,7 +234,7 @@ public class LpBleCmd {
         return getReq(ENCRYPT, data, key);
     }
 
-    private static byte[] getReq(int sendCmd, byte[] data, byte[] key) {
+    public static byte[] getReq(int sendCmd, byte[] data, byte[] key) {
         int len;
         byte[] encryptData = new byte[0];
         Log.d("getReq", "sendCmd: "+ sendCmd +", data: "+bytesToHex(data));

@@ -3850,7 +3850,7 @@ class BleServiceHelper private constructor() {
     /**
      * 加密通讯
      */
-    fun ventilatorEncrypt(model: Int, id: String) {
+    fun encrypt(model: Int, id: String) {
         if (!checkService()) return
         when (model) {
             Bluetooth.MODEL_R20, Bluetooth.MODEL_R21,
@@ -3858,12 +3858,36 @@ class BleServiceHelper private constructor() {
             Bluetooth.MODEL_LERES -> {
                 getInterface(model)?.let { it1 ->
                     (it1 as VentilatorBleInterface).let {
-                        LepuBleLog.d(tag, "it as VentilatorBleInterface--ventilatorEncrypt")
+                        LepuBleLog.d(tag, "it as VentilatorBleInterface--encrypt")
                         it.encrypt(id)
                     }
                 }
             }
-            else -> LepuBleLog.d(tag, "ventilatorEncrypt current model $model unsupported!!")
+            Bluetooth.MODEL_BP2, Bluetooth.MODEL_BP2A, Bluetooth.MODEL_BP2T ->{
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2BleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2BleInterface--encrypt")
+                        it.encrypt(id)
+                    }
+                }
+            }
+            Bluetooth.MODEL_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as Bp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as Bp2wBleInterface--encrypt")
+                        it.encrypt(id)
+                    }
+                }
+            }
+            Bluetooth.MODEL_LE_BP2W -> {
+                getInterface(model)?.let { it1 ->
+                    (it1 as LeBp2wBleInterface).let {
+                        LepuBleLog.d(tag, "it as LeBp2wBleInterface--encrypt")
+                        it.encrypt(id)
+                    }
+                }
+            }
+            else -> LepuBleLog.d(tag, "encrypt current model $model unsupported!!")
         }
     }
     /**

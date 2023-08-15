@@ -39,7 +39,7 @@
     <string name="low">≥</string>
 
     <!-- 兼容英文版本 -->
-    <string name="app_version">软件版本：乐普设备测试软件 V0.0.4</string>
+    <string name="app_version">软件版本：乐普设备测试软件 V0.0.5</string>
     <string name="device_type">设备类型：</string>
     <string name="pair_connect">配对连接</string>
     <string name="bluetooth_device">蓝牙设备</string>

@@ -283,7 +283,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     || it == Bluetooth.MODEL_R10
                     || it == Bluetooth.MODEL_LERES) {
                     if (Constant.BluetoothConfig.isEncrypt) {
-                        LpBleUtil.ventilatorEncrypt(it, "0001")
+                        LpBleUtil.encrypt(it, "0001")
                     } else {
                         LpBleUtil.setTime(it)
                     }
@@ -317,7 +317,6 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     else -> Toast.makeText(this, "BP2 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 }
                 LpBleUtil.getInfo(it.model)
-                LpBleUtil.bp2GetRtState(it.model)
             }
         //bp2 info
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Info)
@@ -336,6 +335,11 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                         else -> Toast.makeText(this, "BP2 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     }
                     viewModel._bp2Info.value = it
+                    if (Constant.BluetoothConfig.isEncrypt) {
+                        LpBleUtil.encrypt(event.model, "0001")
+                    } else {
+                        LpBleUtil.bp2GetRtState(event.model)
+                    }
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2State)
@@ -344,25 +348,43 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
                     viewModel._battery.value = "${it.battery.percent} %"
                 }
             }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2.EventBp2Encrypt)
+            .observe(this) { event ->
+                (event.data as LepuBleResponse.EncryptInfo).let {
+                    LepuBleLog.d(TAG, "交换密钥信息： $it")
+                    LpBleUtil.bp2GetRtState(event.model)
+                }
+            }
         //-------------------------bp2w---------------------------
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wSyncTime)
             .observe(this) {
                 Toast.makeText(this, "BP2W ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
-                LpBleUtil.bp2GetRtState(it.model)
-                LpBleUtil.bp2GetWifiConfig(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wInfo)
             .observe(this) { event ->
                 (event.data as LepuDevice).let {
                     Toast.makeText(this, "BP2W ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._er1Info.value = it
+                    if (Constant.BluetoothConfig.isEncrypt) {
+                        LpBleUtil.encrypt(event.model, "0001")
+                    } else {
+                        LpBleUtil.bp2GetRtState(event.model)
+                    }
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wRtState)
             .observe(this) { event ->
                 (event.data as Bp2BleRtState).let {
                     viewModel._battery.value = "${it.battery.percent} %"
+                    LpBleUtil.bp2GetWifiConfig(event.model)
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.BP2W.EventBp2wEncrypt)
+            .observe(this) { event ->
+                (event.data as LepuBleResponse.EncryptInfo).let {
+                    LepuBleLog.d(TAG, "交换密钥信息： $it")
+                    LpBleUtil.bp2GetRtState(event.model)
                 }
             }
         //-------------------------LeBp2w---------------------------
@@ -370,14 +392,17 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             .observe(this) {
                 Toast.makeText(this, "LP-BP2W ${getString(R.string.sync_utc_time)}", Toast.LENGTH_SHORT).show()
                 LpBleUtil.getInfo(it.model)
-                LpBleUtil.bp2GetRtState(it.model)
-                LpBleUtil.bp2GetWifiConfig(it.model)
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wInfo)
             .observe(this) { event ->
                 (event.data as LepuDevice).let {
                     Toast.makeText(this, "LP-BP2W ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                     viewModel._er1Info.value = it
+                    if (Constant.BluetoothConfig.isEncrypt) {
+                        LpBleUtil.encrypt(event.model, "0001")
+                    } else {
+                        LpBleUtil.bp2GetRtState(event.model)
+                    }
                 }
             }
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wGetWifiVersion)
@@ -388,6 +413,14 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             .observe(this) { event ->
                 (event.data as Bp2BleRtState).let {
                     viewModel._battery.value = "${it.battery.percent} %"
+                    LpBleUtil.bp2GetWifiConfig(event.model)
+                }
+            }
+        LiveEventBus.get<InterfaceEvent>(InterfaceEvent.LeBP2W.EventLeBp2wEncrypt)
+            .observe(this) { event ->
+                (event.data as LepuBleResponse.EncryptInfo).let {
+                    LepuBleLog.d(TAG, "交换密钥信息： $it")
+                    LpBleUtil.bp2GetRtState(event.model)
                 }
             }
         //-------------------------bpm---------------------------

@@ -1334,13 +1334,18 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             }
             fileNames[0]
         }
-        val offset = DownloadHelper.readFile(Constant.BluetoothConfig.currentModel[0], "", curFileName)
-        if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING_S) {
-            LpBleUtil.readFile( "", curFileName, Constant.BluetoothConfig.currentModel[0], offset.size, fileType)
+        if (curFileName.contains("MKFS")) {
+            fileNames.removeAt(0)
+            readFile()
         } else {
-            LpBleUtil.readFile("", curFileName, Constant.BluetoothConfig.currentModel[0], offset.size)
+            val offset = DownloadHelper.readFile(Constant.BluetoothConfig.currentModel[0], "", curFileName)
+            if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_O2RING_S) {
+                LpBleUtil.readFile( "", curFileName, Constant.BluetoothConfig.currentModel[0], offset.size, fileType)
+            } else {
+                LpBleUtil.readFile("", curFileName, Constant.BluetoothConfig.currentModel[0], offset.size)
+            }
+            binding.sendCmd.text = LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
         }
-        binding.sendCmd.text = LpBleUtil.getSendCmd(Constant.BluetoothConfig.currentModel[0])
     }
 
 }
