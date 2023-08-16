@@ -180,7 +180,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
         LiveEventBus.get<InterfaceEvent>(InterfaceEvent.ER1.EventEr1SetTime)
             .observe(this) {
                 when (it.model) {
-                    Bluetooth.MODEL_ER1 -> {
+                    Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1S -> {
                         Toast.makeText(this, "ER1 ${getString(R.string.sync_time)}", Toast.LENGTH_SHORT).show()
                     }
                     Bluetooth.MODEL_ER1_N -> {
@@ -206,7 +206,7 @@ class MainActivity : AppCompatActivity() , BleChangeObserver {
             .observe(this) { event ->
                 (event.data as LepuDevice).let {
                     when (event.model) {
-                        Bluetooth.MODEL_ER1 -> {
+                        Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1S -> {
                             Toast.makeText(this, "ER1 ${getString(R.string.get_info_success)}", Toast.LENGTH_SHORT).show()
                         }
                         Bluetooth.MODEL_ER1_N -> {

@@ -96,6 +96,7 @@ class LpBleUtil {
 
             val RAW_FOLDERS = SparseArray<String>()
             RAW_FOLDERS.put(Bluetooth.MODEL_ER1, PathUtils.getExternalAppFilesPath() + "/er1/")
+            RAW_FOLDERS.put(Bluetooth.MODEL_ER1S, PathUtils.getExternalAppFilesPath() + "/er1s/")
             RAW_FOLDERS.put(Bluetooth.MODEL_HHM1, PathUtils.getExternalAppFilesPath() + "/hhm1/")
             RAW_FOLDERS.put(Bluetooth.MODEL_HHM2, PathUtils.getExternalAppFilesPath() + "/hhm2/")
             RAW_FOLDERS.put(Bluetooth.MODEL_HHM3, PathUtils.getExternalAppFilesPath() + "/hhm3/")

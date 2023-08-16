@@ -289,11 +289,12 @@ class HomeFragment : Fragment(R.layout.fragment_home){
         when (Constant.BluetoothConfig.splitType) {
             0 -> return true
             1 -> return (model == Bluetooth.MODEL_BP2
-                        || model == Bluetooth.MODEL_BP2A
-                        || model == Bluetooth.MODEL_BP2T
-                        || model == Bluetooth.MODEL_BP2W
-                        || model == Bluetooth.MODEL_LE_BP2W)
-            2 -> return model == Bluetooth.MODEL_ER1
+                    || model == Bluetooth.MODEL_BP2A
+                    || model == Bluetooth.MODEL_BP2T
+                    || model == Bluetooth.MODEL_BP2W
+                    || model == Bluetooth.MODEL_LE_BP2W)
+            2 -> return (model == Bluetooth.MODEL_ER1
+                    || model == Bluetooth.MODEL_ER1S)
             3 -> return model == Bluetooth.MODEL_ER1_N
             4 -> return model == Bluetooth.MODEL_HHM1
             5 -> return model == Bluetooth.MODEL_DUOEK

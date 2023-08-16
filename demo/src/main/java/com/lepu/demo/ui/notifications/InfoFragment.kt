@@ -195,6 +195,7 @@ class InfoFragment : Fragment(R.layout.fragment_info){
             .create()
 
         if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1
+            || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1S
             || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1_N
             || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM1
             || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_PF_10AW_1
@@ -677,7 +678,8 @@ class InfoFragment : Fragment(R.layout.fragment_info){
                 }
             }
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1,
-            Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
+            Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
+            Bluetooth.MODEL_ER1S -> {
                 infoViewModel = ViewModelProvider(this).get(Er1ViewModel::class.java)
                 (infoViewModel as Er1ViewModel).initEvent(this)
                 mainViewModel.er1Info.observe(viewLifecycleOwner) {

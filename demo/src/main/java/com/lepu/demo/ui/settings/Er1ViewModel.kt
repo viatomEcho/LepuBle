@@ -101,7 +101,7 @@ class Er1ViewModel : SettingViewModel() {
             .observe(owner) {
                 LpBleUtil.getEr1VibrateConfig(it.model)
                 when (it.model) {
-                    Bluetooth.MODEL_ER1 -> {
+                    Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1S -> {
                         _toast.value = "ER1 设置参数成功"
                     }
                     Bluetooth.MODEL_ER1_N -> {
@@ -151,7 +151,7 @@ class Er1ViewModel : SettingViewModel() {
                     binding.er1Layout.er1Hr2.setText("${config.hr2}")
                     binding.content.text = "switcher : " + config.hrSwitch + " hr1 : " + config.hr1 + " hr2 : " + config.hr2
                     when (it.model) {
-                        Bluetooth.MODEL_ER1 -> {
+                        Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1S -> {
                             _toast.value = "ER1 获取参数成功"
                         }
                         Bluetooth.MODEL_ER1_N -> {

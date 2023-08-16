@@ -146,6 +146,7 @@ public class WaveEcgView extends View {
         SECONDS_PER_LINE = ScreenW / (1 / mGrid1mmLength) / mSpeed;
 
         if (model == Bluetooth.MODEL_ER1
+                || model == Bluetooth.MODEL_ER1S
                 || model == Bluetooth.MODEL_ER1_N
                 || model == Bluetooth.MODEL_HHM1
                 || model == Bluetooth.MODEL_DUOEK

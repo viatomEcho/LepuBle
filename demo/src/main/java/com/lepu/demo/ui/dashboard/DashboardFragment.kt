@@ -241,7 +241,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
         when(model) {
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK,
             Bluetooth.MODEL_ER2, Bluetooth.MODEL_BP2,
-            Bluetooth.MODEL_BP2W,
+            Bluetooth.MODEL_BP2W, Bluetooth.MODEL_ER1S,
             Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_LE_BP2W,
             Bluetooth.MODEL_PC80B, Bluetooth.MODEL_LES1,
             Bluetooth.MODEL_W12C, Bluetooth.MODEL_HHM1,
@@ -321,7 +321,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
             Bluetooth.MODEL_HHM1, Bluetooth.MODEL_DUOEK,
             Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
             Bluetooth.MODEL_ER2, Bluetooth.MODEL_LP_ER2,
-            Bluetooth.MODEL_LES1 -> {
+            Bluetooth.MODEL_LES1, Bluetooth.MODEL_ER1S -> {
 //                binding.wirelessDataLayout.root.visibility = View.VISIBLE
                 binding.ecgLayout.visibility = View.VISIBLE
                 binding.er3Layout.visibility = View.GONE
@@ -568,6 +568,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard){
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_GM_300SNT
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_CMI_PC303
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1S
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_DUOEK
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1_N
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM1

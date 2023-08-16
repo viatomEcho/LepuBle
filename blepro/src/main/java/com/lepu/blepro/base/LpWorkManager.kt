@@ -161,7 +161,8 @@ object LpWorkManager {
                 }
             }
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
-            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3 -> {
+            Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
+            Bluetooth.MODEL_ER1S -> {
                 Er1BleInterface(m).apply {
                     this.runRtImmediately = runRtImmediately
 
@@ -536,7 +537,7 @@ object LpWorkManager {
             }
             Bluetooth.MODEL_ER1, Bluetooth.MODEL_DUOEK, Bluetooth.MODEL_ER1_N,
             Bluetooth.MODEL_HHM1, Bluetooth.MODEL_HHM2, Bluetooth.MODEL_HHM3,
-            Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV -> {
+            Bluetooth.MODEL_VETCORDER, Bluetooth.MODEL_CHECK_ADV, Bluetooth.MODEL_ER1S -> {
                 Er1BleManager(context).apply {
                     vailManager.put(m, this)
                     return this

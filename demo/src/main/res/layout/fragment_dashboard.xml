@@ -137,13 +137,13 @@
                                     app:layout_constraintEnd_toEndOf="parent" />
 
                                 <LinearLayout
+                                    android:visibility="gone"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent">
                                     <TextView
-                                        android:visibility="gone"
                                         android:id="@+id/start_rt_ecg"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
@@ -151,7 +151,7 @@
                                         app:layout_constraintStart_toStartOf="parent"
                                         android:textColor="@color/black"
                                         android:textSize="18sp"
-                                        android:text="开始测量"/>
+                                        android:text="@string/start_measure"/>
 
                                     <TextView
                                         android:id="@+id/stop_rt_ecg"
@@ -161,7 +161,7 @@
                                         app:layout_constraintStart_toStartOf="parent"
                                         android:textColor="@color/black"
                                         android:textSize="18sp"
-                                        android:text="停止测量"
+                                        android:text="@string/stop_measure"
                                         android:layout_marginStart="20dp"/>
 
                                 </LinearLayout>

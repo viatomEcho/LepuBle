@@ -107,7 +107,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private fun initView() {
         Constant.BluetoothConfig.currentModel[0].let {
             when (it) {
-                Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1 -> {
+                Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1_N, Bluetooth.MODEL_HHM1,
+                Bluetooth.MODEL_ER1S -> {
                     setViewVisible(binding.er1Layout.root)
                     LpBleUtil.getEr1VibrateConfig(it)
                 }
@@ -333,6 +334,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
         mainViewModel.er1Info.observe(viewLifecycleOwner) {
             if (Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1
+                || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1S
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_ER1_N
                 || Constant.BluetoothConfig.currentModel[0] == Bluetooth.MODEL_HHM1) {
                 binding.er1Layout.er1Version.setText("${it.hwV}")
@@ -1141,7 +1143,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             .observe(this) {
                 LpBleUtil.getEr1VibrateConfig(it.model)
                 when (it.model) {
-                    Bluetooth.MODEL_ER1 -> {
+                    Bluetooth.MODEL_ER1,Bluetooth.MODEL_ER1S -> {
                         Toast.makeText(context, "ER1 设置参数成功", Toast.LENGTH_SHORT).show()
                     }
                     Bluetooth.MODEL_ER1_N -> {
@@ -1197,7 +1199,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                             " waveSwitch : " + config.waveSwitch +
                             " hr1 : " + config.hr1 + " hr2 : " + config.hr2
                     when (it.model) {
-                        Bluetooth.MODEL_ER1 -> {
+                        Bluetooth.MODEL_ER1, Bluetooth.MODEL_ER1S -> {
                             Toast.makeText(context, "ER1 获取参数成功", Toast.LENGTH_SHORT).show()
                         }
                         Bluetooth.MODEL_ER1_N -> {
